@@ -61,11 +61,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/exchangeSetResponse"
-        "304":
-          description: Not modified.
-          headers:
-            schema:
-              $ref: "#/components/schemas/Last-Modified"
 
         "400":
           description: Bad request.
@@ -168,6 +163,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/exchangeSetResponse"
+
         "304":
           description: Not modified.
           headers:
@@ -189,6 +185,7 @@ paths:
 
         "429":
           $ref: "#/components/responses/tooManyRequests"
+
         "500":
           $ref: "#/components/responses/internalServerError"
 
@@ -476,13 +473,13 @@ components:
         time: "2021-02-17T14:04:04.4880776Z"
         subject: "Requested AVCS Exchange Set Created"
         datacontenttype: "application/json"
-        data: 
+        data:
           _links:
-            exchangeSetBatchStatusUri:            
-              href: ""
+            exchangeSetBatchStatusUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             exchangeSetFileUri:
-              href: ""
-          exchangeSetUrlExpiryDateTime: 
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+          exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
           exchangeSetCellCount: 25
 
     ####################################
