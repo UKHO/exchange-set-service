@@ -3,7 +3,7 @@ info:
   version: "0.1"
   title: Exchange Set Service API
   description: |
-    This API is for Exchange Set Service
+    This API is for the Exchange Set Service.
   contact:
     name: Martin Rock-Evans
     email: martin.rock-evans@ukho.gov.uk
@@ -20,24 +20,24 @@ security:
 paths:
   /productData/productIdentifiers:
     post:
-      summary: Give me all latest releasable baseline data for set of ENCs
+      summary: Provide all the latest releasable baseline data for a specified set of ENCs.
 
       operationId: postProductIdentifiers
 
       description: |
-        Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date.  This being the base edition and any updates or re-issues applied to it.   
+        Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.   
 
         ## Business Rules:
 
         Only ENCs that are releasable at the date of the request will be returned.
 
-        For cancellation updates, all the updates up to the cancellation need to be included.  Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
+        For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
 
-        If an ENC has a re-issue, then the latest batch on the FSS, which will be the re-issue, will be used by the ESS. 
+        If an ENC has a re-issue, then the latest batch on the FSS will be used by the ESS. 
 
-        If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload.  Only the specific ENCs requested will be returned.  The current systems (planning station/gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
+        If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
 
-        If the ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned.  If none of the requested ENCs exist, then the response will be a ‘Bad Request’.
+        If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e the user is not informed it does not exist). If none of the requested ENCs exist, then a 'Bad Request' response will be returned.
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
@@ -53,7 +53,7 @@ paths:
 
       responses:
         "200":
-          description: A JSON body that indicates the URL that the exchange set will be available on as well as the number of cells in that exchange set.
+          description: A JSON body that indicates the URL that the exchange set will be available on as well as the number of cells in that Exchange Set.
           headers:
             schema:
               $ref: "#/components/schemas/Last-Modified"
@@ -77,12 +77,13 @@ paths:
 
         "429":
           $ref: "#/components/responses/tooManyRequests"
+          
         "500":
           $ref: "#/components/responses/internalServerError"
 
   /productData/productVersions:
     post:
-      summary: Given a set of ENC versions (e.g. Edition x Update y) return any later releasable files
+      summary: Given a set of ENC versions (e.g. Edition x Update y) provide any later releasable files.
       description: |
         Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
 
@@ -90,9 +91,9 @@ paths:
 
         If there is no update to the version that is requested, then nothing will be returned for the ENC.
 
-        If none of the ENCs requested have an update, then a ‘Not modified’ response will be returned.  If none of the ENCs requested exist, then a ‘Bad request’ response will be returned. 
+        If none of the ENCs requested have an update, then a 'Not modified' response will be returned. If none of the ENCs requested exist, then a 'Bad Request' response will be returned.
 
-        The rules around cancellation, replacements, additional coverage and re-issues apply as defined in previous section.
+        The rules around cancellation, replacements, additional coverage and re-issues apply as defined in the previous section.
 
       operationId: postProductVersions
 
@@ -110,9 +111,9 @@ paths:
       responses:
         "200":
           description: |
-            A JSON body that indicates the URL that the exchange set will be available on as well as the number of cells in that exchange set.
+            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
 
-            If there are no updates for any of the productVersions, then the return will be a ‘200’ response with an empty exchange set (containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.
+            If there are no updates for any of the productVersions, then the return will be a '200' response with an empty Exchange Set (containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.
 
           content:
             application/json:
@@ -134,14 +135,15 @@ paths:
 
         "429":
           $ref: "#/components/responses/tooManyRequests"
+        
         "500":
           $ref: "#/components/responses/internalServerError"
 
   /productData:
-    get:
-      summary: Give me all the releasable data after a datetime
+    post:
+      summary: Give me all the releasable data after a datetime.
       description: |
-        Given a date time, build an exchange set of all the releasable ENC versions that have been issued since that datetime.
+        Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.
 
       operationId: getProducts
 
@@ -152,10 +154,9 @@ paths:
       responses:
         "200":
           description: |
-            A JSON body that indicates the URL that the exchange set will be available on as well as the number of cells in that exchange set.
+            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
 
-            If there are no updates since the sinceDateTime parameter, then the returned response will be a '304' response.
-
+            If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
             schema:
               $ref: "#/components/schemas/Last-Modified"
@@ -191,13 +192,13 @@ paths:
 
   /callback:
     post:
-      summary: the callback that will be made to the '#/components/parameters/callbackUri' if specified.
+      summary: The callback that will be made to the '#/components/parameters/callbackUri' if specified.
       description: |
-        Once the Exchange Set has been committed on FSS, a notification will be sent to the callbackURI (if specified).  
+        Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
 
         ## Data:
 
-        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same exchange set data as the response to the original API request.
+        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
 
       requestBody:
         content:
@@ -229,7 +230,7 @@ components:
       in: query
       name: callbackUri
       required: false
-      description: An optional callback URI that the Exchange Set Service would call back to once the Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.
+      description: An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.
       schema:
         type: string
 
@@ -290,13 +291,13 @@ components:
         properties:
           productName:
             type: string
-            description: The unique product identifiers
+            description: The unique product identifiers.
           editionNumber:
             type: number
-            description: The edition number
+            description: The edition number.
           updateNumber:
             type: number
-            description: The update number, if applicable
+            description: The update number, if applicable.
       example:
         { "productName": "AU895561", "editionNumber": 4, "updateNumber": 1 }
 
@@ -358,7 +359,7 @@ components:
           type: string
 
     cloudEvent:
-      description: For the full spec, see https://github.com/cloudevents/spec/blob/v1.0/spec.md
+      description: For the full specification, see https://github.com/cloudevents/spec/blob/v1.0/spec.md
       externalDocs:
         description: Event publishing based on Cloud Events.
         url: https://github.com/cloudevents/spec/blob/v1.0/spec.md
@@ -371,7 +372,7 @@ components:
       properties:
         id:
           type: string
-          description: Identifies the event. Producers MUST ensure that source + id is unique for each distinct event. If a duplicate event is re-sent (e.g. due to a network error) it MAY have the same id. Consumers MAY assume that Events with identical source and id are duplicates. Examples include An event counter maintained by the producer or A UUID
+          description: Identifies the event. Producers MUST ensure that source + id is unique for each distinct event. If a duplicate event is re-sent (e.g. due to a network error) it MAY have the same id. Consumers MAY assume that events with identical source and id are duplicates. Examples include an event counter maintained by the producer or A UUID
         source:
           type: string
           format: uri
@@ -380,7 +381,7 @@ components:
 
             Producers MUST ensure that source + id is unique for each distinct event.
 
-            An application MAY assign a unique source to each distinct producer, which makes it easy to produce unique IDs since no other producer will have the same source. The application MAY use UUIDs, URNs, DNS authorities or an application-specific scheme to create unique source identifiers.
+            An application MAY assign a unique source to each distinct producer that makes it easy to produce unique IDs since no other producer will have the same source. The application MAY use UUIDs, URNs, DNS authorities or an application-specific scheme to create unique source identifiers.
 
             A source MAY include more than one producer. In that case the producers MUST collaborate to ensure that source + id is unique for each distinct event.
 
@@ -390,7 +391,7 @@ components:
               * An absolute URI is RECOMMENDED
 
             examples
-              * Internet-wide unique URI with a DNS authority.
+              * Internet-wide unique URI with a DNS authority
               * https://github.com/cloudevents
               * mailto:cncf-wg-serverless@lists.cncf.io
               * Universally-unique URN with a UUID:
@@ -401,7 +402,7 @@ components:
               * 1-555-123-4567
         specversion:
           type: string
-          description: The version of the CloudEvents specification which the event uses. This enables the interpretation of the context. Compliant event producers MUST use a value of `1.0` when referring to this version of the specification.
+          description: The version of the CloudEvents specification that the event uses. This enables the interpretation of the context. Compliant event producers MUST use a value of `1.0` when referring to this version of the specification.
         "type":
           type: string
           description: |
