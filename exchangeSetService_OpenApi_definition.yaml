@@ -317,7 +317,7 @@ components:
               $ref: "#/components/schemas/link"
         exchangeSetUrlExpiryDateTime:
           type: string
-          format: datetime
+          format: date-time
         exchangeSetCellCount:
           type: number
 
