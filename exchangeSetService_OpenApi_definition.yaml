@@ -33,7 +33,7 @@ paths:
 
         For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
 
-        If an ENC has a re-issue, then the latest batch on the FSS, will be used by the ESS. 
+        If an ENC has a re-issue, then the latest batch on the FSS will be used by the ESS. 
 
         If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
 
