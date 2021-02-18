@@ -33,11 +33,11 @@ paths:
 
         For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
 
-        If an ENC has a re-issue, then the latest batch on the FSS will be used by the ESS. 
+        If an ENC has a re-issue, then the latest batch on the FSS will be used. 
 
         If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
 
-        If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e the user is not informed it does not exist). If none of the requested ENCs exist, then a 'Bad Request' response will be returned.
+        If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e. the user is not informed it does not exist). If none of the requested ENCs exist, then a 'Bad Request' response will be returned.
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
@@ -87,7 +87,7 @@ paths:
       description: |
         Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
 
-        ##Business Rules:
+        ## Business Rules:
 
         If there is no update to the version that is requested, then nothing will be returned for the ENC.
 
@@ -141,7 +141,7 @@ paths:
 
   /productData:
     post:
-      summary: Give me all the releasable data after a datetime.
+      summary: Provide all the releasable data after a datetime.
       description: |
         Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.
 
@@ -192,7 +192,7 @@ paths:
 
   /callback:
     post:
-      summary: The callback that will be made to the '#/components/parameters/callbackUri' if specified.
+      summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
       description: |
         Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
 
