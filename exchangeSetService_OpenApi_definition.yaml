@@ -55,7 +55,7 @@ paths:
         "200":
           description: A JSON body that indicates the URL that the exchange set will be available on as well as the number of cells in that Exchange Set.
           headers:
-            schema:
+            Last-Modified:
               $ref: "#/components/schemas/Last-Modified"
           content:
             application/json:
@@ -158,7 +158,7 @@ paths:
 
             If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
-            schema:
+            Last-Modified:
               $ref: "#/components/schemas/Last-Modified"
           content:
             application/json:
@@ -168,7 +168,7 @@ paths:
         "304":
           description: Not modified.
           headers:
-            schema:
+            Last-Modified:
               $ref: "#/components/schemas/Last-Modified"
 
         "400":
