@@ -1,6 +1,6 @@
 openapi: "3.0.0"
 info:
-  version: "0.1"
+  version: "0.2"
   title: Exchange Set Service API
   description: |
     This API is for the Exchange Set Service.
@@ -77,7 +77,7 @@ paths:
 
         "429":
           $ref: "#/components/responses/tooManyRequests"
-          
+
         "500":
           $ref: "#/components/responses/internalServerError"
 
@@ -135,7 +135,7 @@ paths:
 
         "429":
           $ref: "#/components/responses/tooManyRequests"
-        
+
         "500":
           $ref: "#/components/responses/internalServerError"
 
@@ -299,7 +299,10 @@ components:
             type: number
             description: The update number, if applicable.
       example:
-        { "productName": "AU895561", "editionNumber": 4, "updateNumber": 1 }
+        [
+          { "productName": "AU895561", "editionNumber": 4, "updateNumber": 1 },
+          { "productName": "GB100625", "editionNumber": 6, "updateNumber": 0 },
+        ]
 
     ####################################
     #      Response Objects      #
@@ -468,7 +471,7 @@ components:
             - $ref: "#/components/schemas/exchangeSetResponse"
       example:
         specversion: "1.0"
-        type: "uk.co.admiralty.avcsData.exchangeSetCreated"
+        type: "uk.co.admiralty.avcsData.exchangeSetCreated.v1"
         source: " https://exchangeset.admiralty.co.uk/avcsData"
         id: "2f03a25f-28b3-46ea-b009-5943250a9a41"
         time: "2021-02-17T14:04:04.4880776Z"
