@@ -1,6 +1,6 @@
 openapi: "3.0.0"
 info:
-  version: "0.2"
+  version: "0.3"
   title: Exchange Set Service API
   description: |
     This API is for the Exchange Set Service.
@@ -118,7 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/exchangeSetResponse"
+                $ref: "#/components/schemas/productVersionsExchangeSetResponse"
 
         "400":
           description: Bad request.
@@ -310,9 +310,16 @@ components:
 
     exchangeSetResponse:
       type: object
+      required:
+        - "_links"
+        - "exchangeSetUrlExpiryDateTime"
+        - "exchangeSetCellCount"
       properties:
         _links:
           type: object
+          required:
+            - "exchangeSetBatchStatusUri"
+            - "exchangeSetFileUri"
           properties:
             exchangeSetBatchStatusUri:
               $ref: "#/components/schemas/link"
@@ -323,7 +330,60 @@ components:
           format: date-time
         exchangeSetCellCount:
           type: number
+        requestedProductIdentifiersNotInExchangeSet:
+          type: array
+          description: |
+            Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
+            *	productWithdrawn (the product has been withdrawn from the AVCS service)
+            *	invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
+          items:
+            type: object
+            required:
+              - "productName"
+              - "reason"
+            properties:
+              productName:
+                type: string
+              reason:
+                type: string
+                enum: [productWithdrawn, invalidProduct]
+      example:
+        _links:
+          exchangeSetBatchStatusUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+          exchangeSetFileUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+        exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+        exchangeSetCellCount: 15
+        requestedProductIdentifiersNotInExchangeSet:
+          [
+            { productName: "GB123456", reason: "productWithdrawn" },
+            { productName: "GB123789", reason: "invalidProduct" },
+          ]
 
+    productVersionsExchangeSetResponse:
+      allOf:
+        - $ref: "#/components/schemas/exchangeSetResponse"
+        - type: object
+          properties:
+            requestedProductsAlreadyUpToDateCount:
+              type: number
+      example:
+        _links:
+          exchangeSetBatchStatusUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+          exchangeSetFileUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+        exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+        exchangeSetCellCount: 15
+        requestedProductsAlreadyUpToDateCount: 5
+        requestedProductIdentifiersNotInExchangeSet:
+          [
+            { productName: "GB123456", reason: "productWithdrawn" },
+            { productName: "GB123789", reason: "invalidProduct" },
+          ]
+
+      
     Last-Modified:
       type: string
       format: date-time
