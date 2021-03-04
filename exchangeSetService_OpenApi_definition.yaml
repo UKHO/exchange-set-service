@@ -343,7 +343,7 @@ components:
             Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
             *	productWithdrawn (the product has been withdrawn from the AVCS service)
             *	invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
-            *	productCancelled (the product has been cancelled, and is beyond the retention period)
+            *	noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the exchange set)
           items:
             type: object
             required:
@@ -354,7 +354,7 @@ components:
                 type: string
               reason:
                 type: string
-                enum: [productWithdrawn, invalidProduct, productCancelled]
+                enum: [productWithdrawn, invalidProduct, noDataAvailableForCancelledProduct]
       example:
         _links:
           exchangeSetBatchStatusUri:
