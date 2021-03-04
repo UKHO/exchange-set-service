@@ -118,7 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/productVersionsExchangeSetResponse"
+                $ref: "#/components/schemas/exchangeSetResponse"
 
         "400":
           description: Bad request.
@@ -328,14 +328,22 @@ components:
         exchangeSetUrlExpiryDateTime:
           type: string
           format: date-time
+          description: custom exchange sets are only available on the File Share Service for a limited time. After this time the file will expire and will no longer be available to download.
+        requestedProductCount:
+          type: number
+          description: number of products explicitly requested.
         exchangeSetCellCount:
           type: number
-        requestedProductIdentifiersNotInExchangeSet:
+          description: number of products that have data included in the produced exchange set.
+        requestedProductsAlreadyUpToDateCount:
+          type: number
+        requestedProductsNotInExchangeSet:
           type: array
           description: |
             Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
             *	productWithdrawn (the product has been withdrawn from the AVCS service)
             *	invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
+            *	productCancelled (the product has been cancelled, and is beyond the retention period)
           items:
             type: object
             required:
@@ -346,7 +354,7 @@ components:
                 type: string
               reason:
                 type: string
-                enum: [productWithdrawn, invalidProduct]
+                enum: [productWithdrawn, invalidProduct, productCancelled]
       example:
         _links:
           exchangeSetBatchStatusUri:
@@ -354,36 +362,15 @@ components:
           exchangeSetFileUri:
             href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
         exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
-        exchangeSetCellCount: 15
-        requestedProductIdentifiersNotInExchangeSet:
-          [
-            { productName: "GB123456", reason: "productWithdrawn" },
-            { productName: "GB123789", reason: "invalidProduct" },
-          ]
-
-    productVersionsExchangeSetResponse:
-      allOf:
-        - $ref: "#/components/schemas/exchangeSetResponse"
-        - type: object
-          properties:
-            requestedProductsAlreadyUpToDateCount:
-              type: number
-      example:
-        _links:
-          exchangeSetBatchStatusUri:
-            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
-          exchangeSetFileUri:
-            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
-        exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+        requestedProductCount: 22
         exchangeSetCellCount: 15
         requestedProductsAlreadyUpToDateCount: 5
-        requestedProductIdentifiersNotInExchangeSet:
+        requestedProductsNotInExchangeSet:
           [
             { productName: "GB123456", reason: "productWithdrawn" },
             { productName: "GB123789", reason: "invalidProduct" },
           ]
 
-      
     Last-Modified:
       type: string
       format: date-time
@@ -544,7 +531,14 @@ components:
             exchangeSetFileUri:
               href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
           exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
-          exchangeSetCellCount: 25
+          requestedProductCount: 22
+          exchangeSetCellCount: 15
+          requestedProductsAlreadyUpToDateCount: 5
+          requestedProductsNotInExchangeSet:
+            [
+              { productName: "GB123456", reason: "productWithdrawn" },
+              { productName: "GB123789", reason: "invalidProduct" },
+            ]
 
     ####################################
     #      Security Objects      #
