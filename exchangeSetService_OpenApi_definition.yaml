@@ -1,6 +1,6 @@
 openapi: "3.0.0"
 info:
-  version: "0.2"
+  version: "0.3"
   title: Exchange Set Service API
   description: |
     This API is for the Exchange Set Service.
@@ -310,9 +310,16 @@ components:
 
     exchangeSetResponse:
       type: object
+      required:
+        - "_links"
+        - "exchangeSetUrlExpiryDateTime"
+        - "exchangeSetCellCount"
       properties:
         _links:
           type: object
+          required:
+            - "exchangeSetBatchStatusUri"
+            - "exchangeSetFileUri"
           properties:
             exchangeSetBatchStatusUri:
               $ref: "#/components/schemas/link"
@@ -321,8 +328,48 @@ components:
         exchangeSetUrlExpiryDateTime:
           type: string
           format: date-time
+          description: custom exchange sets are only available on the File Share Service for a limited time. After this time the file will expire and will no longer be available to download.
+        requestedProductCount:
+          type: number
+          description: number of products explicitly requested.
         exchangeSetCellCount:
           type: number
+          description: number of products that have data included in the produced exchange set.
+        requestedProductsAlreadyUpToDateCount:
+          type: number
+        requestedProductsNotInExchangeSet:
+          type: array
+          description: |
+            Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
+            *	productWithdrawn (the product has been withdrawn from the AVCS service)
+            *	invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
+            *	noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the exchange set)
+          items:
+            type: object
+            required:
+              - "productName"
+              - "reason"
+            properties:
+              productName:
+                type: string
+              reason:
+                type: string
+                enum: [productWithdrawn, invalidProduct, noDataAvailableForCancelledProduct]
+      example:
+        _links:
+          exchangeSetBatchStatusUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+          exchangeSetFileUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+        exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+        requestedProductCount: 22
+        exchangeSetCellCount: 15
+        requestedProductsAlreadyUpToDateCount: 5
+        requestedProductsNotInExchangeSet:
+          [
+            { productName: "GB123456", reason: "productWithdrawn" },
+            { productName: "GB123789", reason: "invalidProduct" },
+          ]
 
     Last-Modified:
       type: string
@@ -484,7 +531,14 @@ components:
             exchangeSetFileUri:
               href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
           exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
-          exchangeSetCellCount: 25
+          requestedProductCount: 22
+          exchangeSetCellCount: 15
+          requestedProductsAlreadyUpToDateCount: 5
+          requestedProductsNotInExchangeSet:
+            [
+              { productName: "GB123456", reason: "productWithdrawn" },
+              { productName: "GB123789", reason: "invalidProduct" },
+            ]
 
     ####################################
     #      Security Objects      #
