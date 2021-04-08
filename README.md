@@ -1,56 +1,63 @@
 # exchange-set-service
 
-The Exchange Set Service is intended to allow distributors to request a custom S63 exchange set  built to the S-63 Specification, for delivery of requested ENC data required for vessels.
+The Exchange Set Service will allow distributors to request custom exchange sets, built to the [S-63 specification](https://en.wikipedia.org/wiki/S-63_(encryption_standard)) for delivery of ENC data to vessels.
 
-An exchange set: The set of files representing a complete, single purpose (i.e. product specific) data transfer. For example, the "ENC product specification" defines an exchange set which contains one Catalogue file and at least one Data Set file. An exchange set can be loaded into an ECDIS (Electronic Chart Display and Information System).
+An exchange set is defined in the [IC-ENC Glossary](http://www.ic-enc.org/Glossary.html) as:
+
+> An exchange set is a grouping of data sets in a logical, consistent and self-contained collection to support the interchange of geospatial data and meta data.
+
+Read more in the full [IHO S-63 Specification](https://iho.int/uploads/user/Services%20and%20Standards/ENC_ECDIS/data_protection/S-63_e1.2.0_EN_Jan2015.pdf).
+
+An exchange set can be loaded into an ECDIS (Electronic Chart Display and Information System) on a vessel for navigation planning.
 
 ## Viewing the API Spec
 
-Rather than reading the Spec in raw form, copy the content of the OpenAPI spec .yml file into https://editor.swagger.io/ for a nice rendered view
+Rather than reading the OpenAPI specification in raw form, copy the API specification YAML file into [an online Swagger editor](https://editor.swagger.io/) for a rendered view.
 
 ## Calling the Exchange Set Service
 
-*Note that this  section is draft, based on what we are doing for FSS (see <https://github.com/UKHO/file-share-service/>).*
+*Note that this section is draft, based on what we are doing for the [File Share Service (FSS)](https://github.com/UKHO/file-share-service/)*
 
-### Postman
+### Using ESS in Postman
 
-To Generate an authorization token in postman follow the following steps:
+To generate an authorization token in Postman follow these steps:
 
-#### Get Authorization for the Environments AppRegistration
+#### Get Authorization for the environment's App Registration
 
-Ask ### TBC ### (or service Owner if service is live) to give you Roles for the file share service app registration.
-- `ESS-API-DEV`
-- `ESS-API-QA`
-- `ESS-API-LIVE`
+Ask ### TBC ### (or service Owner if service is live) to give you Roles for the FSS App Registration:
 
-#### Select OAuth2.0 in postman
+* `ESS-API-DEV`
+* `ESS-API-QA`
+* `ESS-API-LIVE`
 
-In Postman select `Oauth 2.0` in the authorization tab.
+#### Select OAuth2.0
+
+Select `Oauth 2.0` in the authorization tab.
 
 ![OAuth2 Postman Section](/Documentation/Images/PostmanAuthTabOauth.png)
 
-#### Fill in the Oauth section, click get new access token, login from the popup window
+#### Fill in the OAuth section, click get new access token, login from the popup window
 
 Grant Type - Implicit
 
-Auth URL - https://login.microsoftonline.com/9134ca48-663d-4a05-968a-31a42f0aed3e/oauth2/v2.0/authorize
+Auth URL - <https://login.microsoftonline.com/9134ca48-663d-4a05-968a-31a42f0aed3e/oauth2/v2.0/authorize>
 
 Client ID:
 
-- DEV ### TBC ###
-- QA ### TBC ###
-- LIVE ### TBC ###
+* DEV ### TBC ###
+* QA ### TBC ###
+* LIVE ### TBC ###
 
 Scope:
 
-- DEV ### TBC ###/.default
-- QA ### TBC ###/.default
-- LIVE ### TBC ###/.default
+* DEV ### TBC ###/.default
+* QA ### TBC ###/.default
+* LIVE ### TBC ###/.default
 
-NOTE: browser used to authenticate needs to allow popups
+NOTE: The browser used to authenticate needs to allow popups!
 
 ![OAuth2 Postman Section](/Documentation/Images/PostmanAuthTabOauthDetails.png)
 
 #### Update the token
 
-paste it into the `Access Token` field at the top of the postman Oauth2 section.
+Paste the token into the `Access Token` field at the top of the Postman OAuth2 section.
