@@ -24,7 +24,7 @@ To generate an authorization token in Postman follow these steps:
 
 #### Get Authorization for the environment's App Registration
 
-Ask ### TBC ### (or service Owner if service is live) to give you Roles for the FSS App Registration:
+Ask ### TBC ### (or service Owner if service is live) to give you Roles for the ESS App Registration:
 
 * `ESS-API-DEV`
 * `ESS-API-QA`
