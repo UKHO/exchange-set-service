@@ -34,7 +34,7 @@ Ask ### TBC ### (or service Owner if service is live) to give you Roles for the 
 
 Select `Oauth 2.0` in the authorization tab.
 
-![OAuth2 Postman Section](/Documentation/Images/PostmanAuthTabOauth.png)
+![OAuth2 Postman Section](/Documentation/Images/PostmanAuthTabOauth.PNG)
 
 #### Fill in the OAuth section, click get new access token, login from the popup window
 
@@ -56,7 +56,7 @@ Scope:
 
 NOTE: The browser used to authenticate needs to allow popups!
 
-![OAuth2 Postman Section](/Documentation/Images/PostmanAuthTabOauthDetails.png)
+![OAuth2 Postman Section](/Documentation/Images/PostmanAuthTabOauthDetails.PNG)
 
 #### Update the token
 
