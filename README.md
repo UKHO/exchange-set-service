@@ -40,7 +40,7 @@ Select `Oauth 2.0` in the authorization tab.
 
 Grant Type - Implicit
 
-Auth URL - <https://login.microsoftonline.com/9134ca48-663d-4a05-968a-31a42f0aed3e/oauth2/v2.0/authorize>
+Auth URL - `https://login.microsoftonline.com/9134ca48-663d-4a05-968a-31a42f0aed3e/oauth2/v2.0/authorize`
 
 Client ID:
 
