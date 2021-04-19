@@ -1,0 +1,30 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: Exchange-Set-Service
+  description: The Exchange Set Service generates S-63 exchange sets for AVCS
+  annotations:
+    github.com/project-slug: ukho/exchange-set-service
+spec:
+  type: service
+  lifecycle: alpha
+  owner: martin.rock-evans@ukho.gov.uk
+  system: ADDS
+  providesApis:
+    - Exchange-Set-Service
+  consumesApis:
+    - File-Share-Service
+    - Sales-Catalogue-Service
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: Exchange-Set-Service
+  description: Exchange Set Service API
+spec:
+  type: openapi
+  lifecycle: alpha
+  owner: rockydev
+  system: ESS
+  definition:
+    $text: ./exchangeSetService_OpenApi_definition.yaml
