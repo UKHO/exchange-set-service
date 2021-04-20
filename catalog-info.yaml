@@ -8,7 +8,7 @@ metadata:
 spec:
   type: service
   lifecycle: alpha
-  owner: martin.rock-evans@ukho.gov.uk
+  owner: rockydevnet
   system: ADDS
   providesApis:
     - Exchange-Set-Service
@@ -24,7 +24,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: alpha
-  owner: rockydev
-  system: ESS
+  owner: rockydevnet
+  system: ADDS
   definition:
     $text: ./exchangeSetService_OpenApi_definition.yaml
