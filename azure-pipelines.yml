@@ -1,0 +1,67 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd).$(BuildCounter)
+
+trigger:
+  - main
+  - release/*
+
+pool: NautilusBuild
+
+variables:
+  - name: BuildConfiguration
+    value: "release"
+  - name: BuildPlatform
+    value: "any cpu"
+  - name: BuildCounter
+    value: $[counter(format('{0:yyyyMMdd}', pipeline.startTime), 1)]
+
+stages:
+  - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
+    jobs:
+      - job:
+        workspace:
+          clean: all # what to clean up before the job runs outputs | resources | all
+        displayName: "DependencyChecker Dotnet Build test publish"
+
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore"
+            inputs:
+              command: restore
+              projects: "**/*.sln"
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
+
+          - task: CmdLine@1
+            displayName: "Run OWASP Dependency Checker"
+            inputs:
+              filename: 'E:\encfilestore\tools\dependency-check\bin\dependency-check.bat'
+              arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Artifact: OWASP Dependency Checker Report"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\DCReport'
+              ArtifactName: "OWASP Dependency Checker Report"
+
+          - task: PowerShell@1
+            displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
+            inputs:
+              scriptType: inlineScript
+              arguments: '-ReportLocation $(Build.ArtifactStagingDirectory)\DCReport\*'
+              inlineScript: |
+                param($ReportLocation)
+                Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build for UKHO.ExchangeSetService.API"
+            inputs:
+              projects: "**/UKHO.ExchangeSetService.API.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API'

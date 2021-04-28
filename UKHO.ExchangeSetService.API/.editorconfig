@@ -1,0 +1,19 @@
+﻿[*.cs]
+
+# S100: Methods and properties should be named in PascalCase
+dotnet_diagnostic.S100.severity = error
+
+# S4487: Unread "private" fields should be removed
+dotnet_diagnostic.S4487.severity = error
+
+# S1128: Unused "using" should be removed
+dotnet_diagnostic.S1128.severity = error
+
+# S1144: Unused private types or members should be removed
+dotnet_diagnostic.S1144.severity = error
+
+# S109: Magic numbers should not be used
+dotnet_diagnostic.S109.severity = error
+
+# S1075: URIs should not be hardcoded
+dotnet_diagnostic.S1075.severity = suggestion
