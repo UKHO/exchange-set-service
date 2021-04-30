@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.Filters;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
 using Newtonsoft.Json.Serialization;
+using UKHO.ExchangeSetService.API.Validation;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -37,6 +38,7 @@ namespace UKHO.ExchangeSetService.API
             this.ConfigureSwagger(services);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IProductDataService, ProductDataService>();
+            services.AddScoped<IProductDataValidator, ProductDataValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
