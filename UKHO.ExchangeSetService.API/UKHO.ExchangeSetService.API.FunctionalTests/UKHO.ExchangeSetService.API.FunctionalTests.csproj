@@ -21,9 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="FunctionalTests\" />
-    <Folder Include="Helper\" />
-    <Folder Include="Models\" />
+    <ProjectReference Include="..\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj" />
   </ItemGroup>
 
 </Project>
