@@ -84,7 +84,7 @@ stages:
               projects: '**/*UKHO.ExchangeSetService.API.csproj'
               arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
               zipAfterPublish: true
-              modifyOutputPath: false
+              modifyOutputPath: true
 
           - task: PublishBuildArtifacts@1
             displayName: "Publish WebAPI Artifact"
