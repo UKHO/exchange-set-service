@@ -4,7 +4,8 @@ trigger:
   - main
   - release/*
 
-pool: ubuntu-latest
+pool:
+  vmImage: 'windows-latest'
 
 variables:
   - name: BuildConfiguration
