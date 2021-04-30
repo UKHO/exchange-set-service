@@ -28,26 +28,22 @@ stages:
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore non test projects only"
             inputs:
-              command: "restore"
+              command: 'restore'
               projects: |
                 **/*.csproj
                 !**/*Tests.csproj
-              feedsToUse: config
+              feedsToUse: 'select'
               noCache: true
-              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
+              restoreDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore test projects only"
             inputs:
-              command: "restore"
-              projects: "**/*Tests.csproj"
-              feedsToUse: config
+              command: 'restore'
+              projects: '**/*Tests.csproj'
+              feedsToUse: 'select'
               noCache: true
-              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
+              restoreDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
 
           - task: DotNetCoreCLI@2
             displayName: "dotnet build task"
