@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using UKHO.ExchangeSetService.API.Extensions;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation
@@ -19,20 +20,28 @@ namespace UKHO.ExchangeSetService.API.Validation
         public ProductDataValidator()
         {
             RuleFor(x => x.SinceDateTime)
-                .Must(x => x.IsValidRfc1123Format(out sinceDateTime)).WithMessage($"Provided since date time is either invalid or invalid format, the valid formats are 'RFC1123 formats'.")
+                .Must(x => x.IsValidRfc1123Format(out sinceDateTime))
+                .WithMessage($"Provided since date time is either invalid or invalid format, the valid format is 'RFC1123 format'.")
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .DependentRules(() =>
                 {
                     RuleFor(x => x.SinceDateTime)
-                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow) <= 0).WithMessage("Since date time cannot be a future date.");
-                })
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString());
+                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow) <= 0)
+                    .WithMessage("Provided since date time cannot be a future date.")
+                    .WithErrorCode(HttpStatusCode.BadRequest.ToString());
+                });
 
-            RuleFor(x => x.CallbackUri).NotEmpty().Matches(@"^http(s)?://([\w-]+.)+[\w-]+(/[\w- ./?%&=])?$").WithMessage("Please Check URI Pattern").WithErrorCode(HttpStatusCode.BadRequest.ToString()); 
+            RuleFor(x => x.CallbackUri)
+                .Matches(CallbackUriHelper.ValidCallbackUri).When(x => !string.IsNullOrEmpty(x.CallbackUri))
+                .WithMessage("Provided callbackUri is either invalid or invalid format.")
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString());
         }
 
         Task<ValidationResult> IProductDataValidator.Validate(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
             return ValidateAsync(productDataSinceDateTimeRequest);
         }
+
+
     }
 }

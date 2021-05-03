@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.Services
             ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse
             {
                 ExchangeSetCellCount = 15,
-                ExchangeSetUrlExpiryDateTime = DateTime.Now,
+                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
                 RequestedProductCount = 22,
                 RequestedProductsAlreadyUpToDateCount = 5,
                 RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>
