@@ -9,15 +9,15 @@ using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation
 {
-    public interface IProductDataValidator
+    public interface IProductDataSinceDateTimeValidator
     {
         Task<ValidationResult> Validate(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest);
     }
 
-    public class ProductDataValidator : AbstractValidator<ProductDataSinceDateTimeRequest>, IProductDataValidator
+    public class ProductDataSinceDateTimeValidator : AbstractValidator<ProductDataSinceDateTimeRequest>, IProductDataSinceDateTimeValidator
     {
         private DateTime sinceDateTime;
-        public ProductDataValidator()
+        public ProductDataSinceDateTimeValidator()
         {
             RuleFor(x => x.SinceDateTime)
                 .Must(x => x.IsValidRfc1123Format(out sinceDateTime))
@@ -33,11 +33,11 @@ namespace UKHO.ExchangeSetService.API.Validation
 
             RuleFor(x => x.CallbackUri)
                 .Matches(CallbackUriHelper.ValidCallbackUri).When(x => !string.IsNullOrEmpty(x.CallbackUri))
-                .WithMessage("Provided callbackUri is either invalid or invalid format.")
+                .WithMessage("Invalid CallbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
         }
 
-        Task<ValidationResult> IProductDataValidator.Validate(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        Task<ValidationResult> IProductDataSinceDateTimeValidator.Validate(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
             return ValidateAsync(productDataSinceDateTimeRequest);
         }

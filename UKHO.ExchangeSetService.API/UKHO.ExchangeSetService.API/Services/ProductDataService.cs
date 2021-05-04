@@ -10,9 +10,9 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public class ProductDataService : IProductDataService
     {
-        private readonly IProductDataValidator productDataValidator;
+        private readonly IProductDataSinceDateTimeValidator productDataValidator;
 
-        public ProductDataService(IProductDataValidator productDataValidator)
+        public ProductDataService(IProductDataSinceDateTimeValidator productDataValidator)
         {
             this.productDataValidator = productDataValidator;
         }

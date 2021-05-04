@@ -9,6 +9,7 @@
 
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UserSecretsId>7fda93d5-5ab7-41dd-9634-9a82291e2a49</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

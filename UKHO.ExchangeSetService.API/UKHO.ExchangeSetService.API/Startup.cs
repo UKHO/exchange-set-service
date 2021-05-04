@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API
             this.ConfigureSwagger(services);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IProductDataService, ProductDataService>();
-            services.AddScoped<IProductDataValidator, ProductDataValidator>();
+            services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
