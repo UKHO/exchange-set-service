@@ -1,5 +1,11 @@
 name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd).$(BuildCounter)
 
+parameters:
+  - name: terraformapply
+    displayName: "Continue even if there are resources destroying"
+    type: boolean
+    default: false
+
 trigger:
   - main
   - release/*
@@ -115,3 +121,107 @@ stages:
             inputs:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
               ArtifactName: ExchangeSetServiceWebAPI
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish terraform Artifacts"
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)\Deployment'
+              ArtifactName: terraformartifact
+
+  - stage: Devdeploy
+    displayName: "Devdeploy (inc terraform, webapp deploy)"
+    jobs:
+      - deployment: DevDeployApp
+        displayName: "Dev - deploy terraform and dotnet App"
+        environment: "Ess-Dev"
+        workspace:
+          clean: all
+        variables:
+          - group: "Exchange Set Service Terraform Dev"
+          - name: DeploymentResourceGroupName
+            value: "ExchangeSetDeploymentRS"
+          - name: DeploymentStorageAccountName
+            value: "terraformrsdeploy"
+          - name: "Environment"
+            value: "dev"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: Deployment/templates/continous-deployment.yml
+                  parameters:
+                    terraformapply: ${{ parameters.terraformapply }}
+
+                - task: DownloadPipelineArtifact@2
+                  displayName: "Download Functional test Artifact"
+                  inputs:
+                    source: "current"
+                    artifact: "functionaltests"
+                    path: $(Build.SourcesDirectory)\functionaltests
+
+                - task: FileTransform@1
+                  displayName: "File Transform: functionaltests"
+                  inputs:
+                    folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
+                    fileType: json
+                    targetFiles: 'appsettings.json'
+
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **\*FunctionalTest*.dll
+                      !**\*TestAdapter.dll
+                      !**\obj\**
+                    testRunTitle: "Dev-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)\functionaltests'
+
+  - stage: QAdeploy
+    displayName: QAdeploy (inc terraform, webapp deploy)
+    jobs:
+      - deployment: QADeployApp
+        displayName: QA - deploy terraform and dotnet App
+        environment: "Ess-Qa"
+        workspace:
+          clean: all
+        variables:
+          - group: "Exchange Set Service Terraform Dev"
+          - name: DeploymentResourceGroupName
+            value: "ExchangeSetDeploymentRS"
+          - name: DeploymentStorageAccountName
+            value: "terraformrsdeploy"
+          - name: "Environment"
+            value: "qa"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: Deployment/templates/continous-deployment.yml
+                  parameters:
+                    terraformapply: ${{ parameters.terraformapply }}
+                
+                - task: DownloadPipelineArtifact@2
+                  displayName: "Download Functional test Artifact"
+                  inputs:
+                    source: "current"
+                    artifact: "functionaltests"
+                    path: $(Build.SourcesDirectory)\functionaltests
+
+                - task: FileTransform@1
+                  displayName: "File Transform: functionaltests"
+                  inputs:
+                    folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
+                    fileType: json
+                    targetFiles: 'appsettings.json'
+
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **\*FunctionalTest*.dll
+                      !**\*TestAdapter.dll
+                      !**\obj\**
+                    testRunTitle: "QA-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)\functionaltests'
