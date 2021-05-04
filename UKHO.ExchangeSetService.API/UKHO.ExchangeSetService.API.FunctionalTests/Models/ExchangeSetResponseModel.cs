@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
         /// <summary>
         /// Json property links
         /// </summary>
-        [JsonProperty("links")]
+        [JsonProperty("_links")]
         public Links Links { get; set; }
 
         /// <summary>

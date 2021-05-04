@@ -6,7 +6,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     /// <summary>
     /// This class is for configuration set up
     /// </summary>
-    public class Configuration
+    public class TestConfiguration
     {
         /// <summary>
         /// ConfigurationRoot variable declaire here 
@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Constructor call here
         /// </summary>
-        public Configuration()
+        public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
                                 .AddJsonFile("appSettings.json", false)

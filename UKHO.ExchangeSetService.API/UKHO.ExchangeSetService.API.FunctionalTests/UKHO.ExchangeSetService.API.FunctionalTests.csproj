@@ -21,7 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.csproj" />
     <ProjectReference Include="..\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

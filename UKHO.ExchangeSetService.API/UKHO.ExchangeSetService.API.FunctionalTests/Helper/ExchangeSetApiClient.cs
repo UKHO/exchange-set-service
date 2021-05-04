@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
         {
-            string uri = $"{apiHost}/productData/productIdentifiers";
+            string uri = $"{apiHost}/productData";
             if (sincedateTime != null)
             {
                 uri += $"?sinceDateTime={sincedateTime}&";
