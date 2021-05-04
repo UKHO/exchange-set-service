@@ -10,14 +10,14 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public class ProductDataService : IProductDataService
     {
-        private readonly IProductDataValidator productDataValidator;
+        private readonly IProductDataProductVersionsValidator productProductVersionsValidator;
 
-        public ProductDataService(IProductDataValidator productDataValidator)
+        public ProductDataService(IProductDataProductVersionsValidator productDataValidator)
         {
-            this.productDataValidator = productDataValidator;
+            this.productProductVersionsValidator = productDataValidator;
         }
 
-        public async Task<ExchangeSetResponse> GetProductVersions(ProductVersionsRequest request)
+        public async Task<ExchangeSetResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request)
         {
             var response = new ExchangeSetResponse();
             const int RequestedProductCount = 22;
@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
             };
-            response.ExchangeSetUrlExpiryDateTime = DateTime.Now;
+            response.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime();
             response.RequestedProductCount = RequestedProductCount;
             response.ExchangeSetCellCount = ExchangeSetCellCount;
             response.RequestedProductsAlreadyUpToDateCount = RequestedProductsAlreadyUpToDateCount;
@@ -52,9 +52,9 @@ namespace UKHO.ExchangeSetService.API.Services
             return response;
         }
 
-        public Task<ValidationResult> ValidateCreateBatch(ProductVersionsRequest request)
+        public Task<ValidationResult> ValidateProductDataByProductVersions(ProductDataProductVersionsRequest request)
         {
-            return productDataValidator.Validate(request);
+            return productProductVersionsValidator.Validate(request);
         }
     }
 }

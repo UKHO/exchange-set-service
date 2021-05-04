@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -40,14 +41,18 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// </remarks>
         /// <param name="productVersionsRequest">The JSON body containing product versions.</param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
-        /// <returns></returns>
+        /// <response code="200">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="429">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="500">Internal Server Error.</response>
         [HttpPost]
-        [Route("/productdata/productVersions")]
+        [Route("/productData/productVersions")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "<p>A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</p> <p>If there are no updates for any of the productVersions, then the return will be a '200' response with an empty Exchange Set(containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.</p>")]
-        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request - there are one or more errors in the specified parameters")]
-        public async Task<IActionResult> ProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri)
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time the user should wait in seconds before retrying.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
+        public virtual async Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri)
         {
             if (productVersionsRequest == null || !productVersionsRequest.Any())
             {
@@ -61,11 +66,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 };
                 return BuildBadRequestErrorResponse(error);
             }
-            ProductVersionsRequest request = new ProductVersionsRequest();
+            ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest();
             request.ProductVersions = productVersionsRequest;
             request.CallbackUri = callbackUri;
 
-            var validationResult = await productDataService.ValidateCreateBatch(request);
+            var validationResult = await productDataService.ValidateProductDataByProductVersions(request);
 
             if (!validationResult.IsValid)
             {
@@ -76,7 +81,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildBadRequestErrorResponse(errors);
                 }
             }
-            return Ok(await productDataService.GetProductVersions(request));
+            return Ok(await productDataService.CreateProductDataByProductVersions(request));
         }
     }
 }

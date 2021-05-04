@@ -7,7 +7,7 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public interface IProductDataService
     {
-        Task<ValidationResult> ValidateCreateBatch(ProductVersionsRequest request);
-        Task<ExchangeSetResponse> GetProductVersions(ProductVersionsRequest request);
+        Task<ValidationResult> ValidateProductDataByProductVersions(ProductDataProductVersionsRequest request);
+        Task<ExchangeSetResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request);
     }
 }
