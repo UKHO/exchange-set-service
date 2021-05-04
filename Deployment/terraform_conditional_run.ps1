@@ -12,13 +12,13 @@ terraform init -backend-config="resource_group_name=$DeploymentResourceGroupName
 if ( !$? ) { echo "something went wrong during terraform initialization"; throw "Error" }
 
 Write-output "Selecting workspace"
-terraform workspace select $WorkSpace
-if ( !$? ) {
-    echo "Error while selecting workspace trying to create it"
 
-    terraform workspace new $WorkSpace
-    if ( !$? ){ echo "something went wrong during creating workspace" ; throw "Error" }
-}
+$ErrorActionPreference = 'SilentlyContinue'
+terraform workspace new $WorkSpace 2>&1 > $null
+$ErrorActionPreference = 'Continue'
+
+terraform workspace select $WorkSpace
+if ( !$? ) { echo "Error while selecting workspace trying to create it"; throw "Error" }
 
 Write-output "Validating terraform"
 terraform validate
