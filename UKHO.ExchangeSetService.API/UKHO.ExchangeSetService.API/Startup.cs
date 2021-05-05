@@ -1,19 +1,21 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Reflection;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
-using Newtonsoft.Json.Serialization;
+using UKHO.ExchangeSetService.API.Validation;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -30,13 +32,21 @@ namespace UKHO.ExchangeSetService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson(options =>
+            services.AddControllers(o =>
+            {
+                o.AllowEmptyInputInBodyModelBinding = true;
+            }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
             this.ConfigureSwagger(services);
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IProductDataService, ProductDataService>();
+            services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

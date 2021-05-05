@@ -17,3 +17,6 @@ dotnet_diagnostic.S109.severity = error
 
 # S1075: URIs should not be hardcoded
 dotnet_diagnostic.S1075.severity = suggestion
+
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = suggestion
