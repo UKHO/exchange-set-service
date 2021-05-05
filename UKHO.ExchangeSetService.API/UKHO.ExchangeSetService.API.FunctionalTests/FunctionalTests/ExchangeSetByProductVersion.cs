@@ -14,8 +14,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private TestConfiguration Config { get; set; }
         public DataHelper Datahelper { get; set; }
         public ProductVersionModel ProductVersionmodel { get; set; }
-        public ProductVersionRequestModel ProductVersionRequestmodel { get; set; }
-
+      
         [SetUp]
         public void Setup()
         {
@@ -23,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ExchangesetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             ProductVersionmodel = new ProductVersionModel();
             Datahelper = new DataHelper();
-            ProductVersionRequestmodel = new ProductVersionRequestModel();
+           
         }
 
         [Test]
