@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -57,18 +58,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Get latest baseline data for a specified set of ENCs. - POST /productData/productVersions
         /// </summary>
-        /// <param name="productVersionRequestModel"></param>
+        /// <param name="productVersionModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsAsync(ProductVersionRequestModel productVersionRequestModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
         {
             string uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
             {
                 uri += $"?callbackuri={callbackUri}";
             }
-            string payloadJson = JsonConvert.SerializeObject(productVersionRequestModel);
+            string payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
 
 
