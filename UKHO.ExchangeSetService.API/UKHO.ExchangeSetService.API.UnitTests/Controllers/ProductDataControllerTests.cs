@@ -57,7 +57,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
         
         [Test]
-        public async Task WhenCallTheApiWithNullPayload_ThenBadRequestStatusReturned()
+        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest()
         {
             var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.");
             validationMessage.ErrorCode = HttpStatusCode.BadRequest.ToString();
@@ -73,7 +73,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
         
         [Test]
-        public async Task WhenCallTheApiWithEmptyPayload_ThenBadRequestStatusReturned()
+        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest()
         {
             var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.");
             validationMessage.ErrorCode = HttpStatusCode.BadRequest.ToString();
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
       
         [Test]
-        public async Task WhenCallTheApiWithValidPayload_ThenOkObjectResponseStatusReturned()
+        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated()
         {
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
