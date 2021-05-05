@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for datetime is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 200.");
 
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -62,5 +62,92 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         }
+
+        [Test]
+        public async Task WhenICallTheApiWithAValidProductVersionWithCallbackURI_ThenASuccessStatusIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = "AU895561";
+            ProductVersionmodel.EditionNumber = 4;
+            ProductVersionmodel.UpdateNumber = 1;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            ProductVersionmodel.ProductName = "GB100625";
+            ProductVersionmodel.EditionNumber = 6;
+            ProductVersionmodel.UpdateNumber = 0;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 200.");
+
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithAnEmptyProductVersion_ThenABadRequestStatusIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+        
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 400.");
+
+            var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Either body is null or malformed."));
+        }
+
+        [TestCase(null,4,1, "ProductVersions", "Product Versions product name cannot be blank or null.", TestName = "When product name is null.")]
+        [TestCase("", 4, 1, "ProductVersions", "Product Versions product name cannot be blank or null.", TestName = "When product name is blank.")]
+        [TestCase("AU895561", null, 1, "ProductVersions", "Product Versions edition number cannot be less than zero or null.", TestName = "When edition number is null.")]
+        [TestCase("AU895561", 4, null, "ProductVersions", "Product Versions update number cannot be less than zero or null.", TestName = "When update number is null.")]
+        [TestCase("AU895561", -1, 1, "ProductVersions", "Product Versions edition number cannot be less than zero or null.", TestName = "When edition number is less than zero.")]
+        [TestCase("AU895561", 4, -1, "ProductVersions", "Product Versions update number cannot be less than zero or null.", TestName = "When update number is less than zero.")]
+        public async Task WhenICallTheApiWithNullProductVersion_ThenABadRequestStatusIsReturned(string productname, int editionnumber, int updatenumber, string sourcemessage, string descriptionmessage)
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = productname;
+            ProductVersionmodel.EditionNumber = editionnumber;
+            ProductVersionmodel.UpdateNumber = updatenumber;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 400.");
+
+            var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == sourcemessage));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == descriptionmessage));
+
+        }
+
+        [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without http or https")]
+        [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https parameter")]
+        [TestCase("http:/fss.ukho.gov.uk", TestName = "Callback URL with wrong http parameter")]
+        [TestCase("https://", TestName = "Callback URL with only https parameter")]
+        public async Task WhenICallTheApiWithAValidProductVersionWithInvalidCallbackURI_ThenASuccessStatusIsReturned(string callbackurl)
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = "AU895561";
+            ProductVersionmodel.EditionNumber = 4;
+            ProductVersionmodel.UpdateNumber = 1;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            ProductVersionmodel.ProductName = "GB100625";
+            ProductVersionmodel.EditionNumber = 6;
+            ProductVersionmodel.UpdateNumber = 0;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, callbackurl);
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 400.");
+
+        }
+
+
     }
 }
