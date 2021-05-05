@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetProductVersionsAsync(ProductVersionRequestModel productVersionRequestModel, string callbackUri = null, string accessToken = null)
         {
-            string uri = $"{apiHost}/productData/productIdentifiers";
+            string uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
             {
                 uri += $"?callbackuri={callbackUri}";
