@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation
@@ -15,10 +16,10 @@ namespace UKHO.ExchangeSetService.API.Validation
     {
         public ProductDataProductVersionsValidator()
         {
-            RuleFor(v => v.CallbackUri).NotNull().When(v => !string.IsNullOrEmpty(v.CallbackUri))
-            .Matches(@"^http(s)?://([\w-]+.)+[\w-]+(/[\w- ./?%&=])?$")
-            .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                 .WithMessage("Invalid CallbackUri format.");
+            RuleFor(x => x.CallbackUri)
+                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
+                .WithMessage("Invalid CallbackUri format.")
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString());
             RuleFor(v => v.ProductVersions).NotEmpty().NotNull()
             .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                  .WithMessage("Product Versions cannot be null.");
