@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using UKHO.ExchangeSetService.API.Extensions;
-using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation
@@ -32,7 +31,7 @@ namespace UKHO.ExchangeSetService.API.Validation
                 });
 
             RuleFor(x => x.CallbackUri)
-                .Matches(CallbackUriHelper.ValidCallbackUri).When(x => !string.IsNullOrEmpty(x.CallbackUri))
+                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
                 .WithMessage("Invalid CallbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
         }
