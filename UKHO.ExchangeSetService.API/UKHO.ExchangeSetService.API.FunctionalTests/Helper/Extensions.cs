@@ -5,14 +5,8 @@ using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
-    /// <summary>
-    /// This class contains SetBearerToken() and ReadAsTypeAsync() methods
-    /// </summary>
     public static class Extensions
     {
-        /// <summary>
-        /// Set the Bearer Token for Authorization
-        /// </summary>
         public static void SetBearerToken(this HttpRequestMessage requestMessage, string accessToken)
         {
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
