@@ -104,15 +104,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("AU895561", 4, null, "ProductVersions", "Product Versions update number cannot be less than zero or null.", TestName = "When update number is null.")]
         [TestCase("AU895561", -1, 1, "ProductVersions", "Product Versions edition number cannot be less than zero or null.", TestName = "When edition number is less than zero.")]
         [TestCase("AU895561", 4, -1, "ProductVersions", "Product Versions update number cannot be less than zero or null.", TestName = "When update number is less than zero.")]
-        public async Task WhenICallTheApiWithNullProductVersion_ThenABadRequestStatusIsReturned(string productname, int editionnumber, int updatenumber, string sourcemessage, string descriptionmessage)
+        public async Task WhenICallTheApiWithNullProductVersion_ThenABadRequestStatusIsReturned(string productname, int? editionnumber, int? updatenumber, string sourcemessage, string descriptionmessage)
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersionmodel.ProductName = productname;
-            ProductVersionmodel.EditionNumber = editionnumber;
-            ProductVersionmodel.UpdateNumber = updatenumber;
-
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(productname, editionnumber, updatenumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 400.");
