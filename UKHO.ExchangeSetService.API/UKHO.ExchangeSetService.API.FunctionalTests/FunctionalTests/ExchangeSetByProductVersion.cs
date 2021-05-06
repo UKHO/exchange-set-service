@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of the expected status 200.");
 
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of the expected status 200.");
 
         }
 
@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
         
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
@@ -110,7 +110,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(productname, editionnumber, updatenumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == sourcemessage));
@@ -139,7 +139,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, callbackurl);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
         }
 
