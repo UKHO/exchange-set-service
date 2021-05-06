@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
-            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
             Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode}  is  returned, instead of the expected 200.");
 
         }
@@ -97,19 +97,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Either body is null or malformed."));
         }
 
-        [TestCase(null,4,1, "ProductVersions", "Product Versions product name cannot be blank or null.", TestName = "When product name is null.")]
-        [TestCase("", 4, 1, "ProductVersions", "Product Versions product name cannot be blank or null.", TestName = "When product name is blank.")]
-        [TestCase("AU895561", null, 1, "ProductVersions", "Product Versions edition number cannot be less than zero or null.", TestName = "When edition number is null.")]
-        [TestCase("AU895561", 4, null, "ProductVersions", "Product Versions update number cannot be less than zero or null.", TestName = "When update number is null.")]
-        [TestCase("AU895561", -1, 1, "ProductVersions", "Product Versions edition number cannot be less than zero or null.", TestName = "When edition number is less than zero.")]
-        [TestCase("AU895561", 4, -1, "ProductVersions", "Product Versions update number cannot be less than zero or null.", TestName = "When update number is less than zero.")]
+        [TestCase(null,4,1, "ProductVersions[0].ProductName", "ProductName cannot be blank or null.", TestName = "When product name is null.")]
+        [TestCase("", 4, 1, "ProductVersions[0].ProductName", "ProductName cannot be blank or null.", TestName = "When product name is blank.")]
+        [TestCase("AU895561", null, 1, "ProductVersions[0].EditionNumber", "EditionNumber cannot be less than zero or null.", TestName = "When edition number is null.")]
+        [TestCase("AU895561", 4, null, "ProductVersions[0].UpdateNumber", "UpdateNumber cannot be less than zero or null.", TestName = "When update number is null.")]
+        [TestCase("AU895561", -1, 1, "ProductVersions[0].EditionNumber", "EditionNumber cannot be less than zero or null.", TestName = "When edition number is less than zero.")]
+        [TestCase("AU895561", 4, -1, "ProductVersions[0].UpdateNumber", "UpdateNumber cannot be less than zero or null.", TestName = "When update number is less than zero.")]
         public async Task WhenICallTheApiWithNullProductVersion_ThenABadRequestStatusIsReturned(string productname, int? editionnumber, int? updatenumber, string sourcemessage, string descriptionmessage)
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(productname, editionnumber, updatenumber));
 
-            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode}  is  returned, instead of the expected 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
@@ -120,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without http or https")]
         [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https parameter")]
-        [TestCase("http:/fss.ukho.gov.uk", TestName = "Callback URL with wrong http parameter")]
+        [TestCase("ftp:/fss.ukho.gov.uk", TestName = "Callback URL with ftp parameter")]
         [TestCase("https://", TestName = "Callback URL with only https parameter")]
         public async Task WhenICallTheApiWithAValidProductVersionWithInvalidCallbackURI_ThenABadRequestStatusIsReturned(string callbackurl)
         {
