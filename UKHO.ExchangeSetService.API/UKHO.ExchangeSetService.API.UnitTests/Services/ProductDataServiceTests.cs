@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
-            var result = await fakeProductDataService.ValidateProductDataByProductIdentifiers(
+            var result = await fakeProductDataService.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
