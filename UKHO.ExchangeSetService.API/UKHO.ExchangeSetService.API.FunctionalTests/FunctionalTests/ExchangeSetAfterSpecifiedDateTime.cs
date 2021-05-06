@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithAValidRFC1123DateTimeAndValidCallbackURL_ThenASuccessStatusIsReturned()
         {
             string sincedatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
             Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for datetime is  returned {apiresponse.StatusCode}, instead of the expected 200.");
 
         }
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided since date time cannot be a future date."));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided SinceDateTime cannot be a future date."));
         }
 
         
@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided since date time is either invalid or invalid format, the valid format is 'RFC1123 format'."));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided SinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
 
