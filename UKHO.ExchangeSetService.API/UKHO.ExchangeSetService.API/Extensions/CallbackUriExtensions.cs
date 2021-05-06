@@ -9,7 +9,7 @@ namespace UKHO.ExchangeSetService.API.Extensions
             try
             {
                 Uri baseUri = new Uri(callbackUri);
-                return (baseUri.Scheme == Uri.UriSchemeHttp || baseUri.Scheme == Uri.UriSchemeHttps);
+                return (baseUri.Scheme == Uri.UriSchemeHttps);
             }
             catch (FormatException)
             {

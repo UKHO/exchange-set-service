@@ -1,6 +1,7 @@
 ﻿using FakeItEasy;
 using FluentValidation.Results;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
-    [TestFixture()]
+    [TestFixture]
     public class ProductDataServiceTests
     {
         private IProductIdentifierValidator fakeProductIdentifierValidator;
@@ -27,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
         #region ProductIdentifiers
 
-        [Test()]
+        [Test]
         public async Task WhenInvalidProductIdentifierRequest_ThenValidateProductDataByProductIdentifiersReturnsBadrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
@@ -40,7 +41,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual("Product Identifiers cannot be blank or null.", result.Errors.Single().ErrorMessage);
         }
 
-        [Test()]
+        [Test]
         public async Task WhenInvalidNullProductIdentifierRequest_ThenValidateProductDataByProductIdentifiersReturnsBadrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
@@ -52,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual("Either body is null or malformed.", result.Errors.Single().ErrorMessage);
         }
 
-        [Test()]
+        [Test]
         public async Task WhenValidProductIdentifierRequest_ThenValidateProductDataByProductIdentifierReturnsOkrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
@@ -70,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.IsTrue(result.IsValid);
         }
 
-        [Test()]
+        [Test]
         public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
@@ -83,7 +84,43 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callbackUri
                 });
-            Assert.IsInstanceOf<ExchangeSetResponse>(result);
+            LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+            };
+            LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
+            };
+            Links links = new Links()
+            {
+                ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
+                ExchangeSetFileUri = linkSetFileUri
+            };
+            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+            {
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123456",
+                    Reason = "productWithdrawn"
+                },
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123789",
+                    Reason = "invalidProduct"
+                }
+            };
+            ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
+            {
+                Links = links,
+                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
+                RequestedProductCount = 22,
+                ExchangeSetCellCount = 15,
+                RequestedProductsAlreadyUpToDateCount = 5,
+                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet
+            };
+            Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount,result.ExchangeSetCellCount);
+            Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.RequestedProductCount);
         }
         #endregion
     }
