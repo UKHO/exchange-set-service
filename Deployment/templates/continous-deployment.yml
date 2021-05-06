@@ -25,7 +25,7 @@ steps:
   - task: AzureWebApp@1
     displayName: "Azure App Deploy: ess-$(Environment)-webapp"
     inputs:
-      azureSubscription: "Ravi_subscription_latest"
+      azureSubscription: ""
       appType: webApp
       appName: "$(WEB_APP_NAME)"
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
