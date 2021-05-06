@@ -16,7 +16,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
-    [TestFixture()]
+    [TestFixture]
     public class ProductDataControllerTests
     {
         private ProductDataController controller;
@@ -102,11 +102,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                             .Returns(new ValidationResult(new List<ValidationFailure>()));
 
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
-                 .Returns(new ExchangeSetResponse());
+                 .Returns(response);
 
             var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>() 
                             { new ProductVersionRequest() { ProductName = "demo" } }, "");
-            Assert.IsInstanceOf<OkObjectResult>(result);
+            Assert.AreSame(response, result.Value);
         }
         #endregion
     }

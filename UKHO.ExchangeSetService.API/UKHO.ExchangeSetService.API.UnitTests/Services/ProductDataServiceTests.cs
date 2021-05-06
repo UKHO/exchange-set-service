@@ -11,7 +11,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
-    [TestFixture()]
+    [TestFixture]
     public class ProductDataServiceTests
     {
         private IProductDataProductVersionsValidator fakeProductVersionValidator;
@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
         #region ProductVersions
         
-        [Test()]
+        [Test]
         public async Task WhenInvalidProductVersionRequest_ThenValidateProductDataByProductVersionsReturnsBadrequest()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual("Product Versions product name cannot be blank or null.", result.Errors.Single().ErrorMessage);
         }
         
-        [Test()]
+        [Test]
         public async Task WhenInvalidNullProductVersionRequest_ThenValidateProductDataByProductVersionsReturnsBadrequest()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
@@ -52,25 +52,26 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual("Either body is null or malformed.", result.Errors.Single().ErrorMessage);
         }
 
-        [Test()]
+        [Test]
         public async Task WhenValidProductVersionRequest_ThenValidateProductDataByProductVersionsReturnsOkrequest()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
 
             var result = await fakeProductDataService.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
-                            { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = "Demo" } } });
+                            { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = "Demo", EditionNumber = 5, UpdateNumber = 0 } } });
             Assert.IsTrue(result.IsValid);
         }
 
-        [Test()]
+        [Test]
         public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkrequest()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
 
             var result = await fakeProductDataService.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
-            { ProductVersions = new List<ProductVersionRequest>() });
+            { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest { 
+            ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } }, CallbackUri = "" });
             Assert.IsInstanceOf<ExchangeSetResponse>(result);
         }
         #endregion

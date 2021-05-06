@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
@@ -22,30 +21,30 @@ namespace UKHO.ExchangeSetService.API.Validation
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
             RuleFor(v => v.ProductVersions).NotEmpty().NotNull()
             .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                 .WithMessage("Product Versions cannot be null.");
-            When(b => b != null && b.ProductVersions != null, () =>
-            {
-                RuleFor(b => b.ProductVersions)
-                     .Must(ru => ru.All(u => u != null && !string.IsNullOrWhiteSpace(u.ProductName)))
-                     .When(ru => ru.ProductVersions != null)
-                     .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                     .WithMessage("Product Versions product name cannot be blank or null.");
-                RuleFor(b => b.ProductVersions)
-                     .Must(ru => ru.All(u => u != null && u.EditionNumber != null && u.EditionNumber >= 0))
-                     .When(ru => ru.ProductVersions != null)
-                     .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                     .WithMessage("Product Versions edition number cannot be less than zero or null.");
-                RuleFor(b => b.ProductVersions)
-                     .Must(ru => ru.All(u => u != null && u.UpdateNumber != null && u.UpdateNumber >= 0))
-                     .When(ru => ru.ProductVersions != null)
-                     .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                     .WithMessage("Product Versions update number cannot be less than zero or null.");
-            });
+                 .WithMessage("ProductVersions cannot be null.");
+            RuleForEach(v => v.ProductVersions).SetValidator(new ProductVersionsValidator());
         }
 
         Task<ValidationResult> IProductDataProductVersionsValidator.Validate(ProductDataProductVersionsRequest request)
         {
             return ValidateAsync(request);
+        }
+
+        public class ProductVersionsValidator : AbstractValidator<ProductVersionRequest>
+        {
+            public ProductVersionsValidator()
+            {
+                RuleFor(v => v.ProductName).NotEmpty().NotNull().Must(ru => !string.IsNullOrWhiteSpace(ru))
+                .When(ru => ru != null)
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .WithMessage("ProductName cannot be blank or null.");
+                RuleFor(v => v.EditionNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .WithMessage("EditionNumber cannot be less than zero or null.");
+                RuleFor(v => v.UpdateNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .WithMessage("UpdateNumber cannot be less than zero or null.");
+            }
         }
     }
 }
