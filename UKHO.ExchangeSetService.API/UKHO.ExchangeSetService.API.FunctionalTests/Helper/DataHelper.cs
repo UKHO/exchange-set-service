@@ -13,9 +13,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 ProductName = productName,
                 EditionNumber = editionNumber,
                 UpdateNumber = updateNumber
-
-
-
             };
 
             return ProductVersionmodel;

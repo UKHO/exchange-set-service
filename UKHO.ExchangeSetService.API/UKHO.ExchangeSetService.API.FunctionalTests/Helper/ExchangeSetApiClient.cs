@@ -71,8 +71,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             string payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
-
-
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
             {
