@@ -25,10 +25,12 @@ stages:
 
         steps:
           - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore"
+            displayName: ".Net Core - NuGet restore non test projects only"
             inputs:
-              command: restore
-              projects: "**/*.sln"
+              command: "restore"
+              projects: |
+                **/*.csproj
+                !**/*Tests.csproj
               feedsToUse: config
               noCache: true
               nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
@@ -38,7 +40,7 @@ stages:
           - task: CmdLine@1
             displayName: "Run OWASP Dependency Checker"
             inputs:
-              filename: 'E:\encfilestore\tools\dependency-check\bin\dependency-check.bat'
+              filename: 'dependency-check.bat'
               arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
 
           - task: PublishBuildArtifacts@1
@@ -57,7 +59,59 @@ stages:
                 Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
           - task: DotNetCoreCLI@2
-            displayName: "dotnet build for UKHO.ExchangeSetService.API"
+            displayName: ".Net Core - NuGet restore test projects only"
             inputs:
-              projects: "**/UKHO.ExchangeSetService.API.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API'
+              command: "restore"
+              projects: "**/*Tests.csproj"
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build task"
+            inputs:
+              command: "build"
+              projects: "**/*.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet test - Perform Unit Tests"
+            inputs:
+              command: "test"
+              projects: "**/*UnitTests.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+              publishTestResults: true
+              testRunTitle: "UnitTests"
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish functional test"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: "**/*UKHO.ExchangeSetService.API.FunctionalTests.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              zipAfterPublish: false
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Functional test Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              ArtifactName: functionaltests
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish WebAPI"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: '**/*UKHO.ExchangeSetService.API.csproj'
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
+              zipAfterPublish: true
+              modifyOutputPath: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish WebAPI Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
+              ArtifactName: ExchangeSetServiceWebAPI
