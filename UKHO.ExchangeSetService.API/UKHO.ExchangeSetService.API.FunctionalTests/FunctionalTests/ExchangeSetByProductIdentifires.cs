@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier);
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of theEditionNumber expected 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of the expected status 200.");
 
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of product identifier expected 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of of the expected status 200.");
 
         }
 
@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>();
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of product identifier expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
              Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { null};
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of product identifier expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "ProductIdentifier"));
@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, callbackurl);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of product identifier expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "CallbackUri"));
