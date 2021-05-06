@@ -32,12 +32,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                    {new ValidationFailure("ProductVersions", "Product Versions product name cannot be blank or null.")}));
+                    {new ValidationFailure("ProductName", "ProductName cannot be blank or null.")}));
 
             var result = await fakeProductDataService.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest() 
                     { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } } });
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual("Product Versions product name cannot be blank or null.", result.Errors.Single().ErrorMessage);
+            Assert.AreEqual("ProductName cannot be blank or null.", result.Errors.Single().ErrorMessage);
         }
         
         [Test]

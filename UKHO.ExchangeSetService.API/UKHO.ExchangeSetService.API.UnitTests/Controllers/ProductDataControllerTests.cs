@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest()
         {
-            var validationMessage = new ValidationFailure("ProductVersions", "Product Versions product name cannot be blank or null.");
+            var validationMessage = new ValidationFailure("ProductName", "ProductName cannot be blank or null.");
             validationMessage.ErrorCode = HttpStatusCode.BadRequest.ToString();
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } }, "");
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("Product Versions product name cannot be blank or null.", errors.Errors.Single().Description);
+            Assert.AreEqual("ProductName cannot be blank or null.", errors.Errors.Single().Description);
         }
 
         [Test]
