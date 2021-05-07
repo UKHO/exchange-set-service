@@ -11,7 +11,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
-    [TestFixture()]
+    [TestFixture]
     public class ProductDataServiceTests
     {
         private IProductDataSinceDateTimeValidator fakeIProductDataValidatorService;
@@ -24,7 +24,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             service = new ProductDataService(fakeIProductDataValidatorService);
         }
 
-        [Test()]
+        #region ProductDataSinceDateTime
+
+        [Test]
         public async Task WhenInvalidSinceDateTimeInRequest_ThenValidateProductDataSinceDateTimeReturnsBadRequest()
         {
             A.CallTo(() => fakeIProductDataValidatorService.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
@@ -36,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual("Provided since date time is either invalid or invalid format, the valid format is 'RFC1123 format'.", result.Errors.Single().ErrorMessage);
         }
 
-        [Test()]
+        [Test]
         public async Task WhenSinceDateTimeFormatIsGreaterThanCurrrentDateTimeInRequest_ThenValidateProductDataSinceDateTimeReturnsBadRequest()
         {
             A.CallTo(() => fakeIProductDataValidatorService.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
@@ -48,8 +50,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual("Provided since date time cannot be a future date.", result.Errors.Single().ErrorMessage);
         }
 
-        [Test()]
-        public async Task WhenCallbackUrlparameterNotValidInRequest_ThenValidateProductDataSinceDateTimeReturnsBadRequest()
+        [Test]
+        public async Task WhenCallbackUrlParameterNotValidInRequest_ThenValidateProductDataSinceDateTimeReturnsBadRequest()
         {
             A.CallTo(() => fakeIProductDataValidatorService.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
@@ -60,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual("Invalid CallbackUri format.", result.Errors.Single().ErrorMessage);
         }
 
-        [Test()]
+        [Test]
         public async Task WhenValidateProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnSuccess()
         {
             A.CallTo(() => fakeIProductDataValidatorService.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
@@ -69,5 +71,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
             Assert.IsInstanceOf<ExchangeSetResponse>(result);
         }
+
+        #endregion ProductDataSinceDateTime
     }
 }

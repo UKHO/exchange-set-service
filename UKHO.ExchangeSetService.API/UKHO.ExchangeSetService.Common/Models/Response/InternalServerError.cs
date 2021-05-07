@@ -6,6 +6,6 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
     public class InternalServerError
     {
         public string CorrelationId { get; set; }
-        public string Details { get; set; }
+        public string Detail { get; set; }
     }
 }

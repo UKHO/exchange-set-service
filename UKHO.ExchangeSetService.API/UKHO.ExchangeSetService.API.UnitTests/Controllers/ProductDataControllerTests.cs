@@ -16,7 +16,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
-    [TestFixture()]
+    [TestFixture]
     public class ProductDataControllerTests
     {
         private ProductDataController controller;
@@ -35,6 +35,51 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             controller = new ProductDataController(fakeHttpContextAccessor, fakeLogger ,fakeproductDataService);
         }
 
+        #region GetExchangeSetResponse
+        private ExchangeSetResponse GetExchangeSetResponse()
+        {
+            LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+            };
+            LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
+            };
+            Links links = new Links()
+            {
+                ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
+                ExchangeSetFileUri = linkSetFileUri
+            };
+            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+            {
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123456",
+                    Reason = "productWithdrawn"
+                },
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123789",
+                    Reason = "invalidProduct"
+                }
+            };
+            ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
+            {
+                Links = links,
+                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
+                RequestedProductCount = 22,
+                ExchangeSetCellCount = 15,
+                RequestedProductsAlreadyUpToDateCount = 5,
+                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet
+            };
+            return exchangeSetResponse;
+        }
+
+        #endregion GetExchangeSetResponse
+
+        #region ProductDataSinceDateTime
+
         [Test]
         public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest()
         {
@@ -45,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeproductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com/");
+            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com");
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("Query parameter 'SinceDateTime' is required.", errors.Errors.Single().Description);
@@ -54,15 +99,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess()
         {
-
+            var exchangeSetResponse = GetExchangeSetResponse();
             A.CallTo(() => fakeproductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
-
             A.CallTo(() => fakeproductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
-                .Returns(new ExchangeSetResponse());
+                .Returns(exchangeSetResponse);
 
-            var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "www.abc.com");
-            Assert.IsInstanceOf<OkObjectResult>(result);
+            var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
+
+            Assert.AreSame(exchangeSetResponse, result.Value);
         }
+        
+        #endregion ProductDataSinceDateTime
     }
 }
