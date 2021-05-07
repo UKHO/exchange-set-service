@@ -91,10 +91,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Query parameter 'SinceDateTime' is required."));
         }
 
-        [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without http or https")]
-        [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https parameter")]
-        [TestCase("http:/fss.ukho.gov.uk", TestName = "Callback URL with wrong http parameter")]
-        [TestCase("https://", TestName = "Callback URL with only https parameter")]
+        [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
+        [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https request")]
+        [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
+        [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
+        [TestCase("https://", TestName = "Callback URL with only https request")]
         public async Task WhenICallTheApiWithInvalidCallbackURI_ThenABadRequestResponseIsReturned(string callbackurl)
         {
             string sincedatetime = "Mon, 01 Mar 2021 00:00:00 GMT";

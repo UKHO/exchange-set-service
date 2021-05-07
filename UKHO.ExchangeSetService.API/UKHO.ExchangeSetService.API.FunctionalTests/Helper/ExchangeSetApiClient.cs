@@ -1,6 +1,10 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -35,6 +39,34 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri))
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+        }
+
+        /// <summary>
+        /// Get latest baseline data for a specified set of ENCs. - POST /productData/productVersions
+        /// </summary>
+        /// <param name="productVersionModel"></param>
+        /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
+        {
+            string uri = $"{apiHost}/productData/productVersions";
+            if (callbackUri != null)
+            {
+                uri += $"?callbackuri={callbackUri}";
+            }
+            string payloadJson = JsonConvert.SerializeObject(productVersionModel);
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
             {
                 if (accessToken != null)
                 {
