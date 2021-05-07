@@ -27,4 +27,4 @@ spec:
   owner: rockydevnet
   system: ADDS
   definition:
-    $text: ./exchangeSetService_OpenApi_definition.yaml
+    $text: ./exchangeSetService_OpenApi_definition.yaml asd asd 
