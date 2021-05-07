@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ExchangesetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
         }
         [Test]
-        public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenASuccessStatusIsReturned()
+        public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenACorrectResponseIsReturned()
         {
             string sincedatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
             var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime);
@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https parameter")]
         [TestCase("http:/fss.ukho.gov.uk", TestName = "Callback URL with wrong http parameter")]
         [TestCase("https://", TestName = "Callback URL with only https parameter")]
-        public async Task WhenICallTheApiWithInvalidCallbackURI_ThenABadRequestStatusIsReturned(string callbackurl)
+        public async Task WhenICallTheApiWithInvalidCallbackURI_ThenABadRequestResponseIsReturned(string callbackurl)
         {
             string sincedatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
             var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime, callbackurl);

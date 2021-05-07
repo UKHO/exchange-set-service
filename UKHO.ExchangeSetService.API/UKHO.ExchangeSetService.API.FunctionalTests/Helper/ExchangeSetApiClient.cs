@@ -5,13 +5,11 @@ using System.Threading.Tasks;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
 
-   
+
     public class ExchangeSetApiClient
     {
         static HttpClient httpClient = new HttpClient();
         private readonly string apiHost;
-
-       
         public ExchangeSetApiClient(string apiHost)
         {
             this.apiHost = apiHost;
@@ -46,6 +44,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
         }
-    }   
-    
+    }
+
 }
