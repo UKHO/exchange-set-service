@@ -25,12 +25,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenASuccessStatusIsReturned()
+        public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier);
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product version is  returned {apiresponse.StatusCode}, instead of the expected status 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 200.");
 
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of of the expected status 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code is returned  {apiresponse.StatusCode}, instead of of the expected status 200.");
 
         }
 
@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>();
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
              Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { null};
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "ProductIdentifier"));
@@ -89,12 +89,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https parameter")]
         [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp parameter")]
         [TestCase("https://", TestName = "Callback URL with only https parameter")]
-        public async Task WhenICallTheApiWithAInvalidCallbackURIWithProductIdentifier_ThenABadRequestStatusIsReturned(string callbackurl)
+        public async Task WhenICallTheApiWithAInvalidCallbackURIWithProductIdentifier_ThenABadRequestResponseIsReturned(string callbackurl)
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
             var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, callbackurl);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Exchange Set for Product identifier is  returned {apiresponse.StatusCode}, instead of the expected status 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "CallbackUri"));

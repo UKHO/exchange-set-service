@@ -8,18 +8,11 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
-
-    /// <summary>
-    /// This class is for all Api client methods
-    /// </summary>
     public class ExchangeSetApiClient
     {
         static HttpClient httpClient = new HttpClient();
         private readonly string apiHost;
 
-        /// <summary>
-        /// Constructor call here
-        /// </summary>
         public ExchangeSetApiClient(string apiHost)
         {
             this.apiHost = apiHost;
@@ -71,8 +64,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             string payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
-
-
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
             {
@@ -80,9 +71,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 {
                     httpRequestMessage.SetBearerToken(accessToken);
                 }
-
-
-
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
         }
@@ -103,8 +91,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             string payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
-
-
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
             {
@@ -112,8 +98,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 {
                     httpRequestMessage.SetBearerToken(accessToken);
                 }
-
-
 
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
