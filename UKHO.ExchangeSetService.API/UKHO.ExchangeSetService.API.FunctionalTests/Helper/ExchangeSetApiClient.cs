@@ -79,8 +79,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     httpRequestMessage.SetBearerToken(accessToken);
                 }
 
-
-
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
         }
