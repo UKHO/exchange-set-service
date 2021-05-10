@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
     {
         [JsonProperty("source")]
         public string Source { get; set; }
-
+       
         [JsonProperty("description")]
         public string Description { get; set; }
     }

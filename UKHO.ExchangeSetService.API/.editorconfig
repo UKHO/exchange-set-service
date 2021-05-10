@@ -19,4 +19,4 @@ dotnet_diagnostic.S109.severity = error
 dotnet_diagnostic.S1075.severity = suggestion
 
 # CS1591: Missing XML comment for publicly visible type or member
-dotnet_diagnostic.CS1591.severity = suggestion
+dotnet_diagnostic.CS1591.severity = none

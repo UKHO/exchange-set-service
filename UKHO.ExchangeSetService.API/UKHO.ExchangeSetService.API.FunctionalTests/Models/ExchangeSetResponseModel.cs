@@ -8,6 +8,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
     {
         [JsonProperty("_links")]
         public Links Links { get; set; }
+
         public DateTime? ExchangeSetUrlExpiryDateTime { get; set; }
 
         [JsonProperty("requestedProductCount")]
@@ -18,14 +19,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
 
         [JsonProperty("requestedProductsAlreadyUpToDateCount")]
         public int RequestedProductsAlreadyUpToDateCount { get; set; }
+
         public IEnumerable<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
     }
 
     public class Links
     {
+
         public LinkSetBatchStatusUri ExchangeSetBatchStatusUri { get; set; }
         public LinkSetFileUri ExchangeSetFileUri { get; set; }
     }
+
     public class LinkSetBatchStatusUri
     {
         [JsonProperty("href")]
@@ -36,6 +40,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
         [JsonProperty("href")]
         public string Href { get; set; }
     }
+
     public class RequestedProductsNotInExchangeSet
     {
         [JsonProperty("productName")]

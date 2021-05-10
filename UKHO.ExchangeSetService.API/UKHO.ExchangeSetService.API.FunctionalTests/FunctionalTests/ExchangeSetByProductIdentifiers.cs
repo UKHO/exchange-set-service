@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
-
-
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
-    class ExchangeSetByProductIdentifires
+    class ExchangeSetByProductIdentifiers
     {
         private ExchangeSetApiClient ExchangesetApiClient { get; set; }
         private TestConfiguration Config { get; set; }
