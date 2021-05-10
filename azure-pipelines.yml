@@ -19,6 +19,10 @@ variables:
     value: "any cpu"
   - name: BuildCounter
     value: $[counter(format('{0:yyyyMMdd}', pipeline.startTime), 1)]
+  - name: TerraformContainer
+    value: ukhydrographicoffice/terraform:0.15.3
+  - name: DeploymentPool
+    value: UKHO Ubuntu 1804
 
 stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
@@ -46,7 +50,7 @@ stages:
           - task: CmdLine@1
             displayName: "Run OWASP Dependency Checker"
             inputs:
-              filename: 'dependency-check.bat'
+              filename: "dependency-check.bat"
               arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
 
           - task: PublishBuildArtifacts@1
@@ -80,7 +84,7 @@ stages:
             inputs:
               command: "build"
               projects: "**/*.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
+              arguments: "--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)"
 
           - task: DotNetCoreCLI@2
             displayName: "dotnet test - Perform Unit Tests"
@@ -111,7 +115,7 @@ stages:
             inputs:
               command: "publish"
               publishWebProjects: false
-              projects: '**/*UKHO.ExchangeSetService.API.csproj'
+              projects: "**/*UKHO.ExchangeSetService.API.csproj"
               arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
               zipAfterPublish: true
               modifyOutputPath: true
@@ -129,11 +133,13 @@ stages:
               ArtifactName: terraformartifact
 
   - stage: Devdeploy
+    pool: $(DeploymentPool)
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
       - deployment: DevDeployApp
         displayName: "Dev - deploy terraform and dotnet App"
         environment: "Ess-Dev"
+        container: $(TerraformContainer)
         workspace:
           clean: all
         variables:
@@ -165,7 +171,7 @@ stages:
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
                     fileType: json
-                    targetFiles: 'appsettings.json'
+                    targetFiles: "appsettings.json"
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
@@ -179,12 +185,14 @@ stages:
                     workingDirectory: '$(Build.SourcesDirectory)\functionaltests'
 
   - stage: QAdeploy
+    pool: $(DeploymentPool)
     displayName: QAdeploy (inc terraform, webapp deploy)
     jobs:
       - deployment: QADeployApp
         displayName: QA - deploy terraform and dotnet App
         condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
         environment: "Ess-Qa"
+        container: $(TerraformContainer)
         workspace:
           clean: all
         variables:
@@ -203,7 +211,7 @@ stages:
                 - template: Deployment/templates/continous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                
+
                 - task: DownloadPipelineArtifact@2
                   displayName: "Download Functional test Artifact"
                   inputs:
@@ -216,7 +224,7 @@ stages:
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
                     fileType: json
-                    targetFiles: 'appsettings.json'
+                    targetFiles: "appsettings.json"
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
