@@ -86,9 +86,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
-        [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https parameter")]
-        [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp parameter")]
-        [TestCase("https://", TestName = "Callback URL with only https parameter")]
+        [TestCase("https:/fss.ukho.gov.uk", TestName = "Callback URL with wrong https request")]
+        [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
+        [TestCase("https://", TestName = "Callback URL with only https request")]
+        [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
         public async Task WhenICallTheApiWithAInvalidCallbackURIWithProductIdentifier_ThenABadRequestResponseIsReturned(string callbackurl)
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
