@@ -11,14 +11,29 @@
     <cve>CVE-2020-22475</cve>
   </suppress>
   <suppress>
-    <notes>
-      <![CDATA[
+    <notes><![CDATA[
    file name: GetDocument.Insider.dll
-   Suppressing this CVE as it is false positive and this dll is not refrence in our projects, and this dll is mainly used by cli.
-   ]]>
-    </notes>
-    <cve>CVE-2005-2224</cve>
+   Suppressing this CVE as it is a .NetCore runtime issue affecting .NetCore runtimes below .NET Core 3.1.4 or lower. The ESS Runs in an AppService which will have the fixes already applied, and the global.json has been addeded to require .NetCore 3.1.408 or greater.
+   More details can be found here: https://github.com/dotnet/announcements/issues/156
+   ]]>    </notes>
     <cve>CVE-2020-1108</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: GetDocument.Insider.dll
+  CVE References ASP.Net versions 1.0-1.1. ESS is built on ASP.Net Core 3.1+, not classic ASP.Net.
+See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus.com/bid/14217 for more details.
+   ]]>    </notes>
+    <cve>CVE-2005-2224</cve>
+  </suppress>
+
+  <suppress>
+    <notes><![CDATA[
+   file name: GetDocument.Insider.dll
+  Vunerability applies to AfterLogic MailBee WebMail Pro 4.1 for ASP.NET which is not used by the ESS
+   ]]>    </notes>
     <cve>CVE-2008-0333</cve>
   </suppress>
 </suppressions>
+
+  
