@@ -1,6 +1,7 @@
 parameters:
-  - name: terraformapply
-    type: string
+  - name: ContinueEvenIfResourcesAreGettingDestroyed
+    type: boolean
+    default: false
 
 steps:
   - task: PowerShell@2
@@ -8,7 +9,7 @@ steps:
     inputs:
       targetType: filePath
       filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run.ps1'
-      arguments: '-DeploymentResourceGroupName $(DeploymentResourceGroupName) -DeploymentStorageAccountName $(DeploymentStorageAccountName) -WorkSpace $(Environment) -Terraformapply ${{ parameters.terraformapply }}'
+      arguments: '-deploymentResourceGroupName $(DeploymentResourceGroupName) -deploymentStorageAccountName $(DeploymentStorageAccountName) -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}'
     env:
       ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
       ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
