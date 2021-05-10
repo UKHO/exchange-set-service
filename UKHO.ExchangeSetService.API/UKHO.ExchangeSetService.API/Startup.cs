@@ -14,6 +14,8 @@ using Swashbuckle.AspNetCore.Filters;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
 using Newtonsoft.Json.Serialization;
+using UKHO.ExchangeSetService.API.Validation;
+using Microsoft.AspNetCore.Mvc;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -30,13 +32,21 @@ namespace UKHO.ExchangeSetService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson(options =>
+            services.AddControllers(o =>
+            {
+                o.AllowEmptyInputInBodyModelBinding = true;
+            }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
             this.ConfigureSwagger(services);
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IProductDataService, ProductDataService>();
+            services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
