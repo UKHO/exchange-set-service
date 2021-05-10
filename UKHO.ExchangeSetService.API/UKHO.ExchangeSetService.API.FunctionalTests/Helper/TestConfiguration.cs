@@ -8,18 +8,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     /// </summary>
     public class TestConfiguration
     {
-        /// <summary>
-        /// ConfigurationRoot variable declaire here 
-        /// </summary>
-        protected IConfigurationRoot ConfigurationRoot;
-        /// <summary>
-        /// EssBaseAddress variable declaire here 
-        /// </summary>
-        public string EssBaseAddress;
 
-        /// <summary>
-        /// Constructor call here
-        /// </summary>
+        protected IConfigurationRoot ConfigurationRoot;
+        public string EssBaseAddress;
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()

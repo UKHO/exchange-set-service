@@ -24,14 +24,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
     /// </summary>
     public class Error
     {
-        /// <summary>
-        /// Json property source
-        /// </summary>
         [JsonProperty("source")]
         public string Source { get; set; }
-        /// <summary>
-        /// Json property description
-        /// </summary>
+       
         [JsonProperty("description")]
         public string Description { get; set; }
     }

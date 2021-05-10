@@ -15,18 +15,19 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
     public class ProductDataServiceTests
     {
         private IProductDataProductVersionsValidator fakeProductVersionValidator;
-        private IProductDataService fakeProductDataService;
+        private IProductDataSinceDateTimeValidator fakeProductDataSinceDateTimeValidator;
+        private ProductDataService service;
 
         [SetUp]
         public void Setup()
         {
             fakeProductVersionValidator = A.Fake<IProductDataProductVersionsValidator>();
-
-            fakeProductDataService = new ProductDataService(fakeProductVersionValidator);
+            fakeProductDataSinceDateTimeValidator = A.Fake<IProductDataSinceDateTimeValidator>();
+            service = new ProductDataService(fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator);
         }
 
         #region ProductVersions
-        
+
         [Test]
         public async Task WhenInvalidProductVersionRequest_ThenValidateProductDataByProductVersionsReturnsBadrequest()
         {
@@ -34,12 +35,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>
                     {new ValidationFailure("ProductName", "ProductName cannot be blank or null.")}));
 
-            var result = await fakeProductDataService.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest() 
-                    { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } } });
+            var result = await service.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
+            { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } } });
+
             Assert.IsFalse(result.IsValid);
             Assert.AreEqual("ProductName cannot be blank or null.", result.Errors.Single().ErrorMessage);
         }
-        
+
         [Test]
         public async Task WhenInvalidNullProductVersionRequest_ThenValidateProductDataByProductVersionsReturnsBadrequest()
         {
@@ -47,7 +49,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>
                     {new ValidationFailure("RequestBody", "Either body is null or malformed.")}));
 
-            var result = await fakeProductDataService.ValidateProductDataByProductVersions(null);
+            var result = await service.ValidateProductDataByProductVersions(null);
+
             Assert.IsFalse(result.IsValid);
             Assert.AreEqual("Either body is null or malformed.", result.Errors.Single().ErrorMessage);
         }
@@ -58,8 +61,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
 
-            var result = await fakeProductDataService.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
-                            { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = "Demo", EditionNumber = 5, UpdateNumber = 0 } } });
+            var result = await service.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
+            { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = "Demo", EditionNumber = 5, UpdateNumber = 0 } } });
+
             Assert.IsTrue(result.IsValid);
         }
 
@@ -69,11 +73,69 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
 
-            var result = await fakeProductDataService.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
-            { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest { 
-            ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } }, CallbackUri = "" });
+            var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
+            {
+                ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
+                ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } },
+                CallbackUri = ""
+            });
+
             Assert.IsInstanceOf<ExchangeSetResponse>(result);
         }
         #endregion
+
+        #region ProductDataSinceDateTime
+
+        [Test]
+        public async Task WhenInvalidSinceDateTimeInRequest_ThenValidateProductDataSinceDateTimeReturnsBadRequest()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                            { new ValidationFailure("SinceDateTime", "Provided since date time is either invalid or invalid format, the valid format is 'RFC1123 format'.")}));
+
+            var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual("Provided since date time is either invalid or invalid format, the valid format is 'RFC1123 format'.", result.Errors.Single().ErrorMessage);
+        }
+
+        [Test]
+        public async Task WhenSinceDateTimeFormatIsGreaterThanCurrrentDateTimeInRequest_ThenValidateProductDataSinceDateTimeReturnsBadRequest()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                            { new ValidationFailure("SinceDateTime", "Provided since date time cannot be a future date.")}));
+
+            var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual("Provided since date time cannot be a future date.", result.Errors.Single().ErrorMessage);
+        }
+
+        [Test]
+        public async Task WhenCallbackUrlParameterNotValidInRequest_ThenValidateProductDataSinceDateTimeReturnsBadRequest()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                            { new ValidationFailure("callbackUrl", "Invalid CallbackUri format.")}));
+
+            var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual("Invalid CallbackUri format.", result.Errors.Single().ErrorMessage);
+        }
+
+        [Test]
+        public async Task WhenValidateProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnSuccess()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsInstanceOf<ExchangeSetResponse>(result);
+        }
+
+        #endregion ProductDataSinceDateTime
     }
 }

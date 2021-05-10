@@ -9,17 +9,11 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
 
-    /// <summary>
-    /// This class is for all Api client methods
-    /// </summary>
+
     public class ExchangeSetApiClient
     {
         static HttpClient httpClient = new HttpClient();
         private readonly string apiHost;
-
-        /// <summary>
-        /// Constructor call here
-        /// </summary>
         public ExchangeSetApiClient(string apiHost)
         {
             this.apiHost = apiHost;
