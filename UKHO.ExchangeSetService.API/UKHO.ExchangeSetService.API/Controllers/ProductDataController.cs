@@ -28,6 +28,69 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         /// <summary>
+        /// Provide all the latest releasable baseline data for a specified set of ENCs.
+        /// </summary>
+        /// <remarks>
+        /// Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.
+        /// ## Business Rules:
+        /// Only ENCs that are releasable at the date of the request will be returned.
+        /// 
+        /// For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
+        /// 
+        /// If an ENC has a re-issue, then the latest batch on the FSS will be used.
+        /// 
+        /// If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
+        /// 
+        /// If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e. the user is not informed it does not exist). If none of the requested ENCs exist, then a 'Bad Request' response will be returned.
+        /// </remarks>
+        /// <param name="productIdentifiers">The JSON body containing product versions.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <response code="200">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="429">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="500">Internal Server Error.</response>
+        [HttpPost]
+        [Route("/productData/productIdentifiers")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "<p>A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</p> <p>If there are no updates for any of the productVersions, then the return will be a '200' response with an empty Exchange Set(containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.</p>")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time the user should wait in seconds before retrying.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
+        public virtual async Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
+        {
+            if (productIdentifiers == null || productIdentifiers.Length == 0)
+            {
+                var error = new List<Error>
+                {
+                    new Error()
+                    {
+                        Source = "RequestBody",
+                        Description = "Either body is null or malformed."
+                    }
+                };
+                return BuildBadRequestErrorResponse(error);
+            }
+            ProductIdentifierRequest productIdentifierRequest = new ProductIdentifierRequest()
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+
+            var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
+
+            if (!validationResult.IsValid)
+            {
+                List<Error> errors;
+
+                if (validationResult.HasBadRequestErrors(out errors))
+                {
+                    return BuildBadRequestErrorResponse(errors);
+                }
+            }
+            return Ok(await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest));
+        }
+
+        /// <summary>
         /// Given a set of ENC versions (e.g. Edition x Update y) provide any later releasable files.
         /// </summary>
         /// <remarks>

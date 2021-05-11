@@ -4,10 +4,8 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
 {
-
     public class ExchangeSetResponseModel
     {
-
         [JsonProperty("_links")]
         public Links Links { get; set; }
 

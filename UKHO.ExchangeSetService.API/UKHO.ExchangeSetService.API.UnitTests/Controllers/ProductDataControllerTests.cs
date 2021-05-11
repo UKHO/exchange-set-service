@@ -23,6 +23,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         private IHttpContextAccessor fakeHttpContextAccessor;
         private IProductDataService fakeProductDataService;
         private ILogger<ProductDataController> fakeLogger;
+        public const string errorMessage = "Either body is null or malformed";
 
         [SetUp]
         public void Setup()
@@ -80,6 +81,82 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
         #endregion GetExchangeSetResponse
 
+        #region PostProductIdentifiers
+
+        [Test]
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest()
+        {
+            var validationMessage = new ValidationFailure("ProductIdentifiers", "Product Identifiers cannot be null or empty.");
+            validationMessage.ErrorCode = HttpStatusCode.BadRequest.ToString();
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+                            .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
+
+            string[] productIdentifiers = new string[] { "", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);
+            var errors = (ErrorDescription)result.Value;
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("Product Identifiers cannot be null or empty.", errors.Errors.Single().Description);
+
+        }
+
+        [Test]
+        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest()
+        {
+            var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.");
+            validationMessage.ErrorCode = HttpStatusCode.BadRequest.ToString();
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+                            .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
+
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null);
+            var errors = (ErrorDescription)result.Value;
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
+        }
+
+
+        [Test]
+        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest()
+        {
+            var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.");
+            validationMessage.ErrorCode = HttpStatusCode.BadRequest.ToString();
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+                            .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
+
+            string[] productIdentifiers = new string[] { };
+            string callbackUri = string.Empty;
+
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);
+            var errors = (ErrorDescription)result.Value;
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
+        }
+
+
+        [Test]
+        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated()
+        {
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+
+            var exchangeSetResponse = GetExchangeSetResponse();
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+                 .Returns(exchangeSetResponse);
+            var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);
+
+            Assert.AreSame(exchangeSetResponse, (ExchangeSetResponse)result.Value);
+
+        }
+        #endregion PostProductIdentifiers
+
         #region ProductVersions
 
         [Test]
@@ -95,6 +172,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(
                 new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } }, "");
+
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -120,6 +198,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
+        
         [Test]
         public async Task WhenValidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsOkResponse()
         {
@@ -169,12 +248,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(exchangeSetResponse);
-
+            
             var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
 
             Assert.AreSame(exchangeSetResponse, result.Value);
         }
-        
+              
         #endregion ProductDataSinceDateTime
     }
 }

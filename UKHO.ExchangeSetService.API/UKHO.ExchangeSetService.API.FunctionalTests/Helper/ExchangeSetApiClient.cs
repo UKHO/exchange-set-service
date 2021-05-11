@@ -8,12 +8,11 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
-
-
     public class ExchangeSetApiClient
     {
         static HttpClient httpClient = new HttpClient();
         private readonly string apiHost;
+
         public ExchangeSetApiClient(string apiHost)
         {
             this.apiHost = apiHost;
@@ -64,6 +63,33 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 uri += $"?callbackuri={callbackUri}";
             }
             string payloadJson = JsonConvert.SerializeObject(productVersionModel);
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+        }
+
+        /// <summary>
+        /// Get latest baseline data for a specified set of ENCs. - POST /productData/productIdentifiers
+        /// </summary>
+        /// <param name="productIdentifierModel"></param>
+        /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> GetProductIdentifiresDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
+        {
+            string uri = $"{apiHost}/productData/productIdentifiers";
+            if (callbackUri != null)
+            {
+                uri += $"?callbackuri={callbackUri}";
+            }
+            string payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
