@@ -1,0 +1,126 @@
+﻿using JWT;
+using JWT.Algorithms;
+using JWT.Serializers;
+using Microsoft.Identity.Client;
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
+
+namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
+{
+    public class AuthTokenProvider
+    {
+        static string EssAccessToken = null;
+        static string EssAccessTokenNoAuth = null;
+        static EssAuthorizationTokenConfiguration EssauthConfig = new TestConfiguration().EssAuthorizationConfig;
+
+        public async Task<string> GetEssToken()
+        {
+            EssAccessToken = await GenerateEssToken(EssauthConfig.AutoTestClientId, EssauthConfig.AutoTestClientSecret, EssAccessToken);
+            return EssAccessToken;
+        }
+
+        public async Task<string> GetEssTokenNoAuth()
+        {
+            EssAccessTokenNoAuth = await GenerateEssToken(EssauthConfig.AutoTestClientIdNoAuth, EssauthConfig.AutoTestClientSecretNoAuth, EssAccessTokenNoAuth);
+            return EssAccessTokenNoAuth;
+        }
+
+        /// <summary>
+        /// GenerateToken
+        /// </summary>
+        /// <param name="ClientId"></param>
+        /// <param name="ClientSecrect"></param>
+        /// <param name="Token"></param>
+        /// <returns></returns>
+
+        private static async Task<string> GenerateEssToken(string ClientId, string ClientSecrect, string Token)
+        {
+
+            string[] scopes = new string[] { $"{EssauthConfig.EssClientId}/.default" };
+            if (EssauthConfig.IsRunningOnLocalMachine)
+            {
+                if (Token == null)
+                {
+                    IPublicClientApplication debugapp = PublicClientApplicationBuilder.Create(EssauthConfig.EssClientId).
+                                                        WithRedirectUri("http://localhost").Build();
+
+
+
+                    //Acquiring token through user interaction
+                    AuthenticationResult tokenTask = await debugapp.AcquireTokenInteractive(scopes)
+                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
+                                                            .ExecuteAsync();
+                    Token = tokenTask.AccessToken;
+                }
+                return Token;
+            }
+            else
+            {
+                if (Token == null)
+                {
+                    IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
+                                                    .WithClientSecret(ClientSecrect)
+                                                    .WithAuthority(new Uri($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}"))
+                                                    .Build();
+
+                    AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+                    Token = tokenTask.AccessToken;
+                }
+                return Token;
+            }
+        }
+
+        /// <summary>
+        /// Generate custom signeture verified Auth Token
+        /// </summary>
+        public string GenerateCustomToken()
+        {
+            var privateKey = TestConfiguration.FakeTokenPrivateKey;
+            var header = new Dictionary<string, object>
+            {
+                {  "x5t", "kg2LYs2T0CTjIfj4rt6JIynen38"},
+                {  "kid", "kg2LYs2T0CTjIfj4rt6JIynen38"}
+            };
+
+            var provider = new UtcDateTimeProvider();
+            var now = provider.GetNow();
+            var tokenIssued = UnixEpoch.GetSecondsSince(now);
+            var expiry = tokenIssued + 3600;
+
+            var payload = new Dictionary<string, object>
+            {
+                { "aud", $"{EssauthConfig.EssClientId}"},
+                { "iss", $"https://sts.windows.net/{EssauthConfig.TenantId}/" },
+                { "iat",tokenIssued},
+                { "nbf", tokenIssued},
+                { "exp", expiry },
+                { "aio", "E2RgYPisIWqdtDHp72InvliZoLuf+m/cOdbklLQrIXRDxgPb23MB" },
+                { "appid", $"{EssauthConfig.AutoTestClientId}"},
+                { "appidacr", "1" },
+                { "idp", $"https://sts.windows.net/{EssauthConfig.TenantId}/"},
+                { "oid", "da599026-93fc-4d2a-92c8-94b724e26176" },
+                { "rh", "0.AAAASMo0kT1mBUqWijGkLwrtPjtAyT6ZgpBKjswH7mZCEJ8CAP0."},
+                { "roles", new string [] { "BatchCreate" }  },
+                { "sub", "uftNZPaOJaWSYJqHrMIkFhg3rgQ97G9Km9fDl48WQPk"},
+                { "tid", "9134ca48-663d-4a05-968a-31a42f0aed3e"},
+                { "uti", "KOT0iQPMzESCe4R_Ce94AA"},
+                { "ver", "1.0"}
+            };
+
+            var privateKeyBytes = Convert.FromBase64String(privateKey);
+            using var rsa = RSA.Create();
+            rsa.ImportRSAPrivateKey(privateKeyBytes, out _);
+            IJwtAlgorithm algorithm = new RS256Algorithm(rsa, rsa);
+            IJsonSerializer serializer = new JsonNetSerializer();
+            IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+            IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
+
+            return encoder.Encode(header, payload, "");
+        }
+
+    }
+
+}

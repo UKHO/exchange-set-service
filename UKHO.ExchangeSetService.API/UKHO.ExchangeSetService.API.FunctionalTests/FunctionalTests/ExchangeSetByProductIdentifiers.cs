@@ -12,14 +12,58 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     {
         private ExchangeSetApiClient ExchangesetApiClient { get; set; }
         private TestConfiguration Config { get; set; }
+        private string EssJwtToken { get; set; }
+        private string EssJwtTokenNoRole { get; set; }
+        private string EssJwtCustomizedToken { get; set; }
         public ProductIdentifierModel ProductIdentifiermodel { get; set; }
 
         [SetUp]
-        public void Setup()
+        public async Task SetupAsync()
         {
             Config = new TestConfiguration();
             ExchangesetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             ProductIdentifiermodel = new ProductIdentifierModel();
+            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
+            EssJwtToken = await authTokenProvider.GetEssToken();
+            EssJwtTokenNoRole = await authTokenProvider.GetEssTokenNoAuth();
+            EssJwtCustomizedToken = authTokenProvider.GenerateCustomToken();
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
+        {
+            ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier);
+            
+            Assert.AreEqual(401, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 401.");
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
+        {
+            string TamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
+            ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, accessToken: TamperedEssJwtToken);
+                      
+            Assert.AreEqual(401, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 401.");
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
+        {
+            ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, accessToken: EssJwtCustomizedToken);
+
+            Assert.AreEqual(401, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 401.");
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithNoRoleToken_ThenAForbiddenResponseIsReturned()
+        {
+            ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, accessToken: EssJwtTokenNoRole);
+
+            Assert.AreEqual(403, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 403.");
         }
 
         [Test]
@@ -27,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
-            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier);
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 200.");
 
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -42,7 +86,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual("productWithdrawn", apiresponsedata.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiresponsedata.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'productWithdrawn'");
             Assert.AreEqual("GB123789", apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB123789'");
             Assert.AreEqual("invalidProduct", apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().Reason, $"Exchange set returned Reason {apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
-
         }
 
         [Test]
@@ -50,9 +93,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
-            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22", accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code is returned  {apiresponse.StatusCode}, instead of of the expected status 200.");
-
         }
 
         [Test]
@@ -60,13 +102,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>();
 
-            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22", accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
              Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Either body is null or malformed."));
-
         }
 
         [Test]
@@ -74,13 +115,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { null};
 
-            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22");
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22", accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "ProductIdentifier"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Product Identifiers cannot be null or empty."));
-
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
@@ -92,7 +132,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123456", "GB160060", "AU334550" };
 
-            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, callbackurl);
+            var apiresponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, callbackurl, accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();

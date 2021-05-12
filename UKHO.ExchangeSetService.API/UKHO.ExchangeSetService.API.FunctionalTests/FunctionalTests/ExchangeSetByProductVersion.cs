@@ -14,15 +14,89 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private TestConfiguration Config { get; set; }
         public DataHelper Datahelper { get; set; }
         public ProductVersionModel ProductVersionmodel { get; set; }
-      
+        private string EssJwtToken { get; set; }
+        private string EssJwtTokenNoRole { get; set; }
+        private string EssJwtCustomizedToken { get; set; }
+
         [SetUp]
-        public void Setup()
+        public async Task SetupAsync()
         {
             Config = new TestConfiguration();
             ExchangesetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             ProductVersionmodel = new ProductVersionModel();
             Datahelper = new DataHelper();
+            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
+            EssJwtToken = await authTokenProvider.GetEssToken();
+            EssJwtTokenNoRole = await authTokenProvider.GetEssTokenNoAuth();
+            EssJwtCustomizedToken = authTokenProvider.GenerateCustomToken();
+
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = "AU895561";
+            ProductVersionmodel.EditionNumber = 4;
+            ProductVersionmodel.UpdateNumber = 1;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+                       
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
+
+            Assert.AreEqual(401, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 401.");
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
+        {
+            string TamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
+
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = "AU895561";
+            ProductVersionmodel.EditionNumber = 4;
+            ProductVersionmodel.UpdateNumber = 1;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: TamperedEssJwtToken);
+
+            Assert.AreEqual(401, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 401.");
+        }
+
+
+        [Test]
+        public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = "AU895561";
+            ProductVersionmodel.EditionNumber = 4;
+            ProductVersionmodel.UpdateNumber = 1;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtCustomizedToken);
            
+            Assert.AreEqual(401, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 401.");
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithNoRoleToken_ThenAForbiddenResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = "AU895561";
+            ProductVersionmodel.EditionNumber = 4;
+            ProductVersionmodel.UpdateNumber = 1;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtTokenNoRole);
+
+            Assert.AreEqual(403, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 403.");
         }
 
         [Test]
@@ -43,7 +117,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode}  is  returned, instead of the expected 200.");
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 200.");
 
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -58,8 +132,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual("productWithdrawn", apiresponsedata.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiresponsedata.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'productWithdrawn'");
             Assert.AreEqual("GB123789", apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB123789'");
             Assert.AreEqual("invalidProduct", apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().Reason, $"Exchange set returned Reason {apiresponsedata.RequestedProductsNotInExchangeSet.LastOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
-
-
         }
 
         [Test]
@@ -80,8 +152,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode}  is  returned, instead of the expected 200.");
-
+            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 200.");
         }
 
         [Test]
@@ -90,7 +161,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
         
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode}  is  returned, instead of the expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
@@ -110,12 +181,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(productname, editionnumber, updatenumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode}  is  returned, instead of the expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == sourcemessage));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == descriptionmessage));
-
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
@@ -140,10 +210,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
             var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, callbackurl);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode}  is  returned, instead of the expected 400.");
+            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 400.");
 
         }
-
-
     }
 }
