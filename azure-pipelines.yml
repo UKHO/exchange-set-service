@@ -30,6 +30,13 @@ stages:
         displayName: "DependencyChecker Dotnet Build test publish"
 
         steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore non test projects only"
             inputs:

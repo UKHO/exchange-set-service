@@ -10,7 +10,6 @@ namespace UKHO.ExchangeSetService.API.Extensions
     {
         public static bool HasBadRequestErrors(this ValidationResult validationResult, out List<Error> badRequestErrors)
         {
-            badRequestErrors = new List<Error>();
             return HasErrors(validationResult, HttpStatusCode.BadRequest, out badRequestErrors);
         }
 

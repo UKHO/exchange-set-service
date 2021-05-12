@@ -10,54 +10,119 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public class ProductDataService : IProductDataService
     {
-        private readonly IProductDataProductVersionsValidator productProductVersionsValidator;
+        private readonly IProductIdentifierValidator productIdentifierValidator;
+        private readonly IProductDataProductVersionsValidator productVersionsValidator;
+        private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
 
-        public ProductDataService(IProductDataProductVersionsValidator productDataValidator)
+        public ProductDataService(IProductIdentifierValidator productIdentifierValidator,IProductDataProductVersionsValidator productVersionsValidator, IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator)
         {
-            this.productProductVersionsValidator = productDataValidator;
+            this.productIdentifierValidator = productIdentifierValidator;
+            this.productVersionsValidator = productVersionsValidator;
+            this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
+        }
+
+        public async Task<ExchangeSetResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
+        {
+            LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+            };
+            LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
+            };
+            Links links = new Links()
+            {
+                ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
+                ExchangeSetFileUri = linkSetFileUri
+            };
+            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+            {
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123456",
+                    Reason = "productWithdrawn"
+                },
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123789",
+                    Reason = "invalidProduct"
+                }
+            };
+            ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
+            {
+                Links = links,
+                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
+                RequestedProductCount = 22,
+                ExchangeSetCellCount = 15,
+                RequestedProductsAlreadyUpToDateCount = 5,
+                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet
+            };
+            await Task.CompletedTask;
+            return exchangeSetResponse;
+        }
+
+        public Task<ValidationResult> ValidateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
+        {
+            return productIdentifierValidator.Validate(productIdentifierRequest);
         }
 
         public async Task<ExchangeSetResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request)
         {
-            await Task.CompletedTask;
-            const int RequestedProductCount = 22;
-            const int ExchangeSetCellCount = 15;
-            const int RequestedProductsAlreadyUpToDateCount = 5;
-            return new ExchangeSetResponse()
+            ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse
             {
+                ExchangeSetCellCount = 15,
+                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
+                RequestedProductCount = 22,
+                RequestedProductsAlreadyUpToDateCount = 5,
+                RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>
+                {
+                    new RequestedProductsNotInExchangeSet { ProductName = "GB123456", Reason = "productWithdrawn" },
+                    new RequestedProductsNotInExchangeSet { ProductName = "GB123789", Reason = "invalidProduct" }
+                },
                 Links = new Links()
                 {
-                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri()
-                    {
-                        Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
-                    },
-                    ExchangeSetFileUri = new LinkSetFileUri()
-                    {
-                        Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
-                    }
-                },
-                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
-                RequestedProductCount = RequestedProductCount,
-                ExchangeSetCellCount = ExchangeSetCellCount,
-                RequestedProductsAlreadyUpToDateCount = RequestedProductsAlreadyUpToDateCount,
-                RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>() {
-                    new RequestedProductsNotInExchangeSet()
-                    {
-                        ProductName = "GB123456",
-                        Reason = "productWithdrawn"
-                    },
-                    new RequestedProductsNotInExchangeSet()
-                    {
-                        ProductName = "GB123789",
-                        Reason = "invalidProduct"
-                    }
+                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
+                    ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
                 }
             };
+
+            await Task.CompletedTask;
+            return exchangeSetResponse;
         }
 
         public Task<ValidationResult> ValidateProductDataByProductVersions(ProductDataProductVersionsRequest request)
         {
-            return productProductVersionsValidator.Validate(request);
+            return productVersionsValidator.Validate(request);
+        }
+
+        public async Task<ExchangeSetResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        {
+            ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse
+            {
+                ExchangeSetCellCount = 15,
+                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
+                RequestedProductCount = 22,
+                RequestedProductsAlreadyUpToDateCount = 5,
+                RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>
+                {
+                    new RequestedProductsNotInExchangeSet { ProductName = "GB123456", Reason = "productWithdrawn" },
+                    new RequestedProductsNotInExchangeSet { ProductName = "GB123789", Reason = "invalidProduct" }
+                },
+                Links = new Links()
+                {
+                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
+                    ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
+                }
+            };
+
+            await Task.CompletedTask;
+            return exchangeSetResponse;
+        }
+
+        public Task<ValidationResult> ValidateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        {
+            return productDataSinceDateTimeValidator.Validate(productDataSinceDateTimeRequest);
         }
     }
 }
