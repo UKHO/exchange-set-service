@@ -167,7 +167,7 @@ stages:
                     buildType: 'current'
                     downloadType: 'single'
                     artifactName: 'functionaltests'
-                    downloadPath: '$(Build.SourcesDirectory)\functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"
@@ -220,7 +220,7 @@ stages:
                     buildType: 'current'
                     downloadType: 'single'
                     artifactName: 'functionaltests'
-                    downloadPath: '$(Build.SourcesDirectory)\functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"
