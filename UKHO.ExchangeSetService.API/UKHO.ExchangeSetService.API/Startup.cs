@@ -16,6 +16,7 @@ using System.Reflection;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.Common.Helpers;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -45,6 +46,12 @@ namespace UKHO.ExchangeSetService.API
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+
+            services.AddHttpClient<ISalesCatalougeService, SalesCatalogueService>(client =>
+                client.BaseAddress = new Uri(configuration["SCSBaseUrl"])
+                );
+
             services.AddScoped<IProductDataService, ProductDataService>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();

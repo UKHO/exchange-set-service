@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -13,12 +14,14 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IProductIdentifierValidator productIdentifierValidator;
         private readonly IProductDataProductVersionsValidator productVersionsValidator;
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
+        private readonly ISalesCatalougeService salesCatalogueService;
 
-        public ProductDataService(IProductIdentifierValidator productIdentifierValidator,IProductDataProductVersionsValidator productVersionsValidator, IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator)
+        public ProductDataService(IProductIdentifierValidator productIdentifierValidator,IProductDataProductVersionsValidator productVersionsValidator, IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,ISalesCatalougeService salesCatalougeService)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
             this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
+            this.salesCatalogueService = salesCatalougeService;
         }
 
         public async Task<ExchangeSetResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -98,11 +101,13 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
+            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
+            
             ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse
             {
                 ExchangeSetCellCount = 15,
                 ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
-                RequestedProductCount = 22,
+                RequestedProductCount = (int)response.ResponseBody.ProductCounts.RequestedProductCount,
                 RequestedProductsAlreadyUpToDateCount = 5,
                 RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>
                 {
