@@ -160,13 +160,14 @@ stages:
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-
-                - task: DownloadPipelineArtifact@2
+                    
+                - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
                   inputs:
-                    source: "current"
-                    artifact: "functionaltests"
-                    path: $(Build.SourcesDirectory)\functionaltests
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)\functionaltests'
 
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"
@@ -213,12 +214,13 @@ stages:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
                 
-                - task: DownloadPipelineArtifact@2
+                - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
                   inputs:
-                    source: "current"
-                    artifact: "functionaltests"
-                    path: $(Build.SourcesDirectory)\functionaltests
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)\functionaltests'
 
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"
