@@ -2,6 +2,8 @@ parameters:
   - name: ContinueEvenIfResourcesAreGettingDestroyed
     type: boolean
     default: false
+  - name: AzureSubscription
+    type: string
 
 steps:
   - task: PowerShell@2
@@ -26,7 +28,7 @@ steps:
   - task: AzureWebApp@1
     displayName: "Azure App Deploy: ess-$(Environment)-webapp"
     inputs:
-      azureSubscription: ""
+      azureSubscription: "${{ parameters.AzureSubscription }}"
       appType: webApp
       appName: "$(WEB_APP_NAME)"
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"

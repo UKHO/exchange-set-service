@@ -144,12 +144,12 @@ stages:
         workspace:
           clean: all
         variables:
-          - group: "Exchange Set Service Terraform Dev"
+          - group: "ESS-Deployment-Variables-DEV"
           - group: "ESS-Dev-Variables"
           - name: DeploymentResourceGroupName
-            value: ""
+            value: "ESSDevA00802-RG"
           - name: DeploymentStorageAccountName
-            value: ""
+            value: "essdeva00802"
           - name: "Environment"
             value: "dev"
         strategy:
@@ -159,6 +159,7 @@ stages:
                 - template: Deployment/templates/continous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
                 - task: DownloadPipelineArtifact@2
                   displayName: "Download Functional test Artifact"
@@ -195,12 +196,12 @@ stages:
         workspace:
           clean: all
         variables:
-          - group: "Exchange Set Service Terraform Qa"
+          - group: "ESS-Deployment-Variables-QA"
           - group: "ESS-QA-Variables"
           - name: DeploymentResourceGroupName
-            value: ""
+            value: "ESSQAA00802-RG"
           - name: DeploymentStorageAccountName
-            value: ""
+            value: "essqaa00802"
           - name: "Environment"
             value: "qa"
         strategy:
@@ -210,6 +211,7 @@ stages:
                 - template: Deployment/templates/continous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
                 
                 - task: DownloadPipelineArtifact@2
                   displayName: "Download Functional test Artifact"
