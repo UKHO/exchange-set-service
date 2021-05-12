@@ -6,11 +6,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class AuthTokenProvider : IAuthTokenProvider
     {
-        public async Task<string> GetManagedIdentityAuthAsync(string scope)
+        public async Task<string> GetManagedIdentityAuthAsync(string resource)
         {
             var tokenCredential = new DefaultAzureCredential();
             var accessToken = await tokenCredential.GetTokenAsync(
-                new TokenRequestContext(scopes: new string[] { scope + "/.default" }) { }
+                new TokenRequestContext(scopes: new string[] { resource + "/.default" }) { }
             );
 
             return accessToken.Token;

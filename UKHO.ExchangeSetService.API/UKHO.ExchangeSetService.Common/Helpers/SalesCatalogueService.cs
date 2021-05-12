@@ -17,6 +17,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly ILogger<SalesCatalogueService> logger;
         private readonly IAuthTokenProvider authTokenProvider;
         private const string ProductType = "encs57";
+        private const String Version = "v1";
         public SalesCatalogueService(HttpClient httpClient,
                                      ILogger<SalesCatalogueService> logger,
                                      IAuthTokenProvider authTokenProvider)
@@ -28,9 +29,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SalesCatalougeResponse> GetProductsFromSpecificDateAsync(string sinceDateTime)
         {
-            logger.LogInformation($"");
+            logger.LogInformation($"Get Sales Catalogue service from SinceDateTime Started");
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync("abc");
-            var uri = $"/{ProductType}/products?{sinceDateTime}";
+            var uri = $"/{Version}/productData/{ProductType}/products?sinceDateTime={sinceDateTime}";
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
             httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             var httpResponse = await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
@@ -42,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             string bodyJson = await httpResponse.Content.ReadAsStringAsync();
             response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(bodyJson);
-
+            logger.LogInformation($"Get Sales Catalogue service from SinceDateTime Started");
             return response; 
         }
 
