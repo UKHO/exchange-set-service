@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             });
         }
 
-        public IActionResult GetEssResponse(ExchangeSetServiceResponse model, List<Error> errors = null)
+        protected IActionResult GetEssResponse(ExchangeSetServiceResponse model, List<Error> errors = null)
         {
             HttpStatusCode code = model.HttpstatusCode;
             switch (code)
