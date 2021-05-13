@@ -14,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using UKHO.ExchangeSetService.API.Configuration;
+using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
 
@@ -32,6 +33,16 @@ namespace UKHO.ExchangeSetService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Enables Application Insights telemetry.
+            services.AddApplicationInsightsTelemetry();
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
+                loggingBuilder.AddConsole();
+                loggingBuilder.AddDebug();
+                loggingBuilder.AddAzureWebAppDiagnostics();
+            });
+
             services.AddControllers(o =>
             {
                 o.AllowEmptyInputInBodyModelBinding = true;
@@ -54,6 +65,8 @@ namespace UKHO.ExchangeSetService.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, IHttpContextAccessor httpContextAccessor)
         {
+            ConfigureLogging(app, loggerFactory);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -116,6 +129,17 @@ namespace UKHO.ExchangeSetService.API
                 c.EnableAnnotations();
                 c.OperationFilter<AddResponseHeadersFilter>();
             });
+        }
+
+        private void ConfigureLogging(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+#if (DEBUG)
+            //Add file based logger for development
+            loggerFactory.AddFile(configuration.GetSection("Logging"));
+#endif
+
+            app.UseCorrelationIdMiddleware()
+               .UseErrorLogging(loggerFactory);
         }
     }
 }
