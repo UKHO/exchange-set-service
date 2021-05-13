@@ -14,9 +14,9 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IProductIdentifierValidator productIdentifierValidator;
         private readonly IProductDataProductVersionsValidator productVersionsValidator;
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
-        private readonly ISalesCatalougeService salesCatalogueService;
+        private readonly ISalesCatalogueService salesCatalogueService;
 
-        public ProductDataService(IProductIdentifierValidator productIdentifierValidator,IProductDataProductVersionsValidator productVersionsValidator, IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,ISalesCatalougeService salesCatalougeService)
+        public ProductDataService(IProductIdentifierValidator productIdentifierValidator,IProductDataProductVersionsValidator productVersionsValidator, IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,ISalesCatalogueService salesCatalougeService)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
