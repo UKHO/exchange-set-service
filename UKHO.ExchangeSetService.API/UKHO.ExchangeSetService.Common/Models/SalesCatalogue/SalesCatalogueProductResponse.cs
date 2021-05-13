@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UKHO.ExchangeSetService.Common.Models
+namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
 {
     public class SalesCatalogueProductResponse
     {

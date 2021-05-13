@@ -200,7 +200,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
             }
 
             var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest);
-            return Ok(productDetail);
+            return GetEssResponse(productDetail);
+
         }
     }
 }

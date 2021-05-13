@@ -1,8 +1,8 @@
 ﻿using System.Net;
 
-namespace UKHO.ExchangeSetService.Common.Models
+namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
 {
-    public class SalesCatalougeResponse
+    public class SalesCatalogueResponse
     {
         public SalesCatalogueProductResponse ResponseBody { get; set; }
         public HttpStatusCode ResponseCode { get; set; }

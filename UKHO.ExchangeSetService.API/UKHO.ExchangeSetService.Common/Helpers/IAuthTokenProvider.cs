@@ -4,6 +4,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IAuthTokenProvider
     {
-        public Task<string> GetManagedIdentityAuthAsync(string scope);
+        public Task<string> GetManagedIdentityAuthAsync(string resource);
     }
 }
