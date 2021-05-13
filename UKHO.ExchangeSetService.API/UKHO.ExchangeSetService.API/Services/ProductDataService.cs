@@ -99,7 +99,7 @@ namespace UKHO.ExchangeSetService.API.Services
             return productVersionsValidator.Validate(request);
         }
 
-        public async Task<ExchangeSetResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
             var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
             
@@ -121,8 +121,14 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             };
 
+            ExchangeSetServiceResponse exchangeSetServiceResponse = new ExchangeSetServiceResponse()
+            {
+                ExchangeSetResponse = exchangeSetResponse,
+                HttpstatusCode = response.ResponseCode,
+            };
+
             await Task.CompletedTask;
-            return exchangeSetResponse;
+            return exchangeSetServiceResponse;
         }
 
         public Task<ValidationResult> ValidateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
@@ -44,4 +45,13 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
 
         public string Reason { get; set; }
     }
+
+    public class ExchangeSetServiceResponse
+    {
+        public ExchangeSetResponse ExchangeSetResponse { get; set; }
+
+        public HttpStatusCode HttpstatusCode { get; set; }
+
+    }
+
 }
