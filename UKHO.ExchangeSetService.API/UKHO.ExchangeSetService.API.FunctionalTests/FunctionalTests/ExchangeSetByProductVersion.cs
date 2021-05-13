@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
-            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 200.");
 
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -151,7 +151,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
-            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 200.");
         }
 
@@ -160,7 +160,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
         
-            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(productname, editionnumber, updatenumber));
 
-            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 400.");
 
             var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
@@ -209,7 +209,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
 
-            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, callbackurl);
+            var apiresponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, callbackurl, accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code {apiresponse.StatusCode} is returned, instead of the expected 400.");
 
         }
