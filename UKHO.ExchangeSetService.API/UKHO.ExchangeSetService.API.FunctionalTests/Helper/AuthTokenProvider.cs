@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
 
         /// <summary>
-        /// Generate custom signeture verified Auth Token
+        /// Generate custom signature verified Auth Token
         /// </summary>
         public string GenerateCustomToken()
         {
