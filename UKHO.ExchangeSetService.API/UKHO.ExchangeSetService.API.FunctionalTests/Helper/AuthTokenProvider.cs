@@ -32,11 +32,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// GenerateToken
         /// </summary>
         /// <param name="ClientId"></param>
-        /// <param name="ClientSecrect"></param>
+        /// <param name="ClientSecret"></param>
         /// <param name="Token"></param>
         /// <returns></returns>
 
-        private static async Task<string> GenerateEssToken(string ClientId, string ClientSecrect, string Token)
+        private static async Task<string> GenerateEssToken(string ClientId, string ClientSecret, string Token)
         {
 
             string[] scopes = new string[] { $"{EssauthConfig.EssClientId}/.default" };
@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 if (Token == null)
                 {
                     IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
-                                                    .WithClientSecret(ClientSecrect)
+                                                    .WithClientSecret(ClientSecret)
                                                     .WithAuthority(new Uri($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}"))
                                                     .Build();
 
