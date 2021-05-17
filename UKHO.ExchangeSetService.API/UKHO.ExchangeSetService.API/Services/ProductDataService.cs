@@ -14,6 +14,7 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public class ProductDataService : IProductDataService
     {
+        private const string RFC1123Format = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
         private readonly IProductIdentifierValidator productIdentifierValidator;
         private readonly IProductDataProductVersionsValidator productVersionsValidator;
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
@@ -126,7 +127,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
             {
-                response.LastModified = salesCatalougeResponse.LastModified;
+                response.LastModified = salesCatalougeResponse.LastModified.ToString(RFC1123Format);
             }
             return response;
         }

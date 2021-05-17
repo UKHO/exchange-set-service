@@ -94,9 +94,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 response.ResponseCode = httpResponse.StatusCode;
-                if (httpResponse.StatusCode != HttpStatusCode.OK) 
+                if (httpResponse.StatusCode == HttpStatusCode.OK)
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
-                    
+                else
+                    response.LastModified = ((DateTimeOffset)httpResponse.Content.Headers.LastModified).UtcDateTime;
             }
 
             return response;

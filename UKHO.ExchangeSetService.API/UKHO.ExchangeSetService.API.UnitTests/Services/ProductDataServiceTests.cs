@@ -338,7 +338,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
-            salesCatalogueResponse.LastModified = DateTime.Now.ToString("dd-MMM-yyyy");
+            salesCatalogueResponse.LastModified = DateTime.UtcNow;
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
