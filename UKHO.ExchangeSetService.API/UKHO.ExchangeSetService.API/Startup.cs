@@ -48,11 +48,12 @@ namespace UKHO.ExchangeSetService.API
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+            services.AddScoped<ISalesCatalogueClient, SalesCatalogueClient>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.Configure<SalesCatalogueConfiguration>(configuration.GetSection("SalesCatalogue"));
 
-            services.AddHttpClient<ISalesCatalogueService, SalesCatalogueService>(client =>
+            services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
                 client.BaseAddress = new Uri(configuration["SalesCatalogue:BaseUrl"])
                 );
             
