@@ -6,5 +6,6 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
     {
         public SalesCatalogueProductResponse ResponseBody { get; set; }
         public HttpStatusCode ResponseCode { get; set; }
+        public string LastModified { get; set; }
     }
 }

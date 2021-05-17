@@ -4,13 +4,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
 {
     public enum EventIds
     {
-        SCSGetAllProductRequestStart,
-        SCSGetAllProductRequestCompleted,
-        SalesCatalogueNonOkResponse,
-        SCSPostProductIdentifiersRequestCompleted,
-        SCSPostProductIdentifiersRequestStart,
-        SCSPostProductVersionsRequestStart,
-        SCSPostProductVersionsRequestCompleted,
+        SCSGetProductsFromSpecificDateRequestStart = 805000,
+        SCSGetProductsFromSpecificDateRequestCompleted = 805001,
+        SalesCatalogueNonOkResponse = 805002,
+        SCSPostProductIdentifiersRequestCompleted = 805003,
+        SCSPostProductIdentifiersRequestStart = 805004,
+        SCSPostProductVersionsRequestStart = 805005,
+        SCSPostProductVersionsRequestCompleted = 805006,
     }
 
     public static class EventIdExtensions

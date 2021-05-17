@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime)
         {
-            logger.LogInformation(EventIds.SCSGetAllProductRequestStart.ToEventId(),$"Get sales catalogue service from specific date time started");
+            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestStart.ToEventId(),$"Get sales catalogue service from specific date time started");
             
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
             }
 
-            logger.LogInformation(EventIds.SCSGetAllProductRequestCompleted.ToEventId(),$"Get sales catalogue service from specific date time completed");
+            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestCompleted.ToEventId(),$"Get sales catalogue service from specific date time completed");
             return response; 
         }
 

@@ -51,6 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         public ExchangeSetResponse ExchangeSetResponse { get; set; }
 
         public HttpStatusCode HttpstatusCode { get; set; }
+        public string LastModified { get; set; }
 
     }
 
