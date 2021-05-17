@@ -24,69 +24,70 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenACorrectResponseIsReturned()
         {
-            string sincedatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime);
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected 200.");
+            string sinceDatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
+            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
             //verify model structure
-            await apiresponse.CheckModelStructureForSuccessResponse();
+            await apiResponse.CheckModelStructureForSuccessResponse();
         }
 
         [Test]
-        public async Task WhenICallTheApiWithAValidRFC1123DateTimeAndValidCallbackURL_ThenASuccessStatusIsReturned()
+        public async Task WhenICallTheApiWithAValidRFC1123DateTimeAndValidcallBackUrl_ThenASuccessStatusIsReturned()
         {
-            string sincedatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
-            Assert.AreEqual(200, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected 200.");
+            string sinceDatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
+            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
         }
 
         [Test]
         public async Task WhenICallTheApiWithAValidDateButNoLatestRelease_ThenANotModifiedResponseStatusIsReturned()
         {
-            string sincedatetime = DateTime.UtcNow.AddDays(-1).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
-            Assert.AreEqual(304, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected 304.");
+            string sinceDatetime = DateTime.UtcNow.AddDays(-1).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272");
+            Assert.AreEqual(304, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 304.");
         }
 
         [TestCase(0, TestName = "Current DateTime with valid RFC1123 format")]
         [TestCase(1, TestName = "Future DateTime with valid RFC1123 format")]
         public async Task WhenICallTheApiWithACurrentOrFutureRFC1123DateTime_ThenABadRequestStatusIsReturned(int days)
         {
-            string sincedatetime = DateTime.Now.AddDays(days).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected 400.");
+            string sinceDatetime = DateTime.Now.AddDays(days).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime);
+            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
-            var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided SinceDateTime cannot be a future date."));
+            var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDatetime"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided sinceDatetime cannot be a future date."));
         }
 
 
         [TestCase("Mon, 02 Mar 2021 00:00:00 GMT", TestName = "Invalid day but valid RFC1123 Format")]
         [TestCase("01 Mar 2021 00:00:00 GMT", TestName = "Invalid RFC format 'DD MMM YYYY HH24:MI:SS GMT'")]
         [TestCase("01 03 2021", TestName = "Invalid RFC format 'DD MM YYYY'")]
-        public async Task WhenICallTheApiWithInValidRFC1123DateTime_ThenABadRequestStatusIsReturned(string sincedatetime)
+        public async Task WhenICallTheApiWithInValidRFC1123DateTime_ThenABadRequestStatusIsReturned(string sinceDatetime)
         {
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected 400.");
+            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime);
+            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
-            var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided SinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDatetime"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided sinceDatetime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
 
         [TestCase("", TestName = "Provided Empty DateTime in query parameter")]
         [TestCase(null, TestName = "Provided Null DateTime in query parameter")]
-        public async Task WhenICallTheApiWithANullDateTime_ThenABadRequestStatusIsReturned(string sincedatetime)
+        public async Task WhenICallTheApiWithANullDateTime_ThenABadRequestStatusIsReturned(string sinceDatetime)
         {
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected 400.");
+            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime);
+            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
-            var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Query parameter 'SinceDateTime' is required."));
+            var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
+            
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDatetime"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Query parameter 'sinceDatetime' is required."));
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
@@ -94,13 +95,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
         [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
         [TestCase("https://", TestName = "Callback URL with only https request")]
-        public async Task WhenICallTheApiWithInvalidCallbackURI_ThenABadRequestResponseIsReturned(string callbackurl)
+        public async Task WhenICallTheApiWithInvalidCallbackURI_ThenABadRequestResponseIsReturned(string callBackUrl)
         {
-            string sincedatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
-            var apiresponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sincedatetime, callbackurl);
-            Assert.AreEqual(400, (int)apiresponse.StatusCode, $"Incorrect status code is returned {apiresponse.StatusCode}, instead of the expected 400.");
+            string sinceDatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
+            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, callBackUrl);
+            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
-            var errorMessage = await apiresponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
+            var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
+            
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "CallbackUri"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Invalid CallbackUri format."));
         }
