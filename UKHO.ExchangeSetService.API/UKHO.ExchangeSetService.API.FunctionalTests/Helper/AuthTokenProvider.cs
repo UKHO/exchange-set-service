@@ -52,20 +52,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
-		else
-		{
-			IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
+		    else
+		        {
+			        IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
                                                     .WithClientSecret(ClientSecret)
                                                     .WithAuthority(new Uri($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}"))
                                                     .Build();
 
                     	AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
                     	Token = tokenTask.AccessToken;
-		}
+		        }
                 
             }
-	    return Token;
-          }
+	     return Token;
+       }
 
         /// <summary>
         /// Generate custom signature verified Auth Token
