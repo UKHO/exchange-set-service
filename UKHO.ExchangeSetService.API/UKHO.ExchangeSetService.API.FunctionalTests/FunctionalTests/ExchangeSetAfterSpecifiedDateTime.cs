@@ -58,8 +58,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDatetime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided sinceDatetime cannot be a future date."));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDatetime"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided SinceDatetime cannot be a future date."));
         }
 
 
@@ -72,8 +72,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDatetime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided sinceDatetime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDatetime"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided SinceDatetime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
 
@@ -86,8 +86,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDatetime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Query parameter 'sinceDatetime' is required."));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDatetime"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Query parameter 'SinceDatetime' is required."));
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]

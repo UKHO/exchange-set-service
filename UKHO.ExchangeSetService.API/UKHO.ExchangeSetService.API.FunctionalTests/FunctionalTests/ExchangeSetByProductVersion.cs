@@ -80,6 +80,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        public async Task WhenICallTheApiWithValidDuplicateProductVersion_ThenTheCorrectResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersionmodel.ProductName = "GR3CFZMG";
+            ProductVersionmodel.EditionNumber = 2;
+            ProductVersionmodel.UpdateNumber = 30;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            ProductVersionmodel.ProductName = "GR3CFZMG";
+            ProductVersionmodel.EditionNumber = 2;
+            ProductVersionmodel.UpdateNumber = 30;
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(ProductVersionmodel.ProductName, ProductVersionmodel.EditionNumber, ProductVersionmodel.UpdateNumber));
+
+            var apiResponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureNotModifiedResponse();
+
+        }
+
+        [Test]
         public async Task WhenICallTheApiWithAValidProductVersionWithCallbackURI_ThenASuccessStatusIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
