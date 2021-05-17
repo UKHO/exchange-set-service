@@ -36,42 +36,36 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="Token"></param>
         /// <returns></returns>
 
-        private static async Task<string> GenerateEssToken(string ClientId, string ClientSecret, string Token)
+       private static async Task<string> GenerateEssToken(string ClientId, string ClientSecret, string Token)
         {
-
             string[] scopes = new string[] { $"{EssauthConfig.EssClientId}/.default" };
-            if (EssauthConfig.IsRunningOnLocalMachine)
+            if (Token == null) 
             {
-                if (Token == null)
+                if (EssauthConfig.IsRunningOnLocalMachine)
                 {
-                    IPublicClientApplication debugapp = PublicClientApplicationBuilder.Create(EssauthConfig.EssClientId).
+                    IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(EssauthConfig.EssClientId).
                                                         WithRedirectUri("http://localhost").Build();
 
-
-
                     //Acquiring token through user interaction
-                    AuthenticationResult tokenTask = await debugapp.AcquireTokenInteractive(scopes)
+                    AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
                                                             .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
-                return Token;
-            }
-            else
-            {
-                if (Token == null)
-                {
-                    IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
+		else
+		{
+			IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
                                                     .WithClientSecret(ClientSecret)
                                                     .WithAuthority(new Uri($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}"))
                                                     .Build();
 
-                    AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
-                    Token = tokenTask.AccessToken;
-                }
-                return Token;
+                    	AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+                    	Token = tokenTask.AccessToken;
+		}
+                
             }
-        }
+	    return Token;
+          }
 
         /// <summary>
         /// Generate custom signature verified Auth Token
