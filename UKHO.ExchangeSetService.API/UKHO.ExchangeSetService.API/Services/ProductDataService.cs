@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation.Results;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Validation;
@@ -33,45 +33,23 @@ namespace UKHO.ExchangeSetService.API.Services
             this.mapper = mapper;
         }
 
-        public async Task<ExchangeSetResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
+        public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
         {
-            LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList());
+            ////can check for file size from salesCatalogueResponse.ResponseCode
+            var response = SetExchangeSetResponse(salesCatalogueResponse, false);
+            if (response.HttpstatusCode != HttpStatusCode.OK && response.HttpstatusCode != HttpStatusCode.NotModified)
             {
-                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
-            };
-            LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
+                return response;
+            }
+            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
+            response.ExchangeSetResponse.Links = new Links()
             {
-                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
+                ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
             };
-            Links links = new Links()
-            {
-                ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
-                ExchangeSetFileUri = linkSetFileUri
-            };
-            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
-            {
-                new RequestedProductsNotInExchangeSet()
-                {
-                    ProductName = "GB123456",
-                    Reason = "productWithdrawn"
-                },
-                new RequestedProductsNotInExchangeSet()
-                {
-                    ProductName = "GB123789",
-                    Reason = "invalidProduct"
-                }
-            };
-            ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
-            {
-                Links = links,
-                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
-                RequestedProductCount = 22,
-                ExchangeSetCellCount = 15,
-                RequestedProductsAlreadyUpToDateCount = 5,
-                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet
-            };
-            await Task.CompletedTask;
-            return exchangeSetResponse;
+
+            return response;
         }
 
         public Task<ValidationResult> ValidateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -79,28 +57,27 @@ namespace UKHO.ExchangeSetService.API.Services
             return productIdentifierValidator.Validate(productIdentifierRequest);
         }
 
-        public async Task<ExchangeSetResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request)
+        public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request)
         {
-            ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse
+            var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions);
+            ////can check for file size from salesCatalogueResponse
+            var response = SetExchangeSetResponse(salesCatalogueResponse, true);
+            if (response.HttpstatusCode != HttpStatusCode.OK && response.HttpstatusCode != HttpStatusCode.NotModified)
             {
-                ExchangeSetCellCount = 15,
-                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
-                RequestedProductCount = 22,
-                RequestedProductsAlreadyUpToDateCount = 5,
-                RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>
-                {
-                    new RequestedProductsNotInExchangeSet { ProductName = "GB123456", Reason = "productWithdrawn" },
-                    new RequestedProductsNotInExchangeSet { ProductName = "GB123789", Reason = "invalidProduct" }
-                },
-                Links = new Links()
-                {
-                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
-                    ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
-                }
+                return response;
+            }
+            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
+            if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
+            {
+                response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count; 
+            }
+            response.ExchangeSetResponse.Links = new Links()
+            {
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
+                ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
             };
 
-            await Task.CompletedTask;
-            return exchangeSetResponse;
+            return response;
         }
 
         public Task<ValidationResult> ValidateProductDataByProductVersions(ProductDataProductVersionsRequest request)
@@ -110,8 +87,10 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
-            var response = SetExchangeSetResponse(await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime));
-            if (response.HttpstatusCode != HttpStatusCode.OK || response.HttpstatusCode != HttpStatusCode.NotModified)
+            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
+            ////can check for file size from salesCatalogueResponse
+            var response = SetExchangeSetResponse(salesCatalogueResponse, false);
+            if (response.HttpstatusCode != HttpStatusCode.OK)
             {
                 return response;
             }
@@ -130,15 +109,24 @@ namespace UKHO.ExchangeSetService.API.Services
             return productDataSinceDateTimeValidator.Validate(productDataSinceDateTimeRequest);
         }
 
-        private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse)
+        private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isNotModifiedToOk)
         {
             var response = new ExchangeSetServiceResponse();
             response.HttpstatusCode = salesCatalougeResponse.ResponseCode;
-            if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK || salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
+            if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK)
             {
                 var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
                 model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
                 response.ExchangeSetResponse = model;
+            }
+            else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified && isNotModifiedToOk)
+            {
+                response.HttpstatusCode = HttpStatusCode.OK;
+                response.ExchangeSetResponse = new ExchangeSetResponse();
+            }
+            else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
+            {
+                response.LastModified = salesCatalougeResponse.LastModified;
             }
             return response;
         }
