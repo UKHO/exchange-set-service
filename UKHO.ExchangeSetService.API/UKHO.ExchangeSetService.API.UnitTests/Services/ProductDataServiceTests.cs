@@ -1,14 +1,18 @@
-﻿using FakeItEasy;
+﻿using AutoMapper;
+using FakeItEasy;
 using FluentValidation.Results;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
@@ -19,6 +23,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IProductDataProductVersionsValidator fakeProductVersionValidator;
         private IProductDataSinceDateTimeValidator fakeProductDataSinceDateTimeValidator;
         private ProductDataService service;
+        private ISalesCatalogueService fakeSalesCatalogueService;
+        private IMapper fakeMapper;
 
         [SetUp]
         public void Setup()
@@ -26,7 +32,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeProductIdentifierValidator = A.Fake<IProductIdentifierValidator>();
             fakeProductVersionValidator = A.Fake<IProductDataProductVersionsValidator>();
             fakeProductDataSinceDateTimeValidator = A.Fake<IProductDataSinceDateTimeValidator>();
-            service = new ProductDataService(fakeProductIdentifierValidator,fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator);
+            fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
+            fakeMapper = A.Fake<IMapper>();
+            service = new ProductDataService(fakeProductIdentifierValidator,fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator, 
+                fakeSalesCatalogueService, fakeMapper);
         }
 
         #region GetExchangeSetResponse
@@ -72,6 +81,42 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         #endregion GetExchangeSetResponse
+
+        #region GetSalesCatalogueResponse
+
+        private SalesCatalogueResponse GetSalesCatalogueResponse()
+        {
+            return new SalesCatalogueResponse
+            {
+                ResponseCode = HttpStatusCode.BadRequest,
+                ResponseBody = new SalesCatalogueProductResponse
+                {
+                    ProductCounts = new ProductCounts
+                    {
+                        RequestedProductCount = 6,
+                        RequestedProductsAlreadyUpToDateCount = 8,
+                        ReturnedProductCount = 2,
+                        RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
+                                new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
+                                new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
+                            }
+                    },
+                    Products = new List<Products> {
+                            new Products {
+                                ProductName = "productName",
+                                EditionNumber = 2,
+                                UpdateNumbers = new List<int?> { 3, 4 },
+                                Cancellation = new Cancellation {
+                                    EditionNumber = 4,
+                                    UpdateNumber = 6
+                                },
+                                FileSize = 400
+                            }
+                        }
+                }
+            };
+        }
+        #endregion
 
 
         #region ProductIdentifiers
@@ -126,17 +171,25 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+                .Returns(salesCatalogueResponse);
+            var exchangeSetResponse = GetExchangeSetResponse();
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callbackUri
                 });
-            var exchangeSetResponse = GetExchangeSetResponse();
 
-            Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetCellCount);
-            Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.RequestedProductCount);
-            Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.RequestedProductsAlreadyUpToDateCount);
+            Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
+            Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
+            Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
         }
         #endregion
 
@@ -186,6 +239,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+                .Returns(salesCatalogueResponse);
+            var exchangeSetResponse = GetExchangeSetResponse();
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -194,7 +255,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             });
 
-            Assert.IsInstanceOf<ExchangeSetResponse>(result);
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
         }
         #endregion
 
@@ -247,7 +308,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.IsInstanceOf<ExchangeSetResponse>(result);
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
         }
 
         #endregion ProductDataSinceDateTime
