@@ -257,6 +257,26 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
         }
+
+        [Test]
+        public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsNotModifiedToOkrequest()
+        {
+            A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
+            {
+                ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
+                ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } },
+                CallbackUri = ""
+            });
+
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+        }
         #endregion
 
         #region ProductDataSinceDateTime
@@ -305,6 +325,22 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+        }
+
+        [Test]
+        public async Task WhenValidateProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnNotModified()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
+            salesCatalogueResponse.LastModified = DateTime.UtcNow;
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 

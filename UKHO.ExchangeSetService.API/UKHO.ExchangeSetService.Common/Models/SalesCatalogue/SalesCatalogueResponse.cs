@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
 {
@@ -6,6 +7,6 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
     {
         public SalesCatalogueProductResponse ResponseBody { get; set; }
         public HttpStatusCode ResponseCode { get; set; }
-        public string LastModified { get; set; }
+        public DateTime LastModified { get; set; }
     }
 }

@@ -14,6 +14,7 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public class ProductDataService : IProductDataService
     {
+        private const string RFC1123Format = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
         private readonly IProductIdentifierValidator productIdentifierValidator;
         private readonly IProductDataProductVersionsValidator productVersionsValidator;
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
@@ -70,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
             //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
-            if (response.HttpstatusCode == HttpStatusCode.NotModified)
+            if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count; 
             }
@@ -115,7 +116,7 @@ namespace UKHO.ExchangeSetService.API.Services
             return productDataSinceDateTimeValidator.Validate(productDataSinceDateTimeRequest);
         }
 
-        private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isThreeHundredToTwoHundred)
+        private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isNotModifiedToOk)
         {
             var response = new ExchangeSetServiceResponse();
             response.HttpstatusCode = salesCatalougeResponse.ResponseCode;
@@ -125,14 +126,14 @@ namespace UKHO.ExchangeSetService.API.Services
                 model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
                 response.ExchangeSetResponse = model;
             }
-            else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified && isThreeHundredToTwoHundred)
+            else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified && isNotModifiedToOk)
             {
                 response.HttpstatusCode = HttpStatusCode.OK;
                 response.ExchangeSetResponse = new ExchangeSetResponse();
             }
             else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
             {
-                response.LastModified = salesCatalougeResponse.LastModified;
+                response.LastModified = salesCatalougeResponse.LastModified.ToString(RFC1123Format);
             }
             return response;
         }
