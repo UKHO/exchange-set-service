@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-        private DateTime batchExpiryDateTime;
+        private string batchExpiryDateTime;
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     ReadUsers = new List<string>() { oid }
                 }
             };
-            batchExpiryDateTime =Convert.ToDateTime(createBatchRequest.ExpiryDate);
+            batchExpiryDateTime =createBatchRequest.ExpiryDate;
 
             string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
 

@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
 {
     public class CreateBatchResponseModel
@@ -8,7 +7,7 @@ namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
 
         public string BatchStatusUri { get; set; }
 
-        public DateTime BatchExpiryDateTime { get; set; }
+        public string BatchExpiryDateTime { get; set; }
 
         public string ExchangeSetFileUri { get; set; }
 
