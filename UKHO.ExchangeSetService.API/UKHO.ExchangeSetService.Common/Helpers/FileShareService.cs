@@ -1,14 +1,16 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
@@ -16,24 +18,30 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareService : IFileShareService
     {
-        private readonly HttpClient httpClient;
+        private readonly IFileShareServiceClient fileShareServiceClient;
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
+        private readonly ILogger<FileShareService> logger;
+        private DateTime batchExpiryDateTime;
 
-        public FileShareService(HttpClient httpClient,
+        public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
-                                IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
+                                IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+                                ILogger<FileShareService> logger)
         {
-            this.httpClient = httpClient;
+            this.fileShareServiceClient = fileShareServiceClient;
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
+            this.logger = logger;            
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var jwtSecurityToken = new JwtSecurityToken(accessToken);
+            var oid = jwtSecurityToken.Claims.FirstOrDefault(m => m.Type == "oid").Value;
             var uri = $"/batch";
 
-            CreateBatchRequest batch = new CreateBatchRequest
+            CreateBatchRequest createBatchRequest = new CreateBatchRequest
             {
                 BusinessUnit = fileShareServiceConfig.Value.BusinessUnit,
                 Attributes = new List<KeyValuePair<string, string>>()
@@ -42,20 +50,42 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     new KeyValuePair<string, string>("Media Type", "Zip"),
                     new KeyValuePair<string, string>("Produt Type", "AVCS")
                 },
-                ExpiryDate = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
-             };
+                ExpiryDate = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+                Acl = new Acl()
+                {
+                    ReadUsers = new List<string>() { oid }
+                }
+            };
+            batchExpiryDateTime =Convert.ToDateTime(createBatchRequest.ExpiryDate);
 
-            string payloadJson = JsonConvert.SerializeObject(batch);
+            string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
 
-            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
+
+            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse);
+            return createBatchResponse;                               
+        }
+
+        private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse)
+        {
+            var createBatchResponse = new CreateBatchResponse();
+            var body = await httpResponse.Content.ReadAsStringAsync();
+            if (httpResponse.StatusCode != HttpStatusCode.Created)
             {
-                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                var httpResponse = await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);                
-                var body = await httpResponse.Content.ReadAsStringAsync();
-                
-                return JsonConvert.DeserializeObject<CreateBatchResponse>(body);                           
-            }                      
+                logger.LogError(EventIds.FSSCreateBatchNonOkResponse.ToEventId(), $"File share service create batch endpoint responded with {httpResponse.StatusCode} and message {body}");
+                createBatchResponse.ResponseCode = httpResponse.StatusCode;
+                createBatchResponse.ResponseBody = null;
+            }
+            else
+            {
+                createBatchResponse.ResponseCode = httpResponse.StatusCode;
+                createBatchResponse.ResponseBody = JsonConvert.DeserializeObject<CreateBatchResponseModel>(body);
+                createBatchResponse.ResponseBody.BatchStatusUri = fileShareServiceConfig.Value.BaseUrl + "/batch/" + createBatchResponse.ResponseBody.BatchId;
+                createBatchResponse.ResponseBody.BatchExpiryDateTime = batchExpiryDateTime;
+                createBatchResponse.ResponseBody.ExchangeSetFileUri = createBatchResponse.ResponseBody.BatchStatusUri + "/files/" + fileShareServiceConfig.Value.ExchangeSetFileName;
+            }
+
+            return createBatchResponse;
         }
     }
 }

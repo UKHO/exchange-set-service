@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -21,13 +23,15 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly ISalesCatalogueService salesCatalogueService;
         private readonly IMapper mapper;
         private readonly IFileShareService fileShareService;
+        private readonly ILogger<FileShareService> logger;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator, 
             IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
-            IFileShareService fileShareService)
+            IFileShareService fileShareService,
+            ILogger<FileShareService> logger)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -35,6 +39,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.salesCatalogueService = salesCatalougeService;
             this.mapper = mapper;
             this.fileShareService = fileShareService;
+            this.logger = logger;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -47,11 +52,21 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
             //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
+            logger.LogInformation(EventIds.FSSCreateProductDataByProductIdentifiersCreateBatchRequestStart.ToEventId(), $"FSS create batch for create product data by product identifiers endpoint started");
+
+            var createBatchResponse = await fileShareService.CreateBatch();
+            if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
+            {
+                return response;
+            }
             response.ExchangeSetResponse.Links = new Links()
             {
-                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
-                ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
+                ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri }
             };
+            response.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = createBatchResponse.ResponseBody.BatchExpiryDateTime;
+
+            logger.LogInformation(EventIds.FSSCreateProductDataByProductIdentifiersCreateBatchRequestCompleted.ToEventId(), "FSS batch {BatchId} created successfully for create product data by product identifiers endpoint", createBatchResponse.ResponseBody.BatchId);
 
             return response;
         }
@@ -99,14 +114,21 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
             //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
+            logger.LogInformation(EventIds.FSSCreateProductDataSinceDateTimeCreateBatchRequestStart.ToEventId(), $"FSS create batch for create product data since date time endpoint started");
+           
             var createBatchResponse = await fileShareService.CreateBatch();
-
-            string batchid = createBatchResponse.BatchId;
+            if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
+            {
+                return response;
+            }    
             response.ExchangeSetResponse.Links = new Links()
             {
-                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = batchid },
-                ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
+                ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri }
             };
+            response.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = createBatchResponse.ResponseBody.BatchExpiryDateTime;
+
+            logger.LogInformation(EventIds.FSSCreateProductDataSinceDateTimeCreateBatchRequestCompleted.ToEventId(), "FSS batch {BatchId} created successfully for create product data since date time endpoint", createBatchResponse.ResponseBody.BatchId);
 
             return response;
         }

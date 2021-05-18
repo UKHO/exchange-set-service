@@ -16,7 +16,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         FSSCreateProductDataByProductVersionsCreateBatchRequestStart = 805009,
         FSSCreateProductDataByProductVersionsCreateBatchRequestCompleted = 805010,
         FSSCreateProductDataSinceDateTimeCreateBatchRequestStart = 805011,
-        FSSCreateProductDataSinceDateTimeCreateBatchRequestCompleted = 805012
+        FSSCreateProductDataSinceDateTimeCreateBatchRequestCompleted = 805012,
+        FSSCreateBatchNonOkResponse = 805013
     }
 
     public static class EventIdExtensions
