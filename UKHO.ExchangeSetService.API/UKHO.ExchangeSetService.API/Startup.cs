@@ -55,7 +55,13 @@ namespace UKHO.ExchangeSetService.API
             services.AddHttpClient<ISalesCatalogueService, SalesCatalogueService>(client =>
                 client.BaseAddress = new Uri(configuration["SalesCatalogue:BaseUrl"])
                 );
-            
+
+            services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
+
+            services.AddHttpClient<IFileShareService, FileShareService>(client =>
+                client.BaseAddress = new Uri(configuration["FileShareService:BaseUrl"])
+                );
+
             services.AddScoped<IProductDataService, ProductDataService>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();

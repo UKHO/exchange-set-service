@@ -19,18 +19,21 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
         private readonly ISalesCatalogueService salesCatalogueService;
         private readonly IMapper mapper;
+        private readonly IFileShareService fileShareService;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator, 
             IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
             ISalesCatalogueService salesCatalougeService,
-            IMapper mapper)
+            IMapper mapper,
+            IFileShareService fileShareService)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
             this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
             this.salesCatalogueService = salesCatalougeService;
             this.mapper = mapper;
+            this.fileShareService = fileShareService;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -95,9 +98,12 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
             //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
+            var createBatchResponse = await fileShareService.CreateBatch();
+
+            string batchid = createBatchResponse.BatchId;
             response.ExchangeSetResponse.Links = new Links()
             {
-                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = batchid },
                 ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
             };
 

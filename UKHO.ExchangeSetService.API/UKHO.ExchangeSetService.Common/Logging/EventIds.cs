@@ -11,6 +11,12 @@ namespace UKHO.ExchangeSetService.Common.Logging
         SCSPostProductIdentifiersRequestStart = 805004,
         SCSPostProductVersionsRequestStart = 805005,
         SCSPostProductVersionsRequestCompleted = 805006,
+        FSSCreateProductDataByProductIdentifiersCreateBatchRequestStart = 805007,
+        FSSCreateProductDataByProductIdentifiersCreateBatchRequestCompleted = 805008,
+        FSSCreateProductDataByProductVersionsCreateBatchRequestStart = 805009,
+        FSSCreateProductDataByProductVersionsCreateBatchRequestCompleted = 805010,
+        FSSCreateProductDataSinceDateTimeCreateBatchRequestStart = 805011,
+        FSSCreateProductDataSinceDateTimeCreateBatchRequestCompleted = 805012
     }
 
     public static class EventIdExtensions
