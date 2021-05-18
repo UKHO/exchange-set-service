@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
-            services.AddScoped<ISalesCatalogueClient, SalesCatalogueClient>();
+            services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.Configure<SalesCatalogueConfiguration>(configuration.GetSection("SalesCatalogue"));
