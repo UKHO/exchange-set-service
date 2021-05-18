@@ -23,6 +23,7 @@ using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.Logging.EventHubLogProvider;
+using Azure.Identity;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -93,6 +94,8 @@ namespace UKHO.ExchangeSetService.API
 
             app.UseAuthorization();
 
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -107,6 +110,14 @@ namespace UKHO.ExchangeSetService.API
                 .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true);
 
             builder.AddEnvironmentVariables();
+
+            var tempConfig = builder.Build();            
+            string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
+
+            if (!string.IsNullOrWhiteSpace(kvServiceUri))
+            {
+                builder.AddAzureKeyVault(new Uri(kvServiceUri), new DefaultAzureCredential());
+            }
 
 #if DEBUG
             builder.AddJsonFile("appsettings.local.overrides.json", true, true);
