@@ -80,9 +80,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 createBatchResponse.ResponseCode = httpResponse.StatusCode;
                 createBatchResponse.ResponseBody = JsonConvert.DeserializeObject<CreateBatchResponseModel>(body);
-                createBatchResponse.ResponseBody.BatchStatusUri = fileShareServiceConfig.Value.BaseUrl + "/batch/" + createBatchResponse.ResponseBody.BatchId;
+                createBatchResponse.ResponseBody.BatchStatusUri =$"{fileShareServiceConfig.Value.BaseUrl}/batch/{createBatchResponse.ResponseBody.BatchId}";
                 createBatchResponse.ResponseBody.BatchExpiryDateTime = batchExpiryDateTime;
-                createBatchResponse.ResponseBody.ExchangeSetFileUri = createBatchResponse.ResponseBody.BatchStatusUri + "/files/" + fileShareServiceConfig.Value.ExchangeSetFileName;
+                createBatchResponse.ResponseBody.ExchangeSetFileUri =$"{createBatchResponse.ResponseBody.BatchStatusUri}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}";
             }
 
             return createBatchResponse;
