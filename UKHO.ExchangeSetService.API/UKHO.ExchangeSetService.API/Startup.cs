@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -42,6 +43,16 @@ namespace UKHO.ExchangeSetService.API
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
             this.ConfigureSwagger(services);
+
+            var essAzureADConfiguration = new AzureADConfiguration();
+            configuration.Bind("ESSAzureADConfiguration", essAzureADConfiguration);
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.Audience = essAzureADConfiguration.ClientId;
+                        options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{essAzureADConfiguration.TenantId}";
+                    });
+
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
@@ -82,6 +93,8 @@ namespace UKHO.ExchangeSetService.API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
@@ -127,6 +140,13 @@ namespace UKHO.ExchangeSetService.API
                 c.IncludeXmlComments(xmlPath);
                 c.EnableAnnotations();
                 c.OperationFilter<AddResponseHeadersFilter>();
+                c.AddSecurityDefinition("jwtBearerAuth", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
+                });
+                c.OperationFilter<Filters.SecurityRequirementsOperationFilter>();
             });
         }
     }
