@@ -191,6 +191,33 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
         }
+
+        [Test]
+        public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsBadrequest()
+        {
+            A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.BadRequest;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+                .Returns(salesCatalogueResponse);
+            var exchangeSetResponse = GetExchangeSetResponse();
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+
+            var result = await service.CreateProductDataByProductIdentifiers(
+                new ProductIdentifierRequest()
+                {
+                    ProductIdentifier = productIdentifiers,
+                    CallbackUri = callbackUri
+                });
+
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpstatusCode);
+        }
         #endregion
 
         #region ProductVersions
@@ -338,6 +365,22 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
+            salesCatalogueResponse.LastModified = DateTime.UtcNow;
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+        }
+
+        [Test]
+        public async Task WhenValidateProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnOk()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
                 .Returns(salesCatalogueResponse);

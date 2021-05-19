@@ -94,10 +94,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 response.ResponseCode = httpResponse.StatusCode;
+                var lastModified = httpResponse.Content.Headers.LastModified;
                 if (httpResponse.StatusCode == HttpStatusCode.OK)
+                {
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
-                else
-                    response.LastModified = ((DateTimeOffset)httpResponse.Content.Headers.LastModified).UtcDateTime;
+                }
+                response.LastModified = lastModified != null ? ((DateTimeOffset)lastModified).UtcDateTime : DateTime.MinValue;
             }
 
             return response;
