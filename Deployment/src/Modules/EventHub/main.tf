@@ -58,4 +58,5 @@ resource "azurerm_storage_account" "logstashStorage" {
   account_replication_type  = "LRS"
   access_tier               = "Hot"
   enable_https_traffic_only = true
+  tags                      = var.tags
 }
