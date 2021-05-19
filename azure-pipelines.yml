@@ -1,12 +1,8 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
 name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd).$(BuildCounter)
 
 parameters:
-  - name: terraformapply
-    displayName: "Continue even if there are resources destroying"
+  - name: ContinueEvenIfResourcesAreGettingDestroyed
+    displayName: "Continue even if resources are getting destroyed"
     type: boolean
     default: false
 
@@ -40,19 +36,244 @@ stages:
         displayName: "DependencyChecker Dotnet Build test publish"
 
         steps:
-          - task: PowerShell@2
-            displayName: "Output Environment Variables"
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
             inputs:
-              targetType: inline
-              script: |
-                gci env:
-                $CurrentYear = Get-Date -Format "yyyy"
-                $AssemblyCopyright = "Copyright © UK Hydrographic  Office $CurrentYear"
-                echo "##vso[task.setvariable variable=UKHOAssemblyCopyright]${AssemblyCopyright}"
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
-          - task: PowerShell@2
-            displayName: "Set assembly version numbers based on build ID"
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore non test projects only"
             inputs:
-              targetType: filePath
-              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
-              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.FileShareService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$env:UKHOAssemblyCopyright" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
+              command: "restore"
+              projects: |
+                **/*.csproj
+                !**/*Tests.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
+
+          - task: CmdLine@1
+            displayName: "Run OWASP Dependency Checker"
+            inputs:
+              filename: 'dependency-check.bat'
+              arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Artifact: OWASP Dependency Checker Report"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\DCReport'
+              ArtifactName: "OWASP Dependency Checker Report"
+
+          - task: PowerShell@1
+            displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
+            inputs:
+              scriptType: inlineScript
+              arguments: '-ReportLocation $(Build.ArtifactStagingDirectory)\DCReport\*'
+              inlineScript: |
+                param($ReportLocation)
+                Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
+
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore test projects only"
+            inputs:
+              command: "restore"
+              projects: "**/*Tests.csproj"
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build task"
+            inputs:
+              command: "build"
+              projects: "**/*.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet test - Perform Unit Tests"
+            inputs:
+              command: "test"
+              projects: "**/*UnitTests.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+              publishTestResults: true
+              testRunTitle: "UnitTests"
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish functional test"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: "**/*UKHO.ExchangeSetService.API.FunctionalTests.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              zipAfterPublish: false
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Functional test Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              ArtifactName: functionaltests
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish WebAPI"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: '**/*UKHO.ExchangeSetService.API.csproj'
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
+              zipAfterPublish: true
+              modifyOutputPath: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish WebAPI Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
+              ArtifactName: ExchangeSetServiceWebAPI
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish terraform Artifacts"
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)\Deployment'
+              ArtifactName: terraformartifact
+
+  - stage: Devdeploy
+    displayName: "Devdeploy (inc terraform, webapp deploy)"
+    jobs:
+      - deployment: DevDeployApp
+        displayName: "Dev - deploy terraform and dotnet App"
+        environment: "Ess-Dev"
+        workspace:
+          clean: all
+        variables:
+          - group: "ESS-Deployment-Variables-DEV"
+          - group: "ESS-Dev-Variables"
+          - name: DeploymentResourceGroupName
+            value: "ESSDevA00802-RG"
+          - name: DeploymentStorageAccountName
+            value: "essdeva00802"
+          - name: "Environment"
+            value: "dev"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: Deployment/templates/continous-deployment.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Functional test Artifact"
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
+
+                - task: FileTransform@1
+                  displayName: "File Transform: functionaltests"
+                  inputs:
+                    folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
+                    fileType: json
+                    targetFiles: 'appsettings.json'
+
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **\*FunctionalTest*.dll
+                      !**\*TestAdapter.dll
+                      !**\obj\**
+                    testRunTitle: "Dev-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)\functionaltests'
+
+  - stage: QAdeploy
+    displayName: QAdeploy (inc terraform, webapp deploy)
+    jobs:
+      - deployment: QADeployApp
+        displayName: QA - deploy terraform and dotnet App
+        condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+        environment: "Ess-Qa"
+        workspace:
+          clean: all
+        variables:
+          - group: "ESS-Deployment-Variables-QA"
+          - group: "ESS-QA-Variables"
+          - name: DeploymentResourceGroupName
+            value: "ESSQAA00802-RG"
+          - name: DeploymentStorageAccountName
+            value: "essqaa00802"
+          - name: "Environment"
+            value: "qa"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: Deployment/templates/continous-deployment.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Functional test Artifact"
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
+
+                - task: FileTransform@1
+                  displayName: "File Transform: functionaltests"
+                  inputs:
+                    folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
+                    fileType: json
+                    targetFiles: 'appsettings.json'
+
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **\*FunctionalTest*.dll
+                      !**\*TestAdapter.dll
+                      !**\obj\**
+                    testRunTitle: "QA-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)\functionaltests'
