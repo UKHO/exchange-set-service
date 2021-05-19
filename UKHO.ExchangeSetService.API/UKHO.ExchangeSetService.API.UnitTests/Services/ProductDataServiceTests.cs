@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
 using FakeItEasy;
 using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -24,6 +27,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IProductDataSinceDateTimeValidator fakeProductDataSinceDateTimeValidator;
         private ProductDataService service;
         private ISalesCatalogueService fakeSalesCatalogueService;
+        private IFileShareService fakeFileShareService;
+        private ILogger<FileShareService> logger;
         private IMapper fakeMapper;
 
         [SetUp]
@@ -34,8 +39,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeProductDataSinceDateTimeValidator = A.Fake<IProductDataSinceDateTimeValidator>();
             fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
             fakeMapper = A.Fake<IMapper>();
-            service = new ProductDataService(fakeProductIdentifierValidator,fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator, 
-                fakeSalesCatalogueService, fakeMapper);
+            fakeFileShareService = A.Fake<IFileShareService>();
+            logger = A.Fake<ILogger<FileShareService>>();
+
+            service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
+                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger);
         }
 
         #region GetExchangeSetResponse
@@ -118,6 +126,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
         #endregion
 
+        #region GetCreateBatchResponse
+        private static CreateBatchResponse GetCreateBatchResponse()
+        {
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            return new CreateBatchResponse()
+            {
+                ResponseBody = new CreateBatchResponseModel()
+                {
+                    BatchId = batchId,
+                    BatchStatusUri = $"http://fss.ukho.gov.uk/batch/{batchId}",
+                    ExchangeSetFileUri = $"http://fss.ukho.gov.uk/batch/{batchId}/files/exchangeset123.zip",
+                    BatchExpiryDateTime = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+                },
+                ResponseCode = HttpStatusCode.Created
+            };
+        }
+        #endregion GetCreateBatchResponse
 
         #region ProductIdentifiers
 
@@ -186,43 +211,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callbackUri
                 });
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
+
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
         }
 
         [Test]
-        public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkrequestWithLastModified()
-        {
-            A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>()));
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
-            string callbackUri = string.Empty;
-            var salesCatalogueResponse = GetSalesCatalogueResponse();
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            salesCatalogueResponse.LastModified = DateTime.Now.AddDays(-4);
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
-                .Returns(salesCatalogueResponse);
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-
-            var result = await service.CreateProductDataByProductIdentifiers(
-                new ProductIdentifierRequest()
-                {
-                    ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri
-                });
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
-            Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
-            Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
-            Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
-        }
-
-        [Test]
-        public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsInternalServerError()
+        public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsBadrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -245,8 +241,86 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 });
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpstatusCode);
+        }
+
+        [Test]
+        public async Task WhenInvalidFSSCreateBatchProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsInternalServerError()
+        {
+            A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+            
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+                .Returns(salesCatalogueResponse);
+            
+            var exchangeSetResponse = GetExchangeSetResponse();
+            
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+
+            var CreateBatchResponseModel = GetCreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.BadRequest;
+            
+            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+
+            var result = await service.CreateProductDataByProductIdentifiers(
+                new ProductIdentifierRequest()
+                {
+                    ProductIdentifier = productIdentifiers,
+                    CallbackUri = callbackUri
+                });
+
+            Assert.IsNull(result.ExchangeSetResponse);
             Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpstatusCode);
         }
+
+        [Test]
+        public async Task WhenValidFSSCreateBatchProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkResponse()
+        {
+            A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+            
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+                .Returns(salesCatalogueResponse);
+            
+            var exchangeSetResponse_ = GetExchangeSetResponse();
+            
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse_);
+            
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse_.RequestedProductsNotInExchangeSet);
+
+            var CreateBatchResponseModel = GetCreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            
+            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+
+            var result = await service.CreateProductDataByProductIdentifiers(
+                new ProductIdentifierRequest()
+                {
+                    ProductIdentifier = productIdentifiers,
+                    CallbackUri = callbackUri
+                });
+
+            Assert.AreEqual(exchangeSetResponse_.Links.ExchangeSetBatchStatusUri, result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri);
+            Assert.AreEqual(exchangeSetResponse_.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
+            Assert.AreEqual(exchangeSetResponse_.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
+        }
+
         #endregion
 
         #region ProductVersions
@@ -332,20 +406,31 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             });
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
-            Assert.Null(result.LastModified);
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsNotModifiedToOkrequestWithLastModified()
+        public async Task WhenInvalidFSSCreateBatchProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsInternalServerError()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+
             var salesCatalogueResponse = GetSalesCatalogueResponse();
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
-            salesCatalogueResponse.LastModified = DateTime.Now.AddDays(-2);
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
                 .Returns(salesCatalogueResponse);
+            
+            var exchangeSetResponse = GetExchangeSetResponse();
+
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+
+            var CreateBatchResponseModel = GetCreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.BadRequest;
+
+            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -354,31 +439,44 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             });
 
-            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
-            Assert.NotNull(result.LastModified);
-        }
-
-        [Test]
-        public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsNotModifiedToBadRequest()
-        {
-            A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>()));
-            var salesCatalogueResponse = GetSalesCatalogueResponse();
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.BadRequest;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
-                .Returns(salesCatalogueResponse);
-
-            var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
-            {
-                ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
-                ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } },
-                CallbackUri = ""
-            });
-
-            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+            Assert.IsNull(result.ExchangeSetResponse);
             Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpstatusCode);
-            Assert.Null(result.LastModified);
+        }
+
+        [Test]
+        public async Task WhenValidFSSCreateBatchProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkResponse()
+        {
+            A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+           
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+                .Returns(salesCatalogueResponse);
+            
+            var exchangeSetResponse = GetExchangeSetResponse();
+            
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+
+            var CreateBatchResponseModel = GetCreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            
+            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+
+            var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
+            {
+                ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
+                ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } },
+                CallbackUri = ""
+            });
+
+            Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchStatusUri, result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri);
+            Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
+            Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
         }
 
         #endregion
@@ -465,6 +563,60 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+        }
+
+        [Test]
+        public async Task WhenInvalidFSSCreateBatchProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnInternalServerError()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var CreateBatchResponseModel = GetCreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.BadRequest;
+
+            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+
+            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsNull(result.ExchangeSetResponse);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpstatusCode);
+        }
+
+        [Test]
+        public async Task WhenValidFSSCreateBatchProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnOkResponse()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var exchangeSetResponse = GetExchangeSetResponse();
+            
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+
+            var CreateBatchResponseModel = GetCreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            
+            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+
+            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchStatusUri, result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri);
+            Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
+            Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
         }
 
         #endregion ProductDataSinceDateTime
