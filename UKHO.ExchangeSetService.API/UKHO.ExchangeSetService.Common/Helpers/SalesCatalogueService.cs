@@ -99,7 +99,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
                 }
-                response.LastModified = lastModified != null ? ((DateTimeOffset)lastModified).UtcDateTime : DateTime.MinValue;
+                if (lastModified != null)
+                {
+                    response.LastModified = ((DateTimeOffset)lastModified).UtcDateTime;
+                }
             }
 
             return response;
