@@ -81,15 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             string sinceDatetime = "Mon, 01 Mar 2021 00:00:00 GMT";
             var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 200.");
-        }
-
-        [Test]
-        public async Task WhenICallTheApiWithAValidDateButNoLatestRelease_ThenANotModifiedResponseStatusIsReturned()
-        {
-            string sinceDatetime = DateTime.UtcNow.AddDays(-1).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
-            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
-            Assert.AreEqual(304, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 304.");
-        }
+        }        
 
         [TestCase(0, TestName = "Current DateTime with valid RFC1123 format")]
         [TestCase(1, TestName = "Future DateTime with valid RFC1123 format")]
