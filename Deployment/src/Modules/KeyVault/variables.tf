@@ -37,11 +37,3 @@ variable "trusted_ips" {
 variable "allowed_ips" {
 
 }
-
-variable "storage_business_units_name_primary_key_list" {
-
-}
-
-variable "subnetId" {
-  type = string
-}
