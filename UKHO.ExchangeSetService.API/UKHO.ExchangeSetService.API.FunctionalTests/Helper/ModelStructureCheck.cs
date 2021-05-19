@@ -20,8 +20,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsNotNull(apiresponsedata.Links.ExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
             Assert.IsTrue(Uri.IsWellFormedUriString(apiresponsedata.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, Its not valid uri");
 
-            //Check ExchangeSetUrlExpiryDateTime is Not null
-            Assert.IsNotNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns null instead of valid datetime {apiresponsedata.ExchangeSetUrlExpiryDateTime}.");
+            //Check ExchangeSetUrlExpiryDateTime is null
+            Assert.IsNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns valid datetime {apiresponsedata.ExchangeSetUrlExpiryDateTime}, instead of null.");
 
             //Check data type of RequestedProductCount and value should not be less than zero
             Assert.IsTrue(apiresponsedata.RequestedProductCount.GetType().Equals(typeof(int)), "Responsebody returns other datatype, instead of expected Int");
@@ -53,11 +53,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsNotNull(apiresponsedata.Links.ExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
             Assert.IsTrue(Uri.IsWellFormedUriString(apiresponsedata.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, Its not valid uri");
 
-            //Verify ExchangeSetCellCount is zero since no latest release avaialble
-            Assert.AreEqual(0, apiresponsedata.ExchangeSetCellCount, $"Exchange set returned ExchangeSetCellCount {apiresponsedata.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount 0.");
+            //Verify ExchangeSetCellCount
+            Assert.AreEqual(1, apiresponsedata.ExchangeSetCellCount, $"Exchange set returned ExchangeSetCellCount {apiresponsedata.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount 1.");
 
-            //Check RequestedProductsNotInExchangeSet is null
-            Assert.IsNull(apiresponsedata.RequestedProductsNotInExchangeSet, "Response body returns Not null for RequestedProductsNotInExchangeSet, instead of null");
+            //Check RequestedProductsNotInExchangeSet is empty
+            Assert.IsEmpty(apiresponsedata.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
         }
     }
 }
