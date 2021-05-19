@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation.Results;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -119,15 +120,26 @@ namespace UKHO.ExchangeSetService.API.Services
                 var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
                 model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
                 response.ExchangeSetResponse = model;
-            }
-            else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified && isNotModifiedToOk)
-            {
-                response.HttpstatusCode = HttpStatusCode.OK;
-                response.ExchangeSetResponse = new ExchangeSetResponse();
+                if (salesCatalougeResponse.LastModified.HasValue)
+                {
+                    response.LastModified = salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format);
+                }
             }
             else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
             {
-                response.LastModified = salesCatalougeResponse.LastModified.ToString(RFC1123Format);
+                if (isNotModifiedToOk)
+                {
+                    response.HttpstatusCode = HttpStatusCode.OK;
+                }
+                response.ExchangeSetResponse = new ExchangeSetResponse();
+                if (salesCatalougeResponse.LastModified.HasValue)
+                {
+                    response.LastModified = salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format);
+                }
+            }
+            else
+            {
+                response.HttpstatusCode = HttpStatusCode.InternalServerError;
             }
             return response;
         }

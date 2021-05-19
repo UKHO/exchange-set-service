@@ -11,11 +11,8 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using Newtonsoft.Json;
-using Microsoft.Extensions.Primitives;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
@@ -112,6 +109,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(sinceDateTime);
 
             //Test
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
             Assert.AreEqual(HttpMethod.Get, httpMethodParam);
             Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}", uriParam);
             Assert.IsNull(postBodyParam);
@@ -167,7 +165,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string actualAccessToken = "notRequiredDuringTesting";
             var requestBody = new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber = 1, ProductName = "TEST1", UpdateNumber = 0 } };
             string postBodyParam = "This should be replaced by actual value";
-            string sinceDateTime = DateTime.UtcNow.ToString();
 
             //Test variable
             string accessTokenParam = null;
@@ -193,6 +190,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await salesCatalogueService.PostProductVersionsAsync(requestBody);
 
             //Test
+            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
             Assert.AreEqual(HttpMethod.Post, httpMethodParam);
             Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productVersions",uriParam);
             Assert.AreEqual(JsonConvert.SerializeObject(requestBody), postBodyParam);
@@ -237,7 +235,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
             var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1", "TEST2" });
-            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}");
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}"); 
             Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
         }
 
@@ -248,7 +246,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var requestBody = new List<string> { "TEST1", "TEST2" };
             string actualAccessToken = "notRequiredDuringTesting";
             string postBodyParam = "This should be replace by actual value when param passed to api call";
-            string sinceDateTime = DateTime.UtcNow.ToString();
 
             //Test variable
             string accessTokenParam = null;
@@ -274,6 +271,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await salesCatalogueService.PostProductIdentifiersAsync(requestBody);
 
             //Test
+            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
             Assert.AreEqual(HttpMethod.Post, httpMethodParam);
             Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productIdentifiers", uriParam);
             Assert.AreEqual(JsonConvert.SerializeObject(requestBody),postBodyParam);

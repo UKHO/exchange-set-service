@@ -73,14 +73,16 @@ namespace UKHO.ExchangeSetService.API.Controllers
             switch (code)
             {
                 case (HttpStatusCode)(int)HttpStatusCode.OK:
-                    httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+                    if (model.LastModified != null)
+                        httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
                     return Ok(model.ExchangeSetResponse);
                 case (HttpStatusCode)(int)HttpStatusCode.InternalServerError:
                     return BuildInternalServerErrorResponse();                    
                 case (HttpStatusCode)(int)HttpStatusCode.BadRequest:
                     return BuildBadRequestErrorResponse(errors);
                 case (HttpStatusCode)(int)HttpStatusCode.NotModified:
-                    httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey,model.LastModified);
+                    if (model.LastModified != null)
+                        httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
                     return BuildNotModifiedResponse();
                 default:
                    return BuildInternalServerErrorResponse();
