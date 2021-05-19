@@ -24,5 +24,5 @@ locals {
 }
 
 variable "allowed_ips" {
-  type = map
+  type = list
 }
