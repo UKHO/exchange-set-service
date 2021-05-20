@@ -169,7 +169,7 @@ stages:
           - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
             value: $(AutoTestClientSecret_NoAuth)
           - name: "SalesCatalogue.BaseUrl"
-            value:"https://m-salescatstub-api-dev-appservice.azurewebsites.net"
+            value: "https://m-salescatstub-api-dev-appservice.azurewebsites.net"
         strategy:
           runOnce:
             deploy:
@@ -240,7 +240,7 @@ stages:
           - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
             value: $(AutoTestClientSecret_NoAuth)
           - name: "SalesCatalogue.BaseUrl"
-            value:"https://m-salescatstub-api-qa-appservice.azurewebsites.net"
+            value: "https://m-salescatstub-api-qa-appservice.azurewebsites.net"
         strategy:
           runOnce:
             deploy:
