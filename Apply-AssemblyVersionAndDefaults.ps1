@@ -1,7 +1,8 @@
 param (
     [Parameter(Mandatory = $true)] [string] $buildNumber,
     [Parameter(Mandatory = $true)] [string] $solutionDirectory,
-    [Parameter(Mandatory = $true)] [string] $UKHOAssemblyCompan
+    [Parameter(Mandatory = $true)] [string] $UKHOAssemblyCompany,
+    [Parameter(Mandatory = $true)] [string] $UKHOAssemblyCopyright,
     [Parameter(Mandatory = $true)] [string] $UKHOAssemblyVersionPrefix,
     [Parameter(Mandatory = $true)] [string] $UKHOAssemblyProduct
 )
@@ -18,6 +19,8 @@ if ($validBuildNumber -eq $false) {
 $buildRevisionNumber = $Matches.2 + "." + $Matches.3
 $versionToApply = $UKHOAssemblyVersionPrefix + $buildRevisionNumber
 
+$UKHOAssemblyCopyright = "$UKHOAssemblyCopyright $(Get-Date -Format "yyyy")"
+
 $assemblyValues = @{
     "Company"         = $UKHOAssemblyCompany;
     "Copyright"       = $UKHOAssemblyCopyright;
@@ -26,6 +29,21 @@ $assemblyValues = @{
     "AssemblyVersion" = $versionToApply;
     "FileVersion"     = $versionToApply;
     "Version"         = $versionToApply;
+}
+
+(Get-ChildItem -Path $solutionDirectory -File -Filter "*.csproj" -Recurse) | ForEach-Object {
+    $file = $_
+
+    Write-Host "Updating assembly file at path: $file"
+    [xml]$xmlContent = (Get-Content $file.FullName)
+
+    $assemblyValues.Keys | ForEach-Object {
+        $key = $_
+
+        UpdateOrAddAttribute $xmlContent $key $assemblyValues[$key] $xmlContent.DocumentElement.NamespaceURI
+    }
+
+    $xmlContent.Save($file.FullName)
 }
 
 function UpdateOrAddAttribute($xmlContent, $assemblyKey, $newValue, $namespace) {
@@ -49,19 +67,4 @@ function UpdateOrAddAttribute($xmlContent, $assemblyKey, $newValue, $namespace) 
     $propertyGroup.AppendChild($newChild)
 
     return $propertyGroupNode
-}
-
-(Get-ChildItem -Path $solutionDirectory -File -Filter "*.csproj" -Recurse) | ForEach-Object {
-    $file = $_
-
-    Write-Host "Updating assembly file at path: $file"
-    [xml]$xmlContent = (Get-Content $file.FullName)
-
-    $assemblyValues.Keys | ForEach-Object {
-        $key = $_
-
-        UpdateOrAddAttribute $xmlContent $key $assemblyValues[$key] $xmlContent.DocumentElement.NamespaceURI
-    }
-
-    $xmlContent.Save($file.FullName)
 }

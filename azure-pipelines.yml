@@ -24,7 +24,9 @@ variables:
   - name: UKHOAssemblyVersionPrefix
     value: "1.0."
   - name: UKHOAssemblyProduct
-    value: "File Share Service"
+    value: "Exhange Set Service"
+  - name: AssemblyCopyright
+    value: "Copyright © UK Hydrographic  Office"
 
 stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
@@ -37,21 +39,11 @@ stages:
 
         steps:
           - task: PowerShell@2
-            displayName: "Output Environment Variables"
-            inputs:
-              targetType: inline
-              script: |
-                gci env:
-                $CurrentYear = Get-Date -Format "yyyy"
-                $AssemblyCopyright = "Copyright © UK Hydrographic  Office $CurrentYear"
-                echo "##vso[task.setvariable variable=UKHOAssemblyCopyright]${AssemblyCopyright}"
-
-          - task: PowerShell@2
             displayName: "Set assembly version numbers based on build ID"
             inputs:
               targetType: filePath
               filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
-              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.FileShareService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$env:UKHOAssemblyCopyright" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
+              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$env:UKHOAssemblyCopyright" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
 
           - task: UseDotNet@2
             displayName: 'Use .NET Core 3.1.x sdk'
