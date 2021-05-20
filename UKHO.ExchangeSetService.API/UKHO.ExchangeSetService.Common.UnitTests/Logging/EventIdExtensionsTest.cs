@@ -1,7 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Logging
