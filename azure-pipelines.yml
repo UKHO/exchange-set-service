@@ -24,7 +24,7 @@ variables:
   - name: UKHOAssemblyVersionPrefix
     value: "1.0."
   - name: UKHOAssemblyProduct
-    value: "Exhange Set Service"
+    value: "Exchange Set Service"
   - name: UKHOAssemblyCopyright
     value: "Copyright © UK Hydrographic  Office"
 
