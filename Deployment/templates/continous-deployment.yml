@@ -17,6 +17,7 @@ steps:
       ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
       ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
       ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
+      TF_VAR_allowed_ips: $(whiteListedIps)
 
   - task: FileTransform@1
     displayName: "File Transform: WebAppSettings"
