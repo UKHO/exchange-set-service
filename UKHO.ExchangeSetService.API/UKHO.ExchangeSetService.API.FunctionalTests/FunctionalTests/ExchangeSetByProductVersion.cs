@@ -11,8 +11,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     {
         private ExchangeSetApiClient ExchangesetApiClient { get; set; }
         private TestConfiguration Config { get; set; }
-        public DataHelper Datahelper { get; set; }
-        public ProductVersionModel ProductVersionmodel { get; set; }
+        public DataHelper Datahelper { get; set; }       
         private string EssJwtToken { get; set; }
         private string EssJwtTokenNoRole { get; set; }
         private string EssJwtCustomizedToken { get; set; }
@@ -21,8 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task SetupAsync()
         {
             Config = new TestConfiguration();
-            ExchangesetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
-            ProductVersionmodel = new ProductVersionModel();
+            ExchangesetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);            
             Datahelper = new DataHelper();
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();
