@@ -78,8 +78,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Guid guidID;
             bool hasGUID = Guid.TryParse(batchID, out guidID);
 
-            //Verify the exchangeSetBatchStatusUri Batch ID
-            Assert.IsTrue(hasGUID, $"Exchange set returned batch status URI {apiresponsedata.Links.ExchangeSetBatchStatusUri.Href}, with invalid BatchID");
+            //Verify the exchangeSetBatchStatusUri contains BatchId is a valid GUID
+            Assert.IsTrue(hasGUID, $"Exchange set returned batch status URI contains BatchId {batchID} is not a valid GUID");
 
 
             //Check ExchangeSetFileUri a valid Uri
@@ -94,18 +94,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual("files", ExchangeSetFileUri[5], $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, which is wrong format.");
 
             var fileBatchId = ExchangeSetFileUri[4];
-            bool hasGuid = Guid.TryParse(fileBatchId, out guidID);
+            hasGUID = Guid.TryParse(fileBatchId, out guidID);
 
             //Verify the ExchangeSetFileUri format for BatchID
-            Assert.IsTrue(hasGuid, $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, with invalid BatchID");
+            Assert.IsTrue(hasGUID, $"Exchange set returned file URI contains BatchId {fileBatchId} is not a valid GUID");
+            
             //Verify the File format for ExchangeSetFileUri
             Assert.AreEqual("V01X01.zip", ExchangeSetFileUri[6], $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, which is wrong format.");
 
             // verify both batch ID of ExchangeSetBatchStatusUri and ExchangeSetFileUri are the same
-            Assert.AreEqual(hasGUID, hasGuid, $"The Batch ID of ExchangeSetBatchStatusUri and ExchangeSetFileUri are not the same.");
+            Assert.AreEqual(batchID, fileBatchId, $"The Batch ID of ExchangeSetBatchStatusUri {batchID} and ExchangeSetFileUri {fileBatchId} are not equal.");
 
             //Check ExchangeSetUrlExpiryDateTime is not null
-            Assert.IsNotNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns null, instead of valid Exchange Set Url ExpiryDateTime.");
+            Assert.IsNotNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns null, instead of valid Exchange Set Url ExpiryDateTime {apiresponsedata.ExchangeSetUrlExpiryDateTime}.");
         }
     }
 }

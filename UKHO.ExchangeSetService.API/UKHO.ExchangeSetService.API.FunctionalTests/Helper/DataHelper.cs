@@ -1,4 +1,5 @@
-﻿using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+﻿using System.Collections.Generic;
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -16,6 +17,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             };
 
             return ProductVersionmodel;
+        }
+
+        public List<string> GetProductIdentifierData()
+        {
+            return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080" };
+
         }
     }
 }
