@@ -4,18 +4,14 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
-using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
@@ -27,7 +23,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IAuthTokenProvider fakeAuthTokenProvider;
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
-        private IAuthTokenProvider jwtToken { get; set; }
 
         [SetUp]
         public void Setup()
