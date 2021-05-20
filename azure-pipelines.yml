@@ -109,9 +109,22 @@ stages:
             inputs:
               command: "test"
               projects: "**/*UnitTests.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+              arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
               publishTestResults: true
               testRunTitle: "UnitTests"
+
+          - task: PowerShell@2
+            displayName: "Generate code coverage report"
+            inputs:
+              targetType: filePath
+              filePath: '$(Build.SourcesDirectory)\CodeCoverageReport.ps1'
+              arguments: '-source "$(Build.SourcesDirectory)" -reportFolder "$(Build.ArtifactStagingDirectory)"'
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Code coverage"
+            inputs:
+              PathtoPublish: "$(Build.ArtifactStagingDirectory)/codecoveragereport"
+              ArtifactName: codecoveragereport
 
           - task: DotNetCoreCLI@2
             displayName: "Publish functional test"
