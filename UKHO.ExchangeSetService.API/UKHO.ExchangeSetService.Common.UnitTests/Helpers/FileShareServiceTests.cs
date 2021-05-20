@@ -41,6 +41,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger);
         }
 
+        #region GetCreateBatchResponse
         private static CreateBatchResponseModel GetCreateBatchResponse()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
@@ -52,43 +53,45 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 BatchExpiryDateTime = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
             };
         }
+        #endregion GetCreateBatchResponse
+
+        #region GetFakeToken
+        private static string GetFakeToken()
+        {
+            return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0ZXN0IHNlcnZlciIsImlhdCI6MTU1ODMyOTg2MCwiZXhwIjoxNTg5OTUyMjYwLCJhdWQiOiJ3d3cudGVzdC5jb20iLCJzdWIiOiJ0ZXN0dXNlckB0ZXN0LmNvbSIsIm9pZCI6IjE0Y2I3N2RjLTFiYTUtNDcxZC1hY2Y1LWEwNDBkMTM4YmFhOSJ9.uOPTbf2Tg6M2OIC6bPHsBAOUuFIuCIzQL_MV3qV6agc";
+        }
+        #endregion
 
         #region CreateBatch
         [Test]
-        public async Task WhenFSSClientReturnsOtherThan201_ThenCreateBatchReturnsInternalServerError()
+        public async Task WhenFSSClientReturnsOtherThan201_ThenCreateBatchReturnsSameStatusAndNullInResponse()
         {
-            string token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiI1YzJmNmRmNC0zMmI4LTQyYzgtOWI1Yi0zZjZjMzRiM2RkNGYiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjIxMjU3MjMyLCJuYmYiOjE2MjEyNTcyMzIsImV4cCI6MTYyMTI2MTEzMiwiYWNyIjoiMSIsImFpbyI6IkFZUUFlLzhUQUFBQUE1N2lSeUJpbGtWMUc4M2I3bDg5Z3JuUUVKTjRhWHJCZXdieDU4cVlCWUt4Sm8zQzBZVU1BcTFhVEFrMU5LTHRtN1RIeVZXU0JwRXdBYzQyd2ZhN0hqWVNZWnJaRnZNbDQzNXJnUzNDQUhiNDExOStKNmZoVElod0ZIbjhVaG9KVXgvbVdydUhuejNxYW1uTWg5OUkwTEFhRUVYWUhMR0Y3ODJFc2pBS0h3Yz0iLCJhbXIiOlsicHdkIiwibWZhIl0sImFwcGlkIjoiNWMyZjZkZjQtMzJiOC00MmM4LTliNWItM2Y2YzM0YjNkZDRmIiwiYXBwaWRhY3IiOiIwIiwiZW1haWwiOiJnYW5wYXQuZ2F3ZGVAbWFzdGVrLmNvbSIsImZhbWlseV9uYW1lIjoiZ2F3ZGUiLCJnaXZlbl9uYW1lIjoiZ2FucGF0IiwiaWRwIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvYWRkMWM1MDAtYTZkNy00ZGJkLWI4OTAtN2Y4Y2I2ZjdkODYxLyIsImlwYWRkciI6IjEwMy43NC4xOS4xODIiLCJuYW1lIjoiR2FucGF0IEdhd2RlIiwib2lkIjoiMTk5ZTI1OTUtN2ZlNC00YmM0LWI4MDctOGRmMTAxMjNiZTA2IiwicmgiOiIwLkFRSUFTTW8wa1QxbUJVcVdpakdrTHdydFB2UnRMMXk0TXNoQ20xc19iRFN6M1U4Q0FCQS4iLCJyb2xlcyI6WyJFeGNoYW5nZVNlcnZpY2VSZWFkZXIiLCJDYXRhbG9ndWVSZWFkZXIiXSwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoiWUpyY0l3TWFVVWMxd1Z3bUNrZVZocUFsdE45MFhMM3N5ckFsaWNaMmY3VSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiZ2FucGF0Lmdhd2RlQG1hc3Rlay5jb20iLCJ1dGkiOiJTS1V3eHRLSFlFeThLWkZ3SkVkYkFBIiwidmVyIjoiMS4wIn0.g0i5UnttfuHzrn53g28zOwKXcGi-j4ccoQ8MRFnBXdFRZHYzepVCCMJkTI2KKwpcpP_ULQspnuZVkkk1-tKZo8YWnrY2NroxQx284hxmGt07RFi_I6r8EymBnP86myygThYt-nbtLVbedVcK0Gt17shP_Saf5EWpZwrZ7YDJNvTetD5o_s0xME5PITu50gDqVS_MAW9B4VSf1qw405-z3Fm-B6NtEYNui71hTrI_uaQePuv1Fb3feef9yG6cCbCbSBtd0whv4WdipWEc6IwQ5Rk6NkwMsfLH3hTsfJwjg55tWOaY08yW4-6SPL_Qx98YpDiluP9ZuDcWXz0SNdgo1g";
-
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(token);
-            
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.InternalServerError, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Internal Server Error"))) });
+                .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             var response = await fileShareService.CreateBatch();
-            
-            Assert.AreEqual(HttpStatusCode.InternalServerError, response.ResponseCode, $"Expected {HttpStatusCode.InternalServerError} got {response.ResponseCode}");
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
         }
 
         [Test]
         public async Task WhenFSSClientReturns201_ThenCreateBatchReturns201AndDataInResponse()
         {
-            CreateBatchResponseModel fssResponse = GetCreateBatchResponse();
-            var jsonString = JsonConvert.SerializeObject(fssResponse);
-            
-            string token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiI1YzJmNmRmNC0zMmI4LTQyYzgtOWI1Yi0zZjZjMzRiM2RkNGYiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjIxMjU3MjMyLCJuYmYiOjE2MjEyNTcyMzIsImV4cCI6MTYyMTI2MTEzMiwiYWNyIjoiMSIsImFpbyI6IkFZUUFlLzhUQUFBQUE1N2lSeUJpbGtWMUc4M2I3bDg5Z3JuUUVKTjRhWHJCZXdieDU4cVlCWUt4Sm8zQzBZVU1BcTFhVEFrMU5LTHRtN1RIeVZXU0JwRXdBYzQyd2ZhN0hqWVNZWnJaRnZNbDQzNXJnUzNDQUhiNDExOStKNmZoVElod0ZIbjhVaG9KVXgvbVdydUhuejNxYW1uTWg5OUkwTEFhRUVYWUhMR0Y3ODJFc2pBS0h3Yz0iLCJhbXIiOlsicHdkIiwibWZhIl0sImFwcGlkIjoiNWMyZjZkZjQtMzJiOC00MmM4LTliNWItM2Y2YzM0YjNkZDRmIiwiYXBwaWRhY3IiOiIwIiwiZW1haWwiOiJnYW5wYXQuZ2F3ZGVAbWFzdGVrLmNvbSIsImZhbWlseV9uYW1lIjoiZ2F3ZGUiLCJnaXZlbl9uYW1lIjoiZ2FucGF0IiwiaWRwIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvYWRkMWM1MDAtYTZkNy00ZGJkLWI4OTAtN2Y4Y2I2ZjdkODYxLyIsImlwYWRkciI6IjEwMy43NC4xOS4xODIiLCJuYW1lIjoiR2FucGF0IEdhd2RlIiwib2lkIjoiMTk5ZTI1OTUtN2ZlNC00YmM0LWI4MDctOGRmMTAxMjNiZTA2IiwicmgiOiIwLkFRSUFTTW8wa1QxbUJVcVdpakdrTHdydFB2UnRMMXk0TXNoQ20xc19iRFN6M1U4Q0FCQS4iLCJyb2xlcyI6WyJFeGNoYW5nZVNlcnZpY2VSZWFkZXIiLCJDYXRhbG9ndWVSZWFkZXIiXSwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoiWUpyY0l3TWFVVWMxd1Z3bUNrZVZocUFsdE45MFhMM3N5ckFsaWNaMmY3VSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiZ2FucGF0Lmdhd2RlQG1hc3Rlay5jb20iLCJ1dGkiOiJTS1V3eHRLSFlFeThLWkZ3SkVkYkFBIiwidmVyIjoiMS4wIn0.g0i5UnttfuHzrn53g28zOwKXcGi-j4ccoQ8MRFnBXdFRZHYzepVCCMJkTI2KKwpcpP_ULQspnuZVkkk1-tKZo8YWnrY2NroxQx284hxmGt07RFi_I6r8EymBnP86myygThYt-nbtLVbedVcK0Gt17shP_Saf5EWpZwrZ7YDJNvTetD5o_s0xME5PITu50gDqVS_MAW9B4VSf1qw405-z3Fm-B6NtEYNui71hTrI_uaQePuv1Fb3feef9yG6cCbCbSBtd0whv4WdipWEc6IwQ5Rk6NkwMsfLH3hTsfJwjg55tWOaY08yW4-6SPL_Qx98YpDiluP9ZuDcWXz0SNdgo1g";
+            var createBatchResponse = GetCreateBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(createBatchResponse);
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
 
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(token);
-            
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
             var response = await fileShareService.CreateBatch();
-            
+ 
             Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
-            Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
+            Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
+            Assert.AreEqual(createBatchResponse.BatchStatusUri, response.ResponseBody.BatchStatusUri);
+            Assert.AreEqual(createBatchResponse.ExchangeSetFileUri, response.ResponseBody.ExchangeSetFileUri);
         }
 
         #endregion CreateBatch
