@@ -1,3 +1,26 @@
+function UpdateOrAddAttribute($xmlContent, $assemblyKey, $newValue, $namespace) {
+    $propertyGroup = $xmlContent.Project.PropertyGroup
+    if ($propertyGroup -is [array]) {
+        $propertyGroup = $propertyGroup[0]
+    }
+
+    $propertyGroupNode = $propertyGroup.$assemblyKey
+
+    if ($null -ne $propertyGroupNode) {
+        Write-Host "Assembly key $assemblyKey has been located in source file - updating with value: " + $newValue
+        $propertyGroup.$assemblyKey = $newValue
+        return $xmlContent
+    }
+
+    Write-Host "Assembly key $assemblyKey could not be located in source file - appending value " + $newValue
+
+    $newChild = $xmlContent.CreateElement($assemblyKey, $namespace)
+    $newChild.InnerText = $newValue
+    $propertyGroup.AppendChild($newChild)
+
+    return $propertyGroupNode
+}
+
 param (
     [Parameter(Mandatory = $true)] [string] $buildNumber,
     [Parameter(Mandatory = $true)] [string] $solutionDirectory,
@@ -44,27 +67,4 @@ $assemblyValues = @{
     }
 
     $xmlContent.Save($file.FullName)
-}
-
-function UpdateOrAddAttribute($xmlContent, $assemblyKey, $newValue, $namespace) {
-    $propertyGroup = $xmlContent.Project.PropertyGroup
-    if ($propertyGroup -is [array]) {
-        $propertyGroup = $propertyGroup[0]
-    }
-
-    $propertyGroupNode = $propertyGroup.$assemblyKey
-
-    if ($null -ne $propertyGroupNode) {
-        Write-Host "Assembly key $assemblyKey has been located in source file - updating with value: " + $newValue
-        $propertyGroup.$assemblyKey = $newValue
-        return $xmlContent
-    }
-
-    Write-Host "Assembly key $assemblyKey could not be located in source file - appending value " + $newValue
-
-    $newChild = $xmlContent.CreateElement($assemblyKey, $namespace)
-    $newChild.InnerText = $newValue
-    $propertyGroup.AppendChild($newChild)
-
-    return $propertyGroupNode
 }
