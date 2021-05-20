@@ -34,6 +34,8 @@ resource "azurerm_key_vault_access_policy" "kv_access_terraform" {
     "set",
     "get",
     "delete",
+    "recover",
+    "purge"
   ]
 }
 
