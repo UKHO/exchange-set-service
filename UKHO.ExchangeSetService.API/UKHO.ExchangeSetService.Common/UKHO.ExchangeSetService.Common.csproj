@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Configuration\" />
     <Folder Include="Helpers\" />
   </ItemGroup>
 
