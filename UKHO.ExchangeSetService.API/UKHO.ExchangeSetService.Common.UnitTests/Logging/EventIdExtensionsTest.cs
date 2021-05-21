@@ -7,7 +7,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Logging
     public class EventIdExtensionsTest
     {
         [Test]
-        public void WhenExtensionSetEventId_ThenValidateItsISEqualToActualValue()
+        public void WhenExtensionSetEventId_ThenValidateItIsEqualToActualValue()
         {
             Assert.AreEqual(EventIds.SalesCatalogueNonOkResponse.ToEventId().Id, (int)EventIds.SalesCatalogueNonOkResponse);
         }
