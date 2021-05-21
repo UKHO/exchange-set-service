@@ -59,5 +59,54 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Check RequestedProductsNotInExchangeSet is empty
             Assert.IsEmpty(apiresponsedata.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
         }
+
+        public static async Task CheckFssBatchResponse(this HttpResponseMessage apiresponse)
+        {
+            var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            //Check if ExchangeSetBatchStatusUri is a valid Uri
+            Assert.IsTrue(Uri.IsWellFormedUriString(apiresponsedata.Links.ExchangeSetBatchStatusUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned batch status URI {apiresponsedata.Links.ExchangeSetBatchStatusUri.Href}, Its not valid uri");
+
+            
+            string[] exchangeSetBatchStatusUri = apiresponsedata.Links.ExchangeSetBatchStatusUri.Href.Split('/');
+
+            //Verify the exchangeSetBatchStatusUri format for batch
+            Assert.AreEqual("batch", exchangeSetBatchStatusUri[3], $"Exchange set returned batch status URI {apiresponsedata.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
+
+            
+            var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 1];
+            Guid guidID;
+            bool hasGUID = Guid.TryParse(batchID, out guidID);
+
+            //Verify the exchangeSetBatchStatusUri contains BatchId is a valid GUID
+            Assert.IsTrue(hasGUID, $"Exchange set returned batch status URI contains BatchId {batchID} is not a valid GUID");
+
+
+            //Check ExchangeSetFileUri a valid Uri
+            Assert.IsTrue(Uri.IsWellFormedUriString(apiresponsedata.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, Its not valid uri");
+
+
+            string[] ExchangeSetFileUri = apiresponsedata.Links.ExchangeSetFileUri.Href.Split('/');
+
+            //Verify the ExchangeSetFileUri format for batch
+            Assert.AreEqual("batch", ExchangeSetFileUri[3], $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, which is wrong format.");
+            //Verify the ExchangeSetFileUri format for files
+            Assert.AreEqual("files", ExchangeSetFileUri[5], $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, which is wrong format.");
+
+            var fileBatchId = ExchangeSetFileUri[4];
+            hasGUID = Guid.TryParse(fileBatchId, out guidID);
+
+            //Verify the ExchangeSetFileUri format for BatchID
+            Assert.IsTrue(hasGUID, $"Exchange set returned file URI contains BatchId {fileBatchId} is not a valid GUID");
+            
+            //Verify the File format for ExchangeSetFileUri
+            Assert.AreEqual("V01X01.zip", ExchangeSetFileUri[6], $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, which is wrong format.");
+
+            // verify both batch ID of ExchangeSetBatchStatusUri and ExchangeSetFileUri are the same
+            Assert.AreEqual(batchID, fileBatchId, $"The Batch ID of ExchangeSetBatchStatusUri {batchID} and ExchangeSetFileUri {fileBatchId} are not equal.");
+
+            //Check ExchangeSetUrlExpiryDateTime is not null
+            Assert.IsNotNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns null, instead of valid Exchange Set Url ExpiryDateTime {apiresponsedata.ExchangeSetUrlExpiryDateTime}.");
+        }
     }
 }
