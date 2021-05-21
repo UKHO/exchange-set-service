@@ -26,7 +26,7 @@ variables:
   - name: UKHOAssemblyProduct
     value: "Exchange Set Service"
   - name: UKHOAssemblyCopyright
-    value: "Copyright © UK Hydrographic  Office"
+    value: "Copyright © UK Hydrographic Office"
 
 stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
