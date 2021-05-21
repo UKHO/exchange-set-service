@@ -12,7 +12,7 @@ locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
   web_app_name		    = "${local.service_name}-${local.env_name}-webapp"
-
+  key_vault_name		= "${local.service_name}-${local.env_name}-kv"
   tags = {
     SERVICE          = "Exchange Set Service"
     ENVIRONMENT      = local.env_name
@@ -21,4 +21,8 @@ locals {
     CALLOUT_TEAM     = "On-Call_N/A"
     COST_CENTRE      = "A.008.02"
   }
+}
+
+variable "allowed_ips" {
+  type = list
 }
