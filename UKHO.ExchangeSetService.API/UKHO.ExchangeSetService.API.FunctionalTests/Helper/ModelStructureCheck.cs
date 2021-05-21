@@ -8,6 +8,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class ModelStructureCheck
     {
+        private static TestConfiguration Config { get; set; }
+        static ModelStructureCheck()
+        {
+            Config = new TestConfiguration();
+        }
         public static async Task CheckModelStructureForSuccessResponse(this HttpResponseMessage apiresponse)
         {
             var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -20,8 +25,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsNotNull(apiresponsedata.Links.ExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
             Assert.IsTrue(Uri.IsWellFormedUriString(apiresponsedata.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, Its not valid uri");
 
-            //Check ExchangeSetUrlExpiryDateTime is null
-            Assert.IsNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns valid datetime {apiresponsedata.ExchangeSetUrlExpiryDateTime}, instead of null.");
+            //Check ExchangeSetUrlExpiryDateTime is not null
+            Assert.IsNotNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns null, Instead of valid datetime {apiresponsedata.ExchangeSetUrlExpiryDateTime}.");
 
             //Check data type of RequestedProductCount and value should not be less than zero
             Assert.IsTrue(apiresponsedata.RequestedProductCount.GetType().Equals(typeof(int)), "Responsebody returns other datatype, instead of expected Int");
@@ -33,10 +38,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             //Check data type of RequestedProductsAlreadyUpToDateCount and value should not be less than zero
             Assert.IsTrue(apiresponsedata.RequestedProductsAlreadyUpToDateCount.GetType().Equals(typeof(int)), "Responsebody returns other datatype, instead of expected Int");
-            Assert.IsTrue(apiresponsedata.RequestedProductsAlreadyUpToDateCount >= 0, "Response body returns RequestedProductsAlreadyUpToDateCount less than zero, instead of expected count should not be less than zero.");
-
-            //Check RequestedProductsNotInExchangeSet is Not null
-            Assert.IsNotNull(apiresponsedata.RequestedProductsNotInExchangeSet, "Response body returns null for RequestedProductsNotInExchangeSet, instead of Not null");
+            Assert.IsTrue(apiresponsedata.RequestedProductsAlreadyUpToDateCount >= 0, "Response body returns RequestedProductsAlreadyUpToDateCount less than zero, instead of expected count should not be less than zero.");             
 
         }
 
@@ -75,8 +77,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             
             var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 1];
-            Guid guidID;
-            bool hasGUID = Guid.TryParse(batchID, out guidID);
+            
+            bool hasGUID = Guid.TryParse(batchID, out Guid guidIdBatch);
 
             //Verify the exchangeSetBatchStatusUri contains BatchId is a valid GUID
             Assert.IsTrue(hasGUID, $"Exchange set returned batch status URI contains BatchId {batchID} is not a valid GUID");
@@ -94,19 +96,24 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual("files", ExchangeSetFileUri[5], $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, which is wrong format.");
 
             var fileBatchId = ExchangeSetFileUri[4];
-            hasGUID = Guid.TryParse(fileBatchId, out guidID);
+            hasGUID = Guid.TryParse(fileBatchId, out Guid guidIdFile);
 
             //Verify the ExchangeSetFileUri format for BatchID
             Assert.IsTrue(hasGUID, $"Exchange set returned file URI contains BatchId {fileBatchId} is not a valid GUID");
             
             //Verify the File format for ExchangeSetFileUri
-            Assert.AreEqual("V01X01.zip", ExchangeSetFileUri[6], $"Exchange set returned File URI {apiresponsedata.Links.ExchangeSetFileUri.Href}, which is wrong format.");
+            Assert.AreEqual(Config.ExchangeSetFileName, ExchangeSetFileUri[6], $"Exchange set returned File URI contains file name  {ExchangeSetFileUri[6]}, instead of expected file name {Config.ExchangeSetFileName}.");
 
             // verify both batch ID of ExchangeSetBatchStatusUri and ExchangeSetFileUri are the same
             Assert.AreEqual(batchID, fileBatchId, $"The Batch ID of ExchangeSetBatchStatusUri {batchID} and ExchangeSetFileUri {fileBatchId} are not equal.");
 
             //Check ExchangeSetUrlExpiryDateTime is not null
             Assert.IsNotNull(apiresponsedata.ExchangeSetUrlExpiryDateTime, $"Response body returns null, instead of valid Exchange Set Url ExpiryDateTime {apiresponsedata.ExchangeSetUrlExpiryDateTime}.");
+
+            //Verify expiry datetime
+            var expiryDateTime = DateTime.UtcNow.AddDays(1);
+
+            Assert.True(apiresponsedata.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second), $"Response body returned ExpiryDateTime {apiresponsedata.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
         }
     }
 }
