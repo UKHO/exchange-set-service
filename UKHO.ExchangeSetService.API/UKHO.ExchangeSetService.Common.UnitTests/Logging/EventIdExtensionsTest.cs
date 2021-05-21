@@ -3,16 +3,16 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Logging
 {
-    [TestFixture()]
+    [TestFixture]
     public class EventIdExtensionsTest
     {
-        [Test()]
-        public void WhenExtensionSetEventId_ThenValidateItsISEqualToActualValue()
+        [Test]
+        public void WhenExtensionSetEventId_ThenValidateItIsEqualToActualValue()
         {
             Assert.AreEqual(EventIds.SalesCatalogueNonOkResponse.ToEventId().Id, (int)EventIds.SalesCatalogueNonOkResponse);
         }
 
-        [Test()]
+        [Test]
         public void WhenExtensionSetEventName_ThenValidateItIsSameAsToString()
         {
             Assert.AreEqual(EventIds.SCSPostProductVersionsRequestCompleted.ToEventId().Name, EventIds.SCSPostProductVersionsRequestCompleted.ToString());
