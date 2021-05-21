@@ -89,6 +89,42 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(createBatchResponse.ExchangeSetFileUri, response.ResponseBody.ExchangeSetFileUri);
         }
 
+        [Test]
+        public async Task WhenFSSApiIsCalledForCreateBatch_ThenValidateCorrectParametersArePassed()
+        {
+            //Data
+            string actualAccessToken = GetFakeToken();
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            var createBatchResponse = GetCreateBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(createBatchResponse);
+
+            //Mock
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Invokes((HttpMethod method, string postBody, string accessToken, string uri) =>
+                {
+                    accessTokenParam = accessToken;
+                    uriParam = uri;
+                    httpMethodParam = method;
+                    postBodyParam = postBody;
+                })
+                .Returns(httpResponse);
+
+            //Method call
+            var response = await fileShareService.CreateBatch();
+
+            //Test
+            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
+            Assert.AreEqual(HttpMethod.Post, httpMethodParam);
+            Assert.AreEqual(actualAccessToken, accessTokenParam);
+        }
+
         #endregion CreateBatch
     }
 }
