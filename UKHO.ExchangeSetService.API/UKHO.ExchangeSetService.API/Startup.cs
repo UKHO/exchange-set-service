@@ -107,8 +107,6 @@ namespace UKHO.ExchangeSetService.API
 
             app.UseAuthorization();
 
-            app.UseMiddleware<RequestResponseLoggingMiddleware>();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
