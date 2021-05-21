@@ -188,6 +188,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 CallbackUri = callbackUri
             };
 
+            Logger.LogInformation("GetProductDataSinceDateTime Endpoint Started");
+
             if (productDataSinceDateTimeRequest.SinceDateTime == null)
             {
                 var error = new List<Error>
