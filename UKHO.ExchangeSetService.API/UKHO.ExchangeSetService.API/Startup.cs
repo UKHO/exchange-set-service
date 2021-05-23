@@ -210,6 +210,7 @@ namespace UKHO.ExchangeSetService.API
             //Add file based logger for development
             loggerFactory.AddFile(configuration.GetSection("Logging"));
 #endif
+            app.UseLogAllRequestsAndResponses(loggerFactory);
 
             app.UseCorrelationIdMiddleware()
                .UseErrorLogging(loggerFactory);
