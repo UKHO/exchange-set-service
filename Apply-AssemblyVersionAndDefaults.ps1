@@ -7,11 +7,11 @@ param (
     [Parameter(Mandatory = $true)] [string] $UKHOAssemblyProduct
 )
 
-$buildNumberRegex = "(.+)_([0-9]{3,5}).([0-9]{1,2})"
+$buildNumberRegex = "(.+)_(\d{8}).(\d{1,2})"
 $validBuildNumber = $buildNumber -match $buildNumberRegex
 
 if ($validBuildNumber -eq $false) {
-    Write-Error "Build number passed in must be in the following format: (BuildDefinitionName)_(ProjectVersion).(date:yyyyMMdd)(rev:.r)"
+    Write-Error "Build number passed in must be in the following format: (BuildDefinitionName)_(date:yyyyMMdd).(rev:.r)"
     return
 }
 
