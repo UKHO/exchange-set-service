@@ -13,9 +13,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             Config = new TestConfiguration();
         }
-        public static async Task CheckModelStructureForSuccessResponse(this HttpResponseMessage apiresponse)
+        public static async Task CheckModelStructureForSuccessResponse(this HttpResponseMessage apiResponse)
         {
-            var apiresponsedata = await apiresponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
             //Check ExchangeSetBatchStatusUri is Not null and it is a valid Uri
             Assert.IsNotNull(apiresponsedata.Links.ExchangeSetBatchStatusUri.Href, $"Response body returns null, instead of expected link {apiresponsedata.Links.ExchangeSetBatchStatusUri.Href}.");
