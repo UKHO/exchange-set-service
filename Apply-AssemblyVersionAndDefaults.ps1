@@ -7,7 +7,7 @@ param (
     [Parameter(Mandatory = $true)] [string] $UKHOAssemblyProduct
 )
 
-$buildNumberRegex = "(.+)_(\d{8}).(\d{1,2})"
+$buildNumberRegex = "(.+)_(\d{3,5}).(\d{1,2})"
 $validBuildNumber = $buildNumber -match $buildNumberRegex
 
 if ($validBuildNumber -eq $false) {
