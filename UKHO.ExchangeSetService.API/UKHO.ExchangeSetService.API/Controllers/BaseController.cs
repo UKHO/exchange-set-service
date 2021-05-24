@@ -73,19 +73,33 @@ namespace UKHO.ExchangeSetService.API.Controllers
             switch (code)
             {
                 case (HttpStatusCode)(int)HttpStatusCode.OK:
-                    if (model.LastModified != null)
-                        httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
-                    return Ok(model.ExchangeSetResponse);
+                    {
+                        if (model.LastModified != null)
+                        {
+                            httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+                        }
+                        return Ok(model.ExchangeSetResponse);
+                    }
                 case (HttpStatusCode)(int)HttpStatusCode.InternalServerError:
-                    return BuildInternalServerErrorResponse();                    
+                    {
+                        return BuildInternalServerErrorResponse();
+                    }
                 case (HttpStatusCode)(int)HttpStatusCode.BadRequest:
-                    return BuildBadRequestErrorResponse(errors);
+                    {
+                        return BuildBadRequestErrorResponse(errors);
+                    }
                 case (HttpStatusCode)(int)HttpStatusCode.NotModified:
-                    if (model.LastModified != null)
-                        httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
-                    return BuildNotModifiedResponse();
+                    {
+                        if (model.LastModified != null)
+                        {
+                            httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+                        }
+                        return BuildNotModifiedResponse();
+                    }
                 default:
-                   return BuildInternalServerErrorResponse();
+                    {
+                        return BuildInternalServerErrorResponse();
+                    }
             }
         }
 

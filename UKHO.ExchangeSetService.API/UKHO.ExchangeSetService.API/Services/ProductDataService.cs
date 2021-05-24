@@ -52,12 +52,8 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 return response;
             }
-            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
-            logger.LogInformation(EventIds.FSSCreateProductDataByProductIdentifiersCreateBatchRequestStart.ToEventId(), $"FSS create batch for create product data by product identifiers endpoint started");
 
             response = await SetExchangeSetResponseLinks(response);
-
-            logger.LogInformation(EventIds.FSSCreateProductDataByProductIdentifiersCreateBatchRequestCompleted.ToEventId(), "FSS create batch {ExchangeSetBatchStatusUri} for create product data by product identifiers endpoint completed",response.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri);
 
             return response;
         }
@@ -76,17 +72,13 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 return response;
             }
-            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
+ 
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count; 
             }
 
-            logger.LogInformation(EventIds.FSSCreateProductDataByProductVersionsCreateBatchRequestStart.ToEventId(), $"FSS create batch for create product data by product versions endpoint started");
-
             response = await SetExchangeSetResponseLinks(response);
-
-            logger.LogInformation(EventIds.FSSCreateProductDataByProductVersionsCreateBatchRequestCompleted.ToEventId(), "FSS create batch {ExchangeSetBatchStatusUri} for create product data by product versions endpoint completed", response.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri);
 
             return response;
         }
@@ -105,12 +97,8 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 return response;
             }            
-            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
-            logger.LogInformation(EventIds.FSSCreateProductDataSinceDateTimeCreateBatchRequestStart.ToEventId(), $"FSS create batch for create product data since date time endpoint started");
 
             response =await SetExchangeSetResponseLinks(response);
-
-            logger.LogInformation(EventIds.FSSCreateProductDataSinceDateTimeCreateBatchRequestCompleted.ToEventId(), "FSS created batch {ExchangeSetBatchStatusUri} for create product data since date time endpoint completed", response.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri);
 
             return response;
         }
@@ -155,6 +143,8 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private async Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetResponse)
         {
+            logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), $"FSS create batch endpoint request started");
+
             var createBatchResponse = await fileShareService.CreateBatch();
 
             if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
@@ -170,7 +160,9 @@ namespace UKHO.ExchangeSetService.API.Services
                 ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri }
             };
             exchangeSetResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
-            
+
+            logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri);
+
             return exchangeSetResponse;
         }
     }

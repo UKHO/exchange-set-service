@@ -22,7 +22,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-        private string batchExpiryDateTime;
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
@@ -56,17 +55,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     ReadUsers = new List<string>() { oid }
                 }
             };
-            batchExpiryDateTime =createBatchRequest.ExpiryDate;
 
             string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
 
             var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
-            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse);
+            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
             return createBatchResponse;                               
         }
 
-        private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse)
+        private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse,string batchExpiryDateTime)
         {
             var createBatchResponse = new CreateBatchResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();

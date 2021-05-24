@@ -15,12 +15,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string postBody, string authToken, string uri)
+        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri)
         {
             HttpContent content = null;
 
-            if (postBody != null)
-                content = new StringContent(postBody, Encoding.UTF8, "application/json");
+            if (requestBody != null)
+                content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             { Content = content };
