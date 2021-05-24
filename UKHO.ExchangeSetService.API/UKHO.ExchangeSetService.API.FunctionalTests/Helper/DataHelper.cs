@@ -5,7 +5,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public class DataHelper
     {
-        public ProductVersionModel ProductVersionmodel { get; set; }       
+        public ProductVersionModel ProductVersionModel { get; set; }       
 
         public ProductVersionModel GetProductVersionModelData(string productName, int? editionNumber, int? updateNumber)
         {
