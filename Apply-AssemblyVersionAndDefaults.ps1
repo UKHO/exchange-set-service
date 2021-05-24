@@ -11,7 +11,7 @@ $buildNumberRegex = "(.+)_(\d{3,5}).(\d{1,2})"
 $validBuildNumber = $buildNumber -match $buildNumberRegex
 
 if ($validBuildNumber -eq $false) {
-    Write-Error "Build number passed in must be in the following format: (BuildDefinitionName)_(date:yyyyMMdd).(rev:.r)"
+    Write-Error "Build number passed in must be in the following format: (BuildDefinitionName)_(date:yy)(DayOfYear).(rev:.r)"
     return
 }
 
