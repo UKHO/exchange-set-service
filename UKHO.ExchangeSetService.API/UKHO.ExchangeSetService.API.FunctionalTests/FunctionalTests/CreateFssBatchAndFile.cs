@@ -13,8 +13,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     {
         private ExchangeSetApiClient ExchangesetApiClient { get; set; }
         private TestConfiguration Config { get; set; }
-        public DataHelper Datahelper { get; set; }
-        public ProductIdentifierModel ProductIdentifiermodel { get; set; }        
+        public DataHelper DataHelper { get; set; }
+        public ProductIdentifierModel ProductIdentifierModel { get; set; }        
         private string EssJwtToken { get; set; }       
 
         [SetUp]
@@ -22,8 +22,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             Config = new TestConfiguration();
             ExchangesetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
-            ProductIdentifiermodel = new ProductIdentifierModel();            
-            Datahelper = new DataHelper();
+            ProductIdentifierModel = new ProductIdentifierModel();            
+            DataHelper = new DataHelper();
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();          
 
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(Datahelper.GetProductIdentifierData(), accessToken: EssJwtToken);
+            var apiResponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //verify FssBatchResponse
@@ -53,9 +53,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
-            ProductIdentifiermodel.ProductIdentifier = new List<string>() { "GB123789" };
+            ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
 
-            var apiResponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifiermodel.ProductIdentifier, accessToken: EssJwtToken);
+            var apiResponse = await ExchangesetApiClient.GetProductIdentifiresDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //verify FssBatchResponse
@@ -65,12 +65,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithAValidProductVersion_ThenTheCorrectResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE416080", 9, 6));
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE4NO18Q", 1, 0));                     
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));                     
            
-            var apiResponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            var apiResponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
 
             //verify FssBatchResponse
@@ -80,12 +80,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithValidAndInvalidProductVersion_ThenTheCorrectResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE416080", 9, 5));
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB123789", 1, 0));            
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 5));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB123789", 1, 0));            
 
-            var apiResponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            var apiResponse = await ExchangesetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
 
             //verify FssBatchResponse
