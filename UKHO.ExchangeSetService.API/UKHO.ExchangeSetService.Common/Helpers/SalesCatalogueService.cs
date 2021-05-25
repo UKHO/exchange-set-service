@@ -86,7 +86,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var body = await httpResponse.Content.ReadAsStringAsync();
             if (httpResponse.StatusCode != HttpStatusCode.OK && httpResponse.StatusCode != HttpStatusCode.NotModified)
             {
-                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), $"Sales catalougue service with uri {httpResponse.RequestMessage.RequestUri} and responded with {httpResponse.StatusCode} and message {body}");
+                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service with uri {RequestUri} and responded with {StatusCode} and message {body}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body);
                 response.ResponseCode = httpResponse.StatusCode;
                 response.ResponseBody = null;
             }
