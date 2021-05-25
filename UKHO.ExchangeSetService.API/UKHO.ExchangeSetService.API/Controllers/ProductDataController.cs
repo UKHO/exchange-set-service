@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
@@ -9,22 +10,89 @@ using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
+    [Authorize(Roles = ApplicationRoles.ExchangeSetServiceUser)]
     public class ProductDataController : BaseController<ProductDataController>
     {
         private readonly IProductDataService productDataService;
 
         public ProductDataController(IHttpContextAccessor contextAccessor,
-           ILogger<ProductDataController> logger, IProductDataService productDataService
-          )
-       : base(contextAccessor, logger)
+           ILogger<ProductDataController> logger,
+           IProductDataService productDataService)
+        : base(contextAccessor, logger)
         {
             this.productDataService = productDataService;
+        }
+
+        /// <summary>
+        /// Provide all the latest releasable baseline data for a specified set of ENCs.
+        /// </summary>
+        /// <remarks>
+        /// Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.
+        /// ## Business Rules:
+        /// Only ENCs that are releasable at the date of the request will be returned.
+        /// 
+        /// For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
+        /// 
+        /// If an ENC has a re-issue, then the latest batch on the FSS will be used.
+        /// 
+        /// If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
+        /// 
+        /// If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e. the user is not informed it does not exist). If none of the requested ENCs exist, then a 'Bad Request' response will be returned.
+        /// </remarks>
+        /// <param name="productIdentifiers">The JSON body containing product versions.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <response code="200">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
+        /// <response code="403">Forbidden - you have been authorised, but you are not allowed to access this resource.</response>
+        /// <response code="429">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="500">Internal Server Error.</response>
+        [HttpPost]
+        [Route("/productData/productIdentifiers")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "<p>A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</p> <p>If there are no updates for any of the productVersions, then the return will be a '200' response with an empty Exchange Set(containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.</p>")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time the user should wait in seconds before retrying.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
+        public virtual async Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
+        {
+            if (productIdentifiers == null || productIdentifiers.Length == 0)
+            {
+                var error = new List<Error>
+                {
+                    new Error()
+                    {
+                        Source = "RequestBody",
+                        Description = "Either body is null or malformed."
+                    }
+                };
+                return BuildBadRequestErrorResponse(error);
+            }
+            ProductIdentifierRequest productIdentifierRequest = new ProductIdentifierRequest()
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+
+            var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
+
+            if (!validationResult.IsValid)
+            {
+                List<Error> errors;
+
+                if (validationResult.HasBadRequestErrors(out errors))
+                {
+                    return BuildBadRequestErrorResponse(errors);
+                }
+            }
+            return Ok(await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest));
         }
 
         /// <summary>
@@ -42,6 +110,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <param name="productVersionsRequest">The JSON body containing product versions.</param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
         /// <response code="200">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
+        /// <response code="403">Forbidden - you have been authorised, but you are not allowed to access this resource.</response>
         /// <response code="429">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpPost]
@@ -82,6 +152,64 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 }
             }
             return Ok(await productDataService.CreateProductDataByProductVersions(request));
+        }
+
+        /// <summary>
+        /// Provide all the releasable data after a datetime.
+        /// </summary>
+        /// <remarks>Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.</remarks>
+        /// <param name="sinceDateTime" example="Wed, 21 Oct 2015 07:28:00 GMT" >The date and time from which changes are requested. Any changes since the date will be returned. The value should be the Last-Modified date returned by the last request to this operation. The date format follows RFC 1123.
+        /// <br/><para><i>Example</i> : Wed, 21 Oct 2015 07:28:00 GMT</para>
+        /// </param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</response>
+        /// <response code="304">Not modified.</response>
+        /// <response code="400">Bad Request.</response>
+        /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
+        /// <response code="403">Forbidden - you have been authorised, but you are not allowed to access this resource.</response>
+        /// <response code="429">The user has sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="500">Internal Server Error.</response>
+        [HttpPost]
+        [Route("/productData")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.OK, name: "Last-Modified", type: "string", description: "Returns the date and time the file was last modified. The date format follows RFC 1123.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.<br/><br/> If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.NotModified, name: "Last-Modified", type: "string", description: "Returns the date and time the file was last modified. The date format follows RFC 1123.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time the user should wait in seconds before retrying.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
+        public virtual async Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
+            [FromQuery] string callbackUri)
+        {
+            ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
+            {
+                SinceDateTime = sinceDateTime,
+                CallbackUri = callbackUri
+            };
+
+            if (productDataSinceDateTimeRequest.SinceDateTime == null)
+            {
+                var error = new List<Error>
+                {
+                    new Error()
+                    {
+                        Source = "SinceDateTime",
+                        Description = "Query parameter 'SinceDateTime' is required."
+                    }
+                };
+                return BuildBadRequestErrorResponse(error);
+            }
+
+            var validationResult = await productDataService.ValidateProductDataSinceDateTime(productDataSinceDateTimeRequest);
+
+            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
+            {
+                return BuildBadRequestErrorResponse(errors);
+            }
+
+            var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest);
+            return Ok(productDetail);
         }
     }
 }

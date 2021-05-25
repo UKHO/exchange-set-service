@@ -1,21 +1,23 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Reflection;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
-using Newtonsoft.Json.Serialization;
 using UKHO.ExchangeSetService.API.Validation;
-using Microsoft.AspNetCore.Mvc;
+using UKHO.ExchangeSetService.Common.Configuration;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -40,13 +42,25 @@ namespace UKHO.ExchangeSetService.API
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
             this.ConfigureSwagger(services);
+
+            var essAzureADConfiguration = new AzureADConfiguration();
+            configuration.Bind("ESSAzureADConfiguration", essAzureADConfiguration);
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.Audience = essAzureADConfiguration.ClientId;
+                        options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{essAzureADConfiguration.TenantId}";
+                    });
+
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IProductDataService, ProductDataService>();
+            services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
+            services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,6 +82,8 @@ namespace UKHO.ExchangeSetService.API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
@@ -113,6 +129,13 @@ namespace UKHO.ExchangeSetService.API
                 c.IncludeXmlComments(xmlPath);
                 c.EnableAnnotations();
                 c.OperationFilter<AddResponseHeadersFilter>();
+                c.AddSecurityDefinition("jwtBearerAuth", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
+                });
+                c.OperationFilter<Filters.SecurityRequirementsOperationFilter>();
             });
         }
     }

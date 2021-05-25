@@ -34,6 +34,13 @@ stages:
         displayName: "DependencyChecker Dotnet Build test publish"
 
         steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore non test projects only"
             inputs:
@@ -143,14 +150,30 @@ stages:
         workspace:
           clean: all
         variables:
-          - group: "Exchange Set Service Terraform Dev"
+          - group: "ESS-Deployment-Variables-DEV"
           - group: "ESS-Dev-Variables"
           - name: DeploymentResourceGroupName
-            value: ""
+            value: "ESSDevA00802-RG"
           - name: DeploymentStorageAccountName
-            value: ""
+            value: "essdeva00802"
           - name: "Environment"
             value: "dev"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
         strategy:
           runOnce:
             deploy:
@@ -158,13 +181,15 @@ stages:
                 - template: Deployment/templates/continous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-
-                - task: DownloadPipelineArtifact@2
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    
+                - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
                   inputs:
-                    source: "current"
-                    artifact: "functionaltests"
-                    path: $(Build.SourcesDirectory)\functionaltests
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"
@@ -196,14 +221,30 @@ stages:
         workspace:
           clean: all
         variables:
-          - group: "Exchange Set Service Terraform Qa"
+          - group: "ESS-Deployment-Variables-QA"
           - group: "ESS-QA-Variables"
           - name: DeploymentResourceGroupName
-            value: ""
+            value: "ESSQAA00802-RG"
           - name: DeploymentStorageAccountName
-            value: ""
+            value: "essqaa00802"
           - name: "Environment"
             value: "qa"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
         strategy:
           runOnce:
             deploy:
@@ -211,13 +252,15 @@ stages:
                 - template: Deployment/templates/continous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-
-                - task: DownloadPipelineArtifact@2
+                    AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                
+                - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
                   inputs:
-                    source: "current"
-                    artifact: "functionaltests"
-                    path: $(Build.SourcesDirectory)\functionaltests
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"

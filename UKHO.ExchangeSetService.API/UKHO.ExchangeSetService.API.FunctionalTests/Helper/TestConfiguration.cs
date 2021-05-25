@@ -1,32 +1,36 @@
-﻿
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
-    /// <summary>
-    /// This class is for configuration set up
-    /// </summary>
     public class TestConfiguration
     {
-        /// <summary>
-        /// ConfigurationRoot variable declaire here 
-        /// </summary>
         protected IConfigurationRoot ConfigurationRoot;
-        /// <summary>
-        /// EssBaseAddress variable declaire here 
-        /// </summary>
         public string EssBaseAddress;
+        public static string FakeTokenPrivateKey;
 
-        /// <summary>
-        /// Constructor call here
-        /// </summary>
+        public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
+        public class EssAuthorizationTokenConfiguration
+        {
+            public string MicrosoftOnlineLoginUrl { get; set; }
+            public string TenantId { get; set; }
+            public string AutoTestClientId { get; set; }
+            public string AutoTestClientSecret { get; set; }
+            public string AutoTestClientIdNoAuth { get; set; }
+            public string AutoTestClientSecretNoAuth { get; set; }
+            public string EssClientId { get; set; }
+            public bool IsRunningOnLocalMachine { get; set; }
+        }
+
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
-                                .AddJsonFile("appSettings.json", false)
+                                .AddJsonFile("appsettings.json", false)
                                 .Build();
 
             EssBaseAddress = ConfigurationRoot.GetSection("EssApiUrl").Value;
+            FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
+            ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
+            
         }
     }
 }

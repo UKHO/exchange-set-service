@@ -14,10 +14,11 @@ locals {
   web_app_name		    = "${local.service_name}-${local.env_name}-webapp"
 
   tags = {
-    service          = "Exchange Set Service"
-    environment      = local.env_name
-    service_owner    = "UKHO"
-    responsible_team = "Mastek"
-    callout_team     = "On-Call_N/A"
+    SERVICE          = "Exchange Set Service"
+    ENVIRONMENT      = local.env_name
+    SERVICE_OWNER    = "UKHO"
+    RESPONSIBLE_TEAM = "Mastek"
+    CALLOUT_TEAM     = "On-Call_N/A"
+    COST_CENTRE      = "A.008.02"
   }
 }

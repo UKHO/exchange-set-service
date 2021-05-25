@@ -25,7 +25,7 @@ terraform validate
 if ( !$? ) { echo "Something went wrong during terraform validation" ; throw "Error" }
 
 Write-output "Execute Terraform plan"
-terraform plan -out "terraform.deployment.tfplan" -no-color | tee terraform_output.txt
+terraform plan -out "terraform.deployment.tfplan" | tee terraform_output.txt
 if ( !$? ) { echo "Something went wrong during terraform plan" ; throw "Error" }
 
 $totalDestroyLines=(Get-Content -Path terraform_output.txt | Select-String -Pattern "destroy" -CaseSensitive |  where {$_ -ne ""}).length
@@ -50,3 +50,4 @@ $terraformOutput = terraform output -json | ConvertFrom-Json
 
 write-output "Set JSON output into pipeline variables"
 Write-Host "##vso[task.setvariable variable=WEB_APP_NAME]$($terraformOutput.web_app_name.value)"
+Write-Host "##vso[task.setvariable variable=EssApiUrl]$($terraformOutput.web_app_url.value)"

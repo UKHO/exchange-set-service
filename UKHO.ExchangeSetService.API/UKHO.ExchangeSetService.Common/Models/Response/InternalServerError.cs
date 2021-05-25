@@ -8,5 +8,4 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         public string CorrelationId { get; set; }
         public string Detail { get; set; }
     }
-
 }
