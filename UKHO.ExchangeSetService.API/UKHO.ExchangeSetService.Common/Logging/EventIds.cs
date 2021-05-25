@@ -11,6 +11,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         SCSPostProductIdentifiersRequestStart = 805004,
         SCSPostProductVersionsRequestStart = 805005,
         SCSPostProductVersionsRequestCompleted = 805006,
+        LogRequest = 805007,
+        ErrorRedactingResponseBody = 805008
     }
 
     public static class EventIdExtensions

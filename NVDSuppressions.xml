@@ -34,6 +34,37 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
    ]]>    </notes>
     <cve>CVE-2008-0333</cve>
   </suppress>
-</suppressions>
 
-  
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Serilog.Sinks.File:4.1.0
+      8117-softmagic.c in file before 5.21 does not properly limit recursion, which allows remote attackers to cause a denial of service (CPU consumption or crash) via unspecified vectors.
+      9652-The mconvert function in softmagic.c in file before 5.21, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not properly handle a certain string-length field during a copy of a truncated version of a Pascal string, which might allow remote attackers to cause a denial of service (out-of-bounds memory access and application crash) via a crafted file.
+    This is a false positive. These two CVEs references a C library softmagic.c which is not used by ESS
+    ]]>
+    </notes>
+    <cve>CVE-2014-8117</cve>
+    <cve>CVE-2014-9652</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+     file name: Serilog.Sinks.File:4.1.0
+      readelf.c in file before 5.22, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not consider that pread calls sometimes read only a subset of the available data, which allows remote attackers to cause a denial of service (uninitialized memory access) or possibly have unspecified other impact via a crafted ELF file.
+     This is a false positive in readelf.c as ESS is not using this, or PHP.
+    ]]>
+    </notes>
+    <cve>CVE-2014-9653</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Serilog.Extensions.Logging.File:2.0.0
+      cdf_read_property_info in cdf.c in file through 5.37 does not restrict the number of CDF_VECTOR elements, which allows a heap-based buffer overflow (4-byte out-of-bounds write)
+    This is a false positive in cdf.c which is not used by ESS
+    ]]>
+    </notes>
+    <cve>CVE-2019-18218</cve>
+  </suppress>
+</suppressions>
