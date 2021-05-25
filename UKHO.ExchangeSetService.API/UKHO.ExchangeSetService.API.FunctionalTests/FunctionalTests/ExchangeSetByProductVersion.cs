@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
 
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE416080", 9, 6));
             
