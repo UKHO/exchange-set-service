@@ -1,4 +1,4 @@
-name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd).$(BuildCounter)
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yy)$(DayOfYear).$(BuildCounter)
 
 parameters:
   - name: ContinueEvenIfResourcesAreGettingDestroyed
@@ -19,6 +19,14 @@ variables:
     value: "any cpu"
   - name: BuildCounter
     value: $[counter(format('{0:yyyyMMdd}', pipeline.startTime), 1)]
+  - name: UKHOAssemblyCompany
+    value: "UK Hydrographic Office"
+  - name: UKHOAssemblyVersionPrefix
+    value: "1.0."
+  - name: UKHOAssemblyProduct
+    value: "Exchange Set Service"
+  - name: UKHOAssemblyCopyright
+    value: "Copyright © UK Hydrographic Office"
 
 stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
@@ -30,6 +38,13 @@ stages:
         displayName: "DependencyChecker Dotnet Build test publish"
 
         steps:
+          - task: PowerShell@2
+            displayName: "Set assembly version numbers based on build ID"
+            inputs:
+              targetType: filePath
+              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
+              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
+
           - task: UseDotNet@2
             displayName: 'Use .NET Core 3.1.x sdk'
             inputs:
@@ -94,9 +109,22 @@ stages:
             inputs:
               command: "test"
               projects: "**/*UnitTests.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+              arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
               publishTestResults: true
               testRunTitle: "UnitTests"
+
+          - task: PowerShell@2
+            displayName: "Generate code coverage report"
+            inputs:
+              targetType: filePath
+              filePath: '$(Build.SourcesDirectory)\CodeCoverageReport.ps1'
+              arguments: '-source "$(Build.SourcesDirectory)" -reportFolder "$(Build.ArtifactStagingDirectory)"'
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Code coverage"
+            inputs:
+              PathtoPublish: "$(Build.ArtifactStagingDirectory)/codecoveragereport"
+              ArtifactName: codecoveragereport
 
           - task: DotNetCoreCLI@2
             displayName: "Publish functional test"
