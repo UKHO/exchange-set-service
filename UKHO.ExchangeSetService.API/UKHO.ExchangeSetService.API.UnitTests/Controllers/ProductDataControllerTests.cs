@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.BadRequest
+                HttpstatusCode = HttpStatusCode.BadRequest
             };
 
             var validationMessage = new ValidationFailure("ProductIdentifiers", "Product Identifiers cannot be null or empty.");
@@ -120,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.BadRequest
+                HttpstatusCode = HttpStatusCode.BadRequest
             };
 
             var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.");
@@ -174,7 +174,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.InternalServerError
+                HttpstatusCode = HttpStatusCode.InternalServerError
             };
 
             var validationMessage = new ValidationFailure("ProductIdentifiers", "Internal Server Error.");
@@ -196,13 +196,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified()
+       public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified()
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.NotModified
+                HttpstatusCode = HttpStatusCode.NotModified
             };
 
             var validationMessage = new ValidationFailure("ProductIdentifiers", "NotModified.");
@@ -217,7 +217,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);           
+            var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);           
             Assert.AreEqual(304, result.StatusCode);
 
         }
@@ -229,7 +229,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.OK
+                HttpstatusCode = HttpStatusCode.OK
             };
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
@@ -262,7 +262,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.BadRequest
+                HttpstatusCode = HttpStatusCode.BadRequest
             };
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
@@ -293,7 +293,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.BadRequest
+                HttpstatusCode = HttpStatusCode.BadRequest
             };
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
@@ -316,7 +316,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.InternalServerError
+                HttpstatusCode = HttpStatusCode.InternalServerError
             };
 
             var validationMessage = new ValidationFailure("ProductVersions", "Internal Server Error.");
@@ -355,7 +355,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (ObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
+            var result = (StatusCodeResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new ProductVersionRequest() { ProductName = "demo" } }, "");
             Assert.AreEqual(304, result.StatusCode);
 
@@ -368,7 +368,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.OK
+                HttpstatusCode = HttpStatusCode.OK
             };
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
@@ -399,7 +399,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.BadRequest
+                HttpstatusCode = HttpStatusCode.BadRequest
             };
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
@@ -422,7 +422,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.InternalServerError
+                HttpstatusCode = HttpStatusCode.InternalServerError
             };
 
             var validationMessage = new ValidationFailure("SinceDateTime", "Internal Server Error");
@@ -447,7 +447,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.NotModified
+                HttpstatusCode = HttpStatusCode.NotModified
             };
 
             var validationMessage = new ValidationFailure("SinceDateTime", "NotModified.");
@@ -459,7 +459,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
-            var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
+            var result = (StatusCodeResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
             Assert.AreEqual(304, result.StatusCode);
         }
 
@@ -470,7 +470,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
-                HttpstatusCode = (HttpStatusCode)(int)HttpStatusCode.OK
+                HttpstatusCode = HttpStatusCode.OK
             };
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
