@@ -8,6 +8,7 @@ using System.Net;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
+
 namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ExcludeFromCodeCoverage]
@@ -29,79 +30,58 @@ namespace UKHO.ExchangeSetService.API.Controllers
             return httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
         }
         protected IActionResult BuildBadRequestErrorResponse(List<Error> errors)
-        {            
+        {
             return new BadRequestObjectResult(new ErrorDescription
             {
                 Errors = errors,
                 CorrelationId = GetCurrentCorrelationId()
             });
         }
-        public class InternalServerErrorObjectResult : ObjectResult
-        {
-            public InternalServerErrorObjectResult(object value) : base(value)
-            {
-                StatusCode = StatusCodes.Status500InternalServerError;
-            }
-        }
 
         protected IActionResult BuildInternalServerErrorResponse()
-        {           
-            return new InternalServerErrorObjectResult(new InternalServerError
-            {
-               CorrelationId = GetCurrentCorrelationId(),
-               Detail = InternalServerError,
-            });
-        }
-
-        public class NotModifiedObjectResult : ObjectResult
         {
-            public NotModifiedObjectResult(object value) : base(value)
-            {
-                StatusCode = StatusCodes.Status304NotModified;
-            }
-        }
-
-        protected IActionResult BuildNotModifiedResponse()
-        {            
-            return new NotModifiedObjectResult(new ErrorDescription {              
-            });
+            var objectResult = new ObjectResult
+                (new InternalServerError
+                {
+                    CorrelationId = GetCurrentCorrelationId(),
+                    Detail = InternalServerError,
+                });
+            objectResult.StatusCode = StatusCodes.Status500InternalServerError;
+            return objectResult;
         }
 
         protected IActionResult GetEssResponse(ExchangeSetServiceResponse model, List<Error> errors = null)
         {
-            HttpStatusCode code = model.HttpstatusCode;           
-            switch (code)
+            switch (model.HttpstatusCode)
             {
-                case (HttpStatusCode)(int)HttpStatusCode.OK:
-                    {
-                        if (model.LastModified != null)
-                        {
-                            httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
-                        }
-                        return Ok(model.ExchangeSetResponse);
-                    }
-                case (HttpStatusCode)(int)HttpStatusCode.InternalServerError:
-                    {
-                        return BuildInternalServerErrorResponse();
-                    }
-                case (HttpStatusCode)(int)HttpStatusCode.BadRequest:
-                    {
-                        return BuildBadRequestErrorResponse(errors);
-                    }
-                case (HttpStatusCode)(int)HttpStatusCode.NotModified:
-                    {
-                        if (model.LastModified != null)
-                        {
-                            httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
-                        }
-                        return BuildNotModifiedResponse();
-                    }
+                case HttpStatusCode.OK:
+                    return BuildOkResponse(model);
+
+                case HttpStatusCode.InternalServerError:
+                    return BuildInternalServerErrorResponse();
+
+                case HttpStatusCode.BadRequest:
+                    return BuildBadRequestErrorResponse(errors);
+
+                case HttpStatusCode.NotModified:
+                    return BuildNotModifiedResponse(model);
+
                 default:
-                    {
-                        return BuildInternalServerErrorResponse();
-                    }
+                    return BuildInternalServerErrorResponse();
             }
         }
 
+        private IActionResult BuildNotModifiedResponse(ExchangeSetServiceResponse model)
+        {
+            httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+            return new StatusCodeResult(StatusCodes.Status304NotModified);
+        }
+
+        private IActionResult BuildOkResponse(ExchangeSetServiceResponse model)
+        {
+            if (model.LastModified != null)
+                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+            return Ok(model.ExchangeSetResponse);
+        }
     }
 }
