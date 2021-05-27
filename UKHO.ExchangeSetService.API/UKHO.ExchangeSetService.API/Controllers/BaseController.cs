@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         protected IActionResult GetEssResponse(ExchangeSetServiceResponse model, List<Error> errors = null)
         {
-            switch (model.HttpstatusCode)
+            switch (model.HttpStatusCode)
             {
                 case HttpStatusCode.OK:
                     return BuildOkResponse(model);

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
@@ -21,39 +20,4 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
 
         public IEnumerable<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
     }
-
-    public class Links
-    {
-        public LinkSetBatchStatusUri ExchangeSetBatchStatusUri { get; set; }
-
-        public LinkSetFileUri ExchangeSetFileUri { get; set; }
-    }
-
-    public class LinkSetBatchStatusUri
-    {
-        public string Href { get; set; }
-    }
-
-    public class LinkSetFileUri
-    {
-        public string Href { get; set; }
-    }
-
-    public class RequestedProductsNotInExchangeSet
-    {
-        public string ProductName { get; set; }
-
-        public string Reason { get; set; }
-    }
-
-    public class ExchangeSetServiceResponse
-    {
-        public ExchangeSetResponse ExchangeSetResponse { get; set; }
-
-        public HttpStatusCode HttpstatusCode { get; set; }
-
-        public string LastModified { get; set; }
-
-    }
-
 }

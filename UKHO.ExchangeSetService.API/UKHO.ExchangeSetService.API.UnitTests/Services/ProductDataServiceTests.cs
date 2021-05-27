@@ -186,7 +186,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callbackUri
                 });
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
@@ -215,7 +215,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callbackUri
                 });
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
@@ -245,7 +245,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 });
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpstatusCode);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpStatusCode);
         }
         #endregion
 
@@ -332,7 +332,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             });
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
             Assert.Null(result.LastModified);
         }
 
@@ -355,7 +355,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             });
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpstatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
             Assert.NotNull(result.LastModified);
         }
 
@@ -377,7 +377,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             });
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpstatusCode);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpStatusCode);
             Assert.Null(result.LastModified);
         }
 
