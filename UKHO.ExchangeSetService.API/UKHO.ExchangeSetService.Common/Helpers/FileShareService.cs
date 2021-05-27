@@ -36,10 +36,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<CreateBatchResponse> CreateBatch()
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
             var jwtSecurityToken = new JwtSecurityToken(accessToken);
             var oid = jwtSecurityToken.Claims.FirstOrDefault(m => m.Type == "oid").Value;
             var uri = $"/batch";
 
+            CreateBatchRequest createBatchRequest = CreateBatchRequest(oid);
+
+            string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
+
+            var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
+
+            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
+            return createBatchResponse;                               
+        }
+
+        private CreateBatchRequest CreateBatchRequest(string oid)
+        {
             CreateBatchRequest createBatchRequest = new CreateBatchRequest
             {
                 BusinessUnit = fileShareServiceConfig.Value.BusinessUnit,
@@ -56,18 +69,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
             };
 
-            string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
-
-            var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
-
-            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
-            return createBatchResponse;                               
+            return createBatchRequest;
         }
 
         private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse,string batchExpiryDateTime)
         {
             var createBatchResponse = new CreateBatchResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
+
             if (httpResponse.StatusCode != HttpStatusCode.Created)
             {
                 logger.LogError(EventIds.FSSCreateBatchNonOkResponse.ToEventId(), $"File share service create batch endpoint responded with {httpResponse.StatusCode} and message {body}");

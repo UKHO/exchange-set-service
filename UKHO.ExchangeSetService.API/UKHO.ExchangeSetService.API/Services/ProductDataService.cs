@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList());
             ////can check for file size from salesCatalogueResponse.ResponseCode
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
-            if (response.HttpstatusCode != HttpStatusCode.OK && response.HttpstatusCode != HttpStatusCode.NotModified)
+            if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
             {
                 return response;
             }
@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions);
             ////can check for file size from salesCatalogueResponse
             var response = SetExchangeSetResponse(salesCatalogueResponse, true);
-            if (response.HttpstatusCode != HttpStatusCode.OK && response.HttpstatusCode != HttpStatusCode.NotModified)
+            if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
             {
                 return response;
             }
@@ -93,7 +93,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
             ////can check for file size from salesCatalogueResponse
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
-            if (response.HttpstatusCode != HttpStatusCode.OK)
+            if (response.HttpStatusCode != HttpStatusCode.OK)
             {
                 return response;
             }            
@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isNotModifiedToOk)
         {
             var response = new ExchangeSetServiceResponse();
-            response.HttpstatusCode = salesCatalougeResponse.ResponseCode;
+            response.HttpStatusCode = salesCatalougeResponse.ResponseCode;
             if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK)
             {
                 var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 if (isNotModifiedToOk)
                 {
-                    response.HttpstatusCode = HttpStatusCode.OK;
+                    response.HttpStatusCode = HttpStatusCode.OK;
                 }
                 response.ExchangeSetResponse = new ExchangeSetResponse();
                 if (salesCatalougeResponse.LastModified.HasValue)
@@ -136,7 +136,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             else
             {
-                response.HttpstatusCode = HttpStatusCode.InternalServerError;
+                response.HttpStatusCode = HttpStatusCode.InternalServerError;
             }
             return response;
         }
@@ -149,8 +149,10 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
             {
-                exchangeSetResponse = new ExchangeSetServiceResponse();
-                exchangeSetResponse.HttpstatusCode = HttpStatusCode.InternalServerError;
+                exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.InternalServerError
+                };
                 return exchangeSetResponse;
             }
 
@@ -161,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.Services
             };
             exchangeSetResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
 
-            logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri);
+            logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri.Href}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri.Href);
 
             return exchangeSetResponse;
         }

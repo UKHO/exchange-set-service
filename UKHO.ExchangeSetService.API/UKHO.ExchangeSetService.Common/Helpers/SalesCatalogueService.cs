@@ -46,14 +46,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response; 
         }
 
-        public async Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> ProductIdentifiers)
+        public async Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers)
         {
             logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestStart.ToEventId(), $"Post sales catalogue service for ProductIdentifiers Started");
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productIdentifiers";
 
-            string payloadJson = JsonConvert.SerializeObject(ProductIdentifiers);
+            string payloadJson = JsonConvert.SerializeObject(productIdentifiers);
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
