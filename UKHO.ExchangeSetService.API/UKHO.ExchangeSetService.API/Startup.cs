@@ -25,6 +25,7 @@ using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.Logging.EventHubLogProvider;
 using Azure.Identity;
+using UKHO.ExchangeSetService.Common.Helpers;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -74,6 +75,16 @@ namespace UKHO.ExchangeSetService.API
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+            services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            services.Configure<SalesCatalogueConfiguration>(configuration.GetSection("SalesCatalogue"));
+
+            services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
+                client.BaseAddress = new Uri(configuration["SalesCatalogue:BaseUrl"])
+                );
+            
             services.AddScoped<IProductDataService, ProductDataService>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();

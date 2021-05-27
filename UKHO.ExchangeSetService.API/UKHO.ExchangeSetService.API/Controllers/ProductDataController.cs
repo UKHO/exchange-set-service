@@ -92,7 +92,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildBadRequestErrorResponse(errors);
                 }
             }
-            return Ok(await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest));
+            var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest);
+            return GetEssResponse(productDetail);            
         }
 
         /// <summary>
@@ -151,8 +152,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildBadRequestErrorResponse(errors);
                 }
             }
-            return Ok(await productDataService.CreateProductDataByProductVersions(request));
-        }
+
+            var productDetail = await productDataService.CreateProductDataByProductVersions(request);
+            return GetEssResponse(productDetail);
+            
+        }        
 
         /// <summary>
         /// Provide all the releasable data after a datetime.
@@ -209,7 +213,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
             }
 
             var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest);
-            return Ok(productDetail);
+            return GetEssResponse(productDetail);
+
         }
     }
 }
