@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string EssJwtToken { get; set; }
         private string EssJwtTokenNoRole { get; set; }
         private string EssJwtCustomizedToken { get; set; }
-        private readonly string sinceDateTime = DateTime.Now.AddDays(-20).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-10).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [SetUp]
         public async Task SetupAsync()
@@ -29,8 +29,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()        {
-            
+        public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
+        {
+           
             var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime);
             
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
@@ -48,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
         {
-                     
+                      
             var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtCustomizedToken);
             
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
@@ -57,7 +58,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithNoRoleToken_ThenAForbiddenResponseIsReturned()
         {
-            var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtTokenNoRole);
+           var apiResponse = await ExchangesetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtTokenNoRole);
             
             Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 403.");
         }
