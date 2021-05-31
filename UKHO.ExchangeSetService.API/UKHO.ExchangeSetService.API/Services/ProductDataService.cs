@@ -110,17 +110,14 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isNotModifiedToOk)
         {
-            var response = new ExchangeSetServiceResponse();
-            response.HttpStatusCode = salesCatalougeResponse.ResponseCode;
-            if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK)
+            var response = new ExchangeSetServiceResponse
             {
-                var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
-                model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
-                response.ExchangeSetResponse = model;
-                if (salesCatalougeResponse.LastModified.HasValue)
-                {
-                    response.LastModified = salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format);
-                }
+                HttpStatusCode = salesCatalougeResponse.ResponseCode
+            };
+            if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK)
+            {                
+                response.ExchangeSetResponse = MapExchangeSetResponse(salesCatalougeResponse);       
+                response.LastModified = ConvertLastModifiedToString(salesCatalougeResponse);
             }
             else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
             {
@@ -129,10 +126,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     response.HttpStatusCode = HttpStatusCode.OK;
                 }
                 response.ExchangeSetResponse = new ExchangeSetResponse();
-                if (salesCatalougeResponse.LastModified.HasValue)
-                {
-                    response.LastModified = salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format);
-                }
+                response.LastModified = ConvertLastModifiedToString(salesCatalougeResponse);
             }
             else
             {
@@ -167,5 +161,18 @@ namespace UKHO.ExchangeSetService.API.Services
 
             return exchangeSetResponse;
         }
+
+        private ExchangeSetResponse MapExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse)
+        {
+            var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
+            model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
+            return model;
+        }
+
+        private string ConvertLastModifiedToString(SalesCatalogueResponse salesCatalougeResponse)
+        {
+            return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null; 
+        }
+
     }
 }
