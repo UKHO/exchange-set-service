@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
@@ -29,6 +30,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IFileShareService fakeFileShareService;
         private ILogger<FileShareService> logger;
         private IMapper fakeMapper;
+        private IExchangeSetStorageProvider fakeExchangeSetStorageProvider;
+        private ILogger<ExchangeSetStorageProvider> essLogger;
+
 
         [SetUp]
         public void Setup()
@@ -40,9 +44,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeMapper = A.Fake<IMapper>();
             fakeFileShareService = A.Fake<IFileShareService>();
             logger = A.Fake<ILogger<FileShareService>>();
+            fakeExchangeSetStorageProvider = A.Fake<ExchangeSetStorageProvider>();
+            essLogger = A.Fake<ILogger<ExchangeSetStorageProvider>>();
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
-                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger);
+                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider, essLogger);
         }
 
         #region GetExchangeSetResponse

@@ -12,6 +12,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
@@ -25,6 +26,9 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IMapper mapper;
         private readonly IFileShareService fileShareService;
         private readonly ILogger<FileShareService> logger;
+        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
+        private readonly ILogger<ExchangeSetStorageProvider> essLogger;
+
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator, 
@@ -32,7 +36,8 @@ namespace UKHO.ExchangeSetService.API.Services
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
-            ILogger<FileShareService> logger)
+            ILogger<FileShareService> logger,IExchangeSetStorageProvider exchangeSetStorageProvider,
+            ILogger<ExchangeSetStorageProvider> essLogger)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -41,6 +46,8 @@ namespace UKHO.ExchangeSetService.API.Services
             this.mapper = mapper;
             this.fileShareService = fileShareService;
             this.logger = logger;
+            this.exchangeSetStorageProvider = exchangeSetStorageProvider;
+            this.essLogger = essLogger;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -54,6 +61,11 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             response = await SetExchangeSetResponseLinks(response);
+
+            if (!string.IsNullOrEmpty(response.BatchId))
+            {
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, response.BatchId);
+            }
 
             return response;
         }
@@ -99,6 +111,11 @@ namespace UKHO.ExchangeSetService.API.Services
             }            
 
             response =await SetExchangeSetResponseLinks(response);
+
+            if (!string.IsNullOrEmpty(response.BatchId))
+            {
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, response.BatchId);
+            }
 
             return response;
         }
@@ -172,6 +189,17 @@ namespace UKHO.ExchangeSetService.API.Services
         private string ConvertLastModifiedToString(SalesCatalogueResponse salesCatalougeResponse)
         {
             return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null; 
+        }
+
+        private async Task<bool> GetSalesCatalogueStorageDetails(SalesCatalogueResponse salesCatalogueResponse, string batchId)
+        {
+            essLogger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), $"SCS response store request started");
+
+            bool result = await exchangeSetStorageProvider.SaveSalesCatalogueResponse(salesCatalogueResponse, batchId);
+
+            essLogger.LogInformation(EventIds.SCSResponseStoreCompleted.ToEventId(), $"SCS response store request completed");
+
+            return result;
         }
 
     }

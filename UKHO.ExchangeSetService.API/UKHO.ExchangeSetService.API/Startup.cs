@@ -26,6 +26,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.Logging.EventHubLogProvider;
 using Azure.Identity;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -74,9 +75,13 @@ namespace UKHO.ExchangeSetService.API
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+            services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
             services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
+            services.AddScoped<IScsStorageService, ScsStorageService>();
+            services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
+            services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.Configure<SalesCatalogueConfiguration>(configuration.GetSection("SalesCatalogue"));
@@ -96,6 +101,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
             services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
+            services.AddScoped<IExchangeSetStorageProvider, ExchangeSetStorageProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
