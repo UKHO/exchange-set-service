@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -21,18 +23,24 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
         private readonly ISalesCatalogueService salesCatalogueService;
         private readonly IMapper mapper;
+        private readonly IFileShareService fileShareService;
+        private readonly ILogger<FileShareService> logger;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator, 
             IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
             ISalesCatalogueService salesCatalougeService,
-            IMapper mapper)
+            IMapper mapper,
+            IFileShareService fileShareService,
+            ILogger<FileShareService> logger)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
             this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
             this.salesCatalogueService = salesCatalougeService;
             this.mapper = mapper;
+            this.fileShareService = fileShareService;
+            this.logger = logger;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -44,12 +52,8 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 return response;
             }
-            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
-            response.ExchangeSetResponse.Links = new Links()
-            {
-                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
-                ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
-            };
+
+            response = await SetExchangeSetResponseLinks(response);
 
             return response;
         }
@@ -68,16 +72,13 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 return response;
             }
-            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
+ 
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count; 
             }
-            response.ExchangeSetResponse.Links = new Links()
-            {
-                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
-                ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
-            };
+
+            response = await SetExchangeSetResponseLinks(response);
 
             return response;
         }
@@ -95,13 +96,9 @@ namespace UKHO.ExchangeSetService.API.Services
             if (response.HttpStatusCode != HttpStatusCode.OK)
             {
                 return response;
-            }
-            //// FSS call for creating Batch and fill data for _links, exchangeSetUrlExpiryDateTime etc
-            response.ExchangeSetResponse.Links = new Links()
-            {
-                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272" },
-                ExchangeSetFileUri = new LinkSetFileUri { Href = "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip" }
-            };
+            }            
+
+            response =await SetExchangeSetResponseLinks(response);
 
             return response;
         }
@@ -113,17 +110,14 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isNotModifiedToOk)
         {
-            var response = new ExchangeSetServiceResponse();
-            response.HttpStatusCode = salesCatalougeResponse.ResponseCode;
-            if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK)
+            var response = new ExchangeSetServiceResponse
             {
-                var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
-                model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
-                response.ExchangeSetResponse = model;
-                if (salesCatalougeResponse.LastModified.HasValue)
-                {
-                    response.LastModified = salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format);
-                }
+                HttpStatusCode = salesCatalougeResponse.ResponseCode
+            };
+            if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK)
+            {                
+                response.ExchangeSetResponse = MapExchangeSetResponse(salesCatalougeResponse);       
+                response.LastModified = ConvertLastModifiedToString(salesCatalougeResponse);
             }
             else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
             {
@@ -132,10 +126,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     response.HttpStatusCode = HttpStatusCode.OK;
                 }
                 response.ExchangeSetResponse = new ExchangeSetResponse();
-                if (salesCatalougeResponse.LastModified.HasValue)
-                {
-                    response.LastModified = salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format);
-                }
+                response.LastModified = ConvertLastModifiedToString(salesCatalougeResponse);
             }
             else
             {
@@ -143,5 +134,45 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             return response;
         }
+
+        private async Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetResponse)
+        {
+            logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), $"FSS create batch endpoint request started");
+
+            var createBatchResponse = await fileShareService.CreateBatch();
+
+            if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
+            {
+                exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.InternalServerError
+                };
+                return exchangeSetResponse;
+            }
+
+            exchangeSetResponse.ExchangeSetResponse.Links = new Links()
+            {
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
+                ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri }
+            };
+            exchangeSetResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
+
+            logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri.Href}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri.Href);
+
+            return exchangeSetResponse;
+        }
+
+        private ExchangeSetResponse MapExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse)
+        {
+            var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
+            model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
+            return model;
+        }
+
+        private string ConvertLastModifiedToString(SalesCatalogueResponse salesCatalougeResponse)
+        {
+            return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null; 
+        }
+
     }
 }

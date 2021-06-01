@@ -12,7 +12,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         SCSPostProductVersionsRequestStart = 805005,
         SCSPostProductVersionsRequestCompleted = 805006,
         LogRequest = 805007,
-        ErrorRedactingResponseBody = 805008
+        ErrorRedactingResponseBody = 805008,
+        FSSCreateBatchRequestStart = 805009,
+        FSSCreateBatchRequestCompleted = 805010,
+        FSSCreateBatchNonOkResponse = 805011
     }
 
     public static class EventIdExtensions
