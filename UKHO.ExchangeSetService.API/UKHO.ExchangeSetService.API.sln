@@ -18,7 +18,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.API
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.API.FunctionalTests", "UKHO.ExchangeSetService.API.FunctionalTests\UKHO.ExchangeSetService.API.FunctionalTests.csproj", "{AC5B7898-83E2-4850-9BF3-8BAE03E02326}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Common.UnitTests", "UKHO.ExchangeSetService.Common.UnitTests\UKHO.ExchangeSetService.Common.UnitTests.csproj", "{4F060297-D0C5-4B26-AE87-DD1D501EC568}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.Common.UnitTests", "UKHO.ExchangeSetService.Common.UnitTests\UKHO.ExchangeSetService.Common.UnitTests.csproj", "{4F060297-D0C5-4B26-AE87-DD1D501EC568}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebJobs", "WebJobs", "{1797237E-1A3E-438D-8A30-776DED7F9081}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.FulfilmentService", "UKHO.ExchangeSetService.FulfilmentService\UKHO.ExchangeSetService.FulfilmentService.csproj", "{1EF95688-B26A-4E85-9685-EBF126981673}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Webjob.UnitTests", "UKHO.ExchangeSetService.Webjob.UnitTests\UKHO.ExchangeSetService.Webjob.UnitTests.csproj", "{AEE4375F-7181-4FCB-80F3-10EAE68137B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,6 +96,30 @@ Global
 		{4F060297-D0C5-4B26-AE87-DD1D501EC568}.Release|x64.Build.0 = Release|Any CPU
 		{4F060297-D0C5-4B26-AE87-DD1D501EC568}.Release|x86.ActiveCfg = Release|Any CPU
 		{4F060297-D0C5-4B26-AE87-DD1D501EC568}.Release|x86.Build.0 = Release|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Debug|x64.Build.0 = Debug|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Debug|x86.Build.0 = Debug|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Release|x64.ActiveCfg = Release|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Release|x64.Build.0 = Release|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Release|x86.ActiveCfg = Release|Any CPU
+		{1EF95688-B26A-4E85-9685-EBF126981673}.Release|x86.Build.0 = Release|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Debug|x64.Build.0 = Debug|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Debug|x86.Build.0 = Debug|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Release|x64.ActiveCfg = Release|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Release|x64.Build.0 = Release|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Release|x86.ActiveCfg = Release|Any CPU
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +128,8 @@ Global
 		{1241108A-FA4B-4F19-81B0-AB59A0E11DC0} = {1FE54AB1-9543-480E-8A3D-2FA1E2A340CE}
 		{AC5B7898-83E2-4850-9BF3-8BAE03E02326} = {1FE54AB1-9543-480E-8A3D-2FA1E2A340CE}
 		{4F060297-D0C5-4B26-AE87-DD1D501EC568} = {1FE54AB1-9543-480E-8A3D-2FA1E2A340CE}
+		{1EF95688-B26A-4E85-9685-EBF126981673} = {1797237E-1A3E-438D-8A30-776DED7F9081}
+		{AEE4375F-7181-4FCB-80F3-10EAE68137B6} = {1FE54AB1-9543-480E-8A3D-2FA1E2A340CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34A7E0FB-1B94-467F-9F79-6E05647A6F69}
