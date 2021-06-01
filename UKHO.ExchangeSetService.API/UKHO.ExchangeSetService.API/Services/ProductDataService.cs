@@ -92,6 +92,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
             response = await SetExchangeSetResponseLinks(response);
 
+            if (!string.IsNullOrEmpty(response.BatchId))
+            {
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, response.BatchId);
+            }
+
             return response;
         }
 
