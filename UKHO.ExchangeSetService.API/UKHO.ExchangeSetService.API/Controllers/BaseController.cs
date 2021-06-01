@@ -17,6 +17,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     {
         private readonly IHttpContextAccessor httpContextAccessor;
         protected readonly ILogger<T> Logger;
+        protected new HttpContext HttpContext => httpContextAccessor.HttpContext;
         public const string LastModifiedDateHeaderKey = "Last-Modified";
         public const string InternalServerError = "Internal Server Error";
         public const string NotModified = "Not Modified";
