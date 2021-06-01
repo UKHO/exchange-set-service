@@ -214,6 +214,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
             A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueResponse(salesCatalogueResponse, CreateBatchResponseModel.ResponseBody.BatchId)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
