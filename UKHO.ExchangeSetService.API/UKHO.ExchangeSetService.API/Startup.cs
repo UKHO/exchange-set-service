@@ -26,6 +26,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.Logging.EventHubLogProvider;
 using Azure.Identity;
 using UKHO.ExchangeSetService.Common.Helpers;
+using System.Net.Http.Headers;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -33,6 +34,7 @@ namespace UKHO.ExchangeSetService.API
     public class Startup
     {
         private readonly IConfiguration configuration;
+        public const string ExchangeSetService = "ExchangeSetService";
 
         public Startup(IWebHostEnvironment env)
         {
@@ -79,17 +81,35 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+            services.AddHeaderPropagation(options =>
+            {
+                options.Headers.Add(CorrelationIdMiddleware.XCorrelationIdHeaderKey);
+            });
+
             services.Configure<SalesCatalogueConfiguration>(configuration.GetSection("SalesCatalogue"));
 
             services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
-                client.BaseAddress = new Uri(configuration["SalesCatalogue:BaseUrl"])
-                );
+                {
+                    client.BaseAddress = new Uri(configuration["SalesCatalogue:BaseUrl"]);
+                    var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetService,
+                                            Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
+                    client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                }
+            )
+            .AddHeaderPropagation();            
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
 
             services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
-                client.BaseAddress = new Uri(configuration["FileShareService:BaseUrl"])
-                );
+                {
+                    client.BaseAddress = new Uri(configuration["FileShareService:BaseUrl"]);
+                    var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetService,
+                                                Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
+                    client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                }
+            )
+            .AddHeaderPropagation();
+
             services.AddScoped<IFileShareService, FileShareService>();
 
             services.AddScoped<IProductDataService, ProductDataService>();
@@ -119,6 +139,8 @@ namespace UKHO.ExchangeSetService.API
 
             app.UseHttpsRedirection();
 
+            app.UseHeaderPropagation();
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -140,7 +162,7 @@ namespace UKHO.ExchangeSetService.API
 
             builder.AddEnvironmentVariables();
 
-            var tempConfig = builder.Build();            
+            var tempConfig = builder.Build();
             string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
 
             if (!string.IsNullOrWhiteSpace(kvServiceUri))

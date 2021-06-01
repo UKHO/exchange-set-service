@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -63,6 +64,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual async Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
         {
+            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestStart.ToEventId(), "Product Identifiers Endpoint Started");
+
             if (productIdentifiers == null || productIdentifiers.Length == 0)
             {
                 var error = new List<Error>
@@ -92,7 +95,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildBadRequestErrorResponse(errors);
                 }
             }
+
             var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest);
+
+            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestCompleted.ToEventId(), "Product Identifiers Endpoint Completed");
+
             return GetEssResponse(productDetail);            
         }
 
@@ -125,6 +132,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual async Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri)
         {
+            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestStart.ToEventId(), "Product Versions Endpoint Started");
+
             if (productVersionsRequest == null || !productVersionsRequest.Any())
             {
                 var error = new List<Error>
@@ -154,8 +163,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
             }
 
             var productDetail = await productDataService.CreateProductDataByProductVersions(request);
-            return GetEssResponse(productDetail);
-            
+
+            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestCompleted.ToEventId(), "Product Versions Endpoint Completed");
+
+            return GetEssResponse(productDetail);            
         }        
 
         /// <summary>
@@ -186,6 +197,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual async Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
             [FromQuery] string callbackUri)
         {
+            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId(), "Product Data SinceDateTime Endpoint Started");
+
             ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
             {
                 SinceDateTime = sinceDateTime,
@@ -213,8 +226,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
             }
 
             var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest);
-            return GetEssResponse(productDetail);
 
+            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed");
+
+            return GetEssResponse(productDetail);
         }
     }
 }
