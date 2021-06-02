@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.API
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-            services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
+            services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("ESSFulfilmentStorageConfiguration"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
             services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
