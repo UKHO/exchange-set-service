@@ -19,3 +19,8 @@ resource "azurerm_storage_queue" "storage_queue" {
   name                 = "ess-fulfilment-requests"
   storage_account_name = azurerm_storage_account.storage.name
 }
+
+resource "azurerm_storage_container" "storage_container" {
+  name                  = "ess-fulfilment"
+  storage_account_name  = azurerm_storage_account.storage.name
+}
