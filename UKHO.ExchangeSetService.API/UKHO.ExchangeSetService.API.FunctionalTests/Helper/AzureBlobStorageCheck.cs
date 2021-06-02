@@ -22,8 +22,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var batchId = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 1];
             var fileName = $"{batchId}.json";
 
-            BlobContainerClient container = new BlobContainerClient(storageConnectionString, fileName);
-            return await container.ExistsAsync();
+            BlobContainerClient fileInContainer = new BlobContainerClient(storageConnectionString, fileName);
+
+            return fileInContainer.Name.Contains(fileName);
+
         }
     }
 }
