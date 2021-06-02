@@ -1,7 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
-using System;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -26,17 +23,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.storageConfig = storageConfig;
         }
 
-        public async Task<string> DownloadSalesCatalogueResponse(string ScsResponseUri, string batchid)
+        public async Task<string> DownloadSalesCatalogueResponse(string batchid)
         {
             var fssFileName = $"{batchid}-fssresponse.json";
             var scsFileName = $"{batchid}.json";
 
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
-            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(scsFileName, storageAccountConnectionString, 
-                storageConfig.Value.StorageContainerName);
 
-            var responseFile = await cloudBlockBlob.DownloadTextAsync();
-            var salesCatalogueResponse = JsonConvert.DeserializeObject<SalesCatalogueResponse>(responseFile);
+            SalesCatalogueResponse salesCatalogueResponse = await azureBlobStorageClient.DownloadScsResponse(scsFileName);
             var searchBatchResponse = await queryFssService.QueryFss(salesCatalogueResponse.ResponseBody.Products);
             var blobResult = await queryFssService.UploadFssDataToBlob(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             return "Download completed Successfully!!!!";

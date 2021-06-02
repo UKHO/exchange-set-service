@@ -18,10 +18,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         }
         public async Task ProcessQueueMessage([QueueTrigger("ess-fulfilment-requests")] ScsResponseQueueMessage message, ILogger logger)
         {
-
-            ScsResponseQueueMessage scsResponseQueueMessage = message;
-
-            await fulFilmentDataService.DownloadSalesCatalogueResponse(scsResponseQueueMessage.ScsResponseUri, scsResponseQueueMessage.BatchId);
+            await fulFilmentDataService.DownloadSalesCatalogueResponse(message.BatchId);
             logger.LogInformation(message.BatchId);
         }
     }

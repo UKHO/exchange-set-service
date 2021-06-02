@@ -9,5 +9,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         Task<bool> StoreScsResponseAsync(string containerName, string batchId, SalesCatalogueResponse salesCatalogueResponse, CancellationToken cancellationToken);
         CloudBlockBlob GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName);
+        Task<SalesCatalogueResponse> DownloadScsResponse(string fileName);
     }
 }

@@ -42,6 +42,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         }
 
+        public async Task<SalesCatalogueResponse> DownloadScsResponse(string fileName)
+        {
+            string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
+            CloudBlockBlob cloudBlockBlob = GetCloudBlockBlob(fileName, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
+
+            var responseFile = await cloudBlockBlob.DownloadTextAsync();
+            SalesCatalogueResponse salesCatalogueResponse = JsonConvert.DeserializeObject<SalesCatalogueResponse>(responseFile);
+
+            return salesCatalogueResponse;
+        }
         private async Task<string> UploadFileToBlobAsync(string batchId, string uploadFileName, SalesCatalogueResponse salesCatalogueResponse, string storageAccountConnectionString, string containerName)
         {
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
