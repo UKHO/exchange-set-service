@@ -15,7 +15,16 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ErrorRedactingResponseBody = 805008,
         FSSCreateBatchRequestStart = 805009,
         FSSCreateBatchRequestCompleted = 805010,
-        FSSCreateBatchNonOkResponse = 805011
+        FSSCreateBatchNonOkResponse = 805011,
+        BadRequest = 805012,
+        InternalServerError = 805013,
+        NotModified = 805014,
+        ESSGetProductsFromSpecificDateRequestStart = 805015,
+        ESSGetProductsFromSpecificDateRequestCompleted = 805016,
+        ESSPostProductIdentifiersRequestStart = 805017,
+        ESSPostProductIdentifiersRequestCompleted = 805018,        
+        ESSPostProductVersionsRequestStart = 805019,
+        ESSPostProductVersionsRequestCompleted = 805020        
     }
 
     public static class EventIdExtensions
