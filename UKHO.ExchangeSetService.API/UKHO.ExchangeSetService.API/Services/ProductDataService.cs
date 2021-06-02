@@ -60,11 +60,11 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
 
-            response = await SetExchangeSetResponseLinks(response);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
 
-            if (!string.IsNullOrEmpty(response.BatchId))
+            if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, response.BatchId);
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, exchangeSetServiceResponse.BatchId);
             }
 
             return response;
@@ -90,11 +90,11 @@ namespace UKHO.ExchangeSetService.API.Services
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count; 
             }
 
-            response = await SetExchangeSetResponseLinks(response);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
 
-            if (!string.IsNullOrEmpty(response.BatchId))
+            if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, response.BatchId);
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, exchangeSetServiceResponse.BatchId);
             }
 
             return response;
@@ -115,11 +115,11 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }            
 
-            response =await SetExchangeSetResponseLinks(response);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
 
-            if (!string.IsNullOrEmpty(response.BatchId))
+            if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, response.BatchId);
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, exchangeSetServiceResponse.BatchId);
             }
 
             return response;
@@ -178,6 +178,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri }
             };
             exchangeSetResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
+            exchangeSetResponse.BatchId = createBatchResponse.ResponseBody.BatchId;
 
             logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri.Href}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri.Href);
 
