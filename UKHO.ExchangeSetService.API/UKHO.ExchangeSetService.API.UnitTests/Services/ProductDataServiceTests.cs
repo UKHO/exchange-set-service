@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
             };
-            Links links = new Links()
+            Common.Models.Response.Links links = new Common.Models.Response.Links()
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetFileUri = linkSetFileUri

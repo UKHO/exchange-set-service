@@ -14,24 +14,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly IScsStorageService scsStorageService;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
+        private readonly IQueryFssService queryFssService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
 
-        public FulfilmentDataService(IScsStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient,
+        public FulfilmentDataService(IScsStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient, IQueryFssService queryFssService,
                                      IOptions<EssFulfilmentStorageConfiguration> storageConfig)
         {
             this.scsStorageService = scsStorageService;
             this.azureBlobStorageClient = azureBlobStorageClient;
+            this.queryFssService = queryFssService;
             this.storageConfig = storageConfig;
         }
 
         public async Task<string> DownloadSalesCatalogueResponse(string ScsResponseUri, string batchid)
         {
+            var fssFileName = $"{batchid}-fssresponse.json";
+            var scsFileName = $"{batchid}.json";
+
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
-            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(batchid + ".json", storageAccountConnectionString, storageConfig.Value.StorageContainerName);
+            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(scsFileName, storageAccountConnectionString, 
+                storageConfig.Value.StorageContainerName);
 
             var responseFile = await cloudBlockBlob.DownloadTextAsync();
-            var salesCatalogueResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
-            Console.WriteLine("Download completed Successfully!!!!");
+            var salesCatalogueResponse = JsonConvert.DeserializeObject<SalesCatalogueResponse>(responseFile);
+            var searchBatchResponse = await queryFssService.QueryFss(salesCatalogueResponse.ResponseBody.Products);
+            var blobResult = await queryFssService.UploadFssDataToBlob(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             return "Download completed Successfully!!!!";
 
         }

@@ -95,7 +95,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
-      
+                 services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
+                    client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"])
+                 );
+                 services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+                 services.AddScoped<IFileShareService, FileShareService>();
+                 services.AddScoped<IQueryFssService, QueryFssService>();
+                 services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
              })
               .ConfigureWebJobs(b =>
               {
