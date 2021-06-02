@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.KeyVault;
+﻿using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
@@ -7,12 +6,10 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Events;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 
@@ -96,6 +93,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
                  services.AddScoped<IScsStorageService, ScsStorageService>();
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
+                 services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
+                 services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
       
              })
               .ConfigureWebJobs(b =>

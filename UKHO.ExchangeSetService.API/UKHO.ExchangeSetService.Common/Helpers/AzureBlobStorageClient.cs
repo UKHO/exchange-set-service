@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return scsResponseQueueMessage;
         }
 
-        private static CloudBlockBlob GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
+        public CloudBlockBlob GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
         {
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
             CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();

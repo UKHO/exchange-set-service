@@ -1,11 +1,11 @@
-﻿using Azure.Storage.Blobs;
-using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
@@ -13,29 +13,24 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public class FulfilmentDataService : IFulfilmentDataService
     {
         private readonly IScsStorageService scsStorageService;
+        private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
 
-        public FulfilmentDataService(IScsStorageService scsStorageService,
+        public FulfilmentDataService(IScsStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient,
                                      IOptions<EssFulfilmentStorageConfiguration> storageConfig)
         {
             this.scsStorageService = scsStorageService;
+            this.azureBlobStorageClient = azureBlobStorageClient;
             this.storageConfig = storageConfig;
         }
 
         public async Task<string> DownloadSalesCatalogueResponse(string ScsResponseUri, string batchid)
         {
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
+            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(batchid + ".json", storageAccountConnectionString, storageConfig.Value.StorageContainerName);
 
-            CloudStorageAccount mycloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            CloudBlobClient myBlob = mycloudStorageAccount.CreateCloudBlobClient();
-            CloudBlobContainer mycontainer = myBlob.GetContainerReference(storageConfig.Value.StorageContainerName);
-            CloudBlockBlob myBlockBlob = mycontainer.GetBlockBlobReference(batchid + ".json");
-
-            // provide the location of the file need to be downloaded          
-            Stream fileupd = File.OpenWrite(@"D:\Test\" + batchid);
-
-            var responseFile = await myBlockBlob.DownloadTextAsync();
-            await myBlockBlob.DownloadToStreamAsync(fileupd);
+            var responseFile = await cloudBlockBlob.DownloadTextAsync();
+            var salesCatalogueResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
             Console.WriteLine("Download completed Successfully!!!!");
             return "Download completed Successfully!!!!";
 
