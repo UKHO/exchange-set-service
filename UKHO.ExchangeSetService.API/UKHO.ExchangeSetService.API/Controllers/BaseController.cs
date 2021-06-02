@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         protected IActionResult BuildInternalServerErrorResponse()
         {
-            Logger.LogError(EventIds.InternalServerError.ToEventId(), "InternalServerError");
+            LogError(EventIds.InternalServerError.ToEventId(), null, "InternalServerError", GetCurrentCorrelationId());
 
             var objectResult = new ObjectResult
                 (new InternalServerError
