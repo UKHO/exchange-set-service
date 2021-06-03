@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiresDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
         {
             string uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
