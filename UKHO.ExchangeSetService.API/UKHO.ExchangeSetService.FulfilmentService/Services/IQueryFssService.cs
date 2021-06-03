@@ -7,7 +7,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public interface IQueryFssService
     {
-        Task<SearchBatchResponse> QueryFss(List<Products> products);
-        Task<string> UploadFssDataToBlob(string uploadFileName, SearchBatchResponse searchBatchResponse, string storageAccountConnectionString, string containerName);
+        Task<List<FulfillmentDataResponse>> QueryFss(List<Products> products);
+        Task<string> UploadFssDataToBlob(string uploadFileName, List<FulfillmentDataResponse> fulfillmentDataResponse, string storageAccountConnectionString, string containerName);
     }
 }
