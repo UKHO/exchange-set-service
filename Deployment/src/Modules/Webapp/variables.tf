@@ -18,3 +18,7 @@ variable "app_settings" {
 variable "tags" {
 
 }
+
+variable "subnet_id" {
+  type = string
+}
