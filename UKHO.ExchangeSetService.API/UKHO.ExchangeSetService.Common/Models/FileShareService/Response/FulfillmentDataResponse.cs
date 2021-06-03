@@ -2,7 +2,7 @@
 
 namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
 {
-    public class FulfilmentDataResponse
+    public class FulfillmentDataResponse
     {
         public string BatchId { get; set; }
 
@@ -12,6 +12,6 @@ namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
 
         public int UpdateNumber { get; set; }
 
-        public List<string> FileUri { get; set; }
+        public IEnumerable<string> FileUri { get; set; }
     }
 }

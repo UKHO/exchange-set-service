@@ -96,19 +96,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<SearchBatchResponse> QueryFss(List<Products> products)
+        public async Task<List<FulfillmentDataResponse>> QueryFss(List<Products> products)
         {
             var batchProducts = SliceFssProducts(products);
-            var listSearchbatchResponse = new List<SearchBatchResponse>();
+            var listBatchDetails = new List<BatchDetail>();
             foreach (var item in batchProducts)
             {
-                listSearchbatchResponse.Add(await fileShareService.GetBatchInfoBasedOnProducts(item));
+                var result = await fileShareService.GetBatchInfoBasedOnProducts(item);
+                listBatchDetails.AddRange(result.Entries);
             }
 
-            var entries = listSearchbatchResponse.Select(a => a.Entries);
-            return new SearchBatchResponse() { 
-                Entries = entries.FirstOrDefault()
-            };
+            return SetFaltteningFulfillmentData(new SearchBatchResponse()
+            {
+                Entries = listBatchDetails
+            });
         }
 
         public IEnumerable<List<Products>> SliceFssProducts(List<Products> products)
@@ -124,9 +125,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task<string> UploadFssDataToBlob(string uploadFileName, SearchBatchResponse searchBatchResponse, string storageAccountConnectionString, string containerName)
+        public async Task<string> UploadFssDataToBlob(string uploadFileName, List<FulfillmentDataResponse> fulfillmentDataResponse, string storageAccountConnectionString, string containerName)
         {
-            var serializeJsonObject = JsonConvert.SerializeObject(searchBatchResponse);
+            var serializeJsonObject = JsonConvert.SerializeObject(fulfillmentDataResponse);
 
             var cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
@@ -145,6 +146,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             writer.Write(obj);
             writer.Flush();
             ms.Position = 0;
+        }
+
+        private List<FulfillmentDataResponse> SetFaltteningFulfillmentData(SearchBatchResponse searchBatchResponse)
+        {
+            var listFulfilmentData = new List<FulfillmentDataResponse>();
+            foreach (var item in searchBatchResponse.Entries)
+            {
+                listFulfilmentData.Add(new FulfillmentDataResponse { 
+                    BatchId = item.BatchId,
+                    EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b=>b.Value).FirstOrDefault()),
+                    ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault(),
+                    UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault()),
+                    FileUri = item.Files.Select(a=>a.Links.Get.Href)
+                });
+            }
+            return listFulfilmentData;
         }
     }
 }

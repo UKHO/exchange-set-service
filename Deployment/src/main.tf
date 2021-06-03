@@ -1,3 +1,9 @@
+data "azurerm_subnet" "subnet" {
+  name                 = var.spoke_subnet_name
+  virtual_network_name = var.spoke_vnet_name
+  resource_group_name  = var.spoke_rg
+}
+
 module "app_insights" {
   source              = "./Modules/AppInsights"
   name                = "${local.service_name}-${local.env_name}-insights"
@@ -21,6 +27,7 @@ module "webapp_service" {
   name                = local.web_app_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
+  subnet_id           = data.azurerm_subnet.subnet.id
 
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
@@ -40,6 +47,7 @@ module "storage" {
   location            = var.location
   tags                = local.tags
   env_name            = local.env_name
+  subnet_id           = data.azurerm_subnet.subnet.id
 }
 
 module "key_vault" {
@@ -50,6 +58,7 @@ module "key_vault" {
   tenant_id           = module.webapp_service.web_app_tenant_id
   location            = azurerm_resource_group.rg.location
   allowed_ips         = var.allowed_ips
+  subnet_id           = data.azurerm_subnet.subnet.id
   read_access_objects = {
     "webapp_service" = module.webapp_service.web_app_object_id
   }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -31,8 +32,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
 
             SalesCatalogueResponse salesCatalogueResponse = await azureBlobStorageClient.DownloadScsResponse(scsFileName);
-            var searchBatchResponse = await queryFssService.QueryFss(salesCatalogueResponse.ResponseBody.Products);
-            var blobResult = await queryFssService.UploadFssDataToBlob(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
+            if (salesCatalogueResponse?.ResponseBody?.Products != null && salesCatalogueResponse.ResponseBody.Products.Any())
+            {
+                var searchBatchResponse = await queryFssService.QueryFss(salesCatalogueResponse.ResponseBody.Products);
+                var blobResult = await queryFssService.UploadFssDataToBlob(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName); 
+            }
             return "Download completed Successfully!!!!";
 
         }

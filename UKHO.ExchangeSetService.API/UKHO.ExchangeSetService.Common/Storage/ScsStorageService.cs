@@ -16,7 +16,7 @@ namespace UKHO.ExchangeSetService.Common.Storage
         {
             string ScsStorageAccountAccessKeyValue = storageConfig.Value.StorageAccountKey;
 
-            if (ScsStorageAccountAccessKeyValue == null)
+            if (string.IsNullOrWhiteSpace(ScsStorageAccountAccessKeyValue))
             {
                 throw new KeyNotFoundException($"Storage account accesskey not found");
             }
