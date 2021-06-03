@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.Common.Storage
             this.azureBlobStorageClient = azureBlobStorageClient;
         }
 
-        public async Task<bool> SaveSalesCatalogueResponse(SalesCatalogueResponse salesCatalogueResponse, string batchId)
+        public virtual async Task<bool> SaveSalesCatalogueResponse(SalesCatalogueResponse salesCatalogueResponse, string batchId)
         {
             return await azureBlobStorageClient.StoreScsResponseAsync(storageConfig.Value.StorageContainerName, batchId, salesCatalogueResponse, CancellationToken.None);
         }

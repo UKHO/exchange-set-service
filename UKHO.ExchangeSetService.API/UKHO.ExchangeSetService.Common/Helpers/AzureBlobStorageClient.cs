@@ -34,12 +34,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             string storageAccountConnectionString =
                   scsStorageService.GetStorageAccountConnectionString();
+            CloudBlockBlob cloudBlockBlob = GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
+            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
 
-            await UploadFileToBlobAsync(batchId, uploadFileName, salesCatalogueResponse, storageAccountConnectionString, containerName);
+            await UploadScsResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
+
+            await AddQueueMessage(batchId, salesCatalogueResponse, cloudBlockBlob);
 
             logger.LogInformation(EventIds.SCSResponseStoredAndSentMessageInQueue.ToEventId(), "Sales catalogue response saved for the {batchId}", batchId);
             return true;
+        }
 
+        public async Task AddQueueMessage(string batchId, SalesCatalogueResponse salesCatalogueResponse, CloudBlockBlob cloudBlockBlob)
+        {
+            ScsResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(batchId, salesCatalogueResponse, cloudBlockBlob);
+            var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
+            await azureMessageQueueHelper.AddMessage(storageConfig.Value, scsResponseQueueMessageJSON);
         }
 
         public async Task<SalesCatalogueResponse> DownloadScsResponse(string fileName)
@@ -52,26 +62,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return salesCatalogueResponse;
         }
-        private async Task<string> UploadFileToBlobAsync(string batchId, string uploadFileName, SalesCatalogueResponse salesCatalogueResponse, string storageAccountConnectionString, string containerName)
-        {
-            var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
 
-            CloudBlockBlob cloudBlockBlob = GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
-            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
+        public async Task UploadScsResponseToBlobAsync(CloudBlockBlob cloudBlockBlob , SalesCatalogueResponse salesCatalogueResponse)
+        {
+            var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);            
 
             using (var ms = new MemoryStream())
             {
                 LoadStreamWithJson(ms, serializeJsonObject);
                 await cloudBlockBlob.UploadFromStreamAsync(ms);
             }
-
-            ScsResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(batchId, salesCatalogueResponse, cloudBlockBlob);
-
-            var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
-
-            await azureMessageQueueHelper.AddMessage(storageConfig.Value, scsResponseQueueMessageJSON);
-            return cloudBlockBlob.Uri.AbsoluteUri;
-
         }
 
         private ScsResponseQueueMessage GetScsResponseQueueMessage(string batchId, SalesCatalogueResponse salesCatalogueResponse, CloudBlockBlob cloudBlockBlob)
@@ -112,5 +112,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             return fileSizeCount;
         }
+
+
+
+       
+
     }
 }

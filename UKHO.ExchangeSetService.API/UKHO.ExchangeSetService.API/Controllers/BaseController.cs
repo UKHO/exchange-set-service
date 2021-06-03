@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using UKHO.ExchangeSetService.API.Filters;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
 
@@ -16,6 +17,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     {
         private readonly IHttpContextAccessor httpContextAccessor;
         protected readonly ILogger<T> Logger;
+        protected new HttpContext HttpContext => httpContextAccessor.HttpContext;
         public const string LastModifiedDateHeaderKey = "Last-Modified";
         public const string InternalServerError = "Internal Server Error";
         public const string NotModified = "Not Modified";
@@ -31,6 +33,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
         protected IActionResult BuildBadRequestErrorResponse(List<Error> errors)
         {
+            LogError(EventIds.BadRequest.ToEventId(), errors, "BadRequest", GetCurrentCorrelationId());
+
             return new BadRequestObjectResult(new ErrorDescription
             {
                 Errors = errors,
@@ -40,6 +44,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         protected IActionResult BuildInternalServerErrorResponse()
         {
+            LogError(EventIds.InternalServerError.ToEventId(), null, "InternalServerError", GetCurrentCorrelationId());
+
             var objectResult = new ObjectResult
                 (new InternalServerError
                 {
@@ -73,6 +79,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         private IActionResult BuildNotModifiedResponse(ExchangeSetServiceResponse model)
         {
+            LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
+
             httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
             return new StatusCodeResult(StatusCodes.Status304NotModified);
         }
@@ -82,6 +90,16 @@ namespace UKHO.ExchangeSetService.API.Controllers
             if (model.LastModified != null)
                 httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
             return Ok(model.ExchangeSetResponse);
+        }
+
+        private void LogError(EventId eventId, List<Error> errors, string errorType, string correlationId)
+        {
+            Logger.LogError(eventId, $"{HttpContext.Request.Path} - {errorType} - {{Errors}} for CorrelationId - {{correlationId}}", errors, correlationId);            
+        }
+
+        private void LogInfo(EventId eventId, string infoType, string correlationId)
+        {
+            Logger.LogInformation(eventId, $"{HttpContext.Request.Path} - {infoType} - for CorrelationId - {{correlationId}}", correlationId);
         }
     }
 }
