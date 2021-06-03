@@ -8,7 +8,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string EssBaseAddress;
         public static string FakeTokenPrivateKey;
         public string ExchangeSetFileName;
-
+        public string EssStorageAccountConnectionString;
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public class EssAuthorizationTokenConfiguration
         {
@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot = new ConfigurationBuilder()
                                 .AddJsonFile("appsettings.json", false)
                                 .Build();
-
+            EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;
             EssBaseAddress = ConfigurationRoot.GetSection("EssApiUrl").Value;
             ExchangeSetFileName= ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;

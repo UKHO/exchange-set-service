@@ -37,3 +37,7 @@ variable "trusted_ips" {
 variable "allowed_ips" {
 
 }
+
+variable "subnet_id" {
+  type = string
+}

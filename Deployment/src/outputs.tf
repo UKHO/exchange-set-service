@@ -9,3 +9,8 @@ value = "https://${module.webapp_service.default_site_hostname}"
 output "keyvault_uri"{
   value = module.key_vault.keyvault_uri
 }
+
+output "storage_connection_string" {
+   value = module.storage.connection_string
+   sensitive = true
+}

@@ -10,5 +10,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
 
         public string LastModified { get; set; }
 
+        public string BatchId { get; set; }
+
     }
 }

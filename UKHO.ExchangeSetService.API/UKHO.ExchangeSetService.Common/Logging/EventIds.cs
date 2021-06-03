@@ -24,7 +24,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ESSPostProductIdentifiersRequestStart = 805017,
         ESSPostProductIdentifiersRequestCompleted = 805018,        
         ESSPostProductVersionsRequestStart = 805019,
-        ESSPostProductVersionsRequestCompleted = 805020        
+        ESSPostProductVersionsRequestCompleted = 805020,
+        SCSResponseStoreRequestStart = 805021,
+        SCSResponseStoreRequestCompleted = 805022,
+        SCSResponseStoredAndSentMessageInQueue = 805023
     }
 
     public static class EventIdExtensions

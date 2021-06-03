@@ -8,5 +8,6 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
         public string SinceDateTime { get; set; }
 
         public string CallbackUri { get; set; }
+        public string CorrelationId { get; set; }
     }
 }

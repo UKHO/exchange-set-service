@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
@@ -29,6 +30,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IFileShareService fakeFileShareService;
         private ILogger<FileShareService> logger;
         private IMapper fakeMapper;
+        private IExchangeSetStorageProvider fakeExchangeSetStorageProvider; 
 
         [SetUp]
         public void Setup()
@@ -40,9 +42,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeMapper = A.Fake<IMapper>();
             fakeFileShareService = A.Fake<IFileShareService>();
             logger = A.Fake<ILogger<FileShareService>>();
+            fakeExchangeSetStorageProvider = A.Fake<ExchangeSetStorageProvider>();            
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
-                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger);
+                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider);
         }
 
         #region GetExchangeSetResponse
@@ -206,8 +209,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -297,7 +303,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string callbackUri = string.Empty;
             
             var salesCatalogueResponse = GetSalesCatalogueResponse();
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.InternalServerError;
             
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -310,7 +316,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.BadRequest;
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
             
             A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
 
@@ -485,7 +491,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
 
             var salesCatalogueResponse = GetSalesCatalogueResponse();
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.InternalServerError;
 
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -498,7 +504,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.BadRequest;
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
             A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
 
@@ -621,13 +627,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             
             var salesCatalogueResponse = GetSalesCatalogueResponse();
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.InternalServerError;
             
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.BadRequest;
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
             A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
 
