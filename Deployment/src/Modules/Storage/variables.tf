@@ -21,3 +21,7 @@ variable "tags" {
 variable "allowed_ips" {
 
 }
+
+variable "subnet_id" {
+  type = string
+}
