@@ -68,6 +68,7 @@ module "key_vault" {
     "EventHubLoggingConfiguration--EntityPath"             = module.eventhub.entity_path
     "essFulfilmentStorageConfiguration--StorageAccountName" = module.storage.name
     "essFulfilmentStorageConfiguration--StorageAccountKey"  = module.storage.primary_access_key
+    "AzureWebJobsStorage"                                   = module.storage.connection_string
   }
   tags                                         = local.tags
 }
