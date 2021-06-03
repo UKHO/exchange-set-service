@@ -1,6 +1,6 @@
 ﻿namespace UKHO.ExchangeSetService.Common.Storage
 {
-    public interface IScsStorageService
+    public interface ISalesCatalogueStorageService
     {
         string GetStorageAccountConnectionString();
     }

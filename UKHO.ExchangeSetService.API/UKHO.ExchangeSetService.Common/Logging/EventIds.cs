@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ESSPostProductVersionsRequestStart = 805019,
         ESSPostProductVersionsRequestCompleted = 805020,
         SCSResponseStoreRequestStart = 805021,
-        SCSResponseStoreCompleted = 805022,
+        SCSResponseStoreRequestCompleted = 805022,
         SCSResponseStoredAndSentMessageInQueue = 805023
     }
 

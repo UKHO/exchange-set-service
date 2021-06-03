@@ -15,12 +15,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class AzureBlobStorageClient : IAzureBlobStorageClient
     {
-        private readonly IScsStorageService scsStorageService;
+        private readonly ISalesCatalogueStorageService scsStorageService;
         private const string CONTENT_TYPE = "application/json";
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly IAzureMessageQueueHelper azureMessageQueueHelper;
         private readonly ILogger<AzureBlobStorageClient> logger;
-        public AzureBlobStorageClient(IScsStorageService scsStorageService, IOptions<EssFulfilmentStorageConfiguration> storageConfig, IAzureMessageQueueHelper azureMessageQueueHelper, ILogger<AzureBlobStorageClient> logger)
+        public AzureBlobStorageClient(ISalesCatalogueStorageService scsStorageService, IOptions<EssFulfilmentStorageConfiguration> storageConfig, IAzureMessageQueueHelper azureMessageQueueHelper, ILogger<AzureBlobStorageClient> logger)
         {
             this.scsStorageService = scsStorageService;
             this.storageConfig = storageConfig;
@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.logger = logger;
         }
 
-        public async Task<bool> StoreScsResponseAsync(string containerName, string batchId, SalesCatalogueResponse salesCatalogueResponse, CancellationToken cancellationToken)
+        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CancellationToken cancellationToken)
         {
             string uploadFileName = string.Concat(batchId, ".json");
 
@@ -37,22 +37,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             CloudBlockBlob cloudBlockBlob = GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
 
-            await UploadScsResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
+            await UploadSalesCatalogueServiceResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
 
-            await AddQueueMessage(batchId, salesCatalogueResponse, cloudBlockBlob);
+            await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob);
 
             logger.LogInformation(EventIds.SCSResponseStoredAndSentMessageInQueue.ToEventId(), "Sales catalogue response saved for the {batchId}", batchId);
             return true;
         }
 
-        public async Task AddQueueMessage(string batchId, SalesCatalogueResponse salesCatalogueResponse, CloudBlockBlob cloudBlockBlob)
+        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob)
         {
-            ScsResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(batchId, salesCatalogueResponse, cloudBlockBlob);
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob);
             var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
             await azureMessageQueueHelper.AddMessage(storageConfig.Value, scsResponseQueueMessageJSON);
         }
 
-        public async Task UploadScsResponseToBlobAsync(CloudBlockBlob cloudBlockBlob , SalesCatalogueResponse salesCatalogueResponse)
+        public async Task UploadSalesCatalogueServiceResponseToBlobAsync(CloudBlockBlob cloudBlockBlob , SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);            
 
@@ -63,14 +63,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        private ScsResponseQueueMessage GetScsResponseQueueMessage(string batchId, SalesCatalogueResponse salesCatalogueResponse, CloudBlockBlob cloudBlockBlob)
+        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId,CloudBlockBlob cloudBlockBlob)
         {
             int fileSize = GetFilesize(salesCatalogueResponse);
-            var scsResponseQueueMessage = new ScsResponseQueueMessage()
+            var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
             {
                 BatchId = batchId,
                 ScsResponseUri = cloudBlockBlob.Uri.AbsoluteUri,
-                FileSize = fileSize
+                FileSize = fileSize,
+                CallbackUri = callBackUri == null ? string.Empty : callBackUri,
+                CorrelationId = correlationId
             };
             return scsResponseQueueMessage;
         }
@@ -92,19 +94,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             ms.Position = 0;
         }
 
-        private int GetFilesize(SalesCatalogueResponse salesCatalogueResponse)
+        private int GetFilesize(SalesCatalogueProductResponse salesCatalogueResponse)
         {
             int fileSizeCount = 0;
-            foreach (var item in salesCatalogueResponse.ResponseBody.Products)
+            if(salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0 )
             {
-                fileSizeCount += item.FileSize.Value;
+                foreach (var item in salesCatalogueResponse.Products)
+                {
+                    fileSizeCount += item.FileSize.Value;
+                }                
             }
             return fileSizeCount;
         }
-
-
-
-       
-
     }
 }

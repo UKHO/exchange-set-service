@@ -6,6 +6,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IAzureBlobStorageClient
     {
-        Task<bool> StoreScsResponseAsync(string containerName, string batchId, SalesCatalogueResponse salesCatalogueResponse, CancellationToken cancellationToken);
+        Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CancellationToken cancellationToken);
     }
 }

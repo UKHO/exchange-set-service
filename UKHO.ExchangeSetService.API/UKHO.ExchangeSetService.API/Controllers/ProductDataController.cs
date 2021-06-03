@@ -81,7 +81,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
             ProductIdentifierRequest productIdentifierRequest = new ProductIdentifierRequest()
             {
                 ProductIdentifier = productIdentifiers,
-                CallbackUri = callbackUri
+                CallbackUri = callbackUri,
+                CorrelationId = GetCurrentCorrelationId()
             };
 
             var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
@@ -146,9 +147,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 };
                 return BuildBadRequestErrorResponse(error);
             }
-            ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest();
-            request.ProductVersions = productVersionsRequest;
-            request.CallbackUri = callbackUri;
+            ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest
+            {
+                ProductVersions = productVersionsRequest,
+                CallbackUri = callbackUri,
+                CorrelationId = GetCurrentCorrelationId()
+            };
 
             var validationResult = await productDataService.ValidateProductDataByProductVersions(request);
 
@@ -202,7 +206,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
             ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
             {
                 SinceDateTime = sinceDateTime,
-                CallbackUri = callbackUri
+                CallbackUri = callbackUri,
+                CorrelationId = GetCurrentCorrelationId()
             };
 
             if (productDataSinceDateTimeRequest.SinceDateTime == null)

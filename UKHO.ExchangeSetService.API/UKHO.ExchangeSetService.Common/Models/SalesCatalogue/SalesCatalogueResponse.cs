@@ -8,5 +8,5 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public SalesCatalogueProductResponse ResponseBody { get; set; }
         public HttpStatusCode ResponseCode { get; set; }
         public DateTime? LastModified { get; set; }
-    }
+    }    
 }

@@ -26,8 +26,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IMapper mapper;
         private readonly IFileShareService fileShareService;
         private readonly ILogger<FileShareService> logger;
-        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
-        private readonly ILogger<ExchangeSetStorageProvider> essLogger;
+        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;      
 
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
@@ -36,8 +35,8 @@ namespace UKHO.ExchangeSetService.API.Services
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
-            ILogger<FileShareService> logger,IExchangeSetStorageProvider exchangeSetStorageProvider,
-            ILogger<ExchangeSetStorageProvider> essLogger)
+            ILogger<FileShareService> logger,IExchangeSetStorageProvider exchangeSetStorageProvider
+            )
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -46,8 +45,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.mapper = mapper;
             this.fileShareService = fileShareService;
             this.logger = logger;
-            this.exchangeSetStorageProvider = exchangeSetStorageProvider;
-            this.essLogger = essLogger;
+            this.exchangeSetStorageProvider = exchangeSetStorageProvider;          
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -64,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, exchangeSetServiceResponse.BatchId);
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId);
             }
 
             return response;
@@ -87,14 +85,22 @@ namespace UKHO.ExchangeSetService.API.Services
  
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
-                response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count; 
+                response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
+                salesCatalogueResponse.ResponseBody = new SalesCatalogueProductResponse
+                {
+                    Products = new List<Products>(),
+                    ProductCounts = new ProductCounts()
+                };
+                salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount = 0;
+                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned = new List<RequestedProductsNotReturned>();
+                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount = salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, exchangeSetServiceResponse.BatchId);
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri , request.CorrelationId);
             }
 
             return response;
@@ -119,7 +125,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await GetSalesCatalogueStorageDetails(salesCatalogueResponse, exchangeSetServiceResponse.BatchId);
+                await GetSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.CorrelationId);
             }
 
             return response;
@@ -197,16 +203,16 @@ namespace UKHO.ExchangeSetService.API.Services
             return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null; 
         }
 
-        private async Task<bool> GetSalesCatalogueStorageDetails(SalesCatalogueResponse salesCatalogueResponse, string batchId)
+        private async Task<bool> GetSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId)
         {
-            essLogger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), $"SCS response store request started");
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "SCS response store request started for the {batchId}", batchId);
 
-            bool result = await exchangeSetStorageProvider.SaveSalesCatalogueResponse(salesCatalogueResponse, batchId);
+            bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId);
 
-            essLogger.LogInformation(EventIds.SCSResponseStoreCompleted.ToEventId(), $"SCS response store request completed");
-
+            logger.LogInformation(EventIds.SCSResponseStoreRequestCompleted.ToEventId(), "SCS response store request completed for the {batchId}", batchId);
             return result;
         }
+
 
     }
 }
