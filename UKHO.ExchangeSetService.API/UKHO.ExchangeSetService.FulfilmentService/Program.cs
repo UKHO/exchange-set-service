@@ -18,7 +18,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
     [ExcludeFromCodeCoverage]
     public static class Program
     {
-        private static IServiceProvider ServiceProvider;
         private static IConfiguration ConfigurationBuilder;
         public static void Main(string[] args)
         {
@@ -80,12 +79,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
                  }
 
-                 var eventhubConfig = ConfigurationBuilder.GetSection("EventHubLoggingConfiguration");
-
              })
              .ConfigureServices((hostContext, services) =>
              {
-                 Program.ServiceProvider = services.BuildServiceProvider();
+                 services.BuildServiceProvider();
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));

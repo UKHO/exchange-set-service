@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -39,7 +40,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             {
                 BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
                 FileSize = 4000,
-                ScsResponseUri = "https://esstestdevstorage.blob.core.windows.net/ess-fulfilment/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272.json"
+                ScsResponseUri = "https://test/ess-test/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272.json"
             };
         }
 
@@ -79,22 +80,20 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
+        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
             ScsResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
-              .Returns("Storage account accesskey not found");
-
-            string salesCatalogueResponseFile =  await fulfilmentDataService.DownloadSalesCatalogueResponse(scsResponseQueueMessage.BatchId);
+              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
                    .And.Message.EqualTo("Storage account accesskey not found")
-                    , async delegate { await fulfilmentDataService.DownloadSalesCatalogueResponse(scsResponseQueueMessage.BatchId); });
+                    , async delegate { await fulfilmentDataService.BuildExchangeSet(scsResponseQueueMessage.BatchId); });
         }
 
         [Test]
-        public async void TestKeyNotFoundExceptionWhenScsStorageAccountAccessKeyValueNotfound()
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
         {
             ScsResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueResponse();
@@ -105,9 +104,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeAzureBlobStorageClient.DownloadScsResponse(A<string>.Ignored)).Returns(salesCatalogueResponse);
 
-            string salesCatalogueResponseFile = await fulfilmentDataService.DownloadSalesCatalogueResponse(scsResponseQueueMessage.BatchId);
+            string salesCatalogueResponseFile = await fulfilmentDataService.BuildExchangeSet(scsResponseQueueMessage.BatchId);
 
-            Assert.AreEqual("Download completed Successfully!!!!",salesCatalogueResponseFile);
+            Assert.AreEqual("Received Fulfilment Data Successfully!!!!", salesCatalogueResponseFile);
         }
     }
 }

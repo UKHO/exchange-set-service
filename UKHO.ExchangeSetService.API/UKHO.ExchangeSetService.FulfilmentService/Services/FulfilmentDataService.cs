@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.storageConfig = storageConfig;
         }
 
-        public async Task<string> DownloadSalesCatalogueResponse(string batchid)
+        public async Task<string> BuildExchangeSet(string batchid)
         {
             var fssFileName = $"{batchid}-fssresponse.json";
             var scsFileName = $"{batchid}.json";
@@ -35,9 +35,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (salesCatalogueResponse?.ResponseBody?.Products != null && salesCatalogueResponse.ResponseBody.Products.Any())
             {
                 var searchBatchResponse = await queryFssService.QueryFss(salesCatalogueResponse.ResponseBody.Products);
-                var blobResult = await queryFssService.UploadFssDataToBlob(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName); 
+                await queryFssService.UploadFssDataToBlob(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName); 
             }
-            return "Download completed Successfully!!!!";
+            return "Received Fulfilment Data Successfully!!!!";
 
         }
     }

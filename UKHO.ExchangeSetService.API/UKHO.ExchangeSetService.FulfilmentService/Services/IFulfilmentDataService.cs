@@ -4,6 +4,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public interface IFulfilmentDataService
     {
-        Task<string> DownloadSalesCatalogueResponse(string batchid);
+        Task<string> BuildExchangeSet(string batchid);
     }
 }

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -25,39 +24,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileShareService = fileShareService;
             this.azureBlobStorageClient = azureBlobStorageClient;
-        }
-
-        public string GenerateQueryForFss(List<Products> products)
-        {
-            var productIndex = 1;
-            var productCount = products.Count;
-            StringBuilder sb = new StringBuilder();
-            sb.Append("(");////1st main (
-            foreach (var item in products)
-            {
-                sb.Append("(");////1st product
-                sb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
-                sb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
-                var lstCount = item.UpdateNumbers.Count;
-                var index = 1;
-                if (item.UpdateNumbers != null && item.UpdateNumbers.Any())
-                {
-                    foreach (var updateNumberItem in item.UpdateNumbers)
-                    {
-                        if (index == 1)
-                        {
-                            sb.Append("((");
-                        }
-                        sb.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, updateNumberItem.Value);
-                        sb.Append(lstCount != index ? "or " : "))");
-                        index += 1;
-                    }
-                }
-                sb.Append(productCount == productIndex ? ")" : ") or ");/////last product or with multiple
-                productIndex += 1;
-            }
-            sb.Append(")");//// last main )
-            return sb.ToString();
         }
 
         public List<Products> SliceFssProductsWithUpdateNumber(List<Products> products)
