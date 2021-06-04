@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -19,14 +18,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfiguration;
         public FulfilmentDataService fulfilmentDataService;
         public IAzureBlobStorageClient fakeAzureBlobStorageClient;
-        public IQueryFssService fakeQueryFssService;
+        public IFulfilmentFileShareService fakeQueryFssService;
 
         [SetUp]
         public void Setup()
         {
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
-            fakeQueryFssService = A.Fake<IQueryFssService>();
+            fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
@@ -47,12 +46,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         #region GetSalesCatalogueResponse
-        private SalesCatalogueResponse GetSalesCatalogueResponse()
+        private SalesCatalogueProductResponse GetSalesCatalogueResponse()
         {
-            return new SalesCatalogueResponse
-            {
-                ResponseCode = HttpStatusCode.BadRequest,
-                ResponseBody = new SalesCatalogueProductResponse
+            return  new SalesCatalogueProductResponse
                 {
                     ProductCounts = new ProductCounts
                     {
@@ -76,8 +72,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                                 FileSize = 400
                             }
                         }
-                }
-            };
+                };
         }
         #endregion
 
@@ -91,22 +86,22 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
                    .And.Message.EqualTo("Storage account accesskey not found")
-                    , async delegate { await fulfilmentDataService.BuildExchangeSet(scsResponseQueueMessage.BatchId); });
+                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage.ScsResponseUri, scsResponseQueueMessage.BatchId); });
         }
 
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-            SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueResponse();
+            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageClient.DownloadScsResponse(A<string>.Ignored)).Returns(salesCatalogueResponse);
+            A.CallTo(() => fakeAzureBlobStorageClient.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
 
-            string salesCatalogueResponseFile = await fulfilmentDataService.BuildExchangeSet(scsResponseQueueMessage.BatchId);
+            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage.ScsResponseUri, scsResponseQueueMessage.BatchId);
 
             Assert.AreEqual("Received Fulfilment Data Successfully!!!!", salesCatalogueResponseFile);
         }

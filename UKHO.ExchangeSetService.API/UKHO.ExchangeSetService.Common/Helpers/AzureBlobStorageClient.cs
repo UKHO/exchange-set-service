@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -116,6 +117,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }                
             }
             return fileSizeCount;
+        }
+
+        public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string uri)
+        {
+            string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
+            CloudBlockBlob cloudBlockBlob = GetSalesCatalogueCloudBlockBlob(uri, storageAccountConnectionString);
+
+            var responseFile = await cloudBlockBlob.DownloadTextAsync();
+            SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
+
+            return salesCatalogueProductResponse;
+        }
+
+        public CloudBlockBlob GetSalesCatalogueCloudBlockBlob(string uri, string storageAccountConnectionString)
+        {
+            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
+            return new CloudBlockBlob(new Uri(uri), cloudStorageAccount.Credentials);
         }
     }
 }

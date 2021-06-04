@@ -12,30 +12,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly ISalesCatalogueStorageService scsStorageService;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
-        private readonly IQueryFssService queryFssService;
+        private readonly IFulfilmentFileShareService fulfilmentFileShareService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
 
-        public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient, IQueryFssService queryFssService,
+        public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient, IFulfilmentFileShareService fulfilmentFileShareService,
                                      IOptions<EssFulfilmentStorageConfiguration> storageConfig)
         {
             this.scsStorageService = scsStorageService;
             this.azureBlobStorageClient = azureBlobStorageClient;
-            this.queryFssService = queryFssService;
+            this.fulfilmentFileShareService = fulfilmentFileShareService;
             this.storageConfig = storageConfig;
         }
 
-        public async Task<string> BuildExchangeSet(string batchid)
+        public async Task<string> CreateExchangeSet(string uri, string batchid)
         {
             var fssFileName = $"{batchid}-fssresponse.json";
-            var scsFileName = $"{batchid}.json";
 
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
 
-            SalesCatalogueResponse salesCatalogueResponse = await azureBlobStorageClient.DownloadScsResponse(scsFileName);
-            if (salesCatalogueResponse?.ResponseBody?.Products != null && salesCatalogueResponse.ResponseBody.Products.Any())
+            var response = await azureBlobStorageClient.DownloadSalesCatalogueResponse(uri);
+            if (response.Products != null && response.Products.Any())
             {
-                var searchBatchResponse = await queryFssService.QueryFss(salesCatalogueResponse.ResponseBody.Products);
-                await queryFssService.UploadFssDataToBlob(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName); 
+                var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(response?.Products);
+                await fulfilmentFileShareService.UploadFileShareServiceData(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             }
             return "Received Fulfilment Data Successfully!!!!";
 

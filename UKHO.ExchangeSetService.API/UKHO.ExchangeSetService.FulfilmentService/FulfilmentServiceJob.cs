@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         }
         public async Task ProcessQueueMessage([QueueTrigger("ess-fulfilment-requests")] SalesCatalogueServiceResponseQueueMessage message, ILogger logger)
         {
-            await fulFilmentDataService.BuildExchangeSet(message.BatchId);
+            await fulFilmentDataService.CreateExchangeSet(message.ScsResponseUri, message.BatchId);
             logger.LogInformation(message.BatchId);
         }
     }

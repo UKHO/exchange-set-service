@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  );
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
                  services.AddScoped<IFileShareService, FileShareService>();
-                 services.AddScoped<IQueryFssService, QueryFssService>();
+                 services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
              })
               .ConfigureWebJobs(b =>

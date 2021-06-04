@@ -12,21 +12,21 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
-    public class QueryFssService : IQueryFssService
+    public class FulfilmentFileShareService : IFulfilmentFileShareService
     {
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileShareService fileShareService;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private const string CONTENT_TYPE = "application/json";
 
-        public QueryFssService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileShareService fileShareService, IAzureBlobStorageClient azureBlobStorageClient)
+        public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileShareService fileShareService, IAzureBlobStorageClient azureBlobStorageClient)
         {
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileShareService = fileShareService;
             this.azureBlobStorageClient = azureBlobStorageClient;
         }
 
-        public List<Products> SliceFssProductsWithUpdateNumber(List<Products> products)
+        public List<Products> SliceFileShareServiceProductsWithUpdateNumber(List<Products> products)
         {
             var listSubUpdateNumberProduts = new List<Products>();
             foreach (var item in products)
@@ -62,9 +62,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfillmentDataResponse>> QueryFss(List<Products> products)
+        public async Task<List<FulfillmentDataResponse>> QueryFileShareServiceData(List<Products> products)
         {
-            var batchProducts = SliceFssProducts(products);
+            var batchProducts = SliceFileShareServiceProducts(products);
             var listBatchDetails = new List<BatchDetail>();
             foreach (var item in batchProducts)
             {
@@ -78,9 +78,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             });
         }
 
-        public IEnumerable<List<Products>> SliceFssProducts(List<Products> products)
+        public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
         {
-            return SplitList((SliceFssProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
+            return SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
         }
 
         public static IEnumerable<List<T>> SplitList<T>(List<T> products, int nSize)
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task<string> UploadFssDataToBlob(string uploadFileName, List<FulfillmentDataResponse> fulfillmentDataResponse, string storageAccountConnectionString, string containerName)
+        public async Task<string> UploadFileShareServiceData(string uploadFileName, List<FulfillmentDataResponse> fulfillmentDataResponse, string storageAccountConnectionString, string containerName)
         {
             var serializeJsonObject = JsonConvert.SerializeObject(fulfillmentDataResponse);
 
