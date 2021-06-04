@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
+    [ExcludeFromCodeCoverage] ////Excluded from code coverage as it has actual http calls 
     public class FileShareServiceClient : IFileShareServiceClient
     {
         private readonly HttpClient httpClient;

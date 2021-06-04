@@ -55,17 +55,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await azureMessageQueueHelper.AddMessage(storageConfig.Value, scsResponseQueueMessageJSON);
         }
 
-        public async Task<SalesCatalogueResponse> DownloadScsResponse(string fileName)
-        {
-            string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
-            CloudBlockBlob cloudBlockBlob = GetCloudBlockBlob(fileName, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
-
-            var responseFile = await cloudBlockBlob.DownloadTextAsync();
-            SalesCatalogueResponse salesCatalogueResponse = JsonConvert.DeserializeObject<SalesCatalogueResponse>(responseFile);
-
-            return salesCatalogueResponse;
-        }
-
         public async Task UploadSalesCatalogueServiceResponseToBlobAsync(CloudBlockBlob cloudBlockBlob , SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);            

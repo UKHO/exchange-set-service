@@ -36,6 +36,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 fakeEssFulfilmentStorageConfiguration, fakeLogger);
         }
 
+        #region GetScsResponseQueueMessage
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
             return new SalesCatalogueServiceResponseQueueMessage
@@ -47,6 +48,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
             };
         }
+        #endregion
 
         #region GetSalesCatalogueResponse
         private SalesCatalogueProductResponse GetSalesCatalogueResponse()

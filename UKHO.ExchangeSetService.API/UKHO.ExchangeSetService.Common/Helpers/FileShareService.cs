@@ -168,21 +168,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task<SearchBatchResponse> SearchBatchResponse(HttpResponseMessage httpResponse)
         {
-            var searchBatchResponse = new SearchBatchResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
-
-            if (httpResponse.StatusCode != HttpStatusCode.OK)
-            {
-                ////logger.LogError(EventIds.FSSSearchBatchNonOkResponse.ToEventId(), $"File share service search batch endpoint responded with {httpResponse.StatusCode} and message {body}");
-            }
-            else
-            {
-                searchBatchResponse = JsonConvert.DeserializeObject<SearchBatchResponse>(body);
-            }
-
-            return searchBatchResponse;
+            return JsonConvert.DeserializeObject<SearchBatchResponse>(body);
         }
-
 
         public string GenerateQueryForFss(List<Products> products)
         {
