@@ -1,9 +1,11 @@
 ﻿using Azure.Storage.Queues;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
+    [ExcludeFromCodeCoverage]
     public class AzureMessageQueueHelper : IAzureMessageQueueHelper
     {
         public async Task AddMessage(IEssFulfilmentStorageConfiguration essFulfilmentStorageConfiguration, string message)

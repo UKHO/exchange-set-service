@@ -4,6 +4,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
+    [ExcludeFromCodeCoverage]
     public class AzureBlobStorageClient : IAzureBlobStorageClient
     {
         private readonly ISalesCatalogueStorageService scsStorageService;
