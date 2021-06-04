@@ -44,17 +44,38 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         private SearchBatchResponse GetSearchBatchResponse()
         {
-            return new SearchBatchResponse() { Entries = new List<BatchDetail>() { new BatchDetail {BatchId ="test"} }, Links = new PagingLinks() };
+            return new SearchBatchResponse() { 
+                Entries = new List<BatchDetail>() { 
+                    new BatchDetail {
+                        BatchId ="test"
+                    } }, 
+                Links = new PagingLinks(), 
+                Count = 0, 
+                Total = 0 
+            };
         }
 
         [Test]
         public async Task WhenRequetsQueryFileShareServiceData_ThenReturnsFulfillmentDataResponse()
         {
-            A.CallTo(() =>  fakefileShareService.GetBatchInfoBasedOnProducts(GetProductsdetails())).Returns(GetSearchBatchResponse());
+            A.CallTo(() =>  fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored)).Returns(GetSearchBatchResponse());
 
-            await fulfilmentFileShareService.QueryFileShareServiceData(GetProductsdetails());
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductsdetails());
+
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOf(typeof(List<FulfillmentDataResponse>), result);
            
             Assert.AreEqual("Received Fulfilment Data Successfully!!!!", "Received Fulfilment Data Successfully!!!!");
+        }
+
+        [Test]
+        public async Task WhenRequetsQueryFileShareServiceData_ThenReturnsFulfillmentDataNullResponse()
+        {
+            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored)).Returns(GetSearchBatchResponse());
+
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(null);
+
+            Assert.IsNull(result);
         }
 
         [Test]
@@ -65,7 +86,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string containerName = "testContainer";
             string connectionString = "testConnectionstring";
 
-            A.CallTo(() => fakeazureBlobStorageClient.GetCloudBlockBlob("","","")).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeazureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             await fulfilmentFileShareService.UploadFileShareServiceData(uploadFileName,new List<FulfillmentDataResponse>(), connectionString, containerName);
 

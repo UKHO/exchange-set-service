@@ -64,18 +64,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<List<FulfillmentDataResponse>> QueryFileShareServiceData(List<Products> products)
         {
-            var batchProducts = SliceFileShareServiceProducts(products);
-            var listBatchDetails = new List<BatchDetail>();
-            foreach (var item in batchProducts)
+            if (products != null && products.Any())
             {
-                var result = await fileShareService.GetBatchInfoBasedOnProducts(item);
-                listBatchDetails.AddRange(result.Entries);
-            }
+                var batchProducts = SliceFileShareServiceProducts(products);
+                var listBatchDetails = new List<BatchDetail>();
+                foreach (var item in batchProducts)
+                {
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item);
+                    listBatchDetails.AddRange(result.Entries);
+                }
 
-            return SetFaltteningFulfillmentData(new SearchBatchResponse()
-            {
-                Entries = listBatchDetails
-            });
+                return SetFaltteningFulfillmentData(new SearchBatchResponse()
+                {
+                    Entries = listBatchDetails
+                }); 
+            }
+            return null;
         }
 
         public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
@@ -124,7 +128,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b=>b.Value).FirstOrDefault()),
                     ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault(),
                     UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault()),
-                    FileUri = item.Files.Select(a=>a.Links.Get.Href)
+                    FileUri = item.Files?.Select(a=>a.Links.Get.Href)
                 });
             }
             return listFulfilmentData;
