@@ -30,9 +30,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IFileShareService fakeFileShareService;
         private ILogger<FileShareService> logger;
         private IMapper fakeMapper;
-        private IExchangeSetStorageProvider fakeExchangeSetStorageProvider;
-        private ILogger<ExchangeSetStorageProvider> essLogger;
-
+        private IExchangeSetStorageProvider fakeExchangeSetStorageProvider; 
 
         [SetUp]
         public void Setup()
@@ -44,11 +42,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeMapper = A.Fake<IMapper>();
             fakeFileShareService = A.Fake<IFileShareService>();
             logger = A.Fake<ILogger<FileShareService>>();
-            fakeExchangeSetStorageProvider = A.Fake<ExchangeSetStorageProvider>();
-            essLogger = A.Fake<ILogger<ExchangeSetStorageProvider>>();
+            fakeExchangeSetStorageProvider = A.Fake<ExchangeSetStorageProvider>();            
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
-                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider, essLogger);
+                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider);
         }
 
         #region GetExchangeSetResponse
@@ -212,9 +209,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueResponse(salesCatalogueResponse, CreateBatchResponseModel.ResponseBody.BatchId)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()

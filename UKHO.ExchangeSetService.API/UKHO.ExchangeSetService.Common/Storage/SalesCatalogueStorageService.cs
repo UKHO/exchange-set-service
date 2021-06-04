@@ -4,10 +4,10 @@ using UKHO.ExchangeSetService.Common.Configuration;
 
 namespace UKHO.ExchangeSetService.Common.Storage
 {
-    public class ScsStorageService : IScsStorageService
+    public class SalesCatalogueStorageService : ISalesCatalogueStorageService
     {
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
-        public ScsStorageService(IOptions<EssFulfilmentStorageConfiguration> storageConfig)
+        public SalesCatalogueStorageService(IOptions<EssFulfilmentStorageConfiguration> storageConfig)
         {
             this.storageConfig = storageConfig;
         }

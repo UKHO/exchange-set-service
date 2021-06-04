@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
 
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
-                 services.AddScoped<IScsStorageService, ScsStorageService>();
+                 services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();

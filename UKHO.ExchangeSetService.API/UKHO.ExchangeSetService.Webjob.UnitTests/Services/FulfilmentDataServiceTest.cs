@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     [TestFixture]
     public class FulfilmentDataServiceTest
     {
-        public IScsStorageService fakeScsStorageService;
+        public ISalesCatalogueStorageService fakeScsStorageService;
         public IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfiguration;
         public FulfilmentDataService fulfilmentDataService;
         public IAzureBlobStorageClient fakeAzureBlobStorageClient;
@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [SetUp]
         public void Setup()
         {
-            fakeScsStorageService = A.Fake<IScsStorageService>();
+            fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
             fakeQueryFssService = A.Fake<IQueryFssService>();
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
@@ -34,13 +34,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 fakeEssFulfilmentStorageConfiguration);
         }
 
-        private ScsResponseQueueMessage GetScsResponseQueueMessage()
+        private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
-            return new ScsResponseQueueMessage
+            return new SalesCatalogueServiceResponseQueueMessage
             {
                 BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
                 FileSize = 4000,
-                ScsResponseUri = "https://test/ess-test/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272.json"
+                ScsResponseUri = "https://test/ess-test/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272.json",
+                CallbackUri = "https://test-callbackuri.com",
+                CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
             };
         }
 
@@ -82,7 +84,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
-            ScsResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
@@ -95,7 +97,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
         {
-            ScsResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueResponse();
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
 

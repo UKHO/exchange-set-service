@@ -10,12 +10,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public class FulfilmentDataService : IFulfilmentDataService
     {
-        private readonly IScsStorageService scsStorageService;
+        private readonly ISalesCatalogueStorageService scsStorageService;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private readonly IQueryFssService queryFssService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
 
-        public FulfilmentDataService(IScsStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient, IQueryFssService queryFssService,
+        public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient, IQueryFssService queryFssService,
                                      IOptions<EssFulfilmentStorageConfiguration> storageConfig)
         {
             this.scsStorageService = scsStorageService;
