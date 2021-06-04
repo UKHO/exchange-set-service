@@ -6,12 +6,12 @@ resource "azurerm_storage_account" "storage" {
   account_replication_type = "LRS"
   account_kind = "StorageV2"
 
-  network_rules {
+  /*network_rules {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
     bypass                     = ["Logging", "Metrics", "AzureServices"]
     virtual_network_subnet_ids = [var.subnet_id]
-  }
+  }*/
 
   tags = var.tags
 }
