@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public FulfilmentDataService fulfilmentDataService;
         public IAzureBlobStorageClient fakeAzureBlobStorageClient;
         public IFulfilmentFileShareService fakeQueryFssService;
+        public ILogger<FulfilmentDataService> fakeLogger;
 
         [SetUp]
         public void Setup()
@@ -26,11 +28,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
+            fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
             fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageClient, fakeQueryFssService,
-                fakeEssFulfilmentStorageConfiguration);
+                fakeEssFulfilmentStorageConfiguration, fakeLogger);
         }
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()

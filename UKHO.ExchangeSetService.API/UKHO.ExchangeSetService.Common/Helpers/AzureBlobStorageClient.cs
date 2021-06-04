@@ -121,12 +121,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string uri)
         {
+            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataStart.ToEventId(), "Sales catalogue response download start from blob for the {uri}", uri);
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
             CloudBlockBlob cloudBlockBlob = GetSalesCatalogueCloudBlockBlob(uri, storageAccountConnectionString);
 
             var responseFile = await cloudBlockBlob.DownloadTextAsync();
             SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
-
+            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the {uri}", uri);
             return salesCatalogueProductResponse;
         }
 

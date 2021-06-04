@@ -110,7 +110,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             HttpResponseMessage httpResponse;
 
             string payloadJson = string.Empty;
-            var demoList = new List<string>();
+            var productList = new List<string>();
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
             do
             {
@@ -120,9 +120,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
                     actualSearchBatchResponse.Count = searchBatchResponse.Count;
-                    foreach (var productItem in products) ////(var item in searchBatchResponse.Entries)
+                    foreach (var productItem in products)
                     {
-                        foreach (var item in searchBatchResponse.Entries)////(var productItem in products)
+                        foreach (var item in searchBatchResponse.Entries)
                         {
                             if (CheckProductDoesExistInResponseItem(item, productItem) && CheckEditionNumberDoesExistInResponseItem(item, productItem)
                                 && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
@@ -130,19 +130,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
                                 var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
                                 var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
-                                if (!demoList.Contains(compareProducts))
+                                if (!productList.Contains(compareProducts))
                                 {
                                     internalSearchBatchResponse.Entries.Add(item);
-                                    demoList.Add(compareProducts);
+                                    productList.Add(compareProducts);
                                 }
                             }
                         }
                     }
                     uri = searchBatchResponse.Links.Next?.Href;
                 }
-            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count < prodCount);//// && actualSearchBatchResponse.Links.Next != null);
-
-            logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestCompleted.ToEventId(), "FSS service response for rrespective {internalSearchBatchResponse}", JsonConvert.SerializeObject(internalSearchBatchResponse));
+                else
+                {
+                    logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "File share service with uri {RequestUri} and responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
+                }
+            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count < prodCount);
 
             return internalSearchBatchResponse;
         }
