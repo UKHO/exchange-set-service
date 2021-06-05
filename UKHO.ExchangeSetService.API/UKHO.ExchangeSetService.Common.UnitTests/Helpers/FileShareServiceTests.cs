@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -13,6 +14,9 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
+
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -29,7 +33,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             this.fakeLogger = A.Fake<ILogger<FileShareService>>();
             this.fakeAuthTokenProvider = A.Fake<IAuthTokenProvider>();
-            this.fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration() { BaseUrl = "" });
+            this.fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration()
+                                       { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
 
 
@@ -43,8 +48,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             return new CreateBatchResponseModel()
             {
                 BatchId = batchId,
-                BatchStatusUri = $"/batch/{batchId}",
-                ExchangeSetFileUri = $"/batch/{batchId}/files/",
+                BatchStatusUri = $"http://tempuri.org/batch/{batchId}",
+                ExchangeSetFileUri = $"http://tempuri.org/batch/{batchId}/files/",
                 BatchExpiryDateTime = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
             };
         }
@@ -54,6 +59,41 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private static string GetFakeToken()
         {
             return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0ZXN0IHNlcnZlciIsImlhdCI6MTU1ODMyOTg2MCwiZXhwIjoxNTg5OTUyMjYwLCJhdWQiOiJ3d3cudGVzdC5jb20iLCJzdWIiOiJ0ZXN0dXNlckB0ZXN0LmNvbSIsIm9pZCI6IjE0Y2I3N2RjLTFiYTUtNDcxZC1hY2Y1LWEwNDBkMTM4YmFhOSJ9.uOPTbf2Tg6M2OIC6bPHsBAOUuFIuCIzQL_MV3qV6agc";
+        }
+        #endregion
+
+        #region GetProductdetails
+        private List<Products> GetProductdetails()
+        {
+            return new List<Products> {
+                            new Products {
+                                ProductName = "DE416050",
+                                EditionNumber = 0,
+                                UpdateNumbers = new List<int?> {0},
+                                FileSize = 400
+                            }
+                        };
+        }
+        #endregion
+
+        #region GetSearchBatchResponse
+        private SearchBatchResponse GetSearchBatchResponse()
+        {
+            return new SearchBatchResponse()
+            {
+                Entries = new List<BatchDetail>() {
+                    new BatchDetail {
+                        BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc",
+                        Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416050" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                    } },
+                Links = new PagingLinks(),
+                Count = 0,
+                Total = 0
+            };
         }
         #endregion
 
@@ -126,5 +166,51 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         #endregion CreateBatch
+
+        #region GetBatchInfoBasedOnProducts
+        [Test]
+        public async Task WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsNullResponse()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
+
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails());
+            Assert.AreEqual(0, response.Entries.Count);
+        }
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponse()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+               })
+               .Returns(httpResponse);
+
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails());
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
+            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+        }
+
+        #endregion GetBatchInfoBasedOnProducts
     }
 }

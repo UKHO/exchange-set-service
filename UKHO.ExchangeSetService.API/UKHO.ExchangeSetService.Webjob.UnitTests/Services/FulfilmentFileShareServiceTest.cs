@@ -30,13 +30,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeazureBlobStorageClient);
         }
-        private List<Products> GetProductsdetails()
+        private List<Products> GetProductdetails()
         {
             return new List<Products> {
                             new Products {
-                                ProductName = "productName",
-                                EditionNumber = 2,
-                                UpdateNumbers = new List<int?> {3,4},
+                                ProductName = "DE5NOBRK",
+                                EditionNumber = 0,
+                                UpdateNumbers = new List<int?> {0,1},
                                 FileSize = 400
                             }
                         };
@@ -44,14 +44,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         private SearchBatchResponse GetSearchBatchResponse()
         {
-            return new SearchBatchResponse() { 
-                Entries = new List<BatchDetail>() { 
+            return new SearchBatchResponse()
+            {
+                Entries = new List<BatchDetail>() {
                     new BatchDetail {
-                        BatchId ="test"
-                    } }, 
-                Links = new PagingLinks(), 
-                Count = 0, 
-                Total = 0 
+                        BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
+                    } },
+                Links = new PagingLinks(),
+                Count = 0,
+                Total = 0
             };
         }
 
@@ -60,7 +61,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             A.CallTo(() =>  fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored)).Returns(GetSearchBatchResponse());
 
-            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductsdetails());
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails());
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOf(typeof(List<FulfillmentDataResponse>), result);
@@ -88,9 +89,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeazureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
-            await fulfilmentFileShareService.UploadFileShareServiceData(uploadFileName,new List<FulfillmentDataResponse>(), connectionString, containerName);
+            var result = await fulfilmentFileShareService.UploadFileShareServiceData(uploadFileName,new List<FulfillmentDataResponse>(), connectionString, containerName);
 
-            Assert.AreEqual("Received Fulfilment Data Successfully!!!!", "Received Fulfilment Data Successfully!!!!");
+            Assert.AreEqual("http://tempuri.org/blob", result);
         }
     }
 }
