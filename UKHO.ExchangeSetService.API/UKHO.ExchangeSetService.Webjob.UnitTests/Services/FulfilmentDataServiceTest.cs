@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ISalesCatalogueStorageService fakeScsStorageService;
         public IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfiguration;
         public FulfilmentDataService fulfilmentDataService;
-        public IAzureBlobStorageClient fakeAzureBlobStorageClient;
+        public IAzureBlobStorageService fakeAzureBlobStorageClient;
         public IFulfilmentFileShareService fakeQueryFssService;
         public ILogger<FulfilmentDataService> fakeLogger;
 
@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void Setup()
         {
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
-            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
+            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageService>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 

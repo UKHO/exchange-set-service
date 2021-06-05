@@ -10,9 +10,9 @@ namespace UKHO.ExchangeSetService.Common.Storage
     public class ExchangeSetStorageProvider : IExchangeSetStorageProvider
     {
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
-        private readonly IAzureBlobStorageClient azureBlobStorageClient;
+        private readonly IAzureBlobStorageService azureBlobStorageClient;
         public ExchangeSetStorageProvider(IOptions<EssFulfilmentStorageConfiguration> storageConfig,
-            IAzureBlobStorageClient azureBlobStorageClient)
+            IAzureBlobStorageService azureBlobStorageClient)
         {
             this.storageConfig = storageConfig;
             this.azureBlobStorageClient = azureBlobStorageClient;

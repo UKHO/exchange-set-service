@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequetsQueryFileShareServiceData_ThenReturnsFulfillmentDataResponse()
+        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfillmentDataResponse()
         {
             A.CallTo(() =>  fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored)).Returns(GetSearchBatchResponse());
 
@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequetsQueryFileShareServiceData_ThenReturnsFulfillmentDataNullResponse()
+        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfillmentDataNullResponse()
         {
             A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored)).Returns(GetSearchBatchResponse());
 
@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequetsUploadFileShareServiceData_ThenReturnsCloudBlockBlobUri()
+        public async Task WhenRequestUploadFileShareServiceData_ThenReturnsCloudBlockBlobUri()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string uploadFileName = string.Concat(batchId, ".json");

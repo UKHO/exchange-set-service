@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             using (var ms = new MemoryStream())
             {
                 LoadStreamWithJson(ms, serializeJsonObject);
-                await cloudBlockBlob.UploadFromStreamAsync(ms);
+                await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob, ms);
             }            
             return cloudBlockBlob.Uri.AbsoluteUri;
         }

@@ -12,12 +12,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public class FulfilmentDataService : IFulfilmentDataService
     {
         private readonly ISalesCatalogueStorageService scsStorageService;
-        private readonly IAzureBlobStorageClient azureBlobStorageClient;
+        private readonly IAzureBlobStorageService azureBlobStorageClient;
         private readonly IFulfilmentFileShareService fulfilmentFileShareService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly ILogger<FulfilmentDataService> logger;
 
-        public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageClient azureBlobStorageClient, 
+        public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageService azureBlobStorageClient, 
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     IOptions<EssFulfilmentStorageConfiguration> storageConfig, ILogger<FulfilmentDataService> logger)
         {
@@ -29,8 +29,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
 
         public async Task<string> CreateExchangeSet(string uri, string batchid)
-        {
-            logger.LogInformation(EventIds.CreateExchangeSetRequestStart.ToEventId(), "Create Exchange Set web job started for {batchid}", batchid);
+        {            
             var fssFileName = $"{batchid}-fssresponse.json";
 
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
@@ -45,7 +44,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await fulfilmentFileShareService.UploadFileShareServiceData(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             }
 
-            logger.LogInformation(EventIds.CreateExchangeSetRequestCompleted.ToEventId(), "Create Exchange Set web job completed for {batchid}", batchid);
             return "Received Fulfilment Data Successfully!!!!";
         }
     }

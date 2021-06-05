@@ -16,13 +16,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Storage
     {
         private ExchangeSetStorageProvider service;
         private IOptions<EssFulfilmentStorageConfiguration> fakeStorageConfig;
-        private IAzureBlobStorageClient fakeAzureBlobStorageClient;
+        private IAzureBlobStorageService fakeAzureBlobStorageClient;
 
         [SetUp]
         public void Setup()
         {
             fakeStorageConfig = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
-            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
+            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageService>();
             service = new ExchangeSetStorageProvider(fakeStorageConfig, fakeAzureBlobStorageClient);
         }
 
