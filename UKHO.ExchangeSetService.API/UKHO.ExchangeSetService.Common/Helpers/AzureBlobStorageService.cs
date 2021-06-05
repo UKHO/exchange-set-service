@@ -107,7 +107,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
             CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, storageAccountConnectionString);
 
-            var responseFile = await cloudBlockBlob.DownloadTextAsync();
+            var responseFile = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
             SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
             
             logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the {scsResponseUri}", scsResponseUri);

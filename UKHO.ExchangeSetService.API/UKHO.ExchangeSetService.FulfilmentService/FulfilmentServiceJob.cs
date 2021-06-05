@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -8,6 +9,7 @@ using UKHO.ExchangeSetService.FulfilmentService.Services;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
+    [ExcludeFromCodeCoverage]
     public class FulfilmentServiceJob
     {
         private readonly IFulfilmentDataService fulFilmentDataService;

@@ -83,6 +83,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
             services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
             services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
+            services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
             services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

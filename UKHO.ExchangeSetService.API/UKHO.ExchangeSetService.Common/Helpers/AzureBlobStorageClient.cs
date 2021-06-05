@@ -28,5 +28,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             await cloudBlockBlob.UploadFromStreamAsync(ms);
         }
+        public async Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob)
+        {
+             return await cloudBlockBlob.DownloadTextAsync();
+        }
     }
 }

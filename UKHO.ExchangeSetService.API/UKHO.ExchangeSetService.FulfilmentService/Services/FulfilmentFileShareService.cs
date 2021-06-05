@@ -131,7 +131,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     FileUri = item.Files?.Select(a=>a.Links.Get.Href)
                 });
             }
-            return listFulfilmentData;
+            return listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
         }
     }
 }

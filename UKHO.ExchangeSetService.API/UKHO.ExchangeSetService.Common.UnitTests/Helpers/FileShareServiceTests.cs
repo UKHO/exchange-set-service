@@ -84,6 +84,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Entries = new List<BatchDetail>() {
                     new BatchDetail {
                         BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc",
+                        Files= new List<BatchFile>(){ new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" }}}},
                         Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "0" } ,
