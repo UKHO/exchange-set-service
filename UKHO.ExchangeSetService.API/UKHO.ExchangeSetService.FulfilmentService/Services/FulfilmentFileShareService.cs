@@ -31,19 +31,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var listSubUpdateNumberProduts = new List<Products>();
             foreach (var item in products)
             {
-                var limit = fileShareServiceConfig.Value.UpdateNumberLimit;
-                // assume our list of integers it called values
-                var splitByUpdateLimit = item.UpdateNumbers.Aggregate(new List<List<int?>> { new List<int?>() },
-                                       (list, value) =>
-                                       {
-                                           list.Last().Add(value);
-                                           if (value >= limit)
-                                           {
-                                               limit = value.Value + fileShareServiceConfig.Value.UpdateNumberLimit;
-                                               list.Add(new List<int?>());
-                                           }
-                                           return list;
-                                       });
+                var splitByUpdateLimit = SplitList(item.UpdateNumbers, fileShareServiceConfig.Value.UpdateNumberLimit);
 
                 if (splitByUpdateLimit != null && splitByUpdateLimit.Any())
                 {

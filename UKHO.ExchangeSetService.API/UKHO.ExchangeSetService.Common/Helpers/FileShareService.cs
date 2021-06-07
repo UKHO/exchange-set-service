@@ -120,9 +120,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
                     actualSearchBatchResponse.Count = searchBatchResponse.Count;
-                    foreach (var productItem in products)
+                    foreach (var item in searchBatchResponse.Entries) 
                     {
-                        foreach (var item in searchBatchResponse.Entries)
+                        foreach (var productItem in products)
                         {
                             if (CheckProductDoesExistInResponseItem(item, productItem) && CheckEditionNumberDoesExistInResponseItem(item, productItem)
                                 && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
@@ -137,14 +137,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 }
                             }
                         }
+                        uri = searchBatchResponse.Links.Next?.Href;
                     }
-                    uri = searchBatchResponse.Links.Next?.Href;
                 }
                 else
                 {
                     logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "File share service with uri {RequestUri} and responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
                 }
-            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count < prodCount);
+            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount);
 
             return internalSearchBatchResponse;
         }
