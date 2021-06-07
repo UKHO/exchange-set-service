@@ -9,12 +9,12 @@ resource "azurerm_key_vault" "kv" {
 
   sku_name = "standard"
 
-  /*network_acls {
+  network_acls {
     default_action             = "Deny"
     bypass                     = "AzureServices"
     ip_rules                   = concat(var.allowed_ips, var.trusted_ips)
     virtual_network_subnet_ids = [var.subnet_id]
-  }*/
+  }
 
   tags = var.tags
 
