@@ -10,17 +10,17 @@ namespace UKHO.ExchangeSetService.Common.Storage
     public class ExchangeSetStorageProvider : IExchangeSetStorageProvider
     {
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
-        private readonly IAzureBlobStorageService azureBlobStorageClient;
+        private readonly IAzureBlobStorageService azureBlobStorageService;
         public ExchangeSetStorageProvider(IOptions<EssFulfilmentStorageConfiguration> storageConfig,
-            IAzureBlobStorageService azureBlobStorageClient)
+            IAzureBlobStorageService azureBlobStorageService)
         {
             this.storageConfig = storageConfig;
-            this.azureBlobStorageClient = azureBlobStorageClient;
+            this.azureBlobStorageService = azureBlobStorageService;
         }
 
         public virtual async Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId)
         {
-            return await azureBlobStorageClient.StoreSaleCatalogueServiceResponseAsync(storageConfig.Value.StorageContainerName, batchId, salesCatalogueResponse, callBackUri, correlationId, CancellationToken.None);
+            return await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(storageConfig.Value.StorageContainerName, batchId, salesCatalogueResponse, callBackUri, correlationId, CancellationToken.None);
         }
 
     }

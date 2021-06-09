@@ -12,17 +12,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public class FulfilmentDataService : IFulfilmentDataService
     {
         private readonly ISalesCatalogueStorageService scsStorageService;
-        private readonly IAzureBlobStorageService azureBlobStorageClient;
+        private readonly IAzureBlobStorageService azureBlobStorageService;
         private readonly IFulfilmentFileShareService fulfilmentFileShareService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly ILogger<FulfilmentDataService> logger;
 
-        public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageService azureBlobStorageClient, 
+        public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageService azureBlobStorageService, 
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     IOptions<EssFulfilmentStorageConfiguration> storageConfig, ILogger<FulfilmentDataService> logger)
         {
             this.scsStorageService = scsStorageService;
-            this.azureBlobStorageClient = azureBlobStorageClient;
+            this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
             this.storageConfig = storageConfig;
             this.logger = logger;
@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
 
-            var response = await azureBlobStorageClient.DownloadSalesCatalogueResponse(uri);
+            var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(uri);
             if (response.Products != null && response.Products.Any())
             {
                 logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {batchid}", batchid);

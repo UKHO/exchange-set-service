@@ -99,9 +99,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products)
         {
-            SearchBatchResponse actualSearchBatchResponse = new SearchBatchResponse();
             SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
-            actualSearchBatchResponse.Entries = new List<BatchDetail>();
             internalSearchBatchResponse.Entries = new List<BatchDetail>();
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var productWithAttributes = GenerateQueryForFss(products);
@@ -118,27 +116,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
-                    actualSearchBatchResponse.Count = searchBatchResponse.Count;
-                    foreach (var item in searchBatchResponse.Entries) 
-                    {
-                        foreach (var productItem in products)
-                        {
-                            if (CheckProductDoesExistInResponseItem(item, productItem) && CheckEditionNumberDoesExistInResponseItem(item, productItem)
-                                && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
-                            {
-                                var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
-                                var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
-                                var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
-                                if (!productList.Contains(compareProducts))
-                                {
-                                    internalSearchBatchResponse.Entries.Add(item);
-                                    productList.Add(compareProducts);
-                                }
-                            }
-                        }
-                        uri = searchBatchResponse.Links.Next?.Href;
-                    }
+                    uri = await SelectLatestPublishedDateBatch(products, internalSearchBatchResponse, uri, httpResponse, productList);
                 }
                 else
                 {
@@ -147,6 +125,32 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount);
 
             return internalSearchBatchResponse;
+        }
+
+        private async Task<string> SelectLatestPublishedDateBatch(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string uri, HttpResponseMessage httpResponse, List<string> productList)
+        {
+            SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+            foreach (var item in searchBatchResponse.Entries)
+            {
+                foreach (var productItem in products)
+                {
+                    if (CheckProductDoesExistInResponseItem(item, productItem) && CheckEditionNumberDoesExistInResponseItem(item, productItem)
+                        && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
+                    {
+                        var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
+                        var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
+                        var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
+                        if (!productList.Contains(compareProducts))
+                        {
+                            internalSearchBatchResponse.Entries.Add(item);
+                            productList.Add(compareProducts);
+                        }
+                    }
+                }
+                uri = searchBatchResponse.Links.Next?.Href;
+            }
+
+            return uri;
         }
 
         public bool CheckProductDoesExistInResponseItem(BatchDetail batchDetail, Products product)

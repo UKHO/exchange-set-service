@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     listBatchDetails.AddRange(result.Entries);
                 }
 
-                return SetFaltteningFulfillmentData(new SearchBatchResponse()
+                return SetFulfillmentDataResponse(new SearchBatchResponse()
                 {
                     Entries = listBatchDetails
                 }); 
@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             ms.Position = 0;
         }
 
-        private List<FulfillmentDataResponse> SetFaltteningFulfillmentData(SearchBatchResponse searchBatchResponse)
+        private List<FulfillmentDataResponse> SetFulfillmentDataResponse(SearchBatchResponse searchBatchResponse)
         {
             var listFulfilmentData = new List<FulfillmentDataResponse>();
             foreach (var item in searchBatchResponse.Entries)
