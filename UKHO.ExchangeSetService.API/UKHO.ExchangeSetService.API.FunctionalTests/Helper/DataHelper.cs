@@ -24,5 +24,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080" };         
             
         }
+
+        public List<string> GetOnlyProductIdentifierData()
+        {
+            return new List<string>() { "DE260001" };
+
+        }
     }
 }

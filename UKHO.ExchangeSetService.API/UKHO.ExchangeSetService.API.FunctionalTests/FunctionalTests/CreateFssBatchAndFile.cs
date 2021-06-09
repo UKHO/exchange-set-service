@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssJwtToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetOnlyProductIdentifierData(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //verify FssBatchResponse
