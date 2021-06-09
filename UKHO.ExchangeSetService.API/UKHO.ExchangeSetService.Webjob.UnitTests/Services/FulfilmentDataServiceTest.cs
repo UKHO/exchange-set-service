@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
                    .And.Message.EqualTo("Storage account accesskey not found")
-                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage.ScsResponseUri, scsResponseQueueMessage.BatchId); });
+                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage); });
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
 
-            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage.ScsResponseUri, scsResponseQueueMessage.BatchId);
+            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 
             Assert.AreEqual("Received Fulfilment Data Successfully!!!!", salesCatalogueResponseFile);
         }

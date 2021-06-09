@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
@@ -28,18 +29,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.logger = logger;
         }
 
-        public async Task<string> CreateExchangeSet(string uri, string batchid)
+        public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message)
         {            
-            var fssFileName = $"{batchid}-fssresponse.json";
+            var fssFileName = $"{message.BatchId}-fssresponse.json";
 
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
 
-            var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(uri);
+            var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri);
             if (response.Products != null && response.Products.Any())
             {
-                logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {batchid}", batchid);
+                logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
                 var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(response?.Products);
-                logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for {batchid}", batchid);
+                logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for {BatchId}", message.BatchId);
 
                 await fulfilmentFileShareService.UploadFileShareServiceData(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             }

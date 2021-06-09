@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         {
             logger.LogInformation(EventIds.CreateExchangeSetRequestStart.ToEventId(), "Create Exchange Set web job started for {BatchId}", message.BatchId);
             
-            await fulFilmentDataService.CreateExchangeSet(message.ScsResponseUri, message.BatchId);
+            await fulFilmentDataService.CreateExchangeSet(message);
             
             logger.LogInformation(EventIds.CreateExchangeSetRequestCompleted.ToEventId(), "Create Exchange Set web job completed for {BatchId}", message.BatchId);
         }
