@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ISalesCatalogueStorageService fakeScsStorageService;
         public IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfiguration;
         public FulfilmentDataService fulfilmentDataService;
-        public IAzureBlobStorageService fakeAzureBlobStorageClient;
+        public IAzureBlobStorageService fakeAzureBlobStorageService;
         public IFulfilmentFileShareService fakeQueryFssService;
         public ILogger<FulfilmentDataService> fakeLogger;
 
@@ -26,13 +26,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void Setup()
         {
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
-            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageService>();
+            fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
-            fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageClient, fakeQueryFssService,
+            fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageService, fakeQueryFssService,
                 fakeEssFulfilmentStorageConfiguration, fakeLogger);
         }
 
@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageClient.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage.ScsResponseUri, scsResponseQueueMessage.BatchId);
 
