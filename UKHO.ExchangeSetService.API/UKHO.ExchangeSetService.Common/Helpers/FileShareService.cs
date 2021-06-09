@@ -8,11 +8,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -93,6 +95,118 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
 
             return createBatchResponse;
+        }
+
+        public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products)
+        {
+            SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
+            internalSearchBatchResponse.Entries = new List<BatchDetail>();
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var productWithAttributes = GenerateQueryForFss(products);
+            var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes}";
+
+            HttpResponseMessage httpResponse;
+
+            string payloadJson = string.Empty;
+            var productList = new List<string>();
+            var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
+            do
+            {
+                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    uri = await SelectLatestPublishedDateBatch(products, internalSearchBatchResponse, uri, httpResponse, productList);
+                }
+                else
+                {
+                    logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "File share service with uri {RequestUri} and responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
+                }
+            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount);
+
+            return internalSearchBatchResponse;
+        }
+
+        private async Task<string> SelectLatestPublishedDateBatch(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string uri, HttpResponseMessage httpResponse, List<string> productList)
+        {
+            SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+            foreach (var item in searchBatchResponse.Entries)
+            {
+                foreach (var productItem in products)
+                {
+                    if (CheckProductDoesExistInResponseItem(item, productItem) && CheckEditionNumberDoesExistInResponseItem(item, productItem)
+                        && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
+                    {
+                        var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
+                        var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
+                        var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
+                        if (!productList.Contains(compareProducts))
+                        {
+                            internalSearchBatchResponse.Entries.Add(item);
+                            productList.Add(compareProducts);
+                        }
+                    }
+                }
+                uri = searchBatchResponse.Links.Next?.Href;
+            }
+
+            return uri;
+        }
+
+        public bool CheckProductDoesExistInResponseItem(BatchDetail batchDetail, Products product)
+        {
+            return batchDetail.Attributes.Any(a => a.Key == "CellName" && a.Value == product.ProductName);
+        }
+
+        public bool CheckEditionNumberDoesExistInResponseItem(BatchDetail batchDetail, Products product)
+        {
+            return batchDetail.Attributes.Any(a => a.Key == "EditionNumber" && product.EditionNumber.Value.ToString() == a.Value);
+        }
+
+        public bool CheckUpdateNumberDoesExistInResponseItem(BatchDetail batchDetail, Products product)
+        {
+            var matchProduct = batchDetail.Attributes.Where(a => a.Key == "UpdateNumber");
+            var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
+            return product.UpdateNumbers.Where(x => x.Value.ToString() == updateNumber).ToList().Count > 0;
+        }
+
+        private async Task<SearchBatchResponse> SearchBatchResponse(HttpResponseMessage httpResponse)
+        {
+            var body = await httpResponse.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<SearchBatchResponse>(body);
+        }
+
+        public string GenerateQueryForFss(List<Products> products)
+        {
+            var productIndex = 1;
+            var productCount = products.Count;
+            StringBuilder sb = new StringBuilder();
+            sb.Append("(");////1st main (
+            foreach (var item in products)
+            {
+                sb.Append("(");////1st product
+                sb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
+                sb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
+                var lstCount = item.UpdateNumbers.Count;
+                var index = 1;
+                if (item.UpdateNumbers != null && item.UpdateNumbers.Any())
+                {
+                    foreach (var updateNumberItem in item.UpdateNumbers)
+                    {
+                        if (index == 1)
+                        {
+                            sb.Append("((");
+                        }
+                        sb.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, updateNumberItem.Value);
+                        sb.Append(lstCount != index ? "or " : "))");
+                        index += 1;
+                    }
+                }
+                sb.Append(productCount == productIndex ? ")" : ") or ");/////last product or with multiple
+                productIndex += 1;
+            }
+            sb.Append(")");//// last main )
+            return sb.ToString();
         }
     }
 }

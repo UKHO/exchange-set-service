@@ -16,6 +16,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.API.Filters
 {
+    [ExcludeFromCodeCoverage]   //Used in Startup.cs
     public static class LoggingMiddleware
     {
         private const string RedactedValue = "********";
@@ -23,7 +24,6 @@ namespace UKHO.ExchangeSetService.API.Filters
         private const int maxBodyCharSize = 1000;
         private const int truncatedBodyCharSize = 987;
 
-        [ExcludeFromCodeCoverage]   //Used in Startup.cs
         public static IApplicationBuilder UseErrorLogging(this IApplicationBuilder appBuilder, ILoggerFactory loggerFactory)
         {
             return appBuilder.Use(async (context, func) =>
@@ -42,7 +42,6 @@ namespace UKHO.ExchangeSetService.API.Filters
             });
         }
 
-        [ExcludeFromCodeCoverage]
         public static IApplicationBuilder UseLogAllRequestsAndResponses(this IApplicationBuilder appBuilder, ILoggerFactory loggerFactory)
         {
             return appBuilder.Use(async (context, func) =>
