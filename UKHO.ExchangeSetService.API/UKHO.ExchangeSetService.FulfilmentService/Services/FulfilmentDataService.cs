@@ -17,15 +17,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentFileShareService fulfilmentFileShareService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly ILogger<FulfilmentDataService> logger;
+        private readonly IFileShareService fileShareService;
 
         public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageService azureBlobStorageService, 
                                     IFulfilmentFileShareService fulfilmentFileShareService,
-                                    IOptions<EssFulfilmentStorageConfiguration> storageConfig, ILogger<FulfilmentDataService> logger)
+                                    IOptions<EssFulfilmentStorageConfiguration> storageConfig,
+                                    ILogger<FulfilmentDataService> logger,
+                                    IFileShareService fileShareService)
         {
             this.scsStorageService = scsStorageService;
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
             this.storageConfig = storageConfig;
+            this.fileShareService = fileShareService;
             this.logger = logger;
         }
 
@@ -41,10 +45,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
                 var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(response?.Products);
                 logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for {BatchId}", message.BatchId);
-
                 await fulfilmentFileShareService.UploadFileShareServiceData(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             }
-
+            await fileShareService.DownloadReadMeTextFile(message.BatchId);
             return "Received Fulfilment Data Successfully!!!!";
         }
     }

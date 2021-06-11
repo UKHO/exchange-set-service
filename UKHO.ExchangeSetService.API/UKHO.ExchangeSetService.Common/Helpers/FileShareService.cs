@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -24,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-
+        
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -37,8 +38,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjIzMzMzODAzLCJuYmYiOjE2MjMzMzM4MDMsImV4cCI6MTYyMzMzNzcwMywiYWNyIjoiMSIsImFpbyI6IkFZUUFlLzhUQUFBQVZkME9PVHg3Sm4yMWZCTVZlTE1CNTRhL0JoaHJOOXJweXhqWklyNUIvUEI1a0dXbzNXeVlrR2V2RXNpT3pkU3gxb25JNFhYR3ZCeW5veC9rUmNtWTB3TWJWck5pYXBieStGME8vakp5dEp5QTVtdmZDZGpNWVJMY2hqdmpCZ1lIOWJYNzl3TUZudWVsM3NTcEg4RGhoWms0RUpJOFVEbzd5cm5CWU94RktZND0iLCJhbXIiOlsicHdkIiwibWZhIl0sImFwcGlkIjoiODA1YmUwMjQtYTIwOC00MGZiLWFiNmYtMzk5YzI2NDdkMzM0IiwiYXBwaWRhY3IiOiIwIiwiZW1haWwiOiJhdmFuaTEzNzA5QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMjAzLjE5NC4xMDQuMTYiLCJuYW1lIjoiQXZhbmkgU2FsZWthciIsIm9pZCI6ImFmN2Q4M2NiLWRhZWQtNGNiZi05M2ViLTc0NWNhNmNjYjZhNCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBSWcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoicjdpcVRxMTNMTEM5RHhlN0JmVy1udHR4amcwRzk1ZjhXaENUa2E0Ukx0MCIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiYXZhbmkxMzcwOUBtYXN0ZWsuY29tIiwidXRpIjoiUjd3eG42VjRsVTY1aUFRTFZBWWhBQSIsInZlciI6IjEuMCJ9.MvZg0VYqlVhOimspmKuTQylqY7YrzFpCEXJSyZVt_7vB_Z6_Eu5DBMzr3DU-CH-zvTZ6nIEYR-H5mbvx7STNQyh2Uog_l2nZSpHSFyrnOHWiDQ6Y1jqArOIOdbcxP9tTp_V1EqagkLs51mY_TJbASiezVz9fU2_jaenHrV0FmCUaIDoc2xWLib54abv5LnlDisjqcfxc9t4AuuQ-b363xamS70VpHjkneY4DirDRQZRWnwZ2AoKNm0wYP-BG4OCPJBxUgB_qLw6UQeM7oc3ktJztGSONAmW0ndVdpyeS8HMltVq8KF-m1uVExV6-JWAcl4tZyWuTDGorl9GS7ZVKmw";
             var jwtSecurityToken = new JwtSecurityToken(accessToken);
             var oid = jwtSecurityToken.Claims.FirstOrDefault(m => m.Type == "oid").Value;
             var uri = $"/batch";
@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
-            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
+            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);            
             return createBatchResponse;                               
         }
 
@@ -207,6 +207,49 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             sb.Append(")");//// last main )
             return sb.ToString();
+        }
+        public async Task<bool> DownloadReadMeTextFile(string batchId)
+        {
+            string payloadJson = string.Empty;
+            bool result = false;
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq {fileShareServiceConfig.Value.ReadMeFileName} and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var filePath = string.Format(fileShareServiceConfig.Value.FileDownloadPath, DateTime.UtcNow.ToString("ddMMMyyyy"), batchId, "V01X01", "ENC_ROOT");
+                if (!Directory.Exists(filePath))
+                {
+                    Directory.CreateDirectory(filePath);
+                }
+                string path = Path.Combine(filePath, fileShareServiceConfig.Value.ReadMeFileName);
+                using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+                {
+                    using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        outputFileStream.Position = 0;
+                        int line_to_edit = 2;
+                        StringBuilder lineToWrite = new StringBuilder();
+                        lineToWrite.AppendLine("File date:");
+                        lineToWrite.AppendLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            string line = reader.ReadLine();
+                            for (int i = 0; i <= line_to_edit; ++i)
+                            {
+                                if (line.Contains("Last"))
+                                {
+                                    line = lineToWrite.ToString();
+                                }
+                            }
+                        }
+                        stream.CopyTo(outputFileStream);
+                        result = true;
+                    }
+                }
+            }
+            return result;
         }
     }
 }
