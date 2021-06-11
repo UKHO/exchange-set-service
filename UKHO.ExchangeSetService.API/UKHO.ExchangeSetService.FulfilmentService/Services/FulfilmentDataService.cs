@@ -21,9 +21,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public FulfilmentDataService(ISalesCatalogueStorageService scsStorageService, IAzureBlobStorageService azureBlobStorageService, 
                                     IFulfilmentFileShareService fulfilmentFileShareService,
-                                    IOptions<EssFulfilmentStorageConfiguration> storageConfig,
-                                    ILogger<FulfilmentDataService> logger,
-                                    IFileShareService fileShareService)
+                                    IOptions<EssFulfilmentStorageConfiguration> storageConfig,                                    
+                                    IFileShareService fileShareService,
+                                    ILogger<FulfilmentDataService> logger)
         {
             this.scsStorageService = scsStorageService;
             this.azureBlobStorageService = azureBlobStorageService;
