@@ -14,5 +14,7 @@
         public string UpdateNumber { get; set; }
         public int UpdateNumberLimit { get; set; }
         public int ProductLimit { get; set; }
+        public string FileDownloadPath { get; set; }
+        public int ParallelTaskCount { get; set; }
     }
 }

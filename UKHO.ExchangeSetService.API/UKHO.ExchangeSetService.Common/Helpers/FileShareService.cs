@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -207,6 +208,44 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             sb.Append(")");//// last main )
             return sb.ToString();
+        }
+
+        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath)
+        {
+            HttpResponseMessage httpResponse;
+            string payloadJson = string.Empty;
+            bool result = false;
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+            foreach (var item in uri)
+            {
+                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item);
+                var fileName = item.Split("/").Last();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    if (!Directory.Exists(downloadPath))
+                    {
+                        Directory.CreateDirectory(downloadPath);
+                    }
+                    string path = Path.Combine(downloadPath, fileName);
+                    if (!File.Exists(path))
+                    {
+                        using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+                        {
+                            using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
+                            {
+                                stream.CopyTo(outputFileStream);
+                                result = true;
+                            }
+                        } 
+                    }
+                }
+                else
+                {
+                    logger.LogInformation(EventIds.DownloadFileShareServiceNonOkResponse.ToEventId(), "File share service download end point with uri {RequestUri} responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
+                }
+            }
+            return result;
         }
     }
 }

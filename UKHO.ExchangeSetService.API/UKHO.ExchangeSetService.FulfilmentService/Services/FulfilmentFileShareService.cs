@@ -19,7 +19,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private const string CONTENT_TYPE = "application/json";
 
-        public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileShareService fileShareService, IAzureBlobStorageClient azureBlobStorageClient)
+        public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, 
+            IFileShareService fileShareService, 
+            IAzureBlobStorageClient azureBlobStorageClient)
         {
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileShareService = fileShareService;
@@ -31,7 +33,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var listSubUpdateNumberProduts = new List<Products>();
             foreach (var item in products)
             {
-                var splitByUpdateLimit = SplitList(item.UpdateNumbers, fileShareServiceConfig.Value.UpdateNumberLimit);
+                var splitByUpdateLimit = ConfigHelper.SplitList(item.UpdateNumbers, fileShareServiceConfig.Value.UpdateNumberLimit);
 
                 if (splitByUpdateLimit != null && splitByUpdateLimit.Any())
                 {
@@ -70,17 +72,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return null;
         }
 
-        public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
+        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfillmentDataResponse> fulfillmentDataResponses)
         {
-            return SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
+            string homeDirectoryPath = fileShareServiceConfig.Value.FileDownloadPath;////configuration["HOME"];
+            var filePath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, "V01X01", "ENC_ROOT");
+            foreach (var item in fulfillmentDataResponses)
+            {
+                var downloadPath = Path.Combine(filePath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
+                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath);
+            }
         }
 
-        public static IEnumerable<List<T>> SplitList<T>(List<T> products, int nSize)
+        public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
         {
-            for (int i = 0; i < products.Count; i += nSize)
-            {
-                yield return products.GetRange(i, Math.Min(nSize, products.Count - i));
-            }
+            return ConfigHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
         }
 
         public async Task<string> UploadFileShareServiceData(string uploadFileName, List<FulfillmentDataResponse> fulfillmentDataResponse, string storageAccountConnectionString, string containerName)
