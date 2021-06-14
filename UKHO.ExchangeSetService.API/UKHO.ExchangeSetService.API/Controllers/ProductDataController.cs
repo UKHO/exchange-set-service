@@ -10,7 +10,6 @@ using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Services;
-using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
@@ -18,7 +17,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
-    [Authorize(Roles = ApplicationRoles.ExchangeSetServiceUser)]
+    [Authorize]
     public class ProductDataController : BaseController<ProductDataController>
     {
         private readonly IProductDataService productDataService;
