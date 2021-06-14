@@ -9,38 +9,60 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class FileCheck
     {
+        private static TestConfiguration Config { get; set; }
+        private static bool fileContentCheck = false;
+        private static bool fileExistCheck = false;
+
+        static FileCheck()
+        {
+            Config = new TestConfiguration();
+        }
+
         /// <summary>
         /// Checks if Directory contains the README File
         /// </summary>
         /// <param name="filePath">File path</param>
         /// <param name="readMeFileName">Read me File name</param>
         /// <returns></returns>
-        public static bool CheckIfFileExistAndVerify(string filePath, string readMeFileName)
+        public static async Task<bool> CheckIfFileExistAndVerify(string filePath, string readMeFileName)
         {
-            bool fileCheck = false;
             var fullPath = filePath + @"\" + readMeFileName;
-            if (File.Exists(fullPath))
+
+            //Added step to wait for file exist in specific foldar
+            var startTime = DateTime.UtcNow;
+            while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.FileDownloadWaitTime))
+            {
+                await Task.Delay(5000);
+                if (File.Exists(fullPath))
+                {
+                    fileExistCheck = true;
+                    break;
+                }
+            }
+
+
+             if (fileExistCheck)
             {
                 string[] lines = File.ReadAllLines(fullPath);
-                var secondLinecontent = lines[2];
+                var fileSecondLineContent = lines[2];
 
-                secondLinecontent.Split("File date:");
-                var utcDateSplit = secondLinecontent.Split("yyyy-mm-dd hh:mm:ssZ").ToString();
+                string[] fileContents = fileSecondLineContent.Split("File date:");
 
-                var utcDateFormat = utcDateSplit.Remove(utcDateSplit.Length - 1, 1);
+                //Verifying file contents - second line of the readme file
+                Assert.True(fileSecondLineContent.Contains(fileContents[0]));
 
+                var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
 
-                var utcDate = DateTime.UtcNow.ToString("yyyy-mm-dd");
-                Assert.AreEqual(utcDate, utcDateFormat);
+                Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
 
-                fileCheck = true;
+                fileContentCheck = true;
             }
             else
             {
-                fileCheck = false;
+                fileContentCheck = false;
             }
 
-            return fileCheck;
+            return fileContentCheck;
 
         }
 

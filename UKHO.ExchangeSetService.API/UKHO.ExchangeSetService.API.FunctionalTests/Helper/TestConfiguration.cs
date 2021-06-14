@@ -13,6 +13,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string FileDownloadPath;
         public string ExchangeSetFileFolder;
         public string EncRootFolder;
+        public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public class EssAuthorizationTokenConfiguration
         {
@@ -40,7 +41,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ExchangeSetFileName= ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
-            
+            FileDownloadWaitTime = ConfigurationRoot.GetSection("FileDownloadWaitTime").Value != null ? int.Parse(ConfigurationRoot.GetSection("FileDownloadWaitTime").Value) : 0;
+
         }
     }
 }
