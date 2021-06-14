@@ -10,6 +10,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string ExchangeSetFileName;
         public string EssStorageAccountConnectionString;
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
+        public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
         public class EssAuthorizationTokenConfiguration
         {
             public string MicrosoftOnlineLoginUrl { get; set; }
@@ -22,6 +23,23 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public bool IsRunningOnLocalMachine { get; set; }
         }
 
+        public class AzureAdB2CConfiguration
+        {
+            public string Instance { get; set; }
+            public string ClientId { get; set; }
+            public string CallbackPath { get; set; }
+            public string Domain { get; set; }
+            public string SignUpSignInPolicy { get; set; }
+            public string TenantId { get; set; }
+            public string UserId { get; set; }
+            public string Password { get; set; }            
+            public string MicrosoftOnlineLoginUrl { get; set; }
+            public string ClientSecret { get; set; }
+            // Test Client id is used to test unauthorized scenario for FSS API
+            public bool IsRunningOnLocalMachine { get; set; }
+            public string LocalToken { get; set; }
+        }
+
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
@@ -32,7 +50,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ExchangeSetFileName= ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
-            
+            ConfigurationRoot.Bind("AzureAdB2CConfiguration", AzureAdB2CConfig);
+
         }
     }
 }
