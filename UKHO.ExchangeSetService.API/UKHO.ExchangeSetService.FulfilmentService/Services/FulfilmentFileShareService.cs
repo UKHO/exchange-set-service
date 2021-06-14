@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileShareService fileShareService;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
+        private readonly IConfiguration configuration;
         private const string CONTENT_TYPE = "application/json";
 
         public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, 
             IFileShareService fileShareService, 
-            IAzureBlobStorageClient azureBlobStorageClient)
+            IAzureBlobStorageClient azureBlobStorageClient,
+            IConfiguration configuration)
         {
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileShareService = fileShareService;
             this.azureBlobStorageClient = azureBlobStorageClient;
+            this.configuration = configuration;
         }
 
         public List<Products> SliceFileShareServiceProductsWithUpdateNumber(List<Products> products)
@@ -74,8 +78,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfillmentDataResponse> fulfillmentDataResponses)
         {
-            string homeDirectoryPath = fileShareServiceConfig.Value.FileDownloadPath;////configuration["HOME"];
-            var filePath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, "V01X01", "ENC_ROOT");
+            string homeDirectoryPath = configuration["HOME"];
+            var filePath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder, fileShareServiceConfig.Value.EncRoot);
             foreach (var item in fulfillmentDataResponses)
             {
                 var downloadPath = Path.Combine(filePath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));

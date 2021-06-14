@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
-                var productsList = ConfigHelper.SplitList((response.Products), fileShareServiceConfig.Value.ParallelTaskCount);
+                var productsList = ConfigHelper.SplitList((response.Products), fileShareServiceConfig.Value.ParallelSearchTaskCount);
                 var tasks = productsList.Select(async item =>
                 {
                     await QueryAndDownloadFileShareServiceFiles(message, item);
@@ -61,7 +61,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse);
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for {BatchId}", message.BatchId);
             }
-            await Task.CompletedTask;
         }
     }
 }

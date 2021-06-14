@@ -21,6 +21,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IAzureBlobStorageService fakeAzureBlobStorageService;
         public IFulfilmentFileShareService fakeQueryFssService;
         public ILogger<FulfilmentDataService> fakeLogger;
+        public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
 
         [SetUp]
         public void Setup()
@@ -29,11 +30,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
+            fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
+            { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
+                ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10 });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
-            fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageService, fakeQueryFssService,
-                fakeEssFulfilmentStorageConfiguration, fakeLogger);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig);
         }
 
         #region GetScsResponseQueueMessage
@@ -80,19 +83,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 };
         }
         #endregion
-
-        [Test]
-        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
-        {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
-              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
-
-            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
-                   .And.Message.EqualTo("Storage account accesskey not found")
-                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage); });
-        }
 
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
