@@ -114,11 +114,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheProductVersionApiWithOutB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
 
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -140,11 +140,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheProductVersionApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
 
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssB2CCustomizedToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssB2CCustomizedToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -152,12 +152,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheProductVersionApiWithAValidB2cToken_ThenTheCorrectResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
-
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssB2CToken);
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
+            
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssB2CToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
 
             //verify model structure
