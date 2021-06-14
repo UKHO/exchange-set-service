@@ -9,6 +9,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static string FakeTokenPrivateKey;
         public string ExchangeSetFileName;
         public string EssStorageAccountConnectionString;
+        public string ReadMeFileName;
+        public string FileDownloadPath;
+        public string ExchangeSetFileFolder;
+        public string EncRootFolder;
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public class EssAuthorizationTokenConfiguration
         {
@@ -28,6 +32,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                 .AddJsonFile("appsettings.json", false)
                                 .Build();
             EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;
+            ReadMeFileName = ConfigurationRoot.GetSection("ReadMeFileName").Value;
+            ExchangeSetFileFolder = ConfigurationRoot.GetSection("ExchangeSetFileFolder").Value;
+            EncRootFolder = ConfigurationRoot.GetSection("EncRootFolder").Value;
+            FileDownloadPath = ConfigurationRoot.GetSection("FileDownloadPath").Value;
             EssBaseAddress = ConfigurationRoot.GetSection("EssApiUrl").Value;
             ExchangeSetFileName= ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
