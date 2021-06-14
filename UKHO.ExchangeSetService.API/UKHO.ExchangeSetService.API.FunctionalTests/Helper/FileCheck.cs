@@ -25,17 +25,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 var secondLinecontent = lines[2];
 
                 secondLinecontent.Split("File date:");
-                var utcDateFormat =  secondLinecontent.Split("yyyy-mm-dd hh:mm:ssZ");
+                var utcDateSplit = secondLinecontent.Split("yyyy-mm-dd hh:mm:ssZ").ToString();
 
-                var utcDateFormat = utcDateFormat.Remove(utcDateFormat.Length - 1, 1);
-
+                var utcDateFormat = utcDateSplit.Remove(utcDateSplit.Length - 1, 1);
 
 
                 var utcDate = DateTime.UtcNow.ToString("yyyy-mm-dd");
+                Assert.AreEqual(utcDate, utcDateFormat);
 
-
-                var secondLine = $"";
-                Assert.AreEqual(secondLine, lines[2]);
                 fileCheck = true;
             }
             else
