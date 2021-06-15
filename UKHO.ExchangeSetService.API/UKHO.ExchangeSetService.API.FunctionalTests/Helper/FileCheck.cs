@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             var fullPath = filePath + @"\" + readMeFileName;
 
-            //Added step to wait for file exist in specific foldar
+            //Added step to wait for file exist in specific folder
             var startTime = DateTime.UtcNow;
             while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.FileDownloadWaitTime))
             {
@@ -41,20 +42,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
 
-             if (fileExistCheck)
+            if (fileExistCheck)
             {
                 string[] lines = File.ReadAllLines(fullPath);
-                var fileSecondLineContent = lines[2];
+                var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+                var currentDate = DateTime.Now.ToString("dd-MM-yyyy");
+                var year = currentDate.Substring((currentDate.Length - 2), 2);
 
-                string[] fileContents = fileSecondLineContent.Split("File date:");
-
-                //Verifying file contents - second line of the readme file
-                Assert.True(fileSecondLineContent.Contains(fileContents[0]));
-
-                var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
-
-                Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
-
+                var secondLine = $"Version: Published Week {weekNumber}/{year} dated {currentDate}";
+                Assert.AreEqual(secondLine, lines[1]);
                 fileContentCheck = true;
             }
             else
