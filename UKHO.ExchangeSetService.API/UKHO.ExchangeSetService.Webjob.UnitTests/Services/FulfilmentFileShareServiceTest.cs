@@ -1,5 +1,4 @@
 ﻿using FakeItEasy;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
@@ -19,7 +18,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private IOptions<FileShareServiceConfiguration> fakefileShareServiceConfig;
         private IFileShareService fakefileShareService;
         private IAzureBlobStorageClient fakeazureBlobStorageClient;
-        private IConfiguration fakeConfiguration;
         public FulfilmentFileShareService fulfilmentFileShareService;
 
         [SetUp]
@@ -27,11 +25,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             fakefileShareService = A.Fake<IFileShareService>();
             fakeazureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
-            fakeConfiguration = A.Fake<IConfiguration>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { Limit=100,Start=0,ProductLimit=4,UpdateNumberLimit=10, EncRoot="ENC_ROOT", ExchangeSetFileFolder= "V01X01" });
 
-            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeazureBlobStorageClient, fakeConfiguration);
+            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeazureBlobStorageClient);
         }
         private List<Products> GetProductdetails()
         {
@@ -106,7 +103,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var fulfillmentDataResponses = new List<FulfillmentDataResponse>() {
                 new FulfillmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
             };
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfillmentDataResponses);
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfillmentDataResponses, "");
             Assert.IsNotNull(result);
         }
 
@@ -118,7 +115,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
             };
             var fulfillmentDataResponses = new List<FulfillmentDataResponse>();
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfillmentDataResponses);
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfillmentDataResponses, "");
             Assert.IsNotNull(result);
         }
     }

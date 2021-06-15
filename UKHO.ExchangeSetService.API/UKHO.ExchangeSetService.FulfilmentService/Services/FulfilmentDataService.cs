@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -16,27 +19,33 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentFileShareService fulfilmentFileShareService;
         private readonly ILogger<FulfilmentDataService> logger;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
+        private readonly IConfiguration configuration;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService, 
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     ILogger<FulfilmentDataService> logger,
-                                    IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
+                                    IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+                                    IConfiguration configuration)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
             this.logger = logger;
             this.fileShareServiceConfig = fileShareServiceConfig;
+            this.configuration = configuration;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message)
         {
+            string homeDirectoryPath = configuration["HOME"];
+            var exchangeSetRootPath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder, fileShareServiceConfig.Value.EncRoot);
+
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
                 var productsList = ConfigHelper.SplitList((response.Products), fileShareServiceConfig.Value.ParallelSearchTaskCount);
                 var tasks = productsList.Select(async item =>
                 {
-                    await QueryAndDownloadFileShareServiceFiles(message, item);
+                    await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
                 });
                 await Task.WhenAll(tasks);
             }
@@ -49,7 +58,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri);
         }
 
-        public async Task QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products)
+        public async Task QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
         {
             logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
             var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products);
@@ -58,7 +67,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (searchBatchResponse != null && searchBatchResponse.Any())
             {
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for {BatchId}", message.BatchId);
-                await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse);
+                await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for {BatchId}", message.BatchId);
             }
         }

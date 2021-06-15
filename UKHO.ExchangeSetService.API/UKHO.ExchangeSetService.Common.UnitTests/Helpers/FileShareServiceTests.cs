@@ -213,5 +213,45 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         #endregion GetBatchInfoBasedOnProducts
+
+        #region DownloadBatchFile
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenDownloadBatchFilesResponse()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, RequestMessage = new HttpRequestMessage() { 
+                     RequestUri = new Uri("http://test.com") 
+                 }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) 
+                 });
+
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { "C:\\HOME\\test.txt" }, "C:\\HOME");
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(bool), response);
+        }
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenDontDownloadBatchFilesResponse()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.BadRequest,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
+                 });
+
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { "C:\\HOME\\test.txt" }, "C:\\HOME");
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(bool), response);
+            Assert.IsFalse(response);
+        }
+        #endregion
     }
 }
