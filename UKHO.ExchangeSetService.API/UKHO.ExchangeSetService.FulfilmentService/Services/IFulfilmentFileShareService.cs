@@ -9,5 +9,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         Task<List<FulfillmentDataResponse>> QueryFileShareServiceData(List<Products> products);
         Task<string> UploadFileShareServiceData(string uploadFileName, List<FulfillmentDataResponse> fulfillmentDataResponse, string storageAccountConnectionString, string containerName);
+        Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath);
+        Task<string> SearchReadMeFilePath(string batchId);
     }
 }

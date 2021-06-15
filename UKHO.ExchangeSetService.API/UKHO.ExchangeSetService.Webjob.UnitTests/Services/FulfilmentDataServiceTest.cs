@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -21,7 +22,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IAzureBlobStorageService fakeAzureBlobStorageService;
         public IFulfilmentFileShareService fakeQueryFssService;
         public ILogger<FulfilmentDataService> fakeLogger;
-        private IFileShareService fakeFileShareService;
+        private IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        private IConfiguration fakeConfiguration;
 
         [SetUp]
         public void Setup()
@@ -30,12 +32,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
-            fakeFileShareService = A.Fake<IFileShareService>();
+            fakeFileShareServiceConfig = A.Fake<IOptions<FileShareServiceConfiguration>>();
+            fakeConfiguration = A.Fake<IConfiguration>();
+
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
             fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageService, fakeQueryFssService,
-                fakeEssFulfilmentStorageConfiguration, fakeFileShareService, fakeLogger);
+                fakeEssFulfilmentStorageConfiguration, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration);
         }
 
         #region GetScsResponseQueueMessage
@@ -105,8 +109,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
-
+            string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 

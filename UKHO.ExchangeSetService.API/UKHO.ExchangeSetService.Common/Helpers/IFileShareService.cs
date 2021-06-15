@@ -9,6 +9,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         public Task<CreateBatchResponse> CreateBatch();
         Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products);
-        Task<bool> DownloadReadMeTextFile(string batchId);
+        Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath);
+        Task<string> SearchReadMeFilePath(string batchId);
     }
 }

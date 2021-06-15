@@ -25,7 +25,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-        
+        private const int line = 2;
+
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -34,7 +35,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fileShareServiceClient = fileShareServiceClient;
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
-            this.logger = logger;            
+            this.logger = logger;
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
@@ -49,8 +50,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
-            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);            
-            return createBatchResponse;                               
+            CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
+            return createBatchResponse;
         }
 
         private CreateBatchRequest CreateBatchRequest(string oid)
@@ -74,7 +75,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return createBatchRequest;
         }
 
-        private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse,string batchExpiryDateTime)
+        private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse, string batchExpiryDateTime)
         {
             var createBatchResponse = new CreateBatchResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
@@ -89,9 +90,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 createBatchResponse.ResponseCode = httpResponse.StatusCode;
                 createBatchResponse.ResponseBody = JsonConvert.DeserializeObject<CreateBatchResponseModel>(body);
-                createBatchResponse.ResponseBody.BatchStatusUri =$"{fileShareServiceConfig.Value.BaseUrl}/batch/{createBatchResponse.ResponseBody.BatchId}";
+                createBatchResponse.ResponseBody.BatchStatusUri = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{createBatchResponse.ResponseBody.BatchId}";
                 createBatchResponse.ResponseBody.BatchExpiryDateTime = batchExpiryDateTime;
-                createBatchResponse.ResponseBody.ExchangeSetFileUri =$"{createBatchResponse.ResponseBody.BatchStatusUri}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}";
+                createBatchResponse.ResponseBody.ExchangeSetFileUri = $"{createBatchResponse.ResponseBody.BatchStatusUri}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}";
             }
 
             return createBatchResponse;
@@ -208,48 +209,74 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             sb.Append(")");//// last main )
             return sb.ToString();
         }
-        public async Task<bool> DownloadReadMeTextFile(string batchId)
+
+        public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath)
         {
             string payloadJson = string.Empty;
-            bool result = false;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq {fileShareServiceConfig.Value.ReadMeFileName} and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            string fileName = fileShareServiceConfig.Value.ReadMeFileName;            
+            string file = Path.Combine(exchangeSetRootPath, fileName);
+            if (!Directory.Exists(exchangeSetRootPath))
+            {
+                Directory.CreateDirectory(exchangeSetRootPath);
+            }
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ"));
+            string secondLineText = string.Empty;
+            HttpResponseMessage httpReadMeFileResponse;
+            httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath);
+            if (httpReadMeFileResponse.IsSuccessStatusCode)
+            {
+                using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
+                {
+                    using (var outputFileStream = new FileStream(file, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        stream.CopyTo(outputFileStream);
+                    }
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        secondLineText = GetLine(file, line);
+                    }
+                }
+                string text = File.ReadAllText(file);
+                text = text.Replace(secondLineText, lineToWrite);
+                File.WriteAllText(file, text);               
+            }
+            else
+                logger.LogInformation(EventIds.ReadMeTextFileIsNotDownloaded.ToEventId(), "Error in downloading readme.txt file for {BatchId}", batchId);
+
+            return true;
+        }
+
+        public async Task<string> SearchReadMeFilePath(string batchId)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string filePath = string.Empty;           
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
             if (httpResponse.IsSuccessStatusCode)
             {
-                var filePath = string.Format(fileShareServiceConfig.Value.FileDownloadPath, DateTime.UtcNow.ToString("ddMMMyyyy"), batchId, "V01X01", "ENC_ROOT");
-                if (!Directory.Exists(filePath))
+                SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+                if (searchBatchResponse.Entries.Count > 0)
                 {
-                    Directory.CreateDirectory(filePath);
+                    var batchResult = searchBatchResponse.Entries.FirstOrDefault();
+                    filePath =  batchResult.Files.FirstOrDefault().Links.Get.Href;                  
                 }
-                string path = Path.Combine(filePath, fileShareServiceConfig.Value.ReadMeFileName);
-                using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
-                {
-                    using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
-                    {
-                        outputFileStream.Position = 0;
-                        int line_to_edit = 2;
-                        StringBuilder lineToWrite = new StringBuilder();
-                        lineToWrite.AppendLine("File date:");
-                        lineToWrite.AppendLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
-                        using (StreamReader reader = new StreamReader(stream))
-                        {
-                            string line = reader.ReadLine();
-                            for (int i = 0; i <= line_to_edit; ++i)
-                            {
-                                if (line.Contains("Last"))
-                                {
-                                    line = lineToWrite.ToString();
-                                }
-                            }
-                        }
-                        stream.CopyTo(outputFileStream);
-                        result = true;
-                    }
-                }
+                else
+                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for {BatchId}", batchId);              
             }
-            return result;
+            return filePath;
+        }
+
+        private static string GetLine(string filePath, int line)
+        {
+            using (var sr = new StreamReader(filePath))
+            {
+                for (int i = 1; i < line; i++)
+                    sr.ReadLine();
+                return sr.ReadLine();
+            }
         }
     }
 }

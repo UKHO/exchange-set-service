@@ -121,5 +121,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             return listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
         }
+        public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath)
+        {
+           return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);            
+        }
+        public async Task<string> SearchReadMeFilePath(string batchId)
+        {
+           return await fileShareService.SearchReadMeFilePath(batchId);
+        }
     }
 }

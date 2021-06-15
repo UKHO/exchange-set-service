@@ -93,5 +93,42 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.AreEqual("http://tempuri.org/blob", result);
         }
+
+        [Test]
+        public async Task WhenRequestSearchReadMeFilePath_ThenReturnsFilePath()
+        {
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("ReadMe Text file path found", "ReadMe Text file path found");
+        }
+         [Test]
+        public async Task WhenRequestSearchReadMeFilePath_ThenReturnsNullResponse()
+        {
+            string exchangeSetRootPath = @"D:\\Downloads";
+
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(null);
+
+            Assert.IsNull(result);           
+        }
+
+        [Test]
+        public async Task WhenRequestDownloadReadMeFile_ThenReturnsTrueIfFileIsDownloaded()
+        {
+            bool isFileDownloaded = true;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+            string filePath = "TestFilePath";
+
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+           
+            Assert.AreSame(true, isFileDownloaded);
+        }
     }
 }
