@@ -20,19 +20,19 @@ namespace UKHO.ExchangeSetService.API.Validation
         {
             RuleFor(x => x.SinceDateTime)
                 .Must(x => x.IsValidRfc1123Format(out sinceDateTime))
-                .WithMessage($"Provided SinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').")
+                .WithMessage($"Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .DependentRules(() =>
                 {
                     RuleFor(x => x.SinceDateTime)
                     .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow) <= 0)
-                    .WithMessage("Provided SinceDateTime cannot be a future date.")
+                    .WithMessage("Provided sinceDateTime cannot be a future date.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                 });
 
             RuleFor(x => x.CallbackUri)
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
-                .WithMessage("Invalid CallbackUri format.")
+                .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
         }
 

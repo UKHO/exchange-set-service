@@ -216,7 +216,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     new Error()
                     {
                         Source = "SinceDateTime",
-                        Description = "Query parameter 'SinceDateTime' is required."
+                        Description = "Query parameter 'sinceDateTime' is required."
                     }
                 };
                 return BuildBadRequestErrorResponse(error);
@@ -231,7 +231,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest);
 
-            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed");
+            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed"); 
 
             return GetEssResponse(productDetail);
         }
