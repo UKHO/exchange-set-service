@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     public class AzureB2CAuthTokenProvider
 
     {
-        static AzureAdB2CConfiguration B2CConfig = new TestConfiguration().AzureAdB2CConfig;
+        static AzureAdB2CConfiguration B2cConfig = new TestConfiguration().AzureAdB2CConfig;
         static EssAuthorizationTokenConfiguration EssAuthConfig = new TestConfiguration().EssAuthorizationConfig;
 
 
@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// </summary>
         public async Task<string> GetToken()
         {
-            return await GenerateToken(B2CConfig.ClientId);
+            return await GenerateToken(B2cConfig.ClientId);
         }
 
 
@@ -33,20 +33,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <returns></returns>
         private static async Task<string> GenerateToken(string clientId)
         {
-            if (B2CConfig.IsRunningOnLocalMachine)
+            if (B2cConfig.IsRunningOnLocalMachine)
             {
                 //Generate token locally and pass it in appsettings.json
-                return B2CConfig.LocalToken;
+                return B2cConfig.LocalTestToken;
             }
             else
             {
                 IConfidentialClientApplication app = ConfidentialClientApplicationBuilder
                            .Create(clientId)
-                           .WithTenantId(B2CConfig.TenantId)
-                           .WithAuthority($"{EssAuthConfig.MicrosoftOnlineLoginUrl}{B2CConfig.TenantId}", true)
-                           .WithClientSecret(B2CConfig.ClientSecret)
+                           .WithTenantId(B2cConfig.TenantId)
+                           .WithAuthority($"{EssAuthConfig.MicrosoftOnlineLoginUrl}{B2cConfig.TenantId}", true)
+                           .WithClientSecret(B2cConfig.ClientSecret)
                            .Build();
-                var scopes = new string[] { $"https://{B2CConfig.Domain}/api/.default" };
+                var scopes = new string[] { $"https://{B2cConfig.Domain}/api/.default" };
                 AuthenticationResult result = await app.AcquireTokenForClient(scopes).ExecuteAsync();
                 return result.AccessToken;
             }
@@ -61,8 +61,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var privateKey = TestConfiguration.FakeTokenPrivateKey;
             var header = new Dictionary<string, object>
             {
-                {  "typ", "JWT" },
-                {  "kid", "GvnPApfWMdLRi8PDmisFn7bprKg"}
+                {  "typ", "JWT" },                
+                {  "kid", "GvnPApfWMdLRi8PDmisFn7bprKu"}
             };
 
             var provider = new UtcDateTimeProvider();
@@ -72,17 +72,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var payload = new Dictionary<string, object>
             {
-                { "exp", expiry },
-                { "nbf", tokenIssued},
-                { "ver", "1.0"},
-                { "iss", $"{B2CConfig.Instance}{B2CConfig.TenantId}/v2.0/" },
-                { "sub", $"{B2CConfig.TenantId}"},
-                { "aud", $"{B2CConfig.ClientId}"},
-                { "acr", $"{B2CConfig.SignUpSignInPolicy}" },
+                { "aud", $"{B2cConfig.TenantId}"},
+                { "iss", $"{B2cConfig.MicrosoftOnlineLoginUrl}{B2cConfig.TenantId}/v2.0/" },
                 { "iat", tokenIssued},
-                { "auth_time", tokenIssued},
-                { "email", $"{B2CConfig.UserId}" },
-                { "oid", $"{B2CConfig.TenantId}"}
+                { "nbf", tokenIssued},
+                { "exp", expiry },
+                { "aio", "E2ZgYOD/bNfNzDaJjWGlunhesLAUAA==" },
+                { "azp", $"{B2cConfig.ClientId}" },
+                { "azpacr", "1" },
+                { "oid", "da599026-93fc-4d2a-92c8-94b724e26176"},
+                { "rh", "0.AT8A2Ihb28pF7EqgbHH88S3oGvAwypvZIDhLmevHr_a38FFAAAA."},
+                { "sub", "da599026-93fc-4d2a-92c8-94b724e26176"},
+                { "tid", $"{B2cConfig.TenantId}"},
+                { "uti", "C6oLcfz8e0mzZbv-6pRwAQ"},
+                { "ver", "2.0"}
+
             };
 
             var privateKeyBytes = Convert.FromBase64String(privateKey);

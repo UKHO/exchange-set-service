@@ -67,9 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
         }
-
         #endregion
-
 
         #region ProductIdentifier Api
         [Test]
@@ -106,11 +104,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
         }
-
         #endregion
 
         #region ProductVersion Api
-
         [Test]
         public async Task WhenICallTheProductVersionApiWithOutB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
@@ -161,10 +157,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
-
         }
-
         #endregion
-
     }
 }

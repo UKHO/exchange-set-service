@@ -25,19 +25,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public class AzureAdB2CConfiguration
         {
-            public string Instance { get; set; }
-            public string ClientId { get; set; }
-            public string CallbackPath { get; set; }
-            public string Domain { get; set; }
-            public string SignUpSignInPolicy { get; set; }
-            public string TenantId { get; set; }
-            public string UserId { get; set; }
-            public string Password { get; set; }            
+           
+            public string ClientId { get; set; }           
+            public string Domain { get; set; }           
+            public string TenantId { get; set; }            
             public string MicrosoftOnlineLoginUrl { get; set; }
             public string ClientSecret { get; set; }
             // Test Client id is used to test unauthorized scenario for FSS API
             public bool IsRunningOnLocalMachine { get; set; }
-            public string LocalToken { get; set; }
+            public string LocalTestToken { get; set; } 
         }
 
         public TestConfiguration()
