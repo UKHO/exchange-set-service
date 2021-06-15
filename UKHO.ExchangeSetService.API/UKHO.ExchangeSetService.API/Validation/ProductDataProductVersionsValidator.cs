@@ -17,7 +17,7 @@ namespace UKHO.ExchangeSetService.API.Validation
         {
             RuleFor(x => x.CallbackUri)
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
-                .WithMessage("Invalid CallbackUri format.")
+                .WithMessage("Invalid callbackUri format.") 
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
             RuleFor(v => v.ProductVersions).NotEmpty().NotNull()
             .WithErrorCode(HttpStatusCode.BadRequest.ToString())
@@ -37,13 +37,13 @@ namespace UKHO.ExchangeSetService.API.Validation
                 RuleFor(v => v.ProductName).NotEmpty().NotNull().Must(ru => !string.IsNullOrWhiteSpace(ru))
                 .When(ru => ru != null)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("ProductName cannot be blank or null.");
+                .WithMessage("productName cannot be blank or null.");
                 RuleFor(v => v.EditionNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("EditionNumber cannot be less than zero or null.");
+                .WithMessage("editionNumber cannot be less than zero or null.");
                 RuleFor(v => v.UpdateNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("UpdateNumber cannot be less than zero or null.");
+                .WithMessage("updateNumber cannot be less than zero or null.");
             }
         }
     }
