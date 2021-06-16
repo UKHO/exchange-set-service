@@ -286,7 +286,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileShareConfig.Value.ReadMeFileName = "ReadMe.txt";
 
             string readMeFilePath = @"batch/c4af46f5-1b41-4294-93f9-dda87bf8ab96/files/README.TXT";
-            string exchangeSetRootPath = @"D:\Downloads";
+            string exchangeSetRootPath = @"C:\\HOME";
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             var searchBatchResponse = GetReadMeFileDetails();
