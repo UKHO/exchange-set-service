@@ -8,6 +8,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public interface IFileShareService
     {
         public Task<CreateBatchResponse> CreateBatch();
-        Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products);
+        Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, string correlationId);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri)
+        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri, [Optional] string correlationId)
         {
             HttpContent content = null;
 
@@ -26,6 +27,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             { Content = content };
+
+            if (correlationId != null)
+            {
+                httpRequestMessage.Headers.Add("X-Correlation-ID", correlationId);
+            }
+
             httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             var response = await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             return response;

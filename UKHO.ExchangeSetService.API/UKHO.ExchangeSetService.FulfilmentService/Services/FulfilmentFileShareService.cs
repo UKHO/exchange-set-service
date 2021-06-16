@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfillmentDataResponse>> QueryFileShareServiceData(List<Products> products)
+        public async Task<List<FulfillmentDataResponse>> QueryFileShareServiceData(List<Products> products,string correlationId)
         {
             if (products != null && products.Any())
             {
@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var listBatchDetails = new List<BatchDetail>();
                 foreach (var item in batchProducts)
                 {
-                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item);
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, correlationId);
                     listBatchDetails.AddRange(result.Entries);
                 }
 

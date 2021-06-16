@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 

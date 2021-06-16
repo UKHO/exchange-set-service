@@ -1,17 +1,21 @@
-﻿using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.WebJobs.Host;
+﻿using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using UKHO.Logging.EventHubLogProvider;
+using Serilog;
+using Serilog.Events;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
+using System.Reflection;
+using System.Linq;
+using System.Net.Http.Headers;
+using Azure.Identity;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -19,6 +23,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
     public static class Program
     {
         private static IConfiguration ConfigurationBuilder;
+        public const string FulfilmentServiceJob = "FulfilmentServiceJob";
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
@@ -47,11 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
                 {
-                    var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                    var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-                    builder.AddAzureKeyVault(kvServiceUri,
-                                             keyVaultClient,
-                                             new DefaultKeyVaultSecretManager());
+                    builder.AddAzureKeyVault(new System.Uri(kvServiceUri), new DefaultAzureCredential());
                 }
 
                 #if DEBUG
@@ -70,6 +71,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              {
                  builder.AddConfiguration(ConfigurationBuilder.GetSection("Logging"));
 
+                #if DEBUG
+                 builder.AddSerilog(new LoggerConfiguration()
+                                 .WriteTo.File("Logs/UKHO.ExchangeSetService.FulfilmentServiceLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
+                                 .MinimumLevel.Information()
+                                 .MinimumLevel.Override("UKHO", LogEventLevel.Debug)
+                                 .CreateLogger(), dispose: true);
+                 #endif
+
                  builder.AddConsole();
 
                  //Add Application Insights if needed (if key exists in settings)
@@ -77,6 +86,28 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  if (!string.IsNullOrEmpty(instrumentationKey))
                  {
                      builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
+                 }
+                 var eventhubConfig = ConfigurationBuilder.GetSection("EventHubLoggingConfiguration");
+
+                 if (!string.IsNullOrWhiteSpace(eventhubConfig["ConnectionString"]))
+                 {
+                     builder.AddEventHub(config =>
+                     {
+                         config.Environment = eventhubConfig["Environment"];
+                         config.DefaultMinimumLogLevel =
+                             (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["MinimumLoggingLevel"], true);
+                         config.MinimumLogLevels["UKHO"] =
+                             (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["UkhoMinimumLoggingLevel"], true);
+                         config.EventHubConnectionString = eventhubConfig["ConnectionString"];
+                         config.EventHubEntityPath = eventhubConfig["EntityPath"];
+                         config.System = eventhubConfig["System"];
+                         config.Service = eventhubConfig["Service"];
+                         config.NodeName = eventhubConfig["NodeName"];
+                         config.AdditionalValuesProvider = additionalValues =>
+                         {
+                             additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+                         };
+                     });
                  }
 
              })
@@ -96,6 +127,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                     client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"])
                  );
+                 services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
+                 client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(FulfilmentServiceJob,
+                                            Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version)));
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();

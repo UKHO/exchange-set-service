@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
 
-            var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
+            var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri,null);
 
             CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
             return createBatchResponse;                               
@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return createBatchResponse;
         }
 
-        public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products)
+        public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, string correlationId )
         {
             SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
             internalSearchBatchResponse.Entries = new List<BatchDetail>();
@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
             do
             {
-                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
+                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, correlationId);
 
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -120,7 +120,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "File share service with uri {RequestUri} and responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
+                    logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "File share service with uri {RequestUri}, responded with {StatusCode} and CorrelationId:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, correlationId);
                 }
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount);
 

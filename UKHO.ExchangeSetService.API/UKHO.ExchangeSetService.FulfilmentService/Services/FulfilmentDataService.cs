@@ -35,12 +35,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
 
-            var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri);
+            var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri,message.CorrelationId);
             if (response.Products != null && response.Products.Any())
             {
-                logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
-                var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(response?.Products);
-                logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for {BatchId}", message.BatchId);
+                logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for BatchId:{BatchId} and CorrelationId:{CorrelationId}", message.BatchId, message.CorrelationId);
+                var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(response?.Products,message.CorrelationId);
+                logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for BatchId:{BatchId} and CorrelationId:{CorrelationId}", message.BatchId, message.CorrelationId);
 
                 await fulfilmentFileShareService.UploadFileShareServiceData(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             }

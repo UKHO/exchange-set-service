@@ -103,7 +103,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenFSSClientReturnsOtherThan201_ThenCreateBatchReturnsSameStatusAndNullInResponse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             var response = await fileShareService.CreateBatch();
@@ -119,7 +119,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
 
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
             var response = await fileShareService.CreateBatch();
@@ -141,19 +141,21 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string accessTokenParam = null;
             string uriParam = null;
             HttpMethod httpMethodParam = null;
+            string correlationidParam = null;
             var createBatchResponse = GetCreateBatchResponse();
             var jsonString = JsonConvert.SerializeObject(createBatchResponse);
 
             //Mock
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .Invokes((HttpMethod method, string postBody, string accessToken, string uri) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationid) =>
                 {
                     accessTokenParam = accessToken;
                     uriParam = uri;
                     httpMethodParam = method;
                     postBodyParam = postBody;
+                    correlationidParam = correlationid;
                 })
                 .Returns(httpResponse);
 
@@ -173,10 +175,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsNullResponse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails());
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null);
             Assert.AreEqual(0, response.Entries.Count);
         }
 
@@ -189,23 +191,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string accessTokenParam = null;
             string uriParam = null;
             HttpMethod httpMethodParam = null;
+            string correlationidParam = null;
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationid) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
                    httpMethodParam = method;
                    postBodyParam = postBody;
+                   correlationidParam = correlationid;
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails());
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
