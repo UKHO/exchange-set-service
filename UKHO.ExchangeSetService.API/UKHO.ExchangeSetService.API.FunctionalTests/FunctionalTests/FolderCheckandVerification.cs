@@ -8,6 +8,8 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [TestFixture]
+    [Parallelizable(ParallelScope.Self)]
     public class FolderCheckandVerification
     {
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
@@ -47,15 +49,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenLatestDownloadedFolderExists()
         {
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssJwtToken);
+            var productName = "DE5NOBRK";
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { productName }, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
-            var productName = "DE416050";
+
 
             var batchId = await apiResponse.GetBatchId();
             string homeDirectoryPath = Config.EncHomeFolder;
 
-            int editionNumber = 10;
+            int editionNumber = 1;
             string editionNumberString = editionNumber.ToString();
 
             int updateNumber = 0;
@@ -66,34 +69,29 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
 
-            Assert.AreEqual(10, filesCount, $"File count returned from folder {filesCount}, instead of expected count 10");
+            Assert.AreEqual(4, filesCount, $"File count returned from folder {filesCount}, instead of expected count 4");
         }
 
         [Test]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenLatestDownloadedFolderDoesNotExist()
         {
-            ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
-
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
-       
             var productName = "GB123789";
+
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { productName }, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+
 
             var batchId = await apiResponse.GetBatchId();
             string homeDirectoryPath = Config.EncHomeFolder;
 
-            int editionNumber = 10;
-            string editionNumberString = editionNumber.ToString();
-
-            int updateNumber = 0;
-            string updateNumberString = updateNumber.ToString();
-
             string countryCode = productName.Substring(0, 2);
-            var filePath = GenerateFilePath(homeDirectoryPath, batchId, countryCode, productName, editionNumberString, updateNumberString);
 
-            int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
+            var filePath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), batchId, Config.ExchangeSetFileFolder, Config.EncRootFolder, countryCode, productName);
 
-            Assert.Zero(filesCount);
+
+            bool folderCheck = await FolderCheck.CheckIfDownloadFolderNotExist(filePath);
+
+            Assert.False(folderCheck, $"Folder available for the product {productName}");
         }
 
 
@@ -101,19 +99,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithAValidProductVersion_ThenLatestDownloadedFolderExists()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
-            var productName = "DE416050";
+            var productName = "DE5NOBRK";
 
-            int editionNumber = 10;
+            int editionNumber = 1;
             string editionNumberString = editionNumber.ToString();
 
             int updateNumber = 0;
-            string updateNumberString = updateNumber.ToString();
-
+            
             ProductVersionData.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
 
+            updateNumber = updateNumber + 1;
+            string updateNumberString = updateNumber.ToString();
             var batchId = await apiResponse.GetBatchId();
             string homeDirectoryPath = Config.EncHomeFolder;
 
@@ -122,21 +121,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
 
-            Assert.AreEqual(10, filesCount, $"File count returned from folder {filesCount}, instead of expected count 10");
+            Assert.AreEqual(2, filesCount, $"File count returned from folder {filesCount}, instead of expected count 2");
         }
 
         [Test]
         public async Task WhenICallTheApiWithInvalidEditionNumber_ThenLatestDownloadedFolderDoesNotExist()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
-            var productName = "DE416050";
+            var productName = "DE5NOBRK";
 
             int editionNumber = 50;
             string editionNumberString = editionNumber.ToString();
 
             int updateNumber = 0;
-            string updateNumberString = updateNumber.ToString();
-
+            
             ProductVersionData.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
@@ -146,25 +144,25 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             string homeDirectoryPath = Config.EncHomeFolder;
 
             string countryCode = productName.Substring(0, 2);
-            var filePath = GenerateFilePath(homeDirectoryPath, batchId, countryCode, productName, editionNumberString, updateNumberString);
 
-            int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
+            var filePath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), batchId, Config.ExchangeSetFileFolder, Config.EncRootFolder, countryCode, productName, editionNumberString);
 
-            Assert.Zero(filesCount);
+            bool folderCheck = await FolderCheck.CheckIfDownloadFolderNotExist(filePath);
+
+            Assert.False(folderCheck, $"Folder available for the product {productName}");
         }
 
         [Test]
         public async Task WhenICallTheApiWithInvalidUpdateNumber_ThenLatestDownloadedFolderDoesNotExist()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
-            var productName = "DE416050";
+            var productName = "DE5NOBRK";
 
-            int editionNumber = 10;
+            int editionNumber = 1;
             string editionNumberString = editionNumber.ToString();
 
-            int updateNumber = 100;
-            string updateNumberString = updateNumber.ToString();
-
+            int updateNumber = 1;
+            
             ProductVersionData.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
@@ -174,11 +172,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             string homeDirectoryPath = Config.EncHomeFolder;
 
             string countryCode = productName.Substring(0, 2);
-            var filePath = GenerateFilePath(homeDirectoryPath, batchId, countryCode, productName, editionNumberString, updateNumberString);
+            var filePath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), batchId, Config.ExchangeSetFileFolder, Config.EncRootFolder, countryCode, productName, editionNumberString);
 
-            int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
+            bool folderCheck = await FolderCheck.CheckIfDownloadFolderNotExist(filePath);
 
-            Assert.Zero(filesCount);
+            Assert.False(folderCheck, $"Folder available for the product {productName}");
         }
     }
 

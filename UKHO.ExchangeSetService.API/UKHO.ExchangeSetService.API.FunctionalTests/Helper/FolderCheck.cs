@@ -29,8 +29,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var startTime = DateTime.UtcNow;
             while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.FileDownloadWaitTime))
             {
-                await Task.Delay(5000);
-                if (File.Exists(folderPath))
+                await Task.Delay(2000);
+                if (Directory.Exists(folderPath))
                 {
                     folderExistCheck = true;
                     break;
@@ -49,6 +49,27 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
             return FilesCount;
+
+        }
+
+
+        public static async Task<bool> CheckIfDownloadFolderNotExist(string folderPath)
+        {
+
+            //Added step to wait for file exist in specific folder
+            var startTime = DateTime.UtcNow;
+            while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.FileDownloadWaitTime))
+            {
+                await Task.Delay(2000);
+                if (Directory.Exists(folderPath))
+                {
+                    folderExistCheck = true;
+                    break;
+                }
+            }
+
+            
+            return folderExistCheck;
 
         }
 
