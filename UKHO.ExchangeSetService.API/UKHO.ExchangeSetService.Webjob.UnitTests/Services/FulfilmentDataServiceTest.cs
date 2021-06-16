@@ -106,7 +106,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
+            fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
+            fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";

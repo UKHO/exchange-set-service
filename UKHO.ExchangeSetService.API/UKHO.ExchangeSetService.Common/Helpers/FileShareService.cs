@@ -238,7 +238,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     }
                 }
                 string text = File.ReadAllText(file);
-                text = text.Replace(secondLineText, lineToWrite);
+                text = secondLineText.Length == 0 ? lineToWrite: text.Replace(secondLineText, lineToWrite);
                 File.WriteAllText(file, text);               
             }
             else
@@ -271,12 +271,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private static string GetLine(string filePath, int line)
         {
+            string secondLine = string.Empty;
             using (var sr = new StreamReader(filePath))
             {
                 for (int i = 1; i < line; i++)
                     sr.ReadLine();
-                return sr.ReadLine();
-            }
+               secondLine = sr.ReadLine();
+            }            
+            return secondLine ?? string.Empty;
         }
     }
 }

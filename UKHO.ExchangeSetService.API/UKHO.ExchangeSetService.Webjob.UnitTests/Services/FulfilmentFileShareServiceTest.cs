@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -107,14 +108,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual("ReadMe Text file path found", "ReadMe Text file path found");
         }
          [Test]
-        public async Task WhenRequestSearchReadMeFilePath_ThenReturnsNullResponse()
+        public async Task WhenRequestSearchReadMeFilePath_ThenReturnsEmptyStringResponse()
         {
-            string exchangeSetRootPath = @"D:\\Downloads";
+            string exchangeSetRootPath = string.Empty;
+            string readMeFilePath = string.Empty;
+            string batchId = Guid.NewGuid().ToString();
 
             A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
-            var result = await fulfilmentFileShareService.SearchReadMeFilePath(null);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
 
-            Assert.IsNull(result);           
+            Assert.AreEqual(readMeFilePath, result);           
         }
 
         [Test]
@@ -128,7 +131,21 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
             isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
            
-            Assert.AreSame(true, isFileDownloaded);
+            Assert.AreEqual(true, isFileDownloaded);
+        }
+
+        [Test]
+        public async Task WhenRequestDownloadReadMeFile_ThenReturnsFalseIfFileIsDownloaded()
+        {
+            bool isFileDownloaded = false;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+            string filePath = "TestFilePath";
+
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+
+            Assert.AreEqual(false, isFileDownloaded);
         }
     }
 }
