@@ -44,18 +44,69 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             return filePath;
         }
 
+        [Test]
+        public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenLatestDownloadedFolderExists()
+        {
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
-      
+            var productName = "DE416050";
+
+            var batchId = await apiResponse.GetBatchId();
+            string homeDirectoryPath = Config.EncHomeFolder;
+
+            int editionNumber = 10;
+            string editionNumberString = editionNumber.ToString();
+
+            int updateNumber = 0;
+            string updateNumberString = updateNumber.ToString();
+
+            string countryCode = productName.Substring(0, 2);
+            var filePath = GenerateFilePath(homeDirectoryPath, batchId, countryCode, productName, editionNumberString, updateNumberString);
+
+            int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
+
+            Assert.AreEqual(10, filesCount, $"File count returned from folder {filesCount}, instead of expected count 10");
+        }
+
+        [Test]
+        public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenLatestDownloadedFolderDoesNotExist()
+        {
+            ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
+
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+       
+            var productName = "GB123789";
+
+            var batchId = await apiResponse.GetBatchId();
+            string homeDirectoryPath = Config.EncHomeFolder;
+
+            int editionNumber = 10;
+            string editionNumberString = editionNumber.ToString();
+
+            int updateNumber = 0;
+            string updateNumberString = updateNumber.ToString();
+
+            string countryCode = productName.Substring(0, 2);
+            var filePath = GenerateFilePath(homeDirectoryPath, batchId, countryCode, productName, editionNumberString, updateNumberString);
+
+            int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
+
+            Assert.Zero(filesCount);
+        }
+
+
         [Test]
         public async Task WhenICallTheApiWithAValidProductVersion_ThenLatestDownloadedFolderExists()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
-            var productName = "DE416040";
+            var productName = "DE416050";
 
-            int editionNumber = 11;
+            int editionNumber = 10;
             string editionNumberString = editionNumber.ToString();
 
-            int updateNumber = 1;
+            int updateNumber = 0;
             string updateNumberString = updateNumber.ToString();
 
             ProductVersionData.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
@@ -71,19 +122,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             int filesCount = await FolderCheck.CheckIfDownloadFolderExistAndFileCount(filePath);
 
-            Assert.NotZero(filesCount);
+            Assert.AreEqual(10, filesCount, $"File count returned from folder {filesCount}, instead of expected count 10");
         }
 
         [Test]
         public async Task WhenICallTheApiWithInvalidEditionNumber_ThenLatestDownloadedFolderDoesNotExist()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
-            var productName = "DE416040";
+            var productName = "DE416050";
 
             int editionNumber = 50;
             string editionNumberString = editionNumber.ToString();
 
-            int updateNumber = 1;
+            int updateNumber = 0;
             string updateNumberString = updateNumber.ToString();
 
             ProductVersionData.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
@@ -106,9 +157,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithInvalidUpdateNumber_ThenLatestDownloadedFolderDoesNotExist()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
-            var productName = "DE416040";
+            var productName = "DE416050";
 
-            int editionNumber = 11;
+            int editionNumber = 10;
             string editionNumberString = editionNumber.ToString();
 
             int updateNumber = 100;
