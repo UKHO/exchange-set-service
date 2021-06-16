@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ExchangeSetFileName= ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
-            ConfigurationRoot.Bind("AzureAdB2CConfiguration", AzureAdB2CConfig);
+            ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);
 
         }
     }
