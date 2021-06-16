@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 string[] fileContents = fileSecondLineContent.Split("File date:");
 
                 //Verifying file contents - second line of the readme file
-                Assert.True(fileSecondLineContent.Contains(fileContents[0]));
+                Assert.True(fileSecondLineContent.Contains(fileContents[0]),$"ReadMe file does not contains");
 
                 var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
 

@@ -57,7 +57,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory);
+            Assert.IsTrue(checkIfFileExistInDirectory,"File or folder not exists");
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory);
+            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory);
+            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory);
+            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory);
+            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory);
+            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
         }
     }
 }
