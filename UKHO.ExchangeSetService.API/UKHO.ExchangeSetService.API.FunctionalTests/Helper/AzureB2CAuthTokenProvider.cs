@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                            .WithAuthority($"{EssAuthConfig.MicrosoftOnlineLoginUrl}{B2cConfig.TenantId}", true)
                            .WithClientSecret(B2cConfig.ClientSecret)
                            .Build();
-                var scopes = new string[] { $"https://{B2cConfig.Domain}/exchangesetservice/.default" };
+                var scopes = new string[] { $"https://{B2cConfig.Domain}/exchangesetservice/Request/.default" };
                 AuthenticationResult result = await app.AcquireTokenForClient(scopes).ExecuteAsync();
                 return result.AccessToken;
             }
