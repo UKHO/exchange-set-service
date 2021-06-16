@@ -42,7 +42,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
-                var productsList = ConfigHelper.SplitList((response.Products), fileShareServiceConfig.Value.ParallelSearchTaskCount);
+                int allowedThreadPerEs = fileShareServiceConfig.Value.ParallelSearchTaskCount;
+                int pgGroupCount = response.Products.Count % allowedThreadPerEs == 0 ? response.Products.Count / allowedThreadPerEs : (response.Products.Count / allowedThreadPerEs) + 1;
+                var productsList = ConfigHelper.SplitList((response.Products), pgGroupCount);
+
                 var tasks = productsList.Select(async item =>
                 {
                     await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
@@ -58,7 +61,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri);
         }
 
-        public async Task QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
+        public async Task<bool> QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
         {
             logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
             var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products);
@@ -69,7 +72,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for {BatchId}", message.BatchId);
                 await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for {BatchId}", message.BatchId);
+                return true;
             }
+            return false;
         }
     }
 }
