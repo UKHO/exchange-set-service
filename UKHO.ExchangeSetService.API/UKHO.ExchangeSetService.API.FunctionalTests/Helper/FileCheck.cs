@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -45,12 +44,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             if (fileExistCheck)
             {
                 string[] lines = File.ReadAllLines(fullPath);
-                var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
-                var currentDate = DateTime.Now.ToString("dd-MM-yyyy");
-                var year = currentDate.Substring((currentDate.Length - 2), 2);
+                var fileSecondLineContent = lines[1];
 
-                var secondLine = $"Version: Published Week {weekNumber}/{year} dated {currentDate}";
-                Assert.AreEqual(secondLine, lines[1]);
+                string[] fileContents = fileSecondLineContent.Split("File date:");
+
+                //Verifying file contents - second line of the readme file
+                Assert.True(fileSecondLineContent.Contains(fileContents[0]));
+
+                var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
+
+                Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
+
                 fileContentCheck = true;
             }
             else
