@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var startTime = DateTime.UtcNow;
             while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.FileDownloadWaitTime))
             {
-                await Task.Delay(5000);
+                await Task.Delay(2000);
                 if (File.Exists(fullPath))
                 {
                     fileExistCheck = true;

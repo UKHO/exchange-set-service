@@ -9,6 +9,8 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [TestFixture]
+    [Parallelizable(ParallelScope.Self)]
     public class ReadMeFileCheckandVerification
     {
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
@@ -57,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory,"File or folder not exists");
+            Assert.IsTrue(checkIfFileExistInDirectory, $"File or folder not exists {filePath}");
         }
 
         [Test]
@@ -73,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
+            Assert.IsTrue(checkIfFileExistInDirectory, $"File or folder not exists {filePath}");
         }
 
         [Test]
@@ -91,7 +93,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
+            Assert.IsTrue(checkIfFileExistInDirectory, $"File or folder not exists {filePath}");
         }
 
         [Test]
@@ -111,7 +113,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
+            Assert.IsTrue(checkIfFileExistInDirectory, $"File or folder not exists {filePath}");
         }
 
         [Test]
@@ -132,7 +134,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
+            Assert.IsTrue(checkIfFileExistInDirectory, $"File or folder not exists {filePath}");
         }
 
         [Test]
@@ -152,7 +154,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             bool checkIfFileExistInDirectory = await FileCheck.CheckIfFileExistAndVerify(filePath, Config.ReadMeFileName);
 
-            Assert.IsTrue(checkIfFileExistInDirectory, "File or folder not exists");
+            Assert.IsTrue(checkIfFileExistInDirectory, $"File or folder not exists {filePath}");
         }
     }
 }
