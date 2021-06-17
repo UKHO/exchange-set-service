@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         {
             this.fulFilmentDataService = fulFilmentDataService;
         }
-        public async Task ProcessQueueMessage([QueueTrigger("ess-fulfilment-requests")] SalesCatalogueServiceResponseQueueMessage message, ILogger logger)
+        public async Task ProcessQueueMessage([QueueTrigger("%QueueName%")] SalesCatalogueServiceResponseQueueMessage message, ILogger logger)
         {
             logger.LogInformation(EventIds.CreateExchangeSetRequestStart.ToEventId(), "Create Exchange Set web job started for {BatchId}", message.BatchId);
             

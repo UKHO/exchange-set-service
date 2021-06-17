@@ -24,7 +24,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
 
         $appSettingFile = "$packagePath/$exchangeSet/App_Data/jobs/continuous/ESSFulfilmentWebJob/appsettings.json"
         $appSetting = Get-Content $appSettingFile |ConvertFrom-Json
-        $appSetting.ESSFulfilmentStorageConfiguration.QueueName = $queueName
+        $appSetting.QueueName = $queueName
         $appSetting.KeyVaultSettings.ServiceUri = $KeyVaultUri
         $appSetting | ConvertTo-Json | set-content $appSettingFile
 

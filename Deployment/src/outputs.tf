@@ -11,7 +11,7 @@ output "keyvault_uri"{
 }
 
 output "small_exchange_set_keyvault_uri"{
-  value = module.key_vault.keyvault_uri
+  value = module.fulfilment_keyvaults.small_exchange_set_keyvault_uri
 }
 
 output "small_exchange_set_webapps"{
