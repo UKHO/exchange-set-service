@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
-resource "azurerm_key_vault" "kv" {
-  name                        = var.name
+resource "azurerm_key_vault" "small_exchange_set_kv" {
+  name                        = lower("${var.service_name}-${var.env_name}-sxs-kv")
   location                    = var.location
   resource_group_name         = var.resource_group_name
   enabled_for_disk_encryption = true
@@ -13,16 +13,15 @@ resource "azurerm_key_vault" "kv" {
     default_action             = "Deny"
     bypass                     = "AzureServices"
     ip_rules                   = var.allowed_ips
-    virtual_network_subnet_ids = [var.subnet_id]
+    virtual_network_subnet_ids = var.small_exchange_set_subnets
   }
 
   tags = var.tags
 
 }
 
-#access policy for terraform script service account
-resource "azurerm_key_vault_access_policy" "kv_access_terraform" {
-  key_vault_id = azurerm_key_vault.kv.id
+resource "azurerm_key_vault_access_policy" "small_exchange_set_kv_access_terraform" {
+  key_vault_id = azurerm_key_vault.small_exchange_set_kv.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = data.azurerm_client_config.current.object_id
 
@@ -40,10 +39,9 @@ resource "azurerm_key_vault_access_policy" "kv_access_terraform" {
   ]
 }
 
-#access policy for read access (app service)
-resource "azurerm_key_vault_access_policy" "kv_read_access" {
-  for_each     = var.read_access_objects
-  key_vault_id = azurerm_key_vault.kv.id
+resource "azurerm_key_vault_access_policy" "small_exchange_set_kv_read_access" {
+  for_each     = var.small_exchange_set_read_access_objects
+  key_vault_id = azurerm_key_vault.small_exchange_set_kv.id
   tenant_id    = var.tenant_id
   object_id    = each.value
 
@@ -59,11 +57,11 @@ resource "azurerm_key_vault_access_policy" "kv_read_access" {
 }
 
 resource "azurerm_key_vault_secret" "passed_in_secrets" {
-  for_each     = var.secrets
+  for_each     = var.small_exchange_set_secrets
   name         = each.key
   value        = each.value
-  key_vault_id = azurerm_key_vault.kv.id
+  key_vault_id = azurerm_key_vault.small_exchange_set_kv.id
   tags         = var.tags
 
-  depends_on = [azurerm_key_vault_access_policy.kv_access_terraform]
+  depends_on = [azurerm_key_vault_access_policy.small_exchange_set_kv_access_terraform]
 }

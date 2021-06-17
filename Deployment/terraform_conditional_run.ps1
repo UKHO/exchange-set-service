@@ -2,7 +2,8 @@ param (
     [Parameter(Mandatory = $true)] [string] $deploymentResourceGroupName,
     [Parameter(Mandatory = $true)] [string] $deploymentStorageAccountName,
     [Parameter(Mandatory = $true)] [string] $workSpace,
-    [Parameter(Mandatory = $true)] [boolean] $continueEvenIfResourcesAreGettingDestroyed
+    [Parameter(Mandatory = $true)] [boolean] $continueEvenIfResourcesAreGettingDestroyed,
+    [Parameter(Mandatory = $true)] [string] $TerraformJsonOutputFile
 )
 
 cd $env:AGENT_BUILDDIRECTORY/terraformartifact/src
@@ -53,3 +54,5 @@ Write-Host "##vso[task.setvariable variable=WEB_APP_NAME]$($terraformOutput.web_
 Write-Host "##vso[task.setvariable variable=EssApiUrl]$($terraformOutput.web_app_url.value)"
 Write-Host "##vso[task.setvariable variable=KeyVaultSettings.ServiceUri]$($terraformOutput.keyvault_uri.value)"
 Write-Host "##vso[task.setvariable variable=EssStorageAccountConnectionString;issecret=true]$($terraformOutput.storage_connection_string.value)"
+
+$terraformOutput | ConvertTo-Json > $TerraformJsonOutputFile
