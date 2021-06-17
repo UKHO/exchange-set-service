@@ -4,8 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using UKHO.Logging.EventHubLogProvider;
+#pragma warning disable S1128 // Unused "using" should be removed
 using Serilog;
 using Serilog.Events;
+#pragma warning disable S1128 // Unused "using" should be removed
 using System;
 using System.Diagnostics.CodeAnalysis;
 using UKHO.ExchangeSetService.Common.Configuration;
