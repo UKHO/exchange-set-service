@@ -8,12 +8,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string EssBaseAddress;
         public static string FakeTokenPrivateKey;
         public string ExchangeSetFileName;
-        public string EssStorageAccountConnectionString;
-        public string ReadMeFileName;
-        public string FileDownloadPath;
-        public string ExchangeSetFileFolder;
-        public string EncRootFolder;
-        public string EncHomeFolder;
+        public string EssStorageAccountConnectionString;        
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public class EssAuthorizationTokenConfiguration
@@ -33,18 +28,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot = new ConfigurationBuilder()
                                 .AddJsonFile("appsettings.json", false)
                                 .Build();
-
-            EncHomeFolder = ConfigurationRoot["HOME"];
-            EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;
-            ReadMeFileName = ConfigurationRoot.GetSection("ReadMeFileName").Value;
-            ExchangeSetFileFolder = ConfigurationRoot.GetSection("ExchangeSetFileFolder").Value;
-            EncRootFolder = ConfigurationRoot.GetSection("EncRootFolder").Value;
-            FileDownloadPath = ConfigurationRoot.GetSection("FileDownloadPath").Value;
+            
+            EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;     
             EssBaseAddress = ConfigurationRoot.GetSection("EssApiUrl").Value;
             ExchangeSetFileName = ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
-            ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
-            FileDownloadWaitTime = ConfigurationRoot.GetSection("FileDownloadWaitTime").Value != null ? int.Parse(ConfigurationRoot.GetSection("FileDownloadWaitTime").Value) : 0;
+            ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);            
 
         }
     }
