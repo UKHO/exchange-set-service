@@ -57,5 +57,5 @@ steps:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       scriptType: 'ps'
       scriptLocation: 'scriptPath'
-      scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webapp_deployment.ps1'
+      scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
       arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'
