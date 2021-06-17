@@ -1,10 +1,10 @@
 param (
-    [Parameter(Mandatory = $true)] [string] $TerraformJsonOutputFile,
+    [Parameter(Mandatory = $true)] [string] $terraformJsonOutputFile,
     [Parameter(Mandatory = $true)] [string] $packagePath,
     [Parameter(Mandatory = $true)] [string] $packageName
 )
 
-echo "TerraformJsonOutputFile : $TerraformJsonOutputFile"
+echo "terraformJsonOutputFile : $terraformJsonOutputFile"
 echo "packagePath : $packagePath"
 echo "packageName : $packageName"
 
@@ -48,7 +48,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
     echo "$exchangeSet exchange set deployment completed cleaning up done ..."
 }
 
-$terraformOutput = Get-Content $TerraformJsonOutputFile | ConvertFrom-Json
+$terraformOutput = Get-Content $terraformJsonOutputFile | ConvertFrom-Json
 
 echo "Deploying small exchange set ..."
 ReplaceQueueAndDeployWebApp $terraformOutput.small_exchange_set_webapps.value $packagePath $packageName "small" $terraformOutput.small_exchange_set_keyvault_uri.value $terraformOutput.web_app_resource_group.value
