@@ -30,3 +30,7 @@ output "storage_connection_string" {
 output "web_app_resource_group" {
    value = azurerm_resource_group.rg.name
 }
+
+output "ess_managed_user_identity_client_id"{
+    value = module.user_identity.ess_service_client_id
+}

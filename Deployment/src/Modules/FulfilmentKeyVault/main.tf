@@ -40,7 +40,7 @@ resource "azurerm_key_vault_access_policy" "small_exchange_set_kv_access_terrafo
 }
 
 resource "azurerm_key_vault_access_policy" "small_exchange_set_kv_read_access" {
-  for_each     = var.small_exchange_set_read_access_objects
+  for_each     = var.read_access_objects
   key_vault_id = azurerm_key_vault.small_exchange_set_kv.id
   tenant_id    = var.tenant_id
   object_id    = each.value

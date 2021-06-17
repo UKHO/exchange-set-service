@@ -4,13 +4,20 @@ data "azurerm_subnet" "subnet" {
   resource_group_name  = var.spoke_rg
 }
 
+module "user_identity" {
+  source              = "./Modules/UserIdentity"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  env_name            = local.env_name
+  tags                = local.tags
+}
+
 module "app_insights" {
   source              = "./Modules/AppInsights"
   name                = "${local.service_name}-${local.env_name}-insights"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   tags                = local.tags
-
 }
 
 module "eventhub" {
@@ -23,12 +30,12 @@ module "eventhub" {
 }
 
 module "webapp_service" {
-  source              = "./Modules/Webapp"
-  name                = local.web_app_name
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  subnet_id           = data.azurerm_subnet.subnet.id
-
+  source                    = "./Modules/Webapp"
+  name                      = local.web_app_name
+  resource_group_name       = azurerm_resource_group.rg.name
+  location                  = azurerm_resource_group.rg.location
+  subnet_id                 = data.azurerm_subnet.subnet.id
+  user_assigned_identity    = module.user_identity.ess_service_identity_id
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
     "EventHubLoggingConfiguration:MinimumLoggingLevel"     = "Warning"
@@ -50,13 +57,14 @@ module "fulfilment_vnet" {
 }
 
 module "fulfilment_webapp" {
-  source              = "./Modules/FulfilmentWebapps"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  small_exchange_set_subnets = module.fulfilment_vnet.small_exchange_set_subnets
-  exchange_set_config = local.config_data.ESSFulfilmentConfiguration
-  env_name            = local.env_name
-  service_name        = local.service_name
+  source                        = "./Modules/FulfilmentWebapps"
+  resource_group_name           = azurerm_resource_group.rg.name
+  location                      = azurerm_resource_group.rg.location
+  small_exchange_set_subnets    = module.fulfilment_vnet.small_exchange_set_subnets
+  exchange_set_config           = local.config_data.ESSFulfilmentConfiguration
+  env_name                      = local.env_name
+  service_name                  = local.service_name
+  user_assigned_identity        = module.user_identity.ess_service_identity_id
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
     "EventHubLoggingConfiguration:MinimumLoggingLevel"     = "Warning"
@@ -74,6 +82,7 @@ module "fulfilment_storage" {
   location                              = var.location
   tags                                  = local.tags
   small_exchange_set_subnets            = module.fulfilment_vnet.small_exchange_set_subnets
+  m_spoke_subnet                        = data.azurerm_subnet.subnet.id
   exchange_set_config                   = local.config_data.ESSFulfilmentConfiguration
   env_name                              = local.env_name
   service_name                          = local.service_name
@@ -84,12 +93,12 @@ module "key_vault" {
   name                = local.key_vault_name
   resource_group_name = azurerm_resource_group.rg.name
   env_name            = local.env_name
-  tenant_id           = module.webapp_service.web_app_tenant_id
+  tenant_id           = module.user_identity.ess_service_identity_tenant_id
   location            = azurerm_resource_group.rg.location
   allowed_ips         = var.allowed_ips
   subnet_id           = data.azurerm_subnet.subnet.id
   read_access_objects = {
-    "webapp_service" = module.webapp_service.web_app_object_id
+    "ess_service_identity" = module.user_identity.ess_service_identity_principal_id
   }
   secrets = {
     "EventHubLoggingConfiguration--ConnectionString"       = module.eventhub.log_primary_connection_string
@@ -107,11 +116,13 @@ module "fulfilment_keyvaults" {
   service_name                              = local.service_name
   resource_group_name                       = azurerm_resource_group.rg.name
   env_name                                  = local.env_name
-  tenant_id                                 = module.webapp_service.web_app_tenant_id
+  tenant_id                                 = module.user_identity.ess_service_identity_tenant_id
   location                                  = azurerm_resource_group.rg.location
   allowed_ips                               = var.allowed_ips
   small_exchange_set_subnets                = module.fulfilment_vnet.small_exchange_set_subnets
-  small_exchange_set_read_access_objects    = module.fulfilment_webapp.small_exchange_set_web_app_object_ids
+    read_access_objects = {
+        "ess_service_identity" = module.user_identity.ess_service_identity_principal_id
+  }
   small_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
     "EventHubLoggingConfiguration--EntityPath"                  = module.eventhub.entity_path

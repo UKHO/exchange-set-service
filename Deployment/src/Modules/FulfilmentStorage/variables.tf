@@ -28,3 +28,7 @@ variable "exchange_set_config"{
 variable "service_name" {
   type = string
 }
+
+variable "m_spoke_subnet" {
+  type = string
+}

@@ -29,7 +29,8 @@ resource "azurerm_app_service" "small_exchange_set_webapp" {
   app_settings = var.app_settings
 
   identity {
-    type = "SystemAssigned"
+    type = "UserAssigned"
+    identity_ids = [var.user_assigned_identity]
   }
 
   https_only = true

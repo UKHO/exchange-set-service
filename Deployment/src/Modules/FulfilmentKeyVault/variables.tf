@@ -18,7 +18,7 @@ variable "service_name"{
   type = string
 }
 
-variable "small_exchange_set_read_access_objects" {
+variable "read_access_objects" {
   type = map(string)
 }
 

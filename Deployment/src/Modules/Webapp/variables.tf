@@ -22,3 +22,7 @@ variable "tags" {
 variable "subnet_id" {
   type = string
 }
+
+variable "user_assigned_identity" {
+  type = string
+}
