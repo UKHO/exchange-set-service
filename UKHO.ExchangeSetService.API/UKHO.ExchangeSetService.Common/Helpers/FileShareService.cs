@@ -232,10 +232,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         stream.CopyTo(outputFileStream);
                     }
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        secondLineText = GetLine(file, line);
-                    }
+                    using StreamReader reader = new StreamReader(stream);
+                    secondLineText = GetLine(file, line);
                 }
                 string text = File.ReadAllText(file);
                 text = secondLineText.Length == 0 ? lineToWrite: text.Replace(secondLineText, lineToWrite);
