@@ -94,11 +94,10 @@ module "key_vault" {
   secrets = {
     "EventHubLoggingConfiguration--ConnectionString"       = module.eventhub.log_primary_connection_string
     "EventHubLoggingConfiguration--EntityPath"             = module.eventhub.entity_path
-    "essFulfilmentStorageConfiguration--StorageAccountName" = module.fulfilment_storage.small_exchange_set_name
-    "essFulfilmentStorageConfiguration--StorageAccountKey"  = module.fulfilment_storage.small_exchange_set_primary_access_key
+    "ESSFulfilmentConfiguration--StorageAccountName" = module.fulfilment_storage.small_exchange_set_name
+    "ESSFulfilmentConfiguration--StorageAccountKey"  = module.fulfilment_storage.small_exchange_set_primary_access_key
     "ESSFulfilmentConfiguration--SmallExchangeSetAccountName" = module.fulfilment_storage.small_exchange_set_name
     "ESSFulfilmentConfiguration--SmallExchangeSetAccountKey" = module.fulfilment_storage.small_exchange_set_primary_access_key
-    "AzureWebJobsStorage"                                   = module.fulfilment_storage.small_exchange_set_connection_string
   }
   tags                                         = local.tags
 }
@@ -114,9 +113,11 @@ module "fulfilment_keyvaults" {
   small_exchange_set_subnets           = module.fulfilment_vnet.small_exchange_set_subnets
   small_exchange_set_read_access_objects = module.fulfilment_webapp.small_exchange_set_web_app_object_ids
   small_exchange_set_secrets = {
-    "EventHubLoggingConfiguration--ConnectionString"       = module.eventhub.log_primary_connection_string
-    "EventHubLoggingConfiguration--EntityPath"             = module.eventhub.entity_path
-    "AzureWebJobsStorage"                                   = module.fulfilment_storage.small_exchange_set_connection_string
+    "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
+    "EventHubLoggingConfiguration--EntityPath"                  = module.eventhub.entity_path
+    "ESSFulfilmentStorageConfiguration--StorageAccountName"     = module.fulfilment_storage.small_exchange_set_name
+    "ESSFulfilmentStorageConfiguration--StorageAccountKey"      = module.fulfilment_storage.small_exchange_set_primary_access_key
+    "AzureWebJobsStorage"                                       = module.fulfilment_storage.small_exchange_set_connection_string
   }
   tags                                         = local.tags
 }
