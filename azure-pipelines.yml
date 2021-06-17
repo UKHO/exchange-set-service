@@ -147,7 +147,7 @@ stages:
               command: "publish"
               publishWebProjects: false
               projects: '**/*UKHO.ExchangeSetService.API.csproj'
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)\ExchangeSetServiceWebAPI'
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
               zipAfterPublish: true
               modifyOutputPath: true
 
