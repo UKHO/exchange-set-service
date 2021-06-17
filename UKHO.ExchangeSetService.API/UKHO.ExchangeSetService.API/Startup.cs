@@ -86,11 +86,6 @@ namespace UKHO.ExchangeSetService.API
                     {
                         options.Audience = azureAdB2CConfiguration.ClientId;
                         options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}";
-                        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                        {
-                            ValidAudience = azureAdB2CConfiguration.ClientId,
-                            ValidIssuer = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0"
-                        };
                     });
 
             services.AddAuthorization(options =>
