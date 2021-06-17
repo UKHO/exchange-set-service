@@ -16,6 +16,8 @@ using System.Reflection;
 using System.Linq;
 using System.Net.Http.Headers;
 using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -52,7 +54,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
                 {
-                    builder.AddAzureKeyVault(new System.Uri(kvServiceUri), new DefaultAzureCredential());
+                    var secretClient = new SecretClient(new Uri(kvServiceUri), new DefaultAzureCredential());
+                    builder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
                 }
 
                 #if DEBUG
@@ -93,20 +96,23 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  {
                      builder.AddEventHub(config =>
                      {
-                         config.Environment = eventhubConfig["Environment"];
-                         config.DefaultMinimumLogLevel =
-                             (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["MinimumLoggingLevel"], true);
-                         config.MinimumLogLevels["UKHO"] =
-                             (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["UkhoMinimumLoggingLevel"], true);
-                         config.EventHubConnectionString = eventhubConfig["ConnectionString"];
-                         config.EventHubEntityPath = eventhubConfig["EntityPath"];
-                         config.System = eventhubConfig["System"];
-                         config.Service = eventhubConfig["Service"];
-                         config.NodeName = eventhubConfig["NodeName"];
-                         config.AdditionalValuesProvider = additionalValues =>
-                         {
-                             additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
-                         };
+                     config.Environment = eventhubConfig["Environment"];
+                     config.DefaultMinimumLogLevel =
+                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["MinimumLoggingLevel"], true);
+                     config.MinimumLogLevels["UKHO"] =
+                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["UkhoMinimumLoggingLevel"], true);
+                     config.EventHubConnectionString = eventhubConfig["ConnectionString"];
+                     config.EventHubEntityPath = eventhubConfig["EntityPath"];
+                     config.System = eventhubConfig["System"];
+                     config.Service = eventhubConfig["Service"];
+                     config.NodeName = eventhubConfig["NodeName"];
+                     config.AdditionalValuesProvider = additionalValues =>
+                     {
+                     additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+                         ////var productHeaderValue = new ProductInfoHeaderValue(FulfilmentServiceJob,
+                         ////                       Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
+                     additionalValues["_User-Agent"] = FulfilmentServiceJob + "/" + Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+                        };
                      });
                  }
 

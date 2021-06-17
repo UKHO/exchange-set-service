@@ -38,9 +38,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri,message.CorrelationId);
             if (response.Products != null && response.Products.Any())
             {
-                logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for BatchId:{BatchId} and CorrelationId:{CorrelationId}", message.BatchId, message.CorrelationId);
+                logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(response?.Products,message.CorrelationId);
-                logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for BatchId:{BatchId} and CorrelationId:{CorrelationId}", message.BatchId, message.CorrelationId);
+                logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
 
                 await fulfilmentFileShareService.UploadFileShareServiceData(fssFileName, searchBatchResponse, storageAccountConnectionString, storageConfig.Value.StorageContainerName);
             }

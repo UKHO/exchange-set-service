@@ -102,7 +102,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string scsResponseUri,string correlationId)
         {
-            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataStart.ToEventId(), "Sales catalogue response download start from blob for the scsResponseUri:{scsResponseUri} and CorrelationId:{correlationId}", scsResponseUri, correlationId);
+            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataStart.ToEventId(), "Sales catalogue response download start from blob for the scsResponseUri:{scsResponseUri} and _X-Correlation-ID:{correlationId}", scsResponseUri, correlationId);
             
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
             CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, storageAccountConnectionString);
@@ -110,7 +110,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var responseFile = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
             SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
             
-            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the {scsResponseUri} and CorrelationId:{correlationId}", scsResponseUri, correlationId);
+            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the scsResponseUri:{scsResponseUri} and _X-Correlation-ID:{correlationId}", scsResponseUri, correlationId);
             return salesCatalogueProductResponse;
         }
        
