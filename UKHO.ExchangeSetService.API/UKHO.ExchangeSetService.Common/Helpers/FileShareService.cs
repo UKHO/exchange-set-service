@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
 
-            var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri,null);
+            var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
             CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
             return createBatchResponse;                               
