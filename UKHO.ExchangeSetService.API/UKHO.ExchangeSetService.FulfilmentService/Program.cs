@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
     public static class Program
     {
         private static IConfiguration ConfigurationBuilder;
-        public const string FulfilmentServiceJob = "FulfilmentServiceJob";
+        public const string FulfilmentServiceJob = "ESSFulfilmentServiceWebJob";
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
@@ -107,12 +107,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      config.Service = eventhubConfig["Service"];
                      config.NodeName = eventhubConfig["NodeName"];
                      config.AdditionalValuesProvider = additionalValues =>
-                     {
-                     additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
-                         ////var productHeaderValue = new ProductInfoHeaderValue(FulfilmentServiceJob,
-                         ////                       Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
-                     additionalValues["_User-Agent"] = FulfilmentServiceJob + "/" + Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
-                        };
+                         {
+                            additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+                            additionalValues["_User-Agent"] = FulfilmentServiceJob + "/" + Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+                         };
                      });
                  }
 
