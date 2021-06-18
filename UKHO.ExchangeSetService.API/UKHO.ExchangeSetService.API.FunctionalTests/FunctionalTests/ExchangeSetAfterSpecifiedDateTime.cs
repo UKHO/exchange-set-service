@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDateTime"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "SinceDateTime"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided sinceDateTime cannot be a future date."));
         }
 

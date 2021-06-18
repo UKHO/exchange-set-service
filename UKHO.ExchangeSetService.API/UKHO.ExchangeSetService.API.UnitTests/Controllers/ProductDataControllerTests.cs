@@ -390,7 +390,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest()
         {
-            var validationMessage = new ValidationFailure("sinceDateTime", "Query parameter 'sinceDateTime' is required.")
+            var validationMessage = new ValidationFailure("SinceDateTime", "Query parameter 'sinceDateTime' is required.")
             {
                 ErrorCode = HttpStatusCode.BadRequest.ToString()
             };
