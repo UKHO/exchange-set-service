@@ -244,13 +244,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private static async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
         {
-            using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
-            {
-                using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
-                {
-                    stream.CopyTo(outputFileStream);
-                }
-            }
+            Stream stream = await httpResponse.Content.ReadAsStreamAsync();
+            FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); 
+            stream.CopyTo(outputFileStream);
         }
 
         private static void CheckCreateFolderPath(string downloadPath)

@@ -1,6 +1,5 @@
 ﻿using FakeItEasy;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,18 +16,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     {
         private IOptions<FileShareServiceConfiguration> fakefileShareServiceConfig;
         private IFileShareService fakefileShareService;
-        private IAzureBlobStorageClient fakeazureBlobStorageClient;
         public FulfilmentFileShareService fulfilmentFileShareService;
 
         [SetUp]
         public void Setup()
         {
             fakefileShareService = A.Fake<IFileShareService>();
-            fakeazureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { Limit=100,Start=0,ProductLimit=4,UpdateNumberLimit=10, EncRoot="ENC_ROOT", ExchangeSetFileFolder= "V01X01" });
 
-            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeazureBlobStorageClient);
+            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService);
         }
         private List<Products> GetProductdetails()
         {
@@ -80,22 +77,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestUploadFileShareServiceData_ThenReturnsCloudBlockBlobUri()
-        {
-            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string uploadFileName = string.Concat(batchId, ".json");
-            string containerName = "testContainer";
-            string connectionString = "testConnectionstring";
-
-            A.CallTo(() => fakeazureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
-
-            var result = await fulfilmentFileShareService.UploadFileShareServiceData(uploadFileName,new List<FulfilmentDataResponse>(), connectionString, containerName);
-
-            Assert.AreEqual("http://tempuri.org/blob", result);
-        }
-
-        [Test]
-        public void WhenRequestDownloadFileShareServiceFiles_ThenReturnsFileToSpecificPath()
+        public void WhenValidRequestDownloadFileShareServiceFiles_ThenReturnsFileToSpecificPath()
         {
             var message = new SalesCatalogueServiceResponseQueueMessage() { 
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
@@ -108,7 +90,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void WhenRequestDownloadFileShareServiceFiles_ThenReturnsNoFileToSpecificPath()
+        public void WhenInValidRequestDownloadFileShareServiceFiles_ThenReturnsNoFileToSpecificPath()
         {
             var message = new SalesCatalogueServiceResponseQueueMessage()
             {

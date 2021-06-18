@@ -90,6 +90,18 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
+        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
+        {
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
+
+            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
+                   .And.Message.EqualTo("Storage account accesskey not found")
+                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage); });
+        }
+
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
         {
