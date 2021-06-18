@@ -253,7 +253,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest()
         {
-            var validationMessage = new ValidationFailure("ProductName", "ProductName cannot be blank or null.")
+            var validationMessage = new ValidationFailure("productName", "productName cannot be blank or null.")
             {
                 ErrorCode = HttpStatusCode.BadRequest.ToString()
             };
@@ -277,7 +277,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("ProductName cannot be blank or null.", errors.Errors.Single().Description);
+            Assert.AreEqual("productName cannot be blank or null.", errors.Errors.Single().Description);
         }
 
         [Test]
@@ -390,7 +390,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest()
         {
-            var validationMessage = new ValidationFailure("SinceDateTime", "Query parameter 'SinceDateTime' is required.")
+            var validationMessage = new ValidationFailure("sinceDateTime", "Query parameter 'sinceDateTime' is required.")
             {
                 ErrorCode = HttpStatusCode.BadRequest.ToString()
             };
@@ -412,7 +412,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("Query parameter 'SinceDateTime' is required.", errors.Errors.Single().Description);
+            Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
         }
 
         [Test]
@@ -425,7 +425,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 HttpStatusCode = HttpStatusCode.InternalServerError
             };
 
-            var validationMessage = new ValidationFailure("SinceDateTime", "Internal Server Error");
+            var validationMessage = new ValidationFailure("sinceDateTime", "Internal Server Error");
             validationMessage.ErrorCode = HttpStatusCode.InternalServerError.ToString();
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
@@ -450,7 +450,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 HttpStatusCode = HttpStatusCode.NotModified
             };
 
-            var validationMessage = new ValidationFailure("SinceDateTime", "NotModified.");
+            var validationMessage = new ValidationFailure("sinceDateTime", "NotModified.");
             validationMessage.ErrorCode = HttpStatusCode.NotModified.ToString();
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))

@@ -16,8 +16,8 @@ namespace UKHO.ExchangeSetService.API.Validation
         public ProductDataProductVersionsValidator()
         {
             RuleFor(x => x.CallbackUri)
-                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
-                .WithMessage("Invalid CallbackUri format.")
+                .Must(x => x.IsValidCallbackUri()).OverridePropertyName("callbackUri").When(x => !string.IsNullOrEmpty(x.CallbackUri))
+                .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
             RuleFor(v => v.ProductVersions).NotEmpty().NotNull()
             .WithErrorCode(HttpStatusCode.BadRequest.ToString())
@@ -34,16 +34,16 @@ namespace UKHO.ExchangeSetService.API.Validation
         {
             public ProductVersionsValidator()
             {
-                RuleFor(v => v.ProductName).NotEmpty().NotNull().Must(ru => !string.IsNullOrWhiteSpace(ru))
+                RuleFor(v => v.ProductName).NotEmpty().NotNull().OverridePropertyName("productName").Must(ru => !string.IsNullOrWhiteSpace(ru))
                 .When(ru => ru != null)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("ProductName cannot be blank or null.");
-                RuleFor(v => v.EditionNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
+                .WithMessage("productName cannot be blank or null.");
+                RuleFor(v => v.EditionNumber).NotEmpty().NotNull().OverridePropertyName("editionNumber").GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("EditionNumber cannot be less than zero or null.");
-                RuleFor(v => v.UpdateNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
+                .WithMessage("editionNumber cannot be less than zero or null.");
+                RuleFor(v => v.UpdateNumber).NotEmpty().NotNull().OverridePropertyName("updateNumber").GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("UpdateNumber cannot be less than zero or null.");
+                .WithMessage("updateNumber cannot be less than zero or null.");
             }
         }
     }

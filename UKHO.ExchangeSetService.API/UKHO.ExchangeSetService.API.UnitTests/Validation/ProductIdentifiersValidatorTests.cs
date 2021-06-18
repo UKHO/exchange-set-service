@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var model = new ProductIdentifierRequest { CallbackUri = "demo uri" };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.CallbackUri);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid Callback Uri format."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
         }
 
         [Test]
