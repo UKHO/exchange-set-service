@@ -6,6 +6,8 @@
         public string ResourceId { get; set; }
         public string BusinessUnit { get; set; }
         public string ExchangeSetFileName { get; set; }
+        public string ExchangeSetFileFolder { get; set; }
+        public string EncRoot { get; set; }
         public int Limit { get; set; }
         public int Start { get; set; }
         public string ProductCode { get; set; }
@@ -13,6 +15,7 @@
         public string EditionNumber { get; set; }
         public string UpdateNumber { get; set; }
         public int UpdateNumberLimit { get; set; }
-        public int ProductLimit { get; set; }
+        public int ProductLimit { get; set; } 
+        public int ParallelSearchTaskCount { get; set; }
     }
 }

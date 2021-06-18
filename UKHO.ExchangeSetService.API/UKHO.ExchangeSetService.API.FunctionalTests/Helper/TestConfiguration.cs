@@ -8,7 +8,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string EssBaseAddress;
         public static string FakeTokenPrivateKey;
         public string ExchangeSetFileName;
-        public string EssStorageAccountConnectionString;
+        public string EssStorageAccountConnectionString;        
+        public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public class EssAuthorizationTokenConfiguration
         {
