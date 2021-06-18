@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,16 +15,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileShareService fileShareService;
-        private readonly IAzureBlobStorageClient azureBlobStorageClient;
-        private const string CONTENT_TYPE = "application/json";
 
         public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, 
-            IFileShareService fileShareService, 
-            IAzureBlobStorageClient azureBlobStorageClient)
+            IFileShareService fileShareService)
         {
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileShareService = fileShareService;
-            this.azureBlobStorageClient = azureBlobStorageClient;
         }
 
         public List<Products> SliceFileShareServiceProductsWithUpdateNumber(List<Products> products)
@@ -84,29 +79,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
         {
             return ConfigHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
-        }
-
-        public async Task<string> UploadFileShareServiceData(string uploadFileName, List<FulfilmentDataResponse> fulfilmentDataResponse, string storageAccountConnectionString, string containerName)
-        {
-            var serializeJsonObject = JsonConvert.SerializeObject(fulfilmentDataResponse);
-
-            var cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
-            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
-
-            using (var ms = new MemoryStream())
-            {
-                LoadStreamWithJson(ms, serializeJsonObject);
-                await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob, ms);
-            }            
-            return cloudBlockBlob.Uri.AbsoluteUri;
-        }
-
-        private void LoadStreamWithJson(Stream ms, object obj)
-        {
-            StreamWriter writer = new StreamWriter(ms);
-            writer.Write(obj);
-            writer.Flush();
-            ms.Position = 0;
         }
 
         private List<FulfilmentDataResponse> SetFulfilmentDataResponse(SearchBatchResponse searchBatchResponse)
