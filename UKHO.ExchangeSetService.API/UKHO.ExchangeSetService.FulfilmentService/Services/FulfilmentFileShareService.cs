@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfillmentDataResponse>> QueryFileShareServiceData(List<Products> products)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products)
         {
             if (products != null && products.Any())
             {
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     listBatchDetails.AddRange(result.Entries);
                 }
 
-                return SetFulfillmentDataResponse(new SearchBatchResponse()
+                return SetFulfilmentDataResponse(new SearchBatchResponse()
                 {
                     Entries = listBatchDetails
                 }); 
@@ -72,9 +72,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return null;
         }
 
-        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfillmentDataResponse> fulfillmentDataResponses, string exchangeSetRootPath)
+        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponses, string exchangeSetRootPath)
         {
-            foreach (var item in fulfillmentDataResponses)
+            foreach (var item in fulfilmentDataResponses)
             {
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
                 await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath);
@@ -86,9 +86,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return ConfigHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
         }
 
-        public async Task<string> UploadFileShareServiceData(string uploadFileName, List<FulfillmentDataResponse> fulfillmentDataResponse, string storageAccountConnectionString, string containerName)
+        public async Task<string> UploadFileShareServiceData(string uploadFileName, List<FulfilmentDataResponse> fulfilmentDataResponse, string storageAccountConnectionString, string containerName)
         {
-            var serializeJsonObject = JsonConvert.SerializeObject(fulfillmentDataResponse);
+            var serializeJsonObject = JsonConvert.SerializeObject(fulfilmentDataResponse);
 
             var cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
@@ -109,12 +109,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             ms.Position = 0;
         }
 
-        private List<FulfillmentDataResponse> SetFulfillmentDataResponse(SearchBatchResponse searchBatchResponse)
+        private List<FulfilmentDataResponse> SetFulfilmentDataResponse(SearchBatchResponse searchBatchResponse)
         {
-            var listFulfilmentData = new List<FulfillmentDataResponse>();
+            var listFulfilmentData = new List<FulfilmentDataResponse>();
             foreach (var item in searchBatchResponse.Entries)
             {
-                listFulfilmentData.Add(new FulfillmentDataResponse { 
+                listFulfilmentData.Add(new FulfilmentDataResponse { 
                     BatchId = item.BatchId,
                     EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b=>b.Value).FirstOrDefault()),
                     ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault(),

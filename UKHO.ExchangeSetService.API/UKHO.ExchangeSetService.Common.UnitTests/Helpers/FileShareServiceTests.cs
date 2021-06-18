@@ -27,6 +27,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IAuthTokenProvider fakeAuthTokenProvider;
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
+        public string fakeFilePath = "C:\\HOME\\test.txt";
+        public string fakeFolderPath = "C:\\HOME";
 
         [SetUp]
         public void Setup()
@@ -216,23 +218,23 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region DownloadBatchFile
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProducts_ThenDownloadBatchFilesResponse()
+        public async Task WhenGetBatchInfoBasedOnProductsReturns200_ThenDownloadBatchFiles()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, RequestMessage = new HttpRequestMessage() { 
                      RequestUri = new Uri("http://test.com") 
-                 }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) 
+                 }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!"))) 
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { "C:\\HOME\\test.txt" }, "C:\\HOME");
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
         }
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProducts_ThenDontDownloadBatchFilesResponse()
+        public async Task WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenDonotDownloadBatchFiles()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -246,7 +248,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { "C:\\HOME\\test.txt" }, "C:\\HOME");
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);

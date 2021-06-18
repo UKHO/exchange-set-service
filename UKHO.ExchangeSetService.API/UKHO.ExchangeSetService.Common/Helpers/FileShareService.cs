@@ -212,32 +212,26 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath)
         {
-            HttpResponseMessage httpResponse;
             string payloadJson = string.Empty;
-            bool result = false;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken);
+        }
 
+        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken)
+        {
+            bool result = false;
             foreach (var item in uri)
             {
-                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item);
+                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item);
                 var fileName = item.Split("/").Last();
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    if (!Directory.Exists(downloadPath))
-                    {
-                        Directory.CreateDirectory(downloadPath);
-                    }
+                    CheckCreateFolderPath(downloadPath);
                     string path = Path.Combine(downloadPath, fileName);
                     if (!File.Exists(path))
                     {
-                        using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
-                        {
-                            using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
-                            {
-                                stream.CopyTo(outputFileStream);
-                                result = true;
-                            }
-                        } 
+                        await CopyFileToFolder(httpResponse, path);
+                        result = true;
                     }
                 }
                 else
@@ -246,6 +240,25 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
             }
             return result;
+        }
+
+        private static async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
+        {
+            using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+            {
+                using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
+                {
+                    stream.CopyTo(outputFileStream);
+                }
+            }
+        }
+
+        private static void CheckCreateFolderPath(string downloadPath)
+        {
+            if (!Directory.Exists(downloadPath))
+            {
+                Directory.CreateDirectory(downloadPath);
+            }
         }
     }
 }

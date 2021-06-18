@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri);
         }
 
-        public async Task<bool> QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
+        public async Task QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
         {
             logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
             var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products);
@@ -72,9 +72,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for {BatchId}", message.BatchId);
                 await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for {BatchId}", message.BatchId);
-                return true;
             }
-            return false;
         }
     }
 }

@@ -57,14 +57,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfillmentDataResponse()
+        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse()
         {
             A.CallTo(() =>  fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored)).Returns(GetSearchBatchResponse());
 
             var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails());
 
             Assert.IsNotNull(result);
-            Assert.IsInstanceOf(typeof(List<FulfillmentDataResponse>), result);
+            Assert.IsInstanceOf(typeof(List<FulfilmentDataResponse>), result);
            
             Assert.AreEqual("Received Fulfilment Data Successfully!!!!", "Received Fulfilment Data Successfully!!!!");
         }
@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeazureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
-            var result = await fulfilmentFileShareService.UploadFileShareServiceData(uploadFileName,new List<FulfillmentDataResponse>(), connectionString, containerName);
+            var result = await fulfilmentFileShareService.UploadFileShareServiceData(uploadFileName,new List<FulfilmentDataResponse>(), connectionString, containerName);
 
             Assert.AreEqual("http://tempuri.org/blob", result);
         }
@@ -100,22 +100,22 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var message = new SalesCatalogueServiceResponseQueueMessage() { 
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
             };
-            var fulfillmentDataResponses = new List<FulfillmentDataResponse>() {
-                new FulfillmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
+            var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
             };
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfillmentDataResponses, "");
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponses, "");
             Assert.IsNotNull(result);
         }
 
         [Test]
-        public void WhenRequestDownloadFileShareServiceFiles_ThenReturnsNoFileTospecificPath()
+        public void WhenRequestDownloadFileShareServiceFiles_ThenReturnsNoFileToSpecificPath()
         {
             var message = new SalesCatalogueServiceResponseQueueMessage()
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
             };
-            var fulfillmentDataResponses = new List<FulfillmentDataResponse>();
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfillmentDataResponses, "");
+            var fulfilmentDataResponses = new List<FulfilmentDataResponse>();
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponses, "");
             Assert.IsNotNull(result);
         }
     }
