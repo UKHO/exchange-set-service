@@ -42,8 +42,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
-                int allowedThreadPerEs = fileShareServiceConfig.Value.ParallelSearchTaskCount;
-                int pgGroupCount = response.Products.Count % allowedThreadPerEs == 0 ? response.Products.Count / allowedThreadPerEs : (response.Products.Count / allowedThreadPerEs) + 1;
+                int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
+                int pgGroupCount = response.Products.Count % parallelSearchTaskCount == 0 ? response.Products.Count / parallelSearchTaskCount : (response.Products.Count / parallelSearchTaskCount) + 1;
                 var productsList = ConfigHelper.SplitList((response.Products), pgGroupCount);
 
                 var tasks = productsList.Select(async item =>

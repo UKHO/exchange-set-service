@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void WhenRequestDownloadFileShareServiceFiles_ThenReturnsFileTospecificPath()
+        public void WhenRequestDownloadFileShareServiceFiles_ThenReturnsFileToSpecificPath()
         {
             var message = new SalesCatalogueServiceResponseQueueMessage() { 
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
