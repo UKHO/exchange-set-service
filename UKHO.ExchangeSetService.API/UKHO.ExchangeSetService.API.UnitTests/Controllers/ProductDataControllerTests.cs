@@ -425,7 +425,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 HttpStatusCode = HttpStatusCode.InternalServerError
             };
 
-            var validationMessage = new ValidationFailure("sinceDateTime", "Internal Server Error");
+            var validationMessage = new ValidationFailure("SinceDateTime", "Internal Server Error");
             validationMessage.ErrorCode = HttpStatusCode.InternalServerError.ToString();
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
@@ -450,7 +450,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 HttpStatusCode = HttpStatusCode.NotModified
             };
 
-            var validationMessage = new ValidationFailure("sinceDateTime", "NotModified.");
+            var validationMessage = new ValidationFailure("SinceDateTime", "NotModified.");
             validationMessage.ErrorCode = HttpStatusCode.NotModified.ToString();
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))

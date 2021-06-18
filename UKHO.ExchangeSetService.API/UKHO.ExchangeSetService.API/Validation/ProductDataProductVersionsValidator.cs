@@ -16,7 +16,7 @@ namespace UKHO.ExchangeSetService.API.Validation
         public ProductDataProductVersionsValidator()
         {
             RuleFor(x => x.CallbackUri)
-                .Must(x => x.IsValidCallbackUri()).OverridePropertyName("callbackUri").When(x => !string.IsNullOrEmpty(x.CallbackUri))
+                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
                 .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
             RuleFor(v => v.ProductVersions).NotEmpty().NotNull()
@@ -34,14 +34,14 @@ namespace UKHO.ExchangeSetService.API.Validation
         {
             public ProductVersionsValidator()
             {
-                RuleFor(v => v.ProductName).NotEmpty().NotNull().OverridePropertyName("productName").Must(ru => !string.IsNullOrWhiteSpace(ru))
+                RuleFor(v => v.ProductName).NotEmpty().NotNull().Must(ru => !string.IsNullOrWhiteSpace(ru))
                 .When(ru => ru != null)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("productName cannot be blank or null.");
-                RuleFor(v => v.EditionNumber).NotEmpty().NotNull().OverridePropertyName("editionNumber").GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
+                RuleFor(v => v.EditionNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("editionNumber cannot be less than zero or null.");
-                RuleFor(v => v.UpdateNumber).NotEmpty().NotNull().OverridePropertyName("updateNumber").GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
+                RuleFor(v => v.UpdateNumber).NotEmpty().NotNull().GreaterThanOrEqualTo(0).Must(ru => ru.HasValue && ru >= 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("updateNumber cannot be less than zero or null.");
             }

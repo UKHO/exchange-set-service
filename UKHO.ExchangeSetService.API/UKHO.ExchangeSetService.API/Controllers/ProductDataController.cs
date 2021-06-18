@@ -216,7 +216,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "sinceDateTime",
+                        Source = "SinceDateTime",
                         Description = "Query parameter 'sinceDateTime' is required."
                     }
                 };

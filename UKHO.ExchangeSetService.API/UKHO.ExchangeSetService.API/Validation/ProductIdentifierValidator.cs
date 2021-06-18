@@ -23,8 +23,7 @@ namespace UKHO.ExchangeSetService.API.Validation
                .WithMessage("Product Identifiers cannot be null or empty.");           
 
             RuleFor(x => x.CallbackUri)               
-                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
-                .OverridePropertyName("callbackUri")
+                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))                
                 .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
         }
