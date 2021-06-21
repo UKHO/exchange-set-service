@@ -52,10 +52,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 });
                 await Task.WhenAll(tasks);
             }
-            else
-            {
-                return "Received Fulfilment Data Unsuccessfully!!!!";
-            }
 
             return "Received Fulfilment Data Successfully!!!!";
         }
@@ -67,15 +63,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
         {
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
             var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.CorrelationId);
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for {BatchId}", message.BatchId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
 
             if (searchBatchResponse != null && searchBatchResponse.Any())
             {
-                logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for {BatchId}", message.BatchId);
+                logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
                 await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
-                logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for {BatchId}", message.BatchId);
+                logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
             }
         }
     }

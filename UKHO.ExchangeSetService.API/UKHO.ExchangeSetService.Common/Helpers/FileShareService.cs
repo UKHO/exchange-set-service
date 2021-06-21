@@ -102,7 +102,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
             internalSearchBatchResponse.Entries = new List<BatchDetail>();
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);            
             var productWithAttributes = GenerateQueryForFss(products);
             var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes}";
 
@@ -210,14 +210,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return sb.ToString();
         }
 
-        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath)
+        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath,string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken);
+            return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken, correlationId);
         }
 
-        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken)
+        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken,string correlationId)
         {
             bool result = false;
             foreach (var item in uri)
@@ -236,7 +236,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.DownloadFileShareServiceNonOkResponse.ToEventId(), "File share service download end point with uri {RequestUri} responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
+                    logger.LogInformation(EventIds.DownloadFileShareServiceNonOkResponse.ToEventId(), "File share service download end point with uri {RequestUri} responded with {StatusCode} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, correlationId);
                 }
             }
             return result;

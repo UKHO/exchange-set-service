@@ -91,21 +91,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async Task WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
-        {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-
-            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-            salesCatalogueProductResponse.Products = null;
-
-            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
-
-            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
-
-            Assert.AreEqual("Received Fulfilment Data Unsuccessfully!!!!", salesCatalogueResponseFile);
-        }
-
-        [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();

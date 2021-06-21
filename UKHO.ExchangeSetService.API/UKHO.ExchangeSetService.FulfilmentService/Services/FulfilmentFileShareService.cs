@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             foreach (var item in fulfilmentDataResponses)
             {
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
-                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath);
+                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message.CorrelationId);
             }
         }
 

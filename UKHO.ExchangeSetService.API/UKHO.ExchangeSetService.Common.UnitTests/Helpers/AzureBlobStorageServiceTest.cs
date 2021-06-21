@@ -88,6 +88,20 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #endregion
 
         #region DownloadSalesCatalogueResponse
+
+        [Test]
+        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenReturnKeyNotFoundException()
+        {
+            string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
+        
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
+
+            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
+                   .And.Message.EqualTo("Storage account accesskey not found")
+                    , async delegate { await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, null); });
+        }
+
         [Test]
         public async Task WhenCallDownloadSalesCatalogueResponse_ThenReturnsSalesCatalogueProductResponse()
         {
