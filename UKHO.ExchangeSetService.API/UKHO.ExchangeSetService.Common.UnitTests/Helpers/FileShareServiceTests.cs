@@ -229,7 +229,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region SearchReadMeFilePath
         [Test]
-        public async Task WhenSearchReadMeFilePath_ThenSearchReadMeFilePathReturnsEmptyStringResponse()
+        public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -240,7 +240,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         
         }
         [Test]
-        public async Task WhenSearchReadMeFilePath_ThenSearchReadMeFilePathReturnsReadMeFilePathResponse()
+        public async Task WhenValidSearchReadMeFileRequest_ThenReturnValidFilePath()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
@@ -275,7 +275,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region DownloadReadMeFile
 
         [Test]
-        public async Task WhenDownloadReadMeFile_ThenDownloadReadMeFileReturnsTrueResponse()
+        public async Task WhenValidDownloadReadMeFileRequest_ThenReturnTrueResponse()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;

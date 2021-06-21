@@ -261,8 +261,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var batchResult = searchBatchResponse.Entries.FirstOrDefault();
                     filePath =  batchResult.Files.FirstOrDefault().Links.Get.Href;                  
                 }
-                else
-                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for {BatchId}", batchId);              
+                else                    
+                    logger.LogInformation(EventIds.QueryFileShareServiceForReadMeFileNonOkResponse.ToEventId(), "Query File share service for readme file with uri {RequestUri} responded with {StatusCode} for {BatchId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId);
             }
             return filePath;
         }
