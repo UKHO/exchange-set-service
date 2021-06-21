@@ -215,11 +215,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string payloadJson = string.Empty;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;            
-            string file = Path.Combine(exchangeSetRootPath, fileName);
-            if (!Directory.Exists(exchangeSetRootPath))
-            {
-                Directory.CreateDirectory(exchangeSetRootPath);
-            }
+            string file = Path.Combine(exchangeSetRootPath, fileName);           
+            CheckCreateFolderPath(exchangeSetRootPath);              
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ"));
             string secondLineText = string.Empty;
             HttpResponseMessage httpReadMeFileResponse;
@@ -261,9 +258,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var batchResult = searchBatchResponse.Entries.FirstOrDefault();
                     filePath =  batchResult.Files.FirstOrDefault().Links.Get.Href;                  
                 }
-                else                    
-                    logger.LogInformation(EventIds.QueryFileShareServiceForReadMeFileNonOkResponse.ToEventId(), "Query File share service for readme file with uri {RequestUri} responded with {StatusCode} for {BatchId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId);
+                else
+                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for {BatchId}", batchId);
             }
+            else
+                logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "Query File share service for readme file with uri {RequestUri} responded with {StatusCode} for {BatchId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId);
+
             return filePath;
         }
 
@@ -277,6 +277,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                secondLine = sr.ReadLine();
             }            
             return secondLine ?? string.Empty;
+        }
+
+        private static void CheckCreateFolderPath(string downloadPath)
+        {
+            if (!Directory.Exists(downloadPath))
+            {
+                Directory.CreateDirectory(downloadPath);
+            }
         }
     }
 }
