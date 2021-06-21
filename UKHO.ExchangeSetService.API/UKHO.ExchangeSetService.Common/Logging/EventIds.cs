@@ -35,10 +35,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceRequestStart = 805028,
         QueryFileShareServiceRequestCompleted = 805029,
         QueryFileShareServiceNonOkResponse = 805030,
-        ReadMeTextFileNotFound = 805031,
-        SearchDownloadReadMeFileRequestStart = 805032,
-        SearchDownloadReadMeFileRequestCompleted = 805033,
-        ReadMeTextFileIsNotDownloaded = 805034,
+        DownloadFileShareServiceFilesStart = 805031,
+        DownloadFileShareServiceFilesCompleted = 805032,
+        DownloadFileShareServiceNonOkResponse = 805033,        
+        ReadMeTextFileNotFound = 805034,
+        SearchDownloadReadMeFileRequestStart = 805035,
+        SearchDownloadReadMeFileRequestCompleted = 805036,
+        ReadMeTextFileIsNotDownloaded = 805037,
     }
 
     public static class EventIdExtensions

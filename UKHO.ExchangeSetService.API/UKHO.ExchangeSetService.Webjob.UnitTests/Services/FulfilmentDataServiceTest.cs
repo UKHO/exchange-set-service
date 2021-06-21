@@ -22,8 +22,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IAzureBlobStorageService fakeAzureBlobStorageService;
         public IFulfilmentFileShareService fakeQueryFssService;
         public ILogger<FulfilmentDataService> fakeLogger;
-        private IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
-        private IConfiguration fakeConfiguration;
+        public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        public IConfiguration fakeConfiguration;
 
         [SetUp]
         public void Setup()
@@ -32,14 +32,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
-            fakeFileShareServiceConfig = A.Fake<IOptions<FileShareServiceConfiguration>>();
             fakeConfiguration = A.Fake<IConfiguration>();
-
+            fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
+            { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
+                ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10,
+                EncRoot = "ENC_ROOT",
+                ExchangeSetFileFolder = "V01X01"
+            });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
-            fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageService, fakeQueryFssService,
-                fakeEssFulfilmentStorageConfiguration, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration);
         }
 
         #region GetScsResponseQueueMessage
@@ -87,7 +90,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
-        [Test]
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
             fakeConfiguration["HOME"] = @"D:\Downloads";

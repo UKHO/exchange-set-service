@@ -210,6 +210,45 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return sb.ToString();
         }
 
+        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken);
+        }
+
+        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken)
+        {
+            bool result = false;
+            foreach (var item in uri)
+            {
+                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item);
+                var fileName = item.Split("/").Last();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    CheckCreateFolderPath(downloadPath);
+                    string path = Path.Combine(downloadPath, fileName);
+                    if (!File.Exists(path))
+                    {
+                        await CopyFileToFolder(httpResponse, path);
+                        result = true;
+                    }
+                }
+                else
+                {
+                    logger.LogInformation(EventIds.DownloadFileShareServiceNonOkResponse.ToEventId(), "File share service download end point with uri {RequestUri} responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
+                }
+            }
+            return result;
+        }
+
+        private static async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
+        {
+            Stream stream = await httpResponse.Content.ReadAsStreamAsync();
+            FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); 
+            stream.CopyTo(outputFileStream);
+        }      
+
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath)
         {
             string payloadJson = string.Empty;
