@@ -25,8 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-        private const int line = 2;
-
+       
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -269,7 +268,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         stream.CopyTo(outputFileStream);
                     }
                     using StreamReader reader = new StreamReader(stream);
-                    secondLineText = GetLine(file, line);
+                    secondLineText = GetLine(file);
                 }
                 string text = File.ReadAllText(file);
                 text = secondLineText.Length == 0 ? lineToWrite: text.Replace(secondLineText, lineToWrite);
@@ -306,12 +305,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return filePath;
         }
 
-        private static string GetLine(string filePath, int line)
+        private static string GetLine(string filePath)
         {
+            int lineFound = 2;
             string secondLine = string.Empty;
             using (var sr = new StreamReader(filePath))
             {
-                for (int i = 1; i < line; i++)
+                for (int i = 1; i < lineFound; i++)
                     sr.ReadLine();
                secondLine = sr.ReadLine();
             }            

@@ -39,8 +39,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         DownloadFileShareServiceFilesCompleted = 805032,
         DownloadFileShareServiceNonOkResponse = 805033,        
         ReadMeTextFileNotFound = 805034,
-        SearchDownloadReadMeFileRequestStart = 805035,
-        SearchDownloadReadMeFileRequestCompleted = 805036,
+        DownloadReadMeFileRequestStart = 805035,
+        DownloadReadMeFileRequestCompleted = 805036,
         ReadMeTextFileIsNotDownloaded = 805037,
     }
 

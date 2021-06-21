@@ -103,28 +103,24 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestSearchReadMeFilePath_ThenReturnsFilePath()
+        public async Task WhenValidSearchReadMeFileRequest_ThenReturnFilePath()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string exchangeSetRootPath = @"D:\\Downloads";
-
+            string exchangeSetRootPath = @"batch/" + batchId +"/files/README.TXT";
             A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
             var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual("ReadMe Text file path found", "ReadMe Text file path found");
+            Assert.IsNotEmpty(result);            
         }
          [Test]
-        public async Task WhenRequestSearchReadMeFilePath_ThenReturnsEmptyStringResponse()
+        public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
         {
-            string exchangeSetRootPath = string.Empty;
-            string readMeFilePath = string.Empty;
+            string exchangeSetRootPath = string.Empty;           
             string batchId = Guid.NewGuid().ToString();
 
             A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
             var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
 
-            Assert.AreEqual(readMeFilePath, result);           
+            Assert.IsEmpty(result);           
         }
 
         [Test]

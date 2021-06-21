@@ -81,13 +81,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath)
         {
-            logger.LogInformation(EventIds.SearchDownloadReadMeFileRequestStart.ToEventId(), "Search and download ReadMe Text File start for {BatchId}", batchId);
-
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for readme file for {BatchId}", batchId);           
             string readMeFilePath = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
-            if (!string.IsNullOrWhiteSpace(readMeFilePath))
-                await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for readme file for {BatchId}", batchId);
 
-            logger.LogInformation(EventIds.SearchDownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for {BatchId}", batchId);
+            if (!string.IsNullOrWhiteSpace(readMeFilePath))
+            {
+                logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "Search and download ReadMe Text File start for {BatchId}", batchId);
+                await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath);
+                logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for {BatchId}", batchId);
+            }               
         }
     }
 }
