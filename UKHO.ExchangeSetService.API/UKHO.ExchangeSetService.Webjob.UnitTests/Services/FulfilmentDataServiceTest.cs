@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -21,6 +22,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IAzureBlobStorageService fakeAzureBlobStorageService;
         public IFulfilmentFileShareService fakeQueryFssService;
         public ILogger<FulfilmentDataService> fakeLogger;
+        public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        public IConfiguration fakeConfiguration;
 
         [SetUp]
         public void Setup()
@@ -29,11 +32,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
+            fakeConfiguration = A.Fake<IConfiguration>();
+            fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
+            { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
+                ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10,
+                EncRoot = "ENC_ROOT",
+                ExchangeSetFileFolder = "V01X01"
+            });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
-            fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageService, fakeQueryFssService,
-                fakeEssFulfilmentStorageConfiguration, fakeLogger);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration);
         }
 
         #region GetScsResponseQueueMessage
@@ -82,16 +91,18 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
+        public async Task WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
-              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
+            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
+            salesCatalogueProductResponse.Products = null;
 
-            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
-                   .And.Message.EqualTo("Storage account accesskey not found")
-                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage); });
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+
+            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
+
+            Assert.AreEqual("Received Fulfilment Data Unsuccessfully!!!!", salesCatalogueResponseFile);
         }
 
         [Test]

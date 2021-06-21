@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -97,7 +98,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return createBatchResponse;
         }
 
-        public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, string correlationId )
+        public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, string correlationId)
         {
             SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
             internalSearchBatchResponse.Entries = new List<BatchDetail>();
@@ -207,6 +208,53 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             sb.Append(")");//// last main )
             return sb.ToString();
+        }
+
+        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken);
+        }
+
+        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken)
+        {
+            bool result = false;
+            foreach (var item in uri)
+            {
+                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item);
+                var fileName = item.Split("/").Last();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    CheckCreateFolderPath(downloadPath);
+                    string path = Path.Combine(downloadPath, fileName);
+                    if (!File.Exists(path))
+                    {
+                        await CopyFileToFolder(httpResponse, path);
+                        result = true;
+                    }
+                }
+                else
+                {
+                    logger.LogInformation(EventIds.DownloadFileShareServiceNonOkResponse.ToEventId(), "File share service download end point with uri {RequestUri} responded with {StatusCode}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode);
+                }
+            }
+            return result;
+        }
+
+        private static async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
+        {
+            Stream stream = await httpResponse.Content.ReadAsStreamAsync();
+            FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); 
+            stream.CopyTo(outputFileStream);
+        }
+
+        private static void CheckCreateFolderPath(string downloadPath)
+        {
+            if (!Directory.Exists(downloadPath))
+            {
+                Directory.CreateDirectory(downloadPath);
+            }
         }
     }
 }

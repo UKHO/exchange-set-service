@@ -9,5 +9,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         public Task<CreateBatchResponse> CreateBatch();
         Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, string correlationId);
+        Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath);
     }
 }
