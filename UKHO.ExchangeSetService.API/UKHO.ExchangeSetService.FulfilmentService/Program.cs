@@ -27,13 +27,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService
     public static class Program
     {
         private static IConfiguration ConfigurationBuilder;
+        private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string FulfilmentServiceJob = "ESSFulfilmentServiceWebJob";
+        
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
 
             IHost host = hostBuilder.Build();
-
+            
             using (host)
             {
                 host.Run();
@@ -41,6 +43,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         }
         private static HostBuilder BuildHostConfiguration()
         {
+
             HostBuilder hostBuilder = new HostBuilder();
             hostBuilder.ConfigureAppConfiguration((hostContext, builder) =>
             {
@@ -69,8 +72,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 builder.AddEnvironmentVariables();
 
                 Program.ConfigurationBuilder = builder.Build();
-
-
             })
              .ConfigureLogging((hostContext, builder) =>
              {
@@ -110,8 +111,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      config.NodeName = eventhubConfig["NodeName"];
                      config.AdditionalValuesProvider = additionalValues =>
                          {
-                            additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
-                            additionalValues["_User-Agent"] = FulfilmentServiceJob + "/" + Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+                            additionalValues["_AssemblyVersion"] = AssemblyVersion;
+                            additionalValues["_User-Agent"] = FulfilmentServiceJob + "/" + AssemblyVersion;
                          };
                      });
                  }
@@ -131,11 +132,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
-                    client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"])
-                 );
-                 services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
-                 client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(FulfilmentServiceJob,
-                                            Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version)));
+                     {
+                         client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
+                         var productHeaderValue = new ProductInfoHeaderValue(FulfilmentServiceJob, AssemblyVersion);
+                         client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                     });
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
