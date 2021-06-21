@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
     {
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
-        public const string FulfilmentServiceJob = "ESSFulfilmentServiceWebJob";
+        public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
         
         public static void Main(string[] args)
         {
@@ -93,26 +93,26 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  {
                      builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
                  }
-                 var eventhubConfig = ConfigurationBuilder.GetSection("EventHubLoggingConfiguration");
+                
+                 EventHubLoggingConfiguration eventhubConfig = ConfigurationBuilder.GetSection("EventHubLoggingConfiguration").Get<EventHubLoggingConfiguration>();
 
-                 if (!string.IsNullOrWhiteSpace(eventhubConfig["ConnectionString"]))
+                 if (!string.IsNullOrWhiteSpace(eventhubConfig.ConnectionString))
                  {
                      builder.AddEventHub(config =>
                      {
-                     config.Environment = eventhubConfig["Environment"];
+                     config.Environment = eventhubConfig.Environment;
                      config.DefaultMinimumLogLevel =
-                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["MinimumLoggingLevel"], true);
+                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig.MinimumLoggingLevel, true);
                      config.MinimumLogLevels["UKHO"] =
-                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig["UkhoMinimumLoggingLevel"], true);
-                     config.EventHubConnectionString = eventhubConfig["ConnectionString"];
-                     config.EventHubEntityPath = eventhubConfig["EntityPath"];
-                     config.System = eventhubConfig["System"];
-                     config.Service = eventhubConfig["Service"];
-                     config.NodeName = eventhubConfig["NodeName"];
+                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig.UkhoMinimumLoggingLevel, true);
+                     config.EventHubConnectionString = eventhubConfig.ConnectionString;
+                     config.EventHubEntityPath = eventhubConfig.EntityPath;
+                     config.System = eventhubConfig.System;
+                     config.Service = eventhubConfig.Service;
+                     config.NodeName = eventhubConfig.NodeName;
                      config.AdditionalValuesProvider = additionalValues =>
                          {
-                            additionalValues["_AssemblyVersion"] = AssemblyVersion;
-                            additionalValues["_User-Agent"] = FulfilmentServiceJob + "/" + AssemblyVersion;
+                             additionalValues["_AssemblyVersion"] = AssemblyVersion;
                          };
                      });
                  }
@@ -134,7 +134,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                      {
                          client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
-                         var productHeaderValue = new ProductInfoHeaderValue(FulfilmentServiceJob, AssemblyVersion);
+                         var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                          client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                      });
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
