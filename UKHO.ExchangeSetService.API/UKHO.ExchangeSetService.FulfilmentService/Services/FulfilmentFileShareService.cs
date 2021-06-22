@@ -96,13 +96,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             return listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
         }
-        public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath)
+        public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
-           return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);            
+           return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);            
         }
-        public async Task<string> SearchReadMeFilePath(string batchId)
+        public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
-           return await fileShareService.SearchReadMeFilePath(batchId);
+           return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
     }
 }

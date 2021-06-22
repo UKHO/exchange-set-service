@@ -107,8 +107,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string exchangeSetRootPath = @"batch/" + batchId +"/files/README.TXT";
-            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
-            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId,null);
             Assert.IsNotEmpty(result);            
         }
          [Test]
@@ -117,8 +117,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string exchangeSetRootPath = string.Empty;           
             string batchId = Guid.NewGuid().ToString();
 
-            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
-            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId,null);
 
             Assert.IsEmpty(result);           
         }
@@ -131,8 +131,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string exchangeSetRootPath = @"D:\\Downloads";
             string filePath = "TestFilePath";
 
-            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
-            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath,null);
            
             Assert.AreEqual(true, isFileDownloaded);
         }
@@ -145,8 +145,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string exchangeSetRootPath = @"D:\\Downloads";
             string filePath = "TestFilePath";
 
-            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
-            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath,null);
 
             Assert.AreEqual(false, isFileDownloaded);
         }

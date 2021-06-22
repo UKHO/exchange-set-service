@@ -281,7 +281,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.SearchReadMeFilePath(string.Empty);
+            var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
             Assert.AreEqual(string.Empty, response);
         
         }
@@ -313,7 +313,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.SearchReadMeFilePath(batchId);
+            var response = await fileShareService.SearchReadMeFilePath(batchId,null);
             string expectedReadMeFilePath = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
             Assert.IsNotNull(response);
             Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);
@@ -353,7 +353,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationidParam = correlationid;
                })
                .Returns(httpResponse);
-            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath);
+            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath,null);
             Assert.AreEqual(true,response);
         }
         #endregion 
