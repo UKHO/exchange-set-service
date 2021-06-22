@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IConfiguration configuration;
 
-        public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService, 
+        public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     ILogger<FulfilmentDataService> logger,
                                     IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 });
                 await Task.WhenAll(tasks);
             }
-
+            await CreateAncillaryFiles(message.BatchId, exchangeSetRootPath);
             return "Received Fulfilment Data Successfully!!!!";
         }
 
@@ -73,6 +73,24 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for {BatchId}", message.BatchId);
             }
+        }
+        private async Task CreateAncillaryFiles(string batchId, string exchangeSetRootPath)
+        {
+            await DownloadReadMeFile(batchId, exchangeSetRootPath);
+        }
+
+        public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath)
+        {
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for readme file for {BatchId}", batchId);           
+            string readMeFilePath = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for readme file for {BatchId}", batchId);
+
+            if (!string.IsNullOrWhiteSpace(readMeFilePath))
+            {
+                logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "Search and download ReadMe Text File start for {BatchId}", batchId);
+                await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath);
+                logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for {BatchId}", batchId);
+            }               
         }
     }
 }

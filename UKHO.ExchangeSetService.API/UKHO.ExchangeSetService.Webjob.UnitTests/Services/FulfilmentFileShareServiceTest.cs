@@ -1,6 +1,7 @@
 ﻿using FakeItEasy;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -99,6 +100,55 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var fulfilmentDataResponses = new List<FulfilmentDataResponse>();
             var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponses, "");
             Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public async Task WhenValidSearchReadMeFileRequest_ThenReturnFilePath()
+        {
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"batch/" + batchId +"/files/README.TXT";
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
+            Assert.IsNotEmpty(result);            
+        }
+         [Test]
+        public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
+        {
+            string exchangeSetRootPath = string.Empty;           
+            string batchId = Guid.NewGuid().ToString();
+
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
+
+            Assert.IsEmpty(result);           
+        }
+
+        [Test]
+        public async Task WhenRequestDownloadReadMeFile_ThenReturnsTrueIfFileIsDownloaded()
+        {
+            bool isFileDownloaded = true;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+            string filePath = "TestFilePath";
+
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+           
+            Assert.AreEqual(true, isFileDownloaded);
+        }
+
+        [Test]
+        public async Task WhenRequestDownloadReadMeFile_ThenReturnsFalseIfFileIsNotDownloaded()
+        {
+            bool isFileDownloaded = false;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+            string filePath = "TestFilePath";
+
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+
+            Assert.AreEqual(false, isFileDownloaded);
         }
     }
 }

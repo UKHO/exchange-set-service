@@ -165,7 +165,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "CallbackUri"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Invalid Callback Uri format."));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Invalid callbackUri format."));
         }
     }
 }
