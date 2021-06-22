@@ -138,7 +138,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestDownloadReadMeFile_ThenReturnsFalseIfFileIsDownloaded()
+        public async Task WhenRequestDownloadReadMeFile_ThenReturnsFalseIfFileIsNotDownloaded()
         {
             bool isFileDownloaded = false;
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
