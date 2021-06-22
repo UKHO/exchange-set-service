@@ -90,17 +90,33 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
+        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
+        {
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
+
+            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
+                   .And.Message.EqualTo("Storage account accesskey not found")
+                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage); });
+        }
+
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
+            fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
+            fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
-
+            string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 

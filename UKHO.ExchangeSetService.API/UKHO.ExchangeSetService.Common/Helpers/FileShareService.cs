@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-
+       
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -34,12 +34,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fileShareServiceClient = fileShareServiceClient;
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
-            this.logger = logger;            
+            this.logger = logger;
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-
             var jwtSecurityToken = new JwtSecurityToken(accessToken);
             var oid = jwtSecurityToken.Claims.FirstOrDefault(m => m.Type == "oid").Value;
             var uri = $"/batch";
@@ -51,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
             CreateBatchResponse createBatchResponse = await CreateBatchResponse(httpResponse, createBatchRequest.ExpiryDate);
-            return createBatchResponse;                               
+            return createBatchResponse;
         }
 
         private CreateBatchRequest CreateBatchRequest(string oid)
@@ -75,7 +74,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return createBatchRequest;
         }
 
-        private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse,string batchExpiryDateTime)
+        private async Task<CreateBatchResponse> CreateBatchResponse(HttpResponseMessage httpResponse, string batchExpiryDateTime)
         {
             var createBatchResponse = new CreateBatchResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
@@ -90,9 +89,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 createBatchResponse.ResponseCode = httpResponse.StatusCode;
                 createBatchResponse.ResponseBody = JsonConvert.DeserializeObject<CreateBatchResponseModel>(body);
-                createBatchResponse.ResponseBody.BatchStatusUri =$"{fileShareServiceConfig.Value.BaseUrl}/batch/{createBatchResponse.ResponseBody.BatchId}";
+                createBatchResponse.ResponseBody.BatchStatusUri = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{createBatchResponse.ResponseBody.BatchId}";
                 createBatchResponse.ResponseBody.BatchExpiryDateTime = batchExpiryDateTime;
-                createBatchResponse.ResponseBody.ExchangeSetFileUri =$"{createBatchResponse.ResponseBody.BatchStatusUri}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}";
+                createBatchResponse.ResponseBody.ExchangeSetFileUri = $"{createBatchResponse.ResponseBody.BatchStatusUri}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}";
             }
 
             return createBatchResponse;
@@ -247,6 +246,78 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             Stream stream = await httpResponse.Content.ReadAsStreamAsync();
             FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); 
             stream.CopyTo(outputFileStream);
+        }      
+
+        public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string fileName = fileShareServiceConfig.Value.ReadMeFileName;            
+            string file = Path.Combine(exchangeSetRootPath, fileName);           
+            CheckCreateFolderPath(exchangeSetRootPath);              
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ"));
+            string secondLineText = string.Empty;
+            HttpResponseMessage httpReadMeFileResponse;
+            httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath);
+            if (httpReadMeFileResponse.IsSuccessStatusCode)
+            {
+                using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
+                {
+                    using (var outputFileStream = new FileStream(file, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        stream.CopyTo(outputFileStream);
+                    }
+                    using StreamReader reader = new StreamReader(stream);
+                    secondLineText = GetLine(file);
+                }
+                string text = File.ReadAllText(file);
+                text = secondLineText.Length == 0 ? lineToWrite: text.Replace(secondLineText, lineToWrite);
+                File.WriteAllText(file, text);
+                return true;
+            }
+            else
+            {
+                logger.LogInformation(EventIds.ReadMeTextFileIsNotDownloaded.ToEventId(), "Error in downloading readme.txt file for {BatchId}", batchId);
+                return false;
+            }
+        }
+
+        public async Task<string> SearchReadMeFilePath(string batchId)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string filePath = string.Empty;           
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+                if (searchBatchResponse.Entries.Count > 0)
+                {
+                    var batchResult = searchBatchResponse.Entries.FirstOrDefault();
+                    filePath =  batchResult.Files.FirstOrDefault().Links.Get.Href;                  
+                }
+                else
+                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for {BatchId}", batchId);
+            }
+            else
+                logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "Query File share service for readme file with uri {RequestUri} responded with {StatusCode} for {BatchId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId);
+
+            return filePath;
+        }
+
+        private static string GetLine(string filePath)
+        {
+            int lineFound = 2;
+            string secondLine = string.Empty;
+            using (var sr = new StreamReader(filePath))
+            {
+                for (int i = 1; i < lineFound; i++)
+                    sr.ReadLine();
+               secondLine = sr.ReadLine();
+            }            
+            return secondLine ?? string.Empty;
         }
 
         private static void CheckCreateFolderPath(string downloadPath)

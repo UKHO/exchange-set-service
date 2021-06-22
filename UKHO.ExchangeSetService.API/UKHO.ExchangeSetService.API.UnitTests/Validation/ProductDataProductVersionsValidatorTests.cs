@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var model = new ProductDataProductVersionsRequest { CallbackUri = "demo uri" };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.CallbackUri);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid CallbackUri format."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor("ProductVersions[0].ProductName");
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "ProductName cannot be blank or null."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productName cannot be blank or null."));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor("ProductVersions[0].EditionNumber");
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "EditionNumber cannot be less than zero or null."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "editionNumber cannot be less than zero or null."));
         }
 
         [Test]
@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor("ProductVersions[0].UpdateNumber");
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "UpdateNumber cannot be less than zero or null."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "updateNumber cannot be less than zero or null."));
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor("ProductVersions[0].EditionNumber");
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "EditionNumber cannot be less than zero or null."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "editionNumber cannot be less than zero or null."));
         }
 
         [Test]
@@ -102,12 +102,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             {
                 ProductVersions = new List<ProductVersionRequest> {
                     new ProductVersionRequest {
-                        EditionNumber = 0, UpdateNumber = -3, ProductName = "ProductName"
+                        EditionNumber = 0, UpdateNumber = -3, ProductName = "productName"
                     } }
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor("ProductVersions[0].UpdateNumber");
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "UpdateNumber cannot be less than zero or null."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "updateNumber cannot be less than zero or null."));
         }
 
         [Test]
