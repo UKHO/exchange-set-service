@@ -216,7 +216,7 @@ stages:
           - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
             value: $(AutoTestClientSecret_NoAuth)
           - name: "AzureAdB2CTestConfiguration.ClientSecret"
-            value: $(tempSecret)
+            value: $(AUTOTEST-ESS-SECRET)
         strategy:
           runOnce:
             deploy:

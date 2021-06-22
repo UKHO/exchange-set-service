@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.API
                     .AddJwtBearer("AzureADB2C", options =>
                     {
                         options.Audience = azureAdB2CConfiguration.ClientId;
-                        options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}";
+                        options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0/";
                     });
 
             services.AddAuthorization(options =>
