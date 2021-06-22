@@ -272,12 +272,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 string text = File.ReadAllText(file);
                 text = secondLineText.Length == 0 ? lineToWrite: text.Replace(secondLineText, lineToWrite);
-                File.WriteAllText(file, text);               
+                File.WriteAllText(file, text);
+                return true;
             }
             else
+            {
                 logger.LogInformation(EventIds.ReadMeTextFileIsNotDownloaded.ToEventId(), "Error in downloading readme.txt file for {BatchId}", batchId);
-
-            return true;
+                return false;
+            }
         }
 
         public async Task<string> SearchReadMeFilePath(string batchId)
