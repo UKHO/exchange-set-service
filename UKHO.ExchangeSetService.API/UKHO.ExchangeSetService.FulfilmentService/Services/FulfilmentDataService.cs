@@ -52,44 +52,44 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 });
                 await Task.WhenAll(tasks);
             }
-            await CreateAncillaryFiles(message.BatchId, exchangeSetRootPath);
+            await CreateAncillaryFiles(message.BatchId, exchangeSetRootPath, message.CorrelationId);
             return "Received Fulfilment Data Successfully!!!!";
         }
 
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(SalesCatalogueServiceResponseQueueMessage message)
         {
-            return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri);
+            return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, message.CorrelationId);
         }
 
         public async Task QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
         {
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for {BatchId}", message.BatchId);
-            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products);
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for {BatchId}", message.BatchId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
+            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.CorrelationId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
 
             if (searchBatchResponse != null && searchBatchResponse.Any())
             {
-                logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for {BatchId}", message.BatchId);
+                logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
                 await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
-                logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for {BatchId}", message.BatchId);
+                logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
             }
         }
-        private async Task CreateAncillaryFiles(string batchId, string exchangeSetRootPath)
+        private async Task CreateAncillaryFiles(string batchId, string exchangeSetRootPath, string correlationId)
         {
-            await DownloadReadMeFile(batchId, exchangeSetRootPath);
+            await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
         }
 
-        public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath)
+        public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
         {
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for readme file for {BatchId}", batchId);           
-            string readMeFilePath = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for readme file for {BatchId}", batchId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);           
+            string readMeFilePath = await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
 
             if (!string.IsNullOrWhiteSpace(readMeFilePath))
             {
-                logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "Search and download ReadMe Text File start for {BatchId}", batchId);
-                await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath);
-                logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for {BatchId}", batchId);
+                logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "Search and download ReadMe Text File start for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
+                logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }               
         }
     }

@@ -92,9 +92,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
-            fakeConfiguration["HOME"] = @"D:\Downloads";
-            fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
-            fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
@@ -117,9 +114,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
-            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
-            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 
