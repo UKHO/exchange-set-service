@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region DownloadSalesCatalogueResponse
 
         [Test]
-        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenReturnKeyNotFoundException()
+        public void WhenScsStorageAccountAccessKeyValueNotFound_ThenReturnKeyNotFoundException()
         {
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
         
