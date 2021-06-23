@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, string correlationId)
         {
             if (products != null && products.Any())
             {
@@ -55,14 +55,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var listBatchDetails = new List<BatchDetail>();
                 foreach (var item in batchProducts)
                 {
-                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item);
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, correlationId);
                     listBatchDetails.AddRange(result.Entries);
                 }
 
                 return SetFulfilmentDataResponse(new SearchBatchResponse()
                 {
                     Entries = listBatchDetails
-                }); 
+                });
             }
             return null;
         }
@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             foreach (var item in fulfilmentDataResponses)
             {
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
-                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath);
+                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message.CorrelationId);
             }
         }
 
@@ -96,13 +96,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             return listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
         }
-        public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath)
+        public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
-           return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);            
+           return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);            
         }
-        public async Task<string> SearchReadMeFilePath(string batchId)
+        public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
-           return await fileShareService.SearchReadMeFilePath(batchId);
+           return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
     }
 }

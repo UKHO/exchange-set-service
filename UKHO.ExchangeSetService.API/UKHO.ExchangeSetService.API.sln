@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebJobs", "WebJobs", "{1797
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.FulfilmentService", "UKHO.ExchangeSetService.FulfilmentService\UKHO.ExchangeSetService.FulfilmentService.csproj", "{1EF95688-B26A-4E85-9685-EBF126981673}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Webjob.UnitTests", "UKHO.ExchangeSetService.Webjob.UnitTests\UKHO.ExchangeSetService.Webjob.UnitTests.csproj", "{AEE4375F-7181-4FCB-80F3-10EAE68137B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.Webjob.UnitTests", "UKHO.ExchangeSetService.Webjob.UnitTests\UKHO.ExchangeSetService.Webjob.UnitTests.csproj", "{AEE4375F-7181-4FCB-80F3-10EAE68137B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

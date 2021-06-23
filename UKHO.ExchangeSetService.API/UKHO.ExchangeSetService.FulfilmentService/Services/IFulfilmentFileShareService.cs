@@ -7,12 +7,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public interface IFulfilmentFileShareService
     {
-        Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products);
-        Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponses, string exchangeSetRootPath);      
-        
-        Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath);
-        Task<string> SearchReadMeFilePath(string batchId);
-       
-        
+        Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, string correlationId);
+        Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponses, string exchangeSetRootPath);
+        Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
+        Task<string> SearchReadMeFilePath(string batchId, string correlationId);
     }
 }
