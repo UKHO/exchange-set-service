@@ -26,3 +26,7 @@ variable "subnet_id" {
 variable "user_assigned_identity" {
   type = string
 }
+
+variable "app_service_sku" {
+
+}

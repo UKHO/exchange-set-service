@@ -5,8 +5,8 @@ resource "azurerm_app_service_plan" "small_exchange_set_app_service_plan" {
   resource_group_name = var.resource_group_name
   
   sku {
-	tier = "PremiumV3"
-	size = "P1v3"
+	tier = var.app_service_sku.tier
+	size = var.app_service_sku.size
   }
   tags                = var.tags
 }

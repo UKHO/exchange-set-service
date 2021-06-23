@@ -39,3 +39,21 @@ variable "spoke_vnet_name" {
 variable "spoke_subnet_name" {
   type = string
 }
+
+variable "app_service_sku" {
+  type = map(any)
+  default = {
+    "dev"    = {
+	    tier = "PremiumV2"
+	    size = "P1v2"
+        }
+    "qa"     = {
+	    tier = "PremiumV3"
+	    size = "P1v3"
+        }
+    "prod"   = {
+	    tier = "PremiumV3"
+	    size = "P1v3"
+        }
+  }
+}

@@ -34,6 +34,10 @@ variable "user_assigned_identity" {
   type = string
 }
 
+variable "app_service_sku" {
+
+}
+
 locals {
 	small_exchange_set_name = "${var.service_name}-${var.env_name}-sxs"
 }

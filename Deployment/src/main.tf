@@ -36,6 +36,7 @@ module "webapp_service" {
   location                  = azurerm_resource_group.rg.location
   subnet_id                 = data.azurerm_subnet.subnet.id
   user_assigned_identity    = module.user_identity.ess_service_identity_id
+  app_service_sku           = var.app_service_sku[local.env_name]
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
     "EventHubLoggingConfiguration:MinimumLoggingLevel"     = "Warning"
@@ -65,6 +66,7 @@ module "fulfilment_webapp" {
   env_name                      = local.env_name
   service_name                  = local.service_name
   user_assigned_identity        = module.user_identity.ess_service_identity_id
+  app_service_sku               = var.app_service_sku[local.env_name]
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
     "EventHubLoggingConfiguration:MinimumLoggingLevel"     = "Warning"

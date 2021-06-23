@@ -4,8 +4,8 @@ resource "azurerm_app_service_plan" "app_service_plan" {
   resource_group_name = var.resource_group_name
   
   sku {
-	tier = "PremiumV2"
-	size = "P1v2"
+	tier = var.app_service_sku.tier
+	size = var.app_service_sku.size
   }
   tags                = var.tags
 }
