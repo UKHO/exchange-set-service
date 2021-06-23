@@ -231,7 +231,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest);
 
-            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed"); 
+            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed");
 
             return GetEssResponse(productDetail);
         }
