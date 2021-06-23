@@ -102,7 +102,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             {
                 ProductVersions = new List<ProductVersionRequest> {
                     new ProductVersionRequest {
-                        EditionNumber = 0, UpdateNumber = -3, ProductName = "ProductName"
+                        EditionNumber = 0, UpdateNumber = -3, ProductName = "productName"
                     } }
             };
             var result = validator.TestValidate(model);

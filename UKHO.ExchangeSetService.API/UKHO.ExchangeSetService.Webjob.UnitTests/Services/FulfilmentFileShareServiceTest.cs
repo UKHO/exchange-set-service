@@ -1,7 +1,7 @@
 ﻿using FakeItEasy;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -17,18 +17,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     {
         private IOptions<FileShareServiceConfiguration> fakefileShareServiceConfig;
         private IFileShareService fakefileShareService;
-        private IAzureBlobStorageClient fakeazureBlobStorageClient;
         public FulfilmentFileShareService fulfilmentFileShareService;
 
         [SetUp]
         public void Setup()
         {
             fakefileShareService = A.Fake<IFileShareService>();
-            fakeazureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            { Limit=100,Start=0,ProductLimit=4,UpdateNumberLimit=10});
+            { Limit=100,Start=0,ProductLimit=4,UpdateNumberLimit=10, EncRoot="ENC_ROOT", ExchangeSetFileFolder= "V01X01" });
 
-            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeazureBlobStorageClient);
+            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService);
         }
         private List<Products> GetProductdetails()
         {
@@ -57,14 +55,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfillmentDataResponse()
+        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse()
         {
             A.CallTo(() =>  fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored)).Returns(GetSearchBatchResponse());
 
             var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails());
 
             Assert.IsNotNull(result);
-            Assert.IsInstanceOf(typeof(List<FulfillmentDataResponse>), result);
+            Assert.IsInstanceOf(typeof(List<FulfilmentDataResponse>), result);
            
             Assert.AreEqual("Received Fulfilment Data Successfully!!!!", "Received Fulfilment Data Successfully!!!!");
         }
@@ -80,18 +78,77 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestUploadFileShareServiceData_ThenReturnsCloudBlockBlobUri()
+        public void WhenValidRequest_ThenDownloadFileShareServiceFilesReturnsFile()
+        {
+            var message = new SalesCatalogueServiceResponseQueueMessage() { 
+                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
+            };
+            var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
+            };
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponses, "");
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public void WhenInValidRequest_ThenDownloadFileShareServiceFilesReturnsNoFile()
+        {
+            var message = new SalesCatalogueServiceResponseQueueMessage()
+            {
+                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
+            };
+            var fulfilmentDataResponses = new List<FulfilmentDataResponse>();
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponses, "");
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        public async Task WhenValidSearchReadMeFileRequest_ThenReturnFilePath()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string uploadFileName = string.Concat(batchId, ".json");
-            string containerName = "testContainer";
-            string connectionString = "testConnectionstring";
+            string exchangeSetRootPath = @"batch/" + batchId +"/files/README.TXT";
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
+            Assert.IsNotEmpty(result);            
+        }
+         [Test]
+        public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
+        {
+            string exchangeSetRootPath = string.Empty;           
+            string batchId = Guid.NewGuid().ToString();
 
-            A.CallTo(() => fakeazureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored)).Returns(exchangeSetRootPath);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId);
 
-            var result = await fulfilmentFileShareService.UploadFileShareServiceData(uploadFileName,new List<FulfillmentDataResponse>(), connectionString, containerName);
+            Assert.IsEmpty(result);           
+        }
 
-            Assert.AreEqual("http://tempuri.org/blob", result);
+        [Test]
+        public async Task WhenRequestDownloadReadMeFile_ThenReturnsTrueIfFileIsDownloaded()
+        {
+            bool isFileDownloaded = true;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+            string filePath = "TestFilePath";
+
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+           
+            Assert.AreEqual(true, isFileDownloaded);
+        }
+
+        [Test]
+        public async Task WhenRequestDownloadReadMeFile_ThenReturnsFalseIfFileIsNotDownloaded()
+        {
+            bool isFileDownloaded = false;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+            string filePath = "TestFilePath";
+
+            A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath);
+
+            Assert.AreEqual(false, isFileDownloaded);
         }
     }
 }

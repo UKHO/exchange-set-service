@@ -340,7 +340,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                    {new ValidationFailure("ProductName", "productName cannot be blank or null.")}));
+                    {new ValidationFailure("productName", "productName cannot be blank or null.")}));
 
             var result = await service.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } } });
@@ -528,12 +528,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                            { new ValidationFailure("SinceDateTime", "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').")}));
+                            { new ValidationFailure("SinceDateTime", "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.")}));
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').", result.Errors.Single().ErrorMessage);
+            Assert.AreEqual("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.", result.Errors.Single().ErrorMessage);
         }
 
         [Test]
@@ -554,7 +554,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                            { new ValidationFailure("callbackUrl", "Invalid callbackUri format.")}));
+                            { new ValidationFailure("CallbackUri", "Invalid callbackUri format.")}));
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 

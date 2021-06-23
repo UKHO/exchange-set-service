@@ -253,7 +253,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest()
         {
-            var validationMessage = new ValidationFailure("ProductName", "productName cannot be blank or null.")
+            var validationMessage = new ValidationFailure("productName", "productName cannot be blank or null.")
             {
                 ErrorCode = HttpStatusCode.BadRequest.ToString()
             };

@@ -17,7 +17,7 @@ namespace UKHO.ExchangeSetService.API.Validation
         {
             RuleFor(x => x.CallbackUri)
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
-                .WithMessage("Invalid callbackUri format.") 
+                .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
             RuleFor(v => v.ProductVersions).NotEmpty().NotNull()
             .WithErrorCode(HttpStatusCode.BadRequest.ToString())

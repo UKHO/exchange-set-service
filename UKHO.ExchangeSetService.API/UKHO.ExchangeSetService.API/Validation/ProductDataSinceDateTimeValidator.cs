@@ -19,13 +19,13 @@ namespace UKHO.ExchangeSetService.API.Validation
         public ProductDataSinceDateTimeValidator()
         {
             RuleFor(x => x.SinceDateTime)
-                .Must(x => x.IsValidRfc1123Format(out sinceDateTime))
+                .Must(x => x.IsValidRfc1123Format(out sinceDateTime))               
                 .WithMessage($"Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .DependentRules(() =>
                 {
                     RuleFor(x => x.SinceDateTime)
-                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow) <= 0)
+                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow) <= 0)                   
                     .WithMessage("Provided sinceDateTime cannot be a future date.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                 });

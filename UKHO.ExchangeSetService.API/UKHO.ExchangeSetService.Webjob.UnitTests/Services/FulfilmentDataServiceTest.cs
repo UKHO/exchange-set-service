@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -21,6 +22,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IAzureBlobStorageService fakeAzureBlobStorageService;
         public IFulfilmentFileShareService fakeQueryFssService;
         public ILogger<FulfilmentDataService> fakeLogger;
+        public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        public IConfiguration fakeConfiguration;
 
         [SetUp]
         public void Setup()
@@ -29,11 +32,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
+            fakeConfiguration = A.Fake<IConfiguration>();
+            fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
+            { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
+                ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10,
+                EncRoot = "ENC_ROOT",
+                ExchangeSetFileFolder = "V01X01"
+            });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
-            fulfilmentDataService = new FulfilmentDataService(fakeScsStorageService, fakeAzureBlobStorageService, fakeQueryFssService,
-                fakeEssFulfilmentStorageConfiguration, fakeLogger);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration);
         }
 
         #region GetScsResponseQueueMessage
@@ -81,9 +90,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
-        [Test]
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
+            fakeConfiguration["HOME"] = @"D:\Downloads";
+            fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
+            fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
@@ -100,11 +111,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
+            fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
+            fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
-
+            string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 
