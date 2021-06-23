@@ -206,7 +206,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string accessTokenParam = null;
             string uriParam = null;
             HttpMethod httpMethodParam = null;
-            string correlationidParam = null;
+            string correlationIdParam = null;
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -214,13 +214,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationid) =>
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
                    httpMethodParam = method;
                    postBodyParam = postBody;
-                   correlationidParam = correlationid;
+                   correlationIdParam = correlationId;
                })
                .Returns(httpResponse);
 
