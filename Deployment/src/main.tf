@@ -1,5 +1,12 @@
-data "azurerm_subnet" "subnet" {
+data "azurerm_subnet" "main_subnet" {
   name                 = var.spoke_subnet_name
+  virtual_network_name = var.spoke_vnet_name
+  resource_group_name  = var.spoke_rg
+}
+
+data "azurerm_subnet" "small_exchange_set_subnet" {
+  count                = local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance
+  name                 = "ess-fulfilment-service-s-${sum([1,count.index])}"
   virtual_network_name = var.spoke_vnet_name
   resource_group_name  = var.spoke_rg
 }
@@ -34,7 +41,7 @@ module "webapp_service" {
   name                      = local.web_app_name
   resource_group_name       = azurerm_resource_group.rg.name
   location                  = azurerm_resource_group.rg.location
-  subnet_id                 = data.azurerm_subnet.subnet.id
+  subnet_id                 = data.azurerm_subnet.main_subnet.id
   user_assigned_identity    = module.user_identity.ess_service_identity_id
   app_service_sku           = var.app_service_sku[local.env_name]
   app_settings = {
@@ -47,21 +54,11 @@ module "webapp_service" {
   tags = local.tags
 }
 
-module "fulfilment_vnet" {
-  source              = "./Modules/FulfilmentVnet"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  exchange_set_config = local.config_data.ESSFulfilmentConfiguration
-  env_name            = local.env_name
-  service_name        = local.service_name
-  tags = local.tags
-}
-
 module "fulfilment_webapp" {
   source                        = "./Modules/FulfilmentWebapps"
   resource_group_name           = azurerm_resource_group.rg.name
   location                      = azurerm_resource_group.rg.location
-  small_exchange_set_subnets    = module.fulfilment_vnet.small_exchange_set_subnets
+  small_exchange_set_subnets    = data.azurerm_subnet.small_exchange_set_subnet[*].id
   exchange_set_config           = local.config_data.ESSFulfilmentConfiguration
   env_name                      = local.env_name
   service_name                  = local.service_name
@@ -83,8 +80,8 @@ module "fulfilment_storage" {
   allowed_ips                           = var.allowed_ips
   location                              = var.location
   tags                                  = local.tags
-  small_exchange_set_subnets            = module.fulfilment_vnet.small_exchange_set_subnets
-  m_spoke_subnet                        = data.azurerm_subnet.subnet.id
+  small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
+  m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
   exchange_set_config                   = local.config_data.ESSFulfilmentConfiguration
   env_name                              = local.env_name
   service_name                          = local.service_name
@@ -98,7 +95,7 @@ module "key_vault" {
   tenant_id           = module.user_identity.ess_service_identity_tenant_id
   location            = azurerm_resource_group.rg.location
   allowed_ips         = var.allowed_ips
-  subnet_id           = data.azurerm_subnet.subnet.id
+  subnet_id           = data.azurerm_subnet.main_subnet.id
   read_access_objects = {
     "ess_service_identity" = module.user_identity.ess_service_identity_principal_id
   }
@@ -121,7 +118,7 @@ module "fulfilment_keyvaults" {
   tenant_id                                 = module.user_identity.ess_service_identity_tenant_id
   location                                  = azurerm_resource_group.rg.location
   allowed_ips                               = var.allowed_ips
-  small_exchange_set_subnets                = module.fulfilment_vnet.small_exchange_set_subnets
+  small_exchange_set_subnets                = data.azurerm_subnet.small_exchange_set_subnet[*].id
     read_access_objects = {
         "ess_service_identity" = module.user_identity.ess_service_identity_principal_id
   }

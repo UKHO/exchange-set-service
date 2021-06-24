@@ -23,6 +23,6 @@ resource "azurerm_storage_container" "small_exchange_set_storage_container" {
 
 resource "azurerm_storage_queue" "small_exchange_set_storage_queue" {
   count                = var.exchange_set_config.SmallExchangeSetInstance
-  name                 = "ess-${count.index}-fulfilment"
+  name                 = "ess-${sum([1,count.index])}-fulfilment"
   storage_account_name = azurerm_storage_account.small_exchange_set_storage.name
 }

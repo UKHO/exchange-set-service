@@ -1,6 +1,6 @@
 resource "azurerm_app_service_plan" "small_exchange_set_app_service_plan" {
   count               = var.exchange_set_config.SmallExchangeSetInstance
-  name                = "${local.small_exchange_set_name}-${count.index}-asp"
+  name                = "${local.small_exchange_set_name}-${sum([1,count.index])}-asp"
   location            = var.location
   resource_group_name = var.resource_group_name
   
@@ -13,7 +13,7 @@ resource "azurerm_app_service_plan" "small_exchange_set_app_service_plan" {
 
 resource "azurerm_app_service" "small_exchange_set_webapp" {
   count               = var.exchange_set_config.SmallExchangeSetInstance
-  name                = "${local.small_exchange_set_name}-${count.index}-webapp"
+  name                = "${local.small_exchange_set_name}-${sum([1,count.index])}-webapp"
   location            = var.location
   resource_group_name = var.resource_group_name
   app_service_plan_id = azurerm_app_service_plan.small_exchange_set_app_service_plan[count.index].id
