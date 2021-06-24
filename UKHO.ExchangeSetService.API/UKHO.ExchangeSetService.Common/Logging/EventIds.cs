@@ -42,6 +42,17 @@ namespace UKHO.ExchangeSetService.Common.Logging
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
         ReadMeTextFileIsNotDownloaded = 805037,
+        CreateZipFileRequestStart = 805038,
+        CreateZipFileRequestCompleted = 805039,
+        PackageExchangeSetStart = 805040,
+        PackageExchangeSetCompleted = 805041,
+        UploadExchangeSetToFssStart = 805042,
+        UploadExchangeSetToFssCompleted = 805043,
+        UploadFileCreationProcessStarted = 805044,
+        UploadFileCreationProcessCompleted = 805045,
+        ExchangeSetFileCreateStart = 805046,
+        ExchangeSetFileCreateCompleted = 805047,
+        CreateExchangeSetFileNonOkResponse = 805048,
     }
 
     public static class EventIdExtensions

@@ -104,5 +104,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
            return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
+        public bool CreateZipFileForExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string exchangeSetZipRootPath)
+        {
+            return fileShareService.CreateZipFileForExchangeSet(message, exchangeSetZipRootPath);
+        }
+        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(SalesCatalogueServiceResponseQueueMessage message, string exchangeSetZipRootPath, string correlationId)
+        {
+            return await fileShareService.UploadZipFileForExchangeSetToFileShareService(message, exchangeSetZipRootPath, correlationId);
+        }
     }
 }

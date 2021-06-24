@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -244,10 +245,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private static async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
         {
-            Stream stream = await httpResponse.Content.ReadAsStreamAsync();
-            FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); 
-            stream.CopyTo(outputFileStream);
-        }      
+            using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+            {
+                using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
+                {
+                    stream.CopyTo(outputFileStream);
+                }
+            }
+        }
 
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
@@ -310,6 +315,28 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return filePath;
         }
 
+        public bool CreateZipFileForExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string exchangeSetZipRootPath)
+        {
+            var zipName = $"{exchangeSetZipRootPath}.zip";
+            string path = Path.Combine(exchangeSetZipRootPath, zipName);
+            if (Directory.Exists(exchangeSetZipRootPath) && !File.Exists(path))
+            {
+                ZipFile.CreateFromDirectory(exchangeSetZipRootPath, zipName);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(SalesCatalogueServiceResponseQueueMessage message, string exchangeSetZipRootPath, string correlationId)
+        {
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);           
+            //Add file
+            FileInfo fileInfo = new FileInfo(fileShareServiceConfig.Value.ExchangeSetFileName);
+            bool isUploadZipFile = await CreateFile(message.BatchId, fileInfo.Name, fileInfo.Length, accessToken ,correlationId);
+            return isUploadZipFile;
+        }
+
         private static string GetLine(string filePath)
         {
             int lineFound = 2;
@@ -321,6 +348,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                secondLine = sr.ReadLine();
             }            
             return secondLine ?? string.Empty;
+        }
+
+        public async Task<bool> CreateFile(string batchId, string fileName, long length, string accessToken, string correlationId)
+        {
+            string payloadJson = string.Empty;
+            logger.LogInformation(EventIds.ExchangeSetFileCreateStart.ToEventId(), "File create process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            HttpResponseMessage httpResponse;           
+            httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, payloadJson, accessToken, fileShareServiceConfig.Value.BaseUrl, batchId, fileName, length, correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                logger.LogInformation(EventIds.ExchangeSetFileCreateCompleted.ToEventId(), "File create process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                return true;
+            }   
+            else
+            {
+                logger.LogInformation(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                return false;
+            }              
         }
 
         private static void CheckCreateFolderPath(string downloadPath)
