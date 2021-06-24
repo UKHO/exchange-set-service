@@ -334,6 +334,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             //Add file
             FileInfo fileInfo = new FileInfo(fileShareServiceConfig.Value.ExchangeSetFileName);
             bool isUploadZipFile = await CreateFile(message.BatchId, fileInfo.Name, fileInfo.Length, accessToken ,correlationId);
+            //Upload blocks
+            await UploadBlockFile(message.BatchId, fileInfo.Name, fileInfo.Length, accessToken, correlationId);
+           
             return isUploadZipFile;
         }
 
@@ -366,6 +369,83 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 logger.LogInformation(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 return false;
             }              
+        }
+
+        public async Task UploadBlockFile(string batchId, string fileName, long length, string accessToken, string correlationId)
+        {
+            string payloadJson = string.Empty;
+            logger.LogInformation(EventIds.ExchangeSetFileCreateStart.ToEventId(), "File create process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+
+            UploadMessage uploadMessage = new UploadMessage()
+            {
+                UploadSize = length,
+                BlockSizeInMultipleOfKBs = 1024 // add in config file 
+            };
+            var blockSizeInMultipleOfKBs = uploadMessage.BlockSizeInMultipleOfKBs <= 0
+                                            || uploadMessage.BlockSizeInMultipleOfKBs > 4096 ? 1024 : uploadMessage.BlockSizeInMultipleOfKBs;
+
+            long blockSize = blockSizeInMultipleOfKBs * 1024;
+            List<string> blockIdList = new List<string>();
+
+            long uploadedBytes = 0;
+            int blockNum = 0;
+
+            while (uploadedBytes < length)
+            {
+                blockNum++;
+                int readBlockSize = (int)(length - uploadedBytes <= blockSize ? length - uploadedBytes : blockSize);
+                string blockId = $"Block_{blockNum:000000}";
+
+                var blockUploadMetaData = new UploadBlockMetaData()
+                {
+                    BatchId = batchId,
+                    BlockId = blockId,
+                    FullFileName = fileName,
+                    JwtToken = accessToken,
+                    Offset = uploadedBytes,
+                    Length = readBlockSize
+                };
+                await UploadFileBlock(blockUploadMetaData, correlationId);
+                blockIdList.Add(blockId);
+                uploadedBytes += readBlockSize;                
+            }
+            
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, payloadJson, accessToken, fileShareServiceConfig.Value.BaseUrl, batchId, fileName, length, correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                logger.LogInformation(EventIds.ExchangeSetFileCreateCompleted.ToEventId(), "File create process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+               
+            }
+            else
+            {
+                logger.LogInformation(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                
+            }
+        }
+
+        public async Task UploadFileBlock(UploadBlockMetaData UploadBlockMetaData, string correlationId)
+        {
+            var fileInfo = new FileInfo(UploadBlockMetaData.FullFileName);
+            logger.LogInformation($"Uploaded block id {UploadBlockMetaData.BlockId} for file {fileInfo.Name} and Batch {UploadBlockMetaData.BatchId}");
+
+            Byte[] byteData = new Byte[UploadBlockMetaData.Length];
+            using (var fs = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                fs.Seek(UploadBlockMetaData.Offset, SeekOrigin.Begin);
+                fs.Read(byteData);
+            }
+            var blockMd5Hash = HashHelper.CalculateMD5(byteData);
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl,UploadBlockMetaData.BatchId, fileInfo.Name, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                logger.LogInformation(EventIds.ExchangeSetFileCreateCompleted.ToEventId(), "File create process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", UploadBlockMetaData.BatchId, correlationId);
+            }
+            else
+            {
+                logger.LogInformation(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BatchId, correlationId);
+            }            
         }
 
         private static void CheckCreateFolderPath(string downloadPath)

@@ -62,5 +62,31 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
+
+        public async Task<HttpResponseMessage> UploadFileBlockAsync(HttpMethod method, string baseUrl,string batchId, string fileName, string blockId, byte[] blockBytes, byte[] md5Hash, string accessToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
+        {
+            string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}/{blockId}";
+
+            using var httpRequestMessage = new HttpRequestMessage(method, uri)
+            { Content = (blockBytes == null) ? null : new ByteArrayContent(blockBytes) };
+            httpRequestMessage.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+            if (md5Hash != null)
+            {
+                httpRequestMessage.Content.Headers.ContentMD5 = md5Hash;
+            }
+            if (correlationId != "")
+            {
+                httpRequestMessage.Headers.Add("X-Correlation-ID", correlationId);
+            }
+            if (mimeTypeHeader != null)
+            {
+                httpRequestMessage.Headers.Add("X-MIME-Type", mimeTypeHeader);
+            }
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+
+        }
     }
 }
