@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided SinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided SinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided SinceDateTime cannot be a future date."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime cannot be a future date."));
         } 
 
         [Test]
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.CallbackUri);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid CallbackUri format."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
         }
 
         [Test]

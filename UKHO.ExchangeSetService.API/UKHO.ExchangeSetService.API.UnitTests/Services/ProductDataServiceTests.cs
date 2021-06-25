@@ -340,13 +340,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                    {new ValidationFailure("ProductName", "ProductName cannot be blank or null.")}));
+                    {new ValidationFailure("productName", "productName cannot be blank or null.")}));
 
             var result = await service.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } } });
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual("ProductName cannot be blank or null.", result.Errors.Single().ErrorMessage);
+            Assert.AreEqual("productName cannot be blank or null.", result.Errors.Single().ErrorMessage);
         }
 
         [Test]
@@ -528,12 +528,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                            { new ValidationFailure("SinceDateTime", "Provided since date time is either invalid or invalid format, the valid format is 'RFC1123 format'.")}));
+                            { new ValidationFailure("SinceDateTime", "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.")}));
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual("Provided since date time is either invalid or invalid format, the valid format is 'RFC1123 format'.", result.Errors.Single().ErrorMessage);
+            Assert.AreEqual("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.", result.Errors.Single().ErrorMessage);
         }
 
         [Test]
@@ -541,12 +541,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                            { new ValidationFailure("SinceDateTime", "Provided since date time cannot be a future date.")}));
+                            { new ValidationFailure("SinceDateTime", "Provided sinceDateTime cannot be a future date.")}));
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual("Provided since date time cannot be a future date.", result.Errors.Single().ErrorMessage);
+            Assert.AreEqual("Provided sinceDateTime cannot be a future date.", result.Errors.Single().ErrorMessage);
         }
 
         [Test]
@@ -554,12 +554,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
-                            { new ValidationFailure("callbackUrl", "Invalid CallbackUri format.")}));
+                            { new ValidationFailure("CallbackUri", "Invalid callbackUri format.")}));
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual("Invalid CallbackUri format.", result.Errors.Single().ErrorMessage);
+            Assert.AreEqual("Invalid callbackUri format.", result.Errors.Single().ErrorMessage);
         }
 
         [Test]

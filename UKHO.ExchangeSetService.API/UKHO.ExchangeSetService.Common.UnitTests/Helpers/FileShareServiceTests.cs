@@ -27,6 +27,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IAuthTokenProvider fakeAuthTokenProvider;
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
+        public string fakeFilePath = "C:\\HOME\\test.txt";
+        public string fakeFolderPath = "C:\\HOME";
 
         [SetUp]
         public void Setup()
@@ -98,12 +100,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
         #endregion
 
+        #region GetReadMeFileDetails
+        private String GetReadMeFileDetails()
+        {
+            StringBuilder sb = new StringBuilder();            
+            string lineTwo = "Version: Published Week 22 / 21 dated 03 - 06 - 2021";
+            string lineThree = "This file was last updated 3 - Jun - 2021";            
+            sb.AppendLine("AVCS README");
+            sb.AppendLine(lineTwo);
+            sb.AppendLine(lineThree);
+            return sb.ToString();
+        }
+        #endregion
+
         #region CreateBatch
         [Test]
         public async Task WhenFSSClientReturnsOtherThan201_ThenCreateBatchReturnsSameStatusAndNullInResponse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             var response = await fileShareService.CreateBatch();
@@ -119,7 +134,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
 
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
             var response = await fileShareService.CreateBatch();
@@ -141,19 +156,21 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string accessTokenParam = null;
             string uriParam = null;
             HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
             var createBatchResponse = GetCreateBatchResponse();
             var jsonString = JsonConvert.SerializeObject(createBatchResponse);
 
             //Mock
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .Invokes((HttpMethod method, string postBody, string accessToken, string uri) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationId) =>
                 {
                     accessTokenParam = accessToken;
                     uriParam = uri;
                     httpMethodParam = method;
                     postBodyParam = postBody;
+                    correlationIdParam = correlationId;
                 })
                 .Returns(httpResponse);
 
@@ -173,10 +190,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsNullResponse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails());
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null);
             Assert.AreEqual(0, response.Entries.Count);
         }
 
@@ -189,23 +206,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string accessTokenParam = null;
             string uriParam = null;
             HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
                    httpMethodParam = method;
                    postBodyParam = postBody;
+                   correlationIdParam = correlationId;
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails());
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -213,5 +232,130 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         #endregion GetBatchInfoBasedOnProducts
+
+        #region DownloadBatchFile
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProductsReturns200_ThenDownloadBatchFiles()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, RequestMessage = new HttpRequestMessage() { 
+                     RequestUri = new Uri("http://test.com") 
+                 }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!"))) 
+                 });
+
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath,null);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(bool), response);
+        }
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenDonotDownloadBatchFiles()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.BadRequest,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
+                 });
+
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath,null);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(bool), response);
+            Assert.IsFalse(response);
+        }
+        #endregion
+
+        #region SearchReadMeFilePath
+        [Test]
+        public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
+
+            var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
+            Assert.AreEqual(string.Empty, response);
+        
+        }
+        [Test]
+        public async Task WhenValidSearchReadMeFileRequest_ThenReturnValidFilePath()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string batchId = "a07537ff-ffa2-4565-8f0e-96e61e70a9fc";
+            var searchReadMeFileName = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
+            string correlationidParam = null;
+
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+           
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            var response = await fileShareService.SearchReadMeFilePath(batchId,null);
+            string expectedReadMeFilePath = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
+            Assert.IsNotNull(response);
+            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);
+        }
+        #endregion SearchReadMeFilePath
+
+        #region DownloadReadMeFile
+
+        [Test]
+        public async Task WhenValidDownloadReadMeFileRequest_ThenReturnTrueResponse()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string batchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
+            string correlationidParam = null;
+
+            fakeFileShareConfig.Value.ReadMeFileName = "ReadMe.txt";
+
+            string readMeFilePath = @"batch/c4af46f5-1b41-4294-93f9-dda87bf8ab96/files/README.TXT";
+            string exchangeSetRootPath = @"C:\\HOME";
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            var searchBatchResponse = GetReadMeFileDetails();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);            
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath,null);
+            Assert.AreEqual(true,response);
+        }
+        #endregion 
     }
 }
