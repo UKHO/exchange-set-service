@@ -22,10 +22,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 string serialFilePath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.SerialFileName);
                 CheckCreateFolderPath(exchangeSetPath);
-                 CultureInfo cultureInfo = CultureInfo.InvariantCulture;
+                CultureInfo cultureInfo = CultureInfo.InvariantCulture;
                 int weekNumber = cultureInfo.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
                 var serailFileContent = String.Format("GBWK{0:D2}-{1}   {2:D4}{3:D2}{4:D2}UPDATE    {5:D2}.00{6}\x0b\x0d\x0a",
                     weekNumber, DateTime.UtcNow.Year.ToString("D4").Substring(2), DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, 2, "U01X01");
+              
                 File.WriteAllText(serialFilePath, serailFileContent);
                 await Task.CompletedTask;
                 return true;
