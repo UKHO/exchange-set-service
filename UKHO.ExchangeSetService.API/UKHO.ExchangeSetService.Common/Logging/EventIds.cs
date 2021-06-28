@@ -42,6 +42,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
         ReadMeTextFileIsNotDownloaded = 805037,
+        CreateCatalogFileRequestStart = 805038,
+        CreateCatalogFileRequestCompleted = 805039,
     }
 
     public static class EventIdExtensions
