@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 {
                     new SalesCatalogueDataProductResponse
                     {
-                         ProductName = "10000002",
+                        ProductName = "10000002",
                         LatestUpdateNumber = 5,
                         FileSize = 600,
                         CellLimitSouthernmostLatitude = 24,
