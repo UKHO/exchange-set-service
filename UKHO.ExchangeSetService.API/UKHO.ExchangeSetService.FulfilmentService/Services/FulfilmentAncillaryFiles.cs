@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
         public async Task<bool> CreateSalesCatalogueDataProductFile(string batchId, string exchangeSetInfoPath, string correlationId)
         {
-            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse();
+            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse( correlationId);
             if (salesCatalogueTypeResponse.ResponseCode == HttpStatusCode.OK)
             {
                 string fileName = fileShareServiceConfig.Value.ProductFileName;

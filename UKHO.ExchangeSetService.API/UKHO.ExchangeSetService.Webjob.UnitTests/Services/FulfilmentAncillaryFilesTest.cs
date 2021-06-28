@@ -69,9 +69,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenRequestCreateSalesCatalogueDataProductFile_ThenReturnsFalseIfFileIsNotCreated()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string exchangeSetInfoPath = @"D:\\Downloads";
+            string exchangeSetInfoPath = @"C:\\HOME";
 
-            A.CallTo(() => fakeFulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse()).Returns(GetSalesCatalogueDataBadrequestResponse());
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataBadrequestResponse());
 
             var response = await fulFilmentAncillaryFilesTest.CreateSalesCatalogueDataProductFile(batchId, exchangeSetInfoPath, null);
 
@@ -82,9 +82,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenRequestCreateSalesCatalogueDataProductFile_ThenReturnsTrueIfFileIsCreated()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string exchangeSetInfoPath = @"D:\\Downloads";
+            string exchangeSetInfoPath = @"C:\\HOME";
 
-            A.CallTo(() => fakeFulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse()).Returns(GetSalesCatalogueDataResponse());
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
 
             var response = await fulFilmentAncillaryFilesTest.CreateSalesCatalogueDataProductFile(batchId,exchangeSetInfoPath,null);
 

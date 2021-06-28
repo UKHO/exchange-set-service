@@ -80,14 +80,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
-        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse()
+        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId)
         {
             logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), $"Get Sales Catalogue service for CatalogueData started");
-            
+
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
-
-            var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
+            
+            var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId);
 
             SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse);
 

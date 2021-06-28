@@ -10,6 +10,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime);
         public Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers);
         public Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions);
-        public Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse();
+        public Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId);
     }
 }
