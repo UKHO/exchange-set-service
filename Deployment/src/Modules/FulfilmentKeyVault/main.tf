@@ -56,7 +56,7 @@ resource "azurerm_key_vault_access_policy" "small_exchange_set_kv_read_access" {
   ]
 }
 
-resource "azurerm_key_vault_secret" "passed_in_secrets" {
+resource "azurerm_key_vault_secret" "small_exchange_set_passed_in_secrets" {
   for_each     = var.small_exchange_set_secrets
   name         = each.key
   value        = each.value
