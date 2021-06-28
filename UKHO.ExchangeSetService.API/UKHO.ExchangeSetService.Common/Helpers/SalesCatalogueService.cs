@@ -80,6 +80,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
+        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse()
+        {
+            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), $"Get Sales Catalogue service for CatalogueData started");
+            
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+            var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
+
+            var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
+
+            SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse);
+
+            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), $"Get sales catalouge service for CatalogueData Completed");
+            return response;
+        }
+
         private async Task<SalesCatalogueResponse> CreateSalesCatalogueServiceResponse(HttpResponseMessage httpResponse)
         {
             var response = new SalesCatalogueResponse();
@@ -97,6 +112,33 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (httpResponse.StatusCode == HttpStatusCode.OK)
                 {
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
+                }
+                if (lastModified != null)
+                {
+                    response.LastModified = ((DateTimeOffset)lastModified).UtcDateTime;
+                }
+            }
+
+            return response;
+        }
+
+        private async Task<SalesCatalogueDataResponse> CreateSalesCatalogueDataResponse(HttpResponseMessage httpResponse)
+        {
+            var response = new SalesCatalogueDataResponse();
+            var body = await httpResponse.Content.ReadAsStringAsync();
+            if (httpResponse.StatusCode != HttpStatusCode.OK && httpResponse.StatusCode != HttpStatusCode.NotModified)
+            {
+                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service catalogue end point with uri {RequestUri} responded with {StatusCode} and message {body}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body);
+                response.ResponseCode = httpResponse.StatusCode;
+                response.ResponseBody = null;
+            }
+            else
+            {
+                response.ResponseCode = httpResponse.StatusCode;
+                var lastModified = httpResponse.Content.Headers.LastModified;
+                if (httpResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    response.ResponseBody = JsonConvert.DeserializeObject<List<SalesCatalogueDataProductResponse>>(body);
                 }
                 if (lastModified != null)
                 {

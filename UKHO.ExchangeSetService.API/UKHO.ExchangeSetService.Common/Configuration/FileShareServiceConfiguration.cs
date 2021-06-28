@@ -9,6 +9,8 @@
         public string ExchangeSetFileFolder { get; set; }
         public string EncRoot { get; set; }
         public string ReadMeFileName { get; set; }
+        public string Info { get; set; }
+        public string ProductFileName { get; set; }
         public int Limit { get; set; }
         public int Start { get; set; }
         public string ProductCode { get; set; }

@@ -30,11 +30,62 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             this.fakeLogger = A.Fake<ILogger<SalesCatalogueService>>();
             this.fakeAuthTokenProvider = A.Fake<IAuthTokenProvider>();
-            this.fakeSaleCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { ProductType = "Test", Version = "t1" });
+            this.fakeSaleCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { ProductType = "Test", Version = "t1",CatalogueType= "essTest" });
             this.fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
 
             salesCatalogueService = new SalesCatalogueService(fakeSalesCatalogueClient, fakeLogger, fakeAuthTokenProvider, fakeSaleCatalogueConfig);
         }
+
+        private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
+        {
+            return new SalesCatalogueProductResponse()
+            {
+                ProductCounts = new ProductCounts()
+                {
+                    RequestedProductCount = 12,
+                    RequestedProductsAlreadyUpToDateCount = 5,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>
+                    {
+                        new RequestedProductsNotReturned()
+                        {
+                            ProductName = "test",
+                            Reason = "notfound"
+                        }
+                    },
+                    ReturnedProductCount = 4
+                }
+            };
+        }
+
+        #region GetSalesCatalogueDataProductResponse
+        private List<SalesCatalogueDataProductResponse> GetSalesCatalogueDataProductResponse()
+        {
+            return
+                new List<SalesCatalogueDataProductResponse>()
+                {
+                    new SalesCatalogueDataProductResponse()
+                    {
+                    ProductName = "10000002",
+                    LatestUpdateNumber = 5,
+                    FileSize = 600,
+                    CellLimitSouthernmostLatitude = 24,
+                    CellLimitWesternmostLatitude = 119,
+                    CellLimitNorthernmostLatitude = 25,
+                    CellLimitEasternmostLatitude = 120,
+                    BaseCellEditionNumber = 3,
+                    BaseCellLocation = "M0;B0",
+                    BaseCellIssueDate = DateTime.Today,
+                    BaseCellUpdateNumber = 0,
+                    Encryption = true,
+                    CancelledCellReplacements = new List<string>() { },
+                    Compression = true,
+                    IssueDateLatestUpdate = DateTime.Today,
+                    LastUpdateNumberForPreviousEdition = 0,
+                    TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
+                    }
+                };
+        }
+        #endregion
 
         #region GetProductsFromSpecificDateAsync
         [Test]
@@ -278,25 +329,91 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(actualAccessToken, accessTokenParam);
         }
         #endregion PostProductIdentifiersAsync
-        private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
+
+        #region GetSalesCatalogueDataResponse
+        [Test]
+        public async Task WhenSCSClientReturnsOtherThan200And304_ThenGetSalesCatalogueDataResponseReturnsSameStatusAndNullInResponse()
         {
-            return new SalesCatalogueProductResponse()
-            {
-                ProductCounts = new ProductCounts()
-                {
-                    RequestedProductCount = 12,
-                    RequestedProductsAlreadyUpToDateCount = 5,
-                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>
-                    {
-                        new RequestedProductsNotReturned()
-                        {
-                            ProductName = "test",
-                            Reason = "notfound"
-                        }
-                    },
-                    ReturnedProductCount = 4
-                }
-            };
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
+            
+            var response = await salesCatalogueService.GetSalesCatalogueDataResponse();
+            
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
+            Assert.IsNull(response.ResponseBody);
         }
+
+        [Test]
+        public async Task WhenSCSClientReturns304_ThenGetSalesCatalogueDataResponseReturns304AndLastModifiedDateInResponse()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))) };
+            DateTimeOffset lastModified = DateTime.UtcNow;
+            httpResponse.Content.Headers.LastModified = lastModified;
+
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(httpResponse);
+
+            var response = await salesCatalogueService.GetSalesCatalogueDataResponse();
+
+            Assert.AreEqual(HttpStatusCode.NotModified, response.ResponseCode, $"Expected {HttpStatusCode.NotModified} got {response.ResponseCode}");
+            Assert.AreEqual(lastModified.UtcDateTime, response.LastModified);
+        }
+
+        [Test]
+        public async Task WhenSCSClientReturns200_ThenGetSalesCatalogueDataResponseReturns200AndDataInResponse()
+        {
+            List<SalesCatalogueDataProductResponse> scsResponse = GetSalesCatalogueDataProductResponse();
+            var jsonString = JsonConvert.SerializeObject(scsResponse);
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(httpResponse);
+
+            var response = await salesCatalogueService.GetSalesCatalogueDataResponse();
+           
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}");
+            Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
+        }
+
+        [Test]
+        public async Task WhenGetSalesCatalogueDataResponseCallsApi_ThenValidateCorrectParametersArePassed()
+        {
+            //Data
+            string actualAccessToken = "notRequiredDuringTesting";
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            var scsResponse = new List<SalesCatalogueDataResponse>();
+            var jsonString = JsonConvert.SerializeObject(scsResponse);
+
+            //Mock
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Invokes((HttpMethod method, string postBody, string accessToken, string uri) =>
+                {
+                    accessTokenParam = accessToken;
+                    uriParam = uri;
+                    httpMethodParam = method;
+                    postBodyParam = postBody;
+                })
+                .Returns(httpResponse);
+
+            //Method call
+            var response = await salesCatalogueService.GetSalesCatalogueDataResponse();
+
+            //Test
+            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
+            Assert.AreEqual(HttpMethod.Get, httpMethodParam);
+            Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/catalogue/{fakeSaleCatalogueConfig.Value.CatalogueType}", uriParam);
+            Assert.AreEqual(actualAccessToken, accessTokenParam);
+        }
+        #endregion GetSalesCatalogueDataResponse
     }
 }

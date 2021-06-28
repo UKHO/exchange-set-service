@@ -124,6 +124,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
+                 services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
+                 services.Configure<SalesCatalogueConfiguration>(ConfigurationBuilder.GetSection("SalesCatalogue"));
 
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
                  services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
@@ -137,10 +139,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                          var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                          client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                      });
+                 services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
+                 {
+                     client.BaseAddress = new Uri(ConfigurationBuilder["SalesCatalogue:BaseUrl"]);
+                     var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
+                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                 });
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
-                 services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
+                 services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
+                 services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
+                 services.AddScoped<IFulfilmentSalesCatalogueService, FulfilmentSalesCatalogueService>();
+                 services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
+
              })
               .ConfigureWebJobs(b =>
               {
