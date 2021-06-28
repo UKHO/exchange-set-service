@@ -18,29 +18,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fileShareServiceConfig = fileShareServiceConfig;
         }
 
-        public async Task CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
 
-            catBuilder.Add(new CatalogEntry()
-            {
-                FileLocation = fileShareServiceConfig.Value.CatalogFileName,
-                Implementation = "ASC"
-            });
-            
-            if (File.Exists(readMeFileName))
-            {
-                catBuilder.Add(new CatalogEntry()
-                {
-                    FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
-                    Implementation = "TXT"
-                });
-            }
+            if (File.Exists(outputFileName))
+                File.Delete(outputFileName);
 
             if (listFulfilmentData != null && listFulfilmentData.Any())
             {
                 int length = 2;
+
+                if (File.Exists(readMeFileName))
+                {
+                    catBuilder.Add(new CatalogEntry()
+                    {
+                        FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
+                        Implementation = "TXT"
+                    });
+                }
 
                 foreach (var listItem in listFulfilmentData)
                 {
@@ -58,16 +56,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.ExchangeSetFileFolder);
                 CheckCreateFolderPath(exchangeSetRootPath);
 
-                var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
-                if (File.Exists(outputFileName))
-                    File.Delete(outputFileName);
-
                 using (var output = File.OpenWrite(outputFileName))
                 {
                     output.Write(cat031Bytes, 0, cat031Bytes.Length);
                 }
             }
             await Task.CompletedTask;
+            return File.Exists(outputFileName);
         }
 
         private string GetMimeType(string fileExtension, string mimeType)
