@@ -174,7 +174,8 @@ namespace UKHO.ExchangeSetService.API
 
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
-                builder.AddAzureKeyVault(new Uri(kvServiceUri), new DefaultAzureCredential());
+                builder.AddAzureKeyVault(new Uri(kvServiceUri), 
+                    new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
             }
 
 #if DEBUG
