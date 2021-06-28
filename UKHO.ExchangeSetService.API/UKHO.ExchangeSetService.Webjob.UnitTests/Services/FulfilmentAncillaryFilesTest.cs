@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01",ProductFileName="PRODUCT.TXT" });
+            { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01", ProductFileName = "PRODUCT.TXT" });
 
             fulFilmentAncillaryFilesTest = new FulfilmentAncillaryFiles(fakeFulfilmentSalesCatalogueService, fakeLogger, fakefileShareServiceConfig);
         }
@@ -41,13 +42,23 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 {
                     new SalesCatalogueDataProductResponse
                     {
-                    ProductName="10000002",
-                    LatestUpdateNumber=5,
-                    FileSize=600,
-                    CellLimitSouthernmostLatitude=24,
-                    CellLimitWesternmostLatitude=119,
-                    CellLimitNorthernmostLatitude=25,
-                    CellLimitEasternmostLatitude=120
+                         ProductName = "10000002",
+                        LatestUpdateNumber = 5,
+                        FileSize = 600,
+                        CellLimitSouthernmostLatitude = 24,
+                        CellLimitWesternmostLatitude = 119,
+                        CellLimitNorthernmostLatitude = 25,
+                        CellLimitEasternmostLatitude = 120,
+                        BaseCellEditionNumber = 3,
+                        BaseCellLocation = "M0;B0",
+                        BaseCellIssueDate = DateTime.Today,
+                        BaseCellUpdateNumber = 0,
+                        Encryption = true,
+                        CancelledCellReplacements = new List<string>() { },
+                        Compression = true,
+                        IssueDateLatestUpdate = DateTime.Today,
+                        LastUpdateNumberForPreviousEdition = 0,
+                        TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
                     }
                 }
             };
@@ -60,7 +71,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             return new SalesCatalogueDataResponse
             {
                 ResponseCode = HttpStatusCode.BadRequest,
-                ResponseBody = new List<SalesCatalogueDataProductResponse>()
+                ResponseBody = null
             };
         }
         #endregion
@@ -86,7 +97,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
 
-            var response = await fulFilmentAncillaryFilesTest.CreateSalesCatalogueDataProductFile(batchId,exchangeSetInfoPath,null);
+            var response = await fulFilmentAncillaryFilesTest.CreateSalesCatalogueDataProductFile(batchId, exchangeSetInfoPath, null);
 
             Assert.AreEqual(true, response);
         }
