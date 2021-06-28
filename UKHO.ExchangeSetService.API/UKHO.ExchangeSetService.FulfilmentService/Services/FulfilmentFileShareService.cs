@@ -104,13 +104,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
            return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
-        public bool CreateZipFileForExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string exchangeSetZipRootPath)
+        public bool CreateZipFileForExchangeSet(string exchangeSetZipRootPath, string correlationId)
         {
-            return fileShareService.CreateZipFileForExchangeSet(message, exchangeSetZipRootPath);
+            return fileShareService.CreateZipFileForExchangeSet(exchangeSetZipRootPath, correlationId);
         }
-        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(SalesCatalogueServiceResponseQueueMessage message, string exchangeSetZipRootPath, string correlationId)
+        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
-            return await fileShareService.UploadZipFileForExchangeSetToFileShareService(message, exchangeSetZipRootPath, correlationId);
+            return await fileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipRootPath, correlationId);
         }
     }
 }

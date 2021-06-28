@@ -18,6 +18,8 @@
         public int UpdateNumberLimit { get; set; }
         public int ProductLimit { get; set; } 
         public int ParallelSearchTaskCount { get; set; }       
-        public string ProductType { get; set; }               
+        public string ProductType { get; set; }
+        public int BlockSizeInMultipleOfKBs { get; set; }
+        public int ParallelUploadThreadCount { get; set; }
     }
 }

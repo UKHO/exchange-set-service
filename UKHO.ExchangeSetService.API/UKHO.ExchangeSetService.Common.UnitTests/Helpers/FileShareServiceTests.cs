@@ -316,7 +316,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.SearchReadMeFilePath(batchId,null);
             string expectedReadMeFilePath = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
             Assert.IsNotNull(response);
-            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);
+            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);           
         }
         #endregion SearchReadMeFilePath
 
@@ -356,6 +356,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath,null);
             Assert.AreEqual(true,response);
         }
-        #endregion 
+        #endregion
     }
 }

@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -38,11 +39,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
-        public async Task<HttpResponseMessage> AddFileInBatchAsync(HttpMethod method, string requestBody, string authToken,string baseUrl,string batchId, string fileName, long? fileContentSizeHeader,
+        public async Task<HttpResponseMessage> AddFileInBatchAsync(HttpMethod method, FileCreateModel fileModel, string authToken,string baseUrl,string batchId, string fileName, long? fileContentSizeHeader,
                 string mimeTypeHeader = "application/octet-stream", string correlationId = "")
         {
             string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}";
-            string payloadJson = JsonConvert.SerializeObject(requestBody);
+            string payloadJson = JsonConvert.SerializeObject(fileModel);
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
@@ -87,6 +88,58 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
 
+        }
+
+        public async Task<HttpResponseMessage> WriteBlockInFileAsync(HttpMethod method, string baseUrl, string batchId, string fileName, WriteBlockFileModel writeBlockFileModel, string accessToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
+        {
+            string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}";
+            string payloadJson = JsonConvert.SerializeObject(writeBlockFileModel);
+
+            using var httpRequestMessage = new HttpRequestMessage(method, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+
+            if (correlationId != "")
+            {
+                httpRequestMessage.Headers.Add("X-Correlation-ID", correlationId);
+            }
+            if (mimeTypeHeader != null)
+            {
+                httpRequestMessage.Headers.Add("X-MIME-Type", mimeTypeHeader);
+            }
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+        }
+
+        public async Task<HttpResponseMessage> CommitBatchAsync(HttpMethod method, string baseUrl, string batchId, BatchCommitModel batchCommitModel, string accessToken, string correlationId = "")
+        {
+            string uri = $"{baseUrl}/batch/{batchId}";
+            string payloadJson = JsonConvert.SerializeObject(batchCommitModel.FileDetails);
+
+            using var httpRequestMessage = new HttpRequestMessage(method, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+
+            if (correlationId != "")
+            {
+                httpRequestMessage.Headers.Add("X-Correlation-ID", correlationId);
+            }
+
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+        }
+
+        public async Task<HttpResponseMessage> GetBatchStatusAsync(HttpMethod method, string baseUrl, string batchId, string accessToken, string correlationId = "")
+        {
+            string uri = $"{baseUrl}/batch/{batchId}/status";
+
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
+            if (correlationId != "")
+            {
+                httpRequestMessage.Headers.Add("X-Correlation-ID", correlationId);
+            }
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
     }
 }

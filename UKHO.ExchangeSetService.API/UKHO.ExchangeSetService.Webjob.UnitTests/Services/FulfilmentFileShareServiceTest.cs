@@ -150,5 +150,33 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.AreEqual(false, isFileDownloaded);
         }
+
+        [Test]
+        public async Task WhenRequestUploadZipFileForExchangeSetToFileShareService_ThenReturnsTrueIfFileIsUploaded()
+        {
+            bool isFileUploaded = true;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetPath = @"D:\\Downloads";
+            
+            A.CallTo(() => fakefileShareService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileUploaded);
+            isFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetPath, null);
+
+            Assert.AreEqual(true, isFileUploaded);
+        }
+
+        [Test]
+        public async Task WhenRequestUploadZipFileForExchangeSetToFileShareService_ThenReturnsFalseIfFileIsNotUploaded()
+        {
+            bool isFileDownloaded = false;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"D:\\Downloads";
+           
+
+            A.CallTo(() => fakefileShareService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetRootPath, null);
+
+            Assert.AreEqual(false, isFileDownloaded);
+        }
+
     }
 }
