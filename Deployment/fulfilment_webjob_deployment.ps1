@@ -55,7 +55,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         echo "Cleaning up package for next deployment for $exchangeSet exchange set ..."
         Remove-Item –path "$packagePath/$exchangeSet/$packageName"
 
-        if ( !$? ) { echo "Error while Cleaning up directory" ; throw $_ }
+        if ( !$? ) { echo "Error while cleaning up temp directory" ; throw $_ }
 
         echo "Cleaning up package for next deployment for $exchangeSet exchange set done ..."
     }
@@ -63,7 +63,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
     echo "$exchangeSet exchange set deployment completed cleaning up ..."
     Remove-Item -Path "$packagePath/$exchangeSet/" -Recurse
 
-    if ( !$? ) { echo "Error while Cleaning up directory" ; throw $_ }
+    if ( !$? ) { echo "Error while cleaning up exchange set directory" ; throw $_ }
 
     echo "$exchangeSet exchange set deployment completed cleaning up done ..."
 }
@@ -75,6 +75,13 @@ if ( !$? ) { echo "Error while Reading terraform output" ; throw $_ }
 echo "Deploying small exchange set ..."
 ReplaceQueueAndDeployWebApp $terraformOutput.small_exchange_set_webapps.value $packagePath $packageName "small" $terraformOutput.small_exchange_set_keyvault_uri.value $terraformOutput.web_app_resource_group.value
 
-if ( !$? ) { echo "Error while ReplaceQueueAndDeployWebApp" ; throw $_ }
+if ( !$? ) { echo "Error while replacing queue and deploying small exchange set webapps" ; throw $_ }
 
 echo "Deploying small exchange set done ..."
+
+echo "Deploying medium exchange set ..."
+ReplaceQueueAndDeployWebApp $terraformOutput.medium_exchange_set_webapps.value $packagePath $packageName "medium" $terraformOutput.medium_exchange_set_keyvault_uri.value $terraformOutput.web_app_resource_group.value
+
+if ( !$? ) { echo "Error while replacing queue and deploying medium exchange set webapps" ; throw $_ }
+
+echo "Deploying medium exchange set done ..."

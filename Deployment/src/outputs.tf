@@ -22,6 +22,14 @@ value = [for i, webapp in module.fulfilment_webapp.small_exchange_set_web_apps :
     ]
 }
 
+output "medium_exchange_set_webapps"{
+value = [for i, webapp in module.fulfilment_webapp.small_exchange_set_web_apps : {
+        webappname = webapp
+        queuename  = module.fulfilment_storage.small_exchange_set_fulfilment_queues[i]
+      }
+    ]
+}
+
 output "storage_connection_string" {
    value = module.fulfilment_storage.small_exchange_set_connection_string
    sensitive = true

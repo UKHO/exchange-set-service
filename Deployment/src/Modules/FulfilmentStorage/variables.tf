@@ -32,3 +32,6 @@ variable "service_name" {
 variable "m_spoke_subnet" {
   type = string
 }
+
+variable "small_exchange_set_subnets" {
+}
