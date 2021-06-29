@@ -142,6 +142,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
+                 services.AddScoped<IFileSystemHelper, FileSystemHelper>();
              })
               .ConfigureWebJobs(b =>
               {
