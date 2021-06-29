@@ -105,6 +105,7 @@ namespace UKHO.ExchangeSetService.API
             .AddHeaderPropagation();            
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
+            services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
 
             services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                 {
