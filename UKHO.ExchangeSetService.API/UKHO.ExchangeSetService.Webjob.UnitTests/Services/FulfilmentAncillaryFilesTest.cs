@@ -56,6 +56,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             return batchFiles;
         }
 
+        #region CreateCatalogFile
+
         [Test]
         public async Task WhenValidCreateCatalogFileRequest_ThenReturnTrueReponse()
         {
@@ -83,5 +85,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.AreEqual(false, response);
         }
+
+        #endregion
     }
 }
