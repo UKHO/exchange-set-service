@@ -24,21 +24,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
 
-            if (File.Exists(outputFileName))
-                File.Delete(outputFileName);
+            if (File.Exists(readMeFileName))
+            {
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
+                    Implementation = "TXT"
+                });
+            }
 
             if (listFulfilmentData != null && listFulfilmentData.Any())
             {
                 int length = 2;
-
-                if (File.Exists(readMeFileName))
-                {
-                    catBuilder.Add(new CatalogEntry()
-                    {
-                        FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
-                        Implementation = "TXT"
-                    });
-                }
 
                 foreach (var listItem in listFulfilmentData)
                 {
@@ -51,18 +48,25 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             Implementation = GetMimeType(Path.GetExtension(item.Filename.ToLower()), item.MimeType.ToLower())
                         });
                     }
-                }
-
-                var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.ExchangeSetFileFolder);
-                CheckCreateFolderPath(exchangeSetRootPath);
-
-                using (var output = File.OpenWrite(outputFileName))
-                {
-                    output.Write(cat031Bytes, 0, cat031Bytes.Length);
-                }
+                }                
             }
+
+            var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.ExchangeSetFileFolder);
+            CheckCreateFolderPath(exchangeSetRootPath);
+
+            if (File.Exists(outputFileName))
+                File.Delete(outputFileName);
+
+            using (var output = File.OpenWrite(outputFileName))
+            {
+                output.Write(cat031Bytes, 0, cat031Bytes.Length);
+            }
+
             await Task.CompletedTask;
-            return File.Exists(outputFileName);
+            if (File.Exists(outputFileName))
+                return true;
+            else
+                return false;
         }
 
         private string GetMimeType(string fileExtension, string mimeType)

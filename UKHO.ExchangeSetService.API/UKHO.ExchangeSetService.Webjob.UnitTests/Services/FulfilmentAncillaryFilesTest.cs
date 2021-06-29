@@ -38,29 +38,30 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fileShareServiceConfig);
         }
 
+        public List<BatchFile> GetFiles()
+        {
+            List<BatchFile> batchFiles = new List<BatchFile>();
+            batchFiles.Add(new BatchFile() { Filename = "test1.txt", FileSize = 400, MimeType = "text/plain", Links = new Links { Get = new Link { Href = "" } } });
+            batchFiles.Add(new BatchFile() { Filename = "test2.001", FileSize = 400, MimeType = "text/plain", Links = new Links { Get = new Link { Href = "" } } });
+            batchFiles.Add(new BatchFile() { Filename = "test3.000", FileSize = 400, MimeType = "application/s63", Links = new Links { Get = new Link { Href = "" } } });
+            batchFiles.Add(new BatchFile() { Filename = "TEST4.TIF", FileSize = 400, MimeType = "IMAGE/TIFF", Links = new Links { Get = new Link { Href = "" } } });
+            return batchFiles;
+        }
+
         [Test]
         public async Task WhenValidCatalogFileCreated_ThenReturnTrueReponse()
         {
             var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
-                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= new List<BatchFile>(){ new BatchFile { Filename = "test.txt", FileSize = 400, MimeType = "text/plain", Links = new Links { Get = new Link { Href = "" }}}}}
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() }
             };
-            ////A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponses)).Returns(true);
 
             string batchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc";
             string exchangeSetRootPath = @"C:\\HOME";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
+
             var response = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, fulfilmentDataResponses);
-            Assert.AreEqual(true, response);
-        }
 
-        [Test]
-        public async Task WhenNoCatalogFileCreated_ThenReturnFalseReponse()
-        {
-            string batchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc";
-            string exchangeSetRootPath = @"C:\\HOME";
-            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, null);
-            Assert.AreEqual(false, response);
+            Assert.AreEqual(true, response);
         }
     }
 }
