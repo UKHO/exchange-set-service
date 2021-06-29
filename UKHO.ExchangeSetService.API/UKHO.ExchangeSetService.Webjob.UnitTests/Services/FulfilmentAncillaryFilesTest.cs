@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 
@@ -17,6 +18,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ILogger<FulfilmentDataService> fakeLogger;
         public IOptions<FileShareServiceConfiguration> fakefileShareServiceConfig;
         public FulfilmentAncillaryFiles fulFilmentAncillaryFilesTest;
+        public IFileSystemHelper fakeFileSystemHelper;
         public string fakeExchangeSetInfoPath = @"C:\\HOME";
 
         [SetUp]
@@ -25,8 +27,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01", ProductFileName = "PRODUCT.TXT" });
+            fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
 
-            fulFilmentAncillaryFilesTest = new FulfilmentAncillaryFiles(fakeLogger, fakefileShareServiceConfig);
+            fulFilmentAncillaryFilesTest = new FulfilmentAncillaryFiles(fakeLogger, fakefileShareServiceConfig, fakeFileSystemHelper);
         }
 
         #region GetSalesCatalogueDataResponse
@@ -73,26 +76,31 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
+        #region CreateProductFile
         [Test]
-        public void WhenRequestCreateProductFile_ThenReturnsFalseIfFileIsNotCreated()
+        public void WhenInvalidCreateProductFileRequest_ThenReturnFalseResponse()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
-          
+
             var response =  fulFilmentAncillaryFilesTest.CreateProductFile(batchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(false, response);
         }
 
         [Test]
-        public void WhenRequestCreateProductFile_ThenReturnsTrueIfFileIsCreated()
+        public void WhenValidCreateProductFileRequest_ThenReturnTrueResponse()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            
+
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
             var response =  fulFilmentAncillaryFilesTest.CreateProductFile(batchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(true, response);
         }
+        #endregion
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.Torus.Enc.Core;
@@ -15,13 +16,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly ILogger<FulfilmentDataService> logger;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
+        private readonly IFileSystemHelper fileSystemHelper;
 
         public FulfilmentAncillaryFiles(ILogger<FulfilmentDataService> logger,
-                                        IOptions<FileShareServiceConfiguration> fileShareServiceConfig
-                                        )
+                                        IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+                                        IFileSystemHelper fileSystemHelper)
         {
             this.logger = logger;
             this.fileShareServiceConfig = fileShareServiceConfig;
+            this.fileSystemHelper = fileSystemHelper;
         }
         public bool CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
@@ -29,7 +32,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 string fileName = fileShareServiceConfig.Value.ProductFileName;
                 string file = Path.Combine(exchangeSetInfoPath, fileName);
-                CheckCreateFolderPath(exchangeSetInfoPath);
 
                 var productsBuilder = new ProductListBuilder();
                 foreach (var product in salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName))
@@ -56,23 +58,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
                 var productFileName = file;
-                if (File.Exists(productFileName))
-                    File.Delete(productFileName);
-                File.WriteAllText(productFileName, content);
+                fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
+
+                var response = fileSystemHelper.CreateFileContent(productFileName, content);
+                if (!response)
+                {
+                    logger.LogInformation(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                    return false;
+                }
                 return true;
             }
             else
             {
                 logger.LogInformation(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
                 return false;
-            }
-        }
-
-        private static void CheckCreateFolderPath(string exchangeSetInfoPath)
-        {
-            if (!Directory.Exists(exchangeSetInfoPath))
-            {
-                Directory.CreateDirectory(exchangeSetInfoPath);
             }
         }
     }

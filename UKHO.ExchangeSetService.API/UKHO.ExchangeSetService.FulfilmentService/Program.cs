@@ -152,7 +152,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
                  services.AddScoped<IFulfilmentSalesCatalogueService, FulfilmentSalesCatalogueService>();
                  services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
-
+                 services.AddScoped<IFileSystemHelper, FileSystemHelper>();
              })
               .ConfigureWebJobs(b =>
               {

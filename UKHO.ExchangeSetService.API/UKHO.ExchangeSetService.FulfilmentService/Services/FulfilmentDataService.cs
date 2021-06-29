@@ -113,6 +113,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
             logger.LogInformation(EventIds.CreateProductFileRequestCompleted.ToEventId(), "Sales catalogue data response request completed for product file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
         }
+
         public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId)
         {
             SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(correlationId);
