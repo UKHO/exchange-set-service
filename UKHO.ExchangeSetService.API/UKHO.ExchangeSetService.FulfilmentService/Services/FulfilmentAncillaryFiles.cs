@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.Torus.Enc.Core.EncCatalogue;
 
@@ -12,10 +13,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public class FulfilmentAncillaryFiles : IFulfilmentAncillaryFiles
     {
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
+        private readonly IFileSystemHelper fileSystemHelper;
 
-        public FulfilmentAncillaryFiles(IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
+        public FulfilmentAncillaryFiles(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
         {
             this.fileShareServiceConfig = fileShareServiceConfig;
+            this.fileSystemHelper = fileSystemHelper;
         }
 
         public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
@@ -24,7 +27,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
 
-            if (File.Exists(readMeFileName))
+            if (fileSystemHelper.CheckFileExists(readMeFileName))
             {
                 catBuilder.Add(new CatalogEntry()
                 {
@@ -52,21 +55,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.ExchangeSetFileFolder);
-            CheckCreateFolderPath(exchangeSetRootPath);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
 
-            if (File.Exists(outputFileName))
-                File.Delete(outputFileName);
-
-            using (var output = File.OpenWrite(outputFileName))
-            {
-                output.Write(cat031Bytes, 0, cat031Bytes.Length);
-            }
+            fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
 
             await Task.CompletedTask;
-            if (File.Exists(outputFileName))
-                return true;
-            else
-                return false;
+            return fileSystemHelper.CheckFileExists(outputFileName);
         }
 
         private string GetMimeType(string fileExtension, string mimeType)
@@ -87,14 +81,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 default:
                     return "TXT";
-            }
-        }
-
-        private static void CheckCreateFolderPath(string folderPath)
-        {
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
             }
         }
     }

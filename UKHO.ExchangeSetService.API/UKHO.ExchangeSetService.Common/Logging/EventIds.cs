@@ -44,6 +44,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ReadMeTextFileIsNotDownloaded = 805037,
         CreateCatalogFileRequestStart = 805038,
         CreateCatalogFileRequestCompleted = 805039,
+        UnhandledControllerException = 805040,
     }
 
     public static class EventIdExtensions

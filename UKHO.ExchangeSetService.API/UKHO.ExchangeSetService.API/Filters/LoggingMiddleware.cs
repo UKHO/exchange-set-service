@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                 {
                     loggerFactory
                         .CreateLogger(context.Request.Path)
-                        .LogError(e, "{Exception}", e);
+                        .LogError(EventIds.UnhandledControllerException.ToEventId(), e, "Unhandled controller exception {Exception}", e);
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }
             });
