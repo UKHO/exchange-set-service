@@ -3,7 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -25,6 +27,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         public IConfiguration fakeConfiguration;
         public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
+        public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
 
         [SetUp]
         public void Setup()
@@ -44,9 +47,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
             fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
+            fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
 
-
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration ,  fakeFulfilmentAncillaryFiles);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration ,  fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService);
         }
 
         #region GetScsResponseQueueMessage
@@ -94,6 +97,39 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
+        #region GetSalesCatalogueDataResponse
+        private SalesCatalogueDataResponse GetSalesCatalogueDataResponse()
+        {
+            return new SalesCatalogueDataResponse
+            {
+                ResponseCode = HttpStatusCode.OK,
+                ResponseBody = new List<SalesCatalogueDataProductResponse>()
+                {
+                    new SalesCatalogueDataProductResponse
+                    {
+                        ProductName = "10000002",
+                        LatestUpdateNumber = 5,
+                        FileSize = 600,
+                        CellLimitSouthernmostLatitude = 24,
+                        CellLimitWesternmostLatitude = 119,
+                        CellLimitNorthernmostLatitude = 25,
+                        CellLimitEasternmostLatitude = 120,
+                        BaseCellEditionNumber = 3,
+                        BaseCellLocation = "M0;B0",
+                        BaseCellIssueDate = DateTime.Today,
+                        BaseCellUpdateNumber = 0,
+                        Encryption = true,
+                        CancelledCellReplacements = new List<string>() { },
+                        Compression = true,
+                        IssueDateLatestUpdate = DateTime.Today,
+                        LastUpdateNumberForPreviousEdition = 0,
+                        TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
+                    }
+                }
+            };
+        }
+        #endregion
+
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
@@ -115,13 +151,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeConfiguration["HOME"] = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
+            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSalesCatalogueDataProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 

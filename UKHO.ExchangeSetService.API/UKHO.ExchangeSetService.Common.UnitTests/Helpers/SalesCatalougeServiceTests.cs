@@ -338,7 +338,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region GetSalesCatalogueDataResponse
         [Test]
-        public async Task WhenSCSClientReturnsOtherThan200And304_ThenGetSalesCatalogueDataResponseReturnsSameStatusAndNullInResponse()
+        public async Task WhenSCSClientReturnsOtherThan200_ThenGetSalesCatalogueDataResponseReturnsSameStatusAndNullInResponse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -348,23 +348,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
-        }
-
-        [Test]
-        public async Task WhenSCSClientReturns304_ThenGetSalesCatalogueDataResponseReturns304AndLastModifiedDateInResponse()
-        {
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))) };
-            DateTimeOffset lastModified = DateTime.UtcNow;
-            httpResponse.Content.Headers.LastModified = lastModified;
-
-            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .Returns(httpResponse);
-
-            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(null);
-
-            Assert.AreEqual(HttpStatusCode.NotModified, response.ResponseCode, $"Expected {HttpStatusCode.NotModified} got {response.ResponseCode}");
-            Assert.AreEqual(lastModified.UtcDateTime, response.LastModified);
         }
 
         [Test]

@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId)
         {
-            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), $"Get Sales Catalogue service for CatalogueData started");
+            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), $"Get Sales catalogue service for ProductData started");
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse);
 
-            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), $"Get sales catalouge service for CatalogueData Completed");
+            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), $"Get sales catalouge service for ProductData Completed");
             return response;
         }
 
@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var response = new SalesCatalogueDataResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
-            if (httpResponse.StatusCode != HttpStatusCode.OK && httpResponse.StatusCode != HttpStatusCode.NotModified)
+            if (httpResponse.StatusCode != HttpStatusCode.OK)
             {
                 logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service catalogue end point with uri {RequestUri} responded with {StatusCode} and message {body}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body);
                 response.ResponseCode = httpResponse.StatusCode;

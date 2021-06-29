@@ -5,7 +5,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
@@ -15,21 +14,19 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     [TestFixture]
     public class FulfilmentAncillaryFilesTest
     {
-        public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
         public ILogger<FulfilmentDataService> fakeLogger;
         public IOptions<FileShareServiceConfiguration> fakefileShareServiceConfig;
-
         public FulfilmentAncillaryFiles fulFilmentAncillaryFilesTest;
+        public string fakeExchangeSetInfoPath = @"C:\\HOME";
 
         [SetUp]
         public void Setup()
         {
-            fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01", ProductFileName = "PRODUCT.TXT" });
 
-            fulFilmentAncillaryFilesTest = new FulfilmentAncillaryFiles(fakeFulfilmentSalesCatalogueService, fakeLogger, fakefileShareServiceConfig);
+            fulFilmentAncillaryFilesTest = new FulfilmentAncillaryFiles(fakeLogger, fakefileShareServiceConfig);
         }
 
         #region GetSalesCatalogueDataResponse
@@ -77,27 +74,23 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async Task WhenRequestCreateSalesCatalogueDataProductFile_ThenReturnsFalseIfFileIsNotCreated()
+        public void WhenRequestCreateProductFile_ThenReturnsFalseIfFileIsNotCreated()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string exchangeSetInfoPath = @"C:\\HOME";
-
-            A.CallTo(() => fakeFulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataBadrequestResponse());
-
-            var response = await fulFilmentAncillaryFilesTest.CreateSalesCatalogueDataProductFile(batchId, exchangeSetInfoPath, null);
+            var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
+          
+            var response =  fulFilmentAncillaryFilesTest.CreateProductFile(batchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(false, response);
         }
 
         [Test]
-        public async Task WhenRequestCreateSalesCatalogueDataProductFile_ThenReturnsTrueIfFileIsCreated()
+        public void WhenRequestCreateProductFile_ThenReturnsTrueIfFileIsCreated()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string exchangeSetInfoPath = @"C:\\HOME";
-
-            A.CallTo(() => fakeFulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
-
-            var response = await fulFilmentAncillaryFilesTest.CreateSalesCatalogueDataProductFile(batchId, exchangeSetInfoPath, null);
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            
+            var response =  fulFilmentAncillaryFilesTest.CreateProductFile(batchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(true, response);
         }

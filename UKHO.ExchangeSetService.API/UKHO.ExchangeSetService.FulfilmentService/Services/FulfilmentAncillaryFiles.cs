@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -14,33 +13,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public class FulfilmentAncillaryFiles : IFulfilmentAncillaryFiles
     {
-        private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
         private readonly ILogger<FulfilmentDataService> logger;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
 
-        public FulfilmentAncillaryFiles(IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
-                                        ILogger<FulfilmentDataService> logger,
+        public FulfilmentAncillaryFiles(ILogger<FulfilmentDataService> logger,
                                         IOptions<FileShareServiceConfiguration> fileShareServiceConfig
                                         )
         {
-            this.fulfilmentSalesCatalogueService = fulfilmentSalesCatalogueService;
             this.logger = logger;
             this.fileShareServiceConfig = fileShareServiceConfig;
         }
-        public async Task<bool> CreateSalesCatalogueDataProductFile(string batchId, string exchangeSetInfoPath, string correlationId)
+        public bool CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
-            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse( correlationId);
-            if (salesCatalogueTypeResponse.ResponseCode == HttpStatusCode.OK)
+            if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
             {
                 string fileName = fileShareServiceConfig.Value.ProductFileName;
                 string file = Path.Combine(exchangeSetInfoPath, fileName);
                 CheckCreateFolderPath(exchangeSetInfoPath);
 
                 var productsBuilder = new ProductListBuilder();
-                foreach (var product in salesCatalogueTypeResponse.ResponseBody.OrderBy(p => p.ProductName))
+                foreach (var product in salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName))
                     productsBuilder.Add(new ProductListEntry()
                     {
-                        ProductName = product.ProductName +".000",
+                        ProductName = product.ProductName + fileShareServiceConfig.Value.BaseCellExtension,
                         Compression = product.Compression,
                         Encryption = product.Encryption,
                         BaseCellIssueDate = product.BaseCellIssueDate,
@@ -64,12 +59,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (File.Exists(productFileName))
                     File.Delete(productFileName);
                 File.WriteAllText(productFileName, content);
-
                 return true;
             }
             else
             {
-                logger.LogInformation(EventIds.SalesCatalogueDataProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                logger.LogInformation(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
                 return false;
             }
         }

@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             this.salesCatalogueService = salesCatalogueService;
         }
-        public async Task<SalesCatalogueDataResponse> CreateSalesCatalogueDataResponse(string correlationId)
+        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId)
         {
             SalesCatalogueDataResponse salesCatalogueTypeResponse = await salesCatalogueService.GetSalesCatalogueDataResponse(correlationId);
             return salesCatalogueTypeResponse;

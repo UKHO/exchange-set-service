@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public interface IFulfilmentAncillaryFiles
     {
-        Task<bool> CreateSalesCatalogueDataProductFile(string batchId, string exchangeSetInfoPath, string correlationId);
+        bool CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse);
     }
 }

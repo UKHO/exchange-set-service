@@ -21,13 +21,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IConfiguration configuration;
         private readonly IFulfilmentAncillaryFiles fulfilmentAncillaryFiles;
+        private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
+
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     ILogger<FulfilmentDataService> logger,
                                     IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                     IConfiguration configuration,
-                                    IFulfilmentAncillaryFiles fulfilmentAncillaryFiles)
+                                    IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
+                                    IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -35,6 +38,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.configuration = configuration;
             this.fulfilmentAncillaryFiles = fulfilmentAncillaryFiles;
+            this.fulfilmentSalesCatalogueService = fulfilmentSalesCatalogueService;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message)
@@ -83,8 +87,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
+            SalesCatalogueDataResponse salesCatalogueDataResponse = await GetSalesCatalogueDataResponse(correlationId);
 
-            await CreateSalesCatalogueDataProductFile(batchId, exchangeSetInfoPath,correlationId);
+            CreateProductFile(batchId, exchangeSetInfoPath,correlationId, salesCatalogueDataResponse);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
         }
 
@@ -102,11 +107,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }               
         }
 
-        public async Task CreateSalesCatalogueDataProductFile(string batchId, string exchangeSetInfoPath, string correlationId)
+        public void CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
-            logger.LogInformation(EventIds.CreateSalesCatalogueDataProductFileRequestStart.ToEventId(), "Sales Catalogue Type Response request started for product file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-            await fulfilmentAncillaryFiles.CreateSalesCatalogueDataProductFile(batchId, exchangeSetInfoPath, correlationId);
-            logger.LogInformation(EventIds.CreateSalesCatalogueDataProductFileCompleted.ToEventId(), "Sales Catalogue Type Response request completed for product file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            logger.LogInformation(EventIds.CreateProductFileRequestStart.ToEventId(), "Sales catalogue data response request started for product file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
+            logger.LogInformation(EventIds.CreateProductFileRequestCompleted.ToEventId(), "Sales catalogue data response request completed for product file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+        }
+        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId)
+        {
+            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(correlationId);
+            return salesCatalogueTypeResponse;
         }
     }
 }

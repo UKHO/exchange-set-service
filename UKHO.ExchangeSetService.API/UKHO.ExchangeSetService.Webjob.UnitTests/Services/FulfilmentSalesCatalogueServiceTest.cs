@@ -58,21 +58,21 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async Task WhenRequestSalesCatalogueDataResponse_ThenReturnsBadrequest()
+        public async Task WhenRequestGetSalesCatalogueDataResponse_ThenReturnsBadrequest()
         {
             A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataBadrequestResponse());
 
-            var response = await fulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse(null);
+            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(null);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode);
         }
 
         [Test]
-        public async Task WhenRequestSalesCatalogueDataResponse_ThenReturnsDataInResponse()
+        public async Task WhenRequestGetSalesCatalogueDataResponse_ThenReturnsDataInResponse()
         {
             A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
 
-            var response = await fulfilmentSalesCatalogueService.CreateSalesCatalogueDataResponse(null);
+            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(null);
 
             Assert.IsNotNull(response);
             Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
