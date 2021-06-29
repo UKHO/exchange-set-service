@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenRequestCreateSerialEncFile_ThenReturnsTrueIfFilePathIsNotNull()
         {
-            string exchangeSetPath = @"D:\\Downloads";
+            string exchangeSetPath = @"C:\\HOME";
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(batchId, exchangeSetPath, null);
 
