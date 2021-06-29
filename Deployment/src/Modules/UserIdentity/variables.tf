@@ -1,10 +1,5 @@
-
 variable "resource_group_name" {
   type = string
-}
-
-variable "name" {
-  type  = string
 }
 
 variable "location" {
@@ -12,16 +7,9 @@ variable "location" {
 }
 
 variable "env_name" {
-  type  = string
+  type = string
 }
 
 variable "tags" {
-}
 
-variable "allowed_ips" {
-
-}
-
-variable "subnet_id" {
-  type = string
 }
