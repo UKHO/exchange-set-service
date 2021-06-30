@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.Torus.Enc.Core.EncCatalogue;
 
@@ -12,12 +14,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public class FulfilmentAncillaryFiles : IFulfilmentAncillaryFiles
     {
-        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
+        private readonly ILogger<FulfilmentAncillaryFiles> logger;
+        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;        
         private readonly IFileSystemHelper fileSystemHelper;
 
-        public FulfilmentAncillaryFiles(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
+        public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
         {
-            this.fileShareServiceConfig = fileShareServiceConfig;
+            this.logger = logger;
+            this.fileShareServiceConfig = fileShareServiceConfig;            
             this.fileSystemHelper = fileSystemHelper;
         }
 
@@ -60,7 +64,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
 
             await Task.CompletedTask;
-            return fileSystemHelper.CheckFileExists(outputFileName);
+
+            if (fileSystemHelper.CheckFileExists(outputFileName))
+                return true;
+            else
+            {
+                logger.LogError(EventIds.CatalogueFileIsNotCreated.ToEventId(), "Error in creating catalogue.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                return false;
+            }
         }
 
         private string GetMimeType(string fileExtension, string mimeType)

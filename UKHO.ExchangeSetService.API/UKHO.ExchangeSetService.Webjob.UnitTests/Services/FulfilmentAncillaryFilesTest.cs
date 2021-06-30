@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -14,10 +15,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     public class FulfilmentAncillaryFilesTest
     {
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        public ILogger<FulfilmentAncillaryFiles> fakeLogger;
         public IFileSystemHelper fakeFileSystemHelper;
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
-        public string batchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc";
-        public string exchangeSetRootPath = @"C:\\HOME";
+        public string fakeBatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc";
+        public string fakeExchangeSetRootPath = @"C:\\HOME";
 
         [SetUp]
         public void Setup()
@@ -39,8 +41,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ReadMeFileName = "ReadMe.txt",
                 CatalogFileName = "CATALOG.031"
             });
+            fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeFileShareServiceConfig, fakeFileSystemHelper);
+            fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeLogger, fakeFileShareServiceConfig, fakeFileSystemHelper);
         }
 
         public List<BatchFile> GetFiles()
@@ -69,7 +72,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(A<string>.Ignored, A<byte[]>.Ignored));
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, null, fulfilmentDataResponses);
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponses);
 
             Assert.AreEqual(true, response);
         }
@@ -81,7 +84,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(A<string>.Ignored, A<byte[]>.Ignored));
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, null, null);
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null);
 
             Assert.AreEqual(false, response);
         }
