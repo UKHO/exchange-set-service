@@ -57,20 +57,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     });
 
                 var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
-                var productFileName = file;
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
 
-                var response = fileSystemHelper.CreateFileContent(productFileName, content);
+                var response = fileSystemHelper.CreateFileContent(file, content);
                 if (!response)
                 {
-                    logger.LogInformation(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                    logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
                     return false;
                 }
                 return true;
             }
             else
             {
-                logger.LogInformation(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
                 return false;
             }
         }

@@ -24,6 +24,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IAuthTokenProvider fakeAuthTokenProvider;
         private ISalesCatalogueClient fakeSalesCatalogueClient;
         private ISalesCatalogueService salesCatalogueService;
+        public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
 
         [SetUp]
         public void Setup()
@@ -344,7 +345,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
             
-            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(null);
+            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
             
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
@@ -361,7 +362,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
-            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(null);
+            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
            
             Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}");
             Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
@@ -397,7 +398,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             //Method call
-            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(null);
+            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
 
             //Test
             Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);

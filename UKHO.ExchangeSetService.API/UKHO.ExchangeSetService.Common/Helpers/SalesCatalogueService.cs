@@ -80,9 +80,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
-        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId)
+        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), $"Get Sales catalogue service for ProductData started");
+            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), "Get sales catalogue service for CatalogueData started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse);
 
-            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), $"Get sales catalouge service for ProductData Completed");
+            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), "Get sales catalogue service for CatalogueData completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             return response;
         }
 

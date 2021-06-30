@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
-            SalesCatalogueDataResponse salesCatalogueDataResponse = await GetSalesCatalogueDataResponse(correlationId);
+            SalesCatalogueDataResponse salesCatalogueDataResponse = await GetSalesCatalogueDataResponse(batchId, correlationId);
 
             CreateProductFile(batchId, exchangeSetInfoPath,correlationId, salesCatalogueDataResponse);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
@@ -109,14 +109,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public void CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
-            logger.LogInformation(EventIds.CreateProductFileRequestStart.ToEventId(), "Sales catalogue data response request started for product file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            logger.LogInformation(EventIds.CreateProductFileRequestStart.ToEventId(), "Create product file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
-            logger.LogInformation(EventIds.CreateProductFileRequestCompleted.ToEventId(), "Sales catalogue data response request completed for product file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            logger.LogInformation(EventIds.CreateProductFileRequestCompleted.ToEventId(), "Create product file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
         }
 
-        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId)
+        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId)
         {
-            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(correlationId);
+            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(batchId, correlationId);
             return salesCatalogueTypeResponse;
         }
     }

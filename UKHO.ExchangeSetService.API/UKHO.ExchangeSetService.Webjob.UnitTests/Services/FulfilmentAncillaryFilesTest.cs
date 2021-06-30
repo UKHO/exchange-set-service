@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public FulfilmentAncillaryFiles fulFilmentAncillaryFilesTest;
         public IFileSystemHelper fakeFileSystemHelper;
         public string fakeExchangeSetInfoPath = @"C:\\HOME";
-        public string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
 
         [SetUp]
         public void Setup()
@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
-            var response =  fulFilmentAncillaryFilesTest.CreateProductFile(batchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
+            var response =  fulFilmentAncillaryFilesTest.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(false, response);
         }
@@ -96,7 +96,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var response =  fulFilmentAncillaryFilesTest.CreateProductFile(batchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
+            var response =  fulFilmentAncillaryFilesTest.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(true, response);
         }

@@ -14,6 +14,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     {
         public ISalesCatalogueService fakeSalesCatalogueService;
         public FulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
+        public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
 
         [SetUp]
         public void Setup()
@@ -60,9 +61,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenRequestGetSalesCatalogueDataResponse_ThenReturnsBadrequest()
         {
-            A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataBadrequestResponse());
+            A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueDataBadrequestResponse());
 
-            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(null);
+            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode);
         }
@@ -70,9 +71,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenRequestGetSalesCatalogueDataResponse_ThenReturnsDataInResponse()
         {
-            A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
+            A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
 
-            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(null);
+            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
 
             Assert.IsNotNull(response);
             Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);

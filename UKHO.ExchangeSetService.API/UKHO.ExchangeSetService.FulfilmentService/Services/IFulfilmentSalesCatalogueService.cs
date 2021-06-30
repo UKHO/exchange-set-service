@@ -5,6 +5,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public interface IFulfilmentSalesCatalogueService
     {
-        Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string correlationId);
+        Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId);
     }
 }
