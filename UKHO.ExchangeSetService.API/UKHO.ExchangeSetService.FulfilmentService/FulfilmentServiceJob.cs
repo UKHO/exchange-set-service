@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             this.fulFilmentDataService = fulFilmentDataService;
             this.logger = logger;
         }
-        public async Task ProcessQueueMessage([QueueTrigger("ess-fulfilment-requests")] CloudQueueMessage message)
+        public async Task ProcessQueueMessage([QueueTrigger("%QueueName%")] CloudQueueMessage message)
         {
             SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = JsonConvert.DeserializeObject<SalesCatalogueServiceResponseQueueMessage>(message.AsString);
 
