@@ -334,30 +334,36 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             bool isUploadZipFile = false;
-            FileInfo fileInfo = new FileInfo(fileShareServiceConfig.Value.ExchangeSetFileName);
-            await CreateExchangeSetFile(batchId, correlationId, accessToken, fileInfo);
-            await UploadAndWriteBlock(batchId, correlationId, accessToken, fileInfo);
-            string batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, fileInfo);
-            if (batchStatus == BatchStatus.Committed.ToString())
-            {
-                isUploadZipFile = true;
+            FileInfo fileInfo = new FileInfo(Path.Combine(exchangeSetZipRootPath, fileShareServiceConfig.Value.ExchangeSetFileName));
+            bool isZipFileCreated = await CreateExchangeSetFile(batchId, correlationId, accessToken, fileInfo);
+            if(isZipFileCreated)
+            { 
+                bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, fileInfo);
+                if(isWriteBlock)
+                {
+                    string batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, fileInfo);
+                    if (batchStatus == BatchStatus.Committed.ToString())
+                    {
+                        isUploadZipFile = true;
+                    }
+                }
             }
             return isUploadZipFile;
         }
 
-        private async Task CreateExchangeSetFile(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
+        public async Task<bool> CreateExchangeSetFile(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
         {
-            var fileCreateMetaData = new FileCreateMetaData()
+            FileCreateMetaData fileCreateMetaData = new FileCreateMetaData()
             {
                 AccessToken = accessToken,
                 BatchId = batchId,
                 FileName = fileInfo.Name,
                 Length = fileInfo.Length
             };
-            await CreateFile(fileCreateMetaData, accessToken, correlationId);
+            return await CreateFile(fileCreateMetaData, accessToken, correlationId);
         }
 
-        private async Task<string> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
+        public async Task<string> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
         {
             BatchCommitMetaData batchCommitMetaData = new BatchCommitMetaData()
             {
@@ -382,9 +388,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return batchStatus;
         }
 
-        private async Task UploadAndWriteBlock(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
+        public async Task<bool> UploadAndWriteBlock(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
         {
-            var blockIdList = await UploadBlockFile(batchId, fileInfo.Name, fileInfo.Length, accessToken, correlationId);
+            var blockIdList = await UploadBlockFile(batchId, fileInfo,accessToken, correlationId);            
             WriteBlocksToFileMetaData writeBlocksToFileMetaData = new WriteBlocksToFileMetaData()
             {
                 BatchId = batchId,
@@ -392,7 +398,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 AccessToken = accessToken,
                 BlockIds = blockIdList
             };
-            await WriteBlockFile(writeBlocksToFileMetaData, correlationId);
+            return await WriteBlockFile(writeBlocksToFileMetaData, correlationId);           
         }
 
         private static string GetLine(string filePath)
@@ -412,7 +418,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             logger.LogInformation(EventIds.ExchangeSetFileCreateStart.ToEventId(), "File creation process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.BatchId, correlationId);
             HttpResponseMessage httpResponse;           
-            httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, new FileCreateModel(), accessToken, fileShareServiceConfig.Value.BaseUrl, fileCreateMetaData.BatchId, fileCreateMetaData.FileName, fileCreateMetaData.Length, correlationId);
+            httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, new FileCreateModel(), accessToken, fileShareServiceConfig.Value.BaseUrl, fileCreateMetaData.BatchId, fileCreateMetaData.FileName, fileCreateMetaData.Length, "application/zip", correlationId);
             if (httpResponse.IsSuccessStatusCode)
             {
                 logger.LogInformation(EventIds.ExchangeSetFileCreateCompleted.ToEventId(), "File creation process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.BatchId, correlationId);
@@ -425,11 +431,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }              
         }
 
-        public async Task<List<string>> UploadBlockFile(string batchId, string fileName, long length, string accessToken, string correlationId)
+        public async Task<List<string>> UploadBlockFile(string batchId, FileInfo fileInfo, string accessToken, string correlationId)
         {                 
             UploadMessage uploadMessage = new UploadMessage()
             {
-                UploadSize = length,
+                UploadSize = fileInfo.Length,
                 BlockSizeInMultipleOfKBs = fileShareServiceConfig.Value.BlockSizeInMultipleOfKBs
             };
             var blockSizeInMultipleOfKBs = uploadMessage.BlockSizeInMultipleOfKBs <= 0
@@ -442,17 +448,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             int blockNum = 0;
             BlocksHelper blocksHelper = new BlocksHelper();
 
-            while (uploadedBytes < length)
+            while (uploadedBytes < fileInfo.Length)
             {
                 blockNum++;               
-                int readBlockSize = (int)(length - uploadedBytes <= blockSize ? length - uploadedBytes : blockSize);
+                int readBlockSize = (int)(fileInfo.Length - uploadedBytes <= blockSize ? fileInfo.Length - uploadedBytes : blockSize);
                 string blockId = blocksHelper.GetBlockIds(blockNum);
 
                 var blockUploadMetaData = new UploadBlockMetaData()
                 {
                     BatchId = batchId,
                     BlockId = blockId,
-                    FullFileName = fileName,
+                    FullFileName = fileInfo.FullName,
                     JwtToken = accessToken,
                     Offset = uploadedBytes,
                     Length = readBlockSize
@@ -490,7 +496,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             var blockMd5Hash = HashHelper.CalculateMD5(byteData);
             HttpResponseMessage httpResponse;
-            httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl,UploadBlockMetaData.BatchId, fileInfo.Name, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken);
+            httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl,UploadBlockMetaData.BatchId, fileInfo.Name, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken, correlationId);
             if (httpResponse.IsSuccessStatusCode)
             {
                 logger.LogInformation(EventIds.UploadFileBlockMetaDataCompleted.ToEventId(), "File blocks are uploaded for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", UploadBlockMetaData.BatchId, correlationId);
@@ -501,7 +507,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }            
         }
 
-        public async Task WriteBlockFile(WriteBlocksToFileMetaData writeBlocksToFileMetaData, string correlationId)
+        public async Task<bool> WriteBlockFile(WriteBlocksToFileMetaData writeBlocksToFileMetaData, string correlationId )
         {           
             logger.LogInformation(EventIds.WriteBlocksToFileStart.ToEventId(), "Write Block to file process started for BatchId  {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
 
@@ -509,14 +515,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 BlockIds = writeBlocksToFileMetaData.BlockIds
             };
-            HttpResponseMessage httpResponse;
+            HttpResponseMessage httpResponse;            
+            httpResponse = await fileShareServiceClient.WriteBlockInFileAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, writeBlocksToFileMetaData.BatchId, writeBlocksToFileMetaData.FileName, writeBlockfileModel, writeBlocksToFileMetaData.AccessToken, correlationId: correlationId);
             
-            httpResponse = await fileShareServiceClient.WriteBlockInFileAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, writeBlocksToFileMetaData.BatchId, writeBlocksToFileMetaData.FileName, writeBlockfileModel, writeBlocksToFileMetaData.AccessToken, correlationId);
-
             if (httpResponse.IsSuccessStatusCode)
+            {
                 logger.LogInformation(EventIds.WriteBlocksToFileCompleted.ToEventId(), "Added blocks to file process started for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
+                return true;
+            }
             else
+            {
                 logger.LogInformation(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Added blocks to file process started for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
+                return false;
+            }
         }
 
         public async Task<bool> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData, string correlationId)

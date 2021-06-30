@@ -39,6 +39,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             string homeDirectoryPath = configuration["HOME"];
             var exchangeSetPath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetPathForUploadZipFile = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId);
+            
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
@@ -53,7 +55,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await Task.WhenAll(tasks);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetRootPath, message.CorrelationId);           
-            await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, message.CorrelationId);
+            await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
             return "Received Fulfilment Data Successfully!!!!";
         }
 
@@ -94,17 +96,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }               
         }
        
-        public async Task PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string correlationId)
+        public async Task PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetPathForUploadZipFile,string correlationId)
         {
-            logger.LogInformation(EventIds.CreateZipFileRequestStart.ToEventId(), "Started creating exchange set zip file for {BatchId}", batchId);
+            logger.LogInformation(EventIds.CreateZipFileRequestStart.ToEventId(), "Started creating exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             bool isZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(exchangeSetPath, correlationId);
-            logger.LogInformation(EventIds.PackageExchangeSetCompleted.ToEventId(), "Ended creating exchange set zip file for {BatchId}", batchId);
-           
+            logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Ended creating exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+
             if (isZipFileCreated)   
             {
-                logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Started uploading exchange set zip file for {BatchId}", batchId);
-                await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetPath, correlationId);
-                logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Ended uploading exchange set zip file for {BatchId}", batchId);
+                logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Started uploading exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetPathForUploadZipFile, correlationId);
+                logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Ended uploading exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
         }
     }
