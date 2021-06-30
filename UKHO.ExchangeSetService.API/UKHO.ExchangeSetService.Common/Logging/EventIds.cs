@@ -44,6 +44,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ReadMeTextFileIsNotDownloaded = 805037,
         CreateSerialFileRequestStart = 805038,
         CreateSerialFileRequestCompleted = 805039,
+        SerialFileIsNotCreated = 805040,
     }
 
     public static class EventIdExtensions

@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -12,11 +14,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly ILogger<FulfilmentDataService> logger;
 
-        public FulfilmentAncillaryFiles(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)                                       
+        public FulfilmentAncillaryFiles(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper, ILogger<FulfilmentDataService> logger)                                       
         {
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileSystemHelper = fileSystemHelper;
+            this.logger = logger;
         }
 
         public async Task<bool> CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
@@ -36,6 +40,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             else  
             {
+                logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 return false;
             }
         }
