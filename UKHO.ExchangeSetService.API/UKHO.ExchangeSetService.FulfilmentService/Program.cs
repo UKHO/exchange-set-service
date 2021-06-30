@@ -59,7 +59,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
                 {
-                    var secretClient = new SecretClient(new Uri(kvServiceUri), new DefaultAzureCredential());
+                    var secretClient = new SecretClient(new Uri(kvServiceUri), new DefaultAzureCredential(
+                                                        new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
                     builder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
                 }
 
@@ -149,10 +150,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
                  services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
-                 services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
                  services.AddScoped<IFulfilmentSalesCatalogueService, FulfilmentSalesCatalogueService>();
                  services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
                  services.AddScoped<IFileSystemHelper, FileSystemHelper>();
+                 services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
+                 services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
              })
               .ConfigureWebJobs(b =>
               {
