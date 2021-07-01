@@ -33,6 +33,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeConfiguration = A.Fake<IConfiguration>();
+           
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
                 ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10,
@@ -122,7 +123,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 
-            Assert.AreEqual("Received Fulfilment Data Successfully!!!!", salesCatalogueResponseFile);
+            Assert.AreEqual("Exchange Set Created Successfully!!!!", salesCatalogueResponseFile);
         }
     }
 }

@@ -3,9 +3,9 @@ using System.Security.Cryptography;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
-    public static class HashHelper
+    public class HashHelper : IHashHelper
     {
-        public static byte[] CalculateMD5(byte[] requestBytes)
+        public byte[] CalculateMD5(byte[] requestBytes)
         {
             using var md5 = MD5.Create();
             var hash = md5.ComputeHash(requestBytes);
@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return hash;
         }
 
-        public static byte[] CalculateMD5(Stream requestStream)
+        public byte[] CalculateMD5(Stream requestStream)
         {
             using var md5 = MD5.Create();
             var hash = md5.ComputeHash(requestStream);

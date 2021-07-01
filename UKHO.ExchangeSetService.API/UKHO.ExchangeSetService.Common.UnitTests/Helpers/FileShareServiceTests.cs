@@ -27,20 +27,26 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IAuthTokenProvider fakeAuthTokenProvider;
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
+        private IFileSystemHelper fakeFileSystemHelper;
+        private IHashHelper fakeHashHelper;
+      ////  private FileCreateMetaData fakeFileCreateMetaData;
+
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeFolderPath = "C:\\HOME";
-
+        public string fakeZipFilepath = "D:\\UKHO\\V01X01";
         [SetUp]
         public void Setup()
         {
             this.fakeLogger = A.Fake<ILogger<FileShareService>>();
             this.fakeAuthTokenProvider = A.Fake<IAuthTokenProvider>();
             this.fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration()
-                                       { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
+            { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
+            this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
+            this.fakeHashHelper = A.Fake<IHashHelper>();
+           //// this.fakeFileCreateMetaData = A.Fake<FileCreateMetaData>();
 
-
-            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger);
+            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper, fakeHashHelper);
         }
 
         #region GetCreateBatchResponse
@@ -103,9 +109,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region GetReadMeFileDetails
         private String GetReadMeFileDetails()
         {
-            StringBuilder sb = new StringBuilder();            
+            StringBuilder sb = new StringBuilder();
             string lineTwo = "Version: Published Week 22 / 21 dated 03 - 06 - 2021";
-            string lineThree = "This file was last updated 3 - Jun - 2021";            
+            string lineThree = "This file was last updated 3 - Jun - 2021";
             sb.AppendLine("AVCS README");
             sb.AppendLine(lineTwo);
             sb.AppendLine(lineThree);
@@ -138,7 +144,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             var response = await fileShareService.CreateBatch();
- 
+
             Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
             Assert.AreEqual(createBatchResponse.BatchStatusUri, response.ResponseBody.BatchStatusUri);
@@ -164,7 +170,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationId) =>
+                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
                 {
                     accessTokenParam = accessToken;
                     uriParam = uri;
@@ -193,7 +199,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null);
             Assert.AreEqual(0, response.Entries.Count);
         }
 
@@ -214,7 +220,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationId) =>
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -224,7 +230,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -239,12 +245,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, RequestMessage = new HttpRequestMessage() { 
-                     RequestUri = new Uri("http://test.com") 
-                 }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!"))) 
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.OK,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath,null);
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
@@ -265,7 +276,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath,null);
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
@@ -283,7 +294,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
             Assert.AreEqual(string.Empty, response);
-        
+
         }
         [Test]
         public async Task WhenValidSearchReadMeFileRequest_ThenReturnValidFilePath()
@@ -298,7 +309,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
-           
+
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
@@ -313,10 +324,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.SearchReadMeFilePath(batchId,null);
+            var response = await fileShareService.SearchReadMeFilePath(batchId, null);
             string expectedReadMeFilePath = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
             Assert.IsNotNull(response);
-            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);           
+            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);
         }
         #endregion SearchReadMeFilePath
 
@@ -339,12 +350,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             var searchBatchResponse = GetReadMeFileDetails();
-            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);            
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,string correlationid) =>
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationid) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -353,9 +364,34 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationidParam = correlationid;
                })
                .Returns(httpResponse);
-            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath,null);
-            Assert.AreEqual(true,response);
+            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null);
+            Assert.AreEqual(true, response);
         }
         #endregion
+
+        #region CreateZipFile
+        [Test]
+        public void WhenInvalidZipFileCreateRequest_ThenReturnFalseResponse()
+        {
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
+
+            bool response = fileShareService.CreateZipFileForExchangeSet(string.Empty, string.Empty);
+            Assert.AreEqual(false, response);
+        }
+
+        [Test]
+        public void WhenValidZipFileCreateRequest_ThenReturnTrueResponse()
+        {
+            A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            bool response = fileShareService.CreateZipFileForExchangeSet(fakeZipFilepath, null);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(true, response);
+        }
+        #endregion CreateZipFile
+
+       
     }
 }

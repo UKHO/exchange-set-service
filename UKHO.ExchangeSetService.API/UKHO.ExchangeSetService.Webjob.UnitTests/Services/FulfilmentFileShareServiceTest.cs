@@ -178,5 +178,25 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(false, isFileDownloaded);
         }
 
+        [Test]
+        public void WhenRequestCreateZipFile_ThenReturnsTrueIfZipFileIsCreated()
+        {
+            bool isZipFileCreated = true;
+            string exchangeSetRootPath = @"D:\\Downloads\";
+            A.CallTo(() => fakefileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored)).Returns(isZipFileCreated);
+            isZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(exchangeSetRootPath, null);
+            Assert.AreEqual(true, isZipFileCreated);
+        }
+
+        [Test]
+        public void WhenRequestCreateZipFile_ThenReturnsFalseIfZipFileIsCreated()
+        {
+            bool isZipFileCreated = false;
+            string exchangeSetRootPath = @"D:\\Downloads\";
+            A.CallTo(() => fakefileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored)).Returns(isZipFileCreated);
+            isZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(exchangeSetRootPath, null);
+            Assert.AreEqual(false, isZipFileCreated);
+        }
+
     }
 }
