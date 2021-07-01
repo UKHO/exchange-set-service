@@ -27,9 +27,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IAuthTokenProvider fakeAuthTokenProvider;
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
-        private IFileSystemHelper fakeFileSystemHelper;
-        private IHashHelper fakeHashHelper;
-      ////  private FileCreateMetaData fakeFileCreateMetaData;
+        private IFileSystemHelper fakeFileSystemHelper; 
 
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeFolderPath = "C:\\HOME";
@@ -43,10 +41,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            this.fakeHashHelper = A.Fake<IHashHelper>();
-           //// this.fakeFileCreateMetaData = A.Fake<FileCreateMetaData>();
 
-            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper, fakeHashHelper);
+            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper);
         }
 
         #region GetCreateBatchResponse
@@ -118,6 +114,27 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             return sb.ToString();
         }
         #endregion
+
+        private CustomFileInfo GetFileInfo()
+        {           
+            var customFileInfo = new CustomFileInfo()
+            {
+                Name = "V01X01.zip",
+                FullName = @"D:\Downloads",
+                Length = 21833
+            };
+            return customFileInfo;
+        }
+
+        private ResponseBatchStatusModel GetBatchStatusResponse()
+        {
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            return new ResponseBatchStatusModel()
+            {
+                BatchId = batchId,
+                Status = "Committed"
+            };
+        }
 
         #region CreateBatch
         [Test]
@@ -392,6 +409,60 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
         #endregion CreateZipFile
 
-       
+        #region uploadZipFile
+        [Test]
+        public async Task WhenValidUploadZipFileForExchangeSetToFileShareService_ThenReturnTrueResponse()
+        {
+            string fakeExchangeSetPath = @"D:\UKHO";
+            string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
+            fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
+            fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
+            fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
+            fakeFileShareConfig.Value.BaseUrl = null;
+            byte[] byteData = new byte[1024];
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            
+            var responseBatchStatusModel = GetBatchStatusResponse();
+            var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
+            var GetFileInfoDetails = GetFileInfo();
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            .Returns(httpResponse);
+
+            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            Assert.AreEqual(true, response);
+        }
+
+        [Test]
+        public async Task WhenInvalidUploadZipFileForExchangeSetToFileShareService_ThenReturnFalseResponse()
+        {
+            string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
+            string fakeExchangeSetPath = @"D:\UKHOO";
+            fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
+            fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
+            fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
+            fakeFileShareConfig.Value.BaseUrl = null;
+            byte[] byteData = new byte[1024];
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+           
+            var responseBatchStatusModel = GetBatchStatusResponse();
+            responseBatchStatusModel.Status = "";
+            var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
+            var GetFileInfoDetails = GetFileInfo();
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            .Returns(httpResponse);
+
+            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            Assert.AreEqual(false, response);
+        }
+        #endregion uploadZipFile
+
     }
 }

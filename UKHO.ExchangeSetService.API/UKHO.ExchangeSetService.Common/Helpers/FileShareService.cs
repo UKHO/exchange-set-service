@@ -26,21 +26,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-        private readonly IFileSystemHelper fileSystemHelper;
-        private readonly IHashHelper hashHelper;
+        private readonly IFileSystemHelper fileSystemHelper;       
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 ILogger<FileShareService> logger,
-                                IFileSystemHelper fileSystemHelper,
-                                IHashHelper hashHelper)
+                                IFileSystemHelper fileSystemHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
-            this.fileSystemHelper = fileSystemHelper;
-            this.hashHelper = hashHelper;
+            this.fileSystemHelper = fileSystemHelper;           
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
@@ -338,15 +335,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            bool isUploadZipFile = false;
-            FileInfo fileInfo = new FileInfo(Path.Combine(exchangeSetZipRootPath, fileShareServiceConfig.Value.ExchangeSetFileName));
-            bool isZipFileCreated = await CreateExchangeSetFile(batchId, correlationId, accessToken, fileInfo);
+            bool isUploadZipFile = false;            
+            CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileShareServiceConfig.Value.ExchangeSetFileName));
+           
+            bool isZipFileCreated = await CreateExchangeSetFile(batchId, correlationId, accessToken, customFileInfo);
             if (isZipFileCreated)
             {
-                bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, fileInfo);
+                bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
                 if (isWriteBlock)
                 {
-                    string batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, fileInfo);
+                    string batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, customFileInfo);
                     if (batchStatus == BatchStatus.Committed.ToString())
                     {
                         isUploadZipFile = true;
@@ -356,25 +354,25 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return isUploadZipFile;
         }
 
-        public async Task<bool> CreateExchangeSetFile(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
+        public async Task<bool> CreateExchangeSetFile(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
         {
             FileCreateMetaData fileCreateMetaData = new FileCreateMetaData()
             {
                 AccessToken = accessToken,
                 BatchId = batchId,
-                FileName = fileInfo.Name,
-                Length = fileInfo.Length
+                FileName = customFileInfo.Name,
+                Length = customFileInfo.Length
             };
             return await CreateFile(fileCreateMetaData, accessToken, correlationId);
         }
 
-        public async Task<string> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
+        public async Task<string> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
         {
             BatchCommitMetaData batchCommitMetaData = new BatchCommitMetaData()
             {
                 BatchId = batchId,
                 AccessToken = accessToken,
-                FullFileName = fileInfo.FullName
+                FullFileName = customFileInfo.FullName
             };
             bool isBatchCommitted = await UploadCommitBatch(batchCommitMetaData, correlationId);
             string batchStatus = BatchStatus.CommitInProgress.ToString();
@@ -393,13 +391,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return batchStatus;
         }
 
-        public async Task<bool> UploadAndWriteBlock(string batchId, string correlationId, string accessToken, FileInfo fileInfo)
+        public async Task<bool> UploadAndWriteBlock(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
         {
-            var blockIdList = await UploadBlockFile(batchId, fileInfo, accessToken, correlationId);
+            var blockIdList = await UploadBlockFile(batchId, customFileInfo, accessToken, correlationId);
             WriteBlocksToFileMetaData writeBlocksToFileMetaData = new WriteBlocksToFileMetaData()
             {
                 BatchId = batchId,
-                FileName = fileInfo.Name,
+                FileName = customFileInfo.Name,
                 AccessToken = accessToken,
                 BlockIds = blockIdList
             };
@@ -436,11 +434,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public async Task<List<string>> UploadBlockFile(string batchId, FileInfo fileInfo, string accessToken, string correlationId)
+        public async Task<List<string>> UploadBlockFile(string batchId, CustomFileInfo customFileInfo, string accessToken, string correlationId)
         {
             UploadMessage uploadMessage = new UploadMessage()
             {
-                UploadSize = fileInfo.Length,
+                UploadSize = customFileInfo.Length,
                 BlockSizeInMultipleOfKBs = fileShareServiceConfig.Value.BlockSizeInMultipleOfKBs
             };
             var blockSizeInMultipleOfKBs = uploadMessage.BlockSizeInMultipleOfKBs <= 0
@@ -450,23 +448,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             List<string> blockIdList = new List<string>();
             List<Task> ParallelBlockUploadTasks = new List<Task>();
             long uploadedBytes = 0;
-            int blockNum = 0;
-            BlocksHelper blocksHelper = new BlocksHelper();
+            int blockNum = 0;           
 
-            while (uploadedBytes < fileInfo.Length)
+            while (uploadedBytes < customFileInfo.Length)
             {
                 blockNum++;
-                int readBlockSize = (int)(fileInfo.Length - uploadedBytes <= blockSize ? fileInfo.Length - uploadedBytes : blockSize);
-                string blockId = blocksHelper.GetBlockIds(blockNum);
+                int readBlockSize = (int)(customFileInfo.Length - uploadedBytes <= blockSize ? customFileInfo.Length - uploadedBytes : blockSize);
+                string blockId = CommonHelper.GetBlockIds(blockNum);
 
                 var blockUploadMetaData = new UploadBlockMetaData()
                 {
                     BatchId = batchId,
                     BlockId = blockId,
-                    FullFileName = fileInfo.FullName,
+                    FullFileName = customFileInfo.FullName,
                     JwtToken = accessToken,
                     Offset = uploadedBytes,
-                    Length = readBlockSize
+                    Length = readBlockSize,
+                    FileName = customFileInfo.Name
+                    
                 };
                 ParallelBlockUploadTasks.Add(UploadFileBlockMetaData(blockUploadMetaData, correlationId));
 
@@ -490,18 +489,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData, string correlationId)
         {
-            var fileInfo = new FileInfo(UploadBlockMetaData.FullFileName);
-            logger.LogInformation($"Uploaded block id {UploadBlockMetaData.BlockId} for file {fileInfo.Name} and Batch {UploadBlockMetaData.BatchId}");
-
-            Byte[] byteData = new Byte[UploadBlockMetaData.Length];
-            using (var fs = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                fs.Seek(UploadBlockMetaData.Offset, SeekOrigin.Begin);
-                fs.Read(byteData);
-            }
-            var blockMd5Hash = hashHelper.CalculateMD5(byteData);
+            logger.LogInformation($"Uploaded block id {UploadBlockMetaData.BlockId} for file {UploadBlockMetaData.FileName} and Batch {UploadBlockMetaData.BatchId}");
+            byte[] byteData = fileSystemHelper.UploadFileBlockMetaData(UploadBlockMetaData);
+            var blockMd5Hash = CommonHelper.CalculateMD5(byteData);
             HttpResponseMessage httpResponse;
-            httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, UploadBlockMetaData.BatchId, fileInfo.Name, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken, correlationId);
+            httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, UploadBlockMetaData.BatchId, UploadBlockMetaData.FileName, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken, correlationId);
             if (httpResponse.IsSuccessStatusCode)
             {
                 logger.LogInformation(EventIds.UploadFileBlockMetaDataCompleted.ToEventId(), "File blocks are uploaded for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", UploadBlockMetaData.BatchId, correlationId);
@@ -538,17 +530,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData, string correlationId)
         {
             logger.LogInformation(EventIds.UploadCommitBatchStart.ToEventId(), "Batch commit for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchCommitMetaData.BatchId, correlationId);
-            FileInfo fileInfo = new FileInfo(batchCommitMetaData.FullFileName);
-            using var fs = fileInfo.OpenRead();
-            var fileMd5Hash = hashHelper.CalculateMD5(fs);
-            List<FileDetail> fileDetails = new List<FileDetail>();
-            FileDetail fileDetail = new FileDetail()
-            {
-                FileName = fileInfo.Name,
-                Hash = Convert.ToBase64String(fileMd5Hash)
-            };
-            fileDetails.Add(fileDetail);
-
+            List<FileDetail> fileDetails = fileSystemHelper.UploadCommitBatch(batchCommitMetaData);
             var batchCommitModel = new BatchCommitModel()
             {
                 FileDetails = fileDetails
@@ -575,7 +557,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
             if (httpResponse.IsSuccessStatusCode)
             {
-                responseBatchStatusModel = await httpResponse.ReadAsTypeAsync<ResponseBatchStatusModel>();
+                string bodyJson = await httpResponse.Content.ReadAsStringAsync();
+                responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
                 logger.LogInformation(EventIds.GetBatchStatusCompleted.ToEventId(), "Getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
                 return responseBatchStatusModel.Status;
             }

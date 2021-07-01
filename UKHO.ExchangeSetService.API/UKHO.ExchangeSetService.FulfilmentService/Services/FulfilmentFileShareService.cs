@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var listSubUpdateNumberProduts = new List<Products>();
             foreach (var item in products)
             {
-                var splitByUpdateLimit = ConfigHelper.SplitList(item.UpdateNumbers, fileShareServiceConfig.Value.UpdateNumberLimit);
+                var splitByUpdateLimit = CommonHelper.SplitList(item.UpdateNumbers, fileShareServiceConfig.Value.UpdateNumberLimit);
 
                 if (splitByUpdateLimit != null && splitByUpdateLimit.Any())
                 {
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
         {
-            return ConfigHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
+            return CommonHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
         }
 
         private List<FulfilmentDataResponse> SetFulfilmentDataResponse(SearchBatchResponse searchBatchResponse)

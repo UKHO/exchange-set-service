@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
                 int productGroupCount = response.Products.Count % parallelSearchTaskCount == 0 ? response.Products.Count / parallelSearchTaskCount : (response.Products.Count / parallelSearchTaskCount) + 1;
-                var productsList = ConfigHelper.SplitList((response.Products), productGroupCount);
+                var productsList = CommonHelper.SplitList((response.Products), productGroupCount);
 
                 var tasks = productsList.Select(async item =>
                 {

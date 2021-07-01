@@ -14,5 +14,6 @@
         public long Offset { get; set; }
         public int Length { get; set; }
         public string JwtToken { get; set; }
+        public string FileName { get; set; }
     }
 }

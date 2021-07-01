@@ -138,6 +138,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                          client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                      });
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+                 services.AddScoped<IFileSystemHelper, FileSystemHelper>();
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
