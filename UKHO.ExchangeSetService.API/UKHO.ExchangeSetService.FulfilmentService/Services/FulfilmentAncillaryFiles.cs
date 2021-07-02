@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         {
                             FileLocation = $"{listItem.ProductName.Substring(0, length)}/{listItem.ProductName}/{listItem.EditionNumber}/{listItem.UpdateNumber}/{item.Filename}",
                             FileLongName = "",
-                            Implementation = GetMimeType(Path.GetExtension(item.Filename.ToLower()), item.MimeType.ToLower())
+                            Implementation = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower())
                         });
                     }
                 }                
@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.ExchangeSetFileFolder);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
-
+                
             fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
 
             await Task.CompletedTask;
@@ -74,24 +74,26 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        private string GetMimeType(string fileExtension, string mimeType)
+        private string GetMimeType(string fileName, string mimeType)
         {
+            string fileExtension = Path.GetExtension(fileName);
             switch (mimeType)
             {
                 case "application/s63":
                     return "BIN";
 
                 case "text/plain":
-                    if (fileExtension != ".txt")
-                        return "ASC";
-                    else
+                    if (fileExtension == ".txt")
                         return "TXT";
+                    else
+                        return "ASC";
 
                 case "image/tiff":
                     return "TIF";
-
+                     
                 default:
-                    return "TXT";
+                    logger.LogInformation(EventIds.UnexpectedDefaultFileExtension.ToEventId(), "Default - Unexpected file extension for File : {filename} ", fileName);
+                    return fileExtension?.TrimStart('.').ToUpper();
             }
         }
     }

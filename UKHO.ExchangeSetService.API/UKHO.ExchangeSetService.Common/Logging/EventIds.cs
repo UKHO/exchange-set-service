@@ -46,6 +46,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateCatalogFileRequestCompleted = 805039,
         UnhandledControllerException = 805040,
         CatalogueFileIsNotCreated = 805041,
+        UnexpectedDefaultFileExtension = 805042
     }
 
     public static class EventIdExtensions
