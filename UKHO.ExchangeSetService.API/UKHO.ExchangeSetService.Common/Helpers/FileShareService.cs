@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-        private readonly IFileSystemHelper fileSystemHelper;       
+        private readonly IFileSystemHelper fileSystemHelper;
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
-            this.fileSystemHelper = fileSystemHelper;           
+            this.fileSystemHelper = fileSystemHelper;
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
@@ -327,7 +327,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                logger.LogInformation(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating V01X01.zip with _X-Correlation-ID:{correlationId}", correlationId);
+                logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating V01X01.zip with _X-Correlation-ID:{correlationId}", correlationId);
                 return false;
             }
         }
@@ -335,9 +335,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            bool isUploadZipFile = false;            
+            bool isUploadZipFile = false;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileShareServiceConfig.Value.ExchangeSetFileName));
-           
+
             bool isZipFileCreated = await CreateExchangeSetFile(batchId, correlationId, accessToken, customFileInfo);
             if (isZipFileCreated)
             {
@@ -424,12 +424,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, new FileCreateModel(), accessToken, fileShareServiceConfig.Value.BaseUrl, fileCreateMetaData.BatchId, fileCreateMetaData.FileName, fileCreateMetaData.Length, "application/zip", correlationId);
             if (httpResponse.IsSuccessStatusCode)
             {
-                logger.LogInformation(EventIds.ExchangeSetFileCreateCompleted.ToEventId(), "File creation process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.BatchId, correlationId);
                 return true;
             }
             else
             {
-                logger.LogInformation(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, fileCreateMetaData.BatchId, correlationId);
+                logger.LogError(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, fileCreateMetaData.BatchId, correlationId);
                 return false;
             }
         }
@@ -448,7 +447,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             List<string> blockIdList = new List<string>();
             List<Task> ParallelBlockUploadTasks = new List<Task>();
             long uploadedBytes = 0;
-            int blockNum = 0;           
+            int blockNum = 0;
 
             while (uploadedBytes < customFileInfo.Length)
             {
@@ -465,7 +464,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     Offset = uploadedBytes,
                     Length = readBlockSize,
                     FileName = customFileInfo.Name
-                    
+
                 };
                 ParallelBlockUploadTasks.Add(UploadFileBlockMetaData(blockUploadMetaData, correlationId));
 
@@ -500,21 +499,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                logger.LogInformation(EventIds.UploadFileBlockMetaDataNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BatchId, correlationId);
+                logger.LogError(EventIds.UploadFileBlockMetaDataNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BatchId, correlationId);
             }
         }
 
         public async Task<bool> WriteBlockFile(WriteBlocksToFileMetaData writeBlocksToFileMetaData, string correlationId)
         {
             logger.LogInformation(EventIds.WriteBlocksToFileStart.ToEventId(), "Write Block to file process started for BatchId  {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
-
             WriteBlockFileModel writeBlockfileModel = new WriteBlockFileModel()
             {
                 BlockIds = writeBlocksToFileMetaData.BlockIds
             };
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.WriteBlockInFileAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, writeBlocksToFileMetaData.BatchId, writeBlocksToFileMetaData.FileName, writeBlockfileModel, writeBlocksToFileMetaData.AccessToken, correlationId: correlationId);
-
             if (httpResponse.IsSuccessStatusCode)
             {
                 logger.LogInformation(EventIds.WriteBlocksToFileCompleted.ToEventId(), "Added blocks to file process started for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
@@ -522,7 +519,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                logger.LogInformation(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Added blocks to file process started for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
+                logger.LogError(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Error in adding blocks to file process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
                 return false;
             }
         }
@@ -539,12 +536,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             httpResponse = await fileShareServiceClient.CommitBatchAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, batchCommitMetaData.BatchId, batchCommitModel, batchCommitMetaData.AccessToken, correlationId);
             if (httpResponse.IsSuccessStatusCode)
             {
-                logger.LogInformation(EventIds.UploadCommitBatchStart.ToEventId(), "Batch commit for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
+                logger.LogInformation(EventIds.UploadCommitBatchCompleted.ToEventId(), "Batch commit for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
                 return true;
             }
             else
             {
-                logger.LogInformation(EventIds.UploadCommitBatchStart.ToEventId(), "Error while commiting batch for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
+                logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error while commiting batch for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
                 return false;
             }
         }
@@ -564,7 +561,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                logger.LogInformation(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error while getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
+                logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error while getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
                 return responseBatchStatusModel.Status;
             }
         }

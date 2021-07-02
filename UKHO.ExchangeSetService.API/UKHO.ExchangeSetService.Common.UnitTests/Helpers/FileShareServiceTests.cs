@@ -32,6 +32,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeFolderPath = "C:\\HOME";
         public string fakeZipFilepath = "D:\\UKHO\\V01X01";
+        public string fakeExchangeSetPath = @"D:\UKHO";
+        public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
         [SetUp]
         public void Setup()
         {
@@ -115,6 +117,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
         #endregion
 
+        #region UploadZipFileData
         private CustomFileInfo GetFileInfo()
         {
             var customFileInfo = new CustomFileInfo()
@@ -135,6 +138,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Status = "Committed"
             };
         }
+        #endregion UploadZipFileMethods
 
         #region CreateBatch
         [Test]
@@ -388,7 +392,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region CreateZipFile
         [Test]
-        public void WhenInvalidZipFileCreateRequest_ThenReturnFalseResponse()
+        public void WhenInvalidCreateZipFileRequest_ThenReturnFalse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -399,7 +403,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public void WhenValidZipFileCreateRequest_ThenReturnTrueResponse()
+        public void WhenValidCreateZipFileRequest_ThenReturnTrue()
         {
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -409,12 +413,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
         #endregion CreateZipFile
 
-        #region uploadZipFile
+        #region UploadZipFile
         [Test]
-        public async Task WhenValidUploadZipFileForExchangeSetToFileShareService_ThenReturnTrueResponse()
+        public async Task WhenValidUploadZipFileRequest_ThenReturnTrue()
         {
-            string fakeExchangeSetPath = @"D:\UKHO";
-            string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
@@ -438,23 +440,22 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenInvalidUploadZipFileForExchangeSetToFileShareService_ThenReturnFalseResponse()
+        public async Task WhenInvalidUploadZipFileRequest_ThenReturnFalse()
         {
-            string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
-            string fakeExchangeSetPath = @"D:\UKHOO";
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
             fakeFileShareConfig.Value.BaseUrl = null;
-            byte[] byteData = new byte[1024];          
+            byte[] byteData = new byte[1024];
             var responseBatchStatusModel = GetBatchStatusResponse();
             responseBatchStatusModel.Status = "";
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
+           
             var GetFileInfoDetails = GetFileInfo();
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
             A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };            
             A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
             A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -463,7 +464,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
             Assert.AreEqual(false, response);
         }
-        #endregion uploadZipFile
-
+        #endregion UploadZipFile
     }
 }
