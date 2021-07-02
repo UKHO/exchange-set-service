@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IAuthTokenProvider fakeAuthTokenProvider;
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
-        private IFileSystemHelper fakeFileSystemHelper; 
+        private IFileSystemHelper fakeFileSystemHelper;
 
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeFolderPath = "C:\\HOME";
@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #endregion
 
         private CustomFileInfo GetFileInfo()
-        {           
+        {
             var customFileInfo = new CustomFileInfo()
             {
                 Name = "V01X01.zip",
@@ -421,16 +421,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileShareConfig.Value.BaseUrl = null;
             byte[] byteData = new byte[1024];
 
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            
             var responseBatchStatusModel = GetBatchStatusResponse();
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
-            var GetFileInfoDetails = GetFileInfo();
-            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
-            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            var GetFileInfoDetails = GetFileInfo();
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
+            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
+            A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+             .Returns(httpResponse);
 
             var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
             Assert.AreEqual(true, response);
@@ -445,17 +446,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
             fakeFileShareConfig.Value.BaseUrl = null;
-            byte[] byteData = new byte[1024];
-
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-           
+            byte[] byteData = new byte[1024];          
             var responseBatchStatusModel = GetBatchStatusResponse();
             responseBatchStatusModel.Status = "";
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
             var GetFileInfoDetails = GetFileInfo();
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
             A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            .Returns(httpResponse);
             A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
 
