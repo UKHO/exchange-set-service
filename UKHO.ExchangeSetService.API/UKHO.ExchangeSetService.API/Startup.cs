@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.API
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-            services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("ESSFulfilmentStorageConfiguration"));
+            services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("ESSFulfilmentConfiguration"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
             services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
@@ -133,6 +133,7 @@ namespace UKHO.ExchangeSetService.API
             .AddHeaderPropagation();            
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
+            services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
 
             services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                 {
@@ -202,7 +203,8 @@ namespace UKHO.ExchangeSetService.API
 
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
-                builder.AddAzureKeyVault(new Uri(kvServiceUri), new DefaultAzureCredential());
+                builder.AddAzureKeyVault(new Uri(kvServiceUri), 
+                    new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
             }
 
 #if DEBUG

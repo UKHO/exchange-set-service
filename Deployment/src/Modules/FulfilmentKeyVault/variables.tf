@@ -1,7 +1,3 @@
-variable "name" {
-  type = string
-}
-
 variable "resource_group_name" {
   type = string
 }
@@ -18,11 +14,15 @@ variable "env_name" {
   type = string
 }
 
+variable "service_name"{
+  type = string
+}
+
 variable "read_access_objects" {
   type = map(string)
 }
 
-variable "secrets" {
+variable "small_exchange_set_secrets" {
   type = map(string)
 }
 
@@ -34,6 +34,5 @@ variable "allowed_ips" {
 
 }
 
-variable "subnet_id" {
-  type = string
+variable "small_exchange_set_subnets" {
 }
