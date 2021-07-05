@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -13,6 +14,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 yield return masterList.GetRange(i, Math.Min(nSize, masterList.Count - i));
             }
+        }
+
+        public static int GetCurrentWeekNumber(DateTime date)
+        {
+            CultureInfo cultureInfo = CultureInfo.InvariantCulture;
+            return cultureInfo.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday);            
         }
 
         public static string GetBlockIds(int blockNum)

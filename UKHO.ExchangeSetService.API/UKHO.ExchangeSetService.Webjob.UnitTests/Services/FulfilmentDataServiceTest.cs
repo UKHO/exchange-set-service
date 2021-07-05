@@ -24,6 +24,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ILogger<FulfilmentDataService> fakeLogger;
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         public IConfiguration fakeConfiguration;
+        public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
 
         [SetUp]
         public void Setup()
@@ -33,7 +34,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeConfiguration = A.Fake<IConfiguration>();
-           
+            fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
                 ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10,
@@ -43,7 +44,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles);
         }
 
         #region GetScsResponseQueueMessage
