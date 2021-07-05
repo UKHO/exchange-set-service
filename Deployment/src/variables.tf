@@ -55,5 +55,9 @@ variable "app_service_sku" {
 	    tier = "PremiumV3"
 	    size = "P1v3"
         }
+    "rs"    = {
+	    tier = "PremiumV2"
+	    size = "P1v2"
+        }
   }
 }
