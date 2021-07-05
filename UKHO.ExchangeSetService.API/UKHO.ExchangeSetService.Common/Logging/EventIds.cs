@@ -42,11 +42,14 @@ namespace UKHO.ExchangeSetService.Common.Logging
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
         ReadMeTextFileIsNotDownloaded = 805037,
-        CreateCatalogFileRequestStart = 805038,
-        CreateCatalogFileRequestCompleted = 805039,
-        UnhandledControllerException = 805040,
-        CatalogueFileIsNotCreated = 805041,
-        UnexpectedDefaultFileExtension = 805042
+        CreateSerialFileRequestStart = 805038,
+        CreateSerialFileRequestCompleted = 805039,
+        SerialFileIsNotCreated = 805040,
+        CreateCatalogFileRequestStart = 805041,
+        CreateCatalogFileRequestCompleted = 805042,
+        UnhandledControllerException = 805043,
+        CatalogueFileIsNotCreated = 805044,
+        UnexpectedDefaultFileExtension = 805045
     }
 
     public static class EventIdExtensions

@@ -19,6 +19,7 @@
         public int ProductLimit { get; set; } 
         public int ParallelSearchTaskCount { get; set; }       
         public string ProductType { get; set; }
+        public string SerialFileName { get; set; }
         public string CatalogFileName { get; set; }
     }
 }

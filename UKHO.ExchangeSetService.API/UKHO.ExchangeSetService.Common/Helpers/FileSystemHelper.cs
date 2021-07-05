@@ -14,6 +14,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
+        public bool CreateFileContent(string fileName, string content)
+        {
+            if (!string.IsNullOrWhiteSpace(content))
+            {
+                File.WriteAllText(fileName, content);
+                return true;
+            }
+            return false;
+        }
+
         public void CreateFileContentWithBytes(string outputFileName, byte[] content)
         {
             using (var output = File.OpenWrite(outputFileName))

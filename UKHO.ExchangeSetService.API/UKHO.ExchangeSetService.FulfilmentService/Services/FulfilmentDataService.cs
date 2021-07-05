@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
                 int productGroupCount = response.Products.Count % parallelSearchTaskCount == 0 ? response.Products.Count / parallelSearchTaskCount : (response.Products.Count / parallelSearchTaskCount) + 1;
-                var productsList = ConfigHelper.SplitList((response.Products), productGroupCount);
+                var productsList = CommonHelper.SplitList((response.Products), productGroupCount);
 
                 var tasks = productsList.Select(async item =>
                 {
@@ -84,6 +84,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData);
         }
@@ -100,6 +101,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }               
+        }
+
+        public async Task CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
+        {
+            logger.LogInformation(EventIds.CreateSerialFileRequestStart.ToEventId(), "Serial Enc File creation started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            await fulfilmentAncillaryFiles.CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+            logger.LogInformation(EventIds.CreateSerialFileRequestCompleted.ToEventId(), "Serial Enc File creation completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
         }
 
         public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)

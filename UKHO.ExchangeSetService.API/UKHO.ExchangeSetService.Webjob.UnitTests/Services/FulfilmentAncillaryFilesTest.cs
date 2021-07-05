@@ -18,7 +18,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ILogger<FulfilmentAncillaryFiles> fakeLogger;
         public IFileSystemHelper fakeFileSystemHelper;
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
-        public string fakeBatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc";
+        public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        public string fakeExchangeSetPath = string.Empty;
         public string fakeExchangeSetRootPath = @"C:\\HOME";
 
         [SetUp]
@@ -39,7 +40,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 EncRoot = "ENC_ROOT",
                 ExchangeSetFileFolder = "V01X01",
                 ReadMeFileName = "ReadMe.txt",
-                CatalogFileName = "CATALOG.031"
+                CatalogFileName = "CATALOG.031",
+                SerialFileName = "TEST.ENC"
             });
             fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
@@ -57,6 +59,26 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new BatchFile() { Filename = "Default.img", FileSize = 400, MimeType = "image/jpeg", Links = new Links { Get = new Link { Href = "" } } }
             };
             return batchFiles;
+        }
+
+        [Test]
+        public async Task WhenInvalidCreateSerialEncFileRequest_ThenReturnFalseResponse()
+        {
+            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetPath, null);
+
+            Assert.AreEqual(false, response);
+        }
+        
+        [Test]
+        public async Task WhenValidCreateSerialEncFileRequest_ThenReturnTrueResponse()
+        {
+            fakeExchangeSetPath = @"C:\\HOME";
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetPath, null);
+
+            Assert.AreEqual(true, response);
         }
 
         #region CreateCatalogFile
