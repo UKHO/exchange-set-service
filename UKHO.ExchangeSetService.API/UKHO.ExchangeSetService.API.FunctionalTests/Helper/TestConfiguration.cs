@@ -11,6 +11,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string EssStorageAccountConnectionString;        
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
+        public FileShareServiceConfiguration FssConfig = new FileShareServiceConfiguration();
         public class EssAuthorizationTokenConfiguration
         {
             public string MicrosoftOnlineLoginUrl { get; set; }
@@ -23,6 +24,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public bool IsRunningOnLocalMachine { get; set; }
         }
 
+        public class FileShareServiceConfiguration
+        {
+            public string FssBaseUrl { get; set; }
+            public string FssResourceId { get; set; }
+            
+            public string FssStorageAccountConnectionString { get; set; }
+        }
+
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
@@ -33,7 +42,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             EssBaseAddress = ConfigurationRoot.GetSection("EssApiUrl").Value;
             ExchangeSetFileName = ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
-            ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);            
+            ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
+            ConfigurationRoot.Bind("FileShareServiceConfiguration", FssConfig);
+            
 
         }
     }
