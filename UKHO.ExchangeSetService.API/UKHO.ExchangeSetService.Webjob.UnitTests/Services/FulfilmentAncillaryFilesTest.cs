@@ -20,9 +20,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFileSystemHelper fakeFileSystemHelper;
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
         public ILogger<FulfilmentDataService> fakeLogger;
-        public string fakeExchangeSetInfoPath = @"C:\\HOME";
         public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
         public string fakeExchangeSetPath = string.Empty;
+        public string fakeExchangeSetInfoPath = @"C:\\HOME";
 
         [SetUp]
         public void Setup()

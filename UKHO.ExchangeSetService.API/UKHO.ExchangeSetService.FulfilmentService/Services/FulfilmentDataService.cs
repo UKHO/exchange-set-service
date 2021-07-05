@@ -23,7 +23,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentAncillaryFiles fulfilmentAncillaryFiles;
         private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
 
-
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     ILogger<FulfilmentDataService> logger,
@@ -83,6 +82,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
             }
         }
+
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);

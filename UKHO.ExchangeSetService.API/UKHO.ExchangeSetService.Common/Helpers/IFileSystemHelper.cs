@@ -1,5 +1,4 @@
-﻿
-namespace UKHO.ExchangeSetService.Common.Helpers
+﻿namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IFileSystemHelper
     {
