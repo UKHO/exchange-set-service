@@ -147,34 +147,47 @@ stages:
               command: "publish"
               publishWebProjects: false
               projects: '**/*UKHO.ExchangeSetService.API.csproj'
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)\ExchangeSetServiceWebAPI'
-              zipAfterPublish: false
-              modifyOutputPath: false
-
-          - task: DotNetCoreCLI@2
-            displayName: "Publish ESSFulfilment webjob Code"
-            inputs:
-              command: "publish"
-              publishWebProjects: false
-              projects: "**/*UKHO.ExchangeSetService.FulfilmentService.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)\ExchangeSetServiceWebAPI\App_Data\jobs\continuous\ESSFulfilmentWebJob'
-              zipAfterPublish: false
-              modifyOutputPath: false
-
-          - task: ArchiveFiles@2
-            displayName: "Zip WebAPI"
-            inputs:
-              rootFolderOrFile: '$(Build.BinariesDirectory)\ExchangeSetServiceWebAPI\'
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: '$(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI\UKHO.ExchangeSetService.API.zip'
-              replaceExistingArchive: true
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
+              zipAfterPublish: true
+              modifyOutputPath: true
 
           - task: PublishBuildArtifacts@1
             displayName: "Publish WebAPI Artifact"
             inputs:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)\ExchangeSetServiceWebAPI'
               ArtifactName: ExchangeSetServiceWebAPI
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish ESS Fulfilment Service Code"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: "**/*UKHO.ExchangeSetService.FulfilmentService.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\continuous\ESSFulfilmentWebJob'
+              zipAfterPublish: false
+              modifyOutputPath: false
+
+          - task: ArchiveFiles@2
+            displayName: "Zip ESS fulfilment service"
+            inputs:
+              rootFolderOrFile: '$(Build.BinariesDirectory)\ExchangeSetFulFilmentService\'
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: '$(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\ExchangeSetFulFilmentService.zip'
+              replaceExistingArchive: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish ExchangeSetFulFilmentService Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService'
+              ArtifactName: ExchangeSetService
+
+          - task: CopyFiles@2
+            displayName: Copy EssFulfilment Config
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API\'
+              Contents: 'appsettings.json'
+              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src'
 
           - task: PublishBuildArtifacts@1
             displayName: "Publish terraform Artifacts"
