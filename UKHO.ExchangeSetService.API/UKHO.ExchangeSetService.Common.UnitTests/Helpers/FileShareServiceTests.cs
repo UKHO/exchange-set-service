@@ -469,7 +469,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
-            bool response = fileShareService.CreateZipFileForExchangeSet(string.Empty, string.Empty);
+            bool response = fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty);
             Assert.AreEqual(false, response);
         }
 
@@ -479,7 +479,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            bool response = fileShareService.CreateZipFileForExchangeSet(fakeZipFilepath, null);
+            bool response = fileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeZipFilepath, null);
             Assert.IsNotNull(response);
             Assert.AreEqual(true, response);
         }

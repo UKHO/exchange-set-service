@@ -260,7 +260,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string payloadJson = string.Empty;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
-            string file = Path.Combine(exchangeSetRootPath, fileName);
+            string filePath = Path.Combine(exchangeSetRootPath, fileName);
             CheckCreateFolderPath(exchangeSetRootPath);
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ"));
             string secondLineText = string.Empty;
@@ -270,16 +270,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
                 {
-                    using (var outputFileStream = new FileStream(file, FileMode.Create, FileAccess.ReadWrite))
+                    using (var outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
                     {
                         stream.CopyTo(outputFileStream);
                     }
                     using StreamReader reader = new StreamReader(stream);
-                    secondLineText = GetLine(file);
+                    secondLineText = GetLine(filePath);
                 }
-                string text = File.ReadAllText(file);
+                string text = File.ReadAllText(filePath);
                 text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
-                File.WriteAllText(file, text);
+                File.WriteAllText(filePath, text);
                 return true;
             }
             else
@@ -314,20 +314,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return filePath;
         }
 
-        public bool CreateZipFileForExchangeSet(string exchangeSetZipRootPath, string correlationId)
+        public bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
             var zipName = $"{exchangeSetZipRootPath}.zip";
-            string path = Path.Combine(exchangeSetZipRootPath, zipName);
-            if (fileSystemHelper.CheckDirectoryAndFileExists(exchangeSetZipRootPath, path))
+            string filePath = Path.Combine(exchangeSetZipRootPath, zipName);
+            if (fileSystemHelper.CheckDirectoryAndFileExists(exchangeSetZipRootPath, filePath))
             {
                 fileSystemHelper.CreateZipFile(exchangeSetZipRootPath, zipName);
 
-                logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set V01X01.zip created with _X-Correlation-ID:{correlationId}", correlationId);
+                logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set {ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
                 return true;
             }
             else
             {
-                logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating V01X01.zip with _X-Correlation-ID:{correlationId}", correlationId);
+                logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating {ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
                 return false;
             }
         }
