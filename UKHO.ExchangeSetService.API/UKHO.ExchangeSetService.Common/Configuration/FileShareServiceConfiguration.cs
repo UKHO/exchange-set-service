@@ -19,8 +19,9 @@
         public string EditionNumber { get; set; }
         public string UpdateNumber { get; set; }
         public int UpdateNumberLimit { get; set; }
-        public int ProductLimit { get; set; } 
-        public int ParallelSearchTaskCount { get; set; }       
-        public string ProductType { get; set; }               
+        public int ProductLimit { get; set; }
+        public int ParallelSearchTaskCount { get; set; }
+        public string ProductType { get; set; }
+        public string SerialFileName { get; set; }
     }
 }
