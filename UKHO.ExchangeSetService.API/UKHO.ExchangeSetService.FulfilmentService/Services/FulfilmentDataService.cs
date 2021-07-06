@@ -11,6 +11,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
+
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public class FulfilmentDataService : IFulfilmentDataService
@@ -42,6 +43,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             string homeDirectoryPath = configuration["HOME"];
             var exchangeSetPath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetPathForUploadZipFile = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId);
+
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
@@ -56,7 +59,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await Task.WhenAll(tasks);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId);
-            return "Received Fulfilment Data Successfully!!!!";
+            await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
+            return "Exchange Set Created Successfully!!!!";
         }
 
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(SalesCatalogueServiceResponseQueueMessage message)
@@ -66,15 +70,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
         {
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
             var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.CorrelationId);
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
 
             if (searchBatchResponse != null && searchBatchResponse.Any())
             {
-                logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
+                logger.LogInformation(EventIds.DownloadFileShareServiceFilesStart.ToEventId(), "Download File share service request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
-                logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId,message.CorrelationId);
+                logger.LogInformation(EventIds.DownloadFileShareServiceFilesCompleted.ToEventId(), "Download File share service request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
             }
         }
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId)
@@ -86,7 +90,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
         {
-            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);           
+            logger.LogInformation(EventIds.QueryFileShareServiceRequestStart.ToEventId(), "Query File share service request started for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             string readMeFilePath = await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
             logger.LogInformation(EventIds.QueryFileShareServiceRequestCompleted.ToEventId(), "Query File share service request completed for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
 
@@ -103,6 +107,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             logger.LogInformation(EventIds.CreateSerialFileRequestStart.ToEventId(), "Serial Enc File creation started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             await fulfilmentAncillaryFiles.CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
             logger.LogInformation(EventIds.CreateSerialFileRequestCompleted.ToEventId(), "Serial Enc File creation completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+        }
+
+        public async Task PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetPathForUploadZipFile, string correlationId)
+        {
+            logger.LogInformation(EventIds.CreateZipFileRequestStart.ToEventId(), "Started creating exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            bool isZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId);
+            logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Ended creating exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+
+            if (isZipFileCreated)
+            {
+                logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Started uploading exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetPathForUploadZipFile, correlationId);
+                logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Ended uploading exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            }
         }
     }
 }

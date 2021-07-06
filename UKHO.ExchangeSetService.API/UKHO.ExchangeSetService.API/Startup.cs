@@ -116,9 +116,8 @@ namespace UKHO.ExchangeSetService.API
                 }
             )
             .AddHeaderPropagation();
-
-            services.AddScoped<IFileShareService, FileShareService>();
-
+            services.AddScoped<IFileSystemHelper, FileSystemHelper>();
+            services.AddScoped<IFileShareService, FileShareService>();            
             services.AddScoped<IProductDataService, ProductDataService>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
