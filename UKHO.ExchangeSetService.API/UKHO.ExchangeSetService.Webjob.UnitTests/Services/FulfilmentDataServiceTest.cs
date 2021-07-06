@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ILogger<FulfilmentDataService> fakeLogger;
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         public IConfiguration fakeConfiguration;
-        public IFulfilmentAncillaryFiles fakefulfilmentAncillaryFiles;
+        public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
         public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
 
         [SetUp]
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeQueryFssService = A.Fake<IFulfilmentFileShareService>();
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeConfiguration = A.Fake<IConfiguration>();
-            fakefulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
+            fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
                 ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10,
@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakefulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService);
         }
 
         #region GetScsResponseQueueMessage
@@ -159,12 +159,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored,A<string>.Ignored)).Returns(salesCatalogueDataResponse);
-            A.CallTo(() => fakefulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 
-            Assert.AreEqual("Received Fulfilment Data Successfully!!!!", salesCatalogueResponseFile);
+            Assert.AreEqual("Exchange Set Created Successfully!!!!", salesCatalogueResponseFile);
         }
     }
 }

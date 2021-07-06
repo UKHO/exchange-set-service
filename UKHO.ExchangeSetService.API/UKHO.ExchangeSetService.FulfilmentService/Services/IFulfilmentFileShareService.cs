@@ -11,5 +11,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponses, string exchangeSetRootPath);
         Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
         Task<string> SearchReadMeFilePath(string batchId, string correlationId);
+        bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
+        Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath,string correlationId);
     }
 }
