@@ -12,5 +12,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath,string correlationId);
         Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId);
         Task<string> SearchReadMeFilePath(string batchId,string correlationId);
+        bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
+        Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId);
     }
 }
