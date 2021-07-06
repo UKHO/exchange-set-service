@@ -43,3 +43,10 @@ variable "medium_exchange_set_secrets" {
 
 variable "medium_exchange_set_subnets" {
 }
+
+variable "large_exchange_set_secrets" {
+  type = map(string)
+}
+
+variable "large_exchange_set_subnets" {
+}
