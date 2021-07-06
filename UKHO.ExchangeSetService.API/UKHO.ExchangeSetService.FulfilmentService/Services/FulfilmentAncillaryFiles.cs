@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
             {
                 string fileName = fileShareServiceConfig.Value.ProductFileName;
-                string file = Path.Combine(exchangeSetInfoPath, fileName);
+                string filePath = Path.Combine(exchangeSetInfoPath, fileName);
 
                 var productsBuilder = new ProductListBuilder();
                 foreach (var product in salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName))
@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
 
-                var response = fileSystemHelper.CreateFileContent(file, content);
+                var response = fileSystemHelper.CreateFileContent(filePath, content);
                 if (!response)
                 {
                     logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
