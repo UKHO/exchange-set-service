@@ -7,23 +7,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     public class FssApiClient
     {
         static HttpClient httpClient = new HttpClient();
-        private readonly string apiHost;
-
-        public FssApiClient(string apiHost)
-        {
-            this.apiHost = apiHost;
-        }
 
         /// <summary>
-        /// Get Batch Status - GET /batch/{batchId}/status
+        /// Get Batch Status
         /// </summary>
-        /// <param name="batchId"></param>
+        /// <param name="uri"></param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetBatchStatusAsync(string batchId, string accessToken = null)
+        public async Task<HttpResponseMessage> GetBatchStatusAsync(string uri, string accessToken = null)
         {
-            string uri = $"{apiHost}/batch/{batchId}/status";
-
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
             {
                 if (accessToken != null)
@@ -35,17 +27,45 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
         }
 
+
         /// <summary>
-        /// Search Using Query parameter  - GET /batch
-        /// </summary>        
+        /// Get File Download
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="fileRangeHeader">File Range Header, pass NULL to skip partial download</param>
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> GetFileDownloadAsync(string uri, string fileRangeHeader = null, string accessToken = null)
+        {
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
+            {
+                if (fileRangeHeader != null)
+                {
+                    httpRequestMessage.Headers.Add("Range", fileRangeHeader);
+                }
+
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+        }
+
+        /// <summary>
+        /// Search Using Query parameter
+        /// </summary>  
+        /// <param name="baseUri">Search filter, pass null to get data without filter</param>
         /// <param name="filter">Search filter, pass null to get data without filter</param>
         /// <param name="limit">Page limit, pass null to get default value which is counfigurable and currently set to 10 </param>
         /// <param name="start">Page start value, pass null to get default value which is 0 </param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> SearchBatchesAsync(string filter = null, int? limit = null, int? start = null, string accessToken = null)
+        public async Task<HttpResponseMessage> SearchBatchesAsync(string baseUri, string filter = null, int? limit = null, int? start = null, string accessToken = null)
         {
-            string uri = $"{apiHost}/batch?";
+            string uri = $"{baseUri}/batch?";
 
             if (filter != null)
             {

@@ -8,7 +8,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string EssBaseAddress;
         public static string FakeTokenPrivateKey;
         public string ExchangeSetFileName;
-        public string EssStorageAccountConnectionString;        
+        public string EssStorageAccountConnectionString;
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public FileShareServiceConfiguration FssConfig = new FileShareServiceConfiguration();
@@ -26,10 +26,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public class FileShareServiceConfiguration
         {
-            public string FssBaseUrl { get; set; }
+
             public string FssResourceId { get; set; }
-            
-            public string FssStorageAccountConnectionString { get; set; }
+
+            public int BatchCommitWaitTime { get; set; }
         }
 
         public TestConfiguration()
@@ -37,14 +37,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot = new ConfigurationBuilder()
                                 .AddJsonFile("appsettings.json", false)
                                 .Build();
-            
-            EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;     
+
+            EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;
             EssBaseAddress = ConfigurationRoot.GetSection("EssApiUrl").Value;
             ExchangeSetFileName = ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
             ConfigurationRoot.Bind("FileShareServiceConfiguration", FssConfig);
-            
+
 
         }
     }
