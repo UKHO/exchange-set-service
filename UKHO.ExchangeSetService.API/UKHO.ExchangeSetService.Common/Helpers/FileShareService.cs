@@ -382,11 +382,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     AccessToken = accessToken,
                     BatchId = batchId
-                };
-                if (batchStatus != BatchStatus.Committed.ToString())
-                {
-                    batchStatus = await GetBatchStatus(batchStatusMetaData, correlationId);
-                }
+                };              
+                batchStatus = await GetBatchStatus(batchStatusMetaData, correlationId);               
             }
             return batchStatus;
         }
