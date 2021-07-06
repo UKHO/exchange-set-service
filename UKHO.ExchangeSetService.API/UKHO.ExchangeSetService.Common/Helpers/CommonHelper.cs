@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -18,6 +20,28 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             CultureInfo cultureInfo = CultureInfo.InvariantCulture;
             return cultureInfo.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday);            
+        }
+
+        public static string GetBlockIds(int blockNum)
+        {
+            string blockId = $"Block_{blockNum:00000}";
+            return blockId;
+        }
+
+        public static byte[] CalculateMD5(byte[] requestBytes)
+        {
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(requestBytes);
+
+            return hash;
+        }
+
+        public static byte[] CalculateMD5(Stream requestStream)
+        {
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(requestStream);
+
+            return hash;
         }
     }
 }

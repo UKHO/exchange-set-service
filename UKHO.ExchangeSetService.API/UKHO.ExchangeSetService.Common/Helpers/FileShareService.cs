@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -25,16 +26,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
-       
+        private readonly IFileSystemHelper fileSystemHelper;
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                ILogger<FileShareService> logger)
+                                ILogger<FileShareService> logger,
+                                IFileSystemHelper fileSystemHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
+            this.fileSystemHelper = fileSystemHelper;
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
@@ -102,7 +105,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
             internalSearchBatchResponse.Entries = new List<BatchDetail>();
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-
             var productWithAttributes = GenerateQueryForFss(products);
             var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes}";
 
@@ -210,14 +212,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return sb.ToString();
         }
 
-        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath,string correlationId)
+        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath, string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken, correlationId);
         }
 
-        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken,string correlationId)
+        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken, string correlationId)
         {
             bool result = false;
             foreach (var item in uri)
@@ -244,19 +246,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private static async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
         {
-            Stream stream = await httpResponse.Content.ReadAsStreamAsync();
-            FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); 
-            stream.CopyTo(outputFileStream);
-        }      
+            using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+            {
+                using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
+                {
+                    stream.CopyTo(outputFileStream);
+                }
+            }
+        }
 
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-         
-            string fileName = fileShareServiceConfig.Value.ReadMeFileName;            
-            string file = Path.Combine(exchangeSetRootPath, fileName);           
-            CheckCreateFolderPath(exchangeSetRootPath);              
+            string fileName = fileShareServiceConfig.Value.ReadMeFileName;
+            string filePath = Path.Combine(exchangeSetRootPath, fileName);
+            CheckCreateFolderPath(exchangeSetRootPath);
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ"));
             string secondLineText = string.Empty;
             HttpResponseMessage httpReadMeFileResponse;
@@ -265,16 +270,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
                 {
-                    using (var outputFileStream = new FileStream(file, FileMode.Create, FileAccess.ReadWrite))
+                    using (var outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
                     {
                         stream.CopyTo(outputFileStream);
                     }
                     using StreamReader reader = new StreamReader(stream);
-                    secondLineText = GetLine(file);
+                    secondLineText = GetLine(filePath);
                 }
-                string text = File.ReadAllText(file);
-                text = secondLineText.Length == 0 ? lineToWrite: text.Replace(secondLineText, lineToWrite);
-                File.WriteAllText(file, text);
+                string text = File.ReadAllText(filePath);
+                text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
+                File.WriteAllText(filePath, text);
                 return true;
             }
             else
@@ -284,12 +289,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public async Task<string> SearchReadMeFilePath(string batchId,string correlationId)
+        public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-         
-            string filePath = string.Empty;           
+            string filePath = string.Empty;
             var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, correlationId);
@@ -299,7 +303,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (searchBatchResponse.Entries.Count > 0)
                 {
                     var batchResult = searchBatchResponse.Entries.FirstOrDefault();
-                    filePath =  batchResult.Files.FirstOrDefault().Links.Get.Href;                  
+                    filePath = batchResult.Files.FirstOrDefault().Links.Get.Href;
                 }
                 else
                     logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
@@ -310,6 +314,93 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return filePath;
         }
 
+        public bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
+        {
+            var zipName = $"{exchangeSetZipRootPath}.zip";
+            string filePath = Path.Combine(exchangeSetZipRootPath, zipName);
+            if (fileSystemHelper.CheckDirectoryAndFileExists(exchangeSetZipRootPath, filePath))
+            {
+                fileSystemHelper.CreateZipFile(exchangeSetZipRootPath, zipName);
+
+                logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set {ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                return true;
+            }
+            else
+            {
+                logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating {ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                return false;
+            }
+        }
+
+        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
+        {
+            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            bool isUploadZipFile = false;
+            CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileShareServiceConfig.Value.ExchangeSetFileName));
+
+            bool isZipFileCreated = await CreateExchangeSetFile(batchId, correlationId, accessToken, customFileInfo);
+            if (isZipFileCreated)
+            {
+                bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
+                if (isWriteBlock)
+                {
+                    string batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, customFileInfo);
+                    if (batchStatus == BatchStatus.Committed.ToString())
+                    {
+                        isUploadZipFile = true;
+                    }
+                }
+            }
+            return isUploadZipFile;
+        }
+
+        public async Task<bool> CreateExchangeSetFile(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
+        {
+            FileCreateMetaData fileCreateMetaData = new FileCreateMetaData()
+            {
+                AccessToken = accessToken,
+                BatchId = batchId,
+                FileName = customFileInfo.Name,
+                Length = customFileInfo.Length
+            };
+            return await CreateFile(fileCreateMetaData, accessToken, correlationId);
+        }
+
+        public async Task<string> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
+        {
+            BatchCommitMetaData batchCommitMetaData = new BatchCommitMetaData()
+            {
+                BatchId = batchId,
+                AccessToken = accessToken,
+                FullFileName = customFileInfo.FullName
+            };
+            bool isBatchCommitted = await UploadCommitBatch(batchCommitMetaData, correlationId);
+            string batchStatus = BatchStatus.CommitInProgress.ToString();
+            if (isBatchCommitted)
+            {
+                var batchStatusMetaData = new BatchStatusMetaData()
+                {
+                    AccessToken = accessToken,
+                    BatchId = batchId
+                };              
+                batchStatus = await GetBatchStatus(batchStatusMetaData, correlationId);               
+            }
+            return batchStatus;
+        }
+
+        public async Task<bool> UploadAndWriteBlock(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
+        {
+            var blockIdList = await UploadBlockFile(batchId, customFileInfo, accessToken, correlationId);
+            WriteBlocksToFileMetaData writeBlocksToFileMetaData = new WriteBlocksToFileMetaData()
+            {
+                BatchId = batchId,
+                FileName = customFileInfo.Name,
+                AccessToken = accessToken,
+                BlockIds = blockIdList
+            };
+            return await WriteBlockFile(writeBlocksToFileMetaData, correlationId);
+        }
+
         private static string GetLine(string filePath)
         {
             int lineFound = 2;
@@ -318,9 +409,158 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 for (int i = 1; i < lineFound; i++)
                     sr.ReadLine();
-               secondLine = sr.ReadLine();
-            }            
+                secondLine = sr.ReadLine();
+            }
             return secondLine ?? string.Empty;
+        }
+
+        public async Task<bool> CreateFile(FileCreateMetaData fileCreateMetaData, string accessToken, string correlationId)
+        {
+            logger.LogInformation(EventIds.ExchangeSetFileCreateStart.ToEventId(), "File creation process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.BatchId, correlationId);
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, new FileCreateModel(), accessToken, fileShareServiceConfig.Value.BaseUrl, fileCreateMetaData.BatchId, fileCreateMetaData.FileName, fileCreateMetaData.Length, "application/zip", correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                logger.LogError(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, fileCreateMetaData.BatchId, correlationId);
+                return false;
+            }
+        }
+
+        public async Task<List<string>> UploadBlockFile(string batchId, CustomFileInfo customFileInfo, string accessToken, string correlationId)
+        {
+            UploadMessage uploadMessage = new UploadMessage()
+            {
+                UploadSize = customFileInfo.Length,
+                BlockSizeInMultipleOfKBs = fileShareServiceConfig.Value.BlockSizeInMultipleOfKBs
+            };
+            var blockSizeInMultipleOfKBs = uploadMessage.BlockSizeInMultipleOfKBs <= 0
+                                            || uploadMessage.BlockSizeInMultipleOfKBs > 4096 ? 1024 : uploadMessage.BlockSizeInMultipleOfKBs;
+
+            long blockSize = blockSizeInMultipleOfKBs * 1024;
+            List<string> blockIdList = new List<string>();
+            List<Task> ParallelBlockUploadTasks = new List<Task>();
+            long uploadedBytes = 0;
+            int blockNum = 0;
+
+            while (uploadedBytes < customFileInfo.Length)
+            {
+                blockNum++;
+                int readBlockSize = (int)(customFileInfo.Length - uploadedBytes <= blockSize ? customFileInfo.Length - uploadedBytes : blockSize);
+                string blockId = CommonHelper.GetBlockIds(blockNum);
+
+                var blockUploadMetaData = new UploadBlockMetaData()
+                {
+                    BatchId = batchId,
+                    BlockId = blockId,
+                    FullFileName = customFileInfo.FullName,
+                    JwtToken = accessToken,
+                    Offset = uploadedBytes,
+                    Length = readBlockSize,
+                    FileName = customFileInfo.Name
+
+                };
+                ParallelBlockUploadTasks.Add(UploadFileBlockMetaData(blockUploadMetaData, correlationId));
+
+                blockIdList.Add(blockId);
+                uploadedBytes += readBlockSize;
+                //run uploads in parallel
+                if (ParallelBlockUploadTasks.Count >= fileShareServiceConfig.Value.ParallelUploadThreadCount)
+                {
+                    Task.WaitAll(ParallelBlockUploadTasks.ToArray());
+                    ParallelBlockUploadTasks.Clear();
+                }
+            }
+
+            if (ParallelBlockUploadTasks.Count > 0)
+            {
+                await Task.WhenAll(ParallelBlockUploadTasks);
+                ParallelBlockUploadTasks.Clear();
+            }
+            return blockIdList;
+        }
+
+        public async Task UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData, string correlationId)
+        {
+            logger.LogInformation($"Uploaded block id {UploadBlockMetaData.BlockId} for file {UploadBlockMetaData.FileName} and Batch {UploadBlockMetaData.BatchId}");
+            byte[] byteData = fileSystemHelper.UploadFileBlockMetaData(UploadBlockMetaData);
+            var blockMd5Hash = CommonHelper.CalculateMD5(byteData);
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, UploadBlockMetaData.BatchId, UploadBlockMetaData.FileName, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken, correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                logger.LogInformation(EventIds.UploadFileBlockMetaDataCompleted.ToEventId(), "File blocks are uploaded for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", UploadBlockMetaData.BatchId, correlationId);
+            }
+            else
+            {
+                logger.LogError(EventIds.UploadFileBlockMetaDataNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BatchId, correlationId);
+            }
+        }
+
+        public async Task<bool> WriteBlockFile(WriteBlocksToFileMetaData writeBlocksToFileMetaData, string correlationId)
+        {
+            logger.LogInformation(EventIds.WriteBlocksToFileStart.ToEventId(), "Write Block to file process started for BatchId  {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
+            WriteBlockFileModel writeBlockfileModel = new WriteBlockFileModel()
+            {
+                BlockIds = writeBlocksToFileMetaData.BlockIds
+            };
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.WriteBlockInFileAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, writeBlocksToFileMetaData.BatchId, writeBlocksToFileMetaData.FileName, writeBlockfileModel, writeBlocksToFileMetaData.AccessToken, correlationId: correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                logger.LogInformation(EventIds.WriteBlocksToFileCompleted.ToEventId(), "Added blocks to file process started for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
+                return true;
+            }
+            else
+            {
+                logger.LogError(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Error in adding blocks to file process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
+                return false;
+            }
+        }
+
+        public async Task<bool> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData, string correlationId)
+        {
+            logger.LogInformation(EventIds.UploadCommitBatchStart.ToEventId(), "Batch commit for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchCommitMetaData.BatchId, correlationId);
+            List<FileDetail> fileDetails = fileSystemHelper.UploadCommitBatch(batchCommitMetaData);
+            var batchCommitModel = new BatchCommitModel()
+            {
+                FileDetails = fileDetails
+            };
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.CommitBatchAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, batchCommitMetaData.BatchId, batchCommitModel, batchCommitMetaData.AccessToken, correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                logger.LogInformation(EventIds.UploadCommitBatchCompleted.ToEventId(), "Batch commit for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
+                return true;
+            }
+            else
+            {
+                logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error while commiting batch for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
+                return false;
+            }
+        }
+
+        public async Task<string> GetBatchStatus(BatchStatusMetaData batchStatusMetaData, string correlationId)
+        {
+            logger.LogInformation(EventIds.GetBatchStatusStart.ToEventId(), "Getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
+            ResponseBatchStatusModel responseBatchStatusModel = new ResponseBatchStatusModel();
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                string bodyJson = await httpResponse.Content.ReadAsStringAsync();
+                responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
+                logger.LogInformation(EventIds.GetBatchStatusCompleted.ToEventId(), "Getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
+                return responseBatchStatusModel.Status;
+            }
+            else
+            {
+                logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error while getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
+                return responseBatchStatusModel.Status;
+            }
         }
 
         private static void CheckCreateFolderPath(string downloadPath)
