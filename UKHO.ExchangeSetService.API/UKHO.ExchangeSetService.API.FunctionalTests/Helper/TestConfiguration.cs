@@ -12,6 +12,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public FileShareServiceConfiguration FssConfig = new FileShareServiceConfiguration();
+        public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
         public class EssAuthorizationTokenConfiguration
         {
             public string MicrosoftOnlineLoginUrl { get; set; }
@@ -22,6 +23,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string AutoTestClientSecretNoAuth { get; set; }
             public string EssClientId { get; set; }
             public bool IsRunningOnLocalMachine { get; set; }
+        }
+
+        public class AzureAdB2CConfiguration
+        {
+           
+            public string ClientId { get; set; }           
+            public string Scope { get; set; }           
+            public string TenantId { get; set; }            
+            public string MicrosoftOnlineLoginUrl { get; set; }
+            public string ClientSecret { get; set; }
+            // Test Client id is used to test unauthorized scenario for FSS API
+            public bool IsRunningOnLocalMachine { get; set; }
+            public string LocalTestToken { get; set; } 
         }
 
         public class FileShareServiceConfiguration
@@ -43,6 +57,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ExchangeSetFileName = ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
+            ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);          
             ConfigurationRoot.Bind("FileShareServiceConfiguration", FssConfig);
 
 

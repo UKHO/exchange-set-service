@@ -45,6 +45,26 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateSerialFileRequestStart = 805038,
         CreateSerialFileRequestCompleted = 805039,
         SerialFileIsNotCreated = 805040,
+        CreateZipFileRequestStart = 805041,
+        CreateZipFileRequestCompleted = 805042,       
+        UploadExchangeSetToFssStart = 805043,
+        UploadExchangeSetToFssCompleted = 805044,
+        UploadFileCreationProcessStarted = 805045,
+        UploadFileCreationProcessCompleted = 805046,
+        ExchangeSetFileCreateStart = 805047,
+        CreateExchangeSetFileNonOkResponse = 805048,
+        UploadFileBlockMetaDataCompleted = 805049,
+        UploadFileBlockMetaDataNonOkResponse = 805050,
+        WriteBlocksToFileStart = 805051,
+        WriteBlocksToFileCompleted = 805052,
+        UploadCommitBatchStart = 805053,
+        UploadCommitBatchCompleted = 805054,
+        WriteBlockToFileNonOkResponse = 805055,
+        UploadCommitBatchNonOkResponse = 805056,
+        GetBatchStatusStart = 805057,
+        GetBatchStatusCompleted = 805058,
+        GetBatchStatusNonOkResponse = 805059,
+        ErrorInCreatingZipFile = 805060
     }
 
     public static class EventIdExtensions
