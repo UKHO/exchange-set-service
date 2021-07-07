@@ -41,8 +41,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public class FileShareServiceConfiguration
         {
 
-            public string FssResourceId { get; set; }
-
+            public string MicrosoftOnlineLoginUrl { get; set; }
+            public string TenantId { get; set; }
+            public string AutoTestClientId { get; set; }
+            public string AutoTestClientSecret { get; set; }
+            public string AutoTestClientIdNoAuth { get; set; }
+            public string AutoTestClientSecretNoAuth { get; set; }
+            public string FssClientId { get; set; }
+            public bool IsRunningOnLocalMachine { get; set; }
             public int BatchCommitWaitTime { get; set; }
         }
 

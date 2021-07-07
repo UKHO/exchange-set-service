@@ -9,7 +9,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     public static class FssBatchHelper
     {
         private static FssApiClient FssApiClient { get; set; }
-        static FileShareServiceConfiguration config = new TestConfiguration().FssConfig;
+        static FileShareServiceConfiguration Config = new TestConfiguration().FssConfig;
 
         static FssBatchHelper()
         {
@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             string batchStatus = "";
             var startTime = DateTime.UtcNow;
-            while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(config.BatchCommitWaitTime))
+            while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.BatchCommitWaitTime))
             {
                 await Task.Delay(5000);
                 var batchStatusResponse = await FssApiClient.GetBatchStatusAsync(batchStatusUri, jwtToken);

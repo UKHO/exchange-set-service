@@ -14,7 +14,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     {
         static string EssAccessToken = null;
         static string EssAccessTokenNoAuth = null;
+        static string FssAccessToken = null;
         static EssAuthorizationTokenConfiguration EssauthConfig = new TestConfiguration().EssAuthorizationConfig;
+        static FileShareServiceConfiguration FssAuthConfig = new TestConfiguration().FssConfig;
+
 
         public async Task<string> GetEssToken()
         {
@@ -28,6 +31,51 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return EssAccessTokenNoAuth;
         }
 
+        public async Task<string> GetFssToken()
+        {
+            EssAccessToken = await GenerateFssToken(FssAuthConfig.AutoTestClientId, FssAuthConfig.AutoTestClientSecret, FssAccessToken);
+            return FssAccessToken;
+        }
+
+        /// <summary>
+        /// Generate FSS Token
+        /// </summary>
+        /// <param name="ClientId"></param>
+        /// <param name="ClientSecret"></param>
+        /// <param name="Token"></param>
+        /// <returns></returns>
+
+        private static async Task<string> GenerateFssToken(string ClientId, string ClientSecret, string Token)
+        {
+            string[] scopes = new string[] { $"{FssAuthConfig.FssClientId}/.default" };
+            if (Token == null)
+            {
+                if (EssauthConfig.IsRunningOnLocalMachine)
+                {
+                    IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(FssAuthConfig.FssClientId).
+                                                        WithRedirectUri("http://localhost").Build();
+
+                    //Acquiring token through user interaction
+                    AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
+                                                            .WithAuthority($"{FssAuthConfig.MicrosoftOnlineLoginUrl}{FssAuthConfig.TenantId}", true)
+                                                            .ExecuteAsync();
+                    Token = tokenTask.AccessToken;
+                }
+                else
+                {
+                    IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
+                                                    .WithClientSecret(ClientSecret)
+                                                    .WithAuthority(new Uri($"{FssAuthConfig.MicrosoftOnlineLoginUrl}{FssAuthConfig.TenantId}"))
+                                                    .Build();
+
+                    AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+                    Token = tokenTask.AccessToken;
+                }
+
+            }
+            return Token;
+        }
+
         /// <summary>
         /// GenerateToken
         /// </summary>
@@ -36,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="Token"></param>
         /// <returns></returns>
 
-       private static async Task<string> GenerateEssToken(string ClientId, string ClientSecret, string Token)
+        private static async Task<string> GenerateEssToken(string ClientId, string ClientSecret, string Token)
         {
             string[] scopes = new string[] { $"{EssauthConfig.EssClientId}/.default" };
             if (Token == null) 
