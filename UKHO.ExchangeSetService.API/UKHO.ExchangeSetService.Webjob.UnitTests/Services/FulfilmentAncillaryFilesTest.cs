@@ -26,8 +26,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public string fakeExchangeSetRootPath = @"F:\\HOME";
         public string fakeFileName = "test.txt";
         readonly FakeFileHelper fakeFileHelper = new FakeFileHelper();
-        
-
         public string fakeExchangeSetInfoPath = @"C:\\HOME";
 
         [SetUp]
@@ -149,6 +147,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void WhenValidCreateProductFileRequest_ThenReturnTrueResponse()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetInfoPath);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -156,6 +155,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var response = fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(true, response);
+            Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
         }
 
         #endregion

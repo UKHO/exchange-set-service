@@ -53,7 +53,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ParallelSearchTaskCount = 10,
                 EncRoot = "ENC_ROOT",
                 ExchangeSetFileFolder = "V01X01",
-                Info="INFO",ProductFileName="TEST.TXT"
+                Info="INFO",
+                ProductFileName="TEST.TXT"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});

@@ -47,27 +47,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
-        #region GetSalesCatalogueDataBadrequestResponse
-        private SalesCatalogueDataResponse GetSalesCatalogueDataBadrequestResponse()
-        {
-            return new SalesCatalogueDataResponse
-            {
-                ResponseCode = HttpStatusCode.BadRequest,
-                ResponseBody = null
-            };
-        }
-        #endregion
-
-        [Test]
-        public async Task WhenRequestGetSalesCatalogueDataResponse_ThenReturnsBadrequest()
-        {
-            A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueDataBadrequestResponse());
-
-            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode);
-        }
-
         [Test]
         public async Task WhenRequestGetSalesCatalogueDataResponse_ThenReturnsDataInResponse()
         {
