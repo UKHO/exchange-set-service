@@ -20,7 +20,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
         public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
         public string fakeExchangeSetPath = string.Empty;
-        public string fakeExchangeSetRootPath = @"C:\\HOME";
+        public string fakeExchangeSetRootPath = @"F:\\HOME";
+        public string fakeFileName = "test.txt";
+        readonly FakeFileHelper fakeFileHelper = new FakeFileHelper();
+        
 
         [SetUp]
         public void Setup()
@@ -86,29 +89,33 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateCatalogFileRequest_ThenReturnTrueReponse()
         {
+            byte[] byteContent = new byte[100];
             var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() }
             };
 
+            fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
+            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);
+
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(A<string>.Ignored, A<byte[]>.Ignored));
 
             var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponses);
 
             Assert.AreEqual(true, response);
+            Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(true, fakeFileHelper.CreateFileContentWithBytesIsCalled);
         }
 
         [Test]
         public async Task WhenInvalidCreateCatalogFileRequest_ThenReturnFalseReponse()
         {
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(A<string>.Ignored, A<byte[]>.Ignored));
 
             var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null);
 
             Assert.AreEqual(false, response);
+            Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
         }
 
         #endregion
