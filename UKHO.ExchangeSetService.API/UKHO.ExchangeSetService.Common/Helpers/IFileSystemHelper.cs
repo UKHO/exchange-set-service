@@ -12,5 +12,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         CustomFileInfo GetFileInfo(string filePath);
         byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData);
         List<FileDetail> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData);
+        void CreateFileContentWithBytes(string outputFileName, byte[] content);
+        bool CheckFileExists(string filePath);
     }
 }

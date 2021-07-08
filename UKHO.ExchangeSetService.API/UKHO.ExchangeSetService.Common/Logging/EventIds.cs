@@ -64,7 +64,14 @@ namespace UKHO.ExchangeSetService.Common.Logging
         GetBatchStatusStart = 805057,
         GetBatchStatusCompleted = 805058,
         GetBatchStatusNonOkResponse = 805059,
-        ErrorInCreatingZipFile = 805060
+        ErrorInCreatingZipFile = 805060,
+        CreateCatalogFileRequestStart = 805061,
+        CreateCatalogFileRequestCompleted = 805062,
+        UnhandledControllerException = 805063,
+        CatalogueFileIsNotCreated = 805064,
+        UnexpectedDefaultFileExtension = 805065,
+        ExchangeSetNotCreated = 805066,
+        ExchangeSetCreated = 805067
     }
 
     public static class EventIdExtensions

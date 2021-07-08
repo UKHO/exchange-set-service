@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
@@ -36,15 +37,24 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeConfiguration = A.Fake<IConfiguration>();
             fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, 
-                ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10, ParallelSearchTaskCount = 10,
+            {
+                BaseUrl = "http://tempuri.org",
+                CellName = "DE260001",
+                EditionNumber = "1",
+                Limit = 10,
+                Start = 0,
+                ProductCode = "AVCS",
+                ProductLimit = 4,
+                UpdateNumber = "0",
+                UpdateNumberLimit = 10,
+                ParallelSearchTaskCount = 10,
                 EncRoot = "ENC_ROOT",
                 ExchangeSetFileFolder = "V01X01"
             });
-            fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
-                                                    { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
+            fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
+            { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService,fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles);
         }
 
         #region GetScsResponseQueueMessage
@@ -64,19 +74,19 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #region GetSalesCatalogueResponse
         private SalesCatalogueProductResponse GetSalesCatalogueResponse()
         {
-            return  new SalesCatalogueProductResponse
+            return new SalesCatalogueProductResponse
+            {
+                ProductCounts = new ProductCounts
                 {
-                    ProductCounts = new ProductCounts
-                    {
-                        RequestedProductCount = 6,
-                        RequestedProductsAlreadyUpToDateCount = 8,
-                        ReturnedProductCount = 2,
-                        RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
+                    RequestedProductCount = 6,
+                    RequestedProductsAlreadyUpToDateCount = 8,
+                    ReturnedProductCount = 2,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
                                 new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
                                 new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
                             }
-                    },
-                    Products = new List<Products> {
+                },
+                Products = new List<Products> {
                             new Products {
                                 ProductName = "productName",
                                 EditionNumber = 2,
@@ -88,7 +98,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                                 FileSize = 400
                             }
                         }
-                };
+            };
         }
         #endregion
 
@@ -105,7 +115,35 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsStringDownloadcompletedSuccessfully()
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsExchangeSetCreatedSuccessfully()
+        {
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
+
+            var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
+            };
+
+            string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
+            fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
+            fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+              .Returns(storageAccountConnectionString);
+            string filePath = @"D:\\Downloads";
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponses)).Returns(true);
+
+            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
+
+            Assert.AreEqual("Exchange Set Created Successfully", salesCatalogueResponseFile);
+        }
+
+        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsExchangeSetIsNotCreated()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
@@ -118,13 +156,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored,A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 
-            Assert.AreEqual("Exchange Set Created Successfully!!!!", salesCatalogueResponseFile);
+            Assert.AreEqual("Exchange Set Is Not Created", salesCatalogueResponseFile);
         }
     }
 }
