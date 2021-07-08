@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public async Task<string> GetFssToken()
         {
-            EssAccessToken = await GenerateFssToken(FssAuthConfig.AutoTestClientId, FssAuthConfig.AutoTestClientSecret, FssAccessToken);
+            FssAccessToken = await GenerateFssToken(FssAuthConfig.AutoTestClientId, FssAuthConfig.AutoTestClientSecret, FssAccessToken);
             return FssAccessToken;
         }
 
