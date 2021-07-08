@@ -23,13 +23,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IConfiguration configuration;
         private readonly IFulfilmentAncillaryFiles fulfilmentAncillaryFiles;
+        private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     ILogger<FulfilmentDataService> logger,
                                     IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                     IConfiguration configuration,
-                                    IFulfilmentAncillaryFiles fulfilmentAncillaryFiles)
+                                    IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
+                                    IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -37,6 +39,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.configuration = configuration;
             this.fulfilmentAncillaryFiles = fulfilmentAncillaryFiles;
+            this.fulfilmentSalesCatalogueService = fulfilmentSalesCatalogueService;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message)
@@ -97,6 +100,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
+            SalesCatalogueDataResponse salesCatalogueDataResponse = await GetSalesCatalogueDataResponse(batchId, correlationId);
+
+            CreateProductFile(batchId, exchangeSetInfoPath,correlationId, salesCatalogueDataResponse);
             await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData);
@@ -152,6 +159,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             return isFileCreated;
+        }
+
+        public void CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        {
+            logger.LogInformation(EventIds.CreateProductFileRequestStart.ToEventId(), "Create product file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
+            logger.LogInformation(EventIds.CreateProductFileRequestCompleted.ToEventId(), "Create product file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+        }
+
+        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId)
+        {
+            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(batchId, correlationId);
+            return salesCatalogueTypeResponse;
         }
     }
 }

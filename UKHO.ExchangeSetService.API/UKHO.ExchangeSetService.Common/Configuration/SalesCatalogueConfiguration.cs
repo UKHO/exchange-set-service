@@ -6,5 +6,6 @@
         public string Version { get; set; }
         public string ResourceId { get; set; }
         public string ProductType { get; set; }
+        public string CatalogueType { get; set; }
     }
 }

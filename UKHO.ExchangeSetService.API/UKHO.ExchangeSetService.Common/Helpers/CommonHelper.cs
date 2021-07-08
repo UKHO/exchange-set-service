@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public static int GetCurrentWeekNumber(DateTime date)
         {
             CultureInfo cultureInfo = CultureInfo.InvariantCulture;
-            return cultureInfo.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday);            
+            return cultureInfo.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday);
         }
 
         public static string GetBlockIds(int blockNum)

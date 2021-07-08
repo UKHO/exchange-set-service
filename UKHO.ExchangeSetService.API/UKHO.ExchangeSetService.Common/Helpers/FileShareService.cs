@@ -546,20 +546,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<string> GetBatchStatus(BatchStatusMetaData batchStatusMetaData, string correlationId)
         {
             logger.LogInformation(EventIds.GetBatchStatusStart.ToEventId(), "Getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
-            ResponseBatchStatusModel responseBatchStatusModel = new ResponseBatchStatusModel();
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
             if (httpResponse.IsSuccessStatusCode)
             {
                 string bodyJson = await httpResponse.Content.ReadAsStringAsync();
-                responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
+                ResponseBatchStatusModel responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
                 logger.LogInformation(EventIds.GetBatchStatusCompleted.ToEventId(), "Getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
                 return responseBatchStatusModel.Status;
             }
             else
             {
                 logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error while getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
-                return responseBatchStatusModel.Status;
+                return BatchStatus.Failed.ToString();
             }
         }
 
