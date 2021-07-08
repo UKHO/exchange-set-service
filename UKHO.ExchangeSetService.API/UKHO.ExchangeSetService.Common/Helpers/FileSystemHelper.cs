@@ -76,5 +76,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             fileDetails.Add(fileDetail);
             return fileDetails;
         }
+
+        public void CreateFileContentWithBytes(string outputFileName, byte[] content)
+        {
+            using (var output = File.OpenWrite(outputFileName))
+            {
+                output.Write(content, 0, content.Length);
+            }
+        }
+
+        public bool CheckFileExists(string filePath)
+        {
+            return File.Exists(filePath);
+        }
     }
 }

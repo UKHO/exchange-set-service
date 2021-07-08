@@ -65,11 +65,18 @@ namespace UKHO.ExchangeSetService.Common.Logging
         GetBatchStatusCompleted = 805058,
         GetBatchStatusNonOkResponse = 805059,
         ErrorInCreatingZipFile = 805060,
-        CreateProductFileRequestStart = 805061,
-        CreateProductFileRequestCompleted = 805062,
-        SCSGetSalesCatalogueDataRequestStart = 805063,
-        SCSGetSalesCatalogueDataRequestCompleted = 805064,
-        ProductFileIsNotCreated = 805065
+        CreateCatalogFileRequestStart = 805061,
+        CreateCatalogFileRequestCompleted = 805062,
+        UnhandledControllerException = 805063,
+        CatalogueFileIsNotCreated = 805064,
+        UnexpectedDefaultFileExtension = 805065,
+        ExchangeSetNotCreated = 805066,
+        ExchangeSetCreated = 805067,
+        CreateProductFileRequestStart = 805068,
+        CreateProductFileRequestCompleted = 805069,
+        SCSGetSalesCatalogueDataRequestStart = 805070,
+        SCSGetSalesCatalogueDataRequestCompleted = 805071,
+        ProductFileIsNotCreated = 805072
     }
 
     public static class EventIdExtensions
