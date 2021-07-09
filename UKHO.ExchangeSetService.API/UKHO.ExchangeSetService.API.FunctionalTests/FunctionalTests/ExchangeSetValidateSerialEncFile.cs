@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using System.IO;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -36,17 +37,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseDetails = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
-            var batchStatusUrl = apiResponseDetails.Links.ExchangeSetBatchStatusUri;
+            var batchStatusUrl = apiResponseDetails.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
 
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
 
-            var downloadFileUrl = apiResponseDetails.Links.ExchangeSetFileUri;
+            var downloadFileUrl = apiResponseDetails.Links.ExchangeSetFileUri.Href;
 
-            var responseFileDownload = await FssApiClient.GetFileDownloadAsync(downloadFileUrl.ToString(), accessToken: FssJwtToken);
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);            
 
-            Assert.AreEqual(200, (int)responseFileDownload.StatusCode, $"Incorrect status code File Download api returned {responseFileDownload.StatusCode}, instead of the expected 200.");
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath =Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            bool checkFile = FssBatchHelper.CheckforFileExist(downloadFolderPath, Config.ExchangeSetSerialEncFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {downloadFolderPath}");
 
 
 

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NUnit.Framework;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -42,6 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.ExchangeSetFileName);
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, jwtToken);
+            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode}, instead of the expected 200.");
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
@@ -51,19 +53,37 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
             WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
-            
-            string zipPath =tempFilePath;
+
+            string zipPath = @".\" + tempFilePath;
             string extractPath = Path.GetTempPath();
 
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
-            return Path.Combine(extractPath,"V01X01");
+            return tempFilePath;
+            
         }
 
         private static void WriteToConsole(string message)
         {
             Console.WriteLine($"{DateTime.Now} - {message}");
         }
+
+        public static string RenameFolder(string pathInput)
+        {
+            string fileName = Path.GetFileName(pathInput);
+            if (fileName.Contains(".zip"))
+            {
+                fileName = fileName.Replace(".zip", "");
+            }
+
+            return fileName; 
+        }
+
+        public static bool CheckforFileExist(string filePath, string fileName)
+        {
+            return (Directory.Exists(filePath) && File.Exists(fileName));
+        }
+
 
     }
 }
