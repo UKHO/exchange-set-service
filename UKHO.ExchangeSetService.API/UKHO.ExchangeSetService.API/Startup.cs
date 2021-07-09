@@ -29,6 +29,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using System.Net.Http.Headers;
 using UKHO.ExchangeSetService.Common.Storage;
 using Microsoft.AspNetCore.Authorization;
+using UKHO.ExchangeSetService.Common.HealthCheck;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -130,7 +131,7 @@ namespace UKHO.ExchangeSetService.API
                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                 }
             )
-            .AddHeaderPropagation();            
+            .AddHeaderPropagation();
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
             services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
@@ -145,12 +146,18 @@ namespace UKHO.ExchangeSetService.API
             )
             .AddHeaderPropagation();
             services.AddScoped<IFileSystemHelper, FileSystemHelper>();
-            services.AddScoped<IFileShareService, FileShareService>();            
+            services.AddScoped<IFileShareService, FileShareService>();
             services.AddScoped<IProductDataService, ProductDataService>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
             services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
             services.AddScoped<IExchangeSetStorageProvider, ExchangeSetStorageProvider>();
+            services.AddScoped<IEventHubLoggingHealthClient, EventHubLoggingHealthClient>();
+
+            services.AddHealthChecks()
+                .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
+                .AddCheck<SalesCatalogServiceHealthCheck>("SalesCatalogServiceHealthCheck")
+                .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -185,6 +192,7 @@ namespace UKHO.ExchangeSetService.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health").RequireAuthorization();
             });
         }
 
@@ -202,7 +210,7 @@ namespace UKHO.ExchangeSetService.API
 
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
-                builder.AddAzureKeyVault(new Uri(kvServiceUri), 
+                builder.AddAzureKeyVault(new Uri(kvServiceUri),
                     new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
             }
 
