@@ -54,12 +54,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
 
-            string zipPath = @".\" + tempFilePath;
-            string extractPath = Path.GetTempPath();
+            string zipPath =tempFilePath;
+            string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
-            return tempFilePath;
+            return extractPath;
             
         }
 
@@ -81,9 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static bool CheckforFileExist(string filePath, string fileName)
         {
-            return (Directory.Exists(filePath) && File.Exists(fileName));
-        }
-
-
+            return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath,fileName)));
+        }       
     }
 }
