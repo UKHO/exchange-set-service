@@ -28,6 +28,7 @@ using Azure.Identity;
 using UKHO.ExchangeSetService.Common.Helpers;
 using System.Net.Http.Headers;
 using UKHO.ExchangeSetService.Common.Storage;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -66,12 +67,39 @@ namespace UKHO.ExchangeSetService.API
 
             var essAzureADConfiguration = new AzureADConfiguration();
             configuration.Bind("ESSAzureADConfiguration", essAzureADConfiguration);
+
+            var azureAdB2CConfiguration = new AzureAdB2CConfiguration();
+            configuration.Bind("AzureAdB2CConfiguration", azureAdB2CConfiguration);
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options =>
+                    .AddJwtBearer("AzureAD", options =>
                     {
                         options.Audience = essAzureADConfiguration.ClientId;
                         options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{essAzureADConfiguration.TenantId}";
+                    })
+                    .AddJwtBearer("AzureB2C", jwtOptions =>
+                    {
+                        jwtOptions.Audience = azureAdB2CConfiguration.ClientId;
+                        jwtOptions.Authority = $"{azureAdB2CConfiguration.Instance}{azureAdB2CConfiguration.Domain}/{azureAdB2CConfiguration.SignUpSignInPolicy}/v2.0/";
+                    })
+                    .AddJwtBearer("AzureADB2C", options =>
+                    {
+                        options.Audience = azureAdB2CConfiguration.ClientId;
+                        options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}";
+                        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                        {
+                            ValidAudience = azureAdB2CConfiguration.ClientId,
+                            ValidIssuer = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0"
+                        };
                     });
+
+            services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .AddAuthenticationSchemes("AzureAD", "AzureB2C", "AzureADB2C")
+                .Build();
+            });
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -116,9 +144,8 @@ namespace UKHO.ExchangeSetService.API
                 }
             )
             .AddHeaderPropagation();
-
-            services.AddScoped<IFileShareService, FileShareService>();
-
+            services.AddScoped<IFileSystemHelper, FileSystemHelper>();
+            services.AddScoped<IFileShareService, FileShareService>();            
             services.AddScoped<IProductDataService, ProductDataService>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
