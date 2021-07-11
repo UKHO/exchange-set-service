@@ -89,5 +89,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             return File.Exists(filePath);
         }
+
+        public static byte[] ReadAllBytes(string filePath)
+        {
+            return File.ReadAllBytes(filePath);
+        }
     }
 }

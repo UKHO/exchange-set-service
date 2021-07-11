@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             CreateProductFile(batchId, exchangeSetInfoPath,correlationId, salesCatalogueDataResponse);
             await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
-            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData);
+            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse);
         }
 
         public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
@@ -147,14 +147,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipFileUploaded;
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
             bool isFileCreated = false;
 
             if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
             {
                 logger.LogInformation(EventIds.CreateCatalogFileRequestStart.ToEventId(), "Create catalog file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                isFileCreated = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData);
+                isFileCreated = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse);
                 logger.LogInformation(EventIds.CreateCatalogFileRequestCompleted.ToEventId(), "Create catalog file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
 
