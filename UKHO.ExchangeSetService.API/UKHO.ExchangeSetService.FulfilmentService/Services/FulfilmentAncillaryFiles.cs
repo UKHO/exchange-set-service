@@ -75,16 +75,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     foreach (var item in listItem.Files)
                     {
-                        string fileLocation = $"{listItem.ProductName.Substring(0, length)}/{listItem.ProductName}/{listItem.EditionNumber}/{listItem.UpdateNumber}/{item.Filename}";
+                        string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
                         string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
-                        string comment = string.Empty;
-                        var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+                        string comment = string.Empty;                        
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
 
                         if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
                         {
+                            var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+
                             //BoundingRectangle and Comment only required for BIN
                             comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber}";
+
+                            if (salescatalogProduct.BaseCellIssueDate != null && (salescatalogProduct.IssueDateLatestUpdate == null || Path.GetExtension(item.Filename.ToLower()) != ".000"))
+                                comment = $"{comment},ISDT={salescatalogProduct.BaseCellIssueDate:yyyyMMdd};";
+                            else if (salescatalogProduct.IssueDateLatestUpdate != null && Path.GetExtension(item.Filename.ToLower()) == ".000")
+                                comment = $"{comment},UADT={salescatalogProduct.IssueDateLatestUpdate.Value:yyyyMMdd},ISDT={salescatalogProduct.BaseCellIssueDate:yyyyMMdd};";
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
@@ -97,7 +103,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             FileLocation = fileLocation,
                             FileLongName = "",
                             Implementation = mimeType,
-                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : CrcString($"{exchangeSetRootPath}/{fileLocation}"),
+                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : CrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
                             Comment = comment,
                             BoundingRectangle = boundingRectangle
                         });
@@ -144,7 +150,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public bool CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
             if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -178,6 +184,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
 
                 var response = fileSystemHelper.CreateFileContent(filePath, content);
+                await Task.CompletedTask;
+
                 if (!response)
                 {
                     logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
