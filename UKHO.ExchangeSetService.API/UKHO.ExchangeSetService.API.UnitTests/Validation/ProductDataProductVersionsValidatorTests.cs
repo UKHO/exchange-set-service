@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             UpdateNumber = 0, EditionNumber = 0 } }
             };
             var result = validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor("ProductVersions[0].ProductName");
+            result.ShouldHaveValidationErrorFor("ProductVersions[0].productName");
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productName cannot be blank or null."));
         }
 
@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             UpdateNumber = 0, ProductName = "ProductName" } }
             };
             var result = validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor("ProductVersions[0].EditionNumber");
+            result.ShouldHaveValidationErrorFor("ProductVersions[0].editionNumber");
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "editionNumber cannot be less than zero or null."));
         }
 
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                     } }
             };
             var result = validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor("ProductVersions[0].UpdateNumber");
+            result.ShouldHaveValidationErrorFor("ProductVersions[0].updateNumber");
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "updateNumber cannot be less than zero or null."));
         }
 
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             UpdateNumber = 0, EditionNumber = -8, ProductName = "ProductName" } }
             };
             var result = validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor("ProductVersions[0].EditionNumber");
+            result.ShouldHaveValidationErrorFor("ProductVersions[0].editionNumber");
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "editionNumber cannot be less than zero or null."));
         }
 
@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                     } }
             };
             var result = validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor("ProductVersions[0].UpdateNumber");
+            result.ShouldHaveValidationErrorFor("ProductVersions[0].updateNumber");
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "updateNumber cannot be less than zero or null."));
         }
 
@@ -133,7 +133,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductVersions);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "ProductVersions cannot be null."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productVersions cannot be null."));
         }
         #endregion
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using System.Text.Json;
 
 namespace UKHO.ExchangeSetService.API.Extensions
 {
@@ -19,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.Extensions
             if (validationResult.Errors.Any(e => e.ErrorCode.Equals(errorCode.ToString())))
             {
                 errors = validationResult.Errors.Where(e => e.ErrorCode.Equals(errorCode.ToString()))
-                                    .Select(f => new Error { Source = f.PropertyName, Description = f.ToString() })
+                                    .Select(f => new Error { Source = JsonNamingPolicy.CamelCase.ConvertName(f.PropertyName), Description = f.ToString() })
                                     .ToList();
                 return true;
             }
