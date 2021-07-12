@@ -1,4 +1,4 @@
-﻿using Azure.Messaging.EventHubs.Consumer;
+﻿using Microsoft.Azure.EventHubs;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System;
@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
@@ -21,31 +22,25 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         }
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
+            var connectionStringBuilder = new EventHubsConnectionStringBuilder(eventHubLoggingConfiguration.Value.ConnectionString)
+            {
+                EntityPath = eventHubLoggingConfiguration.Value.EntityPath
+            };
+
+            EventHubClient eventHubClient = EventHubClient.CreateFromConnectionString(connectionStringBuilder.ToString());
+
             try
             {
-                bool eventHubReadSuccessful = false;
-                EventHubConsumerClient eventHubConsumerClient = new EventHubConsumerClient(eventHubLoggingConfiguration.Value.ConsumerGroup, eventHubLoggingConfiguration.Value.ConnectionString);
-                await foreach (PartitionEvent partitionEvent in eventHubConsumerClient.ReadEventsAsync())
-                {
-                    if (Encoding.UTF8.GetString(partitionEvent.Data.EventBody) != null)
-                    {
-                        eventHubReadSuccessful = true;
-                        break;
-                    }
-                }
-
-                if (eventHubReadSuccessful)
-                {
-                    return HealthCheckResult.Healthy("Event hub is healthy");
-                }
-                else
-                {
-                    return HealthCheckResult.Unhealthy("Event hub is unhealthy");
-                }
+                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId() + $" of Event Hub")));
+                return HealthCheckResult.Healthy("Event hub is healthy");
             }
             catch (Exception ex)
             {
-                return HealthCheckResult.Unhealthy("Event hub is unhealthy", ex);
+                return HealthCheckResult.Unhealthy( $"Event hub is unhealthy responded with error {ex.Message}", new Exception(ex.Message));
+            }
+            finally
+            {
+                await eventHubClient.CloseAsync();
             }
         }
     }

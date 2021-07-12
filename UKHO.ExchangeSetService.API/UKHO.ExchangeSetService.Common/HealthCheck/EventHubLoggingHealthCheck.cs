@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
             else
             {
-                logger.LogError(EventIds.EventHubLoggingIsUnhealthy.ToEventId(), $"Event hub is unhealthy responded with {healthCheckResult.Exception.Message}");
+                logger.LogError(EventIds.EventHubLoggingIsUnhealthy.ToEventId(), $"Event hub is unhealthy responded with error {healthCheckResult.Exception.Message}");
             }
             return healthCheckResult;
         }

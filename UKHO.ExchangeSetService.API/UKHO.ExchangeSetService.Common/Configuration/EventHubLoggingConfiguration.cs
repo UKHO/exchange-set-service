@@ -13,6 +13,5 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         public string Service { get; set; }
         public string NodeName { get; set; }
         public string ConnectionString { get; set; }
-        public string ConsumerGroup { get; set; }
     }
 }
