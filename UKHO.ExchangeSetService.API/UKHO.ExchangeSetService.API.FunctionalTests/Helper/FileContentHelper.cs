@@ -6,7 +6,7 @@ using System.IO;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
-    public static class SerialEncFileHelper
+    public static class FileContentHelper
     {
 
         public static void CheckSerialEncFileContent(string inputfile)

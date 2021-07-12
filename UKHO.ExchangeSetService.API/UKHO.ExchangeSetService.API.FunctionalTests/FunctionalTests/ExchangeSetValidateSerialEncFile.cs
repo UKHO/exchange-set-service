@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify Serial.Enc file content
-            SerialEncFileHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
+            FileContentHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
 
         }
 
@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify Serial.Enc file content
-            SerialEncFileHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
+            FileContentHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
         }
 
 
@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify Serial.Enc file content
-            SerialEncFileHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
+            FileContentHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
 
         }
 
@@ -143,7 +143,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify Serial.Enc file content
-            SerialEncFileHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
+            FileContentHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
 
         }
 
@@ -175,7 +175,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify Serial.Enc file content
-            SerialEncFileHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
+            FileContentHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
 
         }
 
@@ -206,7 +206,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify Serial.Enc file content
-            SerialEncFileHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
+            FileContentHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
 
         }
 
