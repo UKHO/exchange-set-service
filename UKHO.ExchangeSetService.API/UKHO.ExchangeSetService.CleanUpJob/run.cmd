@@ -1,0 +1,1 @@
+dotnet UKHO.ExchangeSetService.CleanUpJob.dll
