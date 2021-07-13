@@ -50,3 +50,7 @@ variable "large_exchange_set_secrets" {
 
 variable "large_exchange_set_subnets" {
 }
+
+variable "agent_subnet" {
+  type = string
+}

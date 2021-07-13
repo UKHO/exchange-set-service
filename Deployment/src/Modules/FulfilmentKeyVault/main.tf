@@ -13,7 +13,7 @@ resource "azurerm_key_vault" "small_exchange_set_kv" {
     default_action             = "Deny"
     bypass                     = "AzureServices"
     ip_rules                   = var.allowed_ips
-    virtual_network_subnet_ids = var.small_exchange_set_subnets
+    virtual_network_subnet_ids = concat(var.small_exchange_set_subnets, [var.agent_subnet])
   }
 
   tags = var.tags
@@ -81,7 +81,7 @@ resource "azurerm_key_vault" "medium_exchange_set_kv" {
     default_action             = "Deny"
     bypass                     = "AzureServices"
     ip_rules                   = var.allowed_ips
-    virtual_network_subnet_ids = var.medium_exchange_set_subnets
+    virtual_network_subnet_ids = concat(var.medium_exchange_set_subnets, [var.agent_subnet])
   }
 
   tags = var.tags
@@ -148,7 +148,7 @@ resource "azurerm_key_vault" "large_exchange_set_kv" {
     default_action             = "Deny"
     bypass                     = "AzureServices"
     ip_rules                   = var.allowed_ips
-    virtual_network_subnet_ids = var.large_exchange_set_subnets
+    virtual_network_subnet_ids = concat(var.large_exchange_set_subnets, [var.agent_subnet])
   }
 
   tags = var.tags
