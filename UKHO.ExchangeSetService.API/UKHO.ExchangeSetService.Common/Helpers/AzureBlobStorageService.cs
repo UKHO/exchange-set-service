@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId,CloudBlockBlob cloudBlockBlob)
         {
-            int fileSize = GetFilesize(salesCatalogueResponse);
+            int fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
             {
                 BatchId = batchId,
@@ -86,20 +86,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             writer.Flush();
             ms.Position = 0;
         }
-
-        private int GetFilesize(SalesCatalogueProductResponse salesCatalogueResponse)
-        {
-            int fileSizeCount = 0;
-            if(salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0 )
-            {
-                foreach (var item in salesCatalogueResponse.Products)
-                {
-                    fileSizeCount += item.FileSize.Value;
-                }                
-            }
-            return fileSizeCount;
-        }
-
+        
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string scsResponseUri,string correlationId)
         {
             logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataStart.ToEventId(), "Sales catalogue response download start from blob for the scsResponseUri:{scsResponseUri} and _X-Correlation-ID:{correlationId}", scsResponseUri, correlationId);

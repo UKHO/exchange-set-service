@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             
             if (productDetail.IsExchangeSetTooLarge)
             {
-                Logger.LogInformation(EventIds.ExchangeSetTooLarge.ToEventId(), "Exchange Set is too large for Endpoint productIdentifiers");
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}",productIdentifierRequest.CorrelationId);
                 return BuildBadRequestErrorResponseForTooLargeExchangeSet();               
             }
             Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestCompleted.ToEventId(), "Product Identifiers Endpoint Completed");
@@ -185,7 +185,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             if (productDetail.IsExchangeSetTooLarge)
             {
-                Logger.LogInformation(EventIds.ExchangeSetTooLarge.ToEventId(), "Exchange Set is too large for Endpoint productVersions.");
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.",request.CorrelationId);
                 return BuildBadRequestErrorResponseForTooLargeExchangeSet();
             }
             Logger.LogInformation(EventIds.ESSPostProductVersionsRequestCompleted.ToEventId(), "Product Versions Endpoint Completed");
@@ -259,7 +259,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             if (productDetail.IsExchangeSetTooLarge)
             {
-                Logger.LogInformation(EventIds.ExchangeSetTooLarge.ToEventId(), "Exchange Set is too large for Product Data SinceDateTime Endpoint.");
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.", productDataSinceDateTimeRequest.CorrelationId);
                 return BuildBadRequestErrorResponseForTooLargeExchangeSet();
             }
             Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed");

@@ -52,8 +52,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "Exchange Set Size",
-                        Description = "Exchange set requested too large, please use a standard Exchange Set provided by UKHO."
+                        Source = "exchangeSetSize",
+                        Description = "The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO."
                     }
                 };
             return BuildBadRequestErrorResponse(error);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -48,6 +49,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             double byteSize = 1024f;
             return (bytes / byteSize) / byteSize;
+        }
+
+        public static int GetFileSize(SalesCatalogueProductResponse salesCatalogueResponse)
+        {
+            int fileSizeCount = 0;
+            if (salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0)
+            {
+                foreach (var item in salesCatalogueResponse.Products)
+                {
+                    fileSizeCount += item.FileSize.Value;
+                }
+            }
+            return fileSizeCount;
         }
     }
 }

@@ -60,14 +60,16 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList());
-            ////can check for file size from salesCatalogueResponse.ResponseCode
-            bool isAzureB2C = IsAzureAdB2CSource(azureAdB2C);
-            if (isAzureB2C)
+            if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                var checkFileResponse = CheckIfExchangeServiceSetFileTooLarge(salesCatalogueResponse);
-                if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
+                if (isAzureB2C)
                 {
-                    return checkFileResponse;
+                    var checkFileResponse = CheckIfExchangeSetTooLarge(salesCatalogueResponse);
+                    if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                    {
+                        return checkFileResponse;
+                    }
                 }
             }
 
@@ -88,39 +90,27 @@ namespace UKHO.ExchangeSetService.API.Services
             return response;
         }
 
-        private int GetFilesize(SalesCatalogueProductResponse salesCatalogueResponse)
-        {
-            int fileSizeCount = 0;
-            if (salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0)
-            {
-                foreach (var item in salesCatalogueResponse.Products)
-                {
-                    fileSizeCount += item.FileSize.Value;
-                }
-            }
-            return fileSizeCount;
-        }
-        public bool IsAzureAdB2CSource(AzureAdB2C azureAdB2C)
+        public bool IsAzureB2CUser(AzureAdB2C azureAdB2C)
         {
             bool isAzureB2CUser = false;
-            string B2CAuthority = $"{azureAdB2CConfiguration.Value.Instance}{azureAdB2CConfiguration.Value.TenantId}/v2.0/";// for B2C Token
-            string AdB2CAuthority = $"{azureAdConfiguration.Value.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.Value.TenantId}/v2.0";// for AdB2C Token
-            string Audience = azureAdB2CConfiguration.Value.ClientId;
-            if (azureAdB2C.IssToken == B2CAuthority && azureAdB2C.AudToken == Audience)
+            string b2CAuthority = $"{azureAdB2CConfiguration.Value.Instance}{azureAdB2CConfiguration.Value.TenantId}/v2.0/";// for B2C Token
+            string adB2CAuthority = $"{azureAdConfiguration.Value.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.Value.TenantId}/v2.0";// for AdB2C Token
+            string audience = azureAdB2CConfiguration.Value.ClientId;
+            if (azureAdB2C.IssToken == b2CAuthority && azureAdB2C.AudToken == audience)
             {
                 isAzureB2CUser = true;
             }
-            else if (azureAdB2C.IssToken == AdB2CAuthority && azureAdB2C.AudToken == Audience)
+            else if (azureAdB2C.IssToken == adB2CAuthority && azureAdB2C.AudToken == audience)
             {
                 isAzureB2CUser = true;
             }
             return isAzureB2CUser;
         }
-        public ExchangeSetServiceResponse CheckIfExchangeServiceSetFileTooLarge(SalesCatalogueResponse salesCatalogueResponse)
+        public ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(SalesCatalogueResponse salesCatalogueResponse)
         {
-            int fileSize = GetFilesize(salesCatalogueResponse.ResponseBody);
-            var FileSizeInMB = CommonHelper.ConvertBytesToMegabytes((long)fileSize);
-            if (FileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
+            int fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+            var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes((long)fileSize);
+            if (fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
             {
                 ExchangeSetServiceResponse exchangeSetResponse = new ExchangeSetServiceResponse
                 {
@@ -137,7 +127,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     IsExchangeSetTooLarge = false
                 };
                 return exchangeSetResponse;
-            }            
+            }
         }
 
         public Task<ValidationResult> ValidateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
@@ -148,14 +138,16 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions);
-            ////can check for file size from salesCatalogueResponse
-            bool isAzureB2C = IsAzureAdB2CSource(azureAdB2C);
-            if (isAzureB2C)
+            if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                var checkFileResponse = CheckIfExchangeServiceSetFileTooLarge(salesCatalogueResponse);
-                if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
+                if (isAzureB2C)
                 {
-                    return checkFileResponse;
+                    var checkFileResponse = CheckIfExchangeSetTooLarge(salesCatalogueResponse);
+                    if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                    {
+                        return checkFileResponse;
+                    }
                 }
             }
             var response = SetExchangeSetResponse(salesCatalogueResponse, true);
@@ -196,14 +188,16 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest, AzureAdB2C azureAdB2C)
         {
             var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
-            ////can check for file size from salesCatalogueResponse
-            bool isAzureB2C = IsAzureAdB2CSource(azureAdB2C);
-            if (isAzureB2C)
+            if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                var checkFileResponse = CheckIfExchangeServiceSetFileTooLarge(salesCatalogueResponse);
-                if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
+                if (isAzureB2C)
                 {
-                    return checkFileResponse;
+                    var checkFileResponse = CheckIfExchangeSetTooLarge(salesCatalogueResponse);
+                    if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                    {
+                        return checkFileResponse;
+                    }
                 }
             }
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
