@@ -170,7 +170,7 @@ module "fulfilment_keyvaults" {
     "ESSFulfilmentStorageConfiguration--StorageAccountKey"      = module.fulfilment_storage.medium_exchange_set_primary_access_key
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.medium_exchange_set_connection_string
   }
-  medium_exchange_set_secrets = {
+  large_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
     "EventHubLoggingConfiguration--EntityPath"                  = module.eventhub.entity_path
     "ESSFulfilmentStorageConfiguration--StorageAccountName"     = module.fulfilment_storage.large_exchange_set_name

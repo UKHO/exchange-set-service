@@ -22,10 +22,6 @@ variable "read_access_objects" {
   type = map(string)
 }
 
-variable "small_exchange_set_secrets" {
-  type = map(string)
-}
-
 variable "tags" {
 
 }
@@ -37,18 +33,22 @@ variable "allowed_ips" {
 variable "small_exchange_set_subnets" {
 }
 
-variable "medium_exchange_set_secrets" {
+variable "small_exchange_set_secrets" {
   type = map(string)
 }
 
 variable "medium_exchange_set_subnets" {
 }
 
-variable "large_exchange_set_secrets" {
+variable "medium_exchange_set_secrets" {
   type = map(string)
 }
 
 variable "large_exchange_set_subnets" {
+}
+
+variable "large_exchange_set_secrets" {
+  type = map(string)
 }
 
 variable "agent_subnet" {
