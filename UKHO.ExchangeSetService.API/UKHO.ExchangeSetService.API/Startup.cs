@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.API
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes("AzureAD", "AzureB2C", "AzureADB2C")
+                .AddAuthenticationSchemes("AzureAD", "AzureB2C", "AzureADB2C")               
                 .Build();
             });
 
@@ -130,10 +130,12 @@ namespace UKHO.ExchangeSetService.API
                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                 }
             )
-            .AddHeaderPropagation();            
+            .AddHeaderPropagation();
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
             services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
+            services.Configure<AzureAdB2CConfiguration>(configuration.GetSection("AzureAdB2CConfiguration"));
+            services.Configure<AzureADConfiguration>(configuration.GetSection("ESSAzureADConfiguration"));
 
             services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                 {
@@ -145,7 +147,7 @@ namespace UKHO.ExchangeSetService.API
             )
             .AddHeaderPropagation();
             services.AddScoped<IFileSystemHelper, FileSystemHelper>();
-            services.AddScoped<IFileShareService, FileShareService>();            
+            services.AddScoped<IFileShareService, FileShareService>();
             services.AddScoped<IProductDataService, ProductDataService>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
@@ -202,7 +204,7 @@ namespace UKHO.ExchangeSetService.API
 
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
-                builder.AddAzureKeyVault(new Uri(kvServiceUri), 
+                builder.AddAzureKeyVault(new Uri(kvServiceUri),
                     new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
             }
 

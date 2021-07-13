@@ -18,5 +18,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(26, week26);
             Assert.AreEqual(53, week53);
         }
+        [Test]
+        public void CheckConvertBytesToMegabytes()
+        {
+            var fileSize = CommonHelper.ConvertBytesToMegabytes((long)4194304);
+            Assert.AreEqual(4, fileSize);
+        }
     }
 }

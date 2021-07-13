@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Response;
@@ -20,13 +21,16 @@ namespace UKHO.ExchangeSetService.API.Controllers
         protected new HttpContext HttpContext => httpContextAccessor.HttpContext;
         public const string LastModifiedDateHeaderKey = "Last-Modified";
         public const string InternalServerError = "Internal Server Error";
-        public const string NotModified = "Not Modified";
+        public const string NotModified = "Not Modified";       
+        protected string TokenAudience => httpContextAccessor.HttpContext.User.FindFirstValue("aud");
+        protected string TokenIssuer => httpContextAccessor.HttpContext.User.FindFirstValue("iss");
+
         protected BaseController(IHttpContextAccessor httpContextAccessor, ILogger<T> logger)
         {
             this.httpContextAccessor = httpContextAccessor;
             Logger = logger;
         }
-
+        
         protected string GetCurrentCorrelationId()
         {
             return httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
@@ -40,6 +44,19 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 Errors = errors,
                 CorrelationId = GetCurrentCorrelationId()
             });
+        }
+
+        protected IActionResult BuildBadRequestErrorResponseForTooLargeExchangeSet()
+        {        
+            var error = new List<Error>
+                {
+                    new Error()
+                    {
+                        Source = "Exchange Set Size",
+                        Description = "Exchange set requested too large, please use a standard Exchange Set provided by UKHO."
+                    }
+                };
+            return BuildBadRequestErrorResponse(error);
         }
 
         protected IActionResult BuildInternalServerErrorResponse()
@@ -94,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         private void LogError(EventId eventId, List<Error> errors, string errorType, string correlationId)
         {
-            Logger.LogError(eventId, $"{HttpContext.Request.Path} - {errorType} - {{Errors}} for CorrelationId - {{correlationId}}", errors, correlationId);            
+            Logger.LogError(eventId, $"{HttpContext.Request.Path} - {errorType} - {{Errors}} for CorrelationId - {{correlationId}}", errors, correlationId);
         }
 
         private void LogInfo(EventId eventId, string infoType, string correlationId)

@@ -76,7 +76,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateProductFileRequestCompleted = 805069,
         SCSGetSalesCatalogueDataRequestStart = 805070,
         SCSGetSalesCatalogueDataRequestCompleted = 805071,
-        ProductFileIsNotCreated = 805072
+        ProductFileIsNotCreated = 805072,
+        ExchangeSetTooLarge =805073
     }
 
     public static class EventIdExtensions

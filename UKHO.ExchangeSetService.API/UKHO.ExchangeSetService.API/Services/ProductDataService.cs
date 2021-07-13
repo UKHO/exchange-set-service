@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -26,17 +29,20 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IMapper mapper;
         private readonly IFileShareService fileShareService;
         private readonly ILogger<FileShareService> logger;
-        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;      
-
+        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
+        private readonly IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration;
+        private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
+        private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
-            IProductDataProductVersionsValidator productVersionsValidator, 
+            IProductDataProductVersionsValidator productVersionsValidator,
             IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
-            ILogger<FileShareService> logger,IExchangeSetStorageProvider exchangeSetStorageProvider
-            )
+            ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
+            IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration, IOptions<AzureADConfiguration> azureAdConfiguration,
+            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -45,14 +51,28 @@ namespace UKHO.ExchangeSetService.API.Services
             this.mapper = mapper;
             this.fileShareService = fileShareService;
             this.logger = logger;
-            this.exchangeSetStorageProvider = exchangeSetStorageProvider;          
+            this.exchangeSetStorageProvider = exchangeSetStorageProvider;
+            this.azureAdB2CConfiguration = azureAdB2CConfiguration;
+            this.azureAdConfiguration = azureAdConfiguration;
+            this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
         }
 
-        public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
+        public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList());
             ////can check for file size from salesCatalogueResponse.ResponseCode
+            bool isAzureB2C = IsAzureAdB2CSource(azureAdB2C);
+            if (isAzureB2C)
+            {
+                var checkFileResponse = CheckIfExchangeServiceSetFileTooLarge(salesCatalogueResponse);
+                if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkFileResponse;
+                }
+            }
+
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
+
             if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
             {
                 return response;
@@ -68,21 +88,82 @@ namespace UKHO.ExchangeSetService.API.Services
             return response;
         }
 
+        private int GetFilesize(SalesCatalogueProductResponse salesCatalogueResponse)
+        {
+            int fileSizeCount = 0;
+            if (salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0)
+            {
+                foreach (var item in salesCatalogueResponse.Products)
+                {
+                    fileSizeCount += item.FileSize.Value;
+                }
+            }
+            return fileSizeCount;
+        }
+        public bool IsAzureAdB2CSource(AzureAdB2C azureAdB2C)
+        {
+            bool isAzureB2CUser = false;
+            string B2CAuthority = $"{azureAdB2CConfiguration.Value.Instance}{azureAdB2CConfiguration.Value.TenantId}/v2.0/";// for B2C Token
+            string AdB2CAuthority = $"{azureAdConfiguration.Value.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.Value.TenantId}/v2.0";// for AdB2C Token
+            string Audience = azureAdB2CConfiguration.Value.ClientId;
+            if (azureAdB2C.IssToken == B2CAuthority && azureAdB2C.AudToken == Audience)
+            {
+                isAzureB2CUser = true;
+            }
+            else if (azureAdB2C.IssToken == AdB2CAuthority && azureAdB2C.AudToken == Audience)
+            {
+                isAzureB2CUser = true;
+            }
+            return isAzureB2CUser;
+        }
+        public ExchangeSetServiceResponse CheckIfExchangeServiceSetFileTooLarge(SalesCatalogueResponse salesCatalogueResponse)
+        {
+            int fileSize = GetFilesize(salesCatalogueResponse.ResponseBody);
+            var FileSizeInMB = CommonHelper.ConvertBytesToMegabytes((long)fileSize);
+            if (FileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
+            {
+                ExchangeSetServiceResponse exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    IsExchangeSetTooLarge = true
+                };
+                return exchangeSetResponse;
+            }
+            else
+            {
+                ExchangeSetServiceResponse exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.OK,
+                    IsExchangeSetTooLarge = false
+                };
+                return exchangeSetResponse;
+            }            
+        }
+
         public Task<ValidationResult> ValidateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
         {
             return productIdentifierValidator.Validate(productIdentifierRequest);
         }
 
-        public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request)
+        public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions);
             ////can check for file size from salesCatalogueResponse
+            bool isAzureB2C = IsAzureAdB2CSource(azureAdB2C);
+            if (isAzureB2C)
+            {
+                var checkFileResponse = CheckIfExchangeServiceSetFileTooLarge(salesCatalogueResponse);
+                if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkFileResponse;
+                }
+            }
             var response = SetExchangeSetResponse(salesCatalogueResponse, true);
             if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
             {
                 return response;
             }
- 
+
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
@@ -101,7 +182,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri , request.CorrelationId);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.CorrelationId);
             }
 
             return response;
@@ -112,15 +193,24 @@ namespace UKHO.ExchangeSetService.API.Services
             return productVersionsValidator.Validate(request);
         }
 
-        public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest, AzureAdB2C azureAdB2C)
         {
             var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
             ////can check for file size from salesCatalogueResponse
+            bool isAzureB2C = IsAzureAdB2CSource(azureAdB2C);
+            if (isAzureB2C)
+            {
+                var checkFileResponse = CheckIfExchangeServiceSetFileTooLarge(salesCatalogueResponse);
+                if (checkFileResponse.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkFileResponse;
+                }
+            }
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
             if (response.HttpStatusCode != HttpStatusCode.OK)
             {
                 return response;
-            }            
+            }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
 
@@ -144,8 +234,8 @@ namespace UKHO.ExchangeSetService.API.Services
                 HttpStatusCode = salesCatalougeResponse.ResponseCode
             };
             if (salesCatalougeResponse.ResponseCode == HttpStatusCode.OK)
-            {                
-                response.ExchangeSetResponse = MapExchangeSetResponse(salesCatalougeResponse);       
+            {
+                response.ExchangeSetResponse = MapExchangeSetResponse(salesCatalougeResponse);
                 response.LastModified = ConvertLastModifiedToString(salesCatalougeResponse);
             }
             else if (salesCatalougeResponse.ResponseCode == HttpStatusCode.NotModified)
@@ -201,7 +291,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private string ConvertLastModifiedToString(SalesCatalogueResponse salesCatalougeResponse)
         {
-            return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null; 
+            return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null;
         }
 
         private async Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId)
