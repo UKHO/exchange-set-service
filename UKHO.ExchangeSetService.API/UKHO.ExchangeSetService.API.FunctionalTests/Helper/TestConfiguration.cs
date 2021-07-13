@@ -11,6 +11,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string ExchangeSetSerialEncFile;
         public string ExchangeReadMeFile;
         public string EssStorageAccountConnectionString;
+        public string ExchangeSetEncRootFolder;
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public FileShareServiceConfiguration FssConfig = new FileShareServiceConfiguration();
@@ -42,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public class FileShareServiceConfiguration
         {
-
+            public string FssApiUrl { get; set; }
             public string MicrosoftOnlineLoginUrl { get; set; }
             public string TenantId { get; set; }
             public string AutoTestClientId { get; set; }
@@ -69,6 +70,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
             ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);          
             ConfigurationRoot.Bind("FileShareServiceConfiguration", FssConfig);
+            ExchangeSetEncRootFolder = ConfigurationRoot.GetSection("ExchangeSetEncRootFolder").Value;
 
 
         }
