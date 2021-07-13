@@ -2,7 +2,7 @@ variable "apim_name" {
   type    = string
 }
 
-variable "resource_group" {
+variable "apim_rg" {
   type    = string
 }
 
@@ -10,9 +10,29 @@ variable "backend_url" {
   type    = string
 }
 
+variable "group_name" {
+    type = string
+    default = "Exchange Set Service"
+}
+
 variable "product_name" {
     type = string
     default = "Exchange Set Service"
+}
+
+variable "product_description" {
+    type = string
+    default = "This is exchange set api service product "
+}
+
+variable "api_name" {
+    type = string
+    default = "ess api"
+}
+
+variable "api_description" {
+    type = string
+    default = "This is exchange set api service api "
 }
 
 locals {
