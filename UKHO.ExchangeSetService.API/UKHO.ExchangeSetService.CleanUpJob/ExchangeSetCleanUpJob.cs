@@ -1,11 +1,13 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.CleanUpJob.Services;
 using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
+    [ExcludeFromCodeCoverage]
     public class ExchangeSetCleanUpJob
     {
         private readonly IExchangeSetCleanUpService exchangeSetCleanUpService;
