@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Services;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -20,7 +21,9 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         public IConfiguration fakeConfiguration;
         public ILogger<ExchangeSetCleanUpService> fakeLogger;
         public ExchangeSetCleanUpService exchangeSetCleanUpService;
+        public IOptions<CleanUpConfig> fakeCleanUpConfig;
         public string fakeFilePath = @"D:\\Downloads";
+
 
         [SetUp]
         public void Setup()
@@ -31,8 +34,10 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeConfiguration = A.Fake<IConfiguration>();
             fakeLogger = A.Fake<ILogger<ExchangeSetCleanUpService>>();
+            fakeCleanUpConfig = Options.Create(new CleanUpConfig()
+            { NumberOfDay = 1 });
 
-            exchangeSetCleanUpService = new ExchangeSetCleanUpService(fakeAzureBlobStorageClient, fakeStorageConfig, fakeScsStorageService, fakeConfiguration, fakeLogger);
+            exchangeSetCleanUpService = new ExchangeSetCleanUpService(fakeAzureBlobStorageClient, fakeStorageConfig, fakeScsStorageService, fakeConfiguration, fakeLogger, fakeCleanUpConfig);
         }
 
         [Test]
@@ -53,7 +58,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
             string filePath = @"D:\\Downloads";
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.DeleteDirectoryAsync(storageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, filePath)).Returns(false);
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDay, storageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, filePath)).Returns(false);
 
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
@@ -67,7 +72,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
             fakeConfiguration["HOME"] = @"D:\\Downloads";
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.DeleteDirectoryAsync(storageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(true);
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDay, storageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(true);
 
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 

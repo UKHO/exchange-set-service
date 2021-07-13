@@ -18,6 +18,7 @@ using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
 using System.Reflection;
 using System.Linq;
+using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
@@ -118,6 +119,8 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 services.BuildServiceProvider();
 
                 services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
+                services.Configure<CleanUpConfig>(ConfigurationBuilder.GetSection("CleanUpConfig"));
+
                 services.AddTransient<ExchangeSetCleanUpJob>();
                 services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                 services.AddScoped<IExchangeSetCleanUpService, ExchangeSetCleanUpService>();

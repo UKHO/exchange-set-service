@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             CloudBlockBlob _blockBlob = _cloudBlobContainer.GetBlockBlobReference(batchId);
             await _blockBlob.DeleteIfExistsAsync();
         }
-        public async Task<bool> DeleteDirectoryAsync(string storageAccountConnectionString, string containerName, string filePath)
+        public async Task<bool> DeleteDirectoryAsync(int numberOfDay, string storageAccountConnectionString, string containerName, string filePath)
         {
             Boolean deleteStatus = false;
             if (Directory.Exists(filePath))
@@ -48,10 +48,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var subFolder = Directory.GetDirectories(filePath);
                 foreach (var subFolderName in subFolder)
                 {
-                    var creation = File.GetCreationTimeUtc(subFolderName);
-#pragma warning disable S109 // Magic numbers should not be used
-                    if (creation < DateTime.UtcNow.AddMinutes(-5))
-#pragma warning restore S109 // Magic numbers should not be used
+                    var fileCreationTimeUtc = File.GetCreationTimeUtc(subFolderName);
+                    if (fileCreationTimeUtc < DateTime.UtcNow.AddMinutes(-numberOfDay))
                     {
                         DirectoryInfo di = new DirectoryInfo(subFolderName);
                         foreach (DirectoryInfo dir in di.GetDirectories())
