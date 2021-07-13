@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "RequestBody",
+                        Source = "requestBody",
                         Description = "Either body is null or malformed."
                     }
                 };
@@ -140,7 +140,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "RequestBody",
+                        Source = "requestBody",
                         Description = "Either body is null or malformed."
                     }
                 };
@@ -215,7 +215,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "SinceDateTime",
+                        Source = "sinceDateTime",
                         Description = "Query parameter 'sinceDateTime' is required."
                     }
                 };
