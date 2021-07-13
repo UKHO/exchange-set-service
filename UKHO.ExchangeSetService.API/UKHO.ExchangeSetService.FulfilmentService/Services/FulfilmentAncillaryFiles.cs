@@ -208,7 +208,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         private string CrcString(string fullFilePath)
         {
-            var crcHash = Crc32CheckSumProvider.Instance.Compute(FileSystemHelper.ReadAllBytes(fullFilePath));
+            var crcHash = Crc32CheckSumProvider.Instance.Compute(fileSystemHelper.ReadAllBytes(fullFilePath));
             return crcHash.ToString();
         }
     }

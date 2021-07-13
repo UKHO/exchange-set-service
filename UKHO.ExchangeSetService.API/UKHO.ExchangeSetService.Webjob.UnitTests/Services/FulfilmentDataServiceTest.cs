@@ -54,7 +54,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 EncRoot = "ENC_ROOT",
                 ExchangeSetFileFolder = "V01X01",
                 Info="INFO",
-                ProductFileName="TEST.TXT"
+                ProductFileName="TEST.TXT",
+                CatalogFileName="CATALOG.031",
+                CommentVersion="VERSION=1.0"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
@@ -186,6 +188,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual("Exchange Set Created Successfully", salesCatalogueResponseFile);
         }
 
+        [Test]
         public async Task WhenInvalidMessageQueueTrigger_ThenReturnsExchangeSetIsNotCreated()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();

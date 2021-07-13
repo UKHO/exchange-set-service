@@ -11,6 +11,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
+using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
 
 namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 {
@@ -48,7 +49,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ReadMeFileName = "ReadMe.txt",
                 CatalogFileName = "CATALOG.031",
                 SerialFileName = "TEST.ENC",
-                ProductFileName = "PRODUCT.TXT"
+                ProductFileName = "PRODUCT.TXT",
+                CommentVersion = "VERSION=1.0"
             });
             fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
@@ -61,7 +63,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             {
                 new BatchFile() { Filename = "Test1.txt", FileSize = 400, MimeType = "text/plain", Links = new Links { Get = new Link { Href = "" } } },
                 new BatchFile() { Filename = "Test2.001", FileSize = 400, MimeType = "text/plain", Links = new Links { Get = new Link { Href = "" } } },
-                new BatchFile() { Filename = "Test3.000", FileSize = 400, MimeType = "application/s63", Links = new Links { Get = new Link { Href = "" } } },
+                new BatchFile() { Filename = "Test3.000", FileSize = 400, MimeType = "application/s63", Links = new Links { Get = new Link { Href = "" } },
+                                Attributes = new List<Attribute>(){ new Attribute() { Key = "s57-CRC", Value = "1234CRC" } } },
+                new BatchFile() { Filename = "Test5.001", FileSize = 400, MimeType = "application/s63", Links = new Links { Get = new Link { Href = "" } },
+                                Attributes = new List<Attribute>(){ new Attribute() { Key = "s57-CRC", Value = "1234CRC" } } },
                 new BatchFile() { Filename = "TEST4.TIF", FileSize = 400, MimeType = "IMAGE/TIFF", Links = new Links { Get = new Link { Href = "" } } },
                 new BatchFile() { Filename = "Default.img", FileSize = 400, MimeType = "image/jpeg", Links = new Links { Get = new Link { Href = "" } } }
             };
@@ -133,18 +138,19 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         #region CreateProductFile
+
         [Test]
-        public void WhenInvalidCreateProductFileRequest_ThenReturnFalseResponse()
+        public async Task WhenInvalidCreateProductFileRequest_ThenReturnFalseResponseAsync()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
-            var response = fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
+            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(false, response);
         }
 
         [Test]
-        public void WhenValidCreateProductFileRequest_ThenReturnTrueResponse()
+        public async Task WhenValidCreateProductFileRequest_ThenReturnTrueResponseAsync()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetInfoPath);
@@ -152,7 +158,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var response = fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
+            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
 
             Assert.AreEqual(true, response);
             Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
@@ -172,15 +178,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
 
             fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
-            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);
+            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);            
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
 
             var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponses, salesCatalogueDataResponse);
 
             Assert.AreEqual(true, response);
             Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
             Assert.AreEqual(true, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+            Assert.AreEqual(byteContent, fakeFileHelper.ReadAllBytes(fakeFileName));
         }
 
         [Test]

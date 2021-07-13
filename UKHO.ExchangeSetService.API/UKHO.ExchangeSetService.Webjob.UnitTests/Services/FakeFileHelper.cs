@@ -54,5 +54,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public byte[] ReadAllBytes(string filePath)
+        {
+            byte[] byteContent = new byte[100];
+            return byteContent;
+        }
     }
 }

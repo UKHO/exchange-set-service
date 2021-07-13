@@ -14,5 +14,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         List<FileDetail> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData);
         void CreateFileContentWithBytes(string outputFileName, byte[] content);
         bool CheckFileExists(string filePath);
+        byte[] ReadAllBytes(string filePath);
     }
 }
