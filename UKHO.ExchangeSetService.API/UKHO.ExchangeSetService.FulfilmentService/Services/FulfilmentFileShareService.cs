@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var listSubUpdateNumberProduts = new List<Products>();
             foreach (var item in products)
             {
-                var splitByUpdateLimit = ConfigHelper.SplitList(item.UpdateNumbers, fileShareServiceConfig.Value.UpdateNumberLimit);
+                var splitByUpdateLimit = CommonHelper.SplitList(item.UpdateNumbers, fileShareServiceConfig.Value.UpdateNumberLimit);
 
                 if (splitByUpdateLimit != null && splitByUpdateLimit.Any())
                 {
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
         {
-            return ConfigHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
+            return CommonHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
         }
 
         private List<FulfilmentDataResponse> SetFulfilmentDataResponse(SearchBatchResponse searchBatchResponse)
@@ -91,7 +91,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b=>b.Value).FirstOrDefault()),
                     ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault(),
                     UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault()),
-                    FileUri = item.Files?.Select(a=>a.Links.Get.Href)
+                    FileUri = item.Files?.Select(a=>a.Links.Get.Href),
+                    Files = item.Files
                 });
             }
             return listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
@@ -103,6 +104,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
            return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
+        }
+        public bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
+        {
+            return fileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);
+        }
+        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
+        {
+            return await fileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipRootPath, correlationId);
         }
     }
 }

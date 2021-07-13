@@ -18,13 +18,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private IOptions<FileShareServiceConfiguration> fakefileShareServiceConfig;
         private IFileShareService fakefileShareService;
         public FulfilmentFileShareService fulfilmentFileShareService;
+        public bool fakeIsFileUploaded = false;
+        public bool fakeIsZipFileCreated = false;
+        public string fakeExchangeSetRootPath = @"D:\\Downloads\";
+        public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
 
         [SetUp]
         public void Setup()
         {
             fakefileShareService = A.Fake<IFileShareService>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            { Limit=100,Start=0,ProductLimit=4,UpdateNumberLimit=10, EncRoot="ENC_ROOT", ExchangeSetFileFolder= "V01X01" });
+            { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01" });
 
             fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService);
         }
@@ -57,13 +61,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse()
         {
-            A.CallTo(() =>  fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
+            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
 
-            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(),null);
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), null);
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOf(typeof(List<FulfilmentDataResponse>), result);
-           
+
             Assert.AreEqual("Received Fulfilment Data Successfully!!!!", "Received Fulfilment Data Successfully!!!!");
         }
 
@@ -72,7 +76,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
 
-            var result = await fulfilmentFileShareService.QueryFileShareServiceData(null,null);
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(null, null);
 
             Assert.IsNull(result);
         }
@@ -80,7 +84,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenValidRequest_ThenDownloadFileShareServiceFilesReturnsFile()
         {
-            var message = new SalesCatalogueServiceResponseQueueMessage() { 
+            var message = new SalesCatalogueServiceResponseQueueMessage()
+            {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
             };
             var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
@@ -106,21 +111,21 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidSearchReadMeFileRequest_ThenReturnFilePath()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string exchangeSetRootPath = @"batch/" + batchId +"/files/README.TXT";
+            string exchangeSetRootPath = @"batch/" + batchId + "/files/README.TXT";
             A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(exchangeSetRootPath);
-            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId,null);
-            Assert.IsNotEmpty(result);            
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId, null);
+            Assert.IsNotEmpty(result);
         }
-         [Test]
+        [Test]
         public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
         {
-            string exchangeSetRootPath = string.Empty;           
+            string exchangeSetRootPath = string.Empty;
             string batchId = Guid.NewGuid().ToString();
 
             A.CallTo(() => fakefileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(exchangeSetRootPath);
-            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId,null);
+            var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId, null);
 
-            Assert.IsEmpty(result);           
+            Assert.IsEmpty(result);
         }
 
         [Test]
@@ -132,8 +137,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string filePath = "TestFilePath";
 
             A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
-            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath,null);
-           
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, null);
+
             Assert.AreEqual(true, isFileDownloaded);
         }
 
@@ -141,14 +146,47 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenRequestDownloadReadMeFile_ThenReturnsFalseIfFileIsNotDownloaded()
         {
             bool isFileDownloaded = false;
-            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string exchangeSetRootPath = @"D:\\Downloads";
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";            
             string filePath = "TestFilePath";
-
             A.CallTo(() => fakefileShareService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
-            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath,null);
-
+            isFileDownloaded = await fulfilmentFileShareService.DownloadReadMeFile(filePath, batchId, fakeExchangeSetRootPath, null);
             Assert.AreEqual(false, isFileDownloaded);
+        }
+
+        [Test]
+        public async Task WhenValidUploadZipFileRequest_ThenReturnTrue()
+        {
+            fakeIsFileUploaded = true;                   
+            A.CallTo(() => fakefileShareService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsFileUploaded);
+            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetRootPath, null);
+            Assert.AreEqual(true, fakeIsFileUploaded);
+        }
+
+        [Test]
+        public async Task WhenInvalidUploadZipFileRequest_ThenReturnFalse()
+        {
+            fakeIsFileUploaded = false;                       
+            A.CallTo(() => fakefileShareService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsFileUploaded);
+            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, string.Empty, null);
+            Assert.AreEqual(false, fakeIsFileUploaded);
+        }
+
+        [Test]
+        public void WhenValidCreateZipFileRequest_ThenReturnTrue()
+        {
+            fakeIsZipFileCreated = true;           
+            A.CallTo(() => fakefileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsZipFileCreated);
+            fakeIsZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeExchangeSetRootPath, null);
+            Assert.AreEqual(true, fakeIsZipFileCreated);
+        }
+
+        [Test]
+        public void WhenInvalidCreateZipFileRequest_ThenReturnFalse()
+        {
+            fakeIsZipFileCreated = false;            
+            A.CallTo(() => fakefileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsZipFileCreated);
+            fakeIsZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, null);
+            Assert.AreEqual(false, fakeIsZipFileCreated);
         }
     }
 }

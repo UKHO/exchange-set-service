@@ -57,11 +57,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallTheApiWithNoRoleToken_ThenAForbiddenResponseIsReturned()
+        public async Task WhenICallTheApiWithNoRoleToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), accessToken: EssJwtTokenNoRole);
 
-            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 403.");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "requestBody"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Either body is null or malformed."));
         }
 
@@ -149,8 +149,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "ProductIdentifier"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Product Identifiers cannot be null or empty."));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "productIdentifier"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "productIdentifiers cannot be null or empty."));
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
@@ -164,7 +164,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "CallbackUri"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "callbackUri"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Invalid callbackUri format."));
         }
     }

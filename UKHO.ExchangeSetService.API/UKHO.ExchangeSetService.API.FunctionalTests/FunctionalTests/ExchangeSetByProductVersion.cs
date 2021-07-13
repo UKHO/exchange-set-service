@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallTheApiWithNoRoleToken_ThenAForbiddenResponseIsReturned()
+        public async Task WhenICallTheApiWithNoRoleToken_ThenACorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtTokenNoRole);
 
-            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 403.");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
         }
 
         [Test]
@@ -165,16 +165,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "RequestBody"));
+            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "requestBody"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Either body is null or malformed."));
         }
 
-        [TestCase(null, 9, 6, "ProductVersions[0].ProductName", "productName cannot be blank or null.", TestName = "When product name is null.")]
-        [TestCase("", 9, 6, "ProductVersions[0].ProductName", "productName cannot be blank or null.", TestName = "When product name is blank.")]
-        [TestCase("DE416080", null, 6, "ProductVersions[0].EditionNumber", "editionNumber cannot be less than zero or null.", TestName = "When edition number is null.")]
-        [TestCase("DE416080", 9, null, "ProductVersions[0].UpdateNumber", "updateNumber cannot be less than zero or null.", TestName = "When update number is null.")]
-        [TestCase("DE416080", -1, 1, "ProductVersions[0].EditionNumber", "editionNumber cannot be less than zero or null.", TestName = "When edition number is less than zero.")]
-        [TestCase("DE416080", 4, -1, "ProductVersions[0].UpdateNumber", "updateNumber cannot be less than zero or null.", TestName = "When update number is less than zero.")]
+        [TestCase(null, 9, 6, "productVersions[0].productName", "productName cannot be blank or null.", TestName = "When product name is null.")]
+        [TestCase("", 9, 6, "productVersions[0].productName", "productName cannot be blank or null.", TestName = "When product name is blank.")]
+        [TestCase("DE416080", null, 6, "productVersions[0].editionNumber", "editionNumber cannot be less than zero or null.", TestName = "When edition number is null.")]
+        [TestCase("DE416080", 9, null, "productVersions[0].updateNumber", "updateNumber cannot be less than zero or null.", TestName = "When update number is null.")]
+        [TestCase("DE416080", -1, 1, "productVersions[0].editionNumber", "editionNumber cannot be less than zero or null.", TestName = "When edition number is less than zero.")]
+        [TestCase("DE416080", 4, -1, "productVersions[0].updateNumber", "updateNumber cannot be less than zero or null.", TestName = "When update number is less than zero.")]
         public async Task WhenICallTheApiWithNullProductVersion_ThenABadRequestStatusIsReturned(string productName, int? editionNumber, int? updateNumber, string sourceMessage, string descriptionMessage)
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
