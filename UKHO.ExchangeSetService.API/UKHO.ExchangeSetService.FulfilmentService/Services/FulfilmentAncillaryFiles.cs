@@ -71,8 +71,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 int length = 2;
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
 
+                List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("text/plain", "ASC"), new Tuple<string, string>("text/plain", "TXT"), new Tuple<string, string>("image/tiff", "TIF") };
+
                 foreach (var listItem in listFulfilmentData)
                 {
+                    listItem.Files = listItem.Files.OrderByDescending(
+                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower()))));
+
                     foreach (var item in listItem.Files)
                     {
                         string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
