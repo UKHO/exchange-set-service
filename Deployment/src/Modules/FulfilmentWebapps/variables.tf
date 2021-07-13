@@ -47,5 +47,5 @@ variable "large_exchange_set_subnets" {
 locals {
 	small_exchange_set_name = "${var.service_name}-${var.env_name}-sxs"
 	medium_exchange_set_name = "${var.service_name}-${var.env_name}-mxs"
-	medium_exchange_set_name = "${var.service_name}-${var.env_name}-lxs"
+	large_exchange_set_name = "${var.service_name}-${var.env_name}-lxs"
 }
