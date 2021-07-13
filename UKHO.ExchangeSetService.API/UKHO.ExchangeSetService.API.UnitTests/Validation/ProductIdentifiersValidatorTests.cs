@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Product Identifiers cannot be null or empty."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Product Identifiers cannot be null or empty."));
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
 
