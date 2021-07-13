@@ -48,9 +48,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var subFolder = Directory.GetDirectories(filePath);
                 foreach (var subFolderName in subFolder)
                 {
-                    var creation = File.GetCreationTime(subFolderName);
+                    var creation = File.GetCreationTimeUtc(subFolderName);
 #pragma warning disable S109 // Magic numbers should not be used
-                    if (creation < DateTime.Now.AddMinutes(-5))
+                    if (creation < DateTime.UtcNow.AddMinutes(-5))
 #pragma warning restore S109 // Magic numbers should not be used
                     {
                         DirectoryInfo di = new DirectoryInfo(subFolderName);

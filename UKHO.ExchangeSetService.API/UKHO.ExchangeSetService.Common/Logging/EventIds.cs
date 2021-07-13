@@ -76,7 +76,12 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateProductFileRequestCompleted = 805069,
         SCSGetSalesCatalogueDataRequestStart = 805070,
         SCSGetSalesCatalogueDataRequestCompleted = 805071,
-        ProductFileIsNotCreated = 805072
+        ProductFileIsNotCreated = 805072,
+        ESSCleanUpJobRequestStart=805073,
+        ESSCleanUpJobRequestCompleted = 805073,
+        DeleteHistoricFoldersAndFilesStarted = 805074,
+        DeleteHistoricFoldersAndFilesCompleted = 805075,
+        DeleteHistoricFoldersAndFilesFailed = 805076
     }
 
     public static class EventIdExtensions

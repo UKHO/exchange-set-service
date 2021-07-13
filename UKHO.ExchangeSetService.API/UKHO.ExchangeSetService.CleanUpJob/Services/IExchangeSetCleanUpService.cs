@@ -4,6 +4,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Services
 {
     public interface IExchangeSetCleanUpService
     {
-        Task<bool> CleanUpFoldersFiles();
+        Task<bool> DeleteHistoricFoldersAndFiles();
     }
 }
