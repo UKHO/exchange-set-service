@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -15,5 +16,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CreateFileContentWithBytes(string outputFileName, byte[] content);
         bool CheckFileExists(string filePath);
         byte[] ReadAllBytes(string filePath);
+        bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite);
+        void CreateFileCopy(string filePath, Stream stream);
     }
 }

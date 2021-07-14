@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using System.IO;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
@@ -9,6 +9,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     {
         public bool CheckAndCreateFolderIsCalled = false;
         public bool CreateFileContentWithBytesIsCalled = false;
+        public bool DownloadReadmeFileIsCalled = false;
+        public bool CreateFileCopyIsCalled = false;
 
         public void CheckAndCreateFolder(string folderPath)
         {
@@ -33,7 +35,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public bool CreateFileContent(string fileName, string content)
         {
             throw new System.NotImplementedException();
-        }        
+        }
 
         public void CreateZipFile(string rootPath, string zipFileName)
         {
@@ -59,6 +61,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             byte[] byteContent = new byte[100];
             return byteContent;
+        }
+
+        public bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite)
+        {
+            DownloadReadmeFileIsCalled = true;
+            return DownloadReadmeFileIsCalled;
+        }
+
+        public void CreateFileCopy(string filePath, Stream stream)
+        {
+            CreateFileCopyIsCalled = true;
         }
     }
 }
