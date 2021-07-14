@@ -93,10 +93,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             //BoundingRectangle and Comment only required for BIN
                             comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber}";
 
-                            if (salescatalogProduct.BaseCellIssueDate != null && (salescatalogProduct.IssueDateLatestUpdate == null || Path.GetExtension(item.Filename.ToLower()) != ".000"))
-                                comment = $"{comment},ISDT={salescatalogProduct.BaseCellIssueDate:yyyyMMdd};";
-                            else if (salescatalogProduct.IssueDateLatestUpdate != null && Path.GetExtension(item.Filename.ToLower()) == ".000")
-                                comment = $"{comment},UADT={salescatalogProduct.IssueDateLatestUpdate.Value:yyyyMMdd},ISDT={salescatalogProduct.BaseCellIssueDate:yyyyMMdd};";
+                            comment = $"{comment},{GeIsdtUadt(salescatalogProduct)}";
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
@@ -210,6 +207,25 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             var crcHash = Crc32CheckSumProvider.Instance.Compute(fileSystemHelper.ReadAllBytes(fullFilePath));
             return crcHash.ToString();
+        }
+
+        private string GeIsdtUadt(SalesCatalogueDataProductResponse salescatalogProduct)
+        {
+            string comment = string.Empty;
+            string ISDT = (salescatalogProduct.IssueDateLatestUpdate != null) ? salescatalogProduct.IssueDateLatestUpdate.Value.ToString("yyyyMMdd")
+                                                                                : salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd");
+
+            string UADT = (salescatalogProduct.IssueDatePreviousUpdate != null) ? salescatalogProduct.IssueDatePreviousUpdate.Value.ToString("yyyyMMdd")
+                                                                                : salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd");
+
+            if (ISDT != null && UADT != null)
+                comment = $"UADT={UADT},ISDT={ISDT};";
+            else if (ISDT != null)
+                comment = $"ISDT={ISDT};";
+            else if (UADT != null)
+                comment = $"UADT={UADT};";
+
+            return comment;
         }
     }
 }
