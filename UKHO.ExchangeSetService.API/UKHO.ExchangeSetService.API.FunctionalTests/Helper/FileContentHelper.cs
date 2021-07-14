@@ -125,7 +125,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
         }
 
-        public static async Task CheckNoEncFilesDownloadedAsync(string fssbaseurl, string folderpath, string productname, int? editionnumber, int? updatenumber, string accesstoken)
+        public static void CheckNoEncFilesDownloadedAsync(string folderpath, string productname)
         {
             //Get Countrycode
             string countryCode = productname.Substring(0, 2);
@@ -133,16 +133,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Get list of directories
             List<string> listUpdateNumberPath = GetDirectories(folderpath, countryCode);
             int folderCount = listUpdateNumberPath.Count;
-
-            var searchQueryString = CreateFssSearchQuery(productname, editionnumber.ToString(), updatenumber.ToString());
-
-            var apiResponse = await FssApiClient.SearchBatchesAsync(fssbaseurl, searchQueryString, 100, 0, accesstoken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
-
-            //Batch Search response
-            var responseSearchDetails = await apiResponse.ReadAsTypeAsync<ResponseBatchSearchModel>();
-
-            Assert.AreEqual(responseSearchDetails.Entries.Count, folderCount, $"Downloaded Enc folder count {folderCount}, Instead of expected count {responseSearchDetails.Entries.Count}");
+            
+            Assert.AreEqual(0, folderCount, $"Downloaded Enc folder count {folderCount}, Instead of expected count 0");
 
         }
 

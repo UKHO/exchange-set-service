@@ -33,13 +33,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallExchangeSetApiWithAValidProductVersions_ThenEncFilesAreDownloaded()
         {
-            string ProductName = "DE316004";
-            int EditionNumber = 13;
-            int UpdateNumber = 0;
+            string productName = "DE316004";
+            int editionNumber = 13;
+            int updateNumber = 0;
 
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData(ProductName, EditionNumber, UpdateNumber));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
@@ -58,20 +58,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
             //Verify downloaded files matches with File Share Service Api response file details             
-            await FileContentHelper.CheckDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder,Config.ExchangeSetEncRootFolder), ProductName, EditionNumber, FssJwtToken);
+            await FileContentHelper.CheckDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder,Config.ExchangeSetEncRootFolder), productName, editionNumber, FssJwtToken);
 
         }
 
         [Test]
         public async Task WhenICallExchangeSetApiWithAInValidEditionNumber_ThenNoEncFilesAreDownloaded()
         {
-            string ProductName = "DE316004";
-            int EditionNumber = 15;
-            int UpdateNumber = 0;
+            string productName = "DE316004";
+            int editionNumber = 15;
+            int updateNumber = 0;
 
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData(ProductName, EditionNumber, UpdateNumber));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
@@ -89,21 +89,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Get temp downloaded folder
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            //Verify No folder available and matches with File Share Service Api response             
-            await FileContentHelper.CheckNoEncFilesDownloadedAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder), ProductName, EditionNumber, UpdateNumber, FssJwtToken);
+            //Verify No folder available for the product             
+            FileContentHelper.CheckNoEncFilesDownloadedAsync(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder), productName);
 
         }
 
         [Test]
         public async Task WhenICallExchangeSetApiWithAInValidUpdateNumber_ThenNoEncFilesAreDownloaded()
         {
-            string ProductName = "DE316004";
-            int EditionNumber = 13;
-            int UpdateNumber = 50;
+            string productName = "DE316004";
+            int editionNumber = 13;
+            int updateNumber = 50;
 
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData(ProductName, EditionNumber, UpdateNumber));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
@@ -120,8 +120,32 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            //Verify downloaded files matches with File Share Service Api response file details             
-            await FileContentHelper.CheckNoEncFilesDownloadedAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder), ProductName, EditionNumber, UpdateNumber, FssJwtToken);
+            //Verify No folder available for the product             
+            FileContentHelper.CheckNoEncFilesDownloadedAsync(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder), productName);
+
+        }
+
+        [Test]
+        public async Task WhenICallExchangeSetApiWithAnInvalidValidProductIdentifier_ThenEncFilesAreDownloadedd()
+        {
+            string productName = "GB416080";
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { productName }, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseDetails = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseDetails.Links.ExchangeSetBatchStatusUri.Href;
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+
+            var downloadFileUrl = apiResponseDetails.Links.ExchangeSetFileUri.Href;
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+            //Verify No folder available for the product             
+            FileContentHelper.CheckNoEncFilesDownloadedAsync(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder), productName);
 
         }
 
