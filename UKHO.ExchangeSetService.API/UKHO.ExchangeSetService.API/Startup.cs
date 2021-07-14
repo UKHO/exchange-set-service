@@ -29,6 +29,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using System.Net.Http.Headers;
 using UKHO.ExchangeSetService.Common.Storage;
 using Microsoft.AspNetCore.Authorization;
+using UKHO.ExchangeSetService.Common.HealthCheck;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -153,6 +154,12 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
             services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
             services.AddScoped<IExchangeSetStorageProvider, ExchangeSetStorageProvider>();
+            services.AddScoped<IEventHubLoggingHealthClient, EventHubLoggingHealthClient>();
+
+            services.AddHealthChecks()
+                .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
+                .AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
+                .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -187,6 +194,7 @@ namespace UKHO.ExchangeSetService.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
 

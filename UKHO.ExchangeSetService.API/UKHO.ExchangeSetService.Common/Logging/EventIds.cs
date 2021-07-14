@@ -77,7 +77,14 @@ namespace UKHO.ExchangeSetService.Common.Logging
         SCSGetSalesCatalogueDataRequestStart = 805070,
         SCSGetSalesCatalogueDataRequestCompleted = 805071,
         ProductFileIsNotCreated = 805072,
-        ExchangeSetTooLarge =805073
+        SalesCatalogueServiceIsHealthy = 805073,
+        SalesCatalogueServiceIsUnhealthy = 805074,
+        FileShareServiceIsHealthy = 805075,
+        FileShareServiceIsUnhealthy = 805076,
+        EventHubLoggingEventDataForHealthCheck = 805077,
+        EventHubLoggingIsHealthy = 805078,
+        EventHubLoggingIsUnhealthy = 805079,
+        ExchangeSetTooLarge = 805080
     }
 
     public static class EventIdExtensions
