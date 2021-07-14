@@ -1,4 +1,7 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,6 +38,23 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
         }
 
-    }
+        public async Task<HttpResponseMessage> GetProductIdentifiersAsync(string productType, List<string> productIdentifiers, string accessToken = null)
+        {
+            string uri = $"{apiHost}/v1/productData/{productType}/products/productIdentifiers";
 
+            string payloadJson = JsonConvert.SerializeObject(productIdentifiers);
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+
+        }
+    }
 }

@@ -138,6 +138,44 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
+        public static async Task GetDownloadedEncFilesAsync(string fssbaseurl, string folderpath, string productname, int? editionnumber, int? updatenumber, string accesstoken)
+        {
+            int totalFileCount = 0;
+            //Get Countrycode
+            string countryCode = productname.Substring(0, 2);
+
+            //Get folder path
+            string downloadedEncFolderPath = Path.Combine(folderpath, countryCode, productname, editionnumber.ToString(),updatenumber.ToString());
+
+            var searchQueryString = CreateFssSearchQuery(productname, editionnumber.ToString(), updatenumber.ToString());
+
+            var apiResponse = await FssApiClient.SearchBatchesAsync(fssbaseurl, searchQueryString, 100, 0, accesstoken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+
+            var responseSearchDetails = await apiResponse.ReadAsTypeAsync<ResponseBatchSearchModel>();
+
+
+            if (Directory.Exists(downloadedEncFolderPath) && responseSearchDetails.Entries.Count>0)
+            {
+                totalFileCount = FileCountInDirectories(downloadedEncFolderPath);
+                string[] fileNames = Directory.GetFiles(downloadedEncFolderPath).Select(file => Path.GetFileName(file)).ToArray();
+                int fssFileCount = responseSearchDetails.Entries[0].Files.Count;
+                Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
+
+                foreach (var filenanme in fileNames)
+                {
+                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(filenanme)));
+                }
+
+            }
+            else
+            {
+                Assert.AreEqual(totalFileCount, responseSearchDetails.Count, $"Downloaded Enc files count {responseSearchDetails.Count}, Instead of expected count {totalFileCount}");
+            }        
+
+            
+        }
+
 
         public static string CreateFssSearchQuery(string productName, string editionNumber, string updateNumber)
         {
