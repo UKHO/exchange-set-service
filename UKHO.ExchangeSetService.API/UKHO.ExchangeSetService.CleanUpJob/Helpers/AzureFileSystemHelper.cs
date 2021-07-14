@@ -10,13 +10,13 @@ using UKHO.ExchangeSetService.Common.Logging;
 namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
 {
     [ExcludeFromCodeCoverage]
-    public class AzureDeleteFileSystemHelper : IAzureDeleteFileSystemHelper
+    public class AzureFileSystemHelper : IAzureFileSystemHelper
     {
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
-        private readonly ILogger<AzureDeleteFileSystemHelper> logger;
+        private readonly ILogger<AzureFileSystemHelper> logger;
 
-        public AzureDeleteFileSystemHelper(IAzureBlobStorageClient azureBlobStorageClient,
-                                    ILogger<AzureDeleteFileSystemHelper> logger)
+        public AzureFileSystemHelper(IAzureBlobStorageClient azureBlobStorageClient,
+                                    ILogger<AzureFileSystemHelper> logger)
         {
             this.azureBlobStorageClient = azureBlobStorageClient;
             this.logger = logger;
@@ -30,35 +30,39 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                 var subFolder = Directory.GetDirectories(filePath);
                 foreach (var subFolderName in subFolder)
                 {
+                    DateTime subFolderDateTime;
                     string dateFolder = new DirectoryInfo(subFolderName).Name;
-                    bool isValid = DateTimeExtensions.IsValidDate(dateFolder);
-                    if (isValid)
+                    bool isValidDate = DateTimeExtensions.IsValidDate(dateFolder,out subFolderDateTime);
+
+                    if (isValidDate)
                     {
-                        var subFolderDateTime = Convert.ToDateTime(dateFolder);
                         var historicDateTimeInUtc = DateTime.UtcNow.AddDays(-numberOfDays);
                         DateTime subFolderDate = new DateTime(subFolderDateTime.Year, subFolderDateTime.Month, subFolderDateTime.Day);
                         DateTime historicDate = new DateTime(historicDateTimeInUtc.Year, historicDateTimeInUtc.Month, historicDateTimeInUtc.Day);
+                        
                         if (subFolderDate <= historicDate)
                         {
                             DirectoryInfo di = new DirectoryInfo(subFolderName);
+                            
                             foreach (DirectoryInfo dir in di.GetDirectories())
                             {
-                                var batchidFile = dir.Name;
-                                string batchId = new DirectoryInfo(batchidFile).Name + ".json";
-                                var response =await azureBlobStorageClient.DeleteContainerFile(storageAccountConnectionString, containerName, batchId);
+                                var batchId = dir.Name;
+                                string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
+                                var response =await azureBlobStorageClient.DeleteFileFromContainer(storageAccountConnectionString, containerName, scsResponseFileName);
                                 if (response)
                                 {
                                     dir.Delete(true);
-                                    logger.LogInformation(EventIds.DeleteHistoricContainerFile.ToEventId(), "SCS response from the container file deleted successfully for BatchId:{BatchId}.", batchId);
+                                    logger.LogInformation(EventIds.DeleteHistoricSCSResponseFile.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
                                 }
                                 else
                                 {
-                                    logger.LogInformation(EventIds.DeleteHistoricContainerFileNotFound.ToEventId(), "SCS response from the container file not found for BatchId:{BatchId}.", batchId);
+                                    logger.LogError(EventIds.DeleteHistoricSCSResponseFileNotFound.ToEventId(), "SCS response json file {ScsResponseFileName} not found in the container.", scsResponseFileName);
                                 }
                             }
+
                             di.Delete(true);
                             deleteStatus = true;
-                            logger.LogInformation(EventIds.DeleteHistoricFolder.ToEventId(), "Historic folder deleted successfully for DateFolder:{dateFolder}.", dateFolder);
+                            logger.LogInformation(EventIds.DeleteHistoricDateFolder.ToEventId(), "Historic folder deleted successfully for Date:{dateFolder}.", dateFolder);
                         }
                     }
                 }

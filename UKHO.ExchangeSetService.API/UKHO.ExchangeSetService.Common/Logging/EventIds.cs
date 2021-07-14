@@ -82,9 +82,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         DeleteHistoricFoldersAndFilesStarted = 805074,
         DeleteHistoricFoldersAndFilesCompleted = 805075,
         DeleteHistoricFoldersAndFilesFailed = 805076,
-        DeleteHistoricContainerFile = 805077,
-        DeleteHistoricContainerFileNotFound = 805078,
-        DeleteHistoricFolder = 805079
+        DeleteHistoricSCSResponseFile = 805077,
+        DeleteHistoricSCSResponseFileNotFound = 805078,
+        DeleteHistoricDateFolder = 805079
     }
 
     public static class EventIdExtensions

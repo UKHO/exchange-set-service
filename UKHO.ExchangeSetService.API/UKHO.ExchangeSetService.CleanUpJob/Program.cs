@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                 services.AddScoped<IExchangeSetCleanUpService, ExchangeSetCleanUpService>();
                 services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
-                services.AddScoped<IAzureDeleteFileSystemHelper, AzureDeleteFileSystemHelper>();
+                services.AddScoped<IAzureFileSystemHelper, AzureFileSystemHelper>();
             })
             .ConfigureWebJobs(b =>
             {

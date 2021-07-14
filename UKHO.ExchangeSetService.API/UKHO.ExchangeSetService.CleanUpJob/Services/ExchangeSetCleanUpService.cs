@@ -12,14 +12,14 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Services
 {
     public class ExchangeSetCleanUpService : IExchangeSetCleanUpService
     {
-        private readonly IAzureDeleteFileSystemHelper azureDeleteFileSystemHelper;
+        private readonly IAzureFileSystemHelper azureDeleteFileSystemHelper;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly ISalesCatalogueStorageService scsStorageService;
         private readonly IConfiguration configuration;
         private readonly ILogger<ExchangeSetCleanUpService> logger;
         private readonly IOptions<CleanUpConfig> cleanUpConfig;
 
-        public ExchangeSetCleanUpService(IAzureDeleteFileSystemHelper azureDeleteFileSystemHelper,
+        public ExchangeSetCleanUpService(IAzureFileSystemHelper azureDeleteFileSystemHelper,
                               IOptions<EssFulfilmentStorageConfiguration> storageConfig,
                               ISalesCatalogueStorageService scsStorageService,
                               IConfiguration configuration,
@@ -38,17 +38,17 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Services
             string homeDirectoryPath = configuration["HOME"];
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
 
-            logger.LogInformation(EventIds.DeleteHistoricFoldersAndFilesStarted.ToEventId(), "Clean up process of historic folders started.");
+            logger.LogInformation(EventIds.DeleteHistoricFoldersAndFilesStarted.ToEventId(), "Clean up process of historic folders and files started.");
 
             var response = await azureDeleteFileSystemHelper.DeleteDirectoryAsync(cleanUpConfig.Value.NumberOfDays, storageAccountConnectionString, storageConfig.Value.StorageContainerName, homeDirectoryPath);
             if (response)
             {
-                logger.LogInformation(EventIds.DeleteHistoricFoldersAndFilesCompleted.ToEventId(), "Clean up process of historic folders completed.");
+                logger.LogInformation(EventIds.DeleteHistoricFoldersAndFilesCompleted.ToEventId(), "Clean up process of historic folders and files completed.");
                 return true;
             }
             else
             {
-                logger.LogError(EventIds.DeleteHistoricFoldersAndFilesFailed.ToEventId(), "Clean up process of historic folders failed.");
+                logger.LogError(EventIds.DeleteHistoricFoldersAndFilesFailed.ToEventId(), "Clean up process of historic folders and files failed.");
                 return false;
             }
         }

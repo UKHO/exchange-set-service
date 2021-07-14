@@ -10,6 +10,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString);
         Task UploadFromStreamAsync(CloudBlockBlob cloudBlockBlob, MemoryStream ms);
         Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob);
-        Task<bool> DeleteContainerFile(string storageAccountConnectionString, string containerName, string batchId);
+        Task<bool> DeleteFileFromContainer(string storageAccountConnectionString, string containerName, string batchId);
     }
 }

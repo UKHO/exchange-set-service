@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
 {
     public class ExchangeSetCleanUpServiceTest
     {
-        public IAzureDeleteFileSystemHelper fakeAzureDeleteFileSystemHelper;
+        public IAzureFileSystemHelper fakeAzureFileSystemHelper;
         public IOptions<EssFulfilmentStorageConfiguration> fakeStorageConfig;
         public ISalesCatalogueStorageService fakeScsStorageService;
         public IConfiguration fakeConfiguration;
@@ -23,12 +23,12 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         public ExchangeSetCleanUpService exchangeSetCleanUpService;
         public IOptions<CleanUpConfig> fakeCleanUpConfig;
         public string fakeFilePath = @"D:\\Downloads";
-
+        public string fakeStorageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
 
         [SetUp]
         public void Setup()
         {
-            fakeAzureDeleteFileSystemHelper = A.Fake<IAzureDeleteFileSystemHelper>();
+            fakeAzureFileSystemHelper = A.Fake<IAzureFileSystemHelper>();
             fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration()
                                          { StorageContainerName ="Test"  });
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
             fakeCleanUpConfig = Options.Create(new CleanUpConfig()
             { NumberOfDays = 1 });
 
-            exchangeSetCleanUpService = new ExchangeSetCleanUpService(fakeAzureDeleteFileSystemHelper, fakeStorageConfig, fakeScsStorageService, fakeConfiguration, fakeLogger, fakeCleanUpConfig);
+            exchangeSetCleanUpService = new ExchangeSetCleanUpService(fakeAzureFileSystemHelper, fakeStorageConfig, fakeScsStorageService, fakeConfiguration, fakeLogger, fakeCleanUpConfig);
         }
 
         [Test]
@@ -54,11 +54,8 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         [Test]
         public async Task WhenHistoricFoldersAndFilesNotFound_ThenReturnFalseResponse()
         {
-            string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-            string filePath = @"D:\\Downloads";
-
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
-            A.CallTo(() => fakeAzureDeleteFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, storageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, filePath)).Returns(false);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(fakeStorageAccountConnectionString);
+            A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(false);
 
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
@@ -68,11 +65,10 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         [Test]
         public async Task WhenHistoricFoldersAndFilesFound_ThenReturnTrueResponse()
         {
-            string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
             fakeConfiguration["HOME"] = @"D:\\Downloads";
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
-            A.CallTo(() => fakeAzureDeleteFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, storageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(true);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(fakeStorageAccountConnectionString);
+            A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(true);
 
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 

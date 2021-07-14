@@ -2,7 +2,7 @@
 
 namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
 {
-    public interface IAzureDeleteFileSystemHelper
+    public interface IAzureFileSystemHelper
     {
         Task<bool> DeleteDirectoryAsync(int numberOfDays, string storageAccountConnectionString, string containerName, string filePath);
     }
