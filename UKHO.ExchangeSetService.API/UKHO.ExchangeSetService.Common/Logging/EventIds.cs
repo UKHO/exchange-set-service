@@ -81,7 +81,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ESSCleanUpJobRequestCompleted = 805073,
         DeleteHistoricFoldersAndFilesStarted = 805074,
         DeleteHistoricFoldersAndFilesCompleted = 805075,
-        DeleteHistoricFoldersAndFilesFailed = 805076
+        DeleteHistoricFoldersAndFilesFailed = 805076,
+        DeleteHistoricContainerFile = 805077,
+        DeleteHistoricFolder= 805078
     }
 
     public static class EventIdExtensions

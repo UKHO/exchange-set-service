@@ -2,6 +2,6 @@
 {
     public class CleanUpConfig
     {
-        public int NumberOfDay { get; set; }
+        public int NumberOfDays { get; set; }
     }
 }

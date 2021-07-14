@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.CleanUpJob.Services;
@@ -20,11 +21,11 @@ namespace UKHO.ExchangeSetService.CleanUpJob
         }
         public async Task ProcessCleanUp([TimerTrigger("%ScheduleTimer%", RunOnStartup = true)] TimerInfo timerInfo)
         {
-            logger.LogInformation(EventIds.ESSCleanUpJobRequestStart.ToEventId(), "Exchange Set Service Clean Up web job started.");
+            logger.LogInformation(EventIds.ESSCleanUpJobRequestStart.ToEventId(), "Exchange set service clean up web job started at " + DateTime.Now);
             
             await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
-            logger.LogInformation(EventIds.ESSCleanUpJobRequestCompleted.ToEventId(), "Exchange Set Service Clean Up web job Completed.");
+            logger.LogInformation(EventIds.ESSCleanUpJobRequestCompleted.ToEventId(), "Exchange set service clean up web job completed at " + DateTime.Now);
         }
     }
 }

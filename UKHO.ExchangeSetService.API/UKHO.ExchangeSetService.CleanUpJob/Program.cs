@@ -19,6 +19,7 @@ using UKHO.Logging.EventHubLogProvider;
 using System.Reflection;
 using System.Linq;
 using UKHO.ExchangeSetService.CleanUpJob.Configuration;
+using UKHO.ExchangeSetService.CleanUpJob.Helpers;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
@@ -125,6 +126,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                 services.AddScoped<IExchangeSetCleanUpService, ExchangeSetCleanUpService>();
                 services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
+                services.AddScoped<IAzureDeleteFileSystemHelper, AzureDeleteFileSystemHelper>();
             })
             .ConfigureWebJobs(b =>
             {

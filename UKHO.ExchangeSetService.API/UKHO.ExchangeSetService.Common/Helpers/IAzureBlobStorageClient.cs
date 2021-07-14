@@ -11,6 +11,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString);
         Task UploadFromStreamAsync(CloudBlockBlob cloudBlockBlob, MemoryStream ms);
         Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob);
-        Task<bool> DeleteDirectoryAsync(int numberOfDay, string storageAccountConnectionString, string containerName, string filePath);
+        Task DeleteContainerFile(string storageAccountConnectionString, string containerName, string batchId);
     }
 }

@@ -40,36 +40,5 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             CloudBlockBlob _blockBlob = _cloudBlobContainer.GetBlockBlobReference(batchId);
             await _blockBlob.DeleteIfExistsAsync();
         }
-        public async Task<bool> DeleteDirectoryAsync(int numberOfDay, string storageAccountConnectionString, string containerName, string filePath)
-        {
-            Boolean deleteStatus = false;
-            if (Directory.Exists(filePath))
-            {
-                var subFolder = Directory.GetDirectories(filePath);
-                foreach (var subFolderName in subFolder)
-                {
-                    var fileCreationTimeUtc = File.GetCreationTimeUtc(subFolderName);
-                    if (fileCreationTimeUtc < DateTime.UtcNow.AddMinutes(-numberOfDay))
-                    {
-                        DirectoryInfo di = new DirectoryInfo(subFolderName);
-                        foreach (DirectoryInfo dir in di.GetDirectories())
-                        {
-                            var batchidFile = dir.Name;
-                            string batchId = new DirectoryInfo(batchidFile).Name + ".json";
-
-                            await DeleteContainerFile(storageAccountConnectionString, containerName, batchId);
-                            dir.Delete(true);
-                        }
-                        di.Delete(true);
-                        deleteStatus = true;
-                    }
-                }
-                return deleteStatus;
-            }
-            else
-            {
-                return deleteStatus;
-            }
-        }
     }
 }
