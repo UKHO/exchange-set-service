@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfig;
         private IOptions<AzureAdB2CConfiguration> fakeAzureAdB2CConfig;
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
-    
+
         [SetUp]
         public void Setup()
         {
@@ -280,18 +280,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
                 .Returns(salesCatalogueResponse);
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-
-            var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
-            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
-            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
-
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -300,6 +288,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureB2CToken); //B2C Token with file Size less than 300 mb
 
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
         }
 
@@ -316,18 +305,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
                 .Returns(salesCatalogueResponse);
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-
-            var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
-            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
-            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
-
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -336,7 +313,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureAdB2CToken); //AdB2C token with file size large than 300 mb
 
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);            
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
         }
         [Test]
         public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
@@ -528,8 +506,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [Test]
         public async Task WhenLargeExchangeSetRequestedWithB2CToken_ThenCreateProductDataByProductVersionsReturnsBadRequest()
         {
-             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
+               .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             var azureB2CToken = GetAzureB2CToken();
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
@@ -542,6 +520,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureB2CToken);//valid AzureAdB2c Token , but filesize is large than 300 mb
 
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
         }
 
@@ -562,12 +541,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureAdB2CToken);//valid AzureAdB2c Token , but filesize is large than 300 mb
 
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
         }
 
         [Test]
         public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkrequest()
-        {            
+        {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
@@ -646,7 +626,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
             A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
-           
+
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
                 ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
@@ -800,25 +780,27 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());// B2C token passed and file size large than 300 mb
-            
-            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);            
+
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
         }
 
         [Test]
         public async Task WhenLargeExchangeSetRequestedWithADB2CToken_ThenCreateProductDataSinceDateTimeReturnsBadRequest()
         {
-             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+               .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
-            
+
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());//AdB2C token passed and file size large than 300 mb
 
-            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);            
+            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
         }
 
         [Test]
