@@ -208,7 +208,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Verify Serial.Enc file content
             FileContentHelper.CheckSerialEncFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetSerialEncFile));
 
-        }
+        }     
+
+
 
     }
 }

@@ -18,9 +18,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private FssApiClient FssApiClient { get; set; }
         private string FssJwtToken { get; set; }
 
-        ////private static bool fileContentCheck = false;
-        ////private static bool fileExistCheck = false;
-
+       
         [SetUp]
         public async Task SetupAsync()
         {
@@ -36,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        public async Task WhenICallExchangeSetApiWithAValidProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithValidProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetOnlyProductIdentifierData(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
@@ -47,24 +45,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
 
-            Assert.AreEqual("Failed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
 
             var downloadFileUrl = apiResponseDetails.Links.ExchangeSetFileUri.Href;
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+            bool checkFile = FssBatchHelper.CheckforFileExist(extractDownloadedFolder, Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
-            bool checkFile = FssBatchHelper.CheckforFileExist(downloadFolderPath, Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {downloadFolderPath}");
-
-
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
         }
 
         [Test]
-        public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithInvalidProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
 
@@ -84,16 +80,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+            bool checkFile = FssBatchHelper.CheckforFileExist(extractDownloadedFolder, Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
-            bool checkFile = FssBatchHelper.CheckforFileExist(downloadFolderPath, Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {downloadFolderPath}");
-
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
         }
 
         [Test]
-        public async Task WhenICallTheApiWithAValidProductVersion_ThenAReadMeTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenAReadMeTxtFileIsGenerated()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
@@ -116,18 +111,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+            bool checkFile = FssBatchHelper.CheckforFileExist(extractDownloadedFolder, Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
-            bool checkFile = FssBatchHelper.CheckforFileExist(downloadFolderPath, Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {downloadFolderPath}");
-
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
 
 
         }
 
         [Test]
-        public async Task WhenICallTheApiWithAnInvalidEditionNumber_ThenAReadMeTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithAnInvalidEditionNumber_ThenAReadMeTxtFileIsGenerated()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
@@ -149,16 +143,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+            bool checkFile = FssBatchHelper.CheckforFileExist(extractDownloadedFolder, Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
-            bool checkFile = FssBatchHelper.CheckforFileExist(downloadFolderPath, Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {downloadFolderPath}");
-
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
         }
 
         [Test]
-        public async Task WhenICallTheApiWithAnInvalidUpdateNumber_ThenAReadMeTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithAnInvalidUpdateNumber_ThenAReadMeTxtFileIsGenerated()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
@@ -180,12 +173,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+            bool checkFile = FssBatchHelper.CheckforFileExist(extractDownloadedFolder, Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
-            bool checkFile = FssBatchHelper.CheckforFileExist(downloadFolderPath, Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {downloadFolderPath}");
-
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
         }
     }
 }
