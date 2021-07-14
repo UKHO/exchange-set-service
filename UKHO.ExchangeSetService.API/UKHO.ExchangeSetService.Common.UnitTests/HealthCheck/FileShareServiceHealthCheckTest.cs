@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         #endregion
 
         [Test]
-        public async Task WhenFSSClientReturnsOtherThan200And304_ThenFileShareServiceIsUnhealthy()
+        public async Task WhenFSSClientReturnsOtherThan200_ThenFileShareServiceIsUnhealthy()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))

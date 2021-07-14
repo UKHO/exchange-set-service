@@ -39,7 +39,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
             if (fileShareServiceResponse.StatusCode == HttpStatusCode.OK)
             {
-                logger.LogInformation(EventIds.FileShareServiceIsHealthy.ToEventId(), "File share service is healthy responded with {StatusCode}", fileShareServiceResponse.StatusCode);
+                logger.LogDebug(EventIds.FileShareServiceIsHealthy.ToEventId(), "File share service is healthy responded with {StatusCode}", fileShareServiceResponse.StatusCode);
                 return HealthCheckResult.Healthy("File share service is healthy");
             }
             else

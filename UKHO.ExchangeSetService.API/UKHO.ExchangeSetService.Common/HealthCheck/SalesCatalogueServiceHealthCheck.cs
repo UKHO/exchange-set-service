@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
             if (salesCatalogueServiceResponse.StatusCode == HttpStatusCode.OK || salesCatalogueServiceResponse.StatusCode == HttpStatusCode.NotModified)
             {
-                logger.LogInformation(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), "Sales catalogue service is healthy responded with {StatusCode}", salesCatalogueServiceResponse.StatusCode);
+                logger.LogDebug(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), "Sales catalogue service is healthy responded with {StatusCode}", salesCatalogueServiceResponse.StatusCode);
                 return HealthCheckResult.Healthy("Sales catalogue service is healthy");
             }
             else
