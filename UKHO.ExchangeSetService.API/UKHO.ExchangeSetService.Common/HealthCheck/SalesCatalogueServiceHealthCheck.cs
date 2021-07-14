@@ -12,14 +12,14 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
-    public class SalesCatalogServiceHealthCheck : IHealthCheck
+    public class SalesCatalogueServiceHealthCheck : IHealthCheck
     {
         private readonly ISalesCatalogueClient salesCatalogueClient;
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IOptions<SalesCatalogueConfiguration> salesCatalogueConfig;
         private readonly ILogger<SalesCatalogueService> logger;
 
-        public SalesCatalogServiceHealthCheck(ISalesCatalogueClient salesCatalogueClient,
+        public SalesCatalogueServiceHealthCheck(ISalesCatalogueClient salesCatalogueClient,
                                               IAuthTokenProvider authTokenProvider,
                                               IOptions<SalesCatalogueConfiguration> salesCatalogueConfig,
                                               ILogger<SalesCatalogueService> logger)

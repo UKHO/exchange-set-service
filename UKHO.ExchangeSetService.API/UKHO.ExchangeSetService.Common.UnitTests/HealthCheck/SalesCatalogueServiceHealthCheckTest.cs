@@ -18,13 +18,13 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 {
-    public class SalesCatalogServiceHealthCheckTest
+    public class SalesCatalogueServiceHealthCheckTest
     {
         private ILogger<SalesCatalogueService> fakeLogger;
         private IOptions<SalesCatalogueConfiguration> fakeSaleCatalogueConfig;
         private IAuthTokenProvider fakeAuthTokenProvider;
         private ISalesCatalogueClient fakeSalesCatalogueClient;
-        private SalesCatalogServiceHealthCheck salesCatalogServiceHealthCheck;
+        private SalesCatalogueServiceHealthCheck salesCatalogueServiceHealthCheck;
 
         [SetUp]
         public void Setup()
@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             this.fakeSaleCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { ProductType = "Test", Version = "t1", CatalogueType = "essTest" });
             this.fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
 
-            salesCatalogServiceHealthCheck = new SalesCatalogServiceHealthCheck(fakeSalesCatalogueClient, fakeAuthTokenProvider, fakeSaleCatalogueConfig, fakeLogger);
+            salesCatalogueServiceHealthCheck = new SalesCatalogueServiceHealthCheck(fakeSalesCatalogueClient, fakeAuthTokenProvider, fakeSaleCatalogueConfig, fakeLogger);
         }
 
         #region GetSalesCatalogueDataProductResponse
@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("BadRequest"))) });
 
-            var response = await salesCatalogServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
+            var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
             Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
         }
@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
-            var response = await salesCatalogServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
+            var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
             Assert.AreEqual(HealthStatus.Healthy, response.Status);
         }
@@ -102,7 +102,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.ServiceUnavailable, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("ServiceUnavailable"))) });
 
-            var response = await salesCatalogServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
+            var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
             Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
         }

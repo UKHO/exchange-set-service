@@ -156,7 +156,7 @@ namespace UKHO.ExchangeSetService.API
 
             services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
-                .AddCheck<SalesCatalogServiceHealthCheck>("SalesCatalogServiceHealthCheck")
+                .AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
                 .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck");
         }
 
