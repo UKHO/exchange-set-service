@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
@@ -18,7 +19,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private FssApiClient FssApiClient { get; set; }
         private string FssJwtToken { get; set; }
 
-       
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-10).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+
+
         [SetUp]
         public async Task SetupAsync()
         {
@@ -30,6 +33,32 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssApiClient = new FssApiClient();
             FssJwtToken = await authTokenProvider.GetFssToken();
+        }
+
+        [Test]
+        public async Task WhenICallExchangeSetApiWithAValidRFC1123DateTime_ThenAReadMeTxtFileIsGenerated()
+        {
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
+
+            var apiResponseDetails = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseDetails.Links.ExchangeSetBatchStatusUri.Href;
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+
+            var downloadFileUrl = apiResponseDetails.Links.ExchangeSetFileUri.Href;
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+
+            bool checkFile = FssBatchHelper.CheckforFileExist(extractDownloadedFolder, Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
+
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
 
