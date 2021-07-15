@@ -170,7 +170,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallTheApiWithAnInvalidUpdateNumber_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithAnInvalidUpdateNumber_ThenAProductTxtFileIsGenerated()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
@@ -203,7 +203,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             FileContentHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData, ScsJwtToken);
         }
-
     }
 
 }

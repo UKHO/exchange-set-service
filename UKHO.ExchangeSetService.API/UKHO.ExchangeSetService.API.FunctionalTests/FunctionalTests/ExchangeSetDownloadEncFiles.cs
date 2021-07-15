@@ -77,10 +77,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 }
 
             }
-
-            //Verify downloaded files matches with File Share Service Api response file details             
-            //////await FileContentHelper.CheckDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder,Config.ExchangeSetEncRootFolder), productName, editionNumber, FssJwtToken);
-
         }
 
         [Test]

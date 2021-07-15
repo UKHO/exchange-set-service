@@ -200,14 +200,24 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             List<string> scsCatalogueFilesPath = new List<string>();
             string catalogueFileContent = File.ReadAllText(inputfile);
+          
 
             foreach (var item in scsResponse.Products)
             {
                 string productName = item.ProductName;
                 string editionNumber = item.EditionNumber.ToString();
+                //Get Countrycode
+                string countryCode = productName.Substring(0, 2);
+
+                //Get folder path
+                string editionFolderPath = Path.Combine(inputfile, countryCode, productName, editionNumber);
+
                 foreach (var updateNumber in item.UpdateNumbers)
                 {
-                    scsCatalogueFilesPath.Add(productName+"/"+editionNumber+"/"+(updateNumber.ToString()));
+                    if (editionFolderPath != null && editionFolderPath !="")
+                    {
+                        scsCatalogueFilesPath.Add(productName + "/" + editionNumber + "/" + (updateNumber.ToString()));
+                    }
                 }
             }
 
@@ -216,6 +226,28 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 Assert.True(catalogueFileContent.Contains(cataloguefilePath));
             }
            
+        }
+
+        public static void CheckCatalogueFileNoContent(string inputfile, ScsProductResponseModel scsResponse, string ScsJwtToken)
+        {
+            List<string> scsCatalogueFilesPath = new List<string>();
+            string catalogueFileContent = File.ReadAllText(inputfile);
+
+            foreach (var item in scsResponse.Products)
+            {
+                string productName = item.ProductName;
+                string editionNumber = item.EditionNumber.ToString();
+                foreach (var updateNumber in item.UpdateNumbers)
+                {
+                    scsCatalogueFilesPath.Add(productName + "/" + editionNumber + "/" + (updateNumber.ToString()));
+                }
+            }
+
+            foreach (var cataloguefilePath in scsCatalogueFilesPath)
+            {
+                Assert.False(catalogueFileContent.Contains(cataloguefilePath));
+            }
+
         }
     }
  }

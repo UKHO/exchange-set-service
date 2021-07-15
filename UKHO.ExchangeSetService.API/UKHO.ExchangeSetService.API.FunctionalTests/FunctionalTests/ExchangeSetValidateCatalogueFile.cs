@@ -92,7 +92,108 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetOnlyProductIdentifierData(), ScsJwtToken);
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
+            FileContentHelper.CheckCatalogueFileNoContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+
+        }
+
+        public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenACatalogueFileIsGenerated()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 5));
+
+            var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+            Assert.AreEqual("Commited", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+
+            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder)}");
+
+            //Verify Catalog file content
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
+            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+
             FileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+
+        }
+        public async Task WhenICallExchangeSetApiWithInValidEditionNumber_ThenACatalogueFileIsGenerated()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE316004", 15, 0));
+
+            var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+            Assert.AreEqual("Commited", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+
+            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder)}");
+
+            //Verify Catalog file content
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
+            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+
+            FileContentHelper.CheckCatalogueFileNoContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+
+        }
+
+        public async Task WhenICallExchangeSetApiWithInValidUpdateNumber_ThenACatalogueFileIsGenerated()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE316004", 13, 50));
+
+            var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+            Assert.AreEqual("Commited", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+
+            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder)}");
+
+            //Verify Catalog file content
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
+            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+
+            FileContentHelper.CheckCatalogueFileNoContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
 
         }
     }
