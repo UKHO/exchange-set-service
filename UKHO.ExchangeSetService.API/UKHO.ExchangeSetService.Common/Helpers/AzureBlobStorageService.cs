@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId,CloudBlockBlob cloudBlockBlob)
         {
-            int fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
+            long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
             {
                 BatchId = batchId,

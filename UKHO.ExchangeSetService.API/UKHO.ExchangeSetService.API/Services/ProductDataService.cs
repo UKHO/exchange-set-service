@@ -108,8 +108,8 @@ namespace UKHO.ExchangeSetService.API.Services
         }
         public ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(SalesCatalogueResponse salesCatalogueResponse)
         {
-            int fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
-            var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes((long)fileSize);
+            long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+            var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
             if (fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
             {
                 ExchangeSetServiceResponse exchangeSetResponse = new ExchangeSetServiceResponse

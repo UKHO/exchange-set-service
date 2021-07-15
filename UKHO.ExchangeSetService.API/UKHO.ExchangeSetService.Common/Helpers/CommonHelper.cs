@@ -51,9 +51,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return (bytes / byteSize) / byteSize;
         }
 
-        public static int GetFileSize(SalesCatalogueProductResponse salesCatalogueResponse)
+        public static long GetFileSize(SalesCatalogueProductResponse salesCatalogueResponse)
         {
-            int fileSizeCount = 0;
+            long fileSizeCount = 0;
             if (salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0)
             {
                 foreach (var item in salesCatalogueResponse.Products)

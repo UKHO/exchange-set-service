@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public void CheckGetFileSize()
         {
             SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
-            int fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+            long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
             Assert.AreEqual(500, fileSize);
         }
     }
