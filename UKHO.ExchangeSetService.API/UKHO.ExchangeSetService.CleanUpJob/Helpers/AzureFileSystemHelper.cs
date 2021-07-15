@@ -25,51 +25,56 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
         public async Task<bool> DeleteDirectoryAsync(int numberOfDays, string storageAccountConnectionString, string containerName, string filePath)
         {
             Boolean deleteStatus = false;
-            if (Directory.Exists(filePath))
+            try
             {
                 var subFolder = Directory.GetDirectories(filePath);
                 foreach (var subFolderName in subFolder)
                 {
                     DateTime subFolderDateTime;
                     string dateFolder = new DirectoryInfo(subFolderName).Name;
-                    bool isValidDate = DateTimeExtensions.IsValidDate(dateFolder,out subFolderDateTime);
+                    bool isValidDate = DateTimeExtensions.IsValidDate(dateFolder, out subFolderDateTime);
 
                     if (isValidDate)
                     {
                         var historicDateTimeInUtc = DateTime.UtcNow.AddDays(-numberOfDays);
                         DateTime subFolderDate = new DateTime(subFolderDateTime.Year, subFolderDateTime.Month, subFolderDateTime.Day);
                         DateTime historicDate = new DateTime(historicDateTimeInUtc.Year, historicDateTimeInUtc.Month, historicDateTimeInUtc.Day);
-                        
+
                         if (subFolderDate <= historicDate)
                         {
                             DirectoryInfo di = new DirectoryInfo(subFolderName);
-                            
+
                             foreach (DirectoryInfo dir in di.GetDirectories())
                             {
                                 var batchId = dir.Name;
                                 string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
-                                var response =await azureBlobStorageClient.DeleteFileFromContainer(storageAccountConnectionString, containerName, scsResponseFileName);
+                                var response = await azureBlobStorageClient.DeleteFileFromContainer(storageAccountConnectionString, containerName, scsResponseFileName);
                                 if (response)
                                 {
                                     dir.Delete(true);
-                                    logger.LogInformation(EventIds.DeleteHistoricSCSResponseFile.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
+                                    logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
                                 }
                                 else
                                 {
-                                    logger.LogError(EventIds.DeleteHistoricSCSResponseFileNotFound.ToEventId(), "SCS response json file {ScsResponseFileName} not found in the container.", scsResponseFileName);
+                                    logger.LogError(EventIds.HistoricSCSResponseFileNotFound.ToEventId(), "SCS response json file {ScsResponseFileName} not found in the container.", scsResponseFileName);
                                 }
                             }
 
                             di.Delete(true);
-                            deleteStatus = true;
-                            logger.LogInformation(EventIds.DeleteHistoricDateFolder.ToEventId(), "Historic folder deleted successfully for Date:{dateFolder}.", dateFolder);
+                            logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{dateFolder}.", dateFolder);
                         }
+                        else
+                        {
+                            logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{dateFolder}.", dateFolder);
+                        }
+                        deleteStatus = true;
                     }
                 }
                 return deleteStatus;
             }
-            else
+            catch (Exception ex)
             {
+                logger.LogError(EventIds.DeleteHistoricFoldersAndFilesException.ToEventId(), ex, "Exception while deleteing historic folders and files with error {Message}", ex.Message);
                 return deleteStatus;
             }
         }

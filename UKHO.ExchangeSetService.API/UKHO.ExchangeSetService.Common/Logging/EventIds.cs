@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ESSGetProductsFromSpecificDateRequestStart = 805015,
         ESSGetProductsFromSpecificDateRequestCompleted = 805016,
         ESSPostProductIdentifiersRequestStart = 805017,
-        ESSPostProductIdentifiersRequestCompleted = 805018,        
+        ESSPostProductIdentifiersRequestCompleted = 805018,
         ESSPostProductVersionsRequestStart = 805019,
         ESSPostProductVersionsRequestCompleted = 805020,
         SCSResponseStoreRequestStart = 805021,
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceNonOkResponse = 805030,
         DownloadFileShareServiceFilesStart = 805031,
         DownloadFileShareServiceFilesCompleted = 805032,
-        DownloadFileShareServiceNonOkResponse = 805033,        
+        DownloadFileShareServiceNonOkResponse = 805033,
         ReadMeTextFileNotFound = 805034,
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateSerialFileRequestCompleted = 805039,
         SerialFileIsNotCreated = 805040,
         CreateZipFileRequestStart = 805041,
-        CreateZipFileRequestCompleted = 805042,       
+        CreateZipFileRequestCompleted = 805042,
         UploadExchangeSetToFssStart = 805043,
         UploadExchangeSetToFssCompleted = 805044,
         UploadFileCreationProcessStarted = 805045,
@@ -90,9 +90,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         DeleteHistoricFoldersAndFilesStarted = 805083,
         DeleteHistoricFoldersAndFilesCompleted = 805084,
         DeleteHistoricFoldersAndFilesFailed = 805085,
-        DeleteHistoricSCSResponseFile = 805086,
-        DeleteHistoricSCSResponseFileNotFound = 805087,
-        DeleteHistoricDateFolder = 805088
+        HistoricSCSResponseFileDeleted = 805086,
+        HistoricSCSResponseFileNotFound = 805087,
+        HistoricDateFolderDeleted = 805088,
+        HistoricDateFolderNotFound = 805089,
+        DeleteHistoricFoldersAndFilesException = 805090
     }
 
     public static class EventIdExtensions
