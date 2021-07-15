@@ -286,7 +286,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      },
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!")))
                  });
-            
+
             var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
 
             Assert.IsNotNull(response);
@@ -307,7 +307,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      },
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
                  });
-            
+
             var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
 
             Assert.IsNotNull(response);
