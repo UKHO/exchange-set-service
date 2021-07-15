@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Newtonsoft.Json;
+using System.Net;
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
@@ -11,6 +12,8 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         public string LastModified { get; set; }
 
         public string BatchId { get; set; }
+        [JsonIgnore]
+        public bool IsExchangeSetTooLarge { get; set; }
 
     }
 }
