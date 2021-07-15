@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
 
                             //BoundingRectangle and Comment only required for BIN
-                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GeIsdtUadt(salescatalogProduct)}";
+                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             FileLocation = fileLocation,
                             FileLongName = "",
                             Implementation = mimeType,
-                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : CrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
+                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
                             Comment = comment,
                             BoundingRectangle = boundingRectangle
                         });
@@ -201,13 +201,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        private string CrcString(string fullFilePath)
+        private string GetCrcString(string fullFilePath)
         {
             var crcHash = Crc32CheckSumProvider.Instance.Compute(fileSystemHelper.ReadAllBytes(fullFilePath));
-            return crcHash.ToString();
+            return crcHash.ToString("X");
         }
 
-        private string GeIsdtUadt(SalesCatalogueDataProductResponse salescatalogProduct)
+        private string GetIssueAndUpdateDate(SalesCatalogueDataProductResponse salescatalogProduct)
         {
             string comment = string.Empty;
             string ISDT = (salescatalogProduct.IssueDateLatestUpdate == null)
