@@ -100,6 +100,28 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                         IssueDateLatestUpdate = DateTime.Today,
                         LastUpdateNumberForPreviousEdition = 0,
                         TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
+                        IssueDatePreviousUpdate = DateTime.Today.AddDays(-1)
+                    },
+                    new SalesCatalogueDataProductResponse
+                    {
+                        ProductName = "10000003",
+                        LatestUpdateNumber = 0,
+                        FileSize = 600,
+                        CellLimitSouthernmostLatitude = 24,
+                        CellLimitWesternmostLatitude = 119,
+                        CellLimitNorthernmostLatitude = 25,
+                        CellLimitEasternmostLatitude = 120,
+                        BaseCellEditionNumber = 3,
+                        BaseCellLocation = "M0;B0",
+                        BaseCellIssueDate = DateTime.Today,
+                        BaseCellUpdateNumber = 0,
+                        Encryption = true,
+                        CancelledCellReplacements = new List<string>() { },
+                        Compression = true,
+                        IssueDateLatestUpdate = DateTime.Today.AddDays(1),
+                        LastUpdateNumberForPreviousEdition = 0,
+                        TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
+                        IssueDatePreviousUpdate = null
                     }
                 }
             };
@@ -174,11 +196,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             byte[] byteContent = new byte[100];
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
-                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000002", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() }
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000002", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() },
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() }
             };
 
             fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
-            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);            
+            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);

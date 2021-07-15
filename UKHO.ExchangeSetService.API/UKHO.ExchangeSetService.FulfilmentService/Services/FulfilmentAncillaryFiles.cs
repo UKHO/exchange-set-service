@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     {
                         string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
                         string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
-                        string comment = string.Empty;                        
+                        string comment = string.Empty;
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
 
                         if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
@@ -91,9 +91,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
 
                             //BoundingRectangle and Comment only required for BIN
-                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber}";
-
-                            comment = $"{comment},{GeIsdtUadt(salescatalogProduct)}";
+                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GeIsdtUadt(salescatalogProduct)}";
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
@@ -212,11 +210,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private string GeIsdtUadt(SalesCatalogueDataProductResponse salescatalogProduct)
         {
             string comment = string.Empty;
-            string ISDT = (salescatalogProduct.IssueDateLatestUpdate != null) ? salescatalogProduct.IssueDateLatestUpdate.Value.ToString("yyyyMMdd")
-                                                                                : salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd");
+            string ISDT = (salescatalogProduct.IssueDateLatestUpdate == null)
+                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDateLatestUpdate.Value.ToString("yyyyMMdd");
 
-            string UADT = (salescatalogProduct.IssueDatePreviousUpdate != null) ? salescatalogProduct.IssueDatePreviousUpdate.Value.ToString("yyyyMMdd")
-                                                                                : salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd");
+            string UADT = (salescatalogProduct.IssueDatePreviousUpdate == null && salescatalogProduct.LatestUpdateNumber == 0)
+                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDatePreviousUpdate.Value.ToString("yyyyMMdd");
 
             if (ISDT != null && UADT != null)
                 comment = $"UADT={UADT},ISDT={ISDT};";
