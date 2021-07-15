@@ -7,5 +7,6 @@
         public string ResourceId { get; set; }
         public string ProductType { get; set; }
         public string CatalogueType { get; set; }
+        public int SinceDays { get; set; }
     }
 }
