@@ -98,7 +98,7 @@ namespace UKHO.ExchangeSetService.API
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes("AzureAD", "AzureB2C", "AzureADB2C")
+                .AddAuthenticationSchemes("AzureAD", "AzureB2C", "AzureADB2C")               
                 .Build();
             });
 
@@ -135,6 +135,8 @@ namespace UKHO.ExchangeSetService.API
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
             services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
+            services.Configure<AzureAdB2CConfiguration>(configuration.GetSection("AzureAdB2CConfiguration"));
+            services.Configure<AzureADConfiguration>(configuration.GetSection("ESSAzureADConfiguration"));
 
             services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                 {

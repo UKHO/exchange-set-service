@@ -6,5 +6,6 @@
         public string StorageAccountKey { get; set; }
         public string StorageContainerName { get; set; }
         public string QueueName { get; set; }
+        public int LargeExchangeSetSizeInMB { get; set; }
     }
 }
