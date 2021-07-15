@@ -95,3 +95,10 @@ ReplaceQueueAndDeployWebApp $terraformOutput.medium_exchange_set_webapps.value $
 if ( !$? ) { echo "Error while replacing queue and deploying medium exchange set webapps" ; throw $_ }
 
 echo "Deploying medium exchange set done ..."
+
+echo "Deploying large exchange set ..."
+ReplaceQueueAndDeployWebApp $terraformOutput.large_exchange_set_webapps.value $packagePath $packageName "large" $terraformOutput.large_exchange_set_keyvault_uri.value $terraformOutput.web_app_resource_group.value
+
+if ( !$? ) { echo "Error while replacing queue and deploying large exchange set webapps" ; throw $_ }
+
+echo "Deploying large exchange set done ..."

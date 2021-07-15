@@ -77,14 +77,21 @@ namespace UKHO.ExchangeSetService.Common.Logging
         SCSGetSalesCatalogueDataRequestStart = 805070,
         SCSGetSalesCatalogueDataRequestCompleted = 805071,
         ProductFileIsNotCreated = 805072,
-        ESSCleanUpJobRequestStart=805073,
-        ESSCleanUpJobRequestCompleted = 805073,
-        DeleteHistoricFoldersAndFilesStarted = 805074,
-        DeleteHistoricFoldersAndFilesCompleted = 805075,
-        DeleteHistoricFoldersAndFilesFailed = 805076,
-        DeleteHistoricSCSResponseFile = 805077,
-        DeleteHistoricSCSResponseFileNotFound = 805078,
-        DeleteHistoricDateFolder = 805079
+        SalesCatalogueServiceIsHealthy = 805073,
+        SalesCatalogueServiceIsUnhealthy = 805074,
+        FileShareServiceIsHealthy = 805075,
+        FileShareServiceIsUnhealthy = 805076,
+        EventHubLoggingEventDataForHealthCheck = 805077,
+        EventHubLoggingIsHealthy = 805078,
+        EventHubLoggingIsUnhealthy = 805079,
+        ESSCleanUpJobRequestStart = 805080,
+        ESSCleanUpJobRequestCompleted = 805081,
+        DeleteHistoricFoldersAndFilesStarted = 805082,
+        DeleteHistoricFoldersAndFilesCompleted = 805083,
+        DeleteHistoricFoldersAndFilesFailed = 805084,
+        DeleteHistoricSCSResponseFile = 805085,
+        DeleteHistoricSCSResponseFileNotFound = 805086,
+        DeleteHistoricDateFolder = 805087
     }
 
     public static class EventIdExtensions
