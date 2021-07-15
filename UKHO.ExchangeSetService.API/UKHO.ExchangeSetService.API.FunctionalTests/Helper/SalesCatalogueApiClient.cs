@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -43,6 +43,25 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string uri = $"{apiHost}/v1/productData/{productType}/products/productIdentifiers";
 
             string payloadJson = JsonConvert.SerializeObject(productIdentifiers);
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+
+        }
+
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(string productType, List<ProductVersionModel> productVersionModel, string accessToken = null)
+        {
+            string uri = $"{apiHost}/v1/productData/{productType}/products/productVersions";
+
+            string payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })

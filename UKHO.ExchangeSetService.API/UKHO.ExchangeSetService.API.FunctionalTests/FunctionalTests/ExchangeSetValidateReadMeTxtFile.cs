@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify README.TXT file content
-            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify README.TXT file content
-            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify README.TXT file content
-            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
 
 
         }
@@ -147,7 +147,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify README.TXT file content
-            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
         [Test]
@@ -177,7 +177,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {extractDownloadedFolder}");
 
             //Verify README.TXT file content
-            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeReadMeFile));
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
     }
 }

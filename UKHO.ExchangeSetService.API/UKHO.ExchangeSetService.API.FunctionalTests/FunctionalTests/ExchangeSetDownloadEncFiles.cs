@@ -38,13 +38,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallExchangeSetApiWithAValidProductVersions_ThenEncFilesAreDownloaded()
         {
-            string productName = "DE316004";
-            int editionNumber = 13;
-            int updateNumber = 0;
-
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData(productName, editionNumber, updateNumber));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE316004", 13, 0));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
@@ -62,8 +58,28 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Get temp downloaded folder
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
+            //Get the product details form sales catalogue service
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+
+            foreach (var product in apiScsResponseData.Products)
+            {
+                string productName = product.ProductName;
+                int editionNumber = product.EditionNumber;
+
+                //Enc file downloaded verification
+                foreach (var updateNumber in product.UpdateNumbers)
+                {
+                    await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+
+                }
+
+            }
+
             //Verify downloaded files matches with File Share Service Api response file details             
-            await FileContentHelper.CheckDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder,Config.ExchangeSetEncRootFolder), productName, editionNumber, FssJwtToken);
+            //////await FileContentHelper.CheckDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(extractDownloadedFolder,Config.ExchangeSetEncRootFolder), productName, editionNumber, FssJwtToken);
 
         }
 
@@ -210,7 +226,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the product details form sales catalogue service
 
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, new List<string> { "DE416080" }, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, new List<string> { "DE416080", "DE316004" }, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
