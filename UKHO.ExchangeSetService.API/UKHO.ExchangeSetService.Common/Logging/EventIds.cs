@@ -83,7 +83,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         FileShareServiceIsUnhealthy = 805076,
         EventHubLoggingEventDataForHealthCheck = 805077,
         EventHubLoggingIsHealthy = 805078,
-        EventHubLoggingIsUnhealthy = 805079
+        EventHubLoggingIsUnhealthy = 805079,
+        ExchangeSetTooLarge = 805080
     }
 
     public static class EventIdExtensions
