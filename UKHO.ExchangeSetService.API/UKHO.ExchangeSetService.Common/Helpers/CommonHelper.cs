@@ -53,15 +53,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public static long GetFileSize(SalesCatalogueProductResponse salesCatalogueResponse)
         {
-            long fileSizeCount = 0;
+            long fileSize = 0;
             if (salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0)
             {
                 foreach (var item in salesCatalogueResponse.Products)
                 {
-                    fileSizeCount += item.FileSize.Value;
+                    fileSize += item.FileSize.Value;
                 }
             }
-            return fileSizeCount;
+            return fileSize;
         }
     }
 }
