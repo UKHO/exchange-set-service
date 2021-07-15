@@ -36,10 +36,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static void CheckProductFileContent(string inputfile, dynamic scsResponse,string ScsJwtToken)
+        public static void CheckProductFileContent(string inputfile, dynamic scsResponse, string ScsJwtToken)
         {
             string[] fileContent = File.ReadAllLines(inputfile);
-            int lastIndex = fileContent.Length-2;
+            int lastIndex = fileContent.Length - 2;
             string[] contentFirstLine = fileContent[4].Split(',');
             string[] contentLastLine = fileContent[lastIndex].Split(',');
             int scsResponseLength = scsResponse.Count;
@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(contentFirstLine[8].Contains(scsResponse[0].cellLimitNorthernmostLatitude.ToString()));
             Assert.True(contentFirstLine[9].Contains(scsResponse[0].cellLimitEasternmostLatitude.ToString()));
             //verfying last product details
-            Assert.True(contentLastLine[0].Contains(scsResponse[scsResponseLength-1].productName.ToString()));
+            Assert.True(contentLastLine[0].Contains(scsResponse[scsResponseLength - 1].productName.ToString()));
             Assert.True(contentFirstLine[1].Contains(scsResponse[scsResponseLength - 1].baseCellIssueDate.ToString("yyyyMMdd")));
             Assert.True(contentFirstLine[2].Equals(scsResponse[scsResponseLength - 1].baseCellEditionNumber.ToString()));
             Assert.True(contentFirstLine[3].Contains(scsResponse[scsResponseLength - 1].issueDateLatestUpdate.ToString("yyyyMMdd")));
@@ -88,9 +88,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
         }
 
-        public static async Task CheckDownloadedEncFilesAsync(string fssbaseurl,string folderpath, string productname,int? editionnumber,string accesstoken)
+        public static async Task CheckDownloadedEncFilesAsync(string fssbaseurl, string folderpath, string productname, int? editionnumber, string accesstoken)
         {
-           
+
             //Get Countrycode
             string countryCode = productname.Substring(0, 2);
 
@@ -100,12 +100,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Get list of directories
             List<string> listUpdateNumberPath = GetDirectories(editionFolderPath, "*");
 
-            for(int counter=0; counter<listUpdateNumberPath.Count; counter++)
+            for (int counter = 0; counter < listUpdateNumberPath.Count; counter++)
             {
-                string updatenumber= new DirectoryInfo(listUpdateNumberPath[counter]).Name;
+                string updatenumber = new DirectoryInfo(listUpdateNumberPath[counter]).Name;
                 int totalFileCount = FileCountInDirectories(listUpdateNumberPath[counter]);
                 string[] fileNames = Directory.GetFiles(listUpdateNumberPath[counter]).Select(file => Path.GetFileName(file)).ToArray();
-                
+
                 var searchQueryString = CreateFssSearchQuery(productname, editionnumber.ToString(), updatenumber);
 
                 var apiResponse = await FssApiClient.SearchBatchesAsync(fssbaseurl, searchQueryString, 100, 0, accesstoken);
@@ -117,10 +117,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
 
-                foreach(var filenanme in fileNames)
+                foreach (var filenanme in fileNames)
                 {
                     Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(filenanme)));
-                }                
+                }
 
             }
         }
@@ -129,7 +129,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             //Get Countrycode
             string countryCode = productname.Substring(0, 2);
-           
+
             //Get list of directories
             List<string> listUpdateNumberPath = GetDirectories(folderpath, countryCode);
             int folderCount = listUpdateNumberPath.Count;
@@ -185,9 +185,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static List<string> GetDirectories(string path, string searchPattern)
         {
-           
-           return Directory.GetDirectories(path, searchPattern).ToList();
-        
+
+            return Directory.GetDirectories(path, searchPattern).ToList();
+
         }
 
         public static int FileCountInDirectories(string path)
@@ -196,6 +196,27 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
+        public static void CheckCatalogueFileContent(string inputfile, ScsProductResponseModel scsResponse, string ScsJwtToken)
+        {
+            List<string> scsCatalogueFilesPath = new List<string>();
+            string catalogueFileContent = File.ReadAllText(inputfile);
+
+            foreach (var item in scsResponse.Products)
+            {
+                string productName = item.ProductName;
+                string editionNumber = item.EditionNumber.ToString();
+                foreach (var updateNumber in item.UpdateNumbers)
+                {
+                    scsCatalogueFilesPath.Add(productName+"/"+editionNumber+"/"+(updateNumber.ToString()));
+                }
+            }
+
+            foreach(var cataloguefilePath in scsCatalogueFilesPath)
+            {
+                Assert.True(catalogueFileContent.Contains(cataloguefilePath));
+            }
+           
+        }
     }
-}
+ }
 

@@ -19,13 +19,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
 
         /// <summary>
-        /// Get latest baseline data for a specified set of ENCs. - POST /productData/productVersions
+        /// Get latest baseline data for a specified set of Catalogues. - GET /productData/productType/catalogue/catalogueType
         /// </summary>
         /// <param name="productType"></param>
         /// <param name="catalogueType">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GeScsCatalogueAsync(string productType, string catalogueType, string accessToken = null)
+        public async Task<HttpResponseMessage> GetScsCatalogueAsync(string productType, string catalogueType, string accessToken = null)
         {
             string uri = $"{apiHost}/v1/productData/{productType}/catalogue/{catalogueType}";
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
@@ -38,6 +38,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
         }
 
+
+        /// <summary>
+        /// Get latest baseline data for a specified set of Products. - POST /productData/productType/products/productIdentifiers
+        /// </summary>
+        /// <param name="productType"></param>
+        /// <param name="productIdentifiers"></param>
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <returns></returns>
         public async Task<HttpResponseMessage> GetProductIdentifiersAsync(string productType, List<string> productIdentifiers, string accessToken = null)
         {
             string uri = $"{apiHost}/v1/productData/{productType}/products/productIdentifiers";
@@ -54,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
-
         }
+
     }
 }

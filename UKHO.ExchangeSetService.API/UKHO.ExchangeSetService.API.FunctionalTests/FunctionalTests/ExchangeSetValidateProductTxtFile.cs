@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath)}");
             
             //Verify Product.txt file content
-            var apiScsResponse = await ScsApiClient.GeScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
             var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
             
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath)}");
 
             //Verify Product.txt file content
-            var apiScsResponse = await ScsApiClient.GeScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
             var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
@@ -127,7 +127,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath)}");
 
             //Verify Product.txt file content
-            var apiScsResponse = await ScsApiClient.GeScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
             var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
@@ -162,7 +162,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath)}");
 
             //Verify Product.txt file content
-            var apiScsResponse = await ScsApiClient.GeScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
             var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
@@ -197,7 +197,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath)}");
 
             //Verify Product.txt file content
-            var apiScsResponse = await ScsApiClient.GeScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
             var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
