@@ -3,7 +3,6 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #pragma warning disable S1128 // Unused "using" should be removed
@@ -20,83 +19,101 @@ using System.Reflection;
 using System.Linq;
 using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Helpers;
+using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
     [ExcludeFromCodeCoverage]
     public static class Program
     {
-        private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
-        public static void Main(string[] args)
+
+        static async Task Main()
         {
-            HostBuilder hostBuilder = BuildHostConfiguration();
-
-            IHost host = hostBuilder.Build();
-
-            using (host)
+            try
             {
-                host.Run();
+                //Build configuration
+                var configuration = BuildConfiguration();
+
+                var serviceCollection = new ServiceCollection();
+
+                //Configure required services
+                ConfigureServices(serviceCollection, configuration);
+
+                //Create service provider. This will be used in logging.
+                var serviceProvider = serviceCollection.BuildServiceProvider();
+
+                await serviceProvider.GetService<ExchangeSetCleanUpJob>().ProcessCleanUp();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}{Environment.NewLine}Stack trace: {ex.StackTrace}");
+                throw;
             }
         }
-        private static HostBuilder BuildHostConfiguration()
+
+        private static IConfigurationRoot BuildConfiguration()
         {
-            HostBuilder hostBuilder = new HostBuilder();
-            hostBuilder.ConfigureAppConfiguration((hostContext, builder) =>
-            {
-                builder.AddJsonFile("appsettings.json");
-                //Add environment specific configuration files.
-                var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                if (!string.IsNullOrWhiteSpace(environmentName))
-                {
-                    builder.AddJsonFile($"appsettings.{environmentName}.json", optional: true);
-                }
+            var configBuilder =
+                new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true);
 
-                var tempConfig = builder.Build();
-                string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
-                if (!string.IsNullOrWhiteSpace(kvServiceUri))
-                {
-                    var secretClient = new SecretClient(new Uri(kvServiceUri), new DefaultAzureCredential(
-                                                        new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
-                    builder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
-                }
+            //Add environment specific configuration files.
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (!string.IsNullOrWhiteSpace(environmentName))
+            {
+                configBuilder.AddJsonFile($"appsettings.{environmentName}.json", optional: true);
+            }
+
+            var tempConfig = configBuilder.Build();
+            string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
+            if (!string.IsNullOrWhiteSpace(kvServiceUri))
+            {
+                var secretClient = new SecretClient(new Uri(kvServiceUri), new DefaultAzureCredential(
+                                                    new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
+                configBuilder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+            }
+            #if DEBUG
+            //Add development overrides configuration
+            configBuilder.AddJsonFile("appsettings.local.overrides.json", true, true);
+            #endif
+
+            //Add environment variables
+            configBuilder.AddEnvironmentVariables();
+
+            return configBuilder.Build();
+        }
+
+        private static void ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
+        {
+            //Add logging
+            serviceCollection.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
 
                 #if DEBUG
-                //Add development overrides configuration
-                builder.AddJsonFile("appsettings.local.overrides.json", true, true);
-                #endif
-
-                //Add environment variables
-                builder.AddEnvironmentVariables();
-
-                Program.ConfigurationBuilder = builder.Build();
-            })
-            .ConfigureLogging((hostContext, builder) =>
-            {
-                builder.AddConfiguration(ConfigurationBuilder.GetSection("Logging"));
-
-                #if DEBUG
-                builder.AddSerilog(new LoggerConfiguration()
+                loggingBuilder.AddSerilog(new LoggerConfiguration()
                                 .WriteTo.File("Logs/UKHO.ExchangeSetService.CleanUpLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
                                 .MinimumLevel.Information()
                                 .MinimumLevel.Override("UKHO", LogEventLevel.Debug)
                                 .CreateLogger(), dispose: true);
                 #endif
 
-                builder.AddConsole();
+                loggingBuilder.AddConsole();
+                loggingBuilder.AddDebug();
 
                 ////Add Application Insights if needed(if key exists in settings)
-                string instrumentationKey = ConfigurationBuilder["APPINSIGHTS_INSTRUMENTATIONKEY"];
+                string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
                 if (!string.IsNullOrEmpty(instrumentationKey))
                 {
-                    builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
+                    loggingBuilder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
                 }
 
-                EventHubLoggingConfiguration eventhubConfig = ConfigurationBuilder.GetSection("EventHubLoggingConfiguration").Get<EventHubLoggingConfiguration>();
+                EventHubLoggingConfiguration eventhubConfig = configuration.GetSection("EventHubLoggingConfiguration").Get<EventHubLoggingConfiguration>();
 
                 if (!string.IsNullOrWhiteSpace(eventhubConfig.ConnectionString))
                 {
-                    builder.AddEventHub(config =>
+                    loggingBuilder.AddEventHub(config =>
                     {
                         config.Environment = eventhubConfig.Environment;
                         config.DefaultMinimumLogLevel =
@@ -114,27 +131,17 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                         };
                     });
                 }
-            })
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.BuildServiceProvider();
-
-                services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
-                services.Configure<CleanUpConfig>(ConfigurationBuilder.GetSection("CleanUpConfig"));
-
-                services.AddTransient<ExchangeSetCleanUpJob>();
-                services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
-                services.AddScoped<IExchangeSetCleanUpService, ExchangeSetCleanUpService>();
-                services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
-                services.AddScoped<IAzureFileSystemHelper, AzureFileSystemHelper>();
-            })
-            .ConfigureWebJobs(b =>
-            {
-                b.AddAzureStorageCoreServices();
-                b.AddAzureStorage();
-                b.AddTimers();
             });
-            return hostBuilder;
+
+            serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
+            serviceCollection.Configure<CleanUpConfig>(configuration.GetSection("CleanUpConfig"));
+
+            serviceCollection.AddSingleton<IConfiguration>(configuration);
+            serviceCollection.AddTransient<ExchangeSetCleanUpJob>();
+            serviceCollection.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
+            serviceCollection.AddScoped<IExchangeSetCleanUpService, ExchangeSetCleanUpService>();
+            serviceCollection.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
+            serviceCollection.AddScoped<IAzureFileSystemHelper, AzureFileSystemHelper>();
         }
     }
 }

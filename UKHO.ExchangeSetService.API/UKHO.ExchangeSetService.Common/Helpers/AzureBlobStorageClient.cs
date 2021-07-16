@@ -38,16 +38,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             CloudBlobClient _blobClient = cloudStorageAccount.CreateCloudBlobClient();
             CloudBlobContainer _cloudBlobContainer = _blobClient.GetContainerReference(containerName);
             CloudBlockBlob _blockBlob = _cloudBlobContainer.GetBlockBlobReference(batchId);
-            bool checkBlobReference = await _blockBlob.ExistsAsync();
-            if (checkBlobReference)
-            {
-                await _blockBlob.DeleteIfExistsAsync();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return await _blockBlob.DeleteIfExistsAsync();
         }
     }
 }

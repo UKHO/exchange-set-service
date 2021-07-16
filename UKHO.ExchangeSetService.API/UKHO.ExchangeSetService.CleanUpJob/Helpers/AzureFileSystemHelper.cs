@@ -69,18 +69,13 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                             logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{dateFolder}.", dateFolder);
                         }
                     }
-                    else
-                    {
-                        logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{dateFolder}.", dateFolder);
-                    }
                 }
                 return deleteStatus;
             }
             catch (Exception ex)
             {
-                deleteStatus = false;
                 logger.LogError(EventIds.DeleteHistoricFoldersAndFilesException.ToEventId(), ex, "Exception while deleteing historic folders and files with error {Message}", ex.Message);
-                return deleteStatus;
+                return false;
             }
         }
     }

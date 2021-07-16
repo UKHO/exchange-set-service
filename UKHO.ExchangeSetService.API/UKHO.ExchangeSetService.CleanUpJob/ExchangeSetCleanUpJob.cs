@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             this.exchangeSetCleanUpService = exchangeSetCleanUpService;
             this.logger = logger;
         }
-        public async Task ProcessCleanUp([TimerTrigger("%ScheduleTimer%", RunOnStartup = true)] TimerInfo timerInfo)
+        public async Task ProcessCleanUp()
         {
             logger.LogInformation(EventIds.ESSCleanUpJobRequestStart.ToEventId(), "Exchange set service clean up web job started at " + DateTime.Now);
             
