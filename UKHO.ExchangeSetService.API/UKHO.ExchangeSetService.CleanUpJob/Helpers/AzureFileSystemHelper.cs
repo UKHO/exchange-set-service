@@ -24,23 +24,23 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
 
         public async Task<bool> DeleteDirectoryAsync(int numberOfDays, string storageAccountConnectionString, string containerName, string filePath)
         {
-            Boolean deleteStatus = false;
+            bool deteleFilesStatus = false;
             try
             {
                 var subFolder = Directory.GetDirectories(filePath);
+                var historicDateTimeInUtc = DateTime.UtcNow.AddDays(-numberOfDays);
+                DateTime historicDate = new DateTime(historicDateTimeInUtc.Year, historicDateTimeInUtc.Month, historicDateTimeInUtc.Day);
+
                 foreach (var subFolderName in subFolder)
                 {
-                    deleteStatus = true;
                     DateTime subFolderDateTime;
                     string dateFolder = new DirectoryInfo(subFolderName).Name;
                     bool isValidDate = DateTimeExtensions.IsValidDate(dateFolder, out subFolderDateTime);
-
+                    
                     if (isValidDate)
                     {
-                        var historicDateTimeInUtc = DateTime.UtcNow.AddDays(-numberOfDays);
                         DateTime subFolderDate = new DateTime(subFolderDateTime.Year, subFolderDateTime.Month, subFolderDateTime.Day);
-                        DateTime historicDate = new DateTime(historicDateTimeInUtc.Year, historicDateTimeInUtc.Month, historicDateTimeInUtc.Day);
-
+                        
                         if (subFolderDate <= historicDate)
                         {
                             DirectoryInfo di = new DirectoryInfo(subFolderName);
@@ -62,15 +62,17 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                             }
 
                             di.Delete(true);
+                            deteleFilesStatus = true;
                             logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{dateFolder}.", dateFolder);
-                        }
-                        else
-                        {
-                            logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{dateFolder}.", dateFolder);
                         }
                     }
                 }
-                return deleteStatus;
+
+                if (!deteleFilesStatus)
+                {
+                    logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{historicDate}.", historicDate);
+                }
+                return true;
             }
             catch (Exception ex)
             {
