@@ -64,6 +64,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public class SalesCatalogueAuthConfiguration
         {
+            public string ScsApiUrl { get; set; }
             public string MicrosoftOnlineLoginUrl { get; set; }
             public string TenantId { get; set; }
             public string AutoTestClientId { get; set; }
@@ -91,7 +92,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ExchangeSetProductType = ConfigurationRoot.GetSection("ExchangeSetProductType").Value;
             ExchangeSetCatalogueType = ConfigurationRoot.GetSection("ExchangeSetCatalogueType").Value;
             ExchangeSetEncRootFolder = ConfigurationRoot.GetSection("ExchangeSetEncRootFolder").Value;
-            ScsBaseAddress = ConfigurationRoot.GetSection("ScsApiUrl").Value;
             ExchangeSetCatalogueFile = ConfigurationRoot.GetSection("ExchangeSetCatalogueFile").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
             ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);          

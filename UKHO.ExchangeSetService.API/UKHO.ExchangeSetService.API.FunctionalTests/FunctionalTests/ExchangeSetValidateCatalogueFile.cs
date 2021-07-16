@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
-            ScsApiClient = new SalesCatalogueApiClient(Config.ScsBaseAddress);
+            ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
         }
 
