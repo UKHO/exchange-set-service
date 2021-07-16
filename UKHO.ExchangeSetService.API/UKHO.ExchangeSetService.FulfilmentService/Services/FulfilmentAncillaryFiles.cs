@@ -22,6 +22,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly ILogger<FulfilmentAncillaryFiles> logger;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly int crcLength = 8;
 
         public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
         {
@@ -204,7 +205,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private string GetCrcString(string fullFilePath)
         {
             var crcHash = Crc32CheckSumProvider.Instance.Compute(fileSystemHelper.ReadAllBytes(fullFilePath));
-            return crcHash.ToString("X");
+            return crcHash.ToString("X").PadLeft(crcLength, '0');
         }
 
         private string GetIssueAndUpdateDate(SalesCatalogueDataProductResponse salescatalogProduct)
