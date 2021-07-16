@@ -25,5 +25,6 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public string ProductName { get; set; }
         public decimal CellLimitSouthernmostLatitude { get; set; }
         public List<string> CancelledCellReplacements { get; set; }
+        public DateTime? IssueDatePreviousUpdate { get; set; }
     }
 }
