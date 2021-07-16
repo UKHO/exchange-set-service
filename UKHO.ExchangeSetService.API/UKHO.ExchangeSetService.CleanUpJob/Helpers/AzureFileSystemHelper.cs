@@ -30,6 +30,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                 var subFolder = Directory.GetDirectories(filePath);
                 foreach (var subFolderName in subFolder)
                 {
+                    deleteStatus = true;
                     DateTime subFolderDateTime;
                     string dateFolder = new DirectoryInfo(subFolderName).Name;
                     bool isValidDate = DateTimeExtensions.IsValidDate(dateFolder, out subFolderDateTime);
@@ -67,13 +68,17 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                         {
                             logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{dateFolder}.", dateFolder);
                         }
-                        deleteStatus = true;
+                    }
+                    else
+                    {
+                        logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{dateFolder}.", dateFolder);
                     }
                 }
                 return deleteStatus;
             }
             catch (Exception ex)
             {
+                deleteStatus = false;
                 logger.LogError(EventIds.DeleteHistoricFoldersAndFilesException.ToEventId(), ex, "Exception while deleteing historic folders and files with error {Message}", ex.Message);
                 return deleteStatus;
             }
