@@ -50,6 +50,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 await serviceProvider.GetService<ExchangeSetCleanUpJob>().ProcessCleanUp();
 
                 telemetryClient.TrackTrace("Completed exchange set clean up web job.");
+                telemetryClient.Flush();
             }
             catch (Exception ex)
             {
