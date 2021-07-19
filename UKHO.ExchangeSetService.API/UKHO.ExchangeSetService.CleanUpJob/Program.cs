@@ -93,12 +93,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob
 
         private static void ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
-            if (!string.IsNullOrEmpty(instrumentationKey))
-            {
-                serviceCollection.AddApplicationInsightsTelemetryWorkerService(instrumentationKey);
-            }
-
             //Add logging
             serviceCollection.AddLogging(loggingBuilder =>
             {
@@ -138,6 +132,12 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                     });
                 }
             });
+
+            string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
+            if (!string.IsNullOrEmpty(instrumentationKey))
+            {
+                serviceCollection.AddApplicationInsightsTelemetryWorkerService(instrumentationKey);
+            }
 
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             serviceCollection.Configure<CleanUpConfig>(configuration.GetSection("CleanUpConfig"));
