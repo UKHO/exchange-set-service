@@ -20,6 +20,7 @@ using System.Linq;
 using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Helpers;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
@@ -42,8 +43,13 @@ namespace UKHO.ExchangeSetService.CleanUpJob
 
                 //Create service provider. This will be used in logging.
                 var serviceProvider = serviceCollection.BuildServiceProvider();
+                var telemetryClient = serviceProvider.GetRequiredService<TelemetryClient>();
+
+                telemetryClient.TrackTrace("Start exchange set clean up web job.");
 
                 await serviceProvider.GetService<ExchangeSetCleanUpJob>().ProcessCleanUp();
+
+                telemetryClient.TrackTrace("Completed exchange set clean up web job.");
             }
             catch (Exception ex)
             {
@@ -86,6 +92,12 @@ namespace UKHO.ExchangeSetService.CleanUpJob
 
         private static void ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
         {
+            string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
+            if (!string.IsNullOrEmpty(instrumentationKey))
+            {
+                serviceCollection.AddApplicationInsightsTelemetryWorkerService(instrumentationKey);
+            }
+
             //Add logging
             serviceCollection.AddLogging(loggingBuilder =>
             {
@@ -101,13 +113,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob
 
                 loggingBuilder.AddConsole();
                 loggingBuilder.AddDebug();
-
-                ////Add Application Insights if needed(if key exists in settings)
-                string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
-                if (!string.IsNullOrEmpty(instrumentationKey))
-                {
-                    loggingBuilder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
-                }
 
                 EventHubLoggingConfiguration eventhubConfig = configuration.GetSection("EventHubLoggingConfiguration").Get<EventHubLoggingConfiguration>();
 
