@@ -30,7 +30,7 @@ steps:
     inputs:
       targetType: filePath
       filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_apim.ps1'
-      arguments: '-deploymentResourceGroupName ${{ parameters.tfstateStorageAccountRG }} -deploymentStorageAccountName ${{ parameters.tfstateStorageAccountName }} -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}'
+      arguments: '-deploymentResourceGroupName ${{ parameters.tfstateStorageAccountRG }} -deploymentStorageAccountName ${{ parameters.tfstateStorageAccountName }} -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}'
     env:
       ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
       ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
