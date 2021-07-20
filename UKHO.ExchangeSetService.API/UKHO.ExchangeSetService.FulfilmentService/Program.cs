@@ -152,6 +152,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IFileSystemHelper, FileSystemHelper>();
                  services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
                  services.AddScoped<IFulfilmentSalesCatalogueService, FulfilmentSalesCatalogueService>();
+                 services.AddSingleton<ISmallExchangeSetInstance, ExchangeSetInstance>();
+                 services.AddSingleton<IMediumExchangeSetInstance, ExchangeSetInstance>();
+                 services.AddSingleton<ILargeExchangeSetInstance, ExchangeSetInstance>();
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
              })

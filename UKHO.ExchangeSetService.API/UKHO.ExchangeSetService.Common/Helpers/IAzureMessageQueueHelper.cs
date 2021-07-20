@@ -5,6 +5,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IAzureMessageQueueHelper
     {
-        Task AddMessage(IEssFulfilmentStorageConfiguration essFulfilmentStorageConfiguration, double fileSizeInMB, string message);
+        Task AddMessage(IEssFulfilmentStorageConfiguration essFulfilmentStorageConfiguration, int instanceCount, string storageAccountConnectionString, string message);
     }
 }

@@ -21,6 +21,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public ILogger<AzureBlobStorageService> fakeLogger;
         public IAzureBlobStorageClient fakeAzureBlobStorageClient;
         public AzureBlobStorageService azureBlobStorageService;
+        private ISmallExchangeSetInstance fakeSmallExchangeSetInstance;
+        private IMediumExchangeSetInstance fakeMediumExchangeSetInstance;
+        private ILargeExchangeSetInstance fakeLargeExchangeSetInstance;
 
         [SetUp]
         public void Setup()
@@ -32,8 +35,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeAzureMessageQueueHelper = A.Fake<IAzureMessageQueueHelper>();
             fakeLogger = A.Fake<ILogger<AzureBlobStorageService>>();
             fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
+            fakeSmallExchangeSetInstance = A.Fake<ISmallExchangeSetInstance>();
+            fakeMediumExchangeSetInstance = A.Fake<IMediumExchangeSetInstance>();
+            fakeLargeExchangeSetInstance = A.Fake<ILargeExchangeSetInstance>();
 
-            azureBlobStorageService = new AzureBlobStorageService(fakeScsStorageService, fakeStorageConfig, fakeAzureMessageQueueHelper, fakeLogger, fakeAzureBlobStorageClient);
+            azureBlobStorageService = new AzureBlobStorageService(fakeScsStorageService, fakeStorageConfig, 
+                fakeAzureMessageQueueHelper, fakeLogger, fakeAzureBlobStorageClient, fakeSmallExchangeSetInstance, 
+                fakeMediumExchangeSetInstance, fakeLargeExchangeSetInstance);
         }
 
         private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
@@ -77,7 +85,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
             CancellationToken cancellationToken = CancellationToken.None;
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
 
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
@@ -94,7 +102,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
         
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
@@ -108,7 +116,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
 
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlobByUri(A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 

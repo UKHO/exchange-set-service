@@ -3,7 +3,7 @@
     public interface IMediumExchangeSetInstance
     {
         int GetCurrentInstaceCount();
-        int GetInstanceCount();
+        int GetInstanceCount(int maxInstanceCount);
         void ResetInstanceCount();
     }
 }

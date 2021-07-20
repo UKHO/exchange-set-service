@@ -3,7 +3,7 @@
     public interface ILargeExchangeSetInstance
     {
         int GetCurrentInstaceCount();
-        int GetInstanceCount();
+        int GetInstanceCount(int maxInstanceCount);
         void ResetInstanceCount();
     }
 }
