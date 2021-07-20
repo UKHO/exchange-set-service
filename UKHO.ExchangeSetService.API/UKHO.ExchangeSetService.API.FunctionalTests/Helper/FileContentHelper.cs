@@ -61,15 +61,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(contentFirstLine[9].Contains(scsResponse[0].cellLimitEasternmostLatitude.ToString()));
             //verfying last product details
             Assert.True(contentLastLine[0].Contains(scsResponse[scsResponseLength - 1].productName.ToString()));
-            Assert.True(contentFirstLine[1].Contains(scsResponse[scsResponseLength - 1].baseCellIssueDate.ToString("yyyyMMdd")));
-            Assert.True(contentFirstLine[2].Equals(scsResponse[scsResponseLength - 1].baseCellEditionNumber.ToString()));
-            Assert.True(contentFirstLine[3].Contains(scsResponse[scsResponseLength - 1].issueDateLatestUpdate.ToString("yyyyMMdd")));
-            Assert.True(contentFirstLine[4].Equals(scsResponse[scsResponseLength - 1].latestUpdateNumber.ToString()));
-            Assert.True(contentFirstLine[5].Equals(scsResponse[scsResponseLength - 1].fileSize.ToString()));
-            Assert.True(contentFirstLine[6].Contains(scsResponse[scsResponseLength - 1].cellLimitSouthernmostLatitude.ToString()));
-            Assert.True(contentFirstLine[7].Contains(scsResponse[scsResponseLength - 1].cellLimitWesternmostLatitude.ToString()));
-            Assert.True(contentFirstLine[8].Contains(scsResponse[scsResponseLength - 1].cellLimitNorthernmostLatitude.ToString()));
-            Assert.True(contentFirstLine[9].Contains(scsResponse[scsResponseLength - 1].cellLimitEasternmostLatitude.ToString()));
+            Assert.True(contentLastLine[1].Contains(scsResponse[scsResponseLength - 1].baseCellIssueDate.ToString("yyyyMMdd")));
+            Assert.True(contentLastLine[2].Equals(scsResponse[scsResponseLength - 1].baseCellEditionNumber.ToString()));
+            Assert.True(contentLastLine[3].Contains(scsResponse[scsResponseLength - 1].issueDateLatestUpdate.ToString("yyyyMMdd")));
+            Assert.True(contentLastLine[4].Equals(scsResponse[scsResponseLength - 1].latestUpdateNumber.ToString()));
+            Assert.True(contentLastLine[5].Equals(scsResponse[scsResponseLength - 1].fileSize.ToString()));
+            Assert.True(contentLastLine[6].Contains(scsResponse[scsResponseLength - 1].cellLimitSouthernmostLatitude.ToString()));
+            Assert.True(contentLastLine[7].Contains(scsResponse[scsResponseLength - 1].cellLimitWesternmostLatitude.ToString()));
+            Assert.True(contentLastLine[8].Contains(scsResponse[scsResponseLength - 1].cellLimitNorthernmostLatitude.ToString()));
+            Assert.True(contentLastLine[9].Contains(scsResponse[scsResponseLength - 1].cellLimitEasternmostLatitude.ToString()));
         }
 
         public static void CheckReadMeTxtFileContent(string inputfile)
@@ -196,7 +196,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static void CheckCatalogueFileContent(string inputfile, ScsProductResponseModel scsResponse, string ScsJwtToken)
+        public static void CheckCatalogueFileContent(string inputfile, ScsProductResponseModel scsResponse)
         {
             List<string> scsCatalogueFilesPath = new List<string>();
             string catalogueFileContent = File.ReadAllText(inputfile);
@@ -210,13 +210,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 string countryCode = productName.Substring(0, 2);
 
                 //Get folder path
-                string editionFolderPath = Path.Combine(inputfile, countryCode, productName, editionNumber);
+                string editionFolderPath = Path.Combine(Path.GetDirectoryName(inputfile), countryCode, productName, editionNumber);
 
                 foreach (var updateNumber in item.UpdateNumbers)
                 {
-                    if (editionFolderPath != null && editionFolderPath !="")
+                    if (Directory.Exists(Path.Combine(editionFolderPath, updateNumber.ToString())))
                     {
-                        scsCatalogueFilesPath.Add(productName + "/" + editionNumber + "/" + (updateNumber.ToString()));
+                        scsCatalogueFilesPath.Add(Path.Combine(productName, editionNumber,updateNumber.ToString()));
                     }
                 }
             }

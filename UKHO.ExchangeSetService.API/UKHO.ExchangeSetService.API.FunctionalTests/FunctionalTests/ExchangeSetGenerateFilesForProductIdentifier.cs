@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifierData(), ScsJwtToken);
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+            FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
 
         }
 

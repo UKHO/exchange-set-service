@@ -34,7 +34,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ProductVersiondata = new List<ProductVersionModel>();
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 20, 5)); ////Invalid Edition Number
+            ////Invalid Edition Number
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 20, 5)); 
             DownloadedFolderPath = await ValidateGeneratedFile();
         }
 
@@ -48,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
-            Assert.AreEqual("Commited", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
 
             var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
 

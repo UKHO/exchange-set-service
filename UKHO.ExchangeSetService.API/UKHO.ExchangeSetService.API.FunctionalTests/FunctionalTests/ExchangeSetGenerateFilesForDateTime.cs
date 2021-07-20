@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
-            Assert.AreEqual("Commited", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
 
             var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
 

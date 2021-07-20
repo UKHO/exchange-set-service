@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ProductVersiondata = new List<ProductVersionModel>();
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 5));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
             DownloadedFolderPath = await ValidateGeneratedFile();
         }
 
@@ -96,7 +96,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+            FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
 
         }
 

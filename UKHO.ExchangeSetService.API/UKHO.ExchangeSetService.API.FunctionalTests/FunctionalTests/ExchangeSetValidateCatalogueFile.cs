@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetOnlyProductIdentifierData(), ScsJwtToken);
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            FileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+            FileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
 
         }
 
@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            FileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+            FileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
 
         }
         public async Task WhenICallExchangeSetApiWithInValidEditionNumber_ThenACatalogueFileIsGenerated()
