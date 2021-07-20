@@ -3,7 +3,7 @@ Param(
     [Parameter(mandatory=$true)][string]$waitTimeInMinute
 )
 
-$sleepTimeInSecond = 20
+$sleepTimeInSecond = 15
 $isServiceActive = 'false'
 
 $stopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
@@ -12,28 +12,28 @@ $stopWatch.Start()
 
 do
 {
-    Write-Host "Polling url: $healthEndPointUrl..."
+    Write-Host "Polling url: $healthEndPointUrl ..."
     try{
         Start-Sleep -Seconds $sleepTimeInSecond
         $HttpRequest  = [System.Net.WebRequest]::Create("$healthEndPointUrl")
         $HttpResponse = $HttpRequest.GetResponse() 
         $HttpStatus   = $HttpResponse.StatusCode
-        Write-Host "Status code of web is $HttpStatus..."
+        Write-Host "Status code of web is $HttpStatus ..."
     
         If ($HttpStatus -eq 200 ) {
-            Write-Host "Service is up. Stopping Polling..."
+            Write-Host "Service is up. Stopping Polling ..."
             $isServiceActive = 'true'
             break
         }
         Else {
-            Write-Host "Service not yet Up. Status code: $HttpStatus..."
+            Write-Host "Service not yet Up. Status code: $HttpStatus ..."
             Start-Sleep -Seconds $sleepTimeInSecond
         }
     }
     catch [System.Net.WebException]
     {
-        $HttpStatus = $_.Exception.Response.StatusCode.Value__
-        Write-Host "Service not yet Up. Status code: $HttpStatus..."
+        $HttpStatus = $_.Exception.Response.StatusCode
+        Write-Host "Service not yet Up.Status: $HttpStatus ..."
         Start-Sleep -Seconds $sleepTimeInSecond
     }
     
@@ -47,9 +47,9 @@ If ($HttpResponse -ne $null) {
 }
 
 if ($isServiceActive -eq 'true' ) {
-    Write-Host "Service is up returnig from script..."
+    Write-Host "Service is up returnig from script ..."
 }
 Else { 
-    Write-Error "Service was not up in $waitTimeInMinute, error while deployment..."
+    Write-Error "Service was not up in $waitTimeInMinute, error while deployment ..."
     throw "Error"
 }
