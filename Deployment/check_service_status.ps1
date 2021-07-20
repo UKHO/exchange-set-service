@@ -47,7 +47,7 @@ If ($HttpResponse -ne $null) {
 }
 
 if ($isServiceActive -eq 'true' ) {
-    Write-Host "Service is up returnig from script ..."
+    Write-Host "Service is up returning from script ..."
 }
 Else { 
     Write-Error "Service was not up in $waitTimeInMinute, error while deployment ..."
