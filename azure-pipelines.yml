@@ -241,7 +241,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - template: Deployment/templates/continous-deployment.yml
+                - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
@@ -322,7 +322,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - template: Deployment/templates/continous-deployment.yml
+                - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
