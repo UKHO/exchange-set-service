@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string DownloadedFolderPath { get; set; }
         private List<ProductVersionModel> ProductVersiondata { get; set; }
 
-        [SetUp]
+        [OneTimeSetUp]
         public async Task SetupAsync()
         {
             Config = new TestConfiguration();
@@ -77,8 +77,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public void WhenICallExchangeSetApiWithAValidProductVersion_ThenAReadMeTxtFileIsGenerated()
         {
-            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
             //Verify README.TXT file content
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
@@ -138,7 +138,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public void GlobalTeardown()
         {
             //Clean up downloaded files/folders   
-            FileContentHelper.DeleteDirectory(DownloadedFolderPath);
+            FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
         }
 
     }

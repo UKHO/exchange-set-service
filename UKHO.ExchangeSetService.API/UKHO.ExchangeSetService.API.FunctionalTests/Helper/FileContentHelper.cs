@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string dateAndCdType = fileContent[3];
             string formatVersionAndExchangeSetNumber = fileContent[7];
 
-            int weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            int weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday);
             string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
@@ -256,24 +256,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             if (Directory.Exists(path))
             {
-                //Delete all files from the Directory
-                if (File.Exists(fileName))
-                {
-                    File.Delete(Path.Combine(path, fileName));
-                }
                 string folder = Path.GetFileName(Path.Combine(path, fileName));
                 if (folder.Contains(".zip"))
                 {
                     folder = folder.Replace(".zip", "");
                 }
-                //Delete all child Directories
-                foreach (string directory in Directory.GetDirectories(folder))
+
+                //Delete a Directory and sub directories
+                Directory.Delete(Path.Combine(path, folder),true);
+
+                //Delete all files from the Directory
+                if (File.Exists(Path.Combine(path, fileName)))
                 {
-                    DeleteDirectory(directory);
-                }
-                
-                //Delete a Directory
-                Directory.Delete(Path.Combine(path, fileName));
+                    File.Delete(Path.Combine(path, fileName));
+                }              
+
+               
             }
 
         }
