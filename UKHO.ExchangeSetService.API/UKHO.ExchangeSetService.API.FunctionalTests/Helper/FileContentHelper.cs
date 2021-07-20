@@ -249,6 +249,35 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
         }
+
+        public static void DeleteDirectory(string fileName)
+        {
+            string path = Path.GetTempPath();
+
+            if (Directory.Exists(path))
+            {
+                //Delete all files from the Directory
+                if (File.Exists(fileName))
+                {
+                    File.Delete(Path.Combine(path, fileName));
+                }
+                string folder = Path.GetFileName(Path.Combine(path, fileName));
+                if (folder.Contains(".zip"))
+                {
+                    folder = folder.Replace(".zip", "");
+                }
+                //Delete all child Directories
+                foreach (string directory in Directory.GetDirectories(folder))
+                {
+                    DeleteDirectory(directory);
+                }
+                
+                //Delete a Directory
+                Directory.Delete(Path.Combine(path, fileName));
+            }
+
+        }
+
     }
- }
+}
 

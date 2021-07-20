@@ -8,7 +8,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
-    class ExchangeSetValidateProductIdentifier
+    class ExchangeSetGenerateFilesForInValidProductVersion
     {
         private string EssJwtToken { get; set; }
         private string FssJwtToken { get; set; }
@@ -16,17 +16,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
-        public ProductIdentifierModel ProductIdentifierModel { get; set; }
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
         private string DownloadedFolderPath { get; set; }
+        private List<ProductVersionModel> ProductVersiondata { get; set; }
 
         [SetUp]
         public async Task SetupAsync()
         {
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
-            ProductIdentifierModel = new ProductIdentifierModel();
             FssApiClient = new FssApiClient();
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();
@@ -34,12 +33,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
+            ProductVersiondata = new List<ProductVersionModel>();
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 20, 5)); ////Invalid Edition Number
             DownloadedFolderPath = await ValidateGeneratedFile();
         }
 
         public async Task<string> ValidateGeneratedFile()
         {
-            var apiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE416080", "GB416080" }, accessToken: EssJwtToken);
+            var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -60,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallExchangeSetApiWithAValidProductIdentifiers_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
@@ -71,11 +72,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
             FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData, ScsJwtToken);
-
         }
 
         [Test]
-        public void WhenICallExchangeSetApiWithValidProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallExchangeSetApiWithAnInvalidProductVersion_ThenAReadMeTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
@@ -85,21 +85,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallExchangeSetApiWithAValidProductIdentifiers_ThenACatalogueFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithAnInValidProductVersion_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
-           
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+
             //Verify Catalog file content
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, new List<string>() { "DE416080", "GB416080" }, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
-
+            FileContentHelper.CheckCatalogueFileNoContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
         }
 
         [Test]
-        public void WhenICallExchangeSetApiWithAValidProductIdentifiers_ThenASerialEncFileIsGenerated()
+        public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenASerialEncFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
@@ -110,37 +109,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallExchangeSetApiWithAvalidValidMultipleProductIdentifiers_ThenEncFilesAreDownloadedd()
+        public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenNoEncFilesAreDownloaded()
         {
-            //Get the product details form sales catalogue service
+            //Verify No folder available for the product             
+            FileContentHelper.CheckNoEncFilesDownloadedAsync(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), ProductVersiondata[0].ProductName);
 
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, new List<string> { "DE416080", "GB416080" }, ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
-
-            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
-
-            foreach (var product in apiScsResponseData.Products)
-            {
-                string productName = product.ProductName;
-                int editionNumber = product.EditionNumber;
-
-                //Enc file downloaded verification
-                foreach (var updateNumber in product.UpdateNumbers)
-                {
-                    await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
-
-                }
-
-            }
         }
 
-        [Test]
-        public void WhenICallExchangeSetApiWithAnInvalidProductIdentifier_ThenNoEncFileDownloaded()
-        {
-            //Verify No folder available for the ENC             
-            FileContentHelper.CheckNoEncFilesDownloadedAsync(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), "GB416080");
-        }
 
+        [OneTimeTearDown]
+        public void GlobalTeardown()
+        {
+            //Clean up downloaded files/folders   
+            FileContentHelper.DeleteDirectory(DownloadedFolderPath);
+        }
 
     }
 }

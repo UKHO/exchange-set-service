@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static async Task<string> ExtractDownloadedFolder(string downloadFileUrl, string jwtToken)
         {
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.ExchangeSetFileName);
-            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, jwtToken);
+            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
             Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode}, instead of the expected 200.");
 
             Stream stream = await response.Content.ReadAsStreamAsync();
