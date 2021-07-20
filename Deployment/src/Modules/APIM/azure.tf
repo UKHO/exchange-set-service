@@ -9,7 +9,7 @@ terraform {
   required_version = "=0.14.9"
   backend "azurerm" {
     container_name = "tfstate"
-    key            = "terraform.apim.tfplan"
+    key            = "terraform.ess.apim.deployment.tfplan"
   }
 }
 
