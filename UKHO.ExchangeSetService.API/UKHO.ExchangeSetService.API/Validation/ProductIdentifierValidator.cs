@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.Validation
             RuleFor(p => p.ProductIdentifier)
                .Must(pi => pi != null && pi.All(u => !string.IsNullOrWhiteSpace(u)))
                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-               .WithMessage("Product Identifiers cannot be null or empty.");           
+               .WithMessage("productIdentifiers cannot be null or empty.");           
 
             RuleFor(x => x.CallbackUri)               
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))                

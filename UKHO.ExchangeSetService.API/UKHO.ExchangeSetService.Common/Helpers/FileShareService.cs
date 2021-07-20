@@ -228,7 +228,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var fileName = item.Split("/").Last();
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    CheckCreateFolderPath(downloadPath);
+                    fileSystemHelper.CheckAndCreateFolder(downloadPath);
                     string path = Path.Combine(downloadPath, fileName);
                     if (!File.Exists(path))
                     {
@@ -244,14 +244,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return result;
         }
 
-        private static async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
+        private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
         {
             using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
             {
-                using (FileStream outputFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
-                {
-                    stream.CopyTo(outputFileStream);
-                }
+                fileSystemHelper.CreateFileCopy(path, stream);
             }
         }
 
@@ -261,26 +258,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
             string filePath = Path.Combine(exchangeSetRootPath, fileName);
-            CheckCreateFolderPath(exchangeSetRootPath);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ssZ"));
-            string secondLineText = string.Empty;
             HttpResponseMessage httpReadMeFileResponse;
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, correlationId);
             if (httpReadMeFileResponse.IsSuccessStatusCode)
             {
                 using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
                 {
-                    using (var outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
-                    {
-                        stream.CopyTo(outputFileStream);
-                    }
-                    using StreamReader reader = new StreamReader(stream);
-                    secondLineText = GetLine(filePath);
+                    return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
                 }
-                string text = File.ReadAllText(filePath);
-                text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
-                File.WriteAllText(filePath, text);
-                return true;
             }
             else
             {
@@ -382,8 +369,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     AccessToken = accessToken,
                     BatchId = batchId
-                };              
-                batchStatus = await GetBatchStatus(batchStatusMetaData, correlationId);               
+                };
+                batchStatus = await GetBatchStatus(batchStatusMetaData, correlationId);
             }
             return batchStatus;
         }
@@ -399,19 +386,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 BlockIds = blockIdList
             };
             return await WriteBlockFile(writeBlocksToFileMetaData, correlationId);
-        }
-
-        private static string GetLine(string filePath)
-        {
-            int lineFound = 2;
-            string secondLine = string.Empty;
-            using (var sr = new StreamReader(filePath))
-            {
-                for (int i = 1; i < lineFound; i++)
-                    sr.ReadLine();
-                secondLine = sr.ReadLine();
-            }
-            return secondLine ?? string.Empty;
         }
 
         public async Task<bool> CreateFile(FileCreateMetaData fileCreateMetaData, string accessToken, string correlationId)
@@ -546,28 +520,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<string> GetBatchStatus(BatchStatusMetaData batchStatusMetaData, string correlationId)
         {
             logger.LogInformation(EventIds.GetBatchStatusStart.ToEventId(), "Getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
-            ResponseBatchStatusModel responseBatchStatusModel = new ResponseBatchStatusModel();
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
             if (httpResponse.IsSuccessStatusCode)
             {
                 string bodyJson = await httpResponse.Content.ReadAsStringAsync();
-                responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
+                ResponseBatchStatusModel responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
                 logger.LogInformation(EventIds.GetBatchStatusCompleted.ToEventId(), "Getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
                 return responseBatchStatusModel.Status;
             }
             else
             {
                 logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error while getting batch status for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchStatusMetaData.BatchId, correlationId);
-                return responseBatchStatusModel.Status;
-            }
-        }
-
-        private static void CheckCreateFolderPath(string downloadPath)
-        {
-            if (!Directory.Exists(downloadPath))
-            {
-                Directory.CreateDirectory(downloadPath);
+                return BatchStatus.Failed.ToString();
             }
         }
     }
