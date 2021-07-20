@@ -15,6 +15,7 @@
         public string LargeExchangeSetAccountKey { get; set; }
         public int LargeExchangeSetInstance { get; set; }
         public string QueueName { get; set; }
+        public string DynamicQueueName { get; set; }
         public double LargeExchangeSetSizeInMB { get; set; }
         public double SmallExchangeSetSizeInMB { get; set; }
     }

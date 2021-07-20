@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob);
             var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
-            await azureMessageQueueHelper.AddMessage(storageConfig.Value, instanceCount, storageAccountConnectionString, scsResponseQueueMessageJSON);
+            await azureMessageQueueHelper.AddMessage(batchId, instanceCount, storageAccountConnectionString, scsResponseQueueMessageJSON, correlationId);
         }
 
         public async Task UploadSalesCatalogueServiceResponseToBlobAsync(CloudBlockBlob cloudBlockBlob , SalesCatalogueProductResponse salesCatalogueResponse)
