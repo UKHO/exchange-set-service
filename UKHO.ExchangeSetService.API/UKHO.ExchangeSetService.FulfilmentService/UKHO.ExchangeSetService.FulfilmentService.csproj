@@ -44,19 +44,13 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="System.IO.Abstractions" Version="2.1.0.256" />
 		<PackageReference Include="System.Net.Security" Version="4.3.2" />
 		<PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
 		<PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" />
 		<PackageReference Include="UKHO.Logging.EventHubLogProvider" Version="1.20077.2" />
-    <PackageReference Include="UKHO.Torus.Core" Version="1.6.0.2">
-      <NoWarn>NU1701</NoWarn>
-    </PackageReference>
-    <PackageReference Include="UKHO.Torus.Enc.Core" Version="1.6.0.8">
-      <NoWarn>NU1701</NoWarn>
-    </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="2.0.0.116">
-      <NoWarn>NU1701</NoWarn>
-    </PackageReference>
+		<PackageReference Include="UKHO.Torus.Core" Version="2.0.0" />
+		<PackageReference Include="UKHO.Torus.Enc.Core" Version="2.0.0" />
     </ItemGroup>
 
 	<ItemGroup>
