@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
 
                             //BoundingRectangle and Comment only required for BIN
-                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
+                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
