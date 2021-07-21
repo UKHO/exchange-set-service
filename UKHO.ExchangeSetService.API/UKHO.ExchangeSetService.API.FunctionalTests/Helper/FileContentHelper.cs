@@ -38,9 +38,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static void CheckProductFileContent(string inputfile, dynamic scsResponse, string ScsJwtToken)
         {
+            string[] contentFirstLine = null;
             string[] fileContent = File.ReadAllLines(inputfile);
             int lastIndex = fileContent.Length - 2;
-            string[] contentFirstLine = fileContent[4].Split(',');
+
+            if(fileContent[4] == "")
+            {
+                contentFirstLine = fileContent[5].Split(',');
+            }
+            else
+            {
+                contentFirstLine = fileContent[4].Split(',');
+            }
             string[] contentLastLine = fileContent[lastIndex].Split(',');
             int scsResponseLength = scsResponse.Count;
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
@@ -228,26 +237,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
            
         }
 
-        public static void CheckCatalogueFileNoContent(string inputfile, ScsProductResponseModel scsResponse, string ScsJwtToken)
+        public static void CheckCatalogueFileNoContent(string inputfile, List<ProductVersionModel> ProductVersiondata)
         {
-            List<string> scsCatalogueFilesPath = new List<string>();
             string catalogueFileContent = File.ReadAllText(inputfile);
-
-            foreach (var item in scsResponse.Products)
+            foreach (var product in ProductVersiondata)
             {
-                string productName = item.ProductName;
-                string editionNumber = item.EditionNumber.ToString();
-                foreach (var updateNumber in item.UpdateNumbers)
-                {
-                    scsCatalogueFilesPath.Add(productName + "/" + editionNumber + "/" + (updateNumber.ToString()));
-                }
+                Assert.False(catalogueFileContent.Contains(product.ProductName));
             }
-
-            foreach (var cataloguefilePath in scsCatalogueFilesPath)
-            {
-                Assert.False(catalogueFileContent.Contains(cataloguefilePath));
-            }
-
         }
 
         public static void DeleteDirectory(string fileName)

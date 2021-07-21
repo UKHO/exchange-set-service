@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         public async Task<string> ValidateGeneratedFile()
         {
-            var apiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssJwtToken);
+            var apiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
            
             //Verify Catalog file content
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifierData(), ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
             FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreDownloadedd()
         {
             //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifierData(), ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();

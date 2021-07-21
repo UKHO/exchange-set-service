@@ -33,8 +33,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
-            ProductVersiondata = new List<ProductVersionModel>();
-            ////Invalid Edition Number
+            ProductVersiondata = new List<ProductVersionModel>();////Invalid Edition Number
             ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 20, 5)); 
             DownloadedFolderPath = await ValidateGeneratedFile();
         }
@@ -93,9 +92,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Verify Catalog file content
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
-            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            FileContentHelper.CheckCatalogueFileNoContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData, ScsJwtToken);
+            if ((int)apiScsResponse.StatusCode == 304)
+            {
+                FileContentHelper.CheckCatalogueFileNoContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), ProductVersiondata);
+            }
         }
 
         [Test]
