@@ -35,6 +35,8 @@ namespace UKHO.ExchangeSetService.CleanUpJob
         {
             try
             {
+                var delayTime = 5000;
+
                 //Build configuration
                 var configuration = BuildConfiguration();
 
@@ -54,7 +56,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 {
                     //Ensure all buffered app insights logs are flushed into Azure
                     aiChannel.Flush();
-                    await Task.Delay(5000);
+                    await Task.Delay(delayTime);
                 }
             }
             catch (Exception ex)
