@@ -20,7 +20,8 @@ using System.Linq;
 using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Helpers;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Channel;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
@@ -28,6 +29,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
     public static class Program
     {
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+        static InMemoryChannel aiChannel = new InMemoryChannel();
 
         static async Task Main()
         {
@@ -43,14 +45,17 @@ namespace UKHO.ExchangeSetService.CleanUpJob
 
                 //Create service provider. This will be used in logging.
                 var serviceProvider = serviceCollection.BuildServiceProvider();
-                var telemetryClient = serviceProvider.GetRequiredService<TelemetryClient>();
 
-                telemetryClient.TrackTrace("Start exchange set clean up web job.");
-
-                await serviceProvider.GetService<ExchangeSetCleanUpJob>().ProcessCleanUp();
-
-                telemetryClient.TrackTrace("Completed exchange set clean up web job.");
-                telemetryClient.Flush();
+                try
+                {
+                    await serviceProvider.GetService<ExchangeSetCleanUpJob>().ProcessCleanUp();
+                }
+                finally
+                {
+                    //Ensure all buffered app insights logs are flushed into Azure
+                    aiChannel.Flush();
+                    await Task.Delay(5000);
+                }
             }
             catch (Exception ex)
             {
@@ -98,8 +103,8 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             {
                 loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
 
-                #if DEBUG
-                loggingBuilder.AddSerilog(new LoggerConfiguration()
+#if DEBUG
+            loggingBuilder.AddSerilog(new LoggerConfiguration()
                                 .WriteTo.File("Logs/UKHO.ExchangeSetService.CleanUpLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
                                 .MinimumLevel.Information()
                                 .MinimumLevel.Override("UKHO", LogEventLevel.Debug)
@@ -132,8 +137,14 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                     });
                 }
             });
+            
             Console.WriteLine("APPINSIGHTS_INSTRUMENTATIONKEY start");
-
+            serviceCollection.Configure<TelemetryConfiguration>(
+                (config) =>
+                {
+                    config.TelemetryChannel = aiChannel;
+                }
+            );
             string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
             if (!string.IsNullOrEmpty(instrumentationKey))
             {
