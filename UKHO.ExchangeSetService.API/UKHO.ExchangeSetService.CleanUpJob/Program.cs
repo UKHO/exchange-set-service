@@ -138,7 +138,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 }
             });
             
-            Console.WriteLine("APPINSIGHTS_INSTRUMENTATIONKEY start");
             serviceCollection.Configure<TelemetryConfiguration>(
                 (config) =>
                 {
@@ -149,10 +148,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             if (!string.IsNullOrEmpty(instrumentationKey))
             {
                 serviceCollection.AddApplicationInsightsTelemetryWorkerService(instrumentationKey);
-                Console.WriteLine("APPINSIGHTS_INSTRUMENTATION KEY is " + instrumentationKey);
             }
-
-            Console.WriteLine("APPINSIGHTS_INSTRUMENTATIONKEY end");
 
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             serviceCollection.Configure<CleanUpConfig>(configuration.GetSection("CleanUpConfig"));
