@@ -13,9 +13,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     {
         private static FssApiClient FssApiClient = new FssApiClient();
 
-        public static void CheckSerialEncFileContent(string inputfile)
+        public static void CheckSerialEncFileContent(string inputFile)
         {
-            string[] lines = File.ReadAllLines(inputfile);
+            string[] lines = File.ReadAllLines(inputFile);
 
             //Store file content
             string[] fileContent = lines[0].Split(" ");
@@ -36,10 +36,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static void CheckProductFileContent(string inputfile, dynamic scsResponse, string ScsJwtToken)
+        public static void CheckProductFileContent(string inputFile, dynamic scsResponse)
         {
             string[] contentFirstLine = null;
-            string[] fileContent = File.ReadAllLines(inputfile);
+            string[] fileContent = File.ReadAllLines(inputFile);
             int lastIndex = fileContent.Length - 2;
 
             if(fileContent[4] == "")
@@ -81,10 +81,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(contentLastLine[9].Contains(scsResponse[scsResponseLength - 1].cellLimitEasternmostLatitude.ToString()));
         }
 
-        public static void CheckReadMeTxtFileContent(string inputfile)
+        public static void CheckReadMeTxtFileContent(string inputFile)
         {
 
-            string[] lines = File.ReadAllLines(inputfile);
+            string[] lines = File.ReadAllLines(inputFile);
             var fileSecondLineContent = lines[1];
 
             string[] fileContents = fileSecondLineContent.Split("File date:");
@@ -97,27 +97,27 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
         }
 
-        public static async Task CheckDownloadedEncFilesAsync(string fssbaseurl, string folderpath, string productname, int? editionnumber, string accesstoken)
+        public static async Task CheckDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, string accessToken)
         {
 
             //Get Countrycode
-            string countryCode = productname.Substring(0, 2);
+            string countryCode = productName.Substring(0, 2);
 
             //Get folder path
-            string editionFolderPath = Path.Combine(folderpath, countryCode, productname, editionnumber.ToString());
+            string editionFolderPath = Path.Combine(folderPath, countryCode, productName, editionNumber.ToString());
 
             //Get list of directories
             List<string> listUpdateNumberPath = GetDirectories(editionFolderPath, "*");
 
             for (int counter = 0; counter < listUpdateNumberPath.Count; counter++)
             {
-                string updatenumber = new DirectoryInfo(listUpdateNumberPath[counter]).Name;
+                string updateNumber = new DirectoryInfo(listUpdateNumberPath[counter]).Name;
                 int totalFileCount = FileCountInDirectories(listUpdateNumberPath[counter]);
                 string[] fileNames = Directory.GetFiles(listUpdateNumberPath[counter]).Select(file => Path.GetFileName(file)).ToArray();
 
-                var searchQueryString = CreateFssSearchQuery(productname, editionnumber.ToString(), updatenumber);
+                var searchQueryString = CreateFssSearchQuery(productName, editionNumber.ToString(), updateNumber);
 
-                var apiResponse = await FssApiClient.SearchBatchesAsync(fssbaseurl, searchQueryString, 100, 0, accesstoken);
+                var apiResponse = await FssApiClient.SearchBatchesAsync(fssBaseUrl, searchQueryString, 100, 0, accessToken);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
                 //Batch Search response
@@ -126,39 +126,39 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
 
-                foreach (var filenanme in fileNames)
+                foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(filenanme)));
+                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)));
                 }
 
             }
         }
 
-        public static void CheckNoEncFilesDownloadedAsync(string folderpath, string productname)
+        public static void CheckNoEncFilesDownloadedAsync(string folderPath, string productName)
         {
             //Get Countrycode
-            string countryCode = productname.Substring(0, 2);
+            string countryCode = productName.Substring(0, 2);
 
             //Get list of directories
-            List<string> listUpdateNumberPath = GetDirectories(folderpath, countryCode);
+            List<string> listUpdateNumberPath = GetDirectories(folderPath, countryCode);
             int folderCount = listUpdateNumberPath.Count;
             
             Assert.AreEqual(0, folderCount, $"Downloaded Enc folder count {folderCount}, Instead of expected count 0");
 
         }
 
-        public static async Task GetDownloadedEncFilesAsync(string fssbaseurl, string folderpath, string productname, int? editionnumber, int? updatenumber, string accesstoken)
+        public static async Task GetDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, int? updateNumber, string accessToken)
         {
             int totalFileCount = 0;
             //Get Countrycode
-            string countryCode = productname.Substring(0, 2);
+            string countryCode = productName.Substring(0, 2);
 
             //Get folder path
-            string downloadedEncFolderPath = Path.Combine(folderpath, countryCode, productname, editionnumber.ToString(),updatenumber.ToString());
+            string downloadedEncFolderPath = Path.Combine(folderPath, countryCode, productName, editionNumber.ToString(),updateNumber.ToString());
 
-            var searchQueryString = CreateFssSearchQuery(productname, editionnumber.ToString(), updatenumber.ToString());
+            var searchQueryString = CreateFssSearchQuery(productName, editionNumber.ToString(), updateNumber.ToString());
 
-            var apiResponse = await FssApiClient.SearchBatchesAsync(fssbaseurl, searchQueryString, 100, 0, accesstoken);
+            var apiResponse = await FssApiClient.SearchBatchesAsync(fssBaseUrl, searchQueryString, 100, 0, accessToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             var responseSearchDetails = await apiResponse.ReadAsTypeAsync<ResponseBatchSearchModel>();
@@ -171,9 +171,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 int fssFileCount = responseSearchDetails.Entries[0].Files.Count;
                 Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
 
-                foreach (var filenanme in fileNames)
+                foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(filenanme)));
+                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)));
                 }
 
             }
@@ -205,10 +205,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static void CheckCatalogueFileContent(string inputfile, ScsProductResponseModel scsResponse)
+        public static void CheckCatalogueFileContent(string inputFile, ScsProductResponseModel scsResponse)
         {
             List<string> scsCatalogueFilesPath = new List<string>();
-            string catalogueFileContent = File.ReadAllText(inputfile);
+            string catalogueFileContent = File.ReadAllText(inputFile);
           
 
             foreach (var item in scsResponse.Products)
@@ -219,7 +219,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 string countryCode = productName.Substring(0, 2);
 
                 //Get folder path
-                string editionFolderPath = Path.Combine(Path.GetDirectoryName(inputfile), countryCode, productName, editionNumber);
+                string editionFolderPath = Path.Combine(Path.GetDirectoryName(inputFile), countryCode, productName, editionNumber);
 
                 foreach (var updateNumber in item.UpdateNumbers)
                 {
@@ -230,17 +230,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 }
             }
 
-            foreach(var cataloguefilePath in scsCatalogueFilesPath)
+            foreach(var catalogueFilePath in scsCatalogueFilesPath)
             {
-                Assert.True(catalogueFileContent.Contains(cataloguefilePath));
+                Assert.True(catalogueFileContent.Contains(catalogueFilePath));
             }
            
         }
 
-        public static void CheckCatalogueFileNoContent(string inputfile, List<ProductVersionModel> ProductVersiondata)
+        public static void CheckCatalogueFileNoContent(string inputFile, List<ProductVersionModel> ProductVersionData)
         {
-            string catalogueFileContent = File.ReadAllText(inputfile);
-            foreach (var product in ProductVersiondata)
+            string catalogueFileContent = File.ReadAllText(inputFile);
+            foreach (var product in ProductVersionData)
             {
                 Assert.False(catalogueFileContent.Contains(product.ProductName));
             }

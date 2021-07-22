@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] scopes = new string[] { $"{FssAuthConfig.FssClientId}/.default" };
             if (Token == null)
             {
-                if (EssauthConfig.IsRunningOnLocalMachine)
+                if (FssAuthConfig.IsRunningOnLocalMachine)
                 {
                     IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(FssAuthConfig.FssClientId).
                                                         WithRedirectUri("http://localhost").Build();
@@ -135,7 +135,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] scopes = new string[] { $"{ScsAuthConfig.ScsClientId}/user_impersonation" };
             if (Token == null)
             {
-                if (EssauthConfig.IsRunningOnLocalMachine)
+                if (ScsAuthConfig.IsRunningOnLocalMachine)
                 {
                     IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(ScsAuthConfig.ScsClientId).
                                                         WithRedirectUri("http://localhost").Build();

@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
 
             var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
 
@@ -64,10 +64,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Verify Product.txt file content
             var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
             var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
-            FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData, ScsJwtToken);
+            FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
         }
 
         [Test]
@@ -88,6 +89,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
            
             //Verify Catalog file content
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
             FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);

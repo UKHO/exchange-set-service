@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
         private string DownloadedFolderPath { get; set; }
-        private List<ProductVersionModel> ProductVersiondata { get; set; }
+        private List<ProductVersionModel> ProductVersionData { get; set; }
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -33,14 +33,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
-            ProductVersiondata = new List<ProductVersionModel>();
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
+            ProductVersionData = new List<ProductVersionModel>();
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
             DownloadedFolderPath = await CreateExchangeSetForValidProductVersion();
         }
 
         public async Task<string> CreateExchangeSetForValidProductVersion()
         {
-            var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
 
             var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
 
@@ -68,10 +68,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Verify Product.txt file content
             var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
             var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
             dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
-            FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData, ScsJwtToken);
+            FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
         }
 
         [Test]
@@ -93,7 +95,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
             //Verify Catalog file content
-            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
             FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
@@ -114,7 +117,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenEncFilesAreDownloaded()
         {
             //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
