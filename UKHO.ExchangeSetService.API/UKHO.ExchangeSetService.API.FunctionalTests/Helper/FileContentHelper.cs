@@ -258,10 +258,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     folder = folder.Replace(".zip", "");
                 }
 
-                //Delete a Directory and sub directories
+                //Delete V01XO1 Directory and sub directories from temp Directory
                 Directory.Delete(Path.Combine(path, folder),true);
 
-                //Delete all files from the Directory
+                //Delete V01X01.zip file from temp Directory
                 if (File.Exists(Path.Combine(path, fileName)))
                 {
                     File.Delete(Path.Combine(path, fileName));

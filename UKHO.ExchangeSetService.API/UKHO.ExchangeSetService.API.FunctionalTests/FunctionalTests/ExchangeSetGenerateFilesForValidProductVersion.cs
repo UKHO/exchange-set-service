@@ -35,10 +35,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ProductVersiondata = new List<ProductVersionModel>();
             ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
-            DownloadedFolderPath = await ValidateGeneratedFile();
+            DownloadedFolderPath = await CreateExchangeSetForValidProductVersion();
         }
 
-        public async Task<string> ValidateGeneratedFile()
+        public async Task<string> CreateExchangeSetForValidProductVersion()
         {
             var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");

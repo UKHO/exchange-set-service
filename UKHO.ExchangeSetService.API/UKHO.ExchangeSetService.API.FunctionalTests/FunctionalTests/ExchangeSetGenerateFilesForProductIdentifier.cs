@@ -31,10 +31,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
-            DownloadedFolderPath = await ValidateGeneratedFile();
+            DownloadedFolderPath = await CreateExchangeSetForValidAndInValidProductIdentifier();
         }
 
-        public async Task<string> ValidateGeneratedFile()
+        public async Task<string> CreateExchangeSetForValidAndInValidProductIdentifier()
         {
             var apiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
