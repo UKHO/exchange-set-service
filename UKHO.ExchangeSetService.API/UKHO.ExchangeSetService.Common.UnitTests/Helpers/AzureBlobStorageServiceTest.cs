@@ -30,7 +30,24 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration()
-                                { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
+            {
+                QueueName = "",
+                StorageAccountKey = "",
+                StorageAccountName = "",
+                StorageContainerName = "",
+                DynamicQueueName = "ess-{0}-test",
+                LargeExchangeSetAccountKey = "LargeExchangeSetAccountKey",
+                LargeExchangeSetAccountName = "LargeExchangeSetAccountName",
+                LargeExchangeSetInstance = 2,
+                LargeExchangeSetSizeInMB = 300,
+                MediumExchangeSetAccountKey = "MediumExchangeSetAccountKey",
+                MediumExchangeSetAccountName = "MediumExchangeSetAccountName",
+                MediumExchangeSetInstance = 3,
+                SmallExchangeSetAccountKey = "SmallExchangeSetAccountKey",
+                SmallExchangeSetAccountName = "SmallExchangeSetAccountName",
+                SmallExchangeSetInstance = 2,
+                SmallExchangeSetSizeInMB = 50
+            });
 
             fakeAzureMessageQueueHelper = A.Fake<IAzureMessageQueueHelper>();
             fakeLogger = A.Fake<ILogger<AzureBlobStorageService>>();
@@ -116,7 +133,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString("StorageAccountName", "StorageAccountKey")).Returns(storageAccountConnectionString);
 
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlobByUri(A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 

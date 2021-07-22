@@ -8,7 +8,7 @@
 
         public int GetInstanceCount(int maxInstanceCount)
         {
-            if (instanceCount == maxInstanceCount)
+            if (instanceCount >= maxInstanceCount)
             {
                 ResetInstanceCount();
             }
