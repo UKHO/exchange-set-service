@@ -17,12 +17,15 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
     public class AzureWebJobsHealthCheck : IHealthCheck
     {
         private readonly IOptions<EssManagedIdentityConfiguration> essManagedIdentityConfiguration;
+        private readonly IOptions<EssWebJobsConfiguration> essWebJobsConfiguration;
         private readonly ILogger<AzureBlobStorageService> logger;
 
         public AzureWebJobsHealthCheck(IOptions<EssManagedIdentityConfiguration> essManagedIdentityConfiguration,
+                                       IOptions<EssWebJobsConfiguration> essWebJobsConfiguration,
                                        ILogger<AzureBlobStorageService> logger)
         {
             this.essManagedIdentityConfiguration = essManagedIdentityConfiguration;
+            this.essWebJobsConfiguration = essWebJobsConfiguration;
             this.logger = logger;
         }
 
@@ -38,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     .WithCredentials(credentials)
                     .Build();
 
-                string uri = "";
+                string uri = essWebJobsConfiguration.Value.MxsWebJobApiUri;
 
                 var request = new HttpRequestMessage(HttpMethod.Get, uri);
                 await client.Credentials.ProcessHttpRequestAsync(request, cancellationToken);

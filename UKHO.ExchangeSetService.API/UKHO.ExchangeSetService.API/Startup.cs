@@ -137,6 +137,7 @@ namespace UKHO.ExchangeSetService.API
             services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
             services.Configure<AzureAdB2CConfiguration>(configuration.GetSection("AzureAdB2CConfiguration"));
             services.Configure<AzureADConfiguration>(configuration.GetSection("ESSAzureADConfiguration"));
+            services.Configure<EssWebJobsConfiguration>(configuration.GetSection("EssWebJobsConfiguration"));
 
             services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                 {
