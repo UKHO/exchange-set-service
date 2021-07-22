@@ -21,9 +21,11 @@ namespace UKHO.ExchangeSetService.CleanUpJob
         public async Task ProcessCleanUp()
         {
             logger.LogInformation(EventIds.ESSCleanUpJobRequestStart.ToEventId(), "Exchange set service clean up web job started at " + DateTime.Now);
-            
+            logger.LogWarning("Start clean up web at " + DateTime.Now);
+
             await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
+            logger.LogWarning("End clean up web at " + DateTime.Now);
             logger.LogInformation(EventIds.ESSCleanUpJobRequestCompleted.ToEventId(), "Exchange set service clean up web job completed at " + DateTime.Now);
         }
     }
