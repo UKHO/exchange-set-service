@@ -13,6 +13,7 @@ using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.Torus.Enc.Core.EncCatalogue;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.Torus.Enc.Core;
+using UKHO.Torus.Core;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -21,6 +22,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly ILogger<FulfilmentAncillaryFiles> logger;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly int crcLength = 8;
 
         public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
         {
@@ -50,7 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
@@ -68,16 +70,44 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (listFulfilmentData != null && listFulfilmentData.Any())
             {
                 int length = 2;
+                listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
+
+                List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("text/plain", "ASC"), new Tuple<string, string>("text/plain", "TXT"), new Tuple<string, string>("image/tiff", "TIF") };
 
                 foreach (var listItem in listFulfilmentData)
                 {
+                    listItem.Files = listItem.Files.OrderByDescending(
+                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower()))));
+
                     foreach (var item in listItem.Files)
                     {
+                        string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
+                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
+                        string comment = string.Empty;
+                        BoundingRectangle boundingRectangle = new BoundingRectangle();
+
+                        if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
+                        {
+                            var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+
+                            //BoundingRectangle and Comment only required for BIN
+                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
+
+                            boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
+                            boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
+                            boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
+                            boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
+                        }
+
                         catBuilder.Add(new CatalogEntry()
                         {
-                            FileLocation = $"{listItem.ProductName.Substring(0, length)}/{listItem.ProductName}/{listItem.EditionNumber}/{listItem.UpdateNumber}/{item.Filename}",
+                            FileLocation = fileLocation,
                             FileLongName = "",
-                            Implementation = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower())
+                            Implementation = mimeType,
+                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
+                            Comment = comment,
+                            BoundingRectangle = boundingRectangle
                         });
                     }
                 }
@@ -122,7 +152,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public bool CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
             if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -156,6 +186,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
 
                 var response = fileSystemHelper.CreateFileContent(filePath, content);
+                await Task.CompletedTask;
+
                 if (!response)
                 {
                     logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
@@ -168,6 +200,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
                 return false;
             }
+        }
+
+        private string GetCrcString(string fullFilePath)
+        {
+            var crcHash = Crc32CheckSumProvider.Instance.Compute(fileSystemHelper.ReadAllBytes(fullFilePath));
+            return crcHash.ToString("X").PadLeft(crcLength, '0');
+        }
+
+        private string GetIssueAndUpdateDate(SalesCatalogueDataProductResponse salescatalogProduct)
+        {
+            string comment = string.Empty;
+            string ISDT = (salescatalogProduct.IssueDateLatestUpdate == null)
+                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDateLatestUpdate.Value.ToString("yyyyMMdd");
+
+            string UADT = (salescatalogProduct.IssueDatePreviousUpdate == null && salescatalogProduct.LatestUpdateNumber == 0)
+                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDatePreviousUpdate.Value.ToString("yyyyMMdd");
+
+            if (ISDT != null && UADT != null)
+                comment = $"UADT={UADT},ISDT={ISDT};";
+            else if (ISDT != null)
+                comment = $"ISDT={ISDT};";
+            else if (UADT != null)
+                comment = $"UADT={UADT};";
+
+            return comment;
         }
     }
 }
