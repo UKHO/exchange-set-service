@@ -40,19 +40,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public CustomFileInfo GetFileInfo(string filePath)
         {
-            FileInfo fileInfo =  new FileInfo(filePath);
+            FileInfo fileInfo = new FileInfo(filePath);
             CustomFileInfo customFileInfo = new CustomFileInfo()
             {
                 Name = fileInfo.Name,
                 FullName = fileInfo.FullName,
                 Length = fileInfo.Length
             };
-            return customFileInfo; 
+            return customFileInfo;
         }
 
         public byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData)
-        {            
-            var fileInfo = new FileInfo(UploadBlockMetaData.FullFileName);            
+        {
+            var fileInfo = new FileInfo(UploadBlockMetaData.FullFileName);
             Byte[] byteData = new Byte[UploadBlockMetaData.Length];
             using (var fs = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -75,6 +75,68 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             };
             fileDetails.Add(fileDetail);
             return fileDetails;
+        }
+
+        public void CreateFileContentWithBytes(string outputFileName, byte[] content)
+        {
+            using (var output = File.OpenWrite(outputFileName))
+            {
+                output.Write(content, 0, content.Length);
+            }
+        }
+
+        public bool CheckFileExists(string filePath)
+        {
+            return File.Exists(filePath);
+        }
+
+        public byte[] ReadAllBytes(string filePath)
+        {
+            if (File.Exists(filePath))
+                return File.ReadAllBytes(filePath);
+            else
+                return new byte[0];
+        }
+
+        public bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite)
+        {
+            if (stream != null)
+            {
+                CreateFileCopy(filePath, stream);
+                using StreamReader reader = new StreamReader(stream);
+                string secondLineText = string.Empty;
+                secondLineText = GetLine(filePath);
+                string text = File.ReadAllText(filePath);
+                text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
+                if (!string.IsNullOrWhiteSpace(text))
+                    File.WriteAllText(filePath, text);
+                return true;
+            }
+            return false;
+        }
+
+        public void CreateFileCopy(string filePath, Stream stream)
+        {
+            if(stream != null)
+            {
+                using (var outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
+                {
+                    stream.CopyTo(outputFileStream);
+                }
+            }
+        }
+
+        private static string GetLine(string filePath)
+        {
+            int lineFound = 2;
+            string secondLine = string.Empty;
+            using (var sr = new StreamReader(filePath))
+            {
+                for (int i = 1; i < lineFound; i++)
+                    sr.ReadLine();
+                secondLine = sr.ReadLine();
+            }
+            return secondLine ?? string.Empty;
         }
     }
 }

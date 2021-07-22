@@ -38,6 +38,14 @@ variable "app_service_sku" {
 
 }
 
+variable "medium_exchange_set_subnets" {
+}
+
+variable "large_exchange_set_subnets" {
+}
+
 locals {
 	small_exchange_set_name = "${var.service_name}-${var.env_name}-sxs"
+	medium_exchange_set_name = "${var.service_name}-${var.env_name}-mxs"
+	large_exchange_set_name = "${var.service_name}-${var.env_name}-lxs"
 }

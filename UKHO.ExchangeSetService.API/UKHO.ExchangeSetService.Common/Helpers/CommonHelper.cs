@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -19,7 +20,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public static int GetCurrentWeekNumber(DateTime date)
         {
             CultureInfo cultureInfo = CultureInfo.InvariantCulture;
-            return cultureInfo.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday);            
+            return cultureInfo.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday);
         }
 
         public static string GetBlockIds(int blockNum)
@@ -42,6 +43,25 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var hash = md5.ComputeHash(requestStream);
 
             return hash;
+        }
+        
+        public static double ConvertBytesToMegabytes(long bytes)
+        {
+            double byteSize = 1024f;
+            return (bytes / byteSize) / byteSize;
+        }
+
+        public static long GetFileSize(SalesCatalogueProductResponse salesCatalogueResponse)
+        {
+            long fileSize = 0;
+            if (salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0)
+            {
+                foreach (var item in salesCatalogueResponse.Products)
+                {
+                    fileSize += item.FileSize.Value;
+                }
+            }
+            return fileSize;
         }
     }
 }
