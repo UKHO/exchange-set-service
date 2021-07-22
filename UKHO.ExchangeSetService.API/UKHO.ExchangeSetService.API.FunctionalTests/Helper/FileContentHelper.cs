@@ -6,12 +6,36 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using System.Net.Http;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class FileContentHelper
     {
         private static FssApiClient FssApiClient = new FssApiClient();
+
+
+        public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
+        {
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
+
+            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            return downloadFolderPath;
+        }
+
 
         public static void CheckSerialEncFileContent(string inputFile)
         {

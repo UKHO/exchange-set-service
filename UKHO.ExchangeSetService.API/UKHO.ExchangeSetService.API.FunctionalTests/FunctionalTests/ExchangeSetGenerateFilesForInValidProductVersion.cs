@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using System.Net.Http;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -20,6 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string ScsJwtToken { get; set; }
         private string DownloadedFolderPath { get; set; }
         private List<ProductVersionModel> ProductVersionData { get; set; }
+        private HttpResponseMessage ApiEssResponse { get; set; }
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -33,31 +35,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
-            ProductVersionData = new List<ProductVersionModel>();////Invalid Edition Number
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 20, 5)); 
-            DownloadedFolderPath = await CreateExchangeSetForInvalidProductVersion();
-        }
-
-        public async Task<string> CreateExchangeSetForInvalidProductVersion()
-        {
-            var apiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
-
-            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
-
-            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
-
-            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
-
-            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
-
-            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
-
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
-
-            return downloadFolderPath;
+            ProductVersionData = new List<ProductVersionModel>();
+            ////Invalid Edition Number
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 20, 5));
+            ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
+            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
         }
 
         [Test]
