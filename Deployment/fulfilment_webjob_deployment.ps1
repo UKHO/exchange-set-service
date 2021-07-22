@@ -17,9 +17,8 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
 
     foreach ($webapp in $exchangeSetWebapps) 
     {
-        $webapp -match 'queuename=(?<queueName>.+);\swebappname=(?<webappName>.+)}'
-        $webappName = $Matches.webappName
-        $queueName  = $Matches.queueName
+        $webappName = $webapp.webappName
+        $queueName  = $webapp.queueName
         
         if ( !$? ) { echo "Error while pattern match" ; throw $_ }
 
@@ -32,7 +31,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
 
         $appSettingForFulfilment.QueueName = $queueName
         $appSettingForFulfilment.KeyVaultSettings.ServiceUri = $KeyVaultUri
-        $appSettingForFulfilment | ConvertTo-Json | set-content $appSettingFileForFulfilment
+        $appSettingForFulfilment | ConvertTo-Json -Depth 5 | set-content $appSettingFileForFulfilment
         
         if ( !$? ) { echo "Error while updating json file for fulfilment" ; throw $_ }
         
@@ -42,7 +41,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         if ( !$? ) { echo "Error while Reading json file for CleanUp" ; throw $_ }
 
         $appSettingForCleanUp.KeyVaultSettings.ServiceUri = $KeyVaultUri
-        $appSettingForCleanUp | ConvertTo-Json | set-content $appSettingFileForCleanUp
+        $appSettingForCleanUp | ConvertTo-Json -Depth 5 | set-content $appSettingFileForCleanUp
         
         if ( !$? ) { echo "Error while updating json file for CleanUp" ; throw $_ }
 
@@ -63,7 +62,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         echo "Deploying web app $webappName for $exchangeSet exchange set done ..."
     
         echo "Cleaning up package for next deployment for $exchangeSet exchange set ..."
-        Remove-Item –path "$packagePath/$exchangeSet/$packageName"
+        Remove-Item "$packagePath/$exchangeSet/$packageName"
 
         if ( !$? ) { echo "Error while cleaning up temp directory" ; throw $_ }
 
@@ -71,7 +70,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
     }
 
     echo "$exchangeSet exchange set deployment completed cleaning up ..."
-    Remove-Item -Path "$packagePath/$exchangeSet/" -Recurse
+    Remove-Item "$packagePath/$exchangeSet/" -Recurse
 
     if ( !$? ) { echo "Error while cleaning up exchange set directory" ; throw $_ }
 
