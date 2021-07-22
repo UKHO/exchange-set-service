@@ -11,7 +11,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
-{    
+{
     public class AzureBlobStorageService : IAzureBlobStorageService
     {
         private readonly ISalesCatalogueStorageService scsStorageService;
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob);
 
-            logger.LogInformation(EventIds.SCSResponseStoredAndSentMessageInQueue.ToEventId(), "Sales catalogue response saved for the {batchId}", batchId);
+            logger.LogInformation(EventIds.SCSResponseStoredAndSentMessageInQueue.ToEventId(), "Sales catalogue response saved for the {batchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
             return true;
         }
 
@@ -54,18 +54,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await azureMessageQueueHelper.AddMessage(storageConfig.Value, scsResponseQueueMessageJSON);
         }
 
-        public async Task UploadSalesCatalogueServiceResponseToBlobAsync(CloudBlockBlob cloudBlockBlob , SalesCatalogueProductResponse salesCatalogueResponse)
+        public async Task UploadSalesCatalogueServiceResponseToBlobAsync(CloudBlockBlob cloudBlockBlob, SalesCatalogueProductResponse salesCatalogueResponse)
         {
-            var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);            
+            var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
 
             using (var ms = new MemoryStream())
             {
                 LoadStreamWithJson(ms, serializeJsonObject);
-                await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob,ms);
+                await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob, ms);
             }
         }
 
-        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId,CloudBlockBlob cloudBlockBlob)
+        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob)
         {
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
@@ -86,20 +86,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             writer.Flush();
             ms.Position = 0;
         }
-        
-        public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string scsResponseUri,string correlationId)
+
+        public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string scsResponseUri, string correlationId)
         {
             logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataStart.ToEventId(), "Sales catalogue response download start from blob for the scsResponseUri:{scsResponseUri} and _X-Correlation-ID:{correlationId}", scsResponseUri, correlationId);
-            
+
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
             CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, storageAccountConnectionString);
 
             var responseFile = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
             SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
-            
+
             logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the scsResponseUri:{scsResponseUri} and _X-Correlation-ID:{correlationId}", scsResponseUri, correlationId);
             return salesCatalogueProductResponse;
         }
-       
+
     }
 }

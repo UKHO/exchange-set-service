@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
-            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList());
+            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
@@ -137,7 +137,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
-            var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions);
+            var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
@@ -170,7 +170,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount = salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
             }
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId);
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
@@ -187,7 +187,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest, AzureAdB2C azureAdB2C)
         {
-            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
+            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
@@ -206,7 +206,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
@@ -248,9 +248,9 @@ namespace UKHO.ExchangeSetService.API.Services
             return response;
         }
 
-        private async Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetResponse)
+        private async Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetResponse, string correlationId)
         {
-            logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), $"FSS create batch endpoint request started");
+            logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), "FSS create batch endpoint request started and _X-Correlation-ID:{CorrelationId}", correlationId);
 
             var createBatchResponse = await fileShareService.CreateBatch();
 
@@ -271,7 +271,7 @@ namespace UKHO.ExchangeSetService.API.Services
             exchangeSetResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
             exchangeSetResponse.BatchId = createBatchResponse.ResponseBody.BatchId;
 
-            logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri.Href}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri.Href);
+            logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri.Href} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri.Href, createBatchResponse.ResponseBody.BatchId, correlationId);
 
             return exchangeSetResponse;
         }
@@ -290,11 +290,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private async Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "SCS response store request started for the {batchId}", batchId);
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "SCS response store request started for the {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
 
             bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId);
 
-            logger.LogInformation(EventIds.SCSResponseStoreRequestCompleted.ToEventId(), "SCS response store request completed for the {batchId}", batchId);
+            logger.LogInformation(EventIds.SCSResponseStoreRequestCompleted.ToEventId(), "SCS response store request completed for the {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             return result;
         }
     }

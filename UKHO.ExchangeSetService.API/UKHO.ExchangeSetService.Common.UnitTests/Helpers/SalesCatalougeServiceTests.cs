@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             this.fakeLogger = A.Fake<ILogger<SalesCatalogueService>>();
             this.fakeAuthTokenProvider = A.Fake<IAuthTokenProvider>();
-            this.fakeSaleCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { ProductType = "Test", Version = "t1",CatalogueType= "essTest" });
+            this.fakeSaleCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { ProductType = "Test", Version = "t1", CatalogueType = "essTest" });
             this.fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
 
             salesCatalogueService = new SalesCatalogueService(fakeSalesCatalogueClient, fakeLogger, fakeAuthTokenProvider, fakeSaleCatalogueConfig);
@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
-            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString());
+            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString(), string.Empty);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
         }
@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
-            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString());
+            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString(), string.Empty);
             Assert.AreEqual(HttpStatusCode.NotModified, response.ResponseCode, $"Expected {HttpStatusCode.NotModified} got {response.ResponseCode}");
             Assert.AreEqual(lastModified.UtcDateTime, response.LastModified);
         }
@@ -124,7 +124,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
-            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString());
+            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString(), string.Empty);
             Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}");
             Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
         }
@@ -139,7 +139,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             //Test variable
             string accessTokenParam = null;
-            string uriParam = null ;
+            string uriParam = null;
             HttpMethod httpMethodParam = null;
             var scsResponse = new SalesCatalogueProductResponse();
             var jsonString = JsonConvert.SerializeObject(scsResponse);
@@ -160,7 +160,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             //Method call
-            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(sinceDateTime);
+            var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(sinceDateTime, string.Empty);
 
             //Test
             Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
@@ -178,7 +178,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
-            var response = await salesCatalogueService.PostProductVersionsAsync( new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber =1, ProductName= "TEST1",UpdateNumber=0} });
+            var response = await salesCatalogueService.PostProductVersionsAsync(new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber = 1, ProductName = "TEST1", UpdateNumber = 0 } }, string.Empty);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
         }
@@ -192,7 +192,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
-            var response = await salesCatalogueService.PostProductVersionsAsync(new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber = 1, ProductName = "TEST1", UpdateNumber = 0 } });
+            var response = await salesCatalogueService.PostProductVersionsAsync(new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber = 1, ProductName = "TEST1", UpdateNumber = 0 } }, String.Empty);
             Assert.AreEqual(HttpStatusCode.NotModified, response.ResponseCode, $"Expected {HttpStatusCode.NotModified} got {response.ResponseCode}");
             Assert.AreEqual(lastModified.UtcDateTime, response.LastModified);
         }
@@ -207,7 +207,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
-            var response = await salesCatalogueService.PostProductVersionsAsync(new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber = 1, ProductName = "TEST1", UpdateNumber = 0 } });
+            var response = await salesCatalogueService.PostProductVersionsAsync(new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber = 1, ProductName = "TEST1", UpdateNumber = 0 } }, String.Empty);
             Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}");
             Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
         }
@@ -243,12 +243,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             //Method call
-            var response = await salesCatalogueService.PostProductVersionsAsync(requestBody);
+            var response = await salesCatalogueService.PostProductVersionsAsync(requestBody,string.Empty);
 
             //Test
             Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
             Assert.AreEqual(HttpMethod.Post, httpMethodParam);
-            Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productVersions",uriParam);
+            Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productVersions", uriParam);
             Assert.AreEqual(JsonConvert.SerializeObject(requestBody), postBodyParam);
             Assert.AreEqual(actualAccessToken, accessTokenParam);
         }
@@ -261,7 +261,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
-            var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1","TEST2"});
+            var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1", "TEST2" }, string.Empty);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
         }
@@ -275,7 +275,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
-            var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1", "TEST2" });
+            var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1", "TEST2" }, string.Empty);
             Assert.AreEqual(HttpStatusCode.NotModified, response.ResponseCode, $"Expected {HttpStatusCode.NotModified} got {response.ResponseCode}");
             Assert.AreEqual(lastModified.UtcDateTime, response.LastModified);
         }
@@ -290,8 +290,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
-            var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1", "TEST2" });
-            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}"); 
+            var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1", "TEST2" }, string.Empty);
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}");
             Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
         }
 
@@ -326,13 +326,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             //Method call
-            var response = await salesCatalogueService.PostProductIdentifiersAsync(requestBody);
+            var response = await salesCatalogueService.PostProductIdentifiersAsync(requestBody, string.Empty);
 
             //Test
             Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
             Assert.AreEqual(HttpMethod.Post, httpMethodParam);
             Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productIdentifiers", uriParam);
-            Assert.AreEqual(JsonConvert.SerializeObject(requestBody),postBodyParam);
+            Assert.AreEqual(JsonConvert.SerializeObject(requestBody), postBodyParam);
             Assert.AreEqual(actualAccessToken, accessTokenParam);
         }
         #endregion PostProductIdentifiersAsync
@@ -344,9 +344,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
-            
+
             var response = await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
-            
+
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
         }
@@ -363,7 +363,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             var response = await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
-           
+
             Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode, $"Expected {HttpStatusCode.OK} got {response.ResponseCode}");
             Assert.AreEqual(jsonString, JsonConvert.SerializeObject(response.ResponseBody));
         }

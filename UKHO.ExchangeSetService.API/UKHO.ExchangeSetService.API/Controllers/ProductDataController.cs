@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     [Authorize]
     public class ProductDataController : BaseController<ProductDataController>
     {
-        private readonly IProductDataService productDataService;      
+        private readonly IProductDataService productDataService;
 
         public ProductDataController(IHttpContextAccessor contextAccessor,
            ILogger<ProductDataController> logger,
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual async Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
         {
-            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestStart.ToEventId(), "Product Identifiers Endpoint Started");
+            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestStart.ToEventId(), "Product Identifiers Endpoint Started  for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
 
             if (productIdentifiers == null || productIdentifiers.Length == 0)
             {
@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             {
                 ProductIdentifier = productIdentifiers,
                 CallbackUri = callbackUri,
-                CorrelationId = GetCurrentCorrelationId()               
+                CorrelationId = GetCurrentCorrelationId()
             };
 
             var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
@@ -102,14 +102,14 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 IssToken = TokenIssuer
             };
 
-            var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest,azureAdB2C);
-            
+            var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest, azureAdB2C);
+
             if (productDetail.IsExchangeSetTooLarge)
             {
-                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}",productIdentifierRequest.CorrelationId);
-                return BuildBadRequestErrorResponseForTooLargeExchangeSet();               
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+                return BuildBadRequestErrorResponseForTooLargeExchangeSet();
             }
-            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestCompleted.ToEventId(), "Product Identifiers Endpoint Completed");
+            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestCompleted.ToEventId(), "Product Identifiers Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
 
             return GetEssResponse(productDetail);
         }
@@ -143,7 +143,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual async Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri)
         {
-            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestStart.ToEventId(), "Product Versions Endpoint Started");
+            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestStart.ToEventId(), "Product Versions Endpoint Started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
 
             if (productVersionsRequest == null || !productVersionsRequest.Any())
             {
@@ -185,10 +185,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             if (productDetail.IsExchangeSetTooLarge)
             {
-                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.",request.CorrelationId);
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
                 return BuildBadRequestErrorResponseForTooLargeExchangeSet();
             }
-            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestCompleted.ToEventId(), "Product Versions Endpoint Completed");
+            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestCompleted.ToEventId(), "Product Versions Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
 
             return GetEssResponse(productDetail);
         }
@@ -221,7 +221,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual async Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
             [FromQuery] string callbackUri)
         {
-            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId(), "Product Data SinceDateTime Endpoint Started");
+            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId(), "Product Data SinceDateTime Endpoint Started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
 
             ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
             {
@@ -259,10 +259,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             if (productDetail.IsExchangeSetTooLarge)
             {
-                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.", productDataSinceDateTimeRequest.CorrelationId);
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
                 return BuildBadRequestErrorResponseForTooLargeExchangeSet();
             }
-            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed");
+            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
 
             return GetEssResponse(productDetail);
         }

@@ -31,24 +31,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.salesCatalogueClient = salesCatalogueClient;
         }
 
-        public async Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime)
+        public async Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestStart.ToEventId(),$"Get sales catalogue service from specific date time started");
-            
+            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestStart.ToEventId(), "Get sales catalogue service from specific date time started _X-Correlation-ID:{CorrelationId}", correlationId);
+
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
 
-            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse);
+            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, null);
 
-            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestCompleted.ToEventId(),$"Get sales catalogue service from specific date time completed");
-            return response; 
+            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Get sales catalogue service from specific date time completed _X-Correlation-ID:{CorrelationId}", correlationId);
+            return response;
         }
 
-        public async Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers)
+        public async Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestStart.ToEventId(), $"Post sales catalogue service for ProductIdentifiers Started");
+            logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestStart.ToEventId(), "Post sales catalogue service for ProductIdentifiers Started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productIdentifiers";
@@ -57,15 +57,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
-            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse);
+            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
 
-            logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestCompleted.ToEventId(), $"Post sales catalogue service for ProductIdentifiers completed");
+            logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestCompleted.ToEventId(), "Post sales catalogue service for ProductIdentifiers completed for _X-Correlation-ID:{CorrelationId}", correlationId);
             return response;
         }
 
-        public async Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions)
+        public async Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSPostProductVersionsRequestStart.ToEventId(), $"Post sales catalouge service for ProductVersions started");
+            logger.LogInformation(EventIds.SCSPostProductVersionsRequestStart.ToEventId(), "Post sales catalouge service for ProductVersions started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productVersions";
@@ -74,9 +74,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
-            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse);
-            
-            logger.LogInformation(EventIds.SCSPostProductVersionsRequestCompleted.ToEventId(), $"Post sales catalogue service for ProductVersions completed");
+            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+
+            logger.LogInformation(EventIds.SCSPostProductVersionsRequestCompleted.ToEventId(), "Post sales catalogue service for ProductVersions completed for _X-Correlation-ID:{CorrelationId}", correlationId);
             return response;
         }
 
@@ -86,22 +86,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
-            
+
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId);
 
-            SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse);
+            SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse, correlationId);
 
             logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), "Get sales catalogue service for CatalogueData completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             return response;
         }
 
-        private async Task<SalesCatalogueResponse> CreateSalesCatalogueServiceResponse(HttpResponseMessage httpResponse)
+        private async Task<SalesCatalogueResponse> CreateSalesCatalogueServiceResponse(HttpResponseMessage httpResponse, string correlationId)
         {
             var response = new SalesCatalogueResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
             if (httpResponse.StatusCode != HttpStatusCode.OK && httpResponse.StatusCode != HttpStatusCode.NotModified)
             {
-                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service with uri {RequestUri} and responded with {StatusCode} and message {body}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body);
+                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service with uri {RequestUri} and responded with {StatusCode} and message {body} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body, correlationId);
                 response.ResponseCode = httpResponse.StatusCode;
                 response.ResponseBody = null;
             }
@@ -122,13 +122,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
-        private async Task<SalesCatalogueDataResponse> CreateSalesCatalogueDataResponse(HttpResponseMessage httpResponse)
+        private async Task<SalesCatalogueDataResponse> CreateSalesCatalogueDataResponse(HttpResponseMessage httpResponse, string correlationId)
         {
             var response = new SalesCatalogueDataResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
             if (httpResponse.StatusCode != HttpStatusCode.OK)
             {
-                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service catalogue end point with uri {RequestUri} responded with {StatusCode} and message {body}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body);
+                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service catalogue end point with uri {RequestUri} responded with {StatusCode} and message {body} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body, correlationId);
                 response.ResponseCode = httpResponse.StatusCode;
                 response.ResponseBody = null;
             }
