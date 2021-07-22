@@ -28,6 +28,10 @@ steps:
       TF_VAR_spoke_rg: $(spokeRG)
       TF_VAR_spoke_vnet_name: $(spokeVnetName)
       TF_VAR_spoke_subnet_name: $(spokeSubnetName)
+      TF_VAR_agent_rg: $(agentRG)
+      TF_VAR_agent_vnet_name: $(agentVnetName)
+      TF_VAR_agent_subnet_name: $(agentSubnetName)
+      TF_VAR_agent_subscription_id: $(agentSubscriptionId)
 
   - task: FileTransform@1
     displayName: "File Transform: WebAppSettings"

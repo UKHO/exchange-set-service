@@ -29,13 +29,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
-        
+
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
 
             IHost host = hostBuilder.Build();
-            
+
             using (host)
             {
                 host.Run();
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              {
                  builder.AddConfiguration(ConfigurationBuilder.GetSection("Logging"));
 
-                #if DEBUG
+                 #if DEBUG
                  builder.AddSerilog(new LoggerConfiguration()
                                  .WriteTo.File("Logs/UKHO.ExchangeSetService.FulfilmentServiceLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
                                  .MinimumLevel.Information()
@@ -94,24 +94,24 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  {
                      builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
                  }
-                
+
                  EventHubLoggingConfiguration eventhubConfig = ConfigurationBuilder.GetSection("EventHubLoggingConfiguration").Get<EventHubLoggingConfiguration>();
 
                  if (!string.IsNullOrWhiteSpace(eventhubConfig.ConnectionString))
                  {
                      builder.AddEventHub(config =>
                      {
-                     config.Environment = eventhubConfig.Environment;
-                     config.DefaultMinimumLogLevel =
-                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig.MinimumLoggingLevel, true);
-                     config.MinimumLogLevels["UKHO"] =
-                         (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig.UkhoMinimumLoggingLevel, true);
-                     config.EventHubConnectionString = eventhubConfig.ConnectionString;
-                     config.EventHubEntityPath = eventhubConfig.EntityPath;
-                     config.System = eventhubConfig.System;
-                     config.Service = eventhubConfig.Service;
-                     config.NodeName = eventhubConfig.NodeName;
-                     config.AdditionalValuesProvider = additionalValues =>
+                         config.Environment = eventhubConfig.Environment;
+                         config.DefaultMinimumLogLevel =
+                             (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig.MinimumLoggingLevel, true);
+                         config.MinimumLogLevels["UKHO"] =
+                             (LogLevel)Enum.Parse(typeof(LogLevel), eventhubConfig.UkhoMinimumLoggingLevel, true);
+                         config.EventHubConnectionString = eventhubConfig.ConnectionString;
+                         config.EventHubEntityPath = eventhubConfig.EntityPath;
+                         config.System = eventhubConfig.System;
+                         config.Service = eventhubConfig.Service;
+                         config.NodeName = eventhubConfig.NodeName;
+                         config.AdditionalValuesProvider = additionalValues =>
                          {
                              additionalValues["_AssemblyVersion"] = AssemblyVersion;
                          };
@@ -125,7 +125,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
-
+                 services.Configure<SalesCatalogueConfiguration>(ConfigurationBuilder.GetSection("SalesCatalogue"));
+         
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
                  services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
@@ -133,19 +134,26 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
-                     {
-                         client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
-                         var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
-                         client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
-                     });
+                 {
+                     client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
+                     var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
+                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                 });
+                 services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
+                 {
+                     client.BaseAddress = new Uri(ConfigurationBuilder["SalesCatalogue:BaseUrl"]);
+                     var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
+                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                 });
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
-                 services.AddScoped<IFileSystemHelper, FileSystemHelper>();
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
-                 services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
-                 services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
                  services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
                  services.AddScoped<IFileSystemHelper, FileSystemHelper>();
+                 services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
+                 services.AddScoped<IFulfilmentSalesCatalogueService, FulfilmentSalesCatalogueService>();
+                 services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
+                 services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
              })
               .ConfigureWebJobs(b =>
               {

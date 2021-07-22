@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -22,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
     {
         private ProductDataController controller;
         private IHttpContextAccessor fakeHttpContextAccessor;
-        private IProductDataService fakeProductDataService;        
+        private IProductDataService fakeProductDataService;
         private ILogger<ProductDataController> fakeLogger;
         public const string errorMessage = "Either body is null or malformed";
 
@@ -30,9 +31,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         public void Setup()
         {
             fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
-            fakeProductDataService = A.Fake<IProductDataService>();            
+            fakeProductDataService = A.Fake<IProductDataService>();
             fakeLogger = A.Fake<ILogger<ProductDataController>>();
-
             A.CallTo(() => fakeHttpContextAccessor.HttpContext).Returns(new DefaultHttpContext());
 
             controller = new ProductDataController(fakeHttpContextAccessor, fakeLogger, fakeProductDataService);
@@ -100,9 +100,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
               .Returns(exchangeSetServiceResponse);
-          
+
             string[] productIdentifiers = new string[] { "", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
@@ -129,9 +129,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
               .Returns(exchangeSetServiceResponse);
-           
+
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null);
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
@@ -155,7 +155,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
               .Returns(exchangeSetServiceResponse);
 
             string[] productIdentifiers = new string[] { };
@@ -183,20 +183,20 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
               .Returns(exchangeSetServiceResponse);
 
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
             var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);
-            Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);          
+            Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
 
         }
 
         [Test]
-       public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified()
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified()
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -211,15 +211,42 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
               .Returns(exchangeSetServiceResponse);
 
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);           
+            var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);
             Assert.AreEqual(304, result.StatusCode);
 
+        }
+
+        [Test]
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest()
+        {
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
+            {
+                ExchangeSetResponse = exchangeSetResponse,
+                IsExchangeSetTooLarge = true,
+                HttpStatusCode = HttpStatusCode.BadRequest
+            };
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
+                 .Returns(exchangeSetServiceResponse);
+
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);
+            var errors = (ErrorDescription)result.Value;
+
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
         }
 
         [Test]
@@ -236,9 +263,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
 
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
-            string callbackUri = string.Empty;            
+            string callbackUri = string.Empty;
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
             var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri);
@@ -266,9 +293,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             };
 
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
-                            .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));          
+                            .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(
@@ -282,7 +309,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
         [Test]
         public async Task WhenInvalidNullProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest()
-
         {
             var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.")
             {
@@ -299,7 +325,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>(), "");
@@ -321,18 +347,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var validationMessage = new ValidationFailure("ProductVersions", "Internal Server Error.");
             validationMessage.ErrorCode = HttpStatusCode.InternalServerError.ToString();
-            
+
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
                              .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
             var result = (ObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new ProductVersionRequest() { ProductName = "demo" } }, "");
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
-            Assert.AreEqual(500, result.StatusCode);         
+            Assert.AreEqual(500, result.StatusCode);
 
         }
 
@@ -352,13 +378,38 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
             var result = (StatusCodeResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new ProductVersionRequest() { ProductName = "demo" } }, "");
             Assert.AreEqual(304, result.StatusCode);
 
+        }
+
+        [Test]
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest()
+        {
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
+            {
+                ExchangeSetResponse = exchangeSetResponse,
+                IsExchangeSetTooLarge = true,
+                HttpStatusCode = HttpStatusCode.BadRequest
+            };
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
+                            .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
+                 .Returns(exchangeSetServiceResponse);
+
+            var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "");
+            var errors = (ErrorDescription)result.Value;
+
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
         }
 
         [Test]
@@ -374,7 +425,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure>()));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
             var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
@@ -405,8 +456,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
-               .Returns(exchangeSetServiceResponse);          
+            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
+               .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com");
             var errors = (ErrorDescription)result.Value;
@@ -431,7 +482,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
             var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
@@ -456,13 +507,36 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                             .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
             var result = (StatusCodeResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
             Assert.AreEqual(304, result.StatusCode);
         }
 
+        [Test]
+        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest()
+        {
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
+            {
+                ExchangeSetResponse = exchangeSetResponse,
+                IsExchangeSetTooLarge = true,
+                HttpStatusCode = HttpStatusCode.BadRequest
+            };
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
+                .Returns(exchangeSetServiceResponse);
+
+            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
+            var errors = (ErrorDescription)result.Value;
+
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
+        }
         [Test]
         public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess()
         {
@@ -476,9 +550,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
 
-            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
+            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
-          
+
             var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com");
 
             Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);

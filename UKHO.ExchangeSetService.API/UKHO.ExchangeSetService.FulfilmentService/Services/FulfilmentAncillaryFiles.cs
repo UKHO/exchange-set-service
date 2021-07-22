@@ -1,25 +1,34 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
+using UKHO.Torus.Enc.Core.EncCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.Torus.Enc.Core;
+using UKHO.Torus.Core;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public class FulfilmentAncillaryFiles : IFulfilmentAncillaryFiles
     {
+        private readonly ILogger<FulfilmentAncillaryFiles> logger;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileSystemHelper fileSystemHelper;
-        private readonly ILogger<FulfilmentDataService> logger;
+        private readonly int crcLength = 8;
 
-        public FulfilmentAncillaryFiles(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper, ILogger<FulfilmentDataService> logger)
+        public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
         {
+            this.logger = logger;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileSystemHelper = fileSystemHelper;
-            this.logger = logger;
         }
 
         public async Task<bool> CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
@@ -41,6 +50,181 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
                 return false;
             }
+        }
+
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        {
+            var catBuilder = new Catalog031BuilderFactory().Create();
+            var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
+
+            if (fileSystemHelper.CheckFileExists(readMeFileName))
+            {
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
+                    Implementation = "TXT"
+                });
+            }
+
+            if (listFulfilmentData != null && listFulfilmentData.Any())
+            {
+                int length = 2;
+                listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
+
+                List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("text/plain", "ASC"), new Tuple<string, string>("text/plain", "TXT"), new Tuple<string, string>("image/tiff", "TIF") };
+
+                foreach (var listItem in listFulfilmentData)
+                {
+                    listItem.Files = listItem.Files.OrderByDescending(
+                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower()))));
+
+                    foreach (var item in listItem.Files)
+                    {
+                        string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
+                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
+                        string comment = string.Empty;
+                        BoundingRectangle boundingRectangle = new BoundingRectangle();
+
+                        if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
+                        {
+                            var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+
+                            //BoundingRectangle and Comment only required for BIN
+                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
+
+                            boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
+                            boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
+                            boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
+                            boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
+                        }
+
+                        catBuilder.Add(new CatalogEntry()
+                        {
+                            FileLocation = fileLocation,
+                            FileLongName = "",
+                            Implementation = mimeType,
+                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
+                            Comment = comment,
+                            BoundingRectangle = boundingRectangle
+                        });
+                    }
+                }
+            }
+
+            var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.ExchangeSetFileFolder);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+
+            fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
+
+            await Task.CompletedTask;
+
+            if (fileSystemHelper.CheckFileExists(outputFileName))
+                return true;
+            else
+            {
+                logger.LogError(EventIds.CatalogueFileIsNotCreated.ToEventId(), "Error in creating catalogue.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                return false;
+            }
+        }
+
+        private string GetMimeType(string fileName, string mimeType)
+        {
+            string fileExtension = Path.GetExtension(fileName);
+            switch (mimeType)
+            {
+                case "application/s63":
+                    return "BIN";
+
+                case "text/plain":
+                    if (fileExtension == ".txt")
+                        return "TXT";
+                    else
+                        return "ASC";
+
+                case "image/tiff":
+                    return "TIF";
+
+                default:
+                    logger.LogInformation(EventIds.UnexpectedDefaultFileExtension.ToEventId(), "Default - Unexpected file extension for File : {filename} ", fileName);
+                    return fileExtension?.TrimStart('.').ToUpper();
+            }
+        }
+
+        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        {
+            if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
+            {
+                string fileName = fileShareServiceConfig.Value.ProductFileName;
+                string filePath = Path.Combine(exchangeSetInfoPath, fileName);
+
+                var productsBuilder = new ProductListBuilder();
+                foreach (var product in salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName))
+                    productsBuilder.Add(new ProductListEntry()
+                    {
+                        ProductName = product.ProductName + fileShareServiceConfig.Value.BaseCellExtension,
+                        Compression = product.Compression,
+                        Encryption = product.Encryption,
+                        BaseCellIssueDate = product.BaseCellIssueDate,
+                        BaseCellEdition = product.BaseCellEditionNumber,
+                        IssueDateLatestUpdate = product.IssueDateLatestUpdate,
+                        LatestUpdateNumber = product.LatestUpdateNumber,
+                        FileSize = product.FileSize,
+                        TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
+                        CellLimitSouthernmostLatitude = Convert.ToDecimal(product.CellLimitSouthernmostLatitude.ToString(Convert.ToString("f10"))),
+                        CellLimitWesternmostLatitude = Convert.ToDecimal(product.CellLimitWesternmostLatitude.ToString(Convert.ToString("f10"))),
+                        CellLimitNorthernmostLatitude = Convert.ToDecimal(product.CellLimitNorthernmostLatitude.ToString(Convert.ToString("f10"))),
+                        CellLimitEasternmostLatitude = Convert.ToDecimal(product.CellLimitEasternmostLatitude.ToString(Convert.ToString("f10"))),
+                        BaseCellUpdateNumber = product.BaseCellUpdateNumber,
+                        LastUpdateNumberForPreviousEdition = product.LastUpdateNumberForPreviousEdition,
+                        BaseCellLocation = product.BaseCellLocation,
+                        CancelledCellReplacements = string.Empty,
+                    });
+
+                var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
+                fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
+
+                var response = fileSystemHelper.CreateFileContent(filePath, content);
+                await Task.CompletedTask;
+
+                if (!response)
+                {
+                    logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                return false;
+            }
+        }
+
+        private string GetCrcString(string fullFilePath)
+        {
+            var crcHash = Crc32CheckSumProvider.Instance.Compute(fileSystemHelper.ReadAllBytes(fullFilePath));
+            return crcHash.ToString("X").PadLeft(crcLength, '0');
+        }
+
+        private string GetIssueAndUpdateDate(SalesCatalogueDataProductResponse salescatalogProduct)
+        {
+            string comment = string.Empty;
+            string ISDT = (salescatalogProduct.IssueDateLatestUpdate == null)
+                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDateLatestUpdate.Value.ToString("yyyyMMdd");
+
+            string UADT = (salescatalogProduct.IssueDatePreviousUpdate == null && salescatalogProduct.LatestUpdateNumber == 0)
+                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDatePreviousUpdate.Value.ToString("yyyyMMdd");
+
+            if (ISDT != null && UADT != null)
+                comment = $"UADT={UADT},ISDT={ISDT};";
+            else if (ISDT != null)
+                comment = $"ISDT={ISDT};";
+            else if (UADT != null)
+                comment = $"UADT={UADT};";
+
+            return comment;
         }
     }
 }

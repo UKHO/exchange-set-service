@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -20,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     [Authorize]
     public class ProductDataController : BaseController<ProductDataController>
     {
-        private readonly IProductDataService productDataService;
+        private readonly IProductDataService productDataService;      
 
         public ProductDataController(IHttpContextAccessor contextAccessor,
            ILogger<ProductDataController> logger,
@@ -71,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "RequestBody",
+                        Source = "requestBody",
                         Description = "Either body is null or malformed."
                     }
                 };
@@ -81,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             {
                 ProductIdentifier = productIdentifiers,
                 CallbackUri = callbackUri,
-                CorrelationId = GetCurrentCorrelationId()
+                CorrelationId = GetCurrentCorrelationId()               
             };
 
             var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
@@ -95,12 +96,22 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildBadRequestErrorResponse(errors);
                 }
             }
+            AzureAdB2C azureAdB2C = new AzureAdB2C()
+            {
+                AudToken = TokenAudience,
+                IssToken = TokenIssuer
+            };
 
-            var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest);
-
+            var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest,azureAdB2C);
+            
+            if (productDetail.IsExchangeSetTooLarge)
+            {
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}",productIdentifierRequest.CorrelationId);
+                return BuildBadRequestErrorResponseForTooLargeExchangeSet();               
+            }
             Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestCompleted.ToEventId(), "Product Identifiers Endpoint Completed");
 
-            return GetEssResponse(productDetail);            
+            return GetEssResponse(productDetail);
         }
 
         /// <summary>
@@ -140,7 +151,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "RequestBody",
+                        Source = "requestBody",
                         Description = "Either body is null or malformed."
                     }
                 };
@@ -164,13 +175,23 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildBadRequestErrorResponse(errors);
                 }
             }
+            AzureAdB2C azureAdB2C = new AzureAdB2C()
+            {
+                AudToken = TokenAudience,
+                IssToken = TokenIssuer
+            };
 
-            var productDetail = await productDataService.CreateProductDataByProductVersions(request);
+            var productDetail = await productDataService.CreateProductDataByProductVersions(request, azureAdB2C);
 
+            if (productDetail.IsExchangeSetTooLarge)
+            {
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.",request.CorrelationId);
+                return BuildBadRequestErrorResponseForTooLargeExchangeSet();
+            }
             Logger.LogInformation(EventIds.ESSPostProductVersionsRequestCompleted.ToEventId(), "Product Versions Endpoint Completed");
 
-            return GetEssResponse(productDetail);            
-        }        
+            return GetEssResponse(productDetail);
+        }
 
         /// <summary>
         /// Provide all the releasable data after a datetime.
@@ -215,7 +236,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     new Error()
                     {
-                        Source = "SinceDateTime",
+                        Source = "sinceDateTime",
                         Description = "Query parameter 'sinceDateTime' is required."
                     }
                 };
@@ -228,9 +249,19 @@ namespace UKHO.ExchangeSetService.API.Controllers
             {
                 return BuildBadRequestErrorResponse(errors);
             }
+            AzureAdB2C azureAdB2C = new AzureAdB2C()
+            {
+                AudToken = TokenAudience,
+                IssToken = TokenIssuer
+            };
 
-            var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest);
+            var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest, azureAdB2C);
 
+            if (productDetail.IsExchangeSetTooLarge)
+            {
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.", productDataSinceDateTimeRequest.CorrelationId);
+                return BuildBadRequestErrorResponseForTooLargeExchangeSet();
+            }
             Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed");
 
             return GetEssResponse(productDetail);
