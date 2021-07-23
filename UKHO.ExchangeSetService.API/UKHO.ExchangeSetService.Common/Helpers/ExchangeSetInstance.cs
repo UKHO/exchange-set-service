@@ -1,4 +1,6 @@
-﻿namespace UKHO.ExchangeSetService.Common.Configuration
+﻿using UKHO.ExchangeSetService.Common.Configuration;
+
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class ExchangeSetInstance : ISmallExchangeSetInstance, IMediumExchangeSetInstance, ILargeExchangeSetInstance
     {
