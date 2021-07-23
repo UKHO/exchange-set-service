@@ -88,11 +88,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
 
                         if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
-                        {
+                         {
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
 
                             //BoundingRectangle and Comment only required for BIN
-                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
+                            ////comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
+                            //BoundingRectangle and Comment only required for BIN
+                            comment = salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
+                                ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}"
+                                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
