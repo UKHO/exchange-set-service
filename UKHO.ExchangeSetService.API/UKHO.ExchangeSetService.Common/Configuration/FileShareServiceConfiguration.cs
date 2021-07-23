@@ -27,5 +27,7 @@
         public int ParallelUploadThreadCount { get; set; }
         public string CatalogFileName { get; set; }
         public string CommentVersion { get; set; }
+        public int CutOffTimeInMinutes { get; set; }
+        public int DelayTimeInMilliseconds { get; set; }
     }
 }

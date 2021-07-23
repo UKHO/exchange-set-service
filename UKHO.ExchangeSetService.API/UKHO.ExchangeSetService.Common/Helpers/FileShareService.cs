@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
@@ -361,16 +362,29 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 AccessToken = accessToken,
                 FullFileName = customFileInfo.FullName
             };
-            bool isBatchCommitted = await UploadCommitBatch(batchCommitMetaData, correlationId);
+            bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaData, correlationId);
             string batchStatus = BatchStatus.CommitInProgress.ToString();
-            if (isBatchCommitted)
+            if (isUploadCommitBatchCompleted)
             {
                 var batchStatusMetaData = new BatchStatusMetaData()
                 {
                     AccessToken = accessToken,
                     BatchId = batchId
                 };
-                batchStatus = await GetBatchStatus(batchStatusMetaData, correlationId);
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                while (batchStatus != BatchStatus.Committed.ToString() && watch.Elapsed.TotalMinutes <= fileShareServiceConfig.Value.CutOffTimeInMinutes)
+                {
+                    await Task.Delay(fileShareServiceConfig.Value.DelayTimeInMilliseconds);
+                    batchStatus = await GetBatchStatus(batchStatusMetaData, correlationId);
+                    if (batchStatus == BatchStatus.Failed.ToString())
+                    {
+                        watch.Stop();
+                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
+                        return batchStatus;
+                    }
+                }
+                watch.Stop();
             }
             return batchStatus;
         }
