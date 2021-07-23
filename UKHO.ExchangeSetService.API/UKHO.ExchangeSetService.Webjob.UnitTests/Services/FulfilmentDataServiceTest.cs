@@ -29,6 +29,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IConfiguration fakeConfiguration;
         public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
         public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
+        public IFulfilmentCallBackService fakeFulfilmentCallBackService;
 
         [SetUp]
         public void Setup()
@@ -61,8 +62,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
+            fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService);
         }
 
         #region GetScsResponseQueueMessage

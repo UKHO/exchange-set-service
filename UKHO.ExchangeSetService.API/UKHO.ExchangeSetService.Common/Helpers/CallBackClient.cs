@@ -1,10 +1,12 @@
-﻿using System.Net.Http;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
+    [ExcludeFromCodeCoverage]
     public class CallBackClient : ICallBackClient
     {
         private readonly HttpClient httpClient;
