@@ -105,8 +105,14 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             {
                 loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
 
-#if DEBUG
-            loggingBuilder.AddSerilog(new LoggerConfiguration()
+                string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
+                if (!string.IsNullOrEmpty(instrumentationKey))
+                {
+                    loggingBuilder.AddApplicationInsights(instrumentationKey);
+                }
+
+                #if DEBUG
+                loggingBuilder.AddSerilog(new LoggerConfiguration()
                                 .WriteTo.File("Logs/UKHO.ExchangeSetService.CleanUpLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
                                 .MinimumLevel.Information()
                                 .MinimumLevel.Override("UKHO", LogEventLevel.Debug)
@@ -146,11 +152,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                     config.TelemetryChannel = aiChannel;
                 }
             );
-            string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
-            if (!string.IsNullOrEmpty(instrumentationKey))
-            {
-                serviceCollection.AddApplicationInsightsTelemetryWorkerService(instrumentationKey);
-            }
 
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             serviceCollection.Configure<CleanUpConfig>(configuration.GetSection("CleanUpConfig"));
