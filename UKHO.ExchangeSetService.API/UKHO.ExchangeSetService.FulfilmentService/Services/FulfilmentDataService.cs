@@ -24,6 +24,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IConfiguration configuration;
         private readonly IFulfilmentAncillaryFiles fulfilmentAncillaryFiles;
         private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
+        private readonly IFulfilmentCallBackService fulfilmentCallBackService;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
@@ -31,7 +32,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                     IConfiguration configuration,
                                     IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
-                                    IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService)
+                                    IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
+                                    IFulfilmentCallBackService fulfilmentCallBackService)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -40,6 +42,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.configuration = configuration;
             this.fulfilmentAncillaryFiles = fulfilmentAncillaryFiles;
             this.fulfilmentSalesCatalogueService = fulfilmentSalesCatalogueService;
+            this.fulfilmentCallBackService = fulfilmentCallBackService;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message)
@@ -65,6 +68,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData);
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
+
+
+            var reponse = await fulfilmentCallBackService.CreateCallBackReponse(response, message);
+            Console.WriteLine(reponse);
 
             if (isZipFileUploaded)
             {
