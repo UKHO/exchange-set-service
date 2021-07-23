@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
 
 
-            var reponse = await fulfilmentCallBackService.CreateCallBackReponse(response, message);
+            var reponse = await fulfilmentCallBackService.SendCallBackReponse(response, message);
             Console.WriteLine(reponse);
 
             if (isZipFileUploaded)

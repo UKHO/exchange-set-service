@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fileShareServiceConfig = fileShareServiceConfig;
         }
 
-        public async Task<bool> CreateCallBackReponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
+        public async Task<bool> SendCallBackReponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
         {
             ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
             {
