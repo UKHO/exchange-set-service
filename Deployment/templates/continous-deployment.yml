@@ -38,7 +38,7 @@ steps:
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
       fileType: 'json'
-      targetFiles: '**\appsettings.json'
+      targetFiles: '**/appsettings.json'
 
   - task: AzureWebApp@1
     displayName: "Azure App Deploy: ess-$(Environment)-webapp"
@@ -53,13 +53,13 @@ steps:
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
       fileType: 'json'
-      targetFiles: '**\appsettings.json'
+      targetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2
     displayName: "Azure Fulfilment Webjob Deployment"
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      scriptType: 'ps'
+      scriptType: 'pscore'
       scriptLocation: 'scriptPath'
       scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
       arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'
