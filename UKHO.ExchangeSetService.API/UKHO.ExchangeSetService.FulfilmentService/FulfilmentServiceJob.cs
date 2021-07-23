@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -21,14 +22,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private readonly IFulfilmentDataService fulFilmentDataService;
         private readonly ILogger<FulfilmentServiceJob> logger;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
 
         public FulfilmentServiceJob(IConfiguration configuration,
-                                    IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper)
+                                    IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
+                                    IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
         {
             this.configuration = configuration;
             this.fulFilmentDataService = fulFilmentDataService;
             this.logger = logger;
             this.fileSystemHelper = fileSystemHelper;
+            this.fileShareServiceConfig = fileShareServiceConfig;
         }
 
         public async Task ProcessQueueMessage([QueueTrigger("%QueueName%")] CloudQueueMessage message)
@@ -47,12 +51,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             }
             catch (CustomException ex)
             {
-                string errorFileName = "error.txt";
+                var uploadErrorFileEventId = EventIds.UploadErrorFile.ToEventId();
+                var errorMessage = string.Format(ex.Message, uploadErrorFileEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
+
                 var exchangeSetBatchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, fulfilmentServiceQueueMessage.BatchId);
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetBatchFolderPath);
 
-                var errorFilePath = Path.Combine(exchangeSetBatchFolderPath, errorFileName);
-                await File.WriteAllTextAsync(errorFilePath, ex.ErrorMessage);
+                var errorFileFullPath = Path.Combine(exchangeSetBatchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+                fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
+
+                if (fileSystemHelper.CheckFileExists(errorFileFullPath))
+                {
+                    logger.LogInformation(uploadErrorFileEventId, "Error while processing Exchange Set creation and error file created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                }
             }
         }
     }
