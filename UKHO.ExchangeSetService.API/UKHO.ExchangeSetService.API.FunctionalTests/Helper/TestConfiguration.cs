@@ -11,6 +11,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string ExchangeSetEncRootFolder;
         public string ExchangeSetProductType;
         public string ExchangeSetCatalogueFile;
+        public string ExchangeSetProductFile;
+        public string ExchangeSetProductFilePath;
         public string EssStorageAccountConnectionString;        
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
@@ -81,10 +83,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
             ExchangeSetEncRootFolder = ConfigurationRoot.GetSection("ExchangeSetEncRootFolder").Value;
             ExchangeSetCatalogueFile = ConfigurationRoot.GetSection("ExchangeSetCatalogueFile").Value;
+            ExchangeSetProductFile = ConfigurationRoot.GetSection("ExchangeSetProductFile").Value;
+            ExchangeSetProductFilePath = ConfigurationRoot.GetSection("ExchangeSetProductFilePath").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
             ConfigurationRoot.Bind("FileShareServiceConfiguration", FssConfig);
             ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);
-
+            ConfigurationRoot.Bind("SalesCatalogueAuthConfiguration", ScsAuthConfig);
         }
     }
 }

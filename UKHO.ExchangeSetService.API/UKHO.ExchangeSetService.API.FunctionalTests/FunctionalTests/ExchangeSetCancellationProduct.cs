@@ -29,14 +29,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
-            ScsJwtToken = "";
-          
-        }
+            ScsJwtToken = await authTokenProvider.GetScsToken();
 
-     
+        }     
 
         [Test]
-        public async Task WhenICallExchangeSetApiWithACancelledProductIdentifier_ThenEditionNumberIsZero()
+        public async Task WhenICallExchangeSetProductIdentifierApiWithACancelledProduct_ThenCatalogueFileUpdatedWithEditionNumberZero()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE516510" };
 
@@ -48,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
 
             var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
 
@@ -60,19 +58,28 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             
             //Verify Cancellation details
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, ProductIdentifierModel.ProductIdentifier, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<CancellationResponseModel>();
 
             foreach (var product in apiScsResponseData.Products)
             {
+                var productName = product.ProductName;
                 var editionNumber = product.Cancellation.EditionNumber;
                 Assert.AreEqual(0, editionNumber, $"Incorrect edition number is returned {editionNumber}, instead of 0.");
 
-                CancellationProductFileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
+                var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count-1];
+
+                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
+                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber);
+                
+
             }
+
         }
 
         [Test]
-        public async Task WhenICallExchangeSetApiWithACancelledProductVersion_ThenEditionNumberIsZero()
+        public async Task WhenICallExchangeSetProductVersionsApiWithACancelledProduct_ThenCatalogueFileUpdatedWithEditionNumberZero()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
@@ -86,7 +93,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status is Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
 
             var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
 
@@ -97,15 +104,29 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Verify Cancellation details
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<CancellationResponseModel>();
 
             foreach (var product in apiScsResponseData.Products)
             {
+                var productName = product.ProductName;
                 var editionNumber = product.Cancellation.EditionNumber;
                 Assert.AreEqual(0, editionNumber, $"Incorrect edition number is returned {editionNumber}, instead of 0.");
 
-                CancellationProductFileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
+                var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count - 1];
+
+                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
+                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber);
+                               
             }
+        }
+
+        [TearDown]
+        public void CleanUpExchangeSetTeardown()
+        {
+            //Clean up downloaded files/folders   
+            CancellationFileHelper.DeleteDirectory(Config.ExchangeSetFileName);
         }
     }
 }
