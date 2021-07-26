@@ -132,7 +132,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         private static async Task<string> GenerateScsToken(string ClientId, string ClientSecret, string Token)
         {
-            string[] scopes = new string[] { $"{ScsAuthConfig.ResourceId}/user_impersonation" };
+            string[] scopes = new string[] { $"{ScsAuthConfig.ResourceId}/.default" };
             if (Token == null)
             {
                 if (ScsAuthConfig.IsRunningOnLocalMachine)
