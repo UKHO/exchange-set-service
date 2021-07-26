@@ -516,7 +516,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(false, response);
         }
 
@@ -550,7 +550,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(false, response);
         }
 
@@ -586,7 +586,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
             });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(false, response);
         }
 
@@ -624,7 +624,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
             });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(false, response);
         }
 
@@ -649,7 +649,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
              .Returns(httpResponse);
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(true, response);
         }
 
@@ -675,7 +675,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(false, response);
         }
         #endregion UploadZipFile
