@@ -57,6 +57,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             };
 
             string payloadJson = JsonConvert.SerializeObject(callBackResponse);
+            payloadJson = "<QueueMessage><MessageText>" + payloadJson + "</MessageText></QueueMessage>";
 
             await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri, scsResponseQueueMessage.CorrelationId);
 
