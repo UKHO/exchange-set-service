@@ -17,8 +17,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         static string EssAccessTokenNoAuth = null;
         static string ScsAccessToken = null;
         static EssAuthorizationTokenConfiguration EssauthConfig = new TestConfiguration().EssAuthorizationConfig;
-        static FileShareServiceConfiguration FssAuthConfig = new TestConfiguration().FssConfig;
-        static SalesCatalogueAuthConfiguration ScsAuthConfig = new TestConfiguration().ScsAuthConfig;
+        static FileShareService FssAuthConfig = new TestConfiguration().FssConfig;
+        static SalesCatalogue ScsAuthConfig = new TestConfiguration().ScsAuthConfig;
 
         public async Task<string> GetEssToken()
         {
@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public async Task<string> GetFssToken()
         {
-            FssAccessToken = await GenerateFssToken(FssAuthConfig.AutoTestClientId, FssAuthConfig.AutoTestClientSecret, FssAccessToken);
+            FssAccessToken = await GenerateFssToken(EssauthConfig.AutoTestClientId, EssauthConfig.AutoTestClientSecret, FssAccessToken);
             return FssAccessToken;
         }
 
@@ -48,17 +48,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         private static async Task<string> GenerateFssToken(string ClientId, string ClientSecret, string Token)
         {
-            string[] scopes = new string[] { $"{FssAuthConfig.FssClientId}/.default" };
+            string[] scopes = new string[] { $"{FssAuthConfig.ResourceId}/.default" };
             if (Token == null)
             {
                 if (FssAuthConfig.IsRunningOnLocalMachine)
                 {
-                    IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(FssAuthConfig.FssClientId).
+                    IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(FssAuthConfig.ResourceId).
                                                         WithRedirectUri("http://localhost").Build();
 
                     //Acquiring token through user interaction
                     AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
-                                                            .WithAuthority($"{FssAuthConfig.MicrosoftOnlineLoginUrl}{FssAuthConfig.TenantId}", true)
+                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 {
                     IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
                                                     .WithClientSecret(ClientSecret)
-                                                    .WithAuthority(new Uri($"{FssAuthConfig.MicrosoftOnlineLoginUrl}{FssAuthConfig.TenantId}"))
+                                                    .WithAuthority(new Uri($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}"))
                                                     .Build();
 
                     AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
@@ -118,7 +118,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public async Task<string> GetScsToken()
         {
-            ScsAccessToken = await GenerateScsToken(ScsAuthConfig.AutoTestClientId, ScsAuthConfig.AutoTestClientSecret, ScsAccessToken);
+            ScsAccessToken = await GenerateScsToken(EssauthConfig.AutoTestClientId, EssauthConfig.AutoTestClientSecret, ScsAccessToken);
             return ScsAccessToken;
         }
 
@@ -132,17 +132,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         private static async Task<string> GenerateScsToken(string ClientId, string ClientSecret, string Token)
         {
-            string[] scopes = new string[] { $"{ScsAuthConfig.ScsClientId}/user_impersonation" };
+            string[] scopes = new string[] { $"{ScsAuthConfig.ResourceId}/user_impersonation" };
             if (Token == null)
             {
                 if (ScsAuthConfig.IsRunningOnLocalMachine)
                 {
-                    IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(ScsAuthConfig.ScsClientId).
+                    IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(ScsAuthConfig.ResourceId).
                                                         WithRedirectUri("http://localhost").Build();
 
                     //Acquiring token through user interaction
                     AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
-                                                            .WithAuthority($"{ScsAuthConfig.MicrosoftOnlineLoginUrl}{ScsAuthConfig.TenantId}", true)
+                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
@@ -150,7 +150,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 {
                     IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
                                                     .WithClientSecret(ClientSecret)
-                                                    .WithAuthority(new Uri($"{ScsAuthConfig.MicrosoftOnlineLoginUrl}{ScsAuthConfig.TenantId}"))
+                                                    .WithAuthority(new Uri($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}"))
                                                     .Build();
 
                     AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
