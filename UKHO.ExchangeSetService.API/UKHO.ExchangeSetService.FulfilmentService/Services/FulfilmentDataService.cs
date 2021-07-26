@@ -103,7 +103,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
             SalesCatalogueDataResponse salesCatalogueDataResponse = await GetSalesCatalogueDataResponse(batchId, correlationId);
 
-            await CreateProductFile(batchId, exchangeSetInfoPath,correlationId, salesCatalogueDataResponse);
+            await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
             await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse);
@@ -120,7 +120,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "Search and download ReadMe Text File start for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-            }               
+            }
         }
 
         public async Task CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)

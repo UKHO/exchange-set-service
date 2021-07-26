@@ -22,16 +22,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private readonly IFulfilmentDataService fulFilmentDataService;
         private readonly ILogger<FulfilmentServiceJob> logger;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly IFileShareService fileShareService;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
 
         public FulfilmentServiceJob(IConfiguration configuration,
                                     IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
-                                    IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
+                                    IFileShareService fileShareService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
         {
             this.configuration = configuration;
             this.fulFilmentDataService = fulFilmentDataService;
             this.logger = logger;
             this.fileSystemHelper = fileSystemHelper;
+            this.fileShareService = fileShareService;
             this.fileShareServiceConfig = fileShareServiceConfig;
         }
 
@@ -54,15 +56,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 var uploadErrorFileEventId = EventIds.UploadErrorFile.ToEventId();
                 var errorMessage = string.Format(ex.Message, uploadErrorFileEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
-                var exchangeSetBatchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, fulfilmentServiceQueueMessage.BatchId);
-                fileSystemHelper.CheckAndCreateFolder(exchangeSetBatchFolderPath);
+                var batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, fulfilmentServiceQueueMessage.BatchId);
+                fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
 
-                var errorFileFullPath = Path.Combine(exchangeSetBatchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+                var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
                 fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
 
                 if (fileSystemHelper.CheckFileExists(errorFileFullPath))
                 {
-                    logger.LogInformation(uploadErrorFileEventId, "Error while processing Exchange Set creation and error file created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
+
+                    logger.LogError(uploadErrorFileEventId, "Error while processing Exchange Set creation and error file created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
                 }
             }
         }

@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
-            return await fileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipRootPath, correlationId);
+            return await fileShareService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, fileShareServiceConfig.Value.ExchangeSetFileName);
         }
     }
 }
