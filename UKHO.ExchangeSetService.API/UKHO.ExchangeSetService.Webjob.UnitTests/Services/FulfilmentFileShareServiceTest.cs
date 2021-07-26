@@ -172,20 +172,20 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void WhenValidCreateZipFileRequest_ThenReturnTrue()
+        public async Task WhenValidCreateZipFileRequest_ThenReturnTrue()
         {
             fakeIsZipFileCreated = true;           
             A.CallTo(() => fakefileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsZipFileCreated);
-            fakeIsZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeExchangeSetRootPath, null);
+            fakeIsZipFileCreated =  await fulfilmentFileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeExchangeSetRootPath, null);
             Assert.AreEqual(true, fakeIsZipFileCreated);
         }
 
         [Test]
-        public void WhenInvalidCreateZipFileRequest_ThenReturnFalse()
+        public async Task WhenInvalidCreateZipFileRequest_ThenReturnFalse()
         {
             fakeIsZipFileCreated = false;            
             A.CallTo(() => fakefileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsZipFileCreated);
-            fakeIsZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, null);
+            fakeIsZipFileCreated = await fulfilmentFileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, null);
             Assert.AreEqual(false, fakeIsZipFileCreated);
         }
     }

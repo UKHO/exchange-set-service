@@ -271,8 +271,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                logger.LogInformation(EventIds.ReadMeTextFileIsNotDownloaded.ToEventId(), "Error in downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                return false;
+                logger.LogError(EventIds.ReadMeTextFileIsNotDownloaded.ToEventId(), "Error in downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                throw new CustomException();
             }
         }
 
@@ -293,36 +293,53 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     filePath = batchResult.Files.FirstOrDefault().Links.Get.Href;
                 }
                 else
-                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                {
+                    logger.LogError(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    throw new CustomException();
+                }
             }
             else
-                logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "Query File share service for readme file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+            {
+                logger.LogError(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "Query File share service for readme file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                throw new CustomException();
+            }
 
             return filePath;
         }
 
-        public bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
+        public async Task <bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
+            bool isCreateZipFileExchangeSetcreated = false;
             var zipName = $"{exchangeSetZipRootPath}.zip";
             string filePath = Path.Combine(exchangeSetZipRootPath, zipName);
             if (fileSystemHelper.CheckDirectoryAndFileExists(exchangeSetZipRootPath, filePath))
             {
                 fileSystemHelper.CreateZipFile(exchangeSetZipRootPath, zipName);
-
-                logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set {ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
-                return true;
+                await Task.CompletedTask;
+                
+                if (fileSystemHelper.CheckFileExists(zipName))
+                {
+                    logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set {ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    isCreateZipFileExchangeSetcreated = true;
+                }
+                else
+                {
+                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating {ExchangeSetFileName} zip for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    throw new CustomException();
+                }
             }
             else
             {
                 logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating {ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
-                return false;
+                throw new CustomException();              
             }
+            return isCreateZipFileExchangeSetcreated;
         }
 
         //Upload either Exchange Set or Error File
         public async Task<bool> UploadFileToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName)
         {
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjI3Mjk3NTc2LCJuYmYiOjE2MjcyOTc1NzYsImV4cCI6MTYyNzMwMTQ3NiwiYWNyIjoiMSIsImFpbyI6IkFaUUFhLzhUQUFBQWtvdUpxS1JmcHUvZ1NaV3hUYVhIZUp6N28rQ0J3RHYzR1NrekpaUkxEOGxFZTV6Uy9BSHI4WXZUZkhDWVF6azMyZnNNY1grL0tocmdlSFNQZ2pTMWx4clV0bEZzclgxeS9tQnh4dXBMM1J2L0RGU2lBc3E3YmwxWWUzdGhMYWp1Sk1aWU9vT242RHo2WGF3TU1wcnZsQ3VBZ2hpYSsrYTN2Nmk4bVJkcldQekNtWUc5d25KNTFWcVNBRy9tc2dlUiIsImFtciI6WyJwd2QiLCJyc2EiLCJtZmEiXSwiYXBwaWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJhcHBpZGFjciI6IjAiLCJlbWFpbCI6IlNoaXJpbjE0OTI2QG1hc3Rlay5jb20iLCJmYW1pbHlfbmFtZSI6IlRhbGF3ZGVrYXIiLCJnaXZlbl9uYW1lIjoiU2hpcmluIiwiaWRwIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvYWRkMWM1MDAtYTZkNy00ZGJkLWI4OTAtN2Y4Y2I2ZjdkODYxLyIsImlwYWRkciI6IjE4Mi40OC4xOTcuMTkyIiwibmFtZSI6IlNoaXJpbiBUYWxhd2Rla2FyIiwib2lkIjoiM2JjMTlhMzEtMGQ4Zi00ZmIwLWJjZTctYzkwOTcwYzAwOGU5IiwicmgiOiIwLkFWTUFTTW8wa1QxbUJVcVdpakdrTHdydFBpVGdXNEFJb3Z0QXEyODVuQ1pIMHpRQ0FPVS4iLCJyb2xlcyI6WyJCYXRjaENyZWF0ZSJdLCJzY3AiOiJVc2VyLlJlYWQiLCJzdWIiOiIzQWhSWENMS1lzZGZMNEtMdlZfb05SQUtXX3ZCdWY2N21yZVNwcXFKQmlJIiwidGlkIjoiOTEzNGNhNDgtNjYzZC00YTA1LTk2OGEtMzFhNDJmMGFlZDNlIiwidW5pcXVlX25hbWUiOiJTaGlyaW4xNDkyNkBtYXN0ZWsuY29tIiwidXRpIjoiSlV2UWl2ZkhmVTJuSS1mVWFDQlZBQSIsInZlciI6IjEuMCJ9.UO_R8Qbiwb_Bothxsi2tsReRiN8ALCIDCBjKQ5hyZG1oedXJqZaNKskb8_yFvD4UiK-GS_OD51o3voXBPZNAZiyLMZBg-uedfIW5RNZYZzvkDK05Iel-F8wLPaubze1AbNFP-c2LNipieuqyH7iPcYaRCOdN6Je5lEv4tLG6sdSzOubpE4AqcqP0Pqi-g-CY4qK187nsI-EddgGL8JeOx7ZNUkEkwTnSXQk3FnlCTtnP-Ba2nrySuuzjxhLV0J07iejA9vNWQYwCro0p5Cj6EF61vrwkt5-oUSidnn1d-QFn2BgyuYZFLjsJomT3LnKjNKRkXQ_5dQk2Ut1Lt7vYSw";
             bool isUploadZipFile = false;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileName));
 

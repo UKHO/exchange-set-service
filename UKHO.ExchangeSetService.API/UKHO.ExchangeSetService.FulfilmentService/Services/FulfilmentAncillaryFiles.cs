@@ -33,8 +33,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
         {
+            bool checkSerialEncFileCreated = false;
             if (!string.IsNullOrWhiteSpace(exchangeSetPath))
-            {
+            {              
                 string serialFilePath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.SerialFileName);
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetPath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
@@ -43,13 +44,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 fileSystemHelper.CreateFileContent(serialFilePath, serialFileContent);
                 await Task.CompletedTask;
-                return true;
+
+                if (fileSystemHelper.CheckFileExists(serialFilePath))
+                    checkSerialEncFileCreated = true;
+                else
+                {
+                    logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
+                    throw new CustomException();
+                }                
             }
-            else
-            {
-                logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
-                return false;
-            }
+            return checkSerialEncFileCreated;
         }
 
         public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse)
@@ -125,7 +129,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             else
             {
                 logger.LogError(EventIds.CatalogueFileIsNotCreated.ToEventId(), "Error in creating catalogue.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                return false;
+                throw new CustomException();
             }
         }
 
@@ -191,14 +195,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (!response)
                 {
                     logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                    return false;
+                    throw new CustomException();
                 }
                 return true;
             }
             else
             {
                 logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                return false;
+                throw new CustomException();
             }
         }
 

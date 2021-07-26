@@ -318,19 +318,20 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region SearchReadMeFilePath
         [Test]
-        public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
+        public void WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
-            Assert.AreEqual(string.Empty, response);
-
+            //// var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty); });            
         }
 
         [Test]
-        public async Task WhenReadMeFileNotFound_ThenReturnEmptyFilePath()
+        public void WhenReadMeFileNotFound_ThenReturnEmptyFilePath()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
@@ -353,10 +354,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationidParam = correlationid;
                })
                .Returns(httpResponse);
-
-            var response = await fileShareService.SearchReadMeFilePath(batchId, null);
-
-            Assert.AreEqual("", response);
+            
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fileShareService.SearchReadMeFilePath(batchId, string.Empty); });       
         }
 
         [Test]
@@ -430,7 +431,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(true, response);
         }
         [Test]
-        public async Task WhenInvalidDownloadReadMeFileRequest_ThenReturnFalse()
+        public void WhenInvalidDownloadReadMeFileRequest_ThenReturnFalse()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
@@ -461,10 +462,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
             A.CallTo(() => fakeFileSystemHelper.DownloadReadmeFile(A<string>.Ignored, A<Stream>.Ignored, A<string>.Ignored)).Returns(false);
-
-            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null);
-
-            Assert.AreEqual(false, response);
+           
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+                .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                 , async delegate { await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null); });            
         }
         #endregion
 
@@ -475,17 +476,19 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
-            bool response = fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty); });
         }
 
         [Test]
-        public void WhenValidCreateZipFileRequest_ThenReturnTrue()
+        public async Task WhenValidCreateZipFileRequest_ThenReturnTrue()
         {
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            bool response = fileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeZipFilepath, null);
+            bool response = await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeZipFilepath, null);
             Assert.IsNotNull(response);
             Assert.AreEqual(true, response);
         }

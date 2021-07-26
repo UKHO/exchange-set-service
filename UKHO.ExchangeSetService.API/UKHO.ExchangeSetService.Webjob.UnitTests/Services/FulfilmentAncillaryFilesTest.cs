@@ -153,6 +153,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeExchangeSetPath = @"C:\\HOME";
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
             var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetPath, null);
 
@@ -162,13 +163,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #region CreateProductFile
 
         [Test]
-        public async Task WhenInvalidCreateProductFileRequest_ThenReturnFalseResponseAsync()
+        public void WhenInvalidCreateProductFileRequest_ThenReturnFalseResponseAsync()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
-            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
-
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse); });
         }
 
         [Test]
@@ -215,13 +216,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInvalidCreateCatalogFileRequest_ThenReturnFalseReponse()
+        public void WhenInvalidCreateCatalogFileRequest_ThenReturnFalseReponse()
         {
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null, null);
-
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null, null); });
             Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
             Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
         }
