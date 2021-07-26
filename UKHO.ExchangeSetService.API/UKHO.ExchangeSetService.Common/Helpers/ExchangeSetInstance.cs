@@ -6,7 +6,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         private int instanceCount = 0;
 
-        public int GetCurrentInstaceCount() => instanceCount;
+        public int GetCurrentInstanceCount() => instanceCount;
 
         public int GetInstanceCount(int maxInstanceCount)
         {

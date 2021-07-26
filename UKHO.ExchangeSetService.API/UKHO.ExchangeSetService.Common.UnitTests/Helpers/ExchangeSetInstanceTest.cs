@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenSmallExchangeSetInstanceCurrentInstance_ThenReturnsNotNullInResponse()
         {
-            var response = smallExchangeSetInstance.GetCurrentInstaceCount();
+            var response = smallExchangeSetInstance.GetCurrentInstanceCount();
             Assert.IsInstanceOf(typeof(int), response);
             Assert.AreEqual(0, response);
             Assert.IsNotNull(response);
@@ -57,7 +57,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenMediumExchangeSetInstanceCurrentInstance_ThenReturnsNotNullInResponse()
         {
-            var response = mediumExchangeSetInstance.GetCurrentInstaceCount();
+            var response = mediumExchangeSetInstance.GetCurrentInstanceCount();
             Assert.IsInstanceOf(typeof(int), response);
             Assert.AreEqual(0, response);
             Assert.IsNotNull(response);
@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenLargeExchangeSetInstanceCurrentInstance_ThenReturnsNotNullInResponse()
         {
-            var response = largeExchangeSetInstance.GetCurrentInstaceCount();
+            var response = largeExchangeSetInstance.GetCurrentInstanceCount();
             Assert.IsInstanceOf(typeof(int), response);
             Assert.AreEqual(0, response);
             Assert.IsNotNull(response);

@@ -129,7 +129,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                return (smallExchangeSetInstance.GetInstanceCount(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.SmallExchangeSet.ToString());
+                return (smallExchangeSetInstance.GetInstanceCount(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.SmallExchangeSet.ToString());
             }
         }
 
