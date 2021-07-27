@@ -11,7 +11,7 @@ data "azurerm_api_management" "apim_instance" {
 resource "azurerm_api_management_group" "ess_management_group" {
   resource_group_name = data.azurerm_resource_group.rg.name
   api_management_name = data.azurerm_api_management.apim_instance.name
-  name                = replace(var.apim_group_name, " ", "-")
+  name                = lower(replace(var.apim_group_name, " ", "-"))
   display_name        = title(var.apim_group_name)
   description         = var.apim_group_description
 }
@@ -20,7 +20,7 @@ resource "azurerm_api_management_group" "ess_management_group" {
 resource "azurerm_api_management_product" "ess_product" {
   resource_group_name   = data.azurerm_resource_group.rg.name
   api_management_name   = data.azurerm_api_management.apim_instance.name
-  product_id            = replace(var.apim_ess_product_name, " ", "-")
+  product_id            = lower(replace(var.apim_ess_product_name, " ", "-"))
   display_name          = title(var.apim_ess_product_name)
   description           = var.apim_ess_product_description
   subscription_required = true
@@ -41,7 +41,7 @@ resource "azurerm_api_management_product_group" "product_group_mappping" {
 resource "azurerm_api_management_api" "ess_api" {
   resource_group_name = data.azurerm_resource_group.rg.name
   api_management_name = data.azurerm_api_management.apim_instance.name
-  name                = replace(var.apim_api_name, " ", "-")
+  name                = lower(replace(var.apim_api_name, " ", "-"))
   display_name        = var.apim_api_name
   description         = var.apim_api_description
   revision            = "1"
