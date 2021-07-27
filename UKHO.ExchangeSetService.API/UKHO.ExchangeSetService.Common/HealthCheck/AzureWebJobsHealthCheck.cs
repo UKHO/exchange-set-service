@@ -89,16 +89,11 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
-                logger.LogInformation("Secret Name: {secretName}", secretName);
-                logger.LogInformation("kvServiceUri: {kvServiceUri}", kvServiceUri);
                 string value = string.Empty;
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
                 {
-                    logger.LogInformation("Will connect to key vault now");
                     var client = new SecretClient(vaultUri: new Uri(kvServiceUri), credential: new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityConfiguration.Value.ClientId }));
-                    logger.LogInformation("Client created for key vault");
                     KeyVaultSecret secret = await client.GetSecretAsync(secretName);
-                    logger.LogInformation("Secret read from key vault");
                     value = secret.Value;
                 }
                 return value;
