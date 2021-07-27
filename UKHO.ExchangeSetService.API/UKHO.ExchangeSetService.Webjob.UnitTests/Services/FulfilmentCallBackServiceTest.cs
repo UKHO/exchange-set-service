@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
@@ -22,17 +23,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ICallBackClient fakeCallBackClient;
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         public FulfilmentCallBackService fulfilmentCallBackService;
+        public ILogger<FulfilmentCallBackService> fakeLogger;
 
         [SetUp]
         public void Setup()
         {
-            fakeEssCallBackConfiguration = Options.Create(new EssCallBackConfiguration()
-                                            {});
+            fakeEssCallBackConfiguration = Options.Create(new EssCallBackConfiguration(){});
             fakeCallBackClient = A.Fake<ICallBackClient>();
-            fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-                                            { });
+            fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration(){ });
+            fakeLogger = A.Fake<ILogger<FulfilmentCallBackService>>();
 
-            fulfilmentCallBackService = new FulfilmentCallBackService(fakeEssCallBackConfiguration, fakeCallBackClient, fakeFileShareServiceConfig);
+            fulfilmentCallBackService = new FulfilmentCallBackService(fakeEssCallBackConfiguration, fakeCallBackClient, fakeFileShareServiceConfig, fakeLogger);
         }
 
         #region GetCallBackResponse
@@ -40,10 +41,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             return new CallBackResponse() 
             {
-                Specversion="",
-                Type = "",
-                Source = "",
-                Subject = "",
+                Specversion="1.0",
+                Type = "test",
+                Source = "test",
+                Subject = "test",
                 Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
                 DataContentType = "application/json",
                 Data = new ExchangeSetResponse()
@@ -97,32 +98,50 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async Task WhenValidSendCallBackReponse_ThenReturnsTrue()
+        public async Task WhenValidCallBackUriInRequest_ThenSendCallBackReponseReturnsTrue()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string uriParam = null;
             HttpMethod httpMethodParam = null;
-            string correlationidParam = null;
-
-            ////var callBackResponse = GetCallBackResponse();
-            ////var jsonString = JsonConvert.SerializeObject(callBackResponse);
-            ////var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
-            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri, string correlationid) =>
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string uri) =>
                {
                    uriParam = uri;
                    httpMethodParam = method;
                    postBodyParam = postBody;
-                   correlationidParam = correlationid;
                });
 
             var response = await fulfilmentCallBackService.SendCallBackReponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
             Assert.IsTrue(response);
+        }
+
+        [Test]
+        public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackReponseReturnsFalse()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+
+            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            scsResponseQueueMessage.CallbackUri = "";
+
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string uri) =>
+               {
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+               });
+
+            var response = await fulfilmentCallBackService.SendCallBackReponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
         }
     }
 }

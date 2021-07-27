@@ -69,13 +69,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData);
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
 
-
-            var reponse = await fulfilmentCallBackService.SendCallBackReponse(response, message);
-            Console.WriteLine(reponse);
-
             if (isZipFileUploaded)
             {
                 logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+
+                var reponse = await fulfilmentCallBackService.SendCallBackReponse(response, message);
+                Console.WriteLine(reponse);
+
                 return "Exchange Set Created Successfully";
             }
             else

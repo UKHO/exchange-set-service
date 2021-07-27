@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.storageConfig = storageConfig;
         }
 
-        public async Task<HttpResponseMessage> CallBackApi(HttpMethod method, string requestBody, string uri, string correlationId = "")
+        public async Task CallBackApi(HttpMethod method, string requestBody, string uri)
         {
             HttpContent content = null;
 
@@ -48,12 +48,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 httpRequestMessage.Headers.Authorization = GetAuthorizationHeader(storageConfig.Value.StorageAccountName, storageConfig.Value.StorageAccountKey, httpRequestMessage);
 
                 // Send the request & return response.
-                 var response =  await httpClient.SendAsync(httpRequestMessage, CancellationToken.None).ConfigureAwait(false);
-                return response;
+                await httpClient.SendAsync(httpRequestMessage, CancellationToken.None).ConfigureAwait(false);
             }
         }
-        public  AuthenticationHeaderValue GetAuthorizationHeader(
-          string storageAccountName, string storageAccountKey, HttpRequestMessage httpRequestMessage)
+        public  AuthenticationHeaderValue GetAuthorizationHeader(string storageAccountName, string storageAccountKey, HttpRequestMessage httpRequestMessage)
         {
             // Raw representation of the message signature.
             HttpMethod method = httpRequestMessage.Method;
