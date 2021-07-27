@@ -125,7 +125,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else if (fileSizeInMB > storageConfig.Value.LargeExchangeSetSizeInMB)
             {
-                return (largeExchangeSetInstance.GetInstanceCount(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.LargeExchangeSetInstance.ToString());
+                return (largeExchangeSetInstance.GetInstanceCount(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.LargeExchangeSet.ToString());
             }
             else
             {
@@ -139,7 +139,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 return (storageConfig.Value.MediumExchangeSetAccountName, storageConfig.Value.MediumExchangeSetAccountKey);
             }
-            else if (string.Compare(exchangeSetType, ExchangeSetType.LargeExchangeSetInstance.ToString(), true) == 0)
+            else if (string.Compare(exchangeSetType, ExchangeSetType.LargeExchangeSet.ToString(), true) == 0)
             {
                 return (storageConfig.Value.LargeExchangeSetAccountName, storageConfig.Value.LargeExchangeSetAccountKey);
             }

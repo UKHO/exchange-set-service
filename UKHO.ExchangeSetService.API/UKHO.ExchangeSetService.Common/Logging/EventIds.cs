@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         EventHubLoggingIsHealthy = 805078,
         EventHubLoggingIsUnhealthy = 805079,
         ExchangeSetTooLarge = 805080,
-        AddedMessageInQueueSCSResponseStored = 805081
+        AddedMessageInQueue = 805081
     }
 
     public static class EventIdExtensions

@@ -4,6 +4,6 @@
     {
         SmallExchangeSet = 1,
         MediumExchangeSet = 2,
-        LargeExchangeSetInstance = 3
+        LargeExchangeSet = 3
     }
 }
