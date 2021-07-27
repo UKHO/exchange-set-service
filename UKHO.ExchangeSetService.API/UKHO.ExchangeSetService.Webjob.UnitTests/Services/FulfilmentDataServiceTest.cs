@@ -53,13 +53,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ParallelSearchTaskCount = 10,
                 EncRoot = "ENC_ROOT",
                 ExchangeSetFileFolder = "V01X01",
-                Info="INFO",
-                ProductFileName="TEST.TXT",
-                CatalogFileName="CATALOG.031",
-                CommentVersion="VERSION=1.0"
+                Info = "INFO",
+                ProductFileName = "TEST.TXT",
+                CatalogFileName = "CATALOG.031",
+                CommentVersion = "VERSION=1.0"
             });
-            fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
-                                                    { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
+            fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
+            { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
 
             fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService);
@@ -174,7 +174,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
-            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -200,7 +200,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
-            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);

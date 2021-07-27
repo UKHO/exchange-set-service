@@ -418,7 +418,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, fileCreateMetaData.BatchId, correlationId);
-                return false;
+                throw new CustomException();
             }
         }
 
@@ -489,6 +489,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.UploadFileBlockMetaDataNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BatchId, correlationId);
+                throw new CustomException();
             }
         }
 
@@ -509,7 +510,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Error in adding blocks to file process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
-                return false;
+                throw new CustomException();
             }
         }
 
@@ -531,7 +532,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error while commiting batch for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
-                return false;
+                throw new CustomException();
             }
         }
 

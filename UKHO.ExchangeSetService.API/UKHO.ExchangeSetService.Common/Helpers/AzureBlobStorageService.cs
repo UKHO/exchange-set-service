@@ -87,19 +87,25 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             ms.Position = 0;
         }
 
-        public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string scsResponseUri, string correlationId)
+        public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string scsResponseUri, string batchId, string correlationId)
         {
-            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataStart.ToEventId(), "Sales catalogue response download start from blob for the scsResponseUri:{scsResponseUri} and _X-Correlation-ID:{correlationId}", scsResponseUri, correlationId);
+            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataStart.ToEventId(), "Sales catalogue response download start from blob for the scsResponseUri:{scsResponseUri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", scsResponseUri, batchId, correlationId);
 
             string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
             CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, storageAccountConnectionString);
 
             var responseFile = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
-            SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
-
-            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the scsResponseUri:{scsResponseUri} and _X-Correlation-ID:{correlationId}", scsResponseUri, correlationId);
-            return salesCatalogueProductResponse;
+            if (responseFile != null)
+            {
+                SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
+                logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the scsResponseUri:{scsResponseUri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", scsResponseUri, batchId, correlationId);
+                return salesCatalogueProductResponse;
+            }
+            else
+            {
+                logger.LogError(EventIds.DownloadSalesCatalogueResponseNonOkResponse.ToEventId(), "Error in downloading the Sales catalogue response from blob for the scsResponseUri:{scsResponseUri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", scsResponseUri, batchId, correlationId);
+                throw new CustomException();
+            }
         }
-
     }
 }

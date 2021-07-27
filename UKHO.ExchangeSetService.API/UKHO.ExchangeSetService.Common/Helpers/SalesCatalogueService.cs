@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
 
-            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, null);
+            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
 
             logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Get sales catalogue service from specific date time completed _X-Correlation-ID:{CorrelationId}", correlationId);
             return response;

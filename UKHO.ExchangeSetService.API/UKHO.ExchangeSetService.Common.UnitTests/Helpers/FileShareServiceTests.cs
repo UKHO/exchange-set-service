@@ -327,7 +327,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             //// var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
             Assert.ThrowsAsync(Is.TypeOf<CustomException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
-                  , async delegate { await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty); });            
+                  , async delegate { await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty); });
         }
 
         [Test]
@@ -354,10 +354,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationidParam = correlationid;
                })
                .Returns(httpResponse);
-            
+
             Assert.ThrowsAsync(Is.TypeOf<CustomException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
-                  , async delegate { await fileShareService.SearchReadMeFilePath(batchId, string.Empty); });       
+                  , async delegate { await fileShareService.SearchReadMeFilePath(batchId, string.Empty); });
         }
 
         [Test]
@@ -462,10 +462,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
             A.CallTo(() => fakeFileSystemHelper.DownloadReadmeFile(A<string>.Ignored, A<Stream>.Ignored, A<string>.Ignored)).Returns(false);
-           
+
             Assert.ThrowsAsync(Is.TypeOf<CustomException>()
                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
-                 , async delegate { await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null); });            
+                 , async delegate { await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null); });
         }
         #endregion
 
@@ -497,7 +497,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region UploadZipFile
 
         [Test]
-        public async Task WhenInvalidAddFileInBatchAsyncRequest_ThenReturnFalse()
+        public void WhenInvalidAddFileInBatchAsyncRequest_ThenReturnFalse()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -519,12 +519,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                   , async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
         [Test]
-        public async Task WhenInvalidWriteBlockInFileAsyncRequest_ThenReturnFalse()
+        public void WhenInvalidWriteBlockInFileAsyncRequest_ThenReturnFalse()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -553,12 +554,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>().And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}"),
+                  async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
         [Test]
-        public async Task WhenInvalidCommitBatchAsyncRequest_ThenReturnFalse()
+        public void WhenInvalidCommitBatchAsyncRequest_ThenReturnFalse()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -588,9 +589,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 },
                 Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
             });
-
-            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
-            Assert.AreEqual(false, response);
+            
+            Assert.ThrowsAsync(Is.TypeOf<CustomException>().And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}"),
+                async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });           
         }
 
         [Test]
