@@ -30,14 +30,13 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
-                await Task.CompletedTask;
                 string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
                 QueueClient queueClient = new QueueClient(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.QueueName);
-                var queueMessage = queueClient.PeekMessage();
+                var queueMessage = await queueClient.PeekMessageAsync();
 
                 if (queueMessage != null && queueMessage.GetRawResponse().ReasonPhrase == "OK")
                 {
-                    logger.LogDebug("Azure message queue is healthy");
+                    logger.LogInformation("Azure message queue is healthy");
                     return HealthCheckResult.Healthy("Azure message queue is healthy");
                 }
                 else

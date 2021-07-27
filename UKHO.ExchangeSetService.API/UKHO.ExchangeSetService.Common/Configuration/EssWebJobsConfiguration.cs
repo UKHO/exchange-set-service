@@ -5,6 +5,6 @@ namespace UKHO.ExchangeSetService.Common.Configuration
     [ExcludeFromCodeCoverage]
     public class EssWebJobsConfiguration
     {
-        public string MxsWebJobApiUri { get; set; }
+        public string EssWebAppName { get; set; }
     }
 }

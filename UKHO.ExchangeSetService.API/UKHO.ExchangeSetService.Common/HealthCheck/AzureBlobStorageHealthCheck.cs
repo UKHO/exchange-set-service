@@ -30,14 +30,13 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
-                await Task.CompletedTask;
                 string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
                 BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.StorageContainerName);
-                var blobContainerProperties = container.GetProperties().GetRawResponse();
+                var blobContainerProperties = await container.ExistsAsync();
 
-                if (blobContainerProperties != null && blobContainerProperties.ReasonPhrase == "OK")
+                if (blobContainerProperties)
                 {
-                    logger.LogDebug("Azure blob storage is healthy");
+                    logger.LogInformation("Azure blob storage is healthy");
                     return HealthCheckResult.Healthy("Azure blob storage is healthy");
                 }
                 else
