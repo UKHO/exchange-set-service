@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     public static class FssBatchHelper
     {
         private static FssApiClient FssApiClient { get; set; }
-        static FileShareServiceConfiguration Config = new TestConfiguration().FssConfig;
+        static FileShareService Config = new TestConfiguration().FssConfig;
         static TestConfiguration EssConfig { get; set; }
 
         static FssBatchHelper()

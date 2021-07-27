@@ -20,9 +20,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string ExchangeSetCatalogueFile;
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
-        public FileShareServiceConfiguration FssConfig = new FileShareServiceConfiguration();
+        public FileShareService FssConfig = new FileShareService();
         public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
-        public SalesCatalogueAuthConfiguration ScsAuthConfig = new SalesCatalogueAuthConfiguration();
+        public SalesCatalogue ScsAuthConfig = new SalesCatalogue();
         public class EssAuthorizationTokenConfiguration
         {
             public string MicrosoftOnlineLoginUrl { get; set; }
@@ -48,30 +48,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string LocalTestToken { get; set; } 
         }
 
-        public class FileShareServiceConfiguration
+        public class FileShareService
         {
-            public string FssApiUrl { get; set; }
-            public string MicrosoftOnlineLoginUrl { get; set; }
-            public string TenantId { get; set; }
-            public string AutoTestClientId { get; set; }
-            public string AutoTestClientSecret { get; set; }
-            public string AutoTestClientIdNoAuth { get; set; }
-            public string AutoTestClientSecretNoAuth { get; set; }
-            public string FssClientId { get; set; }
+            public string BaseUrl { get; set; }
+            public string ResourceId { get; set; }
             public bool IsRunningOnLocalMachine { get; set; }
             public int BatchCommitWaitTime { get; set; }
         }
 
-        public class SalesCatalogueAuthConfiguration
+        public class SalesCatalogue
         {
-            public string ScsApiUrl { get; set; }
-            public string MicrosoftOnlineLoginUrl { get; set; }
-            public string TenantId { get; set; }
-            public string AutoTestClientId { get; set; }
-            public string AutoTestClientSecret { get; set; }
-            public string AutoTestClientIdNoAuth { get; set; }
-            public string AutoTestClientSecretNoAuth { get; set; }
-            public string ScsClientId { get; set; }
+            public string BaseUrl { get; set; }
+            public string ResourceId { get; set; }
             public bool IsRunningOnLocalMachine { get; set; }
         }
 
@@ -95,8 +83,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ExchangeSetCatalogueFile = ConfigurationRoot.GetSection("ExchangeSetCatalogueFile").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
             ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);          
-            ConfigurationRoot.Bind("FileShareServiceConfiguration", FssConfig);
-            ConfigurationRoot.Bind("SalesCatalogueAuthConfiguration", ScsAuthConfig);
+            ConfigurationRoot.Bind("FileShareService", FssConfig);
+            ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
         }
     }
 }

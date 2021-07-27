@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
-            ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
+            ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), accessToken: EssJwtToken);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 //Enc file download verification
                 foreach (var updateNumber in product.UpdateNumbers)
                 {
-                    await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.FssApiUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+                    await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
 
                 }
 

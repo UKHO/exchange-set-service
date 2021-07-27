@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
-            ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.ScsApiUrl);
+            ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ProductVersionData = new List<ProductVersionModel>();
             ////Invalid Edition Number
