@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -37,7 +38,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             string webJobStatus = string.Empty;
-            string userName, password, kvServiceUri, webJobUri, webJobDetail = string.Empty;
+            string userName, password, webJobUri, webJobDetail = string.Empty;
             int instanceCount = 2;
             List<string> exchangeSetTypes = new List<string>() { "sxs", "mxs", "lxs" };
             foreach (string exchangeSetType in exchangeSetTypes)
@@ -47,9 +48,8 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     userName = string.Format(essWebJobsConfiguration.Value.EssWebAppName + "-scm-username", webHostEnvironment.EnvironmentName, exchangeSetType, i);
                     password = string.Format(essWebJobsConfiguration.Value.EssWebAppName + "-scm-password", webHostEnvironment.EnvironmentName, exchangeSetType, i);
                     webJobUri = string.Format("https://" + essWebJobsConfiguration.Value.EssWebAppName + ".scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob", webHostEnvironment.EnvironmentName, exchangeSetType, i);
-                    kvServiceUri = string.Format("https://ess-{0}-{1}-kv.vault.azure.net", webHostEnvironment.EnvironmentName, exchangeSetType);
 
-                    string userPswd = await FetchKeyVaultSecret(userName, kvServiceUri) + ":" + await FetchKeyVaultSecret(password, kvServiceUri);
+                    string userPswd = await FetchKeyVaultSecret(userName) + ":" + await FetchKeyVaultSecret(password);
                     userPswd = Convert.ToBase64String(Encoding.Default.GetBytes(userPswd));
                     var httpClient = new HttpClient();
                     using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJobUri);
@@ -85,11 +85,17 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
         }
 
-        private async Task<string> FetchKeyVaultSecret(string secretName, string kvServiceUri)
+        private async Task<string> FetchKeyVaultSecret(string secretName)
         {
             try
             {
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(webHostEnvironment.ContentRootPath);
+
+                var tempConfig = builder.Build();
+                string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
                 string value = string.Empty;
+
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
                 {
                     var client = new SecretClient(vaultUri: new Uri(kvServiceUri), credential: new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityConfiguration.Value.ClientId }));
