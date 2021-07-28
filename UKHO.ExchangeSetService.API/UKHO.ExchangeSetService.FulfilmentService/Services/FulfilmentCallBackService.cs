@@ -64,7 +64,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 };
 
                 string payloadJson = JsonConvert.SerializeObject(callBackResponse);
-                payloadJson = "<QueueMessage><MessageText>" + payloadJson + "</MessageText></QueueMessage>";
 
                 logger.LogInformation(EventIds.ESSPostCallBackRequestStart.ToEventId(), "Post callback request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                 
