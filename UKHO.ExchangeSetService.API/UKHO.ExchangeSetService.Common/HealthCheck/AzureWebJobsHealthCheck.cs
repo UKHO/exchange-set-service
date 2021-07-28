@@ -37,53 +37,64 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         }
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            string webJobStatus = string.Empty;
-            string userName, password, webJobUri, webJobDetail = string.Empty;
-            int instanceCount = 2;
-            List<string> exchangeSetTypes = new List<string>() { "sxs", "mxs", "lxs" };
-            foreach (string exchangeSetType in exchangeSetTypes)
+            try
             {
-                for (int i = 1; i < instanceCount; i++)
+                string webJobStatus = string.Empty;
+                string userNameKey, passwordKey, webJobUri, webJobDetail = string.Empty;
+                int instanceCount = 2;
+                List<string> exchangeSetTypes = new List<string>() { "sxs", "mxs", "lxs" };
+                foreach (string exchangeSetType in exchangeSetTypes)
                 {
-                    userName = string.Format(essWebJobsConfiguration.Value.EssWebAppName + "-scm-username", webHostEnvironment.EnvironmentName, exchangeSetType, i);
-                    password = string.Format(essWebJobsConfiguration.Value.EssWebAppName + "-scm-password", webHostEnvironment.EnvironmentName, exchangeSetType, i);
-                    webJobUri = string.Format("https://" + essWebJobsConfiguration.Value.EssWebAppName + ".scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob", webHostEnvironment.EnvironmentName, exchangeSetType, i);
-
-                    string userPswd = await FetchKeyVaultSecret(userName) + ":" + await FetchKeyVaultSecret(password);
-                    userPswd = Convert.ToBase64String(Encoding.Default.GetBytes(userPswd));
-                    var httpClient = new HttpClient();
-                    using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJobUri);
-                    httpClient.DefaultRequestHeaders.Accept.Clear();
-                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", userPswd);
-                    var response = httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken).Result;
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    for (int i = 1; i < instanceCount; i++)
                     {
-                        logger.LogInformation("Azure webjob response is OK");
-                        var webJobDetails = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
-                        webJobStatus = webJobDetails["status"];
-                        logger.LogInformation("Azure webjob status is " + webJobStatus + " of " + exchangeSetType + "-" + i.ToString());
-                        if (webJobStatus != "Running")
+                        userNameKey = string.Format(essWebJobsConfiguration.Value.EssWebAppName + "-scm-username", webHostEnvironment.EnvironmentName, exchangeSetType, i);
+                        passwordKey = string.Format(essWebJobsConfiguration.Value.EssWebAppName + "-scm-password", webHostEnvironment.EnvironmentName, exchangeSetType, i);
+                        webJobUri = string.Format("https://" + essWebJobsConfiguration.Value.EssWebAppName + ".scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob", webHostEnvironment.EnvironmentName, exchangeSetType, i);
+                        logger.LogInformation("Azure webjob username key is " + userNameKey);
+                        logger.LogInformation("Azure webjob password key is " + passwordKey);
+                        logger.LogInformation("Azure webjob uri is " + webJobUri);
+                        string userPswd = await FetchKeyVaultSecret(userNameKey) + ":" + await FetchKeyVaultSecret(passwordKey);
+                        userPswd = Convert.ToBase64String(Encoding.Default.GetBytes(userPswd));
+                        var httpClient = new HttpClient();
+                        using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJobUri);
+                        httpClient.DefaultRequestHeaders.Accept.Clear();
+                        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", userPswd);
+                        var response = httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken).Result;
+                        logger.LogInformation("Azure webjob response is " + response.StatusCode);
+                        if (response.StatusCode == System.Net.HttpStatusCode.OK)
                         {
-                            webJobDetail = "Webjob " + string.Format(essWebJobsConfiguration.Value.EssWebAppName, webHostEnvironment.EnvironmentName, exchangeSetType, i) + " with status " + webJobStatus;
-                            logger.LogInformation("Azure webjob detail is " + webJobDetail);
-                            break;
+                            logger.LogInformation("Azure webjob response is OK");
+                            var webJobDetails = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+                            webJobStatus = webJobDetails["status"];
+                            logger.LogInformation("Azure webjob status is " + webJobStatus + " of " + exchangeSetType + "-" + i.ToString());
+                            if (webJobStatus != "Running")
+                            {
+                                webJobDetail = "Webjob " + string.Format(essWebJobsConfiguration.Value.EssWebAppName, webHostEnvironment.EnvironmentName, exchangeSetType, i) + " with status " + webJobStatus;
+                                logger.LogInformation("Azure webjob detail is " + webJobDetail);
+                                break;
+                            }
                         }
                     }
+                    if (webJobStatus != "Running")
+                    {
+                        break;
+                    }
                 }
-                if (webJobStatus != "Running")
+                if (webJobStatus == "Running")
                 {
-                    break;
+                    logger.LogInformation("Azure webjob is healthy");
+                    return HealthCheckResult.Healthy("Azure webjob is healthy");
+                }
+                else
+                {
+                    logger.LogError("Azure webjob is unhealthy for {webJobDetail}", webJobDetail);
+                    return HealthCheckResult.Unhealthy("Azure webjob is unhealthy");
                 }
             }
-            if (webJobStatus == "Running")
+            catch (Exception ex)
             {
-                logger.LogInformation("Azure webjob is healthy");
-                return HealthCheckResult.Healthy("Azure webjob is healthy");
-            }
-            else
-            {
-                logger.LogError("Azure webjob is unhealthy for {webJobDetail}", webJobDetail);
+                logger.LogError("Azure webjob is unhealthy with error {message}", ex.Message);
                 return HealthCheckResult.Unhealthy("Azure webjob is unhealthy");
             }
         }
@@ -99,7 +110,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 var tempConfig = builder.Build();
                 string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
                 string value = string.Empty;
-
+                logger.LogInformation("Keyvault uri is " + kvServiceUri);
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
                 {
                     logger.LogInformation("Key vault uri is not empty");
