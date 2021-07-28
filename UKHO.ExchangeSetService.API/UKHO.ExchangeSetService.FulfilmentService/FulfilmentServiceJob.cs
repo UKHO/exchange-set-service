@@ -64,10 +64,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                 if (fileSystemHelper.CheckFileExists(errorFileFullPath))
                 {
-                    await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
+                    var isUploaded = await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
 
-                    logger.LogError(uploadErrorFileEventId, "Error while processing Exchange Set creation and error file created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    if (isUploaded)
+                    {
+                        logger.LogError(uploadErrorFileEventId, "Error while processing Exchange Set creation and error file created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                        logger.LogError(EventIds.ExchangeSetNotCreated.ToEventId(), "Exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                var uploadErrorFileEventId = EventIds.UploadErrorFile.ToEventId();
+                var errorMessage = string.Format(ex.Message, uploadErrorFileEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
+
+                var batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, fulfilmentServiceQueueMessage.BatchId);
+                fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
+
+                var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+                fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
+
+                logger.LogError(EventIds.UnhandledControllerException.ToEventId(), "Unhandled exception for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Exception}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
             }
         }
     }
