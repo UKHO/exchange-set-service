@@ -59,11 +59,14 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     var response = httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken).Result;
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
+                        logger.LogInformation("Azure webjob response is OK");
                         var webJobDetails = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
                         webJobStatus = webJobDetails["status"];
+                        logger.LogInformation("Azure webjob status is " + webJobStatus + " of " + exchangeSetType + "-" + i.ToString());
                         if (webJobStatus != "Running")
                         {
                             webJobDetail = "Webjob " + string.Format(essWebJobsConfiguration.Value.EssWebAppName, webHostEnvironment.EnvironmentName, exchangeSetType, i) + " with status " + webJobStatus;
+                            logger.LogInformation("Azure webjob detail is " + webJobDetail);
                             break;
                         }
                     }
@@ -89,6 +92,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
+                logger.LogInformation("Secretname is " + secretName);
                 var builder = new ConfigurationBuilder()
                     .SetBasePath(webHostEnvironment.ContentRootPath);
 
@@ -98,6 +102,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
                 {
+                    logger.LogInformation("Key vault uri is not empty");
                     var client = new SecretClient(vaultUri: new Uri(kvServiceUri), credential: new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityConfiguration.Value.ClientId }));
                     KeyVaultSecret secret = await client.GetSecretAsync(secretName);
                     value = secret.Value;
