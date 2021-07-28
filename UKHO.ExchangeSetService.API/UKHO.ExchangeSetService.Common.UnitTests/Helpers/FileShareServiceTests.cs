@@ -325,7 +325,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             //// var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                   , async delegate { await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty); });
         }
@@ -355,7 +355,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                   , async delegate { await fileShareService.SearchReadMeFilePath(batchId, string.Empty); });
         }
@@ -463,7 +463,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
             A.CallTo(() => fakeFileSystemHelper.DownloadReadmeFile(A<string>.Ignored, A<Stream>.Ignored, A<string>.Ignored)).Returns(false);
 
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                  , async delegate { await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null); });
         }
@@ -476,7 +476,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                   , async delegate { await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty); });
         }
@@ -519,7 +519,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                   .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                    , async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
@@ -554,7 +554,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>().And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}"),
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}"),
                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
@@ -590,7 +590,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
             });
             
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>().And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}"),
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}"),
                 async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });           
         }
 

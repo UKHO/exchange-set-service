@@ -42,6 +42,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = JsonConvert.DeserializeObject<SalesCatalogueServiceResponseQueueMessage>(message.AsString);
             string homeDirectoryPath = configuration["HOME"];
             string currentUtcDateTime = DateTime.UtcNow.ToString("ddMMMyyyy");
+            string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, fulfilmentServiceQueueMessage.BatchId);
 
             try
             {
@@ -51,41 +52,44 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                 logger.LogInformation(EventIds.CreateExchangeSetRequestCompleted.ToEventId(), "Create Exchange Set web job completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
             }
-            catch (CustomException ex)
+            catch (FulfilmentException ex)
             {
-                var uploadErrorFileEventId = EventIds.UploadErrorFile.ToEventId();
-                var errorMessage = string.Format(ex.Message, uploadErrorFileEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
+                string errorMessage = string.Format(ex.Message, ex.EventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
-                var batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, fulfilmentServiceQueueMessage.BatchId);
-                fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
+                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, ex.EventId, errorMessage, batchFolderPath);
+            }
+            catch (Exception ex)
+            {
+                EventId systemExceptionEventId = EventIds.SystemException.ToEventId();
+                string errorMessage = string.Format(ex.Message, systemExceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
-                var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
-                fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
+                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, systemExceptionEventId, errorMessage, batchFolderPath);
 
-                if (fileSystemHelper.CheckFileExists(errorFileFullPath))
+                logger.LogError(systemExceptionEventId, "Unhandled exception for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Exception}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
+            }
+        }
+
+        public async Task CreateAndUploadErrorFileToFileShareService(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage, EventId eventId, string errorMessage, string batchFolderPath)
+        {
+            fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
+
+            var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+            fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
+
+            if (fileSystemHelper.CheckFileExists(errorFileFullPath))
+            {
+                var isUploaded = await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
+
+                if (isUploaded)
                 {
-                    var isUploaded = await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
-
-                    if (isUploaded)
-                    {
-                        logger.LogError(uploadErrorFileEventId, "Error while processing Exchange Set creation and error file created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                        logger.LogError(EventIds.ExchangeSetNotCreated.ToEventId(), "Exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                    }
+                    logger.LogError(eventId, "Error while processing Exchange Set creation and error file created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    logger.LogError(EventIds.ExchangeSetNotCreated.ToEventId(), "Exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
                 }
+                else
+                    logger.LogError("Error while uploading error.txt");
             }
-            catch(Exception ex)
-            {
-                var uploadErrorFileEventId = EventIds.UploadErrorFile.ToEventId();
-                var errorMessage = string.Format(ex.Message, uploadErrorFileEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
-
-                var batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, fulfilmentServiceQueueMessage.BatchId);
-                fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
-
-                var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
-                fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
-
-                logger.LogError(EventIds.UnhandledControllerException.ToEventId(), "Unhandled exception for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Exception}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
-            }
+            else
+                logger.LogError("Error while creating error.txt");
         }
     }
 }

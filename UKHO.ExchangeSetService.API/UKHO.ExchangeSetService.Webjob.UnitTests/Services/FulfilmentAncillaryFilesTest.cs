@@ -167,7 +167,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                   , async delegate { await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse); });
         }
@@ -220,7 +220,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
-            Assert.ThrowsAsync(Is.TypeOf<CustomException>()
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                   , async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null, null); });
             Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);

@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.DownloadSalesCatalogueResponseNonOkResponse.ToEventId(), "Error in downloading the Sales catalogue response from blob for the scsResponseUri:{scsResponseUri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", scsResponseUri, batchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.DownloadSalesCatalogueResponseNonOkResponse.ToEventId());
             }
         }
     }

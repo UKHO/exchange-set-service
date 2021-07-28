@@ -39,6 +39,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.logger = logger;
             this.fileSystemHelper = fileSystemHelper;
         }
+
         public async Task<CreateBatchResponse> CreateBatch()
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
@@ -272,7 +273,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.ReadMeTextFileIsNotDownloaded.ToEventId(), "Error in downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.ReadMeTextFileIsNotDownloaded.ToEventId());
             }
         }
 
@@ -295,13 +296,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 else
                 {
                     logger.LogError(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                    throw new CustomException();
+                    throw new FulfilmentException(EventIds.ReadMeTextFileNotFound.ToEventId());
                 }
             }
             else
             {
                 logger.LogError(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "Query File share service for readme file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.QueryFileShareServiceNonOkResponse.ToEventId());
             }
 
             return filePath;
@@ -325,13 +326,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 else
                 {
                     logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating {ExchangeSetFileName} zip for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
-                    throw new CustomException();
+                    throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
                 }
             }
             else
             {
                 logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating {ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
-                throw new CustomException();              
+                throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());              
             }
             return isCreateZipFileExchangeSetcreated;
         }
@@ -418,7 +419,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId(), "Error in creating exchange set file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, fileCreateMetaData.BatchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.CreateExchangeSetFileNonOkResponse.ToEventId());
             }
         }
 
@@ -489,7 +490,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.UploadFileBlockMetaDataNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BatchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.UploadFileBlockMetaDataNonOkResponse.ToEventId());
             }
         }
 
@@ -510,7 +511,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Error in adding blocks to file process for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.BatchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.WriteBlockToFileNonOkResponse.ToEventId());
             }
         }
 
@@ -532,7 +533,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error while commiting batch for BatchId {batchId} and _X-Correlation-ID:{CorrelationId} completed", batchCommitMetaData.BatchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.UploadCommitBatchNonOkResponse.ToEventId());
             }
         }
 

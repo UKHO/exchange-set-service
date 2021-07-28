@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         EventHubLoggingIsHealthy = 805078,
         EventHubLoggingIsUnhealthy = 805079,
         ExchangeSetTooLarge = 805080,
-        UploadErrorFile = 805081,
+        SystemException = 805081,
         DownloadSalesCatalogueResponseNonOkResponse = 805082
     }
 

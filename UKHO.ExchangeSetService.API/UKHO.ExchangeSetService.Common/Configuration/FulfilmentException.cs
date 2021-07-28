@@ -1,23 +1,27 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Runtime.Serialization;
 
 namespace UKHO.ExchangeSetService.Common.Configuration
 {
     [Serializable]
-    public class CustomException : Exception
+    public class FulfilmentException : Exception
     {
         private static readonly string message = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. " +
             "Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
-        public CustomException() : base(message)
+        public EventId EventId { get; set; }
+
+        public FulfilmentException() : base(message)
         {
         }
 
-        public CustomException(string message, Exception innerException) : base(message, innerException)
+        public FulfilmentException(EventId eventId) : base(message)
         {
-        }        
+            this.EventId = eventId;
+        }
 
-        protected CustomException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected FulfilmentException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 else
                 {
                     logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
-                    throw new CustomException();
+                    throw new FulfilmentException(EventIds.SerialFileIsNotCreated.ToEventId());
                 }                
             }
             return checkSerialEncFileCreated;
@@ -129,7 +129,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             else
             {
                 logger.LogError(EventIds.CatalogueFileIsNotCreated.ToEventId(), "Error in creating catalogue.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.CatalogueFileIsNotCreated.ToEventId());
             }
         }
 
@@ -195,14 +195,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (!response)
                 {
                     logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                    throw new CustomException();
+                    throw new FulfilmentException(EventIds.ProductFileIsNotCreated.ToEventId());
                 }
                 return true;
             }
             else
             {
                 logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                throw new CustomException();
+                throw new FulfilmentException(EventIds.ProductFileIsNotCreated.ToEventId());
             }
         }
 
