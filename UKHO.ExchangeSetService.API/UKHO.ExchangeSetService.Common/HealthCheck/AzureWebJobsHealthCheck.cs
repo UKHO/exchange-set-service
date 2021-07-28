@@ -105,10 +105,15 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             {
                 logger.LogInformation("Secretname is " + secretName);
                 var builder = new ConfigurationBuilder()
-                    .SetBasePath(webHostEnvironment.ContentRootPath);
+                    .SetBasePath(webHostEnvironment.ContentRootPath)
+                    .AddJsonFile("appsettings.json", false, true)
+                    .AddJsonFile($"appsettings.{webHostEnvironment.EnvironmentName}.json", true, true);
+
+                builder.AddEnvironmentVariables();
 
                 var tempConfig = builder.Build();
                 string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
+
                 string value = string.Empty;
                 logger.LogInformation("Keyvault uri is " + kvServiceUri);
                 if (!string.IsNullOrWhiteSpace(kvServiceUri))
