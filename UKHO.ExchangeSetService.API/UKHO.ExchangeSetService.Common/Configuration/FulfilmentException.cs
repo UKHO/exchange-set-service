@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.Common.Configuration
 
         public FulfilmentException(EventId eventId) : base(message)
         {
-            this.EventId = eventId;
+            EventId = eventId;
         }
 
         protected FulfilmentException(SerializationInfo info, StreamingContext context) : base(info, context)

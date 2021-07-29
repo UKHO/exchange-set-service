@@ -60,12 +60,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             }
             catch (Exception ex)
             {
+                FulfilmentException fulfilmentException = new FulfilmentException();
                 EventId systemExceptionEventId = EventIds.SystemException.ToEventId();
-                string errorMessage = string.Format(ex.Message, systemExceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
+                string errorMessage = string.Format(fulfilmentException.Message, systemExceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
                 await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, systemExceptionEventId, errorMessage, batchFolderPath);
 
-                logger.LogError(systemExceptionEventId, "Unhandled exception for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Exception}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
+                logger.LogError(systemExceptionEventId, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Exception} and StackTrace:{StackTrace}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message, ex.StackTrace);
             }
         }
 
@@ -86,10 +87,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     logger.LogError(EventIds.ExchangeSetNotCreated.ToEventId(), "Exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
                 }
                 else
-                    logger.LogError("Error while uploading error.txt");
+                    logger.LogError(EventIds.ErrorTxtNotUploaded.ToEventId(), "Error while uploading error.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
             }
             else
-                logger.LogError("Error while creating error.txt");
+                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
         }
     }
 }

@@ -47,6 +47,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper);
         }
 
+        private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
+        {
+            return new SalesCatalogueServiceResponseQueueMessage
+            {
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+                FileSize = 4000,
+                ScsResponseUri = "https://test/ess-test/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272.json",
+                CallbackUri = "https://test-callbackuri.com",
+                CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
+            };
+        }
+
         #region GetCreateBatchResponse
         private static CreateBatchResponseModel GetCreateBatchResponse()
         {
@@ -287,14 +299,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage());
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
         }
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenDonotDownloadBatchFiles()
+        public void WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenDonotDownloadBatchFiles()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -308,11 +320,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
-
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(bool), response);
-            Assert.IsFalse(response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage()); });
         }
         #endregion
 
@@ -324,7 +334,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            //// var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
                   , async delegate { await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty); });
@@ -589,9 +598,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 },
                 Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
             });
-            
+
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}"),
-                async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });           
+                async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
         [Test]

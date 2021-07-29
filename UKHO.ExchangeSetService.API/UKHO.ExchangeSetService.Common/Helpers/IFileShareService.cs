@@ -9,9 +9,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         public Task<CreateBatchResponse> CreateBatch();
         Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, string correlationId);
-        Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath,string correlationId);
+        Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage);
         Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId);
-        Task<string> SearchReadMeFilePath(string batchId,string correlationId);
+        Task<string> SearchReadMeFilePath(string batchId, string correlationId);
         Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
         Task<bool> UploadFileToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName);
     }
