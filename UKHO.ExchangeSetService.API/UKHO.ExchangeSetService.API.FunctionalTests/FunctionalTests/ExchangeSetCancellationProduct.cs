@@ -70,8 +70,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count-1];
 
-                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
                 CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber);
+                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
+                
                 
 
             }
@@ -116,8 +117,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count - 1];
 
-                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
                 CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber);
+                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
+               
                                
             }
         }

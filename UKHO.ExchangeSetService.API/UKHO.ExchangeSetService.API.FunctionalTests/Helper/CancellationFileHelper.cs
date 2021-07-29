@@ -16,17 +16,24 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static void CheckProductFileContent(string inputFile, string productName, int editionNumber)
         {
-            string[] eachLineContent = null;
-            string[] productFileContent = File.ReadAllLines(inputFile);
-
-            for (int i = 4; i < productFileContent.Length; i++)
+            if (File.Exists(inputFile))
             {
-                eachLineContent = productFileContent[i].Split(',');
+                string[] eachLineContent = null;
+                string[] productFileContent = File.ReadAllLines(inputFile);
 
-                if (eachLineContent[0].Contains(productName))
+                for (int i = 4; i < productFileContent.Length; i++)
                 {
-                    Assert.AreEqual(eachLineContent[2], editionNumber.ToString(), $"Product.TXT contains edition number for cancel product{eachLineContent[2]}, Instead of expected {editionNumber}");
+                    eachLineContent = productFileContent[i].Split(',');
+
+                    if (eachLineContent[0].Contains(productName))
+                    {
+                        Assert.AreEqual(eachLineContent[2], editionNumber.ToString(), $"Product.TXT contains edition number for cancel product{eachLineContent[2]}, Instead of expected {editionNumber}");
+                    }
                 }
+            }
+            else
+            {
+                Assert.Fail($"File Doesn't Exists {inputFile}");
             }
 
         }
@@ -51,7 +58,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 {
                     File.Delete(Path.Combine(path, fileName));
                 }
-
 
             }
 
