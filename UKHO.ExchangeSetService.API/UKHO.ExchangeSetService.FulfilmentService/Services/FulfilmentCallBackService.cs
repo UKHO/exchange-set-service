@@ -33,9 +33,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.logger = logger;
         }
 
-        public async Task<bool> SendCallBackReponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
+        public async Task<bool> SendCallBackResponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
         {
-            if (scsResponseQueueMessage.CallbackUri != "")
+            if (!string.IsNullOrWhiteSpace(scsResponseQueueMessage.CallbackUri))
             {
                 ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
                 {
@@ -65,16 +65,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 string payloadJson = JsonConvert.SerializeObject(callBackResponse);
 
-                logger.LogInformation(EventIds.ESSPostCallBackRequestStart.ToEventId(), "Post callback request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
-                
                 await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
                 
-                logger.LogInformation(EventIds.ESSPostCallBackRequestCompleted.ToEventId(), "Post callback request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                 return true;
             }
             else 
             {
-                logger.LogInformation(EventIds.ESSPostCallBackRequestNotSend.ToEventId(), "Post callback request not send for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriNotProvided.ToEventId(), "Post callback uri was not provided by requestor for successful exchange set creation for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                 return false;
             }
         }
@@ -84,9 +82,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var listRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>();
             foreach (var item in salesCatalogueProductResponse.ProductCounts.RequestedProductsNotReturned)
             {
-                var requestedProductsNotInExchangeSet = new RequestedProductsNotInExchangeSet();
-                requestedProductsNotInExchangeSet.ProductName = item.ProductName;
-                requestedProductsNotInExchangeSet.Reason = item.Reason;
+                var requestedProductsNotInExchangeSet = new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = item.ProductName,
+                    Reason = item.Reason
+                };
                 listRequestedProductsNotInExchangeSet.Add(requestedProductsNotInExchangeSet);
             }
             return listRequestedProductsNotInExchangeSet;

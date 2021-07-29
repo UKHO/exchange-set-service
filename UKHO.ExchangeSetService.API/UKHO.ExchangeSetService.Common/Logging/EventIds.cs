@@ -85,9 +85,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         EventHubLoggingIsHealthy = 805078,
         EventHubLoggingIsUnhealthy = 805079,
         ExchangeSetTooLarge = 805080,
-        ESSPostCallBackRequestStart = 805081,
-        ESSPostCallBackRequestCompleted = 805082,
-        ESSPostCallBackRequestNotSend = 805083
+        ExchangeSetCreatedPostCallbackUriCalled = 805081,
+        ExchangeSetCreatedPostCallbackUriNotProvided = 805082
     }
 
     public static class EventIdExtensions

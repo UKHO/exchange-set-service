@@ -24,10 +24,21 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         public FulfilmentCallBackService fulfilmentCallBackService;
         public ILogger<FulfilmentCallBackService> fakeLogger;
+        public string postBodyParam;
+        public string uriParam;
+        public HttpMethod httpMethodParam;
+        public SalesCatalogueProductResponse salesCatalogueProductResponse;
+        public SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage;
 
         [SetUp]
         public void Setup()
         {
+            postBodyParam = "This should be replace by actual value when param passed to api call";
+            uriParam = null;
+            httpMethodParam = null;
+            salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
+            scsResponseQueueMessage = GetScsResponseQueueMessage();
+
             fakeEssCallBackConfiguration = Options.Create(new EssCallBackConfiguration(){});
             fakeCallBackClient = A.Fake<ICallBackClient>();
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration(){ });
@@ -98,15 +109,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async Task WhenValidCallBackUriInRequest_ThenSendCallBackReponseReturnsTrue()
+        public async Task WhenValidCallBackUriInRequest_ThenSendCallBackResponseReturnsTrue()
         {
-            string postBodyParam = "This should be replace by actual value when param passed to api call";
-            string uriParam = null;
-            HttpMethod httpMethodParam = null;
-
-            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string uri) =>
                {
@@ -115,20 +119,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                    postBodyParam = postBody;
                });
 
-            var response = await fulfilmentCallBackService.SendCallBackReponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
             Assert.IsTrue(response);
         }
 
         [Test]
-        public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackReponseReturnsFalse()
+        public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackResponseReturnsFalse()
         {
-            string postBodyParam = "This should be replace by actual value when param passed to api call";
-            string uriParam = null;
-            HttpMethod httpMethodParam = null;
-
-            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             scsResponseQueueMessage.CallbackUri = "";
 
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -139,7 +137,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                    postBodyParam = postBody;
                });
 
-            var response = await fulfilmentCallBackService.SendCallBackReponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
             Assert.IsFalse(response);
         }

@@ -73,8 +73,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
 
-                var reponse = await fulfilmentCallBackService.SendCallBackReponse(response, message);
-                Console.WriteLine(reponse);
+                await fulfilmentCallBackService.SendCallBackResponse(response, message);
 
                 return "Exchange Set Created Successfully";
             }
