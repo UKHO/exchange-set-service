@@ -274,7 +274,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             string path = Path.GetTempPath();
 
-            if (Directory.Exists(path))
+            if (Directory.Exists(path) && File.Exists(Path.Combine(path, fileName)))
             {
                 string folder = Path.GetFileName(Path.Combine(path, fileName));
                 if (folder.Contains(".zip"))
