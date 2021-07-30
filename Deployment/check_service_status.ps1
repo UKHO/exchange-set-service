@@ -14,7 +14,6 @@ do
 {
     Write-Host "Polling url: $healthEndPointUrl ..."
     try{
-        Start-Sleep -Seconds $sleepTimeInSecond
         $HttpRequest  = [System.Net.WebRequest]::Create("$healthEndPointUrl")
         $HttpResponse = $HttpRequest.GetResponse() 
         $HttpStatus   = $HttpResponse.StatusCode
@@ -26,18 +25,16 @@ do
             break
         }
         Else {
-            Write-Host "Service not yet Up. Status code: $HttpStatus ..."
-            Start-Sleep -Seconds $sleepTimeInSecond
+            Write-Host "Service not yet Up. Status code: $HttpStatus re-checking after $sleepTimeInSecond sec ..."
         }
     }
     catch [System.Net.WebException]
     {
         $HttpStatus = $_.Exception.Response.StatusCode
-        Write-Host "Service not yet Up.Status: $HttpStatus ..."
-        Start-Sleep -Seconds $sleepTimeInSecond
-    }
+        Write-Host "Service not yet Up.Status: $HttpStatus re-checking after $sleepTimeInSecond sec ..."
+    }    
     
-    
+    Start-Sleep -Seconds $sleepTimeInSecond
 }
 until ($stopWatch.Elapsed -ge $timeSpan)
 
