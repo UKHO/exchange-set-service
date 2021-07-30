@@ -6,11 +6,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class CancellationFileHelper
     {
-        public static void CheckCatalogueFileContent(string inputFile, int editionNumber, int updateNumber)
+        public static void CheckCatalogueFileContent(string inputFile, int editionNumber, int updateNumber, string batchId)
         {
             string catalogueFileContent = File.ReadAllText(inputFile);
 
-            Assert.True(catalogueFileContent.Contains($"VERSION=1.0,EDTN={editionNumber},UPDN={updateNumber}"), $"Content not found file content : {catalogueFileContent} and search content : 'VERSION=1.0,EDTN={editionNumber},UPDN={updateNumber}'");
+            Assert.True(catalogueFileContent.Contains($"VERSION=1.0,EDTN={editionNumber},UPDN={updateNumber}"), $"batchId {batchId}, Content not found file content : {catalogueFileContent} and search content : 'VERSION=1.0,EDTN={editionNumber},UPDN={updateNumber}'");
 
         }
 

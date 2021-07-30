@@ -45,6 +45,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
+            string[] batchUri = batchStatusUrl.Split("/");
+            var batchId = batchUri[batchUri.Length - 1];
+
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
 
@@ -70,7 +73,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count-1];
 
-                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber);
+                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
                 CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
                 
                 
@@ -92,6 +95,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+
+            string[] batchUri = batchStatusUrl.Split("/");
+            var batchId = batchUri[batchUri.Length - 1];
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
@@ -117,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count - 1];
 
-                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber);
+                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
                 CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
                
                                
