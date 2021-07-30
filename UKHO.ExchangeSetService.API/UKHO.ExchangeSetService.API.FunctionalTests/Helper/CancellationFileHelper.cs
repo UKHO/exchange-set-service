@@ -10,7 +10,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             string catalogueFileContent = File.ReadAllText(inputFile);
 
-            Assert.True(catalogueFileContent.Contains($"VERSION=1.0,EDTN={editionNumber},UPDN={updateNumber}"));
+            Assert.True(catalogueFileContent.Contains($"VERSION=1.0,EDTN={editionNumber},UPDN={updateNumber}"), $"Content not found file content : {catalogueFileContent} and search content : 'VERSION=1.0,EDTN={editionNumber},UPDN={updateNumber}'");
 
         }
 
