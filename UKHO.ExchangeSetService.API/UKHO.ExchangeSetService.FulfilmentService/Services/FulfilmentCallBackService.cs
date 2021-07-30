@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 CallBackResponse callBackResponse = new CallBackResponse()
                 {
-                    Specversion = essCallBackConfiguration.Value.SpecVersion,
+                    SpecVersion = essCallBackConfiguration.Value.SpecVersion,
                     Type = essCallBackConfiguration.Value.Type,
                     Source = essCallBackConfiguration.Value.Source,
                     Id = Guid.NewGuid().ToString(),

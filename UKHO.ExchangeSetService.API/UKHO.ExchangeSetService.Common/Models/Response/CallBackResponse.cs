@@ -5,7 +5,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
     public class CallBackResponse
     {
         [JsonProperty("specversion")]
-        public string Specversion { get; set; }
+        public string SpecVersion { get; set; }
         [JsonProperty("type")]
         public string Type { get; set; }
         [JsonProperty("source")]
