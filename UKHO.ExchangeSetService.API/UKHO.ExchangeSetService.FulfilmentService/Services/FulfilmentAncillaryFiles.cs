@@ -86,8 +86,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
                         string comment = string.Empty;
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
-
-                        logger.LogInformation("SCS status check " + salesCatalogueDataResponse.ResponseCode);
+                        
                         if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
                         {
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();

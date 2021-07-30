@@ -75,11 +75,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
                 CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
-                
-                
-
+           
             }
-
         }
 
         [Test]
@@ -125,8 +122,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
                 CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
-               
-                               
+
             }
         }
 
