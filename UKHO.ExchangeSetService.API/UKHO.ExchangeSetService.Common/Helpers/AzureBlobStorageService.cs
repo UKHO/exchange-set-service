@@ -95,17 +95,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, storageAccountConnectionString);
 
             var responseFile = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
-            if (responseFile != null)
-            {
-                SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
-                logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the scsResponseUri:{scsResponseUri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", scsResponseUri, batchId, correlationId);
-                return salesCatalogueProductResponse;
-            }
-            else
-            {
-                logger.LogError(EventIds.DownloadSalesCatalogueResponseNonOkResponse.ToEventId(), "Error in downloading the Sales catalogue response from blob for the scsResponseUri:{scsResponseUri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", scsResponseUri, batchId, correlationId);
-                throw new FulfilmentException(EventIds.DownloadSalesCatalogueResponseNonOkResponse.ToEventId());
-            }
+            SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
+            logger.LogInformation(EventIds.DownloadSalesCatalogueResponsDataCompleted.ToEventId(), "Sales catalogue response download completed from blob for the scsResponseUri:{scsResponseUri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", scsResponseUri, batchId, correlationId);
+            return salesCatalogueProductResponse;
         }
     }
 }

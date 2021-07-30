@@ -349,7 +349,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureAdToken);
 
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
@@ -387,7 +387,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callbackUri
                 }, azureB2CToken); // AzureB2C Token but file size is less than 300 Mb
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.NotNull(result.LastModified);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
@@ -604,7 +604,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, azureB2CToken);// azureB2C Token with file size less than 300 Mb
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.Null(result.LastModified);
         }
 
@@ -634,7 +634,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureAdB2CToken); // Azure Ad B2C Token but file size less than 300 mB
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.NotNull(result.LastModified);
         }
 

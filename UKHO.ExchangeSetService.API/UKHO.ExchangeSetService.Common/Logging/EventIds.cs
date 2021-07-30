@@ -35,9 +35,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceRequestStart = 805028,
         QueryFileShareServiceRequestCompleted = 805029,
         QueryFileShareServiceNonOkResponse = 805030,
-        DownloadFileShareServiceFilesStart = 805031,
-        DownloadFileShareServiceFilesCompleted = 805032,
-        DownloadFileShareServiceNonOkResponse = 805033,        
+        DownloadENCFilesRequestStart = 805031,
+        DownloadENCFilesRequestCompleted = 805032,
+        DownloadENCFilesRequestNonOkResponse = 805033,        
         ReadMeTextFileNotFound = 805034,
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
@@ -51,10 +51,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         UploadExchangeSetToFssCompleted = 805044,
         UploadFileCreationProcessStarted = 805045,
         UploadFileCreationProcessCompleted = 805046,
-        ExchangeSetFileCreateStart = 805047,
-        CreateExchangeSetFileNonOkResponse = 805048,
-        UploadFileBlockMetaDataCompleted = 805049,
-        UploadFileBlockMetaDataNonOkResponse = 805050,
+        CreateFileInBatchStart = 805047,
+        CreateFileInBatchNonOkResponse = 805048,
+        UploadFileBlockCompleted = 805049,
+        UploadFileBlockNonOkResponse = 805050,
         WriteBlocksToFileStart = 805051,
         WriteBlocksToFileCompleted = 805052,
         UploadCommitBatchStart = 805053,
@@ -88,7 +88,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         SystemException = 805081,
         DownloadSalesCatalogueResponseNonOkResponse = 805082,
         ErrorTxtNotUploaded = 805083,
-        ErrorTxtNotCreated = 805084
+        ErrorTxtNotCreated = 805084,
+        UploadFileBlockStarted = 805085,
+        CreateFileInBatchCompleted = 805086
     }
 
     public static class EventIdExtensions

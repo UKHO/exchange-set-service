@@ -81,6 +81,8 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
+            if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
+                return exchangeSetServiceResponse;
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
@@ -171,7 +173,9 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId);
-
+            if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
+                return exchangeSetServiceResponse;
+            
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
                 await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.CorrelationId);
@@ -207,6 +211,8 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
+            if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
+                return exchangeSetServiceResponse;
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
@@ -270,6 +276,7 @@ namespace UKHO.ExchangeSetService.API.Services
             };
             exchangeSetResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
             exchangeSetResponse.BatchId = createBatchResponse.ResponseBody.BatchId;
+            exchangeSetResponse.HttpStatusCode = createBatchResponse.ResponseCode;
 
             logger.LogInformation(EventIds.FSSCreateBatchRequestCompleted.ToEventId(), "FSS create batch endpoint request completed with batch status uri {ExchangeSetBatchStatusUri.Href} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", exchangeSetResponse.ExchangeSetResponse?.Links.ExchangeSetBatchStatusUri.Href, createBatchResponse.ResponseBody.BatchId, correlationId);
 
