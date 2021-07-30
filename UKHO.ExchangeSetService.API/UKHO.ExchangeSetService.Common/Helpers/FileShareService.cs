@@ -105,6 +105,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
             internalSearchBatchResponse.Entries = new List<BatchDetail>();
+            List<Products> internalNotFoundProducts = new List<Products>();
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var productWithAttributes = GenerateQueryForFss(products);
             var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes}";
@@ -126,8 +127,44 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     logger.LogError(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "File share service with uri {RequestUri}, responded with {StatusCode} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, correlationId);                    
                 }
-            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount);
+            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+            if (internalSearchBatchResponse.Entries.Any() && prodCount != internalSearchBatchResponse.Entries.Count)
+            {
+                List<Products> internalProducts = new List<Products>();
 
+                foreach (var item in internalSearchBatchResponse.Entries)
+                {
+                    var product = new Products
+                    {
+                        EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b => b.Value).FirstOrDefault()),
+                        ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault()
+                    };
+                    if (product.UpdateNumbers == null)
+                    {
+                        product.UpdateNumbers = new List<int?>();
+                    }
+                    var UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault());
+                    product.UpdateNumbers.Add(UpdateNumber);
+                    internalProducts.Add(product);
+                }
+                foreach (var itemProduct in products)
+                {
+                    foreach (var itemUpdateNumber in itemProduct.UpdateNumbers)
+                    {
+                        var checkNoDataFound = internalProducts.Where(a => a.EditionNumber == itemProduct.EditionNumber && a.ProductName == itemProduct.ProductName).Select(a => a.UpdateNumbers);
+                        if (checkNoDataFound != null && !checkNoDataFound.Any(a => a.Contains(itemUpdateNumber)))
+                        {
+                            internalNotFoundProducts.Add(itemProduct);
+                        }
+                    }
+                }
+            }
+            if (internalNotFoundProducts.Any())
+            {
+                var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Distinct());
+                logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId(), "File share service response not found while quering to FSS {internalNotFoundProductsPayLoadJson} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, correlationId);
+                throw new FulfilmentException(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId());
+            }
             return internalSearchBatchResponse;
         }
 

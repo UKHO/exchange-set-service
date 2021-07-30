@@ -90,7 +90,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ErrorTxtNotUploaded = 805083,
         ErrorTxtNotCreated = 805084,
         UploadFileBlockStarted = 805085,
-        CreateFileInBatchCompleted = 805086
+        CreateFileInBatchCompleted = 805086,
+        FSSResponseNotFoundForRespectiveProductWhileQuering = 805087
     }
 
     public static class EventIdExtensions
