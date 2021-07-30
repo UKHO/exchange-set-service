@@ -1,23 +1,28 @@
-﻿using UKHO.ExchangeSetService.Common.Configuration;
+﻿using System;
+using UKHO.ExchangeSetService.Common.Configuration;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class ExchangeSetInstance : ISmallExchangeSetInstance, IMediumExchangeSetInstance, ILargeExchangeSetInstance
     {
-        private int instanceCount = 0;
+        private int instanceNumber = 0;
+        private readonly Object _lock = new Object();
 
-        public int GetCurrentInstanceCount() => instanceCount;
+        public int GetCurrentInstanceNumber() => instanceNumber;
 
-        public int GetInstanceCount(int maxInstanceCount)
+        public int GetInstanceNumber(int maxInstanceCount)
         {
-            if (instanceCount >= maxInstanceCount)
+            lock (_lock)
             {
-                ResetInstanceCount();
+                if (instanceNumber >= maxInstanceCount)
+                {
+                    ResetInstanceNumber();
+                }
+                instanceNumber++;
             }
-            instanceCount += 1;
-            return instanceCount;
+            return instanceNumber;
         }
 
-        public void ResetInstanceCount() => instanceCount = 0;
+        private void ResetInstanceNumber() => instanceNumber = 0;
     }
 }

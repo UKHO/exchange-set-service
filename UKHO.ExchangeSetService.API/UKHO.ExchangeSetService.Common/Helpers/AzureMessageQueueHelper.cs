@@ -19,9 +19,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.logger = logger;
             this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
         }
-        public async Task AddMessage(string batchId, int instanceCount, string storageAccountConnectionString, string message, string correlationId)
+        public async Task AddMessage(string batchId, int instanceNumber, string storageAccountConnectionString, string message, string correlationId)
         {
-            var queue = string.Format(essFulfilmentStorageconfig.Value.DynamicQueueName, instanceCount);
+            var queue = string.Format(essFulfilmentStorageconfig.Value.DynamicQueueName, instanceNumber);
             // Create the queue client.
             QueueClient queueClient = new QueueClient(storageAccountConnectionString, queue);
 

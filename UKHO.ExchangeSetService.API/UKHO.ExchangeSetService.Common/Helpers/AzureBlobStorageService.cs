@@ -61,11 +61,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return true;
         }
 
-        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, int instanceCount, string storageAccountConnectionString)
+        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, int instanceNumber, string storageAccountConnectionString)
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob);
             var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
-            await azureMessageQueueHelper.AddMessage(batchId, instanceCount, storageAccountConnectionString, scsResponseQueueMessageJSON, correlationId);
+            await azureMessageQueueHelper.AddMessage(batchId, instanceNumber, storageAccountConnectionString, scsResponseQueueMessageJSON, correlationId);
         }
 
         public async Task UploadSalesCatalogueServiceResponseToBlobAsync(CloudBlockBlob cloudBlockBlob , SalesCatalogueProductResponse salesCatalogueResponse)
@@ -121,15 +121,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (fileSizeInMB > storageConfig.Value.SmallExchangeSetSizeInMB &&
                 fileSizeInMB <= storageConfig.Value.LargeExchangeSetSizeInMB)
             {
-                return (mediumExchangeSetInstance.GetInstanceCount(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.MediumExchangeSet.ToString());
+                return (mediumExchangeSetInstance.GetInstanceNumber(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.MediumExchangeSet.ToString());
             }
             else if (fileSizeInMB > storageConfig.Value.LargeExchangeSetSizeInMB)
             {
-                return (largeExchangeSetInstance.GetInstanceCount(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.LargeExchangeSet.ToString());
+                return (largeExchangeSetInstance.GetInstanceNumber(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.LargeExchangeSet.ToString());
             }
             else
             {
-                return (smallExchangeSetInstance.GetInstanceCount(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.SmallExchangeSet.ToString());
+                return (smallExchangeSetInstance.GetInstanceNumber(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.SmallExchangeSet.ToString());
             }
         }
 
