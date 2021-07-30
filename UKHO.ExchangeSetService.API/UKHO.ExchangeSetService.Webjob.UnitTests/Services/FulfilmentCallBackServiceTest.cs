@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             return new CallBackResponse() 
             {
-                Specversion="1.0",
+                SpecVersion="1.0",
                 Type = "test",
                 Source = "test",
                 Subject = "test",
