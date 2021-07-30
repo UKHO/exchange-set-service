@@ -52,21 +52,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                 logger.LogInformation(EventIds.CreateExchangeSetRequestCompleted.ToEventId(), "Create Exchange Set web job completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
             }
-            catch (FulfilmentException ex)
-            {
-                string errorMessage = string.Format(ex.Message, ex.EventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
-
-                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, ex.EventId, errorMessage, batchFolderPath);
-            }
             catch (Exception ex)
             {
+                EventId exceptionEventId = EventIds.SystemException.ToEventId();
+
+                if (ex.GetType() == typeof(FulfilmentException))
+                    exceptionEventId = ((FulfilmentException)ex).EventId;
+
                 FulfilmentException fulfilmentException = new FulfilmentException();
-                EventId systemExceptionEventId = EventIds.SystemException.ToEventId();
-                string errorMessage = string.Format(fulfilmentException.Message, systemExceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
+                string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
-                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, systemExceptionEventId, errorMessage, batchFolderPath);
+                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
 
-                logger.LogError(systemExceptionEventId, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Exception} and StackTrace:{StackTrace}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message, ex.StackTrace);
+                if (ex.GetType() != typeof(FulfilmentException))
+                    logger.LogError(exceptionEventId, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Exception} and StackTrace:{StackTrace}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message, ex.StackTrace);
             }
         }
 
