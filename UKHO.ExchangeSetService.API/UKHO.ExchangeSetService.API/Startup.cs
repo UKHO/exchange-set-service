@@ -156,6 +156,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
             services.AddScoped<IExchangeSetStorageProvider, ExchangeSetStorageProvider>();
             services.AddScoped<IEventHubLoggingHealthClient, EventHubLoggingHealthClient>();
+            services.AddScoped<IAzureWebJobsHealthCheck, AzureWebJobsHealthCheckClient>();
 
             services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
