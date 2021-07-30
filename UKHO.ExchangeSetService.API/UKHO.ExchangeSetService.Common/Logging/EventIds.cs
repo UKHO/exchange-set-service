@@ -84,7 +84,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         EventHubLoggingEventDataForHealthCheck = 805077,
         EventHubLoggingIsHealthy = 805078,
         EventHubLoggingIsUnhealthy = 805079,
-        ExchangeSetTooLarge = 805080
+        ExchangeSetTooLarge = 805080,
+        AzureBlobStorageIsHealthy = 805081,
+        AzureBlobStorageIsUnhealthy = 805082,
+        AzureMessageQueueIsHealthy = 805083,
+        AzureMessageQueueIsUnhealthy = 805084,
+        AzureWebJobsIsHealthy = 805085,
+        AzureWebJobsIsUnhealthy = 805086
     }
 
     public static class EventIdExtensions

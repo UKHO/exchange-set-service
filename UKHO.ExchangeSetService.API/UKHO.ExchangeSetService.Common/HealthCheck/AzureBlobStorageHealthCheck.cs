@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -7,20 +6,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
     public class AzureBlobStorageHealthCheck : IHealthCheck
     {
+        private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private readonly ISalesCatalogueStorageService scsStorageService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration;
         private readonly ILogger<AzureBlobStorageService> logger;
 
-        public AzureBlobStorageHealthCheck(ISalesCatalogueStorageService scsStorageService,
+        public AzureBlobStorageHealthCheck(IAzureBlobStorageClient azureBlobStorageClient,
+                                           ISalesCatalogueStorageService scsStorageService,
                                            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration,
                                            ILogger<AzureBlobStorageService> logger)
         {
+            this.azureBlobStorageClient = azureBlobStorageClient;
             this.scsStorageService = scsStorageService;
             this.essFulfilmentStorageConfiguration = essFulfilmentStorageConfiguration;
             this.logger = logger;
@@ -31,17 +34,16 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             try
             {
                 string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
-                BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.StorageContainerName);
-                var blobContainerProperties = await container.ExistsAsync();
+                var azureBlobStorageHealthStatus = await azureBlobStorageClient.CheckBlobContainerHealth(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.StorageContainerName);
 
-                if (blobContainerProperties)
+                if (azureBlobStorageHealthStatus.Status == HealthStatus.Healthy)
                 {
-                    logger.LogInformation("Azure blob storage is healthy");
+                    logger.LogDebug(EventIds.AzureBlobStorageIsHealthy.ToEventId(), $"Azure blob storage is healthy");
                     return HealthCheckResult.Healthy("Azure blob storage is healthy");
                 }
                 else
                 {
-                    logger.LogError("Azure blob storage is unhealthy");
+                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), "Azure blob storage is unhealthy");
                     return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy");
                 }
             }
