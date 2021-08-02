@@ -393,6 +393,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 watch.Stop();
             }
+            else
+            {
+                batchStatus = BatchStatus.Failed;
+                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            }
             return batchStatus;
         }
 
