@@ -109,6 +109,34 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
+        public async Task WhenIncorrectCallBackPayloadInRequest_ThenCallBackApiIsNotCalled()
+        {
+            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = 0;
+
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string uri) =>
+               {
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+               });
+
+            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
+        public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackResponseReturnsFalse()
+        {
+            scsResponseQueueMessage.CallbackUri = "";
+
+            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
         public async Task WhenCallBackUriInRequest_ThenSendCallBackResponseReturnsTrue()
         {
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -122,24 +150,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
             Assert.IsTrue(response);
-        }
-
-        [Test]
-        public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackResponseReturnsFalse()
-        {
-            scsResponseQueueMessage.CallbackUri = "";
-
-            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri) =>
-               {
-                   uriParam = uri;
-                   httpMethodParam = method;
-                   postBodyParam = postBody;
-               });
-
-            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
-
-            Assert.IsFalse(response);
         }
     }
 }

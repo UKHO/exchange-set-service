@@ -63,12 +63,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     Data = exchangeSetResponse
                 };
 
-                string payloadJson = JsonConvert.SerializeObject(callBackResponse);
+                if (ValidateCallbackRequestPayload(callBackResponse))
+                {
+                    string payloadJson = JsonConvert.SerializeObject(callBackResponse);
 
-                await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
-                
-                logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
-                return true;
+                    await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
+
+                    logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                    return true;
+                }
+                else 
+                {
+                    logger.LogError(EventIds.ExchangeSetCreatedPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                    return false;
+                }
             }
             else 
             {
@@ -90,6 +98,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 listRequestedProductsNotInExchangeSet.Add(requestedProductsNotInExchangeSet);
             }
             return listRequestedProductsNotInExchangeSet;
+        }
+
+        public bool ValidateCallbackRequestPayload(CallBackResponse callBackResponse)
+        {
+         return (callBackResponse.Data.RequestedProductCount > 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
         }
     }
 }
