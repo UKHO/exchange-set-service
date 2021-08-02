@@ -154,7 +154,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         var checkNoDataFound = internalProducts.Where(a => a.EditionNumber == itemProduct.EditionNumber && a.ProductName == itemProduct.ProductName).Select(a => a.UpdateNumbers);
                         if (checkNoDataFound != null && !checkNoDataFound.Any(a => a.Contains(itemUpdateNumber)))
                         {
-                            internalNotFoundProducts.Add(itemProduct);
+                            internalNotFoundProducts.Add(new Products
+                            {
+                                EditionNumber = itemProduct.EditionNumber,
+                                ProductName = itemProduct.ProductName,
+                                Cancellation = itemProduct.Cancellation,
+                                FileSize = itemProduct.FileSize,
+                                UpdateNumbers = new List<int?> { itemUpdateNumber }
+                            });
                         }
                     }
                 }

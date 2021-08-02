@@ -282,7 +282,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsNotFoundSearchBatchResponse()
+        public void WhenGetBatchInfoBasedOnProducts_ThenReturnsNotFoundSearchBatchResponse()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
 
@@ -326,11 +326,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 FileSize = 400
             });
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, null);
-
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
-            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null); });
         }
         #endregion GetBatchInfoBasedOnProducts
 
