@@ -635,6 +635,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
             fakeFileShareConfig.Value.BaseUrl = null;
+            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
             byte[] byteData = new byte[1024];
 
             var responseBatchStatusModel = GetBatchStatusResponse();

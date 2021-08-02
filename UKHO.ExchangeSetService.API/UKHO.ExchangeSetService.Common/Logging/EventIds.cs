@@ -84,7 +84,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         EventHubLoggingEventDataForHealthCheck = 805077,
         EventHubLoggingIsHealthy = 805078,
         EventHubLoggingIsUnhealthy = 805079,
-        ExchangeSetTooLarge = 805080
+        ExchangeSetTooLarge = 805080,
+        BatchFailedStatus = 805081,
+        BatchCommitTimeout= 805082,
+        BatchStatus= 805083
     }
 
     public static class EventIdExtensions
