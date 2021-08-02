@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId);
 
-            SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse, correlationId);
+            SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse, batchId, correlationId);
 
             logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), "Get sales catalogue service for CatalogueData completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             return response;
@@ -101,7 +101,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var body = await httpResponse.Content.ReadAsStringAsync();
             if (httpResponse.StatusCode != HttpStatusCode.OK && httpResponse.StatusCode != HttpStatusCode.NotModified)
             {
-                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service with uri {RequestUri} and responded with {StatusCode} and message {body} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body, correlationId);
+                logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(), "Error in sales catalogue service with uri:{RequestUri} and responded with {StatusCode} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, correlationId);
                 response.ResponseCode = httpResponse.StatusCode;
                 response.ResponseBody = null;
             }
@@ -122,15 +122,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
-        private async Task<SalesCatalogueDataResponse> CreateSalesCatalogueDataResponse(HttpResponseMessage httpResponse, string correlationId)
+        private async Task<SalesCatalogueDataResponse> CreateSalesCatalogueDataResponse(HttpResponseMessage httpResponse, string batchId, string correlationId)
         {
             var response = new SalesCatalogueDataResponse();
             var body = await httpResponse.Content.ReadAsStringAsync();
             if (httpResponse.StatusCode != HttpStatusCode.OK)
             {
-                logger.LogError(EventIds.SalesCatalogueNonOkResponse.ToEventId(), "Sales catalougue service catalogue end point with uri {RequestUri} responded with {StatusCode} and message {body} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, body, correlationId);
+                logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId(), "Error in sales catalogue service catalogue end point with uri:{RequestUri} responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 response.ResponseCode = httpResponse.StatusCode;
                 response.ResponseBody = null;
+                throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId());
             }
             else
             {

@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         string comment = string.Empty;
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
 
-                        if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
+                        if (mimeType == "BIN")
                         {
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
 
@@ -201,8 +201,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             else
             {
-                logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                throw new FulfilmentException(EventIds.ProductFileIsNotCreated.ToEventId());
+                logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId(), "Error in sales catalogue service catalogue end point for product.txt responded with {ResponseCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", salesCatalogueDataResponse.ResponseCode , batchId, correlationId);
+                throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId());
             }
         }
 

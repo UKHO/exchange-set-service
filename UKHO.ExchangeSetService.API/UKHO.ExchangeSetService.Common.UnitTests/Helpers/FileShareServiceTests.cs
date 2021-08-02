@@ -243,7 +243,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null, null);
             Assert.AreEqual(0, response.Entries.Count);
         }
 
@@ -274,7 +274,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -325,10 +325,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 UpdateNumbers = new List<int?> { 1 },
                 FileSize = 400
             });
-
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                  .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
-                  , async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null); });
+                  , async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null); });
+            
         }
         #endregion GetBatchInfoBasedOnProducts
 
@@ -519,7 +519,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationidParam = correlationid;
                })
                .Returns(httpResponse);
-            A.CallTo(() => fakeFileSystemHelper.DownloadReadmeFile(A<string>.Ignored, A<Stream>.Ignored, A<string>.Ignored)).Returns(false);
+           ///// A.CallTo(() => fakeFileSystemHelper.DownloadReadmeFile(A<string>.Ignored, A<Stream>.Ignored, A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")

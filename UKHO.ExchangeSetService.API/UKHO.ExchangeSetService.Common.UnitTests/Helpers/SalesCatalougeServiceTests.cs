@@ -339,16 +339,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region GetSalesCatalogueDataResponse
         [Test]
-        public async Task WhenSCSClientReturnsOtherThan200_ThenGetSalesCatalogueDataResponseReturnsSameStatusAndNullInResponse()
+        public void WhenSCSClientReturnsOtherThan200_ThenGetSalesCatalogueDataResponseReturnsSameStatusAndNullInResponse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
-            Assert.IsNull(response.ResponseBody);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
+                .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                 , async delegate { await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null); });            
         }
 
         [Test]
