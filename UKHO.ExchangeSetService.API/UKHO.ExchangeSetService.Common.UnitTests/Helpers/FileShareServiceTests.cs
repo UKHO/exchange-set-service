@@ -237,14 +237,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region GetBatchInfoBasedOnProducts
         [Test]
-        public async Task WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsNullResponse()
+        public void WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsNullResponse()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(),null, null);
-            Assert.AreEqual(0, response.Entries.Count);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null); });
         }
 
         [Test]
