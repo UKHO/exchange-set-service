@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async Task WhenValidCallBackUriInRequest_ThenSendCallBackResponseReturnsTrue()
+        public async Task WhenCallBackUriInRequest_ThenSendCallBackResponseReturnsTrue()
         {
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string uri) =>
