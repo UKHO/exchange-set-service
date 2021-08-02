@@ -25,11 +25,11 @@ namespace UKHO.ExchangeSetService.CleanUpJob
         }
         public async Task ProcessCleanUp()
         {
-            logger.LogInformation(EventIds.ESSCleanUpJobRequestStart.ToEventId(), "Exchange set service clean up web job started at " + DateTime.Now + " for storage account name {StorageAccountName} & queue {QueueName} ", storageConfig.Value.StorageAccountName , storageConfig.Value.QueueName);
+            logger.LogInformation(EventIds.ESSCleanUpJobRequestStart.ToEventId(), "Exchange set service clean up web job started at " + DateTime.Now + " for storage account name {StorageAccountName}.", storageConfig.Value.StorageAccountName);
 
             await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
-            logger.LogInformation(EventIds.ESSCleanUpJobRequestCompleted.ToEventId(), "Exchange set service clean up web job completed at " + DateTime.Now + " for storage account name {StorageAccountName} & queue {QueueName} ", storageConfig.Value.StorageAccountName, storageConfig.Value.QueueName);
+            logger.LogInformation(EventIds.ESSCleanUpJobRequestCompleted.ToEventId(), "Exchange set service clean up web job completed at " + DateTime.Now + " for storage account name {StorageAccountName}.", storageConfig.Value.StorageAccountName);
         }
     }
 }
