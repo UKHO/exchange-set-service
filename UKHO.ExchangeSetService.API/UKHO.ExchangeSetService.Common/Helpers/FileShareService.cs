@@ -129,6 +129,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     ////throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
                 }
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+            CheckProductsExistsInFss(products, correlationId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
+            return internalSearchBatchResponse;
+        }
+
+        private void CheckProductsExistsInFss(List<Products> products, string correlationId, SearchBatchResponse internalSearchBatchResponse, List<Products> internalNotFoundProducts, int prodCount)
+        {
             if (internalSearchBatchResponse.Entries.Any() && prodCount != internalSearchBatchResponse.Entries.Count)
             {
                 List<Products> internalProducts = new List<Products>();
@@ -167,13 +173,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     }
                 }
             }
-            if (internalNotFoundProducts.Any())
+            if (internalNotFoundProducts.Any() || !internalSearchBatchResponse.Entries.Any())
             {
-                var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Distinct());
+                var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Any() ? internalNotFoundProducts.Distinct() : products);
                 logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId(), "File share service response not found while quering to FSS {internalNotFoundProductsPayLoadJson} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, correlationId);
                 throw new FulfilmentException(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId());
             }
-            return internalSearchBatchResponse;
         }
 
         private async Task<string> SelectLatestPublishedDateBatch(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string uri, HttpResponseMessage httpResponse, List<string> productList)
