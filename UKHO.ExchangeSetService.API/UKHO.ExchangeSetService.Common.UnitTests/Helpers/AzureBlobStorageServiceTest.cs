@@ -24,6 +24,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private ISmallExchangeSetInstance fakeSmallExchangeSetInstance;
         private IMediumExchangeSetInstance fakeMediumExchangeSetInstance;
         private ILargeExchangeSetInstance fakeLargeExchangeSetInstance;
+        public string fakeExpiryDate = "2021-07-23T06:59:13Z";
 
         [SetUp]
         public void Setup()
@@ -107,8 +108,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
-
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken);
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate);
            
             Assert.IsTrue(response);
         }

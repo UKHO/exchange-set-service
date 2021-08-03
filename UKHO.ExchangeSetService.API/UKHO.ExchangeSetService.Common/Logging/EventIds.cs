@@ -85,7 +85,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         EventHubLoggingIsHealthy = 805078,
         EventHubLoggingIsUnhealthy = 805079,
         ExchangeSetTooLarge = 805080,
-        AddedMessageInQueue = 805081
+        BatchFailedStatus = 805081,
+        BatchCommitTimeout= 805082,
+        BatchStatus= 805083,
+        ExchangeSetCreatedPostCallbackUriCalled = 805084,
+        ExchangeSetCreatedPostCallbackUriNotCalled = 805085,
+        ExchangeSetCreatedPostCallbackUriNotProvided = 805086,
+        AddedMessageInQueue = 805087
     }
 
     public static class EventIdExtensions
