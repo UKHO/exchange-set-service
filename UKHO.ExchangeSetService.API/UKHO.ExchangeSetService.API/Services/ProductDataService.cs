@@ -150,6 +150,7 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
+                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
                 bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
                 if (isAzureB2C)
                 {
@@ -207,6 +208,7 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
+                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
                 bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
                 if (isAzureB2C)
                 {
