@@ -1,9 +1,8 @@
 ﻿using System;
-using UKHO.ExchangeSetService.Common.Configuration;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
-    public class ExchangeSetInstance : ISmallExchangeSetInstance, IMediumExchangeSetInstance, ILargeExchangeSetInstance
+    public abstract class BaseExchangeSetInstance
     {
         private int instanceNumber = 0;
         private readonly Object _lock = new Object();
