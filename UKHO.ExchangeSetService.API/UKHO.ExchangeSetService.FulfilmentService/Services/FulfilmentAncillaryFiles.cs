@@ -164,6 +164,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string filePath = Path.Combine(exchangeSetInfoPath, fileName);
 
                 var productsBuilder = new ProductListBuilder();
+                productsBuilder.UseDefaultOutputTime = false;
+
                 foreach (var product in salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName))
                     productsBuilder.Add(new ProductListEntry()
                     {
