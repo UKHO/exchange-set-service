@@ -1,5 +1,7 @@
 ﻿using Azure.Storage.Queues;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -25,9 +27,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<HealthCheckResult> CheckMessageQueueHealth(string storageAccountConnectionString, string queueName)
         {
-            QueueClient queueClient = new QueueClient(storageAccountConnectionString, queueName);
-            var queueMessage = await queueClient.PeekMessageAsync();
-            if (queueMessage != null && queueMessage.GetRawResponse().ReasonPhrase == "OK")
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+            CloudQueue queue = queueClient.GetQueueReference(queueName);
+            var queueMessageExists = await queue.ExistsAsync();
+            if (queueMessageExists)
                 return HealthCheckResult.Healthy("Azure message queue is healthy");
             else
                 return HealthCheckResult.Unhealthy("Azure message queue is unhealthy", new Exception("Azure message queue is empty"));
