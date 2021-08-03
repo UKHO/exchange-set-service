@@ -85,16 +85,22 @@ namespace UKHO.ExchangeSetService.Common.Logging
         EventHubLoggingIsHealthy = 805078,
         EventHubLoggingIsUnhealthy = 805079,
         ExchangeSetTooLarge = 805080,
-        ESSCleanUpJobRequestStart = 805081,
-        ESSCleanUpJobRequestCompleted = 805082,
-        DeleteHistoricFoldersAndFilesStarted = 805083,
-        DeleteHistoricFoldersAndFilesCompleted = 805084,
-        DeleteHistoricFoldersAndFilesFailed = 805085,
-        HistoricSCSResponseFileDeleted = 805086,
-        HistoricSCSResponseFileNotFound = 805087,
-        HistoricDateFolderDeleted = 805088,
-        HistoricDateFolderNotFound = 805089,
-        DeleteHistoricFoldersAndFilesException = 805090
+        BatchFailedStatus = 805081,
+        BatchCommitTimeout= 805082,
+        BatchStatus= 805083,
+        ExchangeSetCreatedPostCallbackUriCalled = 805084,
+        ExchangeSetCreatedPostCallbackUriNotCalled = 805085,
+        ExchangeSetCreatedPostCallbackUriNotProvided = 805086,
+        ESSCleanUpJobRequestStart = 805087,
+        ESSCleanUpJobRequestCompleted = 805088,
+        DeleteHistoricFoldersAndFilesStarted = 805089,
+        DeleteHistoricFoldersAndFilesCompleted = 805090,
+        DeleteHistoricFoldersAndFilesFailed = 805091,
+        HistoricSCSResponseFileDeleted = 805092,
+        HistoricSCSResponseFileNotFound = 805093,
+        HistoricDateFolderDeleted = 805094,
+        HistoricDateFolderNotFound = 805095,
+        DeleteHistoricFoldersAndFilesException = 805096
     }
 
     public static class EventIdExtensions
