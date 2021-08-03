@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             {
                 logger.LogInformation(EventIds.CreateExchangeSetRequestStart.ToEventId(), "Create Exchange Set web job started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
 
-                await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage);
+                await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDateTime);
 
                 logger.LogInformation(EventIds.CreateExchangeSetRequestCompleted.ToEventId(), "Create Exchange Set web job completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
             }

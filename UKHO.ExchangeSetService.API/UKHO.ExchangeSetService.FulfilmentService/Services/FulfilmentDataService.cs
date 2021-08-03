@@ -45,12 +45,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentCallBackService = fulfilmentCallBackService;
         }
 
-        public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message)
+        public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDateTime)
         {
             string homeDirectoryPath = configuration["HOME"];
-            var exchangeSetPath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
+            var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var exchangeSetPathForUploadZipFile = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId);
+            var exchangeSetPathForUploadZipFile = Path.Combine(homeDirectoryPath, currentUtcDateTime, message.BatchId);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
 
             var response = await DownloadSalesCatalogueResponse(message);
