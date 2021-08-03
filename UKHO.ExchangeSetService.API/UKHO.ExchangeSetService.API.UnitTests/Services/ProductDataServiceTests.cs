@@ -33,6 +33,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IFileShareService fakeFileShareService;
         private ILogger<FileShareService> logger;
         private IMapper fakeMapper;
+        private IMonitorHelper fakeMonitorHelper;
         private IExchangeSetStorageProvider fakeExchangeSetStorageProvider;
         private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfig;
         private IOptions<AzureAdB2CConfiguration> fakeAzureAdB2CConfig;
@@ -52,6 +53,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeEssFulfilmentStorageConfig = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
             fakeAzureAdB2CConfig = A.Fake<IOptions<AzureAdB2CConfiguration>>();
             fakeAzureAdConfig = A.Fake<IOptions<AzureADConfiguration>>();
+            fakeMonitorHelper = A.Fake<IMonitorHelper>();
 
             fakeAzureAdB2CConfig.Value.ClientId = "9bca10f0-20d9-4b38-88eb-c7aff6b5f571";
             fakeAzureAdB2CConfig.Value.Instance = "https://gk.microsoft.com/";
@@ -61,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig);
+            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig,fakeMonitorHelper);
         }
 
         #region GetExchangeSetResponse

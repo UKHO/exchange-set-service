@@ -28,17 +28,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly IMonitorHelper monitorHelper;
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 ILogger<FileShareService> logger,
-                                IFileSystemHelper fileSystemHelper)
+                                IFileSystemHelper fileSystemHelper,
+                                IMonitorHelper monitorHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
             this.fileSystemHelper = fileSystemHelper;
+            this.monitorHelper = monitorHelper;
         }
         public async Task<CreateBatchResponse> CreateBatch()
         {
@@ -114,10 +117,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string payloadJson = string.Empty;
             var productList = new List<string>();
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
+            int queryCount = 0;
             do
             {
+                queryCount++;
                 httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, correlationId);
-
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     uri = await SelectLatestPublishedDateBatch(products, internalSearchBatchResponse, uri, httpResponse, productList);
@@ -126,8 +130,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     logger.LogInformation(EventIds.QueryFileShareServiceNonOkResponse.ToEventId(), "File share service with uri {RequestUri}, responded with {StatusCode} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, correlationId);
                 }
-            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount);
-
+            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+            internalSearchBatchResponse.QueryCount = queryCount;
             return internalSearchBatchResponse;
         }
 
@@ -247,10 +251,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
         {
-            using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
-            {
-                fileSystemHelper.CreateFileCopy(path, stream);
-            }
+            using Stream stream = await httpResponse.Content.ReadAsStreamAsync();
+            fileSystemHelper.CreateFileCopy(path, stream);
         }
 
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
@@ -265,10 +267,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, correlationId);
             if (httpReadMeFileResponse.IsSuccessStatusCode)
             {
-                using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
-                {
-                    return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
-                }
+                using Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync();
+                return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
             }
             else
             {
@@ -323,6 +323,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            DateTime uploadZipFileTaskStartAt = DateTime.UtcNow;
             bool isUploadZipFile = false;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileShareServiceConfig.Value.ExchangeSetFileName));
 
@@ -330,6 +331,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (isZipFileCreated)
             {
                 bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
+                DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartAt, uploadZipFileTaskCompletedAt, correlationId, null, null,null,batchId);
                 if (isWriteBlock)
                 {
                     BatchStatus batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, customFileInfo);
@@ -363,6 +366,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 AccessToken = accessToken,
                 FullFileName = customFileInfo.FullName
             };
+            DateTime commitTaskStartAt = DateTime.UtcNow;
             bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaData, correlationId);
             BatchStatus batchStatus = BatchStatus.CommitInProgress;
             if (isUploadCommitBatchCompleted)
@@ -398,6 +402,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 batchStatus = BatchStatus.Failed;
                 logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
+            DateTime commitTaskCompletedAt = DateTime.UtcNow;
+            monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartAt, commitTaskCompletedAt, correlationId, null, null, null,batchId);
             return batchStatus;
         }
 

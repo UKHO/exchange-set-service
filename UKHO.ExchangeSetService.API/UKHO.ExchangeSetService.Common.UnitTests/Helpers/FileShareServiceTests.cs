@@ -28,6 +28,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
         private IFileSystemHelper fakeFileSystemHelper;
+        private IMonitorHelper fakeMonitorHelper;
 
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeFolderPath = "C:\\HOME";
@@ -43,8 +44,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-
-            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper);
+            this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
+            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper, fakeMonitorHelper);
         }
 
         #region GetCreateBatchResponse

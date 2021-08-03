@@ -30,6 +30,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
         public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
         public IFulfilmentCallBackService fakeFulfilmentCallBackService;
+        public IMonitorHelper fakeMonitorHelper;
 
         [SetUp]
         public void Setup()
@@ -40,6 +41,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeConfiguration = A.Fake<IConfiguration>();
             fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
+            fakeMonitorHelper = A.Fake<IMonitorHelper>();
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             {
                 BaseUrl = "http://tempuri.org",
@@ -64,7 +66,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
             fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper);
         }
 
         #region GetScsResponseQueueMessage

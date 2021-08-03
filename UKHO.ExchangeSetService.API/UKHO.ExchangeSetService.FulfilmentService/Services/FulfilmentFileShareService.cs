@@ -53,16 +53,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 var batchProducts = SliceFileShareServiceProducts(products);
                 var listBatchDetails = new List<BatchDetail>();
+                int totalHitCountForToQueryFileShareService = 0;
                 foreach (var item in batchProducts)
                 {
                     var result = await fileShareService.GetBatchInfoBasedOnProducts(item, correlationId);
                     listBatchDetails.AddRange(result.Entries);
-                }
-
-                return SetFulfilmentDataResponse(new SearchBatchResponse()
+                    totalHitCountForToQueryFileShareService += result.QueryCount;
+                }              
+                var fulFilmentDataResponse = SetFulfilmentDataResponse(new SearchBatchResponse()
                 {
-                    Entries = listBatchDetails
+                    Entries = listBatchDetails,
+
                 });
+                if (fulFilmentDataResponse.Count > 0)
+                    fulFilmentDataResponse.FirstOrDefault().TotalHitCountForQueryFileShareService = totalHitCountForToQueryFileShareService;
+                return fulFilmentDataResponse;
             }
             return null;
         }
