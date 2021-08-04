@@ -2,6 +2,6 @@
 {
     public interface ISalesCatalogueStorageService
     {
-        string GetStorageAccountConnectionString();
+        string GetStorageAccountConnectionString(string storageAccountName = null, string storageAccountKey = null);
     }
 }

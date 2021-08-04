@@ -15,7 +15,24 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
         public void Setup()
         {
             fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration()
-            { QueueName = "", StorageAccountKey = "", StorageAccountName = "test", StorageContainerName = "test" });
+            {
+                QueueName = "",
+                StorageAccountKey = "",
+                StorageAccountName = "test",
+                StorageContainerName = "test",
+                DynamicQueueName = "ess-{0}-test",
+                LargeExchangeSetAccountKey = "LargeExchangeSetAccountKey",
+                LargeExchangeSetAccountName = "LargeExchangeSetAccountName",
+                LargeExchangeSetInstance = 2,
+                LargeExchangeSetSizeInMB = 300,
+                MediumExchangeSetAccountKey = "MediumExchangeSetAccountKey",
+                MediumExchangeSetAccountName = "MediumExchangeSetAccountName",
+                MediumExchangeSetInstance = 3,
+                SmallExchangeSetAccountKey = "SmallExchangeSetAccountKey",
+                SmallExchangeSetAccountName = "SmallExchangeSetAccountName",
+                SmallExchangeSetInstance = 2,
+                SmallExchangeSetSizeInMB = 50
+            });
 
             salesCatalogueStorageService = new SalesCatalogueStorageService(fakeStorageConfig);
         }
