@@ -157,6 +157,9 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
             services.AddScoped<IExchangeSetStorageProvider, ExchangeSetStorageProvider>();
             services.AddScoped<IEventHubLoggingHealthClient, EventHubLoggingHealthClient>();
+            services.AddSingleton<ISmallExchangeSetInstance, SmallExchangeSetInstance>();
+            services.AddSingleton<IMediumExchangeSetInstance, MediumExchangeSetInstance>();
+            services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
 
             services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")

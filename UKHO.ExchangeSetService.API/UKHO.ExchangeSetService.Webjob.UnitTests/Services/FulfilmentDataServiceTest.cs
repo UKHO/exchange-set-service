@@ -151,7 +151,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
@@ -175,7 +175,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
@@ -202,7 +202,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeConfiguration["HOME"] = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);

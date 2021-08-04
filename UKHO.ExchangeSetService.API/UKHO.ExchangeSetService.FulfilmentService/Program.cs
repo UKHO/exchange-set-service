@@ -156,6 +156,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IFileSystemHelper, FileSystemHelper>();
                  services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
                  services.AddScoped<IFulfilmentSalesCatalogueService, FulfilmentSalesCatalogueService>();
+                 services.AddSingleton<ISmallExchangeSetInstance, SmallExchangeSetInstance>();
+                 services.AddSingleton<IMediumExchangeSetInstance, MediumExchangeSetInstance>();
+                 services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
                  services.AddScoped<IFulfilmentCallBackService, FulfilmentCallBackService>();
 
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
