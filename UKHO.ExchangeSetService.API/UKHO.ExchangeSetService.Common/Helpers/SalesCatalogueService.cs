@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestStart.ToEventId(), "Get sales catalogue service from specific date time started _X-Correlation-ID:{CorrelationId}", correlationId);
+            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestStart.ToEventId(), "Get sales catalogue service from specific date time started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
 
-            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Get sales catalogue service from specific date time completed _X-Correlation-ID:{CorrelationId}", correlationId);
+            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Get sales catalogue service from specific date time completed for _X-Correlation-ID:{CorrelationId}", correlationId);
             return response;
         }
 
@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSPostProductVersionsRequestStart.ToEventId(), "Post sales catalouge service for ProductVersions started for _X-Correlation-ID:{CorrelationId}", correlationId);
+            logger.LogInformation(EventIds.SCSPostProductVersionsRequestStart.ToEventId(), "Post sales catalogue service for ProductVersions started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productVersions";

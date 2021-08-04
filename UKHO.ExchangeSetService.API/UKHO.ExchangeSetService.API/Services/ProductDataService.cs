@@ -265,7 +265,7 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), "FSS create batch endpoint request started and _X-Correlation-ID:{CorrelationId}", correlationId);
 
-            var createBatchResponse = await fileShareService.CreateBatch();
+            var createBatchResponse = await fileShareService.CreateBatch(correlationId);
 
             if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
             {
@@ -304,11 +304,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private async Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate)
         {
-            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "SCS response store request started for the {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "SCS response store request started for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
 
             bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId, expiryDate);
 
-            logger.LogInformation(EventIds.SCSResponseStoreRequestCompleted.ToEventId(), "SCS response store request completed for the {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            logger.LogInformation(EventIds.SCSResponseStoreRequestCompleted.ToEventId(), "SCS response store request completed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             return result;
         }
     }
