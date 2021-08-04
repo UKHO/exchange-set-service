@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -34,17 +35,18 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}";
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string payloadJson = string.Empty;
-
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             var fileShareServiceResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
-
+            watch.Stop();
             if (fileShareServiceResponse.StatusCode == HttpStatusCode.OK)
             {
-                logger.LogDebug(EventIds.FileShareServiceIsHealthy.ToEventId(), "File share service is healthy responded with {StatusCode}", fileShareServiceResponse.StatusCode);
+                logger.LogInformation(EventIds.FileShareServiceIsHealthy.ToEventId(), $"File share service is healthy responded with {fileShareServiceResponse.StatusCode}, time spent to check this is {watch.ElapsedMilliseconds}ms");
                 return HealthCheckResult.Healthy("File share service is healthy");
             }
             else
             {
-                logger.LogError(EventIds.FileShareServiceIsUnhealthy.ToEventId(), "File share service is unhealthy responded with {StatusCode} for request uri {RequestUri}", fileShareServiceResponse.StatusCode, fileShareServiceResponse.RequestMessage.RequestUri);
+                logger.LogError(EventIds.FileShareServiceIsUnhealthy.ToEventId(), $"File share service is unhealthy responded with {fileShareServiceResponse.StatusCode} for request uri {fileShareServiceResponse.RequestMessage.RequestUri}, time spent to check this is {watch.ElapsedMilliseconds}ms");
                 return HealthCheckResult.Unhealthy("File share service is unhealthy");
             }
         }

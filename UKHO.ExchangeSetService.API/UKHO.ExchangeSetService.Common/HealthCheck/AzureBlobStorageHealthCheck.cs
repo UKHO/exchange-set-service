@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -33,17 +34,19 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
                 string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
                 var azureBlobStorageHealthStatus = await azureBlobStorageClient.CheckBlobContainerHealth(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.StorageContainerName);
-
+                watch.Stop();
                 if (azureBlobStorageHealthStatus.Status == HealthStatus.Healthy)
                 {
-                    logger.LogDebug(EventIds.AzureBlobStorageIsHealthy.ToEventId(), $"Azure blob storage is healthy");
+                    logger.LogInformation(EventIds.AzureBlobStorageIsHealthy.ToEventId(), $"Azure blob storage is healthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
                     return HealthCheckResult.Healthy("Azure blob storage is healthy");
                 }
                 else
                 {
-                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), "Azure blob storage is unhealthy");
+                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), "Azure blob storage is unhealthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
                     return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy");
                 }
             }

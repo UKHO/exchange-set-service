@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -33,17 +34,19 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
                 string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
                 var messageQueueHealthStatus = await azureMessageQueueHelper.CheckMessageQueueHealth(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.QueueName);
-
+                watch.Stop();
                 if (messageQueueHealthStatus.Status == HealthStatus.Healthy)
                 {
-                    logger.LogDebug(EventIds.AzureMessageQueueIsHealthy.ToEventId(), $"Azure message queue is healthy");
+                    logger.LogInformation(EventIds.AzureMessageQueueIsHealthy.ToEventId(), $"Azure message queue is healthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
                     return HealthCheckResult.Healthy("Azure message queue is healthy");
                 }
                 else
                 {
-                    logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), $"Azure message queue is unhealthy");
+                    logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), $"Azure message queue is unhealthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
                     return HealthCheckResult.Unhealthy("Azure message queue is unhealthy");
                 }
             }
