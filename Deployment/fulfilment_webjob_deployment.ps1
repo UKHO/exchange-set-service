@@ -40,8 +40,9 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
 
         if ( !$? ) { echo "Error while Reading json file for CleanUp" ; throw $_ }
 
-        $appSettingForCleanUp.KeyVaultSettings.ServiceUri = $KeyVaultUri
-        $appSettingForCleanUp | ConvertTo-Json -Depth 5 | set-content $appSettingFileForCleanUp
+        $appSetting.ESSFulfilmentStorageConfiguration.QueueName = $queueName
+        $appSetting.KeyVaultSettings.ServiceUri = $KeyVaultUri
+        $appSetting | ConvertTo-Json | set-content $appSettingFile
         
         if ( !$? ) { echo "Error while updating json file for CleanUp" ; throw $_ }
 

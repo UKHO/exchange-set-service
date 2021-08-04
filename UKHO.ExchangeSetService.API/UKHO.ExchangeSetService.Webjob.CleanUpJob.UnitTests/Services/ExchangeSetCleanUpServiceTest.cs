@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotFound_ThenReturnKeyNotFoundException()
         {
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         [Test]
         public async Task WhenHistoricFoldersAndFilesNotFound_ThenReturnFalseResponse()
         {
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(fakeStorageAccountConnectionString);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(fakeStorageAccountConnectionString);
             A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(false);
 
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         {
             fakeConfiguration["HOME"] = @"D:\\Downloads";
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(fakeStorageAccountConnectionString);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(fakeStorageAccountConnectionString);
             A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(true);
 
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
