@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IConfiguration configuration;
         private const string requestStartedAt = "StartedAt";
         private const string requestCompletedAt = "CompletedAt";
-        private const string runtimeDurationInMs = "DurationInMiliSecond";
+        private const string runtimeDurationInMs = "DurationInMilliSeconds";
         public MonitorHelper(IConfiguration configuration, TelemetryConfiguration telemetryConfiguration)
         {
             this.configuration = configuration;
