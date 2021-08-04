@@ -3,6 +3,6 @@
     public interface ILargeExchangeSetInstance
     {
         int GetCurrentInstanceNumber();
-        int GetInstanceNumber(int maxInstanceCount);
+        int GetInstanceNumber(int largeMaxInstanceCount);
     }
 }

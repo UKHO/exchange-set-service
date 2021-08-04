@@ -3,6 +3,6 @@
     public interface ISmallExchangeSetInstance
     {
         int GetCurrentInstanceNumber();
-        int GetInstanceNumber(int maxInstanceCount);
+        int GetInstanceNumber(int smallMaxInstanceCount);
     }
 }

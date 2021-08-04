@@ -3,6 +3,6 @@
     public interface IMediumExchangeSetInstance
     {
         int GetCurrentInstanceNumber();
-        int GetInstanceNumber(int maxInstanceCount);
+        int GetInstanceNumber(int mediumMaxInstanceCount);
     }
 }

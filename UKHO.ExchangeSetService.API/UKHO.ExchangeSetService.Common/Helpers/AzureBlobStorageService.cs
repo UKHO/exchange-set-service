@@ -119,34 +119,33 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private (int, string) GetInstanceCountBasedOnFileSize(double fileSizeInMB)
         {
-            if (fileSizeInMB > storageConfig.Value.SmallExchangeSetSizeInMB &&
-                fileSizeInMB <= storageConfig.Value.LargeExchangeSetSizeInMB)
+            if (fileSizeInMB <= storageConfig.Value.SmallExchangeSetSizeInMB)
+            {
+                return (smallExchangeSetInstance.GetInstanceNumber(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.SmallExchangeSet.ToString());
+            }
+            else if (fileSizeInMB > storageConfig.Value.SmallExchangeSetSizeInMB && fileSizeInMB <= storageConfig.Value.LargeExchangeSetSizeInMB)
             {
                 return (mediumExchangeSetInstance.GetInstanceNumber(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.MediumExchangeSet.ToString());
             }
-            else if (fileSizeInMB > storageConfig.Value.LargeExchangeSetSizeInMB)
-            {
-                return (largeExchangeSetInstance.GetInstanceNumber(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.LargeExchangeSet.ToString());
-            }
             else
             {
-                return (smallExchangeSetInstance.GetInstanceNumber(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.SmallExchangeSet.ToString());
+                return (largeExchangeSetInstance.GetInstanceNumber(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.LargeExchangeSet.ToString());
             }
         }
 
         private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
         {
-            if (string.Compare(exchangeSetType, ExchangeSetType.MediumExchangeSet.ToString(), true) == 0)
+            if (string.Compare(exchangeSetType, ExchangeSetType.SmallExchangeSet.ToString(), true) == 0)
+            {
+                return (storageConfig.Value.SmallExchangeSetAccountName, storageConfig.Value.SmallExchangeSetAccountKey);
+            }
+            else if (string.Compare(exchangeSetType, ExchangeSetType.MediumExchangeSet.ToString(), true) == 0)
             {
                 return (storageConfig.Value.MediumExchangeSetAccountName, storageConfig.Value.MediumExchangeSetAccountKey);
             }
-            else if (string.Compare(exchangeSetType, ExchangeSetType.LargeExchangeSet.ToString(), true) == 0)
-            {
-                return (storageConfig.Value.LargeExchangeSetAccountName, storageConfig.Value.LargeExchangeSetAccountKey);
-            }
             else
             {
-                return (storageConfig.Value.SmallExchangeSetAccountName, storageConfig.Value.SmallExchangeSetAccountKey);
+                return (storageConfig.Value.LargeExchangeSetAccountName, storageConfig.Value.LargeExchangeSetAccountKey);
             }
         }
     }
