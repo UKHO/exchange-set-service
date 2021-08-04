@@ -20,6 +20,7 @@ using System.Net.Http.Headers;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -145,6 +146,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                  });
+                 services.AddHttpClient<ICallBackClient, CallBackClient>();
+
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
@@ -152,8 +155,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IFileSystemHelper, FileSystemHelper>();
                  services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
                  services.AddScoped<IFulfilmentSalesCatalogueService, FulfilmentSalesCatalogueService>();
+                 services.AddSingleton<ISmallExchangeSetInstance, SmallExchangeSetInstance>();
+                 services.AddSingleton<IMediumExchangeSetInstance, MediumExchangeSetInstance>();
+                 services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
+                 services.AddScoped<IFulfilmentCallBackService, FulfilmentCallBackService>();
+
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
+                 services.Configure<EssCallBackConfiguration>(ConfigurationBuilder.GetSection("ESSCallBackConfiguration"));
              })
               .ConfigureWebJobs(b =>
               {
