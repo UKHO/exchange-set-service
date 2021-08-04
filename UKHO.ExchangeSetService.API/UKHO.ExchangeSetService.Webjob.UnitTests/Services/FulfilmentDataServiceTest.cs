@@ -29,6 +29,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IConfiguration fakeConfiguration;
         public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
         public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
+        public IFulfilmentCallBackService fakeFulfilmentCallBackService;
 
         [SetUp]
         public void Setup()
@@ -61,8 +62,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() 
                                                     { QueueName="",StorageAccountKey="",StorageAccountName="",StorageContainerName=""});
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
+            fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService);
         }
 
         #region GetScsResponseQueueMessage
@@ -147,7 +149,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
@@ -171,7 +173,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
@@ -182,6 +184,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponses, salesCatalogueDataResponse)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse)).Returns(true);
+            A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage);
 
@@ -197,7 +200,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeConfiguration["HOME"] = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
