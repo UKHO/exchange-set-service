@@ -90,7 +90,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         BatchStatus= 805083,
         ExchangeSetCreatedPostCallbackUriCalled = 805084,
         ExchangeSetCreatedPostCallbackUriNotCalled = 805085,
-        ExchangeSetCreatedPostCallbackUriNotProvided = 805086
+        ExchangeSetCreatedPostCallbackUriNotProvided = 805086,
+        AddedMessageInQueue = 805087
     }
 
     public static class EventIdExtensions
