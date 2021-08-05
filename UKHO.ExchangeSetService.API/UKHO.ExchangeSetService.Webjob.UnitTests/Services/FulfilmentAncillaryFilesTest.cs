@@ -140,11 +140,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #endregion
 
         [Test]
-        public async Task WhenInvalidCreateSerialEncFileRequest_ThenReturnFalseResponse()
+        public void WhenInvalidCreateSerialEncFileRequest_ThenReturnFalseResponse()
         {
-            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetPath, null);
+            fakeExchangeSetPath = @"C:\\HOME";
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
+                 .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
+                  , async delegate { await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null); });
         }
 
         [Test]
