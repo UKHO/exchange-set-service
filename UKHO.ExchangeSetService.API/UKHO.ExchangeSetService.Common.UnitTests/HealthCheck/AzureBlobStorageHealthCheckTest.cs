@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             this.fakeSalesCatalogueStorageService = A.Fake<ISalesCatalogueStorageService>();
 
             this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
-            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer" });
+            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes = "test" });
 
             azureBlobStorageHealthCheck = new AzureBlobStorageHealthCheck(fakeAzureBlobStorageClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger);
         }
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureBlobStorageContainerExists_ThenAzureBlobStorageServiceIsHealthy()
         {
-            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString()).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureBlobStorageClient.CheckBlobContainerHealth(A<string>.Ignored, A<string>.Ignored)).Returns(HealthCheckResult.Healthy("Azure blob storage is healthy"));
 
             var response = await azureBlobStorageHealthCheck.CheckHealthAsync(new HealthCheckContext());
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureBlobStorageContainerNotExists_ThenAzureBlobStorageServiceIsUnhealthy()
         {
-            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString()).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureBlobStorageClient.CheckBlobContainerHealth(A<string>.Ignored, A<string>.Ignored)).Returns(HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", new Exception("Azure blob storage connection failed or not available")));
 
             var response = await azureBlobStorageHealthCheck.CheckHealthAsync(new HealthCheckContext());

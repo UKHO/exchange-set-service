@@ -36,8 +36,17 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             {
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
-                var azureBlobStorageHealthStatus = await azureBlobStorageClient.CheckBlobContainerHealth(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.StorageContainerName);
+                string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
+                string storageAccountConnectionString = string.Empty;
+                HealthCheckResult azureBlobStorageHealthStatus = new HealthCheckResult(HealthStatus.Healthy);
+                foreach (string exchangeSetType in exchangeSetTypes)
+                {
+                    var storageAccountWithKey = GetStorageAccountNameAndKey(exchangeSetType);
+                    storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
+                    azureBlobStorageHealthStatus = await azureBlobStorageClient.CheckBlobContainerHealth(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.StorageContainerName);
+                    if (azureBlobStorageHealthStatus.Status == HealthStatus.Unhealthy)
+                        break;
+                }
                 watch.Stop();
                 if (azureBlobStorageHealthStatus.Status == HealthStatus.Healthy)
                 {
@@ -46,7 +55,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 }
                 else
                 {
-                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), "Azure blob storage is unhealthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), $"Azure blob storage is unhealthy with error {azureBlobStorageHealthStatus.Exception.Message}, time spent to check this is {watch.ElapsedMilliseconds}ms");
                     return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy");
                 }
             }
@@ -54,6 +63,22 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             {
                 logger.LogError("Azure blob storage is unhealthy with error " + ex.Message);
                 return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy");
+            }
+        }
+
+        private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
+        {
+            if (string.Compare(exchangeSetType, "sxs", true) == 0)
+            {
+                return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
+            }
+            else if (string.Compare(exchangeSetType, "mxs", true) == 0)
+            {
+                return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
+            }
+            else
+            {
+                return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
             }
         }
     }

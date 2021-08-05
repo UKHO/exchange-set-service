@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             this.fakeSalesCatalogueStorageService = A.Fake<ISalesCatalogueStorageService>();
 
             this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
-            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer" });
+            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes= "test" });
 
             fakeAzureMessageQueueHealthCheck = new AzureMessageQueueHealthCheck(fakeAzureMessageQueueHelperClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger);
         }
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureMessageQueueExists_ThenAzureMessageQueueIsHealthy()
         {
-            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString()).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty,string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
 
             var response = await fakeAzureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureMessageQueueNotExists_ThenAzureMessageQueueIsUnhealthy()
         {
-            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString()).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy", new Exception("Azure webjob is unhealthy")));
 
             var response = await fakeAzureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());

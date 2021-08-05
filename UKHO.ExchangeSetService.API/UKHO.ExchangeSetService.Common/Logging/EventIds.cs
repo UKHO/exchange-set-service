@@ -91,12 +91,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ExchangeSetCreatedPostCallbackUriCalled = 805084,
         ExchangeSetCreatedPostCallbackUriNotCalled = 805085,
         ExchangeSetCreatedPostCallbackUriNotProvided = 805086,
-        AzureBlobStorageIsHealthy = 805087,
-        AzureBlobStorageIsUnhealthy = 805088,
-        AzureMessageQueueIsHealthy = 805089,
-        AzureMessageQueueIsUnhealthy = 805090,
-        AzureWebJobsIsHealthy = 805091,
-        AzureWebJobsIsUnhealthy = 805092
+        AddedMessageInQueue = 805087,
+        AzureBlobStorageIsHealthy = 805088,
+        AzureBlobStorageIsUnhealthy = 805089,
+        AzureMessageQueueIsHealthy = 805090,
+        AzureMessageQueueIsUnhealthy = 805091,
+        AzureWebJobsIsHealthy = 805092,
+        AzureWebJobsIsUnhealthy = 805093
     }
 
     public static class EventIdExtensions

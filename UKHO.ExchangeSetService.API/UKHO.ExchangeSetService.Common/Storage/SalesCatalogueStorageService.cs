@@ -12,16 +12,17 @@ namespace UKHO.ExchangeSetService.Common.Storage
             this.storageConfig = storageConfig;
         }
 
-        public string GetStorageAccountConnectionString()
+        public string GetStorageAccountConnectionString(string storageAccountName = null, string storageAccountKey = null)
         {
-            string ScsStorageAccountAccessKeyValue = storageConfig.Value.StorageAccountKey;
+            string ScsStorageAccountAccessKeyValue = !string.IsNullOrEmpty(storageAccountKey) ? storageAccountKey : storageConfig.Value.StorageAccountKey;
+            string ScsStorageAccountName = !string.IsNullOrEmpty(storageAccountName) ? storageAccountName : storageConfig.Value.StorageAccountName;
 
             if (string.IsNullOrWhiteSpace(ScsStorageAccountAccessKeyValue))
             {
                 throw new KeyNotFoundException($"Storage account accesskey not found");
             }
 
-            string storageAccountConnectionString = $"DefaultEndpointsProtocol=https;AccountName={storageConfig.Value.StorageAccountName};AccountKey={ScsStorageAccountAccessKeyValue};EndpointSuffix=core.windows.net";
+            string storageAccountConnectionString = $"DefaultEndpointsProtocol=https;AccountName={ScsStorageAccountName};AccountKey={ScsStorageAccountAccessKeyValue};EndpointSuffix=core.windows.net";
 
             return storageAccountConnectionString;
         }
