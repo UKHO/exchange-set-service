@@ -32,13 +32,5 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
              return await cloudBlockBlob.DownloadTextAsync();
         }
-        public async Task<bool> DeleteFileFromContainer(string storageAccountConnectionString, string containerName, string batchId)
-        {
-            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            CloudBlobClient _blobClient = cloudStorageAccount.CreateCloudBlobClient();
-            CloudBlobContainer _cloudBlobContainer = _blobClient.GetContainerReference(containerName);
-            CloudBlockBlob _blockBlob = _cloudBlobContainer.GetBlockBlobReference(batchId);
-            return await _blockBlob.DeleteIfExistsAsync();
-        }
     }
 }

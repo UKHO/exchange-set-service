@@ -1,6 +1,6 @@
 ﻿namespace UKHO.ExchangeSetService.CleanUpJob.Configuration
 {
-    public class CleanUpConfig
+    public class CleanUpConfiguration
     {
         public int NumberOfDays { get; set; }
     }

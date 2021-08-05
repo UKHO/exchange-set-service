@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -24,36 +25,39 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
 
         public async Task<bool> DeleteDirectoryAsync(int numberOfDays, string storageAccountConnectionString, string containerName, string filePath)
         {
-            bool deteleFilesStatus = false;
+            DateTime subFolderDateTime;
+            bool deteleFolderStatus = false;
             try
             {
                 var subFolder = Directory.GetDirectories(filePath);
                 var historicDateTimeInUtc = DateTime.UtcNow.AddDays(-numberOfDays);
                 DateTime historicDate = new DateTime(historicDateTimeInUtc.Year, historicDateTimeInUtc.Month, historicDateTimeInUtc.Day);
 
-                foreach (var subFolderName in subFolder)
+                foreach (var subFolderItem in subFolder)
                 {
-                    DateTime subFolderDateTime;
-                    string dateFolder = new DirectoryInfo(subFolderName).Name;
-                    bool isValidDate = DateTimeExtensions.IsValidDate(dateFolder, out subFolderDateTime);
+                    string subFolderName = new DirectoryInfo(subFolderItem).Name;
+                    bool isSubFolderDateFolder = DateTimeExtensions.IsValidDate(subFolderName, out subFolderDateTime);
                     
-                    if (isValidDate)
+                    if (isSubFolderDateFolder)
                     {
                         DateTime subFolderDate = new DateTime(subFolderDateTime.Year, subFolderDateTime.Month, subFolderDateTime.Day);
                         
                         if (subFolderDate <= historicDate)
                         {
-                            DirectoryInfo di = new DirectoryInfo(subFolderName);
+                            DirectoryInfo di = new DirectoryInfo(subFolderItem);
 
                             foreach (DirectoryInfo dir in di.GetDirectories())
                             {
                                 var batchId = dir.Name;
                                 string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
-                                var response = await azureBlobStorageClient.DeleteFileFromContainer(storageAccountConnectionString, containerName, scsResponseFileName);
+
+                                CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(scsResponseFileName, storageAccountConnectionString, containerName);
+                                var response = await cloudBlockBlob.DeleteIfExistsAsync();
+
                                 if (response)
                                 {
                                     dir.Delete(true);
-                                    logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
+                                    logger.LogInformation(EventIds.HistoricSCSResponseFileDeleted.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
                                 }
                                 else
                                 {
@@ -62,13 +66,13 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                             }
 
                             di.Delete(true);
-                            deteleFilesStatus = true;
-                            logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{dateFolder}.", dateFolder);
+                            deteleFolderStatus = true;
+                            logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{subFolderName}.", subFolderName);
                         }
                     }
                 }
 
-                if (!deteleFilesStatus)
+                if (!deteleFolderStatus)
                 {
                     logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{historicDate}.", historicDate);
                 }

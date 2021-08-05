@@ -154,7 +154,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             );
 
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
-            serviceCollection.Configure<CleanUpConfig>(configuration.GetSection("CleanUpConfig"));
+            serviceCollection.Configure<CleanUpConfiguration>(configuration.GetSection("CleanUpConfiguration"));
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.AddTransient<ExchangeSetCleanUpJob>();

@@ -17,14 +17,14 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Services
         private readonly ISalesCatalogueStorageService scsStorageService;
         private readonly IConfiguration configuration;
         private readonly ILogger<ExchangeSetCleanUpService> logger;
-        private readonly IOptions<CleanUpConfig> cleanUpConfig;
+        private readonly IOptions<CleanUpConfiguration> cleanUpConfig;
 
         public ExchangeSetCleanUpService(IAzureFileSystemHelper azureDeleteFileSystemHelper,
                               IOptions<EssFulfilmentStorageConfiguration> storageConfig,
                               ISalesCatalogueStorageService scsStorageService,
                               IConfiguration configuration,
                               ILogger<ExchangeSetCleanUpService> logger,
-                              IOptions<CleanUpConfig> cleanUpConfig)
+                              IOptions<CleanUpConfiguration> cleanUpConfig)
         {
             this.azureDeleteFileSystemHelper = azureDeleteFileSystemHelper;
             this.storageConfig = storageConfig;
