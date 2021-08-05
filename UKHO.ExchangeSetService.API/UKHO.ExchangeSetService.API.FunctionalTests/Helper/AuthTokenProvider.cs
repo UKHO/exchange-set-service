@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private static async Task<string> GenerateEssToken(string ClientId, string ClientSecret, string Token)
         {
             string[] scopes = new string[] { $"{EssauthConfig.EssClientId}/.default" };
-            if (Token == null) 
+            if (Token == null)
             {
                 if (EssauthConfig.IsRunningOnLocalMachine)
                 {
@@ -101,20 +101,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
-		    else
-		        {
-			        IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
+                else
+                {
+                    IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(ClientId)
                                                     .WithClientSecret(ClientSecret)
                                                     .WithAuthority(new Uri($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}"))
                                                     .Build();
 
-                    	AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
-                    	Token = tokenTask.AccessToken;
-		        }
-                
+                    AuthenticationResult tokenTask = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+                    Token = tokenTask.AccessToken;
+                }
+
             }
-	     return Token;
-       }
+            return Token;
+        }
 
         public async Task<string> GetScsToken()
         {
@@ -160,8 +160,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             return Token;
         }
-
-
+       
         /// <summary>
         /// Generate custom signature verified Auth Token
         /// </summary>

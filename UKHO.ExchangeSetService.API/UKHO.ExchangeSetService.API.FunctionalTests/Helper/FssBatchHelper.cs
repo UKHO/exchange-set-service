@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             return extractPath;
-
+            
         }
 
         private static void WriteToConsole(string message)
@@ -78,12 +78,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 fileName = fileName.Replace(".zip", "");
             }
 
-            return fileName;
+            return fileName; 
         }
 
         public static bool CheckforFileExist(string filePath, string fileName)
         {
             return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath, fileName)));
-        }
+        }       
     }
 }

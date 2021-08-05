@@ -30,7 +30,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
 
         if ( !$? ) { echo "Error while Reading json file" ; throw $_ }
 
-        $appSetting.QueueName = $queueName
+        $appSetting.ESSFulfilmentStorageConfiguration.QueueName = $queueName
         $appSetting.KeyVaultSettings.ServiceUri = $KeyVaultUri
         $appSetting | ConvertTo-Json | set-content $appSettingFile
         
