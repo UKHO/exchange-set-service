@@ -46,9 +46,9 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                         {
                             DirectoryInfo di = new DirectoryInfo(subFolderItem);
 
-                            foreach (DirectoryInfo dir in di.GetDirectories())
+                            foreach (DirectoryInfo subDirectory in di.GetDirectories())
                             {
-                                var batchId = dir.Name;
+                                var batchId = subDirectory.Name;
                                 string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
 
                                 CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(scsResponseFileName, storageAccountConnectionString, containerName);
@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
 
                                 if (response)
                                 {
-                                    dir.Delete(true);
+                                    subDirectory.Delete(true);
                                     logger.LogInformation(EventIds.HistoricSCSResponseFileDeleted.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
                                 }
                                 else
