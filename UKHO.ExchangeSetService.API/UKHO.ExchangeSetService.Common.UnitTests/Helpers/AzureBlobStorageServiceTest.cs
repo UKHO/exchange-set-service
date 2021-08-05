@@ -21,6 +21,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public ILogger<AzureBlobStorageService> fakeLogger;
         public IAzureBlobStorageClient fakeAzureBlobStorageClient;
         public AzureBlobStorageService azureBlobStorageService;
+        private ISmallExchangeSetInstance fakeSmallExchangeSetInstance;
+        private IMediumExchangeSetInstance fakeMediumExchangeSetInstance;
+        private ILargeExchangeSetInstance fakeLargeExchangeSetInstance;
         public string fakeExpiryDate = "2021-07-23T06:59:13Z";
 
         [SetUp]
@@ -28,13 +31,35 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration()
-                                { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
+            {
+                QueueName = "",
+                StorageAccountKey = "",
+                StorageAccountName = "",
+                StorageContainerName = "",
+                DynamicQueueName = "ess-{0}-test",
+                LargeExchangeSetAccountKey = "LargeExchangeSetAccountKey",
+                LargeExchangeSetAccountName = "LargeExchangeSetAccountName",
+                LargeExchangeSetInstance = 2,
+                LargeExchangeSetSizeInMB = 300,
+                MediumExchangeSetAccountKey = "MediumExchangeSetAccountKey",
+                MediumExchangeSetAccountName = "MediumExchangeSetAccountName",
+                MediumExchangeSetInstance = 3,
+                SmallExchangeSetAccountKey = "SmallExchangeSetAccountKey",
+                SmallExchangeSetAccountName = "SmallExchangeSetAccountName",
+                SmallExchangeSetInstance = 2,
+                SmallExchangeSetSizeInMB = 50
+            });
 
             fakeAzureMessageQueueHelper = A.Fake<IAzureMessageQueueHelper>();
             fakeLogger = A.Fake<ILogger<AzureBlobStorageService>>();
             fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
+            fakeSmallExchangeSetInstance = A.Fake<ISmallExchangeSetInstance>();
+            fakeMediumExchangeSetInstance = A.Fake<IMediumExchangeSetInstance>();
+            fakeLargeExchangeSetInstance = A.Fake<ILargeExchangeSetInstance>();
 
-            azureBlobStorageService = new AzureBlobStorageService(fakeScsStorageService, fakeStorageConfig, fakeAzureMessageQueueHelper, fakeLogger, fakeAzureBlobStorageClient);
+            azureBlobStorageService = new AzureBlobStorageService(fakeScsStorageService, fakeStorageConfig, 
+                fakeAzureMessageQueueHelper, fakeLogger, fakeAzureBlobStorageClient, fakeSmallExchangeSetInstance, 
+                fakeMediumExchangeSetInstance, fakeLargeExchangeSetInstance);
         }
 
         private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
@@ -78,10 +103,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
             CancellationToken cancellationToken = CancellationToken.None;
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
 
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
+            A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
             var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate);
            
             Assert.IsTrue(response);
@@ -95,7 +121,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
             string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString())
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
@@ -110,12 +136,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString()).Returns(storageAccountConnectionString);
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString("StorageAccountName", "StorageAccountKey")).Returns(storageAccountConnectionString);
 
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlobByUri(A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<CloudBlockBlob>.Ignored)).Returns("{\"Products\":[{\"productName\":\"DE5NOBRK\",\"editionNumber\":1,\"updateNumbers\":[0,1],\"fileSize\":200}],\"ProductCounts\":{\"RequestedProductCount\":1,\"ReturnedProductCount\":1,\"RequestedProductsAlreadyUpToDateCount\":0,\"RequestedProductsNotReturned\":[]}}");
-
+            A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
             var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null);
 
             Assert.IsInstanceOf<SalesCatalogueProductResponse>(response);

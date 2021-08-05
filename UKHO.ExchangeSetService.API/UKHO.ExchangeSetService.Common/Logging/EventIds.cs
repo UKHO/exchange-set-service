@@ -91,17 +91,18 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ExchangeSetCreatedPostCallbackUriCalled = 805084,
         ExchangeSetCreatedPostCallbackUriNotCalled = 805085,
         ExchangeSetCreatedPostCallbackUriNotProvided = 805086,
-        SystemException = 805087,
-        DownloadSalesCatalogueResponseNonOkResponse = 805088,
-        ErrorTxtNotUploaded = 805089,
-        ErrorTxtNotCreated = 805090,
-        UploadFileBlockStarted = 805091,
-        CreateFileInBatchCompleted = 805092,
-        FSSResponseNotFoundForRespectiveProductWhileQuering = 805093,
-        SalesCatalogueServiceCatalogueDataNonOkResponse = 805094,
-        QueryFileShareServiceReadMeFileRequestStart = 805095,
-        QueryFileShareServiceReadMeFileRequestCompleted = 805096,
-        QueryFileShareServiceReadMeFileNonOkResponse = 805097
+        AddedMessageInQueue = 805087,
+        SystemException = 805088,
+        DownloadSalesCatalogueResponseNonOkResponse = 805089,
+        ErrorTxtNotUploaded = 805090,
+        ErrorTxtNotCreated = 805091,
+        UploadFileBlockStarted = 805092,
+        CreateFileInBatchCompleted = 805093,
+        FSSResponseNotFoundForRespectiveProductWhileQuering = 805094,
+        SalesCatalogueServiceCatalogueDataNonOkResponse = 805095,
+        QueryFileShareServiceReadMeFileRequestStart = 805096,
+        QueryFileShareServiceReadMeFileRequestCompleted = 805097,
+        QueryFileShareServiceReadMeFileNonOkResponse = 805098
     }
 
     public static class EventIdExtensions

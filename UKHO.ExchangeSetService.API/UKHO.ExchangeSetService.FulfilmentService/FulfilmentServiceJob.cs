@@ -36,8 +36,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             this.fileShareService = fileShareService;
             this.fileShareServiceConfig = fileShareServiceConfig;
         }
-
-        public async Task ProcessQueueMessage([QueueTrigger("%QueueName%")] CloudQueueMessage message)
+        public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] CloudQueueMessage message)
         {
             SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = JsonConvert.DeserializeObject<SalesCatalogueServiceResponseQueueMessage>(message.AsString);
             string homeDirectoryPath = configuration["HOME"];

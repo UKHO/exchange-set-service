@@ -138,46 +138,55 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (internalSearchBatchResponse.Entries.Any() && prodCount != internalSearchBatchResponse.Entries.Count)
             {
                 List<Products> internalProducts = new List<Products>();
-
-                foreach (var item in internalSearchBatchResponse.Entries)
-                {
-                    var product = new Products
-                    {
-                        EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b => b.Value).FirstOrDefault()),
-                        ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault()
-                    };
-                    if (product.UpdateNumbers == null)
-                    {
-                        product.UpdateNumbers = new List<int?>();
-                    }
-                    var UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault());
-                    product.UpdateNumbers.Add(UpdateNumber);
-                    internalProducts.Add(product);
-                }
-                foreach (var itemProduct in products)
-                {
-                    foreach (var itemUpdateNumber in itemProduct.UpdateNumbers)
-                    {
-                        var checkNoDataFound = internalProducts.Where(a => a.EditionNumber == itemProduct.EditionNumber && a.ProductName == itemProduct.ProductName).Select(a => a.UpdateNumbers);
-                        if (checkNoDataFound != null && !checkNoDataFound.Any(a => a.Contains(itemUpdateNumber)))
-                        {
-                            internalNotFoundProducts.Add(new Products
-                            {
-                                EditionNumber = itemProduct.EditionNumber,
-                                ProductName = itemProduct.ProductName,
-                                Cancellation = itemProduct.Cancellation,
-                                FileSize = itemProduct.FileSize,
-                                UpdateNumbers = new List<int?> { itemUpdateNumber }
-                            });
-                        }
-                    }
-                }
+                ConvertFssSearchBatchResponseToProductResponse(internalSearchBatchResponse, internalProducts);
+                GetProductDetailsNotFoundInFss(products, internalNotFoundProducts, internalProducts);
             }
             if (internalNotFoundProducts.Any() || !internalSearchBatchResponse.Entries.Any())
             {
                 var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Any() ? internalNotFoundProducts.Distinct() : products);
                 logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId(), "File share service response not found while quering to FSS {internalNotFoundProductsPayLoadJson} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, correlationId);
                 throw new FulfilmentException(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId());
+            }
+        }
+
+        private void GetProductDetailsNotFoundInFss(List<Products> products, List<Products> internalNotFoundProducts, List<Products> internalProducts)
+        {
+            foreach (var itemProduct in products)
+            {
+                foreach (var itemUpdateNumber in itemProduct.UpdateNumbers)
+                {
+                    var checkNoDataFound = internalProducts.Where(a => a.EditionNumber == itemProduct.EditionNumber && a.ProductName == itemProduct.ProductName).Select(a => a.UpdateNumbers);
+                    if (checkNoDataFound != null && !checkNoDataFound.Any(a => a.Contains(itemUpdateNumber)))
+                    {
+                        internalNotFoundProducts.Add(new Products
+                        {
+                            EditionNumber = itemProduct.EditionNumber,
+                            ProductName = itemProduct.ProductName,
+                            Cancellation = itemProduct.Cancellation,
+                            FileSize = itemProduct.FileSize,
+                            UpdateNumbers = new List<int?> { itemUpdateNumber }
+                        });
+                    }
+                }
+            }
+        }
+
+        private void ConvertFssSearchBatchResponseToProductResponse(SearchBatchResponse internalSearchBatchResponse, List<Products> internalProducts)
+        {
+            foreach (var item in internalSearchBatchResponse.Entries)
+            {
+                var product = new Products
+                {
+                    EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b => b.Value).FirstOrDefault()),
+                    ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault()
+                };
+                if (product.UpdateNumbers == null)
+                {
+                    product.UpdateNumbers = new List<int?>();
+                }
+                var UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault());
+                product.UpdateNumbers.Add(UpdateNumber);
+                internalProducts.Add(product);
             }
         }
 
