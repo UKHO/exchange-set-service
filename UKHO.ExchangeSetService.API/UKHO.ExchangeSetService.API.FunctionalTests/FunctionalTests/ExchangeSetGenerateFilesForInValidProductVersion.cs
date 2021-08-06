@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ProductVersionData = new List<ProductVersionModel>();
             ////Invalid Edition Number
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 20, 5));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416040", 11, 1));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
         }

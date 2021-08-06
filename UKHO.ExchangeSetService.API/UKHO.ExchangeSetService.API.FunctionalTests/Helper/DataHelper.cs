@@ -33,7 +33,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiers()
         {
-            return new List<string>() { "DE416080", "GB416080" };
+
+            return new List<string>() { "DE360010", "DE416040" };
 
         }
     }
