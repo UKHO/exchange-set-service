@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (queueMessageExists)
                 return HealthCheckResult.Healthy("Azure message queue is healthy");
             else
-                return HealthCheckResult.Unhealthy("Azure message queue is unhealthy", new Exception("Azure message queue is empty"));
+                return HealthCheckResult.Unhealthy("Azure message queue is unhealthy", new Exception($"Azure message queue {queueName} does not exists"));
         }
     }
 }

@@ -51,10 +51,10 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                         webJobs.Add(Tuple.Create(userPswd, webJobUri, exchangeSetType, i));
                     }
                 }
-                var webJobsTasks = CheckAllWebJobsHealth(webJobs);
-                await Task.WhenAll(webJobsTasks);
+                var webJobsHealth = CheckAllWebJobsHealth(webJobs);
+                await Task.WhenAll(webJobsHealth);
 
-                return webJobsTasks.Result;
+                return webJobsHealth.Result;
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 case "lxs":
                     return essFulfilmentStorageConfiguration.Value.LargeExchangeSetInstance;
                 default:
-                    return 0;
+                    return 1;
             }
         }
     }

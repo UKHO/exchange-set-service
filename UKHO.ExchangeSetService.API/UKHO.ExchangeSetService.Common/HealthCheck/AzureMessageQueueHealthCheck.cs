@@ -36,29 +36,18 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             {
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
-                string storageAccountConnectionString = string.Empty;
-                
-                var queueName = string.Format(essFulfilmentStorageConfiguration.Value.DynamicQueueName, 1);
-                HealthCheckResult messageQueueHealthStatus = new HealthCheckResult(HealthStatus.Healthy);
-                foreach (string exchangeSetType in exchangeSetTypes)
-                {
-                    var storageAccountWithKey = GetStorageAccountNameAndKey(exchangeSetType);
-                    storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
-                    messageQueueHealthStatus = await azureMessageQueueHelper.CheckMessageQueueHealth(storageAccountConnectionString, queueName);
-                    if (messageQueueHealthStatus.Status == HealthStatus.Unhealthy)
-                        break;
-                }
+                var messageQueuesHealth = CheckAllMessageQueuesHealth();
+                await Task.WhenAll(messageQueuesHealth);
                 watch.Stop();
 
-                if (messageQueueHealthStatus.Status == HealthStatus.Healthy)
+                if (messageQueuesHealth.Result.Status == HealthStatus.Healthy)
                 {
                     logger.LogInformation(EventIds.AzureMessageQueueIsHealthy.ToEventId(), $"Azure message queue is healthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
                     return HealthCheckResult.Healthy("Azure message queue is healthy");
                 }
                 else
                 {
-                    logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), $"Azure message queue is unhealthy with error {messageQueueHealthStatus.Exception.Message}, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                    logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), $"Azure message queue is unhealthy with error {messageQueuesHealth.Result.Exception.Message}, time spent to check this is {watch.ElapsedMilliseconds}ms");
                     return HealthCheckResult.Unhealthy("Azure message queue is unhealthy");
                 }
             }
@@ -69,19 +58,56 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
         }
 
+        private async Task<HealthCheckResult> CheckAllMessageQueuesHealth()
+        {
+            string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
+            string storageAccountConnectionString = string.Empty;
+
+            var queueName = string.Empty;
+
+            HealthCheckResult messageQueueHealthStatus = new HealthCheckResult(HealthStatus.Healthy);
+            foreach (string exchangeSetType in exchangeSetTypes)
+            {
+                for (int i = 1; i <= GetInstanceCount(exchangeSetType); i++)
+                {
+                    queueName = string.Format(essFulfilmentStorageConfiguration.Value.DynamicQueueName, i);
+                    var storageAccountWithKey = GetStorageAccountNameAndKey(exchangeSetType);
+                    storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
+                    messageQueueHealthStatus = await azureMessageQueueHelper.CheckMessageQueueHealth(storageAccountConnectionString, queueName);
+                    if (messageQueueHealthStatus.Status == HealthStatus.Unhealthy)
+                        break;
+                }
+            }
+            return messageQueueHealthStatus;
+        }
+
         private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
         {
-            if (string.Compare(exchangeSetType, "sxs", true) == 0)
+            switch (exchangeSetType)
             {
-                return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
+                case "sxs":
+                    return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
+                case "mxs":
+                    return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
+                case "lxs":
+                    return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
+                default:
+                    return (string.Empty, string.Empty);
             }
-            else if (string.Compare(exchangeSetType, "mxs", true) == 0)
+        }
+
+        private int GetInstanceCount(string exchangeSetType)
+        {
+            switch (exchangeSetType)
             {
-                return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
-            }
-            else
-            {
-                return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
+                case "sxs":
+                    return essFulfilmentStorageConfiguration.Value.SmallExchangeSetInstance;
+                case "mxs":
+                    return essFulfilmentStorageConfiguration.Value.MediumExchangeSetInstance;
+                case "lxs":
+                    return essFulfilmentStorageConfiguration.Value.LargeExchangeSetInstance;
+                default:
+                    return 1;
             }
         }
     }
