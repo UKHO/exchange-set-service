@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public async Task WhenAzureMessageQueueNotExists_ThenAzureMessageQueueIsUnhealthy()
         {
             A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy", new Exception("Azure webjob is unhealthy")));
+            A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy", new Exception("Azure message queue is unhealthy")));
 
             var response = await fakeAzureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
