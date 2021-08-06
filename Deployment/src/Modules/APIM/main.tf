@@ -1,0 +1,17 @@
+module "exchange_set_service" {
+  source							= "./Modules/ExchangeSetService"
+  apim_name							= var.apim_name
+  apim_rg							= var.apim_rg
+  env_name							= local.env_name
+  apim_api_path						= local.apim_api_path 
+  apim_api_backend_url				= var.apim_api_backend_url
+  apim_group_name					= local.group_name
+  apim_group_description			= var.group_description
+  apim_ess_product_name				= local.product_name
+  apim_ess_product_description		= var.product_description
+  apim_api_name						= local.api_name
+  apim_api_description				= var.api_description
+  apim_api_openapi					= local.apim_api_openapi
+  product_rate_limit				= var.product_rate_limit
+  product_quota						= var.product_quota
+}
