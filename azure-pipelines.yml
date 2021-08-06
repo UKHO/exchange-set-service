@@ -199,6 +199,13 @@ stages:
               Contents: 'appsettings.json'
               TargetFolder: '$(Build.SourcesDirectory)\Deployment\src'
 
+          - task: CopyFiles@2
+            displayName: "Copy OpenAPI spec for deployment"
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: 'exchangeSetService_OpenApi_definition.yaml'
+              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
+
           - task: PublishBuildArtifacts@1
             displayName: "Publish terraform Artifacts"
             inputs:
@@ -244,10 +251,20 @@ stages:
           runOnce:
             deploy:
               steps:
-                - template: Deployment/templates/continous-deployment.yml
+                - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Fleet Manager Dev/Test"
+                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                    APIMServiceInstance: $(APIM_SERVICE_NAME)
+                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
@@ -315,11 +332,21 @@ stages:
           runOnce:
             deploy:
               steps:
-                - template: Deployment/templates/continous-deployment.yml
+                - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-                
+
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                     AzureSubscription: "Fleet Manager Dev/Test"
+                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                     APIMServiceInstance: $(APIM_SERVICE_NAME)
+                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)"
+                     
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
                   inputs:
