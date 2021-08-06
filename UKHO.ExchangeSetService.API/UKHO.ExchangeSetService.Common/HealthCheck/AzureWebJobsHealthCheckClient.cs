@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -21,14 +22,17 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration;
         private readonly IWebJobsAccessKeyProvider webJobsAccessKeyProvider;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<AzureWebJobsHealthCheck> logger;
 
         public AzureWebJobsHealthCheckClient(IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration,
                                              IWebJobsAccessKeyProvider webJobsAccessKeyProvider,
-                                             IWebHostEnvironment webHostEnvironment)
+                                             IWebHostEnvironment webHostEnvironment,
+                                             ILogger<AzureWebJobsHealthCheck> logger)
         {
             this.essFulfilmentStorageConfiguration = essFulfilmentStorageConfiguration;
             this.webJobsAccessKeyProvider = webJobsAccessKeyProvider;
             this.webHostEnvironment = webHostEnvironment;
+            this.logger = logger;
         }
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
@@ -68,6 +72,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             string webJobDetail = string.Empty;
             foreach (var webJob in webJobs)
             {
+                logger.LogInformation($"{webJob.Item3} web job uri: {webJob.Item2}");
                 var httpClient = new HttpClient();
                 using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJob.Item2);
                 httpClient.DefaultRequestHeaders.Accept.Clear();

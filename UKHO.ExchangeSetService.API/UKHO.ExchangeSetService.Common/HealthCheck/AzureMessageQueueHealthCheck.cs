@@ -74,6 +74,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     var storageAccountWithKey = GetStorageAccountNameAndKey(exchangeSetType);
                     storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
                     messageQueueHealthStatus = await azureMessageQueueHelper.CheckMessageQueueHealth(storageAccountConnectionString, queueName);
+                    logger.LogInformation($"Message queue health check for exchange set {exchangeSetType}-{i}");
                     if (messageQueueHealthStatus.Status == HealthStatus.Unhealthy)
                         break;
                 }
