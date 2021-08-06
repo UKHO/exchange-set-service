@@ -8,10 +8,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string EssBaseAddress;
         public static string FakeTokenPrivateKey;
         public string ExchangeSetFileName;
-        public string EssStorageAccountConnectionString;        
+        public string ExchangeSetSerialEncFile;
+        public string ExchangeReadMeFile;
+        public string EssStorageAccountConnectionString;
+        public string ExchangeSetProductFile;
+        public string ExchangeSetProductFilePath;
+        public string ScsBaseAddress;
+        public string ExchangeSetProductType;
+        public string ExchangeSetCatalogueType;
+        public string ExchangeSetEncRootFolder;
+        public string ExchangeSetCatalogueFile;
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
+        public FileShareService FssConfig = new FileShareService();
         public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
+        public SalesCatalogue ScsAuthConfig = new SalesCatalogue();
         public class EssAuthorizationTokenConfiguration
         {
             public string MicrosoftOnlineLoginUrl { get; set; }
@@ -37,19 +48,43 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string LocalTestToken { get; set; } 
         }
 
+        public class FileShareService
+        {
+            public string BaseUrl { get; set; }
+            public string ResourceId { get; set; }
+            public bool IsRunningOnLocalMachine { get; set; }
+            public int BatchCommitWaitTime { get; set; }
+        }
+
+        public class SalesCatalogue
+        {
+            public string BaseUrl { get; set; }
+            public string ResourceId { get; set; }
+            public bool IsRunningOnLocalMachine { get; set; }
+        }
+
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
                                 .AddJsonFile("appsettings.json", false)
                                 .Build();
-            
-            EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;     
+
+            EssStorageAccountConnectionString = ConfigurationRoot.GetSection("EssStorageAccountConnectionString").Value;
             EssBaseAddress = ConfigurationRoot.GetSection("EssApiUrl").Value;
             ExchangeSetFileName = ConfigurationRoot.GetSection("ExchangeSetFileName").Value;
+            ExchangeSetSerialEncFile = ConfigurationRoot.GetSection("ExchangeSetSerialEncFile").Value;
+            ExchangeReadMeFile = ConfigurationRoot.GetSection("ExchangeReadMeFile").Value;
             FakeTokenPrivateKey = ConfigurationRoot.GetSection("FakeTokenPrivateKey").Value;
+            ExchangeSetProductFile = ConfigurationRoot.GetSection("ExchangeSetProductFile").Value;
+            ExchangeSetProductFilePath = ConfigurationRoot.GetSection("ExchangeSetProductFilePath").Value;
+            ExchangeSetProductType = ConfigurationRoot.GetSection("ExchangeSetProductType").Value;
+            ExchangeSetCatalogueType = ConfigurationRoot.GetSection("ExchangeSetCatalogueType").Value;
+            ExchangeSetEncRootFolder = ConfigurationRoot.GetSection("ExchangeSetEncRootFolder").Value;
+            ExchangeSetCatalogueFile = ConfigurationRoot.GetSection("ExchangeSetCatalogueFile").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
-            ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);
-
+            ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);          
+            ConfigurationRoot.Bind("FileShareService", FssConfig);
+            ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
         }
     }
 }
