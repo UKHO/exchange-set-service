@@ -23,5 +23,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string bodyJson = await httpResponseMessage.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(bodyJson);
         }
+
+        public static async Task<string> ReadAsStringAsync(this HttpResponseMessage httpResponseMessage)
+        {
+            string bodyJson = await httpResponseMessage.Content.ReadAsStringAsync();
+            return bodyJson;
+        }
+
+
     }
 }
