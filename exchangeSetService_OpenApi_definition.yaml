@@ -81,7 +81,11 @@ paths:
 
         "500":
           $ref: "#/components/responses/internalServerError"
-
+          
+      callbacks:
+        fulfilmentResponse:
+          $ref: "#/components/callbacks/fulfilmentResponse"
+          
   /productData/productVersions:
     post:
       summary: Given a set of ENC versions (e.g. Edition x Update y) provide any later releasable files.
@@ -139,6 +143,10 @@ paths:
 
         "500":
           $ref: "#/components/responses/internalServerError"
+      
+      callbacks:
+        fulfilmentResponse:
+          $ref: "#/components/callbacks/fulfilmentResponse"    
 
   /productData:
     post:
@@ -192,25 +200,11 @@ paths:
 
         "500":
           $ref: "#/components/responses/internalServerError"
+      
+      callbacks:
+        fulfilmentResponse:
+          $ref: "#/components/callbacks/fulfilmentResponse"
 
-  /callback:
-    post:
-      summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
-      description: |
-        Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
-
-        ## Data:
-
-        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
-
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/cloudEvent"
-      responses:
-        "200":
-          description: The service will ignore all response from the callback.
 
 components:
   ################################################################################
@@ -552,3 +546,28 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+    ######################
+    #      callbacks     #
+    ######################
+    
+  callbacks:
+    fulfilmentResponse:
+      '{$request.query.callbackUri}':
+        post:
+          summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
+          description: |
+            Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
+    
+            ## Data:
+    
+            The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
+    
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/cloudEvent"
+          responses:
+            "200":
+              description: The service will ignore all response from the callback.
