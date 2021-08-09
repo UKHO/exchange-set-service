@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase(1, TestName = "Future DateTime with valid RFC1123 format")]
         public async Task WhenICallTheApiWithACurrentOrFutureRFC1123DateTime_ThenABadRequestStatusIsReturned(int days)
         {
-            string sinceDatetime = DateTime.Now.AddDays(days).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+            string sinceDatetime = DateTime.Now.AddDays(days).AddHours(1).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400. For given date {sinceDatetime}");
 
