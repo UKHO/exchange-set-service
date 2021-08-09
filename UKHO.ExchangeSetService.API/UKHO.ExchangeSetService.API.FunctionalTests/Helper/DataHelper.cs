@@ -5,7 +5,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public class DataHelper
     {
-        public ProductVersionModel ProductVersionModel { get; set; }       
+        public ProductVersionModel ProductVersionModel { get; set; }
 
         public ProductVersionModel GetProductVersionModelData(string productName, int? editionNumber, int? updateNumber)
         {
@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifierData()
         {
-            return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080" }; 
+            return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080" };
 
         }
 
@@ -33,8 +33,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiers()
         {
-            return new List<string>() { "DE416080", "GB416080" };
-
+            return new List<string>() { "DE360010", "DE416040" };
         }
     }
 }
