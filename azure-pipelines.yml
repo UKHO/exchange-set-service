@@ -345,7 +345,7 @@ stages:
                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                      APIMServiceInstance: $(APIM_SERVICE_NAME)
                      tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)"
+                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                      
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
