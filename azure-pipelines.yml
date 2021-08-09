@@ -301,6 +301,8 @@ stages:
       - deployment: QADeployApp
         displayName: QA - deploy terraform and dotnet App
         environment: "Ess-Qa"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
         workspace:
           clean: all
         variables:
