@@ -129,11 +129,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service for query search ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 }
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
-            CheckProductsExistsInFileShareService(products, correlationId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
+            CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
             return internalSearchBatchResponse;
         }
 
-        private void CheckProductsExistsInFileShareService(List<Products> products, string correlationId, SearchBatchResponse internalSearchBatchResponse, List<Products> internalNotFoundProducts, int prodCount)
+        private void CheckProductsExistsInFileShareService(List<Products> products, string correlationId, string batchId, SearchBatchResponse internalSearchBatchResponse, List<Products> internalNotFoundProducts, int prodCount)
         {
             if (internalSearchBatchResponse.Entries.Any() && prodCount != internalSearchBatchResponse.Entries.Count)
             {
@@ -144,7 +144,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (internalNotFoundProducts.Any() || !internalSearchBatchResponse.Entries.Any())
             {
                 var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Any() ? internalNotFoundProducts.Distinct() : products);
-                logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId(), "File share service response not found while quering to FSS {internalNotFoundProductsPayLoadJson} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, correlationId);
+                logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId(), "Error in file share service while searching ENC files and no data found while querying for products:{internalNotFoundProductsPayLoadJson} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, batchId, correlationId);
                 throw new FulfilmentException(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId());
             }
         }
