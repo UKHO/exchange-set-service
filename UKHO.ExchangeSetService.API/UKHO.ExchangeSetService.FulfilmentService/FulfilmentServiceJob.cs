@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 if (ex.GetType() == typeof(FulfilmentException))
                     exceptionEventId = ((FulfilmentException)ex).EventId;
 
-                FulfilmentException fulfilmentException = new FulfilmentException();
+                FulfilmentException fulfilmentException = new FulfilmentException(exceptionEventId);
                 string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
                 await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
