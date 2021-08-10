@@ -19,6 +19,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
     [ExcludeFromCodeCoverage]
     public class AzureWebJobsHealthCheckClient : IAzureWebJobsHealthCheck
     {
+        static HttpClient httpClient = new HttpClient();
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration;
         private readonly IWebJobsAccessKeyProvider webJobsAccessKeyProvider;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -40,7 +41,6 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             {
                 string webJobUri, userNameKey, passwordKey = string.Empty;
                 string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
-
                 List<Tuple<string, string, string, int>> webJobs = new List<Tuple<string, string, string, int>>();
                 foreach (string exchangeSetType in exchangeSetTypes)
                 {
@@ -73,7 +73,6 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             foreach (var webJob in webJobs)
             {
                 logger.LogInformation($"{webJob.Item3} web job uri: {webJob.Item2}");
-                var httpClient = new HttpClient();
                 using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJob.Item2);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -84,6 +83,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 {
                     var webJobDetails = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
                     webJobStatus = webJobDetails["status"];
+                    logger.LogInformation($"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.Item3}-{webJob.Item4} status is {webJobStatus}");
                     if (webJobStatus != "Running")
                     {
                         webJobDetail = $"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.Item3}-{webJob.Item4} status is {webJobStatus}";
