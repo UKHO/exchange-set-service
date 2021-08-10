@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ProductVersionData = new List<ProductVersionModel>();
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416040", 11, 0));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
 
@@ -72,6 +72,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Ignore this test since SCS stub responses are intermittent")]
         public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
