@@ -63,7 +63,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
-        [Test]        
+        [Test]
+        [Ignore("Ignore this test since SCS stub responses are intermittent")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
@@ -91,6 +92,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Ignore this test since SCS stub responses are intermittent")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreDownloaded()
         {
             //Get the product details form sales catalogue service
@@ -114,7 +116,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
-      
         [OneTimeTearDown]
         public void GlobalTeardown()
         {
