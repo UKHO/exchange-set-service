@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public string fakeFileName = "test.txt";
         readonly FakeFileHelper fakeFileHelper = new FakeFileHelper();
         public string fakeExchangeSetInfoPath = @"C:\\HOME";
-        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : 805011 and correlation ID : 727c5230-2c25-4244-9580-13d90004584a";
+        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
         [SetUp]
         public void Setup()

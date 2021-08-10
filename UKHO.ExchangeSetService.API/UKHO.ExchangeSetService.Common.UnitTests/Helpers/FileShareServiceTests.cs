@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public string fakeZipFilepath = "D:\\UKHO\\V01X01";
         public string fakeExchangeSetPath = @"D:\UKHO";
         public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
-        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : 805011 and correlation ID : 727c5230-2c25-4244-9580-13d90004584a";
+        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
         [SetUp]
         public void Setup()
