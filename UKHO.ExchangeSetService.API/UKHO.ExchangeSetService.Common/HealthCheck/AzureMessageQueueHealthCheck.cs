@@ -61,10 +61,8 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         private async Task<HealthCheckResult> CheckAllMessageQueuesHealth()
         {
             string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
-            string storageAccountConnectionString = string.Empty;
-
-            var queueName = string.Empty;
-
+            string storageAccountConnectionString, queueName = string.Empty;
+            
             HealthCheckResult messageQueueHealthStatus = new HealthCheckResult(HealthStatus.Healthy);
             foreach (string exchangeSetType in exchangeSetTypes)
             {

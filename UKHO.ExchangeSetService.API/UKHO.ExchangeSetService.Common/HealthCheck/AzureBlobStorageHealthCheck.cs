@@ -68,17 +68,16 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
         {
-            if (string.Compare(exchangeSetType, "sxs", true) == 0)
+            switch (exchangeSetType)
             {
-                return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
-            }
-            else if (string.Compare(exchangeSetType, "mxs", true) == 0)
-            {
-                return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
-            }
-            else
-            {
-                return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
+                case "sxs":
+                    return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
+                case "mxs":
+                    return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
+                case "lxs":
+                    return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
+                default:
+                    return (string.Empty, string.Empty);
             }
         }
     }
