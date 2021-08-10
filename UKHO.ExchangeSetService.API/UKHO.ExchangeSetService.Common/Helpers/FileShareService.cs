@@ -86,7 +86,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             if (httpResponse.StatusCode != HttpStatusCode.Created)
             {
-                logger.LogError(EventIds.FSSCreateBatchNonOkResponse.ToEventId(), "File share service create batch endpoint with Uri:{RequestUri} responded with {StatusCode} for _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, correlationId);
+                logger.LogError(EventIds.FSSCreateBatchNonOkResponse.ToEventId(), "Error in file share service create batch endpoint with Uri:{RequestUri} responded with {StatusCode} for _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, correlationId);
                 createBatchResponse.ResponseCode = httpResponse.StatusCode;
                 createBatchResponse.ResponseBody = null;
             }
@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service for query search ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 }
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
             CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
@@ -144,8 +144,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (internalNotFoundProducts.Any() || !internalSearchBatchResponse.Entries.Any())
             {
                 var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Any() ? internalNotFoundProducts.Distinct() : products);
-                logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId(), "Error in file share service while searching ENC files and no data found while querying for products:{internalNotFoundProductsPayLoadJson} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, batchId, correlationId);
-                throw new FulfilmentException(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuering.ToEventId());
+                logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuerying.ToEventId(), "Error in file share service while searching ENC files and no data found while querying for products:{internalNotFoundProductsPayLoadJson} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, batchId, correlationId);
+                throw new FulfilmentException(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuerying.ToEventId());
             }
         }
 
@@ -298,8 +298,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogError(EventIds.DownloadENCFilesRequestNonOkResponse.ToEventId(), "Error in file share service while downloading ENC file:{fileName} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
-                    throw new FulfilmentException(EventIds.DownloadENCFilesRequestNonOkResponse.ToEventId());
+                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in file share service while downloading ENC file:{fileName} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
+                    throw new FulfilmentException(EventIds.DownloadENCFilesNonOkResponse.ToEventId());
                 }
             }
             return result;
@@ -355,13 +355,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogError(EventIds.ReadMeTextFileNotFound.ToEventId(), "Readme.txt file not found in file share service for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    logger.LogError(EventIds.ReadMeTextFileNotFound.ToEventId(), "Error in file share service readme.txt not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                     throw new FulfilmentException(EventIds.ReadMeTextFileNotFound.ToEventId());
                 }
             }
             else
             {
-                logger.LogError(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId(), "Error in file share service for query search ReadMe file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                logger.LogError(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId(), "Error in file share service while searching ReadMe file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId());
             }
 
@@ -380,18 +380,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                 if (fileSystemHelper.CheckFileExists(zipName))
                 {
-                    logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set:{ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set zip:{ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
                     isCreateZipFileExchangeSetCreated = true;
                 }
                 else
                 {
-                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating ExchangeSetFileName:{ExchangeSetFileName} zip for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
                     throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
                 }
             }
             else
             {
-                logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating ExchangeSetFileName:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
                 throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
             }
             return isCreateZipFileExchangeSetCreated;
@@ -422,7 +422,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         isUploadZipFile = true;
                     }
-                    logger.LogInformation(EventIds.BatchStatus.ToEventId(), "BatchStatus:{batchStatus} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, batchId, correlationId);
+                    logger.LogInformation(EventIds.BatchStatus.ToEventId(), "BatchStatus:{batchStatus} for file:{fileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, fileName, batchId, correlationId);
                 }
             }
             return isUploadZipFile;
@@ -455,7 +455,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     if (batchStatus == BatchStatus.Failed)
                     {
                         watch.Stop();
-                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
+                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
                         throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
 
                     }
@@ -464,14 +464,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (batchStatus != BatchStatus.Committed)
                 {
                     watch.Stop();
-                    logger.LogError(EventIds.BatchCommitTimeout.ToEventId(), "Batch Commit Status timedout with BatchStatus:{batchStatus} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, batchStatusMetaData.BatchId, correlationId);
+                    logger.LogError(EventIds.BatchCommitTimeout.ToEventId(), "Batch Commit Status timeout with BatchStatus:{batchStatus} for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
                     throw new FulfilmentException(EventIds.BatchCommitTimeout.ToEventId());
                 }
                 watch.Stop();
             }
             else
             {               
-                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchId, correlationId);
                 throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
             }
             return batchStatus;

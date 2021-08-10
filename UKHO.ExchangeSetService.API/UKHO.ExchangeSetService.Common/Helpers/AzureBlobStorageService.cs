@@ -54,10 +54,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
 
             await UploadSalesCatalogueServiceResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
+            logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
             await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, instanceCountAndType.Item1, storageAccountConnectionString, expiryDate);
 
-            logger.LogInformation(EventIds.SCSResponseStoredAndSentMessageInQueue.ToEventId(), "Sales catalogue response saved for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
             return true;
         }
 
@@ -77,6 +77,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 LoadStreamWithJson(ms, serializeJsonObject);
                 await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob, ms);
             }
+
         }
 
         private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, string expiryDate)

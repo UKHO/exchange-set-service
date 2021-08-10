@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ESSPostProductVersionsRequestCompleted = 805020,
         SCSResponseStoreRequestStart = 805021,
         SCSResponseStoreRequestCompleted = 805022,
-        SCSResponseStoredAndSentMessageInQueue = 805023,
+        SCSResponseStoredToBlobStorage = 805023,
         CreateExchangeSetRequestStart = 805024,
         CreateExchangeSetRequestCompleted = 805025,
         DownloadSalesCatalogueResponseDataStart = 805026,
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceENCFilesNonOkResponse = 805030,
         DownloadENCFilesRequestStart = 805031,
         DownloadENCFilesRequestCompleted = 805032,
-        DownloadENCFilesRequestNonOkResponse = 805033,        
+        DownloadENCFilesNonOkResponse = 805033,        
         ReadMeTextFileNotFound = 805034,
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateCatalogFileRequestStart = 805061,
         CreateCatalogFileRequestCompleted = 805062,
         UnhandledControllerException = 805063,
-        CatalogueFileIsNotCreated = 805064,
+        CatalogFileIsNotCreated = 805064,
         UnexpectedDefaultFileExtension = 805065,
         ExchangeSetNotCreated = 805066,
         ExchangeSetCreated = 805067,
@@ -98,11 +98,12 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ErrorTxtNotCreated = 805091,
         UploadFileBlockStarted = 805092,
         CreateFileInBatchCompleted = 805093,
-        FSSResponseNotFoundForRespectiveProductWhileQuering = 805094,
+        FSSResponseNotFoundForRespectiveProductWhileQuerying = 805094,
         SalesCatalogueServiceCatalogueDataNonOkResponse = 805095,
         QueryFileShareServiceReadMeFileRequestStart = 805096,
         QueryFileShareServiceReadMeFileRequestCompleted = 805097,
-        QueryFileShareServiceReadMeFileNonOkResponse = 805098
+        QueryFileShareServiceReadMeFileNonOkResponse = 805098,
+        ErrorTxtIsUploaded = 805099
     }
 
     public static class EventIdExtensions
