@@ -296,7 +296,7 @@ stages:
 
   - stage: QAdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    #condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: QADeployApp
         displayName: QA - deploy terraform and dotnet App
@@ -365,6 +365,12 @@ stages:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     fileType: json
                     targetFiles: '**/appsettings.json'
+
+                - task: UseDotNet@2
+                  displayName: 'Use .NET Core sdk'
+                  inputs:
+                    packageType: sdk
+                    version: 3.1.x
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
