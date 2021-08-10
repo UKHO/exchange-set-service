@@ -129,17 +129,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service for query search ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 }
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
-            CheckProductsExistsInFss(products, correlationId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
+            CheckProductsExistsInFileShareService(products, correlationId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
             return internalSearchBatchResponse;
         }
 
-        private void CheckProductsExistsInFss(List<Products> products, string correlationId, SearchBatchResponse internalSearchBatchResponse, List<Products> internalNotFoundProducts, int prodCount)
+        private void CheckProductsExistsInFileShareService(List<Products> products, string correlationId, SearchBatchResponse internalSearchBatchResponse, List<Products> internalNotFoundProducts, int prodCount)
         {
             if (internalSearchBatchResponse.Entries.Any() && prodCount != internalSearchBatchResponse.Entries.Count)
             {
                 List<Products> internalProducts = new List<Products>();
                 ConvertFssSearchBatchResponseToProductResponse(internalSearchBatchResponse, internalProducts);
-                GetProductDetailsNotFoundInFss(products, internalNotFoundProducts, internalProducts);
+                GetProductDetailsNotFoundInFileShareService(products, internalNotFoundProducts, internalProducts);
             }
             if (internalNotFoundProducts.Any() || !internalSearchBatchResponse.Entries.Any())
             {
@@ -149,7 +149,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        private void GetProductDetailsNotFoundInFss(List<Products> products, List<Products> internalNotFoundProducts, List<Products> internalProducts)
+        private void GetProductDetailsNotFoundInFileShareService(List<Products> products, List<Products> internalNotFoundProducts, List<Products> internalProducts)
         {
             foreach (var itemProduct in products)
             {
