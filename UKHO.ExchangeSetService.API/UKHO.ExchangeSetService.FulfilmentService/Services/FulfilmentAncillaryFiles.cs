@@ -185,7 +185,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         BaseCellUpdateNumber = product.BaseCellUpdateNumber,
                         LastUpdateNumberForPreviousEdition = product.LastUpdateNumberForPreviousEdition,
                         BaseCellLocation = product.BaseCellLocation,
-                        CancelledCellReplacements = string.Empty,
+                        CancelledCellReplacements = String.Join(";", product.CancelledCellReplacements)
                     });
 
                 var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
