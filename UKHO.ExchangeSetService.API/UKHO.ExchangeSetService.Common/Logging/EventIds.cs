@@ -102,7 +102,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         SalesCatalogueServiceCatalogueDataNonOkResponse = 805095,
         QueryFileShareServiceReadMeFileRequestStart = 805096,
         QueryFileShareServiceReadMeFileRequestCompleted = 805097,
-        QueryFileShareServiceReadMeFileNonOkResponse = 805098
+        QueryFileShareServiceReadMeFileNonOkResponse = 805098,
+        ExchangeSetErrorPostCallbackUriCalled = 805099,
+        ExchangeSetErrorPostCallbackUriNotCalled = 805100,
+        ExchangeSetErrorPostCallbackUriNotProvided = 805101
     }
 
     public static class EventIdExtensions
