@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -36,18 +35,15 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             string sinceDateTime = DateTime.UtcNow.AddDays(-salesCatalogueConfig.Value.SinceDays).ToString("R");
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
             var salesCatalogueServiceResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
-            watch.Stop();
             if (salesCatalogueServiceResponse.StatusCode == HttpStatusCode.OK || salesCatalogueServiceResponse.StatusCode == HttpStatusCode.NotModified)
             {
-                logger.LogInformation(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), $"Sales catalogue service is healthy responded with {salesCatalogueServiceResponse.StatusCode}, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                logger.LogDebug(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), $"Sales catalogue service is healthy responded with {salesCatalogueServiceResponse.StatusCode}");
                 return HealthCheckResult.Healthy("Sales catalogue service is healthy");
             }
             else
             {
-                logger.LogError(EventIds.SalesCatalogueServiceIsUnhealthy.ToEventId(), $"Sales catalogue service is unhealthy responded with {salesCatalogueServiceResponse.StatusCode} for request uri {salesCatalogueServiceResponse.RequestMessage.RequestUri}, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                logger.LogError(EventIds.SalesCatalogueServiceIsUnhealthy.ToEventId(), $"Sales catalogue service is unhealthy responded with {salesCatalogueServiceResponse.StatusCode} for request uri {salesCatalogueServiceResponse.RequestMessage.RequestUri}");
                 return HealthCheckResult.Unhealthy("Sales catalogue service is unhealthy");
             }
         }

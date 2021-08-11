@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -34,8 +33,6 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
                 string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
                 string storageAccountConnectionString = string.Empty;
                 HealthCheckResult azureBlobStorageHealthStatus = new HealthCheckResult(HealthStatus.Healthy);
@@ -47,15 +44,14 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     if (azureBlobStorageHealthStatus.Status == HealthStatus.Unhealthy)
                         break;
                 }
-                watch.Stop();
                 if (azureBlobStorageHealthStatus.Status == HealthStatus.Healthy)
                 {
-                    logger.LogInformation(EventIds.AzureBlobStorageIsHealthy.ToEventId(), $"Azure blob storage is healthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                    logger.LogDebug(EventIds.AzureBlobStorageIsHealthy.ToEventId(), $"Azure blob storage is healthy");
                     return HealthCheckResult.Healthy("Azure blob storage is healthy");
                 }
                 else
                 {
-                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), $"Azure blob storage is unhealthy with error {azureBlobStorageHealthStatus.Exception.Message}, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), $"Azure blob storage is unhealthy with error {azureBlobStorageHealthStatus.Exception.Message}");
                     return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy");
                 }
             }
@@ -68,13 +64,14 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
         {
-            switch (exchangeSetType)
+            Enum.TryParse(exchangeSetType, out ExchangeSetType exchangeSetTypeName);
+            switch (exchangeSetTypeName)
             {
-                case "sxs":
+                case ExchangeSetType.sxs:
                     return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
-                case "mxs":
+                case ExchangeSetType.mxs:
                     return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
-                case "lxs":
+                case ExchangeSetType.lxs:
                     return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
                 default:
                     return (string.Empty, string.Empty);

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -34,20 +33,17 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         {
             try
             {
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
                 var messageQueuesHealth = CheckAllMessageQueuesHealth();
                 await Task.WhenAll(messageQueuesHealth);
-                watch.Stop();
-
+                
                 if (messageQueuesHealth.Result.Status == HealthStatus.Healthy)
                 {
-                    logger.LogInformation(EventIds.AzureMessageQueueIsHealthy.ToEventId(), $"Azure message queue is healthy, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                    logger.LogDebug(EventIds.AzureMessageQueueIsHealthy.ToEventId(), $"Azure message queue is healthy");
                     return HealthCheckResult.Healthy("Azure message queue is healthy");
                 }
                 else
                 {
-                    logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), $"Azure message queue is unhealthy with error {messageQueuesHealth.Result.Exception.Message}, time spent to check this is {watch.ElapsedMilliseconds}ms");
+                    logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), $"Azure message queue is unhealthy with error {messageQueuesHealth.Result.Exception.Message}");
                     return HealthCheckResult.Unhealthy("Azure message queue is unhealthy");
                 }
             }
@@ -72,7 +68,6 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     var storageAccountWithKey = GetStorageAccountNameAndKey(exchangeSetType);
                     storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
                     messageQueueHealthStatus = await azureMessageQueueHelper.CheckMessageQueueHealth(storageAccountConnectionString, queueName);
-                    logger.LogInformation($"Message queue health check for exchange set {exchangeSetType}-{i}");
                     if (messageQueueHealthStatus.Status == HealthStatus.Unhealthy)
                         break;
                 }
@@ -82,13 +77,14 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
         {
-            switch (exchangeSetType)
+            Enum.TryParse(exchangeSetType, out ExchangeSetType exchangeSetTypeName);
+            switch (exchangeSetTypeName)
             {
-                case "sxs":
+                case ExchangeSetType.sxs:
                     return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
-                case "mxs":
+                case ExchangeSetType.mxs:
                     return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
-                case "lxs":
+                case ExchangeSetType.lxs:
                     return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
                 default:
                     return (string.Empty, string.Empty);
@@ -97,13 +93,14 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         private int GetInstanceCount(string exchangeSetType)
         {
-            switch (exchangeSetType)
+            Enum.TryParse(exchangeSetType, out ExchangeSetType exchangeSetTypeName);
+            switch (exchangeSetTypeName)
             {
-                case "sxs":
+                case ExchangeSetType.sxs:
                     return essFulfilmentStorageConfiguration.Value.SmallExchangeSetInstance;
-                case "mxs":
+                case ExchangeSetType.mxs:
                     return essFulfilmentStorageConfiguration.Value.MediumExchangeSetInstance;
-                case "lxs":
+                case ExchangeSetType.lxs:
                     return essFulfilmentStorageConfiguration.Value.LargeExchangeSetInstance;
                 default:
                     return 1;
