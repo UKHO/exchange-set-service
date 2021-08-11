@@ -7,7 +7,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
     public class ExchangeSetErrorResponse
     {
         [JsonProperty("_links")]
-        public CallBackUri Links { get; set; }
+        public CallBackLinks Links { get; set; }
 
         [JsonProperty("exchangeSetUrlExpiryDateTime")]
         public DateTime? ExchangeSetUrlExpiryDateTime { get; set; }

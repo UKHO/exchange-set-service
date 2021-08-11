@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     Source = essCallBackConfiguration.Value.Source,
                     Id = Guid.NewGuid().ToString(),
                     Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
-                    Subject = essCallBackConfiguration.Value.SubjectForCreated,
+                    Subject = essCallBackConfiguration.Value.Subject,
                     DataContentType = "application/json",
                     Data = exchangeSetResponse
                 };
@@ -95,11 +95,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 ExchangeSetErrorResponse exchangeSetErrorResponse = new ExchangeSetErrorResponse()
                 {
-                    Links = new CallBackUri()
+                    Links = new CallBackLinks()
                     {
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
                         ExchangeSetFileUri = null,
-                        ExchangeSetErrorFileUri = new LinkSetErrorFileUri { Href = $"{essCallBackConfiguration.Value.ErrorFileUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ErrorFileName}" }
+                        ExchangeSetErrorFileUri = new LinkSetErrorFileUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ErrorFileName}" }
                     },
                     ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
                     RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
@@ -115,7 +115,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     Source = essCallBackConfiguration.Value.Source,
                     Id = Guid.NewGuid().ToString(),
                     Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
-                    Subject = essCallBackConfiguration.Value.SubjectForCreated,
+                    Subject = essCallBackConfiguration.Value.ErrorSubject,
                     DataContentType = "application/json",
                     Data = exchangeSetErrorResponse
                 };
@@ -126,18 +126,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                     await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
 
-                    logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                    logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                     return true;
                 }
                 else
                 {
-                    logger.LogError(EventIds.ExchangeSetErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                    logger.LogError(EventIds.ExchangeSetErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                     return false;
                 }
             }
             else
             {
-                logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriNotProvided.ToEventId(), "Post callback uri was not provided by requestor for successful exchange set creation for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriNotProvided.ToEventId(), "Post callback uri was not provided by requestor for unsuccessful exchange set creation for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                 return false;
             }
         }

@@ -151,5 +151,49 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.IsTrue(response);
         }
+
+        [Test]
+        public async Task WhenIncorrectCallBackPayloadErrorInRequest_ThenCallBackApiIsNotCalled()
+        {
+            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = 0;
+
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string uri) =>
+               {
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+               });
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
+        public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsFalse()
+        {
+            scsResponseQueueMessage.CallbackUri = "";
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
+        public async Task WhenCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsTrue()
+        {
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string uri) =>
+               {
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+               });
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsTrue(response);
+        }
     }
 }
