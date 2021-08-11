@@ -27,6 +27,10 @@ variables:
     value: "Exchange Set Service"
   - name: UKHOAssemblyCopyright
     value: "Copyright © UK Hydrographic Office"
+  - name: Container
+    value: "ukhydrographicoffice/terraform-azure-powershell-unzip:0.14.9"
+  - name: DeploymentPool
+    value: "UKHO Ubuntu 1804"
 
 stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
@@ -189,6 +193,13 @@ stages:
               Contents: 'appsettings.json'
               TargetFolder: '$(Build.SourcesDirectory)\Deployment\src'
 
+          - task: CopyFiles@2
+            displayName: "Copy OpenAPI spec for deployment"
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: 'exchangeSetService_OpenApi_definition.yaml'
+              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
+
           - task: PublishBuildArtifacts@1
             displayName: "Publish terraform Artifacts"
             inputs:
@@ -201,6 +212,8 @@ stages:
       - deployment: DevDeployApp
         displayName: "Dev - deploy terraform and dotnet App"
         environment: "Ess-Dev"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
         workspace:
           clean: all
         variables:
@@ -234,10 +247,20 @@ stages:
           runOnce:
             deploy:
               steps:
-                - template: Deployment/templates/continous-deployment.yml
+                - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Fleet Manager Dev/Test"
+                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                    APIMServiceInstance: $(APIM_SERVICE_NAME)
+                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
@@ -250,20 +273,26 @@ stages:
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"
                   inputs:
-                    folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
+                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     fileType: json
-                    targetFiles: 'appsettings.json'
+                    targetFiles: '**/appsettings.json'
+
+                - task: UseDotNet@2
+                  displayName: 'Use .NET Core sdk'
+                  inputs:
+                    packageType: sdk
+                    version: 3.1.x
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
                   inputs:
                     command: "test"
                     projects: |
-                      **\*FunctionalTest*.dll
-                      !**\*TestAdapter.dll
-                      !**\obj\**
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
                     testRunTitle: "Dev-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)\functionaltests'
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
   - stage: QAdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
@@ -272,6 +301,8 @@ stages:
       - deployment: QADeployApp
         displayName: QA - deploy terraform and dotnet App
         environment: "Ess-Qa"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
         workspace:
           clean: all
         variables:
@@ -305,11 +336,21 @@ stages:
           runOnce:
             deploy:
               steps:
-                - template: Deployment/templates/continous-deployment.yml
+                - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-                
+
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                     AzureSubscription: "Fleet Manager Dev/Test"
+                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                     APIMServiceInstance: $(APIM_SERVICE_NAME)
+                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+                     
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
                   inputs:
@@ -321,17 +362,23 @@ stages:
                 - task: FileTransform@1
                   displayName: "File Transform: functionaltests"
                   inputs:
-                    folderPath: '$(Build.SourcesDirectory)\functionaltests\UKHO.ExchangeSetService.API.FunctionalTests'
+                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     fileType: json
-                    targetFiles: 'appsettings.json'
+                    targetFiles: '**/appsettings.json'
+
+                - task: UseDotNet@2
+                  displayName: 'Use .NET Core sdk'
+                  inputs:
+                    packageType: sdk
+                    version: 3.1.x
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
                   inputs:
                     command: "test"
                     projects: |
-                      **\*FunctionalTest*.dll
-                      !**\*TestAdapter.dll
-                      !**\obj\**
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
                     testRunTitle: "QA-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)\functionaltests'
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
