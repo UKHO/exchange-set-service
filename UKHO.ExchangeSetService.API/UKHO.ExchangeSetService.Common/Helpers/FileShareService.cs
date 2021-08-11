@@ -320,7 +320,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
             string filePath = Path.Combine(exchangeSetRootPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
-            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture));
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             HttpResponseMessage httpReadMeFileResponse;
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, correlationId);
             if (httpReadMeFileResponse.IsSuccessStatusCode)
@@ -455,7 +455,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     if (batchStatus == BatchStatus.Failed)
                     {
                         watch.Stop();
-                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
+                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
                         throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
 
                     }
@@ -464,14 +464,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (batchStatus != BatchStatus.Committed)
                 {
                     watch.Stop();
-                    logger.LogError(EventIds.BatchCommitTimeout.ToEventId(), "Batch Commit Status timeout with BatchStatus:{batchStatus} for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
+                    logger.LogError(EventIds.BatchCommitTimeout.ToEventId(), "Batch Commit Status timeout with BatchStatus:{batchStatus} for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
                     throw new FulfilmentException(EventIds.BatchCommitTimeout.ToEventId());
                 }
                 watch.Stop();
             }
             else
             {               
-                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchId, correlationId);
+                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchId, correlationId);
                 throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
             }
             return batchStatus;
