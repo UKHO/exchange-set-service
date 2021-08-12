@@ -30,3 +30,7 @@ variable "user_assigned_identity" {
 variable "app_service_sku" {
 
 }
+
+variable "allowed_ips{
+
+}
