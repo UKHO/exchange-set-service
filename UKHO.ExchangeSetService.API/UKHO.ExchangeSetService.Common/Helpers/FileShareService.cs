@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     new KeyValuePair<string, string>("Media Type", "Zip"),
                     new KeyValuePair<string, string>("Product Type", "AVCS")
                 },
-                ExpiryDate = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+                ExpiryDate = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture),
                 Acl = new Acl()
                 {
                     ReadUsers = new List<string>() { oid }

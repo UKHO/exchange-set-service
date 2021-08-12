@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 Type = "test",
                 Source = "test",
                 Subject = "test",
-                Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+                Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                 DataContentType = "application/json",
                 Data = new ExchangeSetResponse()
             };

@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 BatchId = batchId,
                 BatchStatusUri = $"http://tempuri.org/batch/{batchId}",
                 ExchangeSetFileUri = $"http://tempuri.org/batch/{batchId}/files/",
-                BatchExpiryDateTime = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+                BatchExpiryDateTime = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
             };
         }
         #endregion GetCreateBatchResponse

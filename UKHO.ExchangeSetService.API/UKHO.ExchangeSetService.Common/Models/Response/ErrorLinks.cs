@@ -2,7 +2,7 @@
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
-    public class CallBackLinks : Links
+    public class ErrorLinks : Links
     {
         [JsonProperty("errorFileUri")]
         public LinkSetErrorFileUri ExchangeSetErrorFileUri { get; set; }

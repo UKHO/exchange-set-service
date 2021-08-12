@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
                     RequestedProductsAlreadyUpToDateCount = salesCatalogueProductResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Value,
                     RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse)
-                }; 
+                };
 
                 CallBackResponse callBackResponse = new CallBackResponse()
                 {
@@ -57,7 +57,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     Type = essCallBackConfiguration.Value.Type,
                     Source = essCallBackConfiguration.Value.Source,
                     Id = Guid.NewGuid().ToString(),
-                    Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+                    Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                     Subject = essCallBackConfiguration.Value.Subject,
                     DataContentType = "application/json",
                     Data = exchangeSetResponse
@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 ExchangeSetErrorResponse exchangeSetErrorResponse = new ExchangeSetErrorResponse()
                 {
-                    Links = new CallBackLinks()
+                    Links = new ErrorLinks()
                     {
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
                         ExchangeSetFileUri = null,
@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     Type = essCallBackConfiguration.Value.Type,
                     Source = essCallBackConfiguration.Value.Source,
                     Id = Guid.NewGuid().ToString(),
-                    Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+                    Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                     Subject = essCallBackConfiguration.Value.ErrorSubject,
                     DataContentType = "application/json",
                     Data = exchangeSetErrorResponse
