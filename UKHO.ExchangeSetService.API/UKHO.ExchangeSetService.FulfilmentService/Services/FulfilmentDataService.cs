@@ -145,7 +145,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Upload exchange set zip file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 isZipFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
-                logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Upload exchange set zip file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Upload exchange set zip file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
             return isZipFileUploaded;
         }
