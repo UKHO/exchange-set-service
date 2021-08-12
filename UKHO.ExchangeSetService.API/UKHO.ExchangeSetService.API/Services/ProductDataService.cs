@@ -263,7 +263,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private async Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetResponse, string correlationId)
         {
-            logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), "FSS create batch endpoint request started and _X-Correlation-ID:{CorrelationId}", correlationId);
+            logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), "FSS create batch endpoint request started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
             var createBatchResponse = await fileShareService.CreateBatch(correlationId);
 

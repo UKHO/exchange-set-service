@@ -25,6 +25,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private ISalesCatalogueClient fakeSalesCatalogueClient;
         private ISalesCatalogueService salesCatalogueService;
         public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
         [SetUp]
         public void Setup()
@@ -33,7 +34,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             this.fakeAuthTokenProvider = A.Fake<IAuthTokenProvider>();
             this.fakeSaleCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { ProductType = "Test", Version = "t1", CatalogueType = "essTest" });
             this.fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
-
             salesCatalogueService = new SalesCatalogueService(fakeSalesCatalogueClient, fakeLogger, fakeAuthTokenProvider, fakeSaleCatalogueConfig);
         }
 
@@ -243,7 +243,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             //Method call
-            var response = await salesCatalogueService.PostProductVersionsAsync(requestBody,string.Empty);
+            var response = await salesCatalogueService.PostProductVersionsAsync(requestBody, string.Empty);
 
             //Test
             Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
@@ -339,15 +339,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region GetSalesCatalogueDataResponse
         [Test]
-        public void WhenSCSClientReturnsOtherThan200_ThenGetSalesCatalogueDataResponseReturnsSameStatusAndNullInResponse()
+        public void WhenSCSClientReturnsOtherThan200_ThenGetSalesCatalogueDataResponseReturnsFulfilmentException()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>()
-                .And.Message.EqualTo("There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}")
-                 , async delegate { await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null); });            
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null); });
         }
 
         [Test]

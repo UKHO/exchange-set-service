@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var messageBase64String = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(message));
             // Send a message to the queue
             await queueClient.SendMessageAsync(messageBase64String);
-            logger.LogInformation(EventIds.AddedMessageInQueue.ToEventId(), "Added message in Queue:{queue} with Sales catalogue response uri for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", queue, batchId, correlationId);
+            logger.LogInformation(EventIds.AddedMessageInQueue.ToEventId(), "Added message in Queue:{queue} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", queue, batchId, correlationId);
         }
     }
 }

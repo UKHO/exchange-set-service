@@ -12,10 +12,6 @@ namespace UKHO.ExchangeSetService.Common.Configuration
 
         public EventId EventId { get; set; }
 
-        public FulfilmentException() : base(message)
-        {
-        }
-
         public FulfilmentException(EventId eventId) : base(message)
         {
             EventId = eventId;

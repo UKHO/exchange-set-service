@@ -45,12 +45,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentCallBackService = fulfilmentCallBackService;
         }
 
-        public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDateTime)
+        public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
             string homeDirectoryPath = configuration["HOME"];
-            var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDateTime, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
+            var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var exchangeSetPathForUploadZipFile = Path.Combine(homeDirectoryPath, currentUtcDateTime, message.BatchId);
+            var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
 
             var response = await DownloadSalesCatalogueResponse(message);
@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await Task.WhenAll(tasks);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData);
-            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
+            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetZipFilePath, message.CorrelationId);
 
             if (isZipFileUploaded)
             {
@@ -133,7 +133,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             logger.LogInformation(EventIds.CreateSerialFileRequestCompleted.ToEventId(), "Create serial enc file request completed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
         }
 
-        public async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetPathForUploadZipFile, string correlationId)
+        public async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId)
         {
             bool isZipFileUploaded = false;
 
@@ -144,7 +144,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (isZipFileCreated)
             {
                 logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Upload exchange set zip file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                isZipFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetPathForUploadZipFile, correlationId);
+                isZipFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
                 logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Upload exchange set zip file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
             return isZipFileUploaded;

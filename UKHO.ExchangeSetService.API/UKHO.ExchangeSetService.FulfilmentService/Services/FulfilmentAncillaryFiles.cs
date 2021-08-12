@@ -82,12 +82,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 foreach (var listItem in listFulfilmentData)
                 {
                     listItem.Files = listItem.Files.OrderByDescending(
-                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower()))));
+                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
 
                     foreach (var item in listItem.Files)
                     {
                         string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
-                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
+                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
                         string comment = string.Empty;
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
 
@@ -128,12 +128,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 return true;
             else
             {
-                logger.LogError(EventIds.CatalogueFileIsNotCreated.ToEventId(), "Error in creating catalogue.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                throw new FulfilmentException(EventIds.CatalogueFileIsNotCreated.ToEventId());
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
             }
         }
 
-        private string GetMimeType(string fileName, string mimeType)
+        private string GetMimeType(string fileName, string mimeType, string batchId, string correlationId)
         {
             string fileExtension = Path.GetExtension(fileName);
             switch (mimeType)
@@ -151,7 +151,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     return "TIF";
 
                 default:
-                    logger.LogInformation(EventIds.UnexpectedDefaultFileExtension.ToEventId(), "Default - Unexpected file extension for File : {filename} ", fileName);
+                    logger.LogInformation(EventIds.UnexpectedDefaultFileExtension.ToEventId(), "Default - Unexpected file extension for File:{filename} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, batchId, correlationId);
                     return fileExtension?.TrimStart('.').ToUpper();
             }
         }
@@ -185,7 +185,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         BaseCellUpdateNumber = product.BaseCellUpdateNumber,
                         LastUpdateNumberForPreviousEdition = product.LastUpdateNumberForPreviousEdition,
                         BaseCellLocation = product.BaseCellLocation,
-                        CancelledCellReplacements = string.Empty,
+                        CancelledCellReplacements = String.Join(";", product.CancelledCellReplacements)
                     });
 
                 var content = productsBuilder.WriteProductsList(DateTime.UtcNow);

@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
         public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
         public IFulfilmentCallBackService fakeFulfilmentCallBackService;
-        public string currentUtcDateTime = DateTime.UtcNow.ToString("ddMMMyyyy");
+        public string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
 
         [SetUp]
         public void Setup()
@@ -153,9 +153,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
-            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
-                   .And.Message.EqualTo("Storage account accesskey not found")
-                    , async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDateTime); });
+            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>().And.Message.EqualTo("Storage account accesskey not found"),
+                    async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate); });
         }
 
         [Test]
@@ -187,7 +186,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse)).Returns(true);
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
 
-            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDateTime);
+            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
             Assert.AreEqual("Exchange Set Created Successfully", salesCatalogueResponseFile);
         }
@@ -210,7 +209,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
-            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDateTime);
+            string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
             Assert.AreEqual("Exchange Set Is Not Created", salesCatalogueResponseFile);
         }
