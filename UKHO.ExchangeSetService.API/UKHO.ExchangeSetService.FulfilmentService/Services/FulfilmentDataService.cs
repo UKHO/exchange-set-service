@@ -55,11 +55,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetPath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetPathForUploadZipFile = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId);
-            var listFulfilmentData = new List<FulfilmentDataResponse>();
-            DateTime downloadEncFilesFromFileShareServiceTaskStartAt = DateTime.UtcNow;
+            var listFulfilmentData = new List<FulfilmentDataResponse>();           
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
+                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
                 int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
                 int productGroupCount = response.Products.Count % parallelSearchTaskCount == 0 ? response.Products.Count / parallelSearchTaskCount : (response.Products.Count / parallelSearchTaskCount) + 1;
                 var productsList = CommonHelper.SplitList((response.Products), productGroupCount);
@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponses = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
-                    int queryCount = fulfilmentDataResponses.Count > 0 ? fulfilmentDataResponses.FirstOrDefault().TotalHitCountForQueryFileShareService : 0;
+                    int queryCount = fulfilmentDataResponses.Count > 0 ? fulfilmentDataResponses.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
@@ -79,12 +79,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 await Task.WhenAll(tasks);                
                 DateTime downloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
-                int folderCount = 0;
+                int downloadedENCFileCount = 0;
                 foreach (var item in listFulfilmentData)
                 {
-                    folderCount += item.Files.Count();
+                    downloadedENCFileCount += item.Files.Count();
                 }                
-                monitorHelper.MonitorRequest("Query and download file share service data", downloadEncFilesFromFileShareServiceTaskStartAt, downloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, folderCount, null, message.BatchId);
+                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, downloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData);
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
@@ -164,12 +164,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetPathForUploadZipFile, string correlationId)
         {
             bool isZipFileUploaded = false;
-            DateTime createZipFileTaskStartAt = DateTime.UtcNow;
+            DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
             logger.LogInformation(EventIds.CreateZipFileRequestStart.ToEventId(), "Started creating exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             bool isZipFileCreated = fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId);
             logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Ended creating exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             DateTime createZipFileTaskCompletedAt = DateTime.UtcNow;
-            monitorHelper.MonitorRequest("Zip File Creation Task", createZipFileTaskStartAt, createZipFileTaskCompletedAt, correlationId,null,null, null,batchId);
+            monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, createZipFileTaskCompletedAt, correlationId,null,null, null,batchId);
             if (isZipFileCreated)
             {
                 logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Started uploading exchange set zip file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);

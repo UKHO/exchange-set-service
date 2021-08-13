@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 });
                 if (fulFilmentDataResponse.Count > 0)
-                    fulFilmentDataResponse.FirstOrDefault().TotalHitCountForQueryFileShareService = totalHitCountForToQueryFileShareService;
+                    fulFilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount = totalHitCountForToQueryFileShareService;
                 return fulFilmentDataResponse;
             }
             return null;
