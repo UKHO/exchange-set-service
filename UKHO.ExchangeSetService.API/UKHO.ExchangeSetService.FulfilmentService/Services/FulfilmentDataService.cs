@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message)
         {
-            DateTime createExchangeSetTaskStartAt = DateTime.UtcNow;
+            DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
             var exchangeSetPath = Path.Combine(homeDirectoryPath, DateTime.UtcNow.ToString("ddMMMyyyy"), message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -63,28 +63,28 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
                 int productGroupCount = response.Products.Count % parallelSearchTaskCount == 0 ? response.Products.Count / parallelSearchTaskCount : (response.Products.Count / parallelSearchTaskCount) + 1;
                 var productsList = CommonHelper.SplitList((response.Products), productGroupCount);
-                List<FulfilmentDataResponse> fulfilmentDataResponses = new List<FulfilmentDataResponse>();
+                List<FulfilmentDataResponse> fulfilmentDataResponse = new List<FulfilmentDataResponse>();
                 object sync = new object();
                 int fileShareServiceSearchQueryCount = 0;                
                 var tasks = productsList.Select(async item =>
                 {
-                    fulfilmentDataResponses = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
-                    int queryCount = fulfilmentDataResponses.Count > 0 ? fulfilmentDataResponses.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
+                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
+                    int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
                     }
-                    listFulfilmentData.AddRange(fulfilmentDataResponses);
+                    listFulfilmentData.AddRange(fulfilmentDataResponse);
                 });
 
                 await Task.WhenAll(tasks);                
-                DateTime downloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
+                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
                 int downloadedENCFileCount = 0;
                 foreach (var item in listFulfilmentData)
                 {
                     downloadedENCFileCount += item.Files.Count();
                 }                
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, downloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
+                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData);
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (isZipFileUploaded)
             {
                 DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartAt, createExchangeSetTaskCompletedAt, message.CorrelationId,null,null,null,message.BatchId);
+                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId,null,null,null,message.BatchId);
                 logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
 
                 await fulfilmentCallBackService.SendCallBackResponse(response, message);
@@ -145,12 +145,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (!string.IsNullOrWhiteSpace(readMeFilePath))
             {
-                DateTime createReadMeFileTaskStartAt = DateTime.UtcNow;
+                DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "Search and download ReadMe Text File start for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "Search and download ReadMe Text File completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartAt, createReadMeFileTaskCompletedAt, correlationId, null,null, null, batchId);
+                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null,null, null, batchId);
             }
         }
 
@@ -202,12 +202,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
             {
-                DateTime createProductFileTaskStartAt = DateTime.UtcNow;
+                DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
                 logger.LogInformation(EventIds.CreateProductFileRequestStart.ToEventId(), "Create product file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 isProductFileCreated = await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
                 logger.LogInformation(EventIds.CreateProductFileRequestCompleted.ToEventId(), "Create product file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 DateTime createProductFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartAt, createProductFileTaskCompletedAt, correlationId,null, null, null,batchId);
+                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, correlationId,null, null, null,batchId);
             }
 
             return isProductFileCreated;

@@ -323,7 +323,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            DateTime uploadZipFileTaskStartAt = DateTime.UtcNow;
+            DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             bool isUploadZipFile = false;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileShareServiceConfig.Value.ExchangeSetFileName));
 
@@ -332,7 +332,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
                 DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartAt, uploadZipFileTaskCompletedAt, correlationId, null, null,null,batchId);
+                monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null,null,batchId);
                 if (isWriteBlock)
                 {
                     BatchStatus batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, customFileInfo);
@@ -366,7 +366,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 AccessToken = accessToken,
                 FullFileName = customFileInfo.FullName
             };
-            DateTime commitTaskStartAt = DateTime.UtcNow;
+            DateTime commitTaskStartedAt = DateTime.UtcNow;
             bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaData, correlationId);
             BatchStatus batchStatus = BatchStatus.CommitInProgress;
             if (isUploadCommitBatchCompleted)
@@ -403,7 +403,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId {batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
             DateTime commitTaskCompletedAt = DateTime.UtcNow;
-            monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartAt, commitTaskCompletedAt, correlationId, null, null, null,batchId);
+            monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null,batchId);
             return batchStatus;
         }
 

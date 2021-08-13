@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
-            DateTime salesCatalogueServiceRequestStartAt = DateTime.UtcNow;
+            DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList());
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             }
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;          
-            monitorHelper.MonitorRequest("Sales Catalogue Service Product Identifier Request", salesCatalogueServiceRequestStartAt, salesCatalogueServiceRequestCompletedAt, productIdentifierRequest.CorrelationId,null,null, fileSize ,null);
+            monitorHelper.MonitorRequest("Sales Catalogue Service Product Identifier Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productIdentifierRequest.CorrelationId,null,null, fileSize ,null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
 
@@ -145,7 +145,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
-            DateTime salesCatalogueServiceRequestStartAt = DateTime.UtcNow;
+            DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
@@ -163,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;            
-            monitorHelper.MonitorRequest("Sales Catalogue Service Product Version Request", salesCatalogueServiceRequestStartAt, salesCatalogueServiceRequestCompletedAt, request.CorrelationId, null, null, fileSize, null);
+            monitorHelper.MonitorRequest("Sales Catalogue Service Product Version Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, request.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, true);
             if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
@@ -203,7 +203,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest, AzureAdB2C azureAdB2C)
         {
-            DateTime salesCatalogueServiceRequestStartAt = DateTime.UtcNow;
+            DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
             var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
@@ -220,7 +220,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             }
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;            
-            monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
+            monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
             if (response.HttpStatusCode != HttpStatusCode.OK)
