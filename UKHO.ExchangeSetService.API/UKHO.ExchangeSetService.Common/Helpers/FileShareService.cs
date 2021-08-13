@@ -251,8 +251,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
         {
-            using Stream stream = await httpResponse.Content.ReadAsStreamAsync();
-            fileSystemHelper.CreateFileCopy(path, stream);
+            using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+            {
+                fileSystemHelper.CreateFileCopy(path, stream);
+            }
         }
 
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
@@ -267,8 +269,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, correlationId);
             if (httpReadMeFileResponse.IsSuccessStatusCode)
             {
-                using Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync();
-                return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
+                using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
+                {
+                    return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
+                }
             }
             else
             {
