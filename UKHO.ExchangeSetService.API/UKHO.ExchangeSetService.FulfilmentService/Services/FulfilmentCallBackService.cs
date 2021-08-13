@@ -37,44 +37,48 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             if (!string.IsNullOrWhiteSpace(scsResponseQueueMessage.CallbackUri))
             {
-                ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
+                try
                 {
-                    Links = new Links()
+                    ExchangeSetResponse exchangeSetResponse = new ExchangeSetResponse()
                     {
-                        ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
-                        ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}" }
-                    },
-                    ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
-                    RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
-                    ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
-                    RequestedProductsAlreadyUpToDateCount = salesCatalogueProductResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Value,
-                    RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse)
-                };
+                        Links = new Links()
+                        {
+                            ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
+                            ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}" }
+                        },
+                        ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
+                        RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
+                        ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
+                        RequestedProductsAlreadyUpToDateCount = salesCatalogueProductResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Value,
+                        RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse)
+                    };
 
-                CallBackResponse callBackResponse = new CallBackResponse()
-                {
-                    SpecVersion = essCallBackConfiguration.Value.SpecVersion,
-                    Type = essCallBackConfiguration.Value.Type,
-                    Source = essCallBackConfiguration.Value.Source,
-                    Id = Guid.NewGuid().ToString(),
-                    Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
-                    Subject = essCallBackConfiguration.Value.Subject,
-                    DataContentType = "application/json",
-                    Data = exchangeSetResponse
-                };
+                    CallBackResponse callBackResponse = new CallBackResponse()
+                    {
+                        SpecVersion = essCallBackConfiguration.Value.SpecVersion,
+                        Type = essCallBackConfiguration.Value.Type,
+                        Source = essCallBackConfiguration.Value.Source,
+                        Id = Guid.NewGuid().ToString(),
+                        Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
+                        Subject = essCallBackConfiguration.Value.Subject,
+                        DataContentType = "application/json",
+                        Data = exchangeSetResponse
+                    };
 
-                if (ValidateCallbackRequestPayload(callBackResponse))
-                {
-                    string payloadJson = JsonConvert.SerializeObject(callBackResponse);
+                    if (ValidateCallbackRequestPayload(callBackResponse))
+                    {
+                        string payloadJson = JsonConvert.SerializeObject(callBackResponse);
 
-                    await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
-
-                    logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
-                    return true;
+                        return await SendResponseToCallBackApi(false, payloadJson, scsResponseQueueMessage);
+                    }
+                    else
+                    {
+                        logger.LogError(EventIds.ExchangeSetCreatedPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                        return false;
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    logger.LogError(EventIds.ExchangeSetCreatedPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                     return false;
                 }
             }
@@ -88,50 +92,53 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task<bool> SendCallBackErrorResponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
         {
             salesCatalogueProductResponse.ProductCounts.ReturnedProductCount = 0;
-            salesCatalogueProductResponse.ProductCounts.RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
-                                new RequestedProductsNotReturned { ProductName = null, Reason = essCallBackConfiguration.Value.Reason }};
+            salesCatalogueProductResponse.ProductCounts.RequestedProductsNotReturned = new List<RequestedProductsNotReturned> { new RequestedProductsNotReturned { ProductName = null, Reason = essCallBackConfiguration.Value.Reason }};
 
             if (!string.IsNullOrWhiteSpace(scsResponseQueueMessage.CallbackUri))
             {
-                ExchangeSetErrorResponse exchangeSetErrorResponse = new ExchangeSetErrorResponse()
+                try
                 {
-                    Links = new ErrorLinks()
+                    ExchangeSetErrorResponse exchangeSetErrorResponse = new ExchangeSetErrorResponse()
                     {
-                        ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
-                        ExchangeSetFileUri = null,
-                        ExchangeSetErrorFileUri = new LinkSetErrorFileUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ErrorFileName}" }
-                    },
-                    ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
-                    RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
-                    ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
-                    RequestedProductsAlreadyUpToDateCount = salesCatalogueProductResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Value,
-                    RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse)
-                };
+                        Links = new ErrorLinks()
+                        {
+                            ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
+                            ExchangeSetFileUri = null,
+                            ExchangeSetErrorFileUri = new LinkSetErrorFileUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ErrorFileName}" }
+                        },
+                        ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
+                        RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
+                        ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
+                        RequestedProductsAlreadyUpToDateCount = salesCatalogueProductResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Value,
+                        RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse)
+                    };
 
-                CallBackErrorResponse callBackErrorResponse = new CallBackErrorResponse()
-                {
-                    SpecVersion = essCallBackConfiguration.Value.SpecVersion,
-                    Type = essCallBackConfiguration.Value.Type,
-                    Source = essCallBackConfiguration.Value.Source,
-                    Id = Guid.NewGuid().ToString(),
-                    Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
-                    Subject = essCallBackConfiguration.Value.ErrorSubject,
-                    DataContentType = "application/json",
-                    Data = exchangeSetErrorResponse
-                };
+                    CallBackErrorResponse callBackErrorResponse = new CallBackErrorResponse()
+                    {
+                        SpecVersion = essCallBackConfiguration.Value.SpecVersion,
+                        Type = essCallBackConfiguration.Value.Type,
+                        Source = essCallBackConfiguration.Value.Source,
+                        Id = Guid.NewGuid().ToString(),
+                        Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
+                        Subject = essCallBackConfiguration.Value.ErrorSubject,
+                        DataContentType = "application/json",
+                        Data = exchangeSetErrorResponse
+                    };
 
-                if (ValidateCallbackErrorRequestPayload(callBackErrorResponse))
-                {
-                    string payloadJson = JsonConvert.SerializeObject(callBackErrorResponse);
+                    if (ValidateCallbackErrorRequestPayload(callBackErrorResponse))
+                    {
+                        string payloadJson = JsonConvert.SerializeObject(callBackErrorResponse);
 
-                    await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
-
-                    logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
-                    return true;
+                        return await SendResponseToCallBackApi(true, payloadJson, scsResponseQueueMessage);
+                    }
+                    else
+                    {
+                        logger.LogError(EventIds.ExchangeSetErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                        return false;
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    logger.LogError(EventIds.ExchangeSetErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                     return false;
                 }
             }
@@ -159,12 +166,24 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public bool ValidateCallbackRequestPayload(CallBackResponse callBackResponse)
         {
-         return (callBackResponse.Data.RequestedProductCount > 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
+            return (callBackResponse.Data.RequestedProductCount > 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
         }
 
         public bool ValidateCallbackErrorRequestPayload(CallBackErrorResponse callBackResponse)
         {
             return (callBackResponse.Data.RequestedProductCount > 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && Links.Equals(callBackResponse.Data.Links.ExchangeSetFileUri,null) && !string.IsNullOrWhiteSpace(callBackResponse.Id) && int.Equals(callBackResponse.Data.ExchangeSetCellCount,0));
+        }
+
+        public async Task<bool> SendResponseToCallBackApi(bool errorStatus, string payloadJson, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
+        {
+            await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
+
+            if (!errorStatus)
+                logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+            else
+                logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                
+            return true;
         }
     }
 }
