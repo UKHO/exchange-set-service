@@ -4,6 +4,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IMonitorHelper
     {
-        void MonitorRequest(string message, DateTime startAt, DateTime completedAt, string correlationId, int? totalHitCountsToFileShareServiceForQuery = null, int? fileCount = null, long? fileSize = null, string batchId = null);
+        void MonitorRequest(string message, DateTime startedAt, DateTime completedAt, string correlationId, int? fileShareServiceSearchQueryCount = null, int? downloadedENCFileCount = null, long? fileSizeInBytes = null, string batchId = null);
     }
 }

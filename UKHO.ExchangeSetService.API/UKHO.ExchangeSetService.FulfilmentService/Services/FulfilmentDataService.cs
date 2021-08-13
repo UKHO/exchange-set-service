@@ -65,14 +65,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var productsList = CommonHelper.SplitList((response.Products), productGroupCount);
                 List<FulfilmentDataResponse> fulfilmentDataResponses = new List<FulfilmentDataResponse>();
                 object sync = new object();
-                int totalHitCountsToFileShareServiceForQuery = 0;                
+                int fileShareServiceSearchQueryCount = 0;                
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponses = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
                     int queryCount = fulfilmentDataResponses.Count > 0 ? fulfilmentDataResponses.FirstOrDefault().TotalHitCountForQueryFileShareService : 0;
                     lock (sync)
                     {
-                        totalHitCountsToFileShareServiceForQuery += queryCount;
+                        fileShareServiceSearchQueryCount += queryCount;
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponses);
                 });
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     folderCount += item.Files.Count();
                 }                
-                monitorHelper.MonitorRequest("Query and download file share service data", downloadEncFilesFromFileShareServiceTaskStartAt, downloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, totalHitCountsToFileShareServiceForQuery, folderCount, null, message.BatchId);
+                monitorHelper.MonitorRequest("Query and download file share service data", downloadEncFilesFromFileShareServiceTaskStartAt, downloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, folderCount, null, message.BatchId);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData);
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetPathForUploadZipFile, message.CorrelationId);
@@ -185,12 +185,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
             {
-                DateTime createCatalogueFileTaskStartAt = DateTime.UtcNow;
+                DateTime createCatalogFileTaskStartedAt = DateTime.UtcNow;
                 logger.LogInformation(EventIds.CreateCatalogFileRequestStart.ToEventId(), "Create catalog file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 isFileCreated = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse);
                 logger.LogInformation(EventIds.CreateCatalogFileRequestCompleted.ToEventId(), "Create catalog file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                DateTime createCatalogueFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Catalogue File Task", createCatalogueFileTaskStartAt, createCatalogueFileTaskCompletedAt, correlationId,null,null, null,batchId);
+                DateTime createCatalogFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileTaskStartedAt, createCatalogFileTaskCompletedAt, correlationId,null,null, null,batchId);
             }
 
             return isFileCreated;

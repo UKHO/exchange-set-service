@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.telemetryClient = new TelemetryClient(telemetryConfiguration);
         }
 
-        public void MonitorRequest(string message,DateTime startAt, DateTime completedAt, string correlationId, int? totalHitCountsToFileShareServiceForQuery = null, int? fileCount=null, long? fileSize= null,string batchId = null)
+        public void MonitorRequest(string message,DateTime startedAt, DateTime completedAt, string correlationId, int? fileShareServiceSearchQueryCount = null, int? downloadedENCFileCount = null, long? fileSizeInBytes = null,string batchId = null)
         {
             string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
             this.telemetryClient.InstrumentationKey = instrumentationKey;
@@ -30,12 +30,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                {
                                     {"CorrelationId:",correlationId },
                                     {"BatchId:", !string.IsNullOrWhiteSpace(batchId) ? batchId: string.Empty},
-                                    {"FileSize:", $"{fileSize}" },
-                                    {"FileShareServiceSearchQueryCount:", $"{totalHitCountsToFileShareServiceForQuery}" },
-                                    {"DownloadedENCFileCount:", $"{fileCount}" },
-                                    {requestStartedAt,$"{startAt:MM/dd/yyyy hh:mm:ss.fff tt}" },
+                                    {"FileSizeInBytes:", $"{fileSizeInBytes}" },
+                                    {"FileShareServiceSearchQueryCount:", $"{fileShareServiceSearchQueryCount}" },
+                                    {"DownloadedENCFileCount:", $"{downloadedENCFileCount}" },
+                                    {requestStartedAt,$"{startedAt:MM/dd/yyyy hh:mm:ss.fff tt}" },
                                     {requestCompletedAt,$"{completedAt:MM/dd/yyyy hh:mm:ss.fff tt}" },
-                                    {runtimeDurationInMs,$"{completedAt.Subtract(startAt.ToUniversalTime()).TotalMilliseconds}" }
+                                    {runtimeDurationInMs,$"{completedAt.Subtract(startedAt.ToUniversalTime()).TotalMilliseconds}" }
                                });
         }
     }
