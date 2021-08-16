@@ -91,7 +91,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ExchangeSetCreatedPostCallbackUriCalled = 805084,
         ExchangeSetCreatedPostCallbackUriNotCalled = 805085,
         ExchangeSetCreatedPostCallbackUriNotProvided = 805086,
-        AddedMessageInQueue = 805087
+        AddedMessageInQueue = 805087,
+        RetryHttpClientSCSRequest = 805088,
+        RetryHttpClientFSSRequest = 805089
     }
 
     public static class EventIdExtensions
