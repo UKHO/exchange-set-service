@@ -19,6 +19,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfiguration;
         private ILogger<AzureBlobStorageService> fakeLogger;
         private AzureBlobStorageHealthCheck azureBlobStorageHealthCheck;
+        private IAzureBlobStorageService fakeAzureBlobStorageService;
 
         [SetUp]
         public void Setup()
@@ -26,11 +27,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             this.fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
             this.fakeLogger = A.Fake<ILogger<AzureBlobStorageService>>();
             this.fakeSalesCatalogueStorageService = A.Fake<ISalesCatalogueStorageService>();
+            this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
 
             this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
             { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes = "test" });
 
-            azureBlobStorageHealthCheck = new AzureBlobStorageHealthCheck(fakeAzureBlobStorageClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger);
+            azureBlobStorageHealthCheck = new AzureBlobStorageHealthCheck(fakeAzureBlobStorageClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger, fakeAzureBlobStorageService);
         }
 
         private (string, string) GetStorageAccountConnectionStringAndContainerName()

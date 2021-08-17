@@ -12,24 +12,29 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
     [ExcludeFromCodeCoverage]
-    public class AzureWebJobsHealthCheckClient : IAzureWebJobsHealthCheck
+    public class AzureWebJobsHealthCheckClient : IAzureWebJobsHealthCheckClient
     {
         static HttpClient httpClient = new HttpClient();
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration;
         private readonly IWebJobsAccessKeyProvider webJobsAccessKeyProvider;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IAzureBlobStorageService azureBlobStorageService;
 
         public AzureWebJobsHealthCheckClient(IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration,
                                              IWebJobsAccessKeyProvider webJobsAccessKeyProvider,
-                                             IWebHostEnvironment webHostEnvironment)
+                                             IWebHostEnvironment webHostEnvironment,
+                                             IAzureBlobStorageService azureBlobStorageService)
         {
             this.essFulfilmentStorageConfiguration = essFulfilmentStorageConfiguration;
             this.webJobsAccessKeyProvider = webJobsAccessKeyProvider;
             this.webHostEnvironment = webHostEnvironment;
+            this.azureBlobStorageService = azureBlobStorageService;
         }
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
@@ -38,9 +43,10 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 string webJobUri, userNameKey, passwordKey = string.Empty;
                 string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
                 List<Tuple<string, string, string, int>> webJobs = new List<Tuple<string, string, string, int>>();
-                foreach (string exchangeSetType in exchangeSetTypes)
+                foreach (string exchangeSetTypeName in exchangeSetTypes)
                 {
-                    for (int i = 1; i <= GetInstanceCount(exchangeSetType); i++)
+                    Enum.TryParse(exchangeSetTypeName, out ExchangeSetType exchangeSetType);
+                    for (int i = 1; i <= azureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(exchangeSetType); i++)
                     {
                         userNameKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{i}-webapp-scm-username";
                         passwordKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{i}-webapp-scm-password";
@@ -48,7 +54,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
                         string userPswd = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey) + ":" + webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
                         userPswd = Convert.ToBase64String(Encoding.Default.GetBytes(userPswd));
-                        webJobs.Add(Tuple.Create(userPswd, webJobUri, exchangeSetType, i));
+                        webJobs.Add(Tuple.Create(userPswd, webJobUri, exchangeSetTypeName, i));
                     }
                 }
                 var webJobsHealth = CheckAllWebJobsHealth(webJobs);
@@ -58,14 +64,13 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
             catch (Exception ex)
             {
-                return HealthCheckResult.Unhealthy($"Azure webjob is unhealthy with error {ex.Message}", new Exception(ex.Message));
+                return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(ex.Message));
             }
         }
 
         private async Task<HealthCheckResult> CheckAllWebJobsHealth(List<Tuple<string, string, string, int>> webJobs)
         {
-            string webJobStatus = string.Empty;
-            string webJobDetail = string.Empty;
+            string webJobDetail, webJobStatus = string.Empty;
             foreach (var webJob in webJobs)
             {
                 using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJob.Item2);
@@ -81,36 +86,11 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     if (webJobStatus != "Running")
                     {
                         webJobDetail = $"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.Item3}-{webJob.Item4} status is {webJobStatus}";
-                        break;
+                        return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(webJobDetail));
                     }
                 }
-                if (webJobStatus != "Running")
-                    break;
             }
-            if (webJobStatus == "Running")
-            {
-                return HealthCheckResult.Healthy("Azure webjob is healthy");
-            }
-            else
-            {
-                return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(webJobDetail));
-            }
-        }
-
-        private int GetInstanceCount(string exchangeSetType)
-        {
-            Enum.TryParse(exchangeSetType, out ExchangeSetType exchangeSetTypeName);
-            switch (exchangeSetTypeName)
-            {
-                case ExchangeSetType.sxs:
-                    return essFulfilmentStorageConfiguration.Value.SmallExchangeSetInstance;
-                case ExchangeSetType.mxs:
-                    return essFulfilmentStorageConfiguration.Value.MediumExchangeSetInstance;
-                case ExchangeSetType.lxs:
-                    return essFulfilmentStorageConfiguration.Value.LargeExchangeSetInstance;
-                default:
-                    return 1;
-            }
+            return HealthCheckResult.Healthy("Azure webjob is healthy");
         }
     }
 }

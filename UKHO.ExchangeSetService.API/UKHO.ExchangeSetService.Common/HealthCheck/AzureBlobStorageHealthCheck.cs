@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
@@ -17,16 +18,19 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         private readonly ISalesCatalogueStorageService scsStorageService;
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration;
         private readonly ILogger<AzureBlobStorageService> logger;
+        private readonly IAzureBlobStorageService azureBlobStorageService;
 
         public AzureBlobStorageHealthCheck(IAzureBlobStorageClient azureBlobStorageClient,
                                            ISalesCatalogueStorageService scsStorageService,
                                            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration,
-                                           ILogger<AzureBlobStorageService> logger)
+                                           ILogger<AzureBlobStorageService> logger,
+                                           IAzureBlobStorageService azureBlobStorageService)
         {
             this.azureBlobStorageClient = azureBlobStorageClient;
             this.scsStorageService = scsStorageService;
             this.essFulfilmentStorageConfiguration = essFulfilmentStorageConfiguration;
             this.logger = logger;
+            this.azureBlobStorageService = azureBlobStorageService;
         }
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
@@ -35,46 +39,27 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             {
                 string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
                 string storageAccountConnectionString = string.Empty;
-                HealthCheckResult azureBlobStorageHealthStatus = new HealthCheckResult(HealthStatus.Healthy);
+                HealthCheckResult azureBlobStorageHealthStatus = new HealthCheckResult(HealthStatus.Healthy, "Azure blob storage is healthy");
                 foreach (string exchangeSetType in exchangeSetTypes)
                 {
-                    var storageAccountWithKey = GetStorageAccountNameAndKey(exchangeSetType);
+                    Enum.TryParse(exchangeSetType, out ExchangeSetType exchangeSetTypeName);
+                    var storageAccountWithKey = azureBlobStorageService.GetStorageAccountNameAndKeyBasedOnExchangeSetType(exchangeSetTypeName);
                     storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
                     azureBlobStorageHealthStatus = await azureBlobStorageClient.CheckBlobContainerHealth(storageAccountConnectionString, essFulfilmentStorageConfiguration.Value.StorageContainerName);
                     if (azureBlobStorageHealthStatus.Status == HealthStatus.Unhealthy)
-                        break;
+                    {
+                        logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), azureBlobStorageHealthStatus.Exception, "Azure blob storage is unhealthy for exchangeSetType: {exchangeSetType} with error {Message}", exchangeSetType, azureBlobStorageHealthStatus.Exception.Message);
+                        azureBlobStorageHealthStatus = HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", azureBlobStorageHealthStatus.Exception);
+                        return azureBlobStorageHealthStatus;
+                    }
                 }
-                if (azureBlobStorageHealthStatus.Status == HealthStatus.Healthy)
-                {
-                    logger.LogDebug(EventIds.AzureBlobStorageIsHealthy.ToEventId(), $"Azure blob storage is healthy");
-                    return HealthCheckResult.Healthy("Azure blob storage is healthy");
-                }
-                else
-                {
-                    logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), $"Azure blob storage is unhealthy with error {azureBlobStorageHealthStatus.Exception.Message}");
-                    return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy");
-                }
+                logger.LogDebug(EventIds.AzureBlobStorageIsHealthy.ToEventId(), "Azure blob storage is healthy");
+                return azureBlobStorageHealthStatus;
             }
             catch (Exception ex)
             {
-                logger.LogError("Azure blob storage is unhealthy with error " + ex.Message);
-                return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy");
-            }
-        }
-
-        private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
-        {
-            Enum.TryParse(exchangeSetType, out ExchangeSetType exchangeSetTypeName);
-            switch (exchangeSetTypeName)
-            {
-                case ExchangeSetType.sxs:
-                    return (essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.SmallExchangeSetAccountKey);
-                case ExchangeSetType.mxs:
-                    return (essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.MediumExchangeSetAccountKey);
-                case ExchangeSetType.lxs:
-                    return (essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountName, essFulfilmentStorageConfiguration.Value.LargeExchangeSetAccountKey);
-                default:
-                    return (string.Empty, string.Empty);
+                logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), ex, "Azure blob storage is unhealthy with error {Message}", ex.Message);
+                return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", ex);
             }
         }
     }

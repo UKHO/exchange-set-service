@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
@@ -19,6 +20,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfiguration;
         private ILogger<AzureMessageQueueHelper> fakeLogger;
         private AzureMessageQueueHealthCheck fakeAzureMessageQueueHealthCheck;
+        private IAzureBlobStorageService fakeAzureBlobStorageService;
 
         [SetUp]
         public void Setup()
@@ -26,11 +28,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             this.fakeAzureMessageQueueHelperClient = A.Fake<IAzureMessageQueueHelper>();
             this.fakeLogger = A.Fake<ILogger<AzureMessageQueueHelper>>();
             this.fakeSalesCatalogueStorageService = A.Fake<ISalesCatalogueStorageService>();
+            this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
 
             this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
             { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes= "test" });
 
-            fakeAzureMessageQueueHealthCheck = new AzureMessageQueueHealthCheck(fakeAzureMessageQueueHelperClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger);
+            fakeAzureMessageQueueHealthCheck = new AzureMessageQueueHealthCheck(fakeAzureMessageQueueHelperClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger, fakeAzureBlobStorageService);
         }
 
         private (string, string) GetStorageAccountConnectionStringAndContainerName()
@@ -45,6 +48,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         {
             A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty,string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
+            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
 
             var response = await fakeAzureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
@@ -56,6 +60,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         {
             A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy", new Exception("Azure message queue is unhealthy")));
+            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
 
             var response = await fakeAzureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 

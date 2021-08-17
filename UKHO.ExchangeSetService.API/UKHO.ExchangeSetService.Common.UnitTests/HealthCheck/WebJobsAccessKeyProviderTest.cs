@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
-        public void DoesGetAccessKeyReturnCorrectKeyWhenExists()
+        public void DoesGetWebJobAccessKeyReturnCorrectKeyWhenExists()
         {
             var webJobsAccessKey = webJobsAccessKeyProvider.GetWebJobsAccessKey("webjob1key");
 
@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
-        public void DoesGetAccessKeyReturnNullWhenNotExists()
+        public void DoesGetWebJobAccessKeyReturnNullWhenNotExists()
         {
             var actualAccessKey = webJobsAccessKeyProvider.GetWebJobsAccessKey("nonexistingkey");
 

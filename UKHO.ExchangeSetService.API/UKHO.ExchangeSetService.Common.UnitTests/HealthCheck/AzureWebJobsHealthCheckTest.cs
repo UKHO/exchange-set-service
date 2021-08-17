@@ -11,7 +11,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 {
     public class AzureWebJobsHealthCheckTest
     {
-        private IAzureWebJobsHealthCheck fakeAzureWebJobsHealthCheckClient;
+        private IAzureWebJobsHealthCheckClient fakeAzureWebJobsHealthCheckClient;
         private AzureWebJobsHealthCheck azureWebJobsHealthCheck;
         private ILogger<AzureWebJobsHealthCheck> fakeLogger;
 
@@ -19,13 +19,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public void Setup()
         {
             this.fakeLogger = A.Fake<ILogger<AzureWebJobsHealthCheck>>();
-            this.fakeAzureWebJobsHealthCheckClient = A.Fake<IAzureWebJobsHealthCheck>();
+            this.fakeAzureWebJobsHealthCheckClient = A.Fake<IAzureWebJobsHealthCheckClient>();
 
             azureWebJobsHealthCheck = new AzureWebJobsHealthCheck(fakeAzureWebJobsHealthCheckClient, fakeLogger);
         }
 
         [Test]
-        public async Task WhenAzureWebJobsRunning_ThenAzureWebJobsIsHealthy()
+        public async Task WhenAzureWebJobStatusIsRunning_ThenAzureWebJobsIsHealthy()
         {
             A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckHealthAsync(A<HealthCheckContext>.Ignored, A<CancellationToken>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure webjob is healthy"));
 
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
-        public async Task WhenAzureWebJobsNotRunning_ThenAzureWebJobsIsUnhealthy()
+        public async Task WhenAzureWebJobStatusIsNotRunning_ThenAzureWebJobsIsUnhealthy()
         {
             A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckHealthAsync(A<HealthCheckContext>.Ignored, A<CancellationToken>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure webjob is unhealthy", new Exception("Azure webjob is unhealthy")));
 

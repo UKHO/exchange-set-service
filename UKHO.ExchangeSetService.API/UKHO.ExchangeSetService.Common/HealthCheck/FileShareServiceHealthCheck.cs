@@ -37,12 +37,12 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             var fileShareServiceResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
             if (fileShareServiceResponse.StatusCode == HttpStatusCode.OK)
             {
-                logger.LogDebug(EventIds.FileShareServiceIsHealthy.ToEventId(), $"File share service is healthy responded with {fileShareServiceResponse.StatusCode}");
+                logger.LogDebug(EventIds.FileShareServiceIsHealthy.ToEventId(), "File share service is healthy responded with {StatusCode}", fileShareServiceResponse.StatusCode);
                 return HealthCheckResult.Healthy("File share service is healthy");
             }
             else
             {
-                logger.LogError(EventIds.FileShareServiceIsUnhealthy.ToEventId(), $"File share service is unhealthy responded with {fileShareServiceResponse.StatusCode} for request uri {fileShareServiceResponse.RequestMessage.RequestUri}");
+                logger.LogError(EventIds.FileShareServiceIsUnhealthy.ToEventId(), "File share service is unhealthy responded with {StatusCode} for request uri {RequestUri}", fileShareServiceResponse.StatusCode, fileShareServiceResponse.RequestMessage.RequestUri);
                 return HealthCheckResult.Unhealthy("File share service is unhealthy");
             }
         }

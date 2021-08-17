@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
-    public interface IAzureWebJobsHealthCheck
+    public interface IAzureWebJobsHealthCheckClient
     {
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default);
     }

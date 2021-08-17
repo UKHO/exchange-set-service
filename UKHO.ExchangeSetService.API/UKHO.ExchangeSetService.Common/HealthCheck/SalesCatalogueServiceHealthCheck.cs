@@ -38,12 +38,12 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             var salesCatalogueServiceResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
             if (salesCatalogueServiceResponse.StatusCode == HttpStatusCode.OK || salesCatalogueServiceResponse.StatusCode == HttpStatusCode.NotModified)
             {
-                logger.LogDebug(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), $"Sales catalogue service is healthy responded with {salesCatalogueServiceResponse.StatusCode}");
+                logger.LogDebug(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), "Sales catalogue service is healthy responded with {StatusCode}", salesCatalogueServiceResponse.StatusCode);
                 return HealthCheckResult.Healthy("Sales catalogue service is healthy");
             }
             else
             {
-                logger.LogError(EventIds.SalesCatalogueServiceIsUnhealthy.ToEventId(), $"Sales catalogue service is unhealthy responded with {salesCatalogueServiceResponse.StatusCode} for request uri {salesCatalogueServiceResponse.RequestMessage.RequestUri}");
+                logger.LogError(EventIds.SalesCatalogueServiceIsUnhealthy.ToEventId(), "Sales catalogue service is unhealthy responded with {StatusCode} for request uri {RequestUri}", salesCatalogueServiceResponse.StatusCode, salesCatalogueServiceResponse.RequestMessage.RequestUri);
                 return HealthCheckResult.Unhealthy("Sales catalogue service is unhealthy");
             }
         }

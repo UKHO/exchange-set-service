@@ -158,7 +158,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddSingleton<ISmallExchangeSetInstance, SmallExchangeSetInstance>();
             services.AddSingleton<IMediumExchangeSetInstance, MediumExchangeSetInstance>();
             services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
-            services.AddScoped<IAzureWebJobsHealthCheck, AzureWebJobsHealthCheckClient>();
+            services.AddScoped<IAzureWebJobsHealthCheckClient, AzureWebJobsHealthCheckClient>();
             services.AddSingleton<IWebJobsAccessKeyProvider>(s => new WebJobsAccessKeyProvider(configuration));
 
             services.AddHealthChecks()

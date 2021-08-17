@@ -96,8 +96,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         AzureBlobStorageIsUnhealthy = 805089,
         AzureMessageQueueIsHealthy = 805090,
         AzureMessageQueueIsUnhealthy = 805091,
-        AzureWebJobsIsHealthy = 805092,
-        AzureWebJobsIsUnhealthy = 805093
+        AzureWebJobIsHealthy = 805092,
+        AzureWebJobIsUnhealthy = 805093
     }
 
     public static class EventIdExtensions
