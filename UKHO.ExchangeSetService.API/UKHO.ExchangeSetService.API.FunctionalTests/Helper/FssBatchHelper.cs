@@ -29,6 +29,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 await Task.Delay(5000);
                 var batchStatusResponse = await FssApiClient.GetBatchStatusAsync(batchStatusUri, jwtToken);
+                Assert.AreEqual(200,(int)batchStatusResponse.StatusCode);
+
                 var batchStatusResponseObj = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(await batchStatusResponse.Content.ReadAsStringAsync());
                 batchStatus = batchStatusResponseObj.Status;
 
@@ -54,7 +56,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
 
-            string zipPath =tempFilePath;
+            string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
             ZipFile.ExtractToDirectory(zipPath, extractPath);
@@ -81,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static bool CheckforFileExist(string filePath, string fileName)
         {
-            return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath,fileName)));
+            return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath, fileName)));
         }       
     }
 }
