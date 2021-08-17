@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [TestFixture]
+    [Ignore("Ignore all tests since SCS responses are intermittent, returns 503")]
     class ExchangeSetGenerateFilesForInValidProductVersion
     {
         private string EssJwtToken { get; set; }
@@ -59,6 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Ignore this test since SCS responses are intermittent")]
         public void WhenICallExchangeSetApiWithAnInvalidProductVersion_ThenAReadMeTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
@@ -69,6 +72,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Ignore this test since SCS responses are intermittent")]
         public async Task WhenICallExchangeSetApiWithAnInValidProductVersion_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
@@ -82,6 +86,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Ignore this test since SCS responses are intermittent")]
         public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenASerialEncFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
@@ -93,6 +98,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Ignore this test since SCS responses are intermittent")]
         public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenNoEncFilesAreDownloaded()
         {
             //Verify No folder available for the product             
