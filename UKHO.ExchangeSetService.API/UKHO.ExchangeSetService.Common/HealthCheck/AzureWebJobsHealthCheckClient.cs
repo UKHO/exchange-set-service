@@ -89,6 +89,10 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                         return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(webJobDetail));
                     }
                 }
+                else
+                {
+                    return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception($"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.Item3}-{webJob.Item4} status code is {response.StatusCode}"));
+                }
             }
             return HealthCheckResult.Healthy("Azure webjob is healthy");
         }
