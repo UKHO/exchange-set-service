@@ -7,13 +7,13 @@ const dataHelper = require('./dataHelper.js');
 const productVersionsData =  dataHelper.GetProductVersionData(); 
 
 export default function (clientAuthResp) {
-    let batchStatusUrl = apiClient.GetESSApiResponse("productVersions", productVersionsData,`${clientAuthResp.access_token}`);
+    let batchStatusUrl = apiClient.GetESSApiResponse("productVersions", productVersionsData, `${clientAuthResp.essToken}`);
    
     let fssCommitStatus =  apiClient.GetFSSApiResponse(JSON.parse(batchStatusUrl));
    
       while(fssCommitStatus != 'Committed'){
        setTimeout(() => {
-        let fssCommitStatus =  apiClient.GetFSSApiResponse(JSON.parse(batchStatusUrl));
+           let fssCommitStatus = apiClient.GetFSSApiResponse(JSON.parse(batchStatusUrl), `${clientAuthResp.fssToken}`);
        }, "3000");
       
        if(fssCommitStatus === 'Failed'){

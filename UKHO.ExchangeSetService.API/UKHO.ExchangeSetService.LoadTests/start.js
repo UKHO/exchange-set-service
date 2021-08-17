@@ -15,16 +15,16 @@ export let options = {
 
 export function setup() {
     // client credentials authentication flow
-
+    var clientAuthResp = {};
     let essAuthResp = authenticateUsingAzure(
         `${config.ESS_TENANT_ID}, ${config.ESS_CLIENT_ID}, ${config.ESS_CLIENT_SECRET}, ${config.ESS_SCOPES}, ${config.ESS_RESOURCE}`
     );
-
+    clientAuthResp["essToken"] = essAuthResp;
     let fssAuthResp = authenticateUsingAzure(
         `${config.FSS_TENANT_ID}, ${config.FSS_CLIENT_ID}, ${config.FSS_CLIENT_SECRET}, ${config.FSS_SCOPES}, ${config.FSS_RESOURCE}`
     );
+    clientAuthResp["fssToken"] = fssAuthResp;
 
-    clientAuthResp = essAuthResp.concat(fssAuthResp);
     return clientAuthResp;
 }
 
