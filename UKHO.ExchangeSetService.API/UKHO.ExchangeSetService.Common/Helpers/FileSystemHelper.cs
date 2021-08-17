@@ -91,11 +91,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         public byte[] ReadAllBytes(string filePath)
-        {
-            if (File.Exists(filePath))
-                return File.ReadAllBytes(filePath);
-            else
-                return new byte[0];
+        {            
+            return File.ReadAllBytes(filePath);            
         }
 
         public bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite)
