@@ -138,8 +138,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Length = 21833
             };
             return customFileInfo;
-        }
+        }        
 
+        private List<FileDetail> GetFileDetails()
+        {
+            List<FileDetail> lstFileDetails = new List<FileDetail>()
+            { new FileDetail() { FileName = "V01X01.zip", Hash = "Testdata" } };
+            return lstFileDetails;
+        }
         private ResponseBatchStatusModel GetBatchStatusResponse()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
@@ -562,6 +568,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
             fakeFileShareConfig.Value.BaseUrl = null;
             byte[] byteData = new byte[1024];
+            var fileDetail = GetFileDetails();
             var responseBatchStatusModel = GetBatchStatusResponse();
             responseBatchStatusModel.Status = "";
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
@@ -571,6 +578,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
             A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
+            A.CallTo(() => fakeFileSystemHelper.UploadCommitBatch(A<BatchCommitMetaData>.Ignored)).Returns(fileDetail); 
             A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
             A.CallTo(() => fakeFileShareServiceClient.WriteBlockInFileAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<WriteBlockFileModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))

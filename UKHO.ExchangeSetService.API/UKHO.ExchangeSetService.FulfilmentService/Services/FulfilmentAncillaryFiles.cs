@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
@@ -85,14 +85,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
                         string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
                         string comment = string.Empty;
+                        string getIssueAndUpdateDate = null;
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
 
                         if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
                         {
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+                            var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
+
+                            if (salescatalogProductResponse.Dates != null)
+                            {
+                                var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
+                                getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
+                            }
 
                             //BoundingRectangle and Comment only required for BIN
-                            comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
+                             comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";                            
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
@@ -210,22 +218,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return crcHash.ToString("X").PadLeft(crcLength, '0');
         }
 
-        private string GetIssueAndUpdateDate(SalesCatalogueDataProductResponse salescatalogProduct)
-        {
-            string comment = string.Empty;
-            string ISDT = (salescatalogProduct.IssueDateLatestUpdate == null)
-                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDateLatestUpdate.Value.ToString("yyyyMMdd");
+        private string GetIssueAndUpdateDate(Dates dateResponse)
+        {           
+            string comment;
+            string UADT = dateResponse.UpdateApplicationDate == null ? null : dateResponse.UpdateApplicationDate.Value.ToString("yyyyMMdd");
+            string ISDT = dateResponse.IssueDate.ToString("yyyyMMdd");
 
-            string UADT = (salescatalogProduct.IssueDatePreviousUpdate == null && salescatalogProduct.LatestUpdateNumber == 0)
-                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDatePreviousUpdate.Value.ToString("yyyyMMdd");
-
-            if (ISDT != null && UADT != null)
+            if (UADT != null)
                 comment = $"UADT={UADT},ISDT={ISDT};";
-            else if (ISDT != null)
+            else
                 comment = $"ISDT={ISDT};";
-            else if (UADT != null)
-                comment = $"UADT={UADT};";
-
             return comment;
         }
     }
