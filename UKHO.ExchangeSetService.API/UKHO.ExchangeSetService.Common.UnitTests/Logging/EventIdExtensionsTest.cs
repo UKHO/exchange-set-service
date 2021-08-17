@@ -9,7 +9,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Logging
         [Test]
         public void WhenExtensionSetEventId_ThenValidateItIsEqualToActualValue()
         {
-            Assert.AreEqual(EventIds.SalesCatalogueNonOkResponse.ToEventId().Id, (int)EventIds.SalesCatalogueNonOkResponse);
+            Assert.AreEqual(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId().Id, (int)EventIds.SalesCatalogueServiceNonOkResponse);
         }
 
         [Test]
