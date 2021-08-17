@@ -8,6 +8,8 @@ using System.Net.Http;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [TestFixture]
+    [Ignore("Ignore all tests since SCS responses are intermittent, returns 503")]
     class ExchangeSetGenerateFilesForProductIdentifier
     {
         private string EssJwtToken { get; set; }
@@ -116,7 +118,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
-       
         [OneTimeTearDown]
         public void GlobalTeardown()
         {
