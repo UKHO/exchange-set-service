@@ -35,6 +35,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public bool IsRunningOnLocalMachine { get; set; }
         }
 
+        public class SalesCatalogue
+        {
+            public string BaseUrl { get; set; }            
+            public string ResourceId { get; set; }
+            public bool IsRunningOnLocalMachine { get; set; }
+        }
+
+        public class FileShareService
+        {
+            public string BaseUrl { get; set; }      
+            public string ResourceId { get; set; }
+            public bool IsRunningOnLocalMachine { get; set; }
+            public int BatchCommitWaitTime { get; set; }
+        }
         public class AzureAdB2CConfiguration
         {
            
@@ -46,22 +60,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             // Test Client id is used to test unauthorized scenario for FSS API
             public bool IsRunningOnLocalMachine { get; set; }
             public string LocalTestToken { get; set; } 
-        }
-
-        public class FileShareService
-        {
-            public string BaseUrl { get; set; }
-            public string ResourceId { get; set; }
-            public bool IsRunningOnLocalMachine { get; set; }
-            public int BatchCommitWaitTime { get; set; }
-        }
-
-        public class SalesCatalogue
-        {
-            public string BaseUrl { get; set; }
-            public string ResourceId { get; set; }
-            public bool IsRunningOnLocalMachine { get; set; }
-        }
+        }       
 
         public TestConfiguration()
         {
