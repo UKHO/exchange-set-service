@@ -139,54 +139,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
-                 var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
-                 var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                  {
                      client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
-                 }).AddPolicyHandler((services, request) => Policy
-                .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable || r.StatusCode == HttpStatusCode.TooManyRequests)
-                .OrResult(r => r.StatusCode == HttpStatusCode.ServiceUnavailable || r.StatusCode == HttpStatusCode.TooManyRequests)
-                .WaitAndRetryAsync(retryCount, (retryAttempt) => {
-                    return TimeSpan.FromSeconds(Math.Pow(sleepDuration, (retryAttempt - 1)));
-                }, async (response, timespan, retryAttempt, context) => {
-                    var retryAfterHeader = response.Result.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "retry-after");
-                    var correlationId = response.Result.RequestMessage.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "x-correlation-id");
-                    int retryAfter = 0;
-                    if (response.Result.StatusCode == HttpStatusCode.TooManyRequests && retryAfterHeader.Value != null && retryAfterHeader.Value.Any())
-                    {
-                        retryAfter = int.Parse(retryAfterHeader.Value.First());
-                        await Task.Delay(TimeSpan.FromMilliseconds(int.Parse(retryAfterHeader.Value.First())));
-                    }
-                    services.GetService<ILogger<IFileShareServiceClient>>()
-                    .LogInformation(EventIds.RetryHttpClientFSSRequest.ToEventId(), "Re-trying File share service with uri {RequestUri} request with delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
-                    response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
-                }));
+                 }).AddPolicyHandler((services, request) => GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest));
                  services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
                  {
                      client.BaseAddress = new Uri(ConfigurationBuilder["SalesCatalogue:BaseUrl"]);
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
-                 }).AddPolicyHandler((services, request) => Policy
-                .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable || r.StatusCode == HttpStatusCode.TooManyRequests)
-                .OrResult(r => r.StatusCode == HttpStatusCode.ServiceUnavailable || r.StatusCode == HttpStatusCode.TooManyRequests)
-                .WaitAndRetryAsync(retryCount, (retryAttempt) => {
-                    return TimeSpan.FromSeconds(Math.Pow(sleepDuration, (retryAttempt - 1)));
-                }, async (response, timespan, retryAttempt, context) => {
-                    var retryAfterHeader = response.Result.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "retry-after");
-                    var correlationId = response.Result.RequestMessage.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "x-correlation-id");
-                    int retryAfter = 0;
-                    if (response.Result.StatusCode == HttpStatusCode.TooManyRequests && retryAfterHeader.Value != null && retryAfterHeader.Value.Any())
-                    {
-                        retryAfter = int.Parse(retryAfterHeader.Value.First());
-                        await Task.Delay(TimeSpan.FromMilliseconds(int.Parse(retryAfterHeader.Value.First())));
-                    }
-                    services.GetService<ILogger<ISalesCatalogueClient>>()
-                    .LogInformation(EventIds.RetryHttpClientSCSRequest.ToEventId(), "Re-trying sales catalogue service with uri {RequestUri} request with delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
-                    response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
-                }));
+                 }).AddPolicyHandler((services, request) => GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), "Sales Catalogue", EventIds.RetryHttpClientSCSRequest));
+
                  services.AddHttpClient<ICallBackClient, CallBackClient>();
 
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
@@ -212,6 +177,33 @@ namespace UKHO.ExchangeSetService.FulfilmentService
               });
 
             return hostBuilder;
+        }
+
+        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(Microsoft.Extensions.Logging.ILogger logger, string requestType, EventIds eventId)
+        {
+
+            var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
+            var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
+            return Policy
+                .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable || r.StatusCode == HttpStatusCode.TooManyRequests)
+                .OrResult(r => r.StatusCode == HttpStatusCode.ServiceUnavailable || r.StatusCode == HttpStatusCode.TooManyRequests)
+                .WaitAndRetryAsync(retryCount, (retryAttempt) =>
+                {
+                    return TimeSpan.FromSeconds(Math.Pow(sleepDuration, (retryAttempt - 1)));
+                }, async (response, timespan, retryAttempt, context) =>
+                {
+                    var retryAfterHeader = response.Result.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "retry-after");
+                    var correlationId = response.Result.RequestMessage.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "x-correlation-id");
+                    int retryAfter = 0;
+                    if (response.Result.StatusCode == HttpStatusCode.TooManyRequests && retryAfterHeader.Value != null && retryAfterHeader.Value.Any())
+                    {
+                        retryAfter = int.Parse(retryAfterHeader.Value.First());
+                        await Task.Delay(TimeSpan.FromMilliseconds(retryAfter));
+                    }
+                    logger
+                    .LogInformation(eventId.ToEventId(), "Re-trying {requestType} service with uri {RequestUri} request with delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
+                    requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
+                });
         }
     }
 }
