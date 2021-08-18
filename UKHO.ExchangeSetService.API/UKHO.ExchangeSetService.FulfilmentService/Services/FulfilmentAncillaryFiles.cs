@@ -110,25 +110,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
                 string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
-                string comment = string.Empty;
-                string getIssueAndUpdateDate = null;
+                string comment = string.Empty;               
                 BoundingRectangle boundingRectangle = new BoundingRectangle();
 
                 if (mimeType == "BIN")
                 {
                     var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
-                    var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
-
-                    if (salescatalogProductResponse.Dates != null)
-                    {
-                        var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
-                        getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
-                    }
-
-                    //BoundingRectangle and Comment only required for BIN
-                    comment = salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
-                        ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
-                        : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";
+                    
+                    comment = SetCatalogFileComment(listItem, salescatalogProduct, salesCatalogueProductResponse);
 
                     boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                     boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
@@ -146,6 +135,23 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     BoundingRectangle = boundingRectangle
                 });
             }
+        }
+
+        private string SetCatalogFileComment(FulfilmentDataResponse listItem, SalesCatalogueDataProductResponse salescatalogProduct, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        {
+            string getIssueAndUpdateDate = null;            
+            var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
+
+            if (salescatalogProductResponse.Dates != null)
+            {
+                var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
+                getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
+            }
+
+            //BoundingRectangle and Comment only required for BIN
+            return salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
+                ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
+                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";             
         }
 
         private string GetMimeType(string fileName, string mimeType, string batchId, string correlationId)
