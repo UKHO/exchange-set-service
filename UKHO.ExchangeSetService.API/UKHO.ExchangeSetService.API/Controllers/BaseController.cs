@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         protected new HttpContext HttpContext => httpContextAccessor.HttpContext;
         public const string LastModifiedDateHeaderKey = "Last-Modified";
         public const string InternalServerError = "Internal Server Error";
-        public const string NotModified = "Not Modified";       
+        public const string NotModified = "Not Modified";
         protected string TokenAudience => httpContextAccessor.HttpContext.User.FindFirstValue("aud");
         protected string TokenIssuer => httpContextAccessor.HttpContext.User.FindFirstValue("iss");
 
@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
             Logger = logger;
         }
-        
+
         protected string GetCurrentCorrelationId()
         {
             return httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         protected IActionResult BuildBadRequestErrorResponseForTooLargeExchangeSet()
-        {        
+        {
             var error = new List<Error>
                 {
                     new Error()
@@ -78,6 +78,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             switch (model.HttpStatusCode)
             {
                 case HttpStatusCode.OK:
+                case HttpStatusCode.Created:
                     return BuildOkResponse(model);
 
                 case HttpStatusCode.InternalServerError:
