@@ -15,6 +15,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
     {
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private readonly ILogger<AzureFileSystemHelper> logger;
+        private bool deteleFolderStatus = false;
 
         public AzureFileSystemHelper(IAzureBlobStorageClient azureBlobStorageClient,
                                     ILogger<AzureFileSystemHelper> logger)
@@ -26,7 +27,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
         public async Task<bool> DeleteDirectoryAsync(int numberOfDays, string storageAccountConnectionString, string containerName, string filePath)
         {
             DateTime subFolderDateTime;
-            bool deteleFolderStatus = false;
             try
             {
                 var subFolder = Directory.GetDirectories(filePath);
@@ -44,30 +44,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                         
                         if (subFolderDate <= historicDate)
                         {
-                            DirectoryInfo di = new DirectoryInfo(subFolderItem);
-
-                            foreach (DirectoryInfo subDirectory in di.GetDirectories())
-                            {
-                                var batchId = subDirectory.Name;
-                                string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
-
-                                CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(scsResponseFileName, storageAccountConnectionString, containerName);
-                                var response = await cloudBlockBlob.DeleteIfExistsAsync();
-
-                                if (response)
-                                {
-                                    subDirectory.Delete(true);
-                                    logger.LogInformation(EventIds.HistoricSCSResponseFileDeleted.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
-                                }
-                                else
-                                {
-                                    logger.LogError(EventIds.HistoricSCSResponseFileNotFound.ToEventId(), "SCS response json file {ScsResponseFileName} not found in the container.", scsResponseFileName);
-                                }
-                            }
-
-                            di.Delete(true);
-                            deteleFolderStatus = true;
-                            logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{subFolderName}.", subFolderName);
+                            await DeleteHistoricDateFolder(subFolderItem, storageAccountConnectionString, containerName, subFolderName);
                         }
                     }
                 }
@@ -76,12 +53,46 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
                 {
                     logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{historicDate}.", historicDate);
                 }
+
                 return true;
             }
             catch (Exception ex)
             {
                 logger.LogError(EventIds.DeleteHistoricFoldersAndFilesException.ToEventId(), ex, "Exception while deleteing historic folders and files with error {Message}", ex.Message);
                 return false;
+            }
+        }
+
+        public async Task DeleteHistoricDateFolder(string subFolderItem, string storageAccountConnectionString, string containerName, string subFolderName)
+        {
+            DirectoryInfo di = new DirectoryInfo(subFolderItem);
+
+            foreach (DirectoryInfo subDirectory in di.GetDirectories())
+            {
+                await DeleteHistoricScsResponseFile(subDirectory, storageAccountConnectionString, containerName);
+            }
+
+            di.Delete(true);
+            deteleFolderStatus = true;
+            logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{subFolderName}.", subFolderName);
+        }
+
+        public async Task DeleteHistoricScsResponseFile(DirectoryInfo subDirectory, string storageAccountConnectionString, string containerName)
+        {
+            var batchId = subDirectory.Name;
+            string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
+
+            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(scsResponseFileName, storageAccountConnectionString, containerName);
+            var response = await cloudBlockBlob.DeleteIfExistsAsync();
+
+            if (response)
+            {
+                subDirectory.Delete(true);
+                logger.LogInformation(EventIds.HistoricSCSResponseFileDeleted.ToEventId(), "SCS response json file {ScsResponseFileName} deleted successfully from the container.", scsResponseFileName);
+            }
+            else
+            {
+                logger.LogError(EventIds.HistoricSCSResponseFileNotFound.ToEventId(), "SCS response json file {ScsResponseFileName} not found in the container.", scsResponseFileName);
             }
         }
     }
