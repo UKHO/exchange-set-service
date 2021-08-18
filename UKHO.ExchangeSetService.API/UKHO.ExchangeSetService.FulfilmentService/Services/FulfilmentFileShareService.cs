@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, string correlationId)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products,string batchId, string correlationId)
         {
             if (products != null && products.Any())
             {
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var listBatchDetails = new List<BatchDetail>();
                 foreach (var item in batchProducts)
                 {
-                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, correlationId);
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId);
                     listBatchDetails.AddRange(result.Entries);
                 }
 
@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             foreach (var item in fulfilmentDataResponses)
             {
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
-                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message.CorrelationId);
+                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message);
             }
         }
 
@@ -105,13 +105,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
            return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
-        public bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
+        public async Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
-            return fileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);
+            return await fileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);
         }
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
-            return await fileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipRootPath, correlationId);
+            return await fileShareService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, fileShareServiceConfig.Value.ExchangeSetFileName);
         }
     }
 }
