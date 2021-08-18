@@ -73,7 +73,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (listFulfilmentData != null && listFulfilmentData.Any())
             {
-                int length = 2;
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
 
                 List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
@@ -81,49 +80,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 foreach (var listItem in listFulfilmentData)
                 {
-                    listItem.Files = listItem.Files.OrderByDescending(
-                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
-
-                    foreach (var item in listItem.Files)
-                    {
-                        string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
-                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
-                        string comment = string.Empty;
-                        string getIssueAndUpdateDate = null;
-                        BoundingRectangle boundingRectangle = new BoundingRectangle();
-
-                        if (mimeType == "BIN")
-                        {
-                            var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
-                            var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
-
-                            if (salescatalogProductResponse.Dates != null)
-                            {
-                                var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
-                                getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
-                            }
-
-                            //BoundingRectangle and Comment only required for BIN
-                            comment = salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
-                                ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
-                                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";
-
-                            boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
-                            boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
-                            boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
-                            boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
-                        }
-
-                        catBuilder.Add(new CatalogEntry()
-                        {
-                            FileLocation = fileLocation,
-                            FileLongName = "",
-                            Implementation = mimeType,
-                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
-                            Comment = comment,
-                            BoundingRectangle = boundingRectangle
-                        });
-                    }
+                    CreateCatalogEntry(listItem, orderPreference, catBuilder, salesCatalogueDataResponse, salesCatalogueProductResponse, exchangeSetRootPath, batchId, correlationId);
                 }
             }
 
@@ -140,6 +97,54 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
+            }
+        }
+
+        private void CreateCatalogEntry(FulfilmentDataResponse listItem, List<Tuple<string, string>> orderPreference, ICatalog031Builder catBuilder, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse, string exchangeSetRootPath, string batchId, string correlationId)
+        {
+            int length = 2;
+            listItem.Files = listItem.Files.OrderByDescending(
+                                item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
+
+            foreach (var item in listItem.Files)
+            {
+                string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
+                string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
+                string comment = string.Empty;
+                string getIssueAndUpdateDate = null;
+                BoundingRectangle boundingRectangle = new BoundingRectangle();
+
+                if (mimeType == "BIN")
+                {
+                    var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+                    var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
+
+                    if (salescatalogProductResponse.Dates != null)
+                    {
+                        var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
+                        getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
+                    }
+
+                    //BoundingRectangle and Comment only required for BIN
+                    comment = salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
+                        ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
+                        : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";
+
+                    boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
+                    boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
+                    boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
+                    boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
+                }
+
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileLocation,
+                    FileLongName = "",
+                    Implementation = mimeType,
+                    Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
+                    Comment = comment,
+                    BoundingRectangle = boundingRectangle
+                });
             }
         }
 
