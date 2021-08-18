@@ -33,6 +33,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
         {
+            bool checkSerialEncFileCreated = false;
             if (!string.IsNullOrWhiteSpace(exchangeSetPath))
             {
                 string serialFilePath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.SerialFileName);
@@ -43,13 +44,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 fileSystemHelper.CreateFileContent(serialFilePath, serialFileContent);
                 await Task.CompletedTask;
-                return true;
+
+                if (fileSystemHelper.CheckFileExists(serialFilePath))
+                    checkSerialEncFileCreated = true;
+                else
+                {
+                    logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.SerialFileIsNotCreated.ToEventId());
+                }
             }
-            else
-            {
-                logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
-                return false;
-            }
+            return checkSerialEncFileCreated;
         }
 
         public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
@@ -78,17 +82,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 foreach (var listItem in listFulfilmentData)
                 {
                     listItem.Files = listItem.Files.OrderByDescending(
-                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower()))));
+                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
 
                     foreach (var item in listItem.Files)
                     {
                         string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
-                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower());
+                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
                         string comment = string.Empty;
                         string getIssueAndUpdateDate = null;
                         BoundingRectangle boundingRectangle = new BoundingRectangle();
 
-                        if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK && mimeType == "BIN")
+                        if (mimeType == "BIN")
                         {
                             var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
                             var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
@@ -100,7 +104,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             }
 
                             //BoundingRectangle and Comment only required for BIN
-                             comment = $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";                            
+                            comment = salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
+                                ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
+                                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";
 
                             boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
                             boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
@@ -132,12 +138,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 return true;
             else
             {
-                logger.LogError(EventIds.CatalogueFileIsNotCreated.ToEventId(), "Error in creating catalogue.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                return false;
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
             }
         }
 
-        private string GetMimeType(string fileName, string mimeType)
+        private string GetMimeType(string fileName, string mimeType, string batchId, string correlationId)
         {
             string fileExtension = Path.GetExtension(fileName);
             switch (mimeType)
@@ -155,7 +161,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     return "TIF";
 
                 default:
-                    logger.LogInformation(EventIds.UnexpectedDefaultFileExtension.ToEventId(), "Default - Unexpected file extension for File : {filename} ", fileName);
+                    logger.LogInformation(EventIds.UnexpectedDefaultFileExtension.ToEventId(), "Default - Unexpected file extension for File:{filename} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, batchId, correlationId);
                     return fileExtension?.TrimStart('.').ToUpper();
             }
         }
@@ -189,7 +195,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         BaseCellUpdateNumber = product.BaseCellUpdateNumber,
                         LastUpdateNumberForPreviousEdition = product.LastUpdateNumberForPreviousEdition,
                         BaseCellLocation = product.BaseCellLocation,
-                        CancelledCellReplacements = string.Empty,
+                        CancelledCellReplacements = String.Join(";", product.CancelledCellReplacements)
                     });
 
                 var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
@@ -201,14 +207,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (!response)
                 {
                     logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                    return false;
+                    throw new FulfilmentException(EventIds.ProductFileIsNotCreated.ToEventId());
                 }
                 return true;
             }
             else
             {
-                logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
-                return false;
+                logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId(), "Error in sales catalogue service catalogue end point for product.txt responded with {ResponseCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", salesCatalogueDataResponse.ResponseCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId());
             }
         }
 
@@ -219,16 +225,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
 
         private string GetIssueAndUpdateDate(Dates dateResponse)
-        {           
-            string comment;
+        {
             string UADT = dateResponse.UpdateApplicationDate == null ? null : dateResponse.UpdateApplicationDate.Value.ToString("yyyyMMdd");
             string ISDT = dateResponse.IssueDate.ToString("yyyyMMdd");
-
-            if (UADT != null)
-                comment = $"UADT={UADT},ISDT={ISDT};";
-            else
-                comment = $"ISDT={ISDT};";
-            return comment;
+            return (UADT != null) ? $"UADT={UADT},ISDT={ISDT};" : $"ISDT={ISDT};";
         }
     }
 }

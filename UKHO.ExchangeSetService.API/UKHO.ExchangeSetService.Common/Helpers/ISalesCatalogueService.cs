@@ -7,9 +7,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface ISalesCatalogueService
     {
-        public Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime);
-        public Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers);
-        public Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions);
+        public Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime, string correlationId);
+        public Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers, string correlationId);
+        public Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions, string correlationId);
         public Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId);
     }
 }
