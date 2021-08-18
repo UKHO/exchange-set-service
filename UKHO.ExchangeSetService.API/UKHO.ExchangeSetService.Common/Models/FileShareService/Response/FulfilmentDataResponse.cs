@@ -15,5 +15,7 @@ namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
         public IEnumerable<string> FileUri { get; set; }
 
         public IEnumerable<BatchFile> Files { get; set; }
+
+        public int FileShareServiceSearchQueryCount { get; set; }
     }
 }

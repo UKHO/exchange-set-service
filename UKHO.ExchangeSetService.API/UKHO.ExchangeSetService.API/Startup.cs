@@ -116,6 +116,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
             services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddApplicationInsightsTelemetry();
 
             services.AddHeaderPropagation(options =>
             {
@@ -153,6 +154,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             services.AddScoped<IFileShareService, FileShareService>();
             services.AddScoped<IProductDataService, ProductDataService>();
+            services.AddScoped<IMonitorHelper, MonitorHelper>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
             services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
