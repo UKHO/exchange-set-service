@@ -13,5 +13,8 @@ namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
 
         [JsonProperty("_links")]
         public PagingLinks Links { get; set; }
+
+        [JsonIgnore]
+        public int QueryCount { get; set; }
     }
 }

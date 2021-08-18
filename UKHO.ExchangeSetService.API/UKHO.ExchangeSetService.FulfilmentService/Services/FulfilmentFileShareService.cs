@@ -53,23 +53,28 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 var batchProducts = SliceFileShareServiceProducts(products);
                 var listBatchDetails = new List<BatchDetail>();
+                int fileShareServiceSearchQueryCount = 0;
                 foreach (var item in batchProducts)
                 {
                     var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId);
                     listBatchDetails.AddRange(result.Entries);
+                    fileShareServiceSearchQueryCount += result.QueryCount;
                 }
 
-                return SetFulfilmentDataResponse(new SearchBatchResponse()
+                var fulFilmentDataResponse = SetFulfilmentDataResponse(new SearchBatchResponse()
                 {
                     Entries = listBatchDetails
                 });
+                if (fulFilmentDataResponse.Count > 0)
+                    fulFilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount = fileShareServiceSearchQueryCount;
+                return fulFilmentDataResponse;
             }
             return null;
         }
 
-        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponses, string exchangeSetRootPath)
+        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponse, string exchangeSetRootPath)
         {
-            foreach (var item in fulfilmentDataResponses)
+            foreach (var item in fulfilmentDataResponse)
             {
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
                 await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message);
