@@ -168,7 +168,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                         EditionNumber = 10,
                         UpdateNumbers = new List<int?>{3,4},
                          Dates = new List<Dates> {
-                            new Dates {UpdateNumber=3, UpdateApplicationDate = DateTime.Today , IssueDate = DateTime.Today },
+                            new Dates {UpdateNumber=3, IssueDate = DateTime.Today },
                             new Dates {UpdateNumber=4, IssueDate = DateTime.UtcNow },
                         },
                         Cancellation = new Cancellation
