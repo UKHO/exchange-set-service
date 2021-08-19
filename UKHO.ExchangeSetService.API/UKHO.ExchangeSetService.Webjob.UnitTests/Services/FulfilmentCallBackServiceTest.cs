@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -137,6 +138,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
+        public async Task WhenCallBackApiSocketExceptionFound_ThenSendCallBackResponseReturnsFalse()
+        {
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+              .Throws(new SocketException());
+
+            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
         public async Task WhenCallBackUriInRequest_ThenSendCallBackResponseReturnsTrue()
         {
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -174,6 +186,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsFalse()
         {
             scsResponseQueueMessage.CallbackUri = "";
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
+        public async Task WhenCallBackApiSocketExceptionFound_ThenSendCallBackErrorResponseReturnsFalse()
+        {
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+              .Throws(new SocketException());
 
             var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
