@@ -88,10 +88,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
             };
-            var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
             };
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponses, "");
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "");
             Assert.IsNotNull(result);
         }
 
@@ -102,8 +102,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
             };
-            var fulfilmentDataResponses = new List<FulfilmentDataResponse>();
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponses, "");
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "");
             Assert.IsNotNull(result);
         }
 

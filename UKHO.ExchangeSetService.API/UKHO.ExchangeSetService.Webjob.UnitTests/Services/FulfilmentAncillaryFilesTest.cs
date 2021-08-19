@@ -254,7 +254,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             byte[] byteContent = new byte[100];
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
-            var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000002", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() },
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() }
             };
@@ -265,7 +265,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.AreEqual(true, response);
             Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
