@@ -116,6 +116,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (mimeType == "BIN")
                 {
                     var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+                    if (salescatalogProduct == null)
+                    {
+                        logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId(), "Error in sales catalogue service catalogue end point when product details not found for Product:{ProductName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", listItem.ProductName, batchId, correlationId);
+                        throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId());
+                    }
                     
                     comment = SetCatalogFileComment(listItem, salescatalogProduct, salesCatalogueProductResponse);
 

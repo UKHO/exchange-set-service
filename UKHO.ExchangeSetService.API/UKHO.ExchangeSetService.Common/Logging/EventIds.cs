@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ESSGetProductsFromSpecificDateRequestStart = 805015,
         ESSGetProductsFromSpecificDateRequestCompleted = 805016,
         ESSPostProductIdentifiersRequestStart = 805017,
-        ESSPostProductIdentifiersRequestCompleted = 805018,        
+        ESSPostProductIdentifiersRequestCompleted = 805018,
         ESSPostProductVersionsRequestStart = 805019,
         ESSPostProductVersionsRequestCompleted = 805020,
         SCSResponseStoreRequestStart = 805021,
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceENCFilesNonOkResponse = 805030,
         DownloadENCFilesRequestStart = 805031,
         DownloadENCFilesRequestCompleted = 805032,
-        DownloadENCFilesNonOkResponse = 805033,        
+        DownloadENCFilesNonOkResponse = 805033,
         ReadMeTextFileNotFound = 805034,
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateSerialFileRequestCompleted = 805039,
         SerialFileIsNotCreated = 805040,
         CreateZipFileRequestStart = 805041,
-        CreateZipFileRequestCompleted = 805042,       
+        CreateZipFileRequestCompleted = 805042,
         UploadExchangeSetToFssStart = 805043,
         UploadExchangeSetToFssCompleted = 805044,
         UploadFileCreationProcessStarted = 805045,
@@ -103,7 +103,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceReadMeFileRequestStart = 805096,
         QueryFileShareServiceReadMeFileRequestCompleted = 805097,
         QueryFileShareServiceReadMeFileNonOkResponse = 805098,
-        ErrorTxtIsUploaded = 805099
+        ErrorTxtIsUploaded = 805099,
+        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 505100
     }
 
     public static class EventIdExtensions
