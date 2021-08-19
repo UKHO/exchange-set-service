@@ -1,7 +1,14 @@
-﻿using NUnit.Framework;
+﻿using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NUnit.Framework;
+////using Polly;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
@@ -10,6 +17,21 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
     [TestFixture]
     public class CommonHelperTest
     {
+        private ILogger<FileShareService> fakeLogger;
+        ////private HttpResponseMessage fakeHttpResponse;
+        ////private HttpClient fakeHttpClient;
+        public int retryCount = 3;
+        private const double sleepDuration = 2; 
+        const string TestClient = "TestClient";
+        private bool _isRetryCalled;
+
+        [SetUp]
+        public void Setup()
+        {
+            fakeLogger = A.Fake<ILogger<FileShareService>>();
+            ////fakeHttpResponse = A.Fake<HttpResponseMessage>();
+            ////fakeHttpClient = A.Fake<HttpClient>();
+        }
 
         #region SalesCatalogueResponse
         private SalesCatalogueResponse GetSalesCatalogueFileSizeResponse()
@@ -69,6 +91,82 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
             Assert.AreEqual(500, fileSize);
+        }
+
+        [Test]
+        public async Task GetRetryPolicyWhenTooManyRequests()
+        {
+            // Arrange 
+            IServiceCollection services = new ServiceCollection();
+            _isRetryCalled = false;
+            retryCount = 1;
+
+            services.AddHttpClient(TestClient)
+                .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, "File Share", Common.Logging.EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration))
+                .AddHttpMessageHandler(() => new StubTooManyRequestsDelegatingHandler());
+
+            HttpClient configuredClient =
+                services
+                    .BuildServiceProvider()
+                    .GetRequiredService<IHttpClientFactory>()
+                    .CreateClient(TestClient);
+
+            // Act
+            var result = await configuredClient.GetAsync("https://test.com");
+
+            // Assert
+            Assert.False(_isRetryCalled);
+            Assert.AreEqual(HttpStatusCode.TooManyRequests, result.StatusCode);
+        }
+
+        [Test]
+        public async Task GetRetryPolicyWhenServiceUnavailable()
+        {
+            // Arrange 
+            IServiceCollection services = new ServiceCollection();
+            _isRetryCalled = false;
+
+            services.AddHttpClient(TestClient)
+                .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, "Sales Catalogue", Common.Logging.EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration))
+                .AddHttpMessageHandler(() => new StubServiceUnavailableDelegatingHandler());
+
+            HttpClient configuredClient =
+                services
+                    .BuildServiceProvider()
+                    .GetRequiredService<IHttpClientFactory>()
+                    .CreateClient(TestClient);
+
+            // Act
+            var result = await configuredClient.GetAsync("https://test.com");
+
+            // Assert
+            Assert.False(_isRetryCalled);
+            Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
+
+        }
+    }
+
+    public class StubTooManyRequestsDelegatingHandler : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var httpResponse = new HttpResponseMessage();
+            httpResponse.Headers.Add("retry-after", "3600");
+            httpResponse.RequestMessage = new HttpRequestMessage();
+            httpResponse.RequestMessage.Headers.Add("x-correlation-id", "");
+            httpResponse.StatusCode = HttpStatusCode.TooManyRequests;
+            return Task.FromResult(httpResponse);
+        }
+    }
+
+    public class StubServiceUnavailableDelegatingHandler : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var httpResponse = new HttpResponseMessage();
+            httpResponse.RequestMessage = new HttpRequestMessage();
+            httpResponse.StatusCode = HttpStatusCode.ServiceUnavailable;
+            return Task.FromResult(httpResponse);
         }
     }
 }

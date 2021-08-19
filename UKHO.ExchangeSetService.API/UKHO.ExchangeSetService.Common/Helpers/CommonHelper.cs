@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         await Task.Delay(TimeSpan.FromMilliseconds(retryAfter));
                     }
                     logger
-                    .LogInformation(eventId.ToEventId(), "Re-trying {requestType} service with uri {RequestUri} request with delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
+                    .LogInformation(eventId.ToEventId(), "Re-trying {requestType} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
                     requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
                 });
         }
