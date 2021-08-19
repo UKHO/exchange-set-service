@@ -99,7 +99,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             services.AddHttpClient(TestClient)
                 .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, "File Share", Common.Logging.EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration))
-                .AddHttpMessageHandler(() => new StubTooManyRequestsDelegatingHandler());
+                .AddHttpMessageHandler(() => new TooManyRequestsDelegatingHandler());
 
             HttpClient configuredClient =
                 services
@@ -124,7 +124,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             services.AddHttpClient(TestClient)
                 .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, "Sales Catalogue", Common.Logging.EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration))
-                .AddHttpMessageHandler(() => new StubServiceUnavailableDelegatingHandler());
+                .AddHttpMessageHandler(() => new ServiceUnavailableDelegatingHandler());
 
             HttpClient configuredClient =
                 services
@@ -142,7 +142,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
     }
 
-    public class StubTooManyRequestsDelegatingHandler : DelegatingHandler
+    public class TooManyRequestsDelegatingHandler : DelegatingHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -155,7 +155,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
     }
 
-    public class StubServiceUnavailableDelegatingHandler : DelegatingHandler
+    public class ServiceUnavailableDelegatingHandler : DelegatingHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
