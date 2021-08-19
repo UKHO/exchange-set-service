@@ -18,8 +18,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
     public class CommonHelperTest
     {
         private ILogger<FileShareService> fakeLogger;
-        ////private HttpResponseMessage fakeHttpResponse;
-        ////private HttpClient fakeHttpClient;
         public int retryCount = 3;
         private const double sleepDuration = 2; 
         const string TestClient = "TestClient";
@@ -29,8 +27,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public void Setup()
         {
             fakeLogger = A.Fake<ILogger<FileShareService>>();
-            ////fakeHttpResponse = A.Fake<HttpResponseMessage>();
-            ////fakeHttpClient = A.Fake<HttpClient>();
         }
 
         #region SalesCatalogueResponse
