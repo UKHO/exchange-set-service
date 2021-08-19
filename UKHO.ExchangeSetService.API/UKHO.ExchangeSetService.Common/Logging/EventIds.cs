@@ -104,9 +104,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceReadMeFileRequestCompleted = 805097,
         QueryFileShareServiceReadMeFileNonOkResponse = 805098,
         ErrorTxtIsUploaded = 805099,
-        ExchangeSetErrorPostCallbackUriCalled = 8050100,
-        ExchangeSetErrorPostCallbackUriNotCalled = 805101,
-        ExchangeSetErrorPostCallbackUriNotProvided = 805102
+        ExchangeSetCreatedWithErrorPostCallbackUriCalled = 8050100,
+        ExchangeSetCreatedWithErrorPostCallbackUriNotCalled = 805101,
+        ExchangeSetCreatedWithErrorPostCallbackUriNotProvided = 805102
     }
 
     public static class EventIdExtensions

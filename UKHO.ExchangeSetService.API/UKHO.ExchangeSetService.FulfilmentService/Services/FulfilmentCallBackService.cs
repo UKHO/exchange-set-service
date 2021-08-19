@@ -134,19 +134,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     }
                     else
                     {
-                        logger.LogError(EventIds.ExchangeSetErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                        logger.LogError(EventIds.ExchangeSetCreatedWithErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} as payload data is incorrect.", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                         return false;
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(EventIds.ExchangeSetErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId, ex.Message);
+                    logger.LogError(EventIds.ExchangeSetCreatedWithErrorPostCallbackUriNotCalled.ToEventId(), "Post Callback uri is not called after exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId, ex.Message);
                     return false;
                 }
             }
             else
             {
-                logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriNotProvided.ToEventId(), "Post callback uri was not provided by requestor for unsuccessful exchange set creation for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                logger.LogInformation(EventIds.ExchangeSetCreatedWithErrorPostCallbackUriNotProvided.ToEventId(), "Post callback uri was not provided by requestor for exchange set creation with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                 return false;
             }
         }
@@ -183,7 +183,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!errorStatus)
                 logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
             else
-                logger.LogInformation(EventIds.ExchangeSetErrorPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                logger.LogInformation(EventIds.ExchangeSetCreatedWithErrorPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
                 
             return true;
         }
