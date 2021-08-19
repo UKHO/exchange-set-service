@@ -24,6 +24,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         public IOptions<CleanUpConfiguration> fakeCleanUpConfig;
         public string fakeFilePath = @"D:\\Downloads";
         public string fakeStorageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
+        public int fakeNumberOfDays = 1;
 
         [SetUp]
         public void Setup()
@@ -43,29 +44,39 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotFound_ThenReturnKeyNotFoundException()
         {
+            FakeAzureFileHelper fakeAzureFileHelper = new FakeAzureFileHelper();
+
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
                    .And.Message.EqualTo("Storage account accesskey not found")
                     , async delegate { await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles(); });
+
+            Assert.AreEqual(false, fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled);
         }
 
         [Test]
         public async Task WhenHistoricFoldersAndFilesNotFound_ThenReturnFalseResponse()
         {
+            FakeAzureFileHelper fakeAzureFileHelper = new FakeAzureFileHelper();
+
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(fakeStorageAccountConnectionString);
             A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(false);
 
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
             Assert.AreEqual(false, response);
+            Assert.AreEqual(false, fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled);
         }
 
         [Test]
         public async Task WhenHistoricFoldersAndFilesFound_ThenReturnTrueResponse()
         {
+            FakeAzureFileHelper fakeAzureFileHelper = new FakeAzureFileHelper();
             fakeConfiguration["HOME"] = fakeFilePath;
+
+            await fakeAzureFileHelper.DeleteDirectoryAsync(fakeNumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath);
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(fakeStorageAccountConnectionString);
             A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(true);
@@ -73,6 +84,7 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
             var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
             Assert.AreEqual(true, response);
+            Assert.AreEqual(true, fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled);
         }
     }
 }
