@@ -28,12 +28,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IFileShareServiceClient fakeFileShareServiceClient;
         private IFileShareService fileShareService;
         private IFileSystemHelper fakeFileSystemHelper;
+        private IMonitorHelper fakeMonitorHelper;
 
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeFolderPath = "C:\\HOME";
         public string fakeZipFilepath = "D:\\UKHO\\V01X01";
         public string fakeExchangeSetPath = @"D:\UKHO";
         public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
+        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
+
         [SetUp]
         public void Setup()
         {
@@ -43,8 +46,21 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
+            this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
 
-            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper);
+            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper, fakeMonitorHelper);
+        }
+
+        private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
+        {
+            return new SalesCatalogueServiceResponseQueueMessage
+            {
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+                FileSize = 4000,
+                ScsResponseUri = "https://test/ess-test/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272.json",
+                CallbackUri = "https://test-callbackuri.com",
+                CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
+            };
         }
 
         #region GetCreateBatchResponse
@@ -159,7 +175,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.CreateBatch();
+            var response = await fileShareService.CreateBatch(string.Empty);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
         }
@@ -175,7 +191,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
-            var response = await fileShareService.CreateBatch();
+            var response = await fileShareService.CreateBatch(string.Empty);
 
             Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
@@ -200,7 +216,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             //Mock
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, };
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
                 {
@@ -213,7 +229,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             //Method call
-            var response = await fileShareService.CreateBatch();
+            var response = await fileShareService.CreateBatch(correlationIdParam);
 
             //Test
             Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
@@ -225,14 +241,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region GetBatchInfoBasedOnProducts
         [Test]
-        public async Task WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsNullResponse()
+        public void WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsFulfilmentException()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null);
-            Assert.AreEqual(0, response.Entries.Count);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null); });
         }
 
         [Test]
@@ -262,13 +278,62 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
             Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
         }
 
+        [Test]
+        public void WhenFssResponseNotFoundForScsProducts_ThenReturnFulfilmentException()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416050" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+            });
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            var productList = GetProductdetails();
+            productList.Add(new Products
+            {
+                ProductName = "DE416051",
+                EditionNumber = 0,
+                UpdateNumbers = new List<int?> { 1 },
+                FileSize = 400
+            });
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null); });
+
+        }
         #endregion GetBatchInfoBasedOnProducts
 
         #region DownloadBatchFile
@@ -287,14 +352,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage());
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
         }
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenDonotDownloadBatchFiles()
+        public void WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -308,29 +373,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, null);
-
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(bool), response);
-            Assert.IsFalse(response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage()); });
         }
         #endregion
 
         #region SearchReadMeFilePath
         [Test]
-        public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
+        public void WhenInvalidSearchReadMeFileRequest_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty);
-            Assert.AreEqual(string.Empty, response);
-
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty); });
         }
 
         [Test]
-        public async Task WhenReadMeFileNotFound_ThenReturnEmptyFilePath()
+        public void WhenReadMeFileNotFound_ThenReturnFulfilmentException()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
@@ -354,9 +415,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.SearchReadMeFilePath(batchId, null);
-
-            Assert.AreEqual("", response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fileShareService.SearchReadMeFilePath(batchId, string.Empty); });
         }
 
         [Test]
@@ -429,8 +489,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.AreEqual(true, response);
         }
+
         [Test]
-        public async Task WhenInvalidDownloadReadMeFileRequest_ThenReturnFalse()
+        public void WhenInvalidDownloadReadMeFileRequest_ThenReturnFulfilmentException()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
@@ -447,7 +508,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             var searchBatchResponse = GetReadMeFileDetails();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
 
             A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -460,32 +522,31 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationidParam = correlationid;
                })
                .Returns(httpResponse);
-            A.CallTo(() => fakeFileSystemHelper.DownloadReadmeFile(A<string>.Ignored, A<Stream>.Ignored, A<string>.Ignored)).Returns(false);
 
-            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null);
-
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null); });
         }
         #endregion
 
         #region CreateZipFile
         [Test]
-        public void WhenInvalidCreateZipFileRequest_ThenReturnFalse()
+        public void WhenInvalidCreateZipFileRequest_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
-            bool response = fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty); });
         }
 
         [Test]
-        public void WhenValidCreateZipFileRequest_ThenReturnTrue()
+        public async Task WhenValidCreateZipFileRequest_ThenReturnTrue()
         {
             A.CallTo(() => fakeFileSystemHelper.CreateZipFile(A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            bool response = fileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeZipFilepath, null);
+            bool response = await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeZipFilepath, null);
             Assert.IsNotNull(response);
             Assert.AreEqual(true, response);
         }
@@ -494,7 +555,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region UploadZipFile
 
         [Test]
-        public async Task WhenInvalidAddFileInBatchAsyncRequest_ThenReturnFalse()
+        public void WhenInvalidAddFileInBatchAsyncRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -516,12 +577,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
         [Test]
-        public async Task WhenInvalidWriteBlockInFileAsyncRequest_ThenReturnFalse()
+        public void WhenInvalidWriteBlockInFileAsyncRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -550,12 +611,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
              });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
         [Test]
-        public async Task WhenInvalidCommitBatchAsyncRequest_ThenReturnFalse()
+        public void WhenInvalidCommitBatchAsyncRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -586,12 +647,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
             });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
         [Test]
-        public async Task WhenInvalidGetBatchStatusAsyncRequest_ThenReturnFalse()
+        public void WhenInvalidGetBatchStatusAsyncRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -624,8 +685,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
             });
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
 
         [Test]
@@ -651,12 +712,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
              .Returns(httpResponse);
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
+            var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(true, response);
         }
 
         [Test]
-        public async Task WhenInvalidUploadZipFileRequest_ThenReturnFalse()
+        public void WhenInvalidUploadZipFileRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
@@ -677,8 +738,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
 
-            var response = await fileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetPath, null);
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
         #endregion UploadZipFile
     }

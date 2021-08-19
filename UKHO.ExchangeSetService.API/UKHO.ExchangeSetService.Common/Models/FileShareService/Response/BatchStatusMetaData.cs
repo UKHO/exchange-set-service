@@ -4,5 +4,6 @@
     {
         public string AccessToken { get; set; }
         public string BatchId { get; set; }
+        public string FileName { get; set; }
     }
 }

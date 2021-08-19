@@ -37,6 +37,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfig;
         private IOptions<AzureAdB2CConfiguration> fakeAzureAdB2CConfig;
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
+        private IMonitorHelper fakeMonitorHelper;
 
         [SetUp]
         public void Setup()
@@ -52,6 +53,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeEssFulfilmentStorageConfig = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
             fakeAzureAdB2CConfig = A.Fake<IOptions<AzureAdB2CConfiguration>>();
             fakeAzureAdConfig = A.Fake<IOptions<AzureADConfiguration>>();
+            fakeMonitorHelper = A.Fake<IMonitorHelper>();
 
             fakeAzureAdB2CConfig.Value.ClientId = "9bca10f0-20d9-4b38-88eb-c7aff6b5f571";
             fakeAzureAdB2CConfig.Value.Instance = "https://gk.microsoft.com/";
@@ -61,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig);
+            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper);
         }
 
         #region GetExchangeSetResponse
@@ -278,7 +280,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var azureB2CToken = GetAzureB2CToken();
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataByProductIdentifiers(
@@ -303,7 +305,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var azureAdB2CToken = GetAzureAdB2CToken();
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataByProductIdentifiers(
@@ -327,7 +329,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var azureAdToken = GetAzureADToken();
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             var exchangeSetResponse = GetExchangeSetResponse();
             A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
@@ -339,7 +341,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
@@ -349,7 +351,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureAdToken);
 
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
@@ -369,7 +371,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var azureB2CToken = GetAzureB2CToken();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.Now.AddDays(-4);
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             var exchangeSetResponse = GetExchangeSetResponse();
             A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
@@ -379,7 +381,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -387,7 +389,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callbackUri
                 }, azureB2CToken); // AzureB2C Token but file size is less than 300 Mb
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.NotNull(result.LastModified);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
@@ -404,7 +406,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdB2CToken = GetAzureAdB2CToken();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.BadRequest;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             var exchangeSetResponse = GetExchangeSetResponse();
             A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
@@ -434,7 +436,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var exchangeSetResponse = GetExchangeSetResponse();
@@ -447,7 +449,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(string.Empty)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -510,7 +512,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             var azureB2CToken = GetAzureB2CToken();
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
@@ -531,7 +533,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             var azureAdB2CToken = GetAzureAdB2CToken();
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored,A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
@@ -554,7 +556,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var azureAdToken = GetAzureADToken();
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var exchangeSetResponse = GetExchangeSetResponse();
@@ -565,7 +567,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -588,13 +590,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureB2CToken = GetAzureB2CToken();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -604,7 +606,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, azureB2CToken);// azureB2C Token with file size less than 300 Mb
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.Null(result.LastModified);
         }
 
@@ -619,13 +621,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
             salesCatalogueResponse.LastModified = DateTime.Now.AddDays(-2);
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -634,7 +636,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureAdB2CToken); // Azure Ad B2C Token but file size less than 300 mB
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.HttpStatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.NotNull(result.LastModified);
         }
 
@@ -647,7 +649,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var azureADToken = GetAzureADToken();
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.BadRequest;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored,A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
@@ -671,7 +673,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var exchangeSetResponse = GetExchangeSetResponse();
@@ -684,7 +686,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(string.Empty)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -759,7 +761,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
-            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureADToken());
@@ -776,7 +778,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
 
-            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());// B2C token passed and file size large than 300 mb
@@ -794,7 +796,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
 
-            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());//AdB2C token passed and file size large than 300 mb
@@ -812,7 +814,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
 
-            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var exchangeSetResponse = GetExchangeSetResponse();
@@ -824,7 +826,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
@@ -843,13 +845,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch()).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());// ADB2C Token with File size less than 300 mb
 

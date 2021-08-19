@@ -160,8 +160,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             return Token;
         }
-
-
+       
         /// <summary>
         /// Generate custom signature verified Auth Token
         /// </summary>
