@@ -168,12 +168,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public bool ValidateCallbackRequestPayload(CallBackResponse callBackResponse)
         {
-            return (callBackResponse.Data.RequestedProductCount > 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
+            return (callBackResponse.Data.RequestedProductCount >= 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
         }
 
         public bool ValidateCallbackErrorRequestPayload(CallBackErrorResponse callBackResponse)
         {
-            return (callBackResponse.Data.RequestedProductCount > 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && Links.Equals(callBackResponse.Data.Links.ExchangeSetFileUri,null) && !string.IsNullOrWhiteSpace(callBackResponse.Id) && int.Equals(callBackResponse.Data.ExchangeSetCellCount,0));
+            return (callBackResponse.Data.RequestedProductCount >= 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && Links.Equals(callBackResponse.Data.Links.ExchangeSetFileUri,null) && !string.IsNullOrWhiteSpace(callBackResponse.Id) && int.Equals(callBackResponse.Data.ExchangeSetCellCount,0));
         }
 
         public async Task<bool> SendResponseToCallBackApi(bool errorStatus, string payloadJson, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)

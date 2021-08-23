@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenIncorrectCallBackPayloadInRequest_ThenCallBackApiIsNotCalled()
         {
-            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = 0;
+            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
 
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string uri) =>
@@ -167,7 +167,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenIncorrectCallBackPayloadErrorInRequest_ThenCallBackApiIsNotCalled()
         {
-            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = 0;
+            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
 
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string uri) =>
