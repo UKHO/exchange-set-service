@@ -121,8 +121,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 2, 0));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 2, 0));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
@@ -135,25 +135,25 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithAValidProductVersionWithCallbackURI_ThenASuccessStatusIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();      
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q",1,0));
-                    
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 2, 0));
+
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
 
         }
 
         [TestCase("DE416080", 10, 6, TestName = "EditionNumber Unavailable")]
-        [TestCase("DE416080", 9, 7, TestName = "UpdateNumber Unavailable")]
-        public async Task WhenICallTheApiWithAProductVersionNotAvailable_ThenTheCorrectResponseIsReturned(string productname, int editionnumber, int updatenumber)
+        [TestCase("DE416080", 9, 10, TestName = "UpdateNumber Unavailable")]
+        public async Task WhenICallTheApiWithAProductVersionNotAvailable_ThenAInternalServerErrorResponseIsReturned(string productname, int editionnumber, int updatenumber)
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();           
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
             ProductVersiondata.Add(DataHelper.GetProductVersionModelData(productname, editionnumber, updatenumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+            Assert.AreEqual(500, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 500.");
         }
 
         [Test]
