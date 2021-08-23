@@ -28,17 +28,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly IMonitorHelper monitorHelper;
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthTokenProvider authTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 ILogger<FileShareService> logger,
-                                IFileSystemHelper fileSystemHelper)
+                                IFileSystemHelper fileSystemHelper, IMonitorHelper monitorHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
             this.authTokenProvider = authTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
             this.fileSystemHelper = fileSystemHelper;
+            this.monitorHelper = monitorHelper;
         }
 
         public async Task<CreateBatchResponse> CreateBatch(string correlationId)
@@ -116,8 +118,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string payloadJson = string.Empty;
             var productList = new List<string>();
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
+            int queryCount = 0;
             do
             {
+                queryCount++;
                 httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, correlationId);
 
                 if (httpResponse.IsSuccessStatusCode)
@@ -129,6 +133,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 }
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+            internalSearchBatchResponse.QueryCount = queryCount;
             CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
             return internalSearchBatchResponse;
         }
@@ -402,6 +407,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             bool isUploadZipFile = false;
+            DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileName));
 
             FileCreateMetaData fileCreateMetaData = new FileCreateMetaData()
@@ -417,6 +423,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
                 if (isWriteBlock)
                 {
+                    DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
+                    monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
                     BatchStatus batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, customFileInfo);
                     if (batchStatus == BatchStatus.Committed)
                     {
@@ -437,6 +445,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 FileName = customFileInfo.Name,
                 FullFileName = customFileInfo.FullName
             };
+            DateTime commitTaskStartedAt = DateTime.UtcNow;
             bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaData, correlationId);
             BatchStatus batchStatus = BatchStatus.CommitInProgress;
             if (isUploadCommitBatchCompleted)
@@ -474,6 +483,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchId, correlationId);
                 throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
             }
+            DateTime commitTaskCompletedAt = DateTime.UtcNow;
+            monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null, batchId);
             return batchStatus;
         }
 
