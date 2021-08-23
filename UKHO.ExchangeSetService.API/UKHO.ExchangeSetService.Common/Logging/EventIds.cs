@@ -104,7 +104,17 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceReadMeFileRequestCompleted = 805097,
         QueryFileShareServiceReadMeFileNonOkResponse = 805098,
         ErrorTxtIsUploaded = 805099,
-        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 505100
+        ESSCleanUpJobRequestStart = 805100,
+        ESSCleanUpJobRequestCompleted = 805101,
+        DeleteHistoricFoldersAndFilesStarted = 805102,
+        DeleteHistoricFoldersAndFilesCompleted = 805103,
+        DeleteHistoricFoldersAndFilesFailed = 805104,
+        HistoricSCSResponseFileDeleted = 805105,
+        HistoricSCSResponseFileNotFound = 805106,
+        HistoricDateFolderDeleted = 805107,
+        HistoricDateFolderNotFound = 805108,
+        DeleteHistoricFoldersAndFilesException = 805109,
+        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 505110
     }
 
     public static class EventIdExtensions
