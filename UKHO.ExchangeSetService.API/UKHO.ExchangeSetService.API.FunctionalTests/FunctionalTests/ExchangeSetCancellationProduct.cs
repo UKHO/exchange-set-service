@@ -17,7 +17,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
         public ProductIdentifierModel ProductIdentifierModel { get; set; }
-        
+
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
@@ -31,10 +31,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
 
-        }     
+        }
 
         [Test]
-        [Ignore("Ignore this test since SCS response is intermittent")]
         public async Task WhenICallExchangeSetProductIdentifierApiWithACancelledProduct_ThenCatalogueFileUpdatedWithEditionNumberZero()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE516510" };
@@ -59,7 +58,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
-            
+
             //Verify Cancellation details
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, ProductIdentifierModel.ProductIdentifier, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
@@ -76,12 +75,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
                 CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
-           
+
             }
         }
 
         [Test]
-        [Ignore("Ignore this test since SCS response is intermittent")]
         public async Task WhenICallExchangeSetProductVersionsApiWithACancelledProduct_ThenCatalogueFileUpdatedWithEditionNumberZero()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();

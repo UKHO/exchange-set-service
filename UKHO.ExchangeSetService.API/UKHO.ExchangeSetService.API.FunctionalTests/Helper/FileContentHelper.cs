@@ -78,31 +78,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             int scsResponseLength = scsResponse.Count;
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
            
-            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]} , expected is {currentDate}");
-            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]} , expected is VERSION.");
-            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]} , expected is ENC.");
+            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
             //verfying first product details
-            Assert.True(contentFirstLine[0].Contains(scsResponse[0].productName.ToString()), $"Product File returned {contentFirstLine[0]}, and it should be {scsResponse[0].productName.ToString()}.");
-            Assert.True(contentFirstLine[1].Contains(scsResponse[0].baseCellIssueDate.ToString("yyyyMMdd")), $"Product File returned {contentFirstLine[1]} , and it should be {scsResponse[0].baseCellIssueDate.ToString("yyyyMMdd")}.");
-            Assert.True(contentFirstLine[2].Equals(scsResponse[0].baseCellEditionNumber.ToString()), $"Product File returned {contentFirstLine[2]} , and it should be {scsResponse[0].baseCellEditionNumber.ToString()}.");
-            Assert.True(contentFirstLine[3].Contains(scsResponse[0].issueDateLatestUpdate.ToString("yyyyMMdd")), $"Product File returned {contentFirstLine[3]} , and it should be {scsResponse[0].issueDateLatestUpdate.ToString("yyyyMMdd")}.");
-            Assert.True(contentFirstLine[4].Equals(scsResponse[0].latestUpdateNumber.ToString()), $"Product File returned {contentFirstLine[4]} , and it should be {scsResponse[0].issueDateLatestUpdate.ToString("yyyyMMdd")}.");
-            Assert.True(contentFirstLine[5].Equals(scsResponse[0].fileSize.ToString()), $"Product File returned {contentFirstLine[5]} , and it should be {scsResponse[0].fileSize.ToString()}.");
-            Assert.True(contentFirstLine[6].Contains(scsResponse[0].cellLimitSouthernmostLatitude.ToString()), $"Product File returned {contentFirstLine[6]} , and it should be {scsResponse[0].cellLimitSouthernmostLatitude.ToString()}.");
-            Assert.True(contentFirstLine[7].Contains(scsResponse[0].cellLimitWesternmostLatitude.ToString()), $"Product File returned {contentFirstLine[7]} , and it should be {scsResponse[0].cellLimitWesternmostLatitude.ToString()}.");
-            Assert.True(contentFirstLine[8].Contains(scsResponse[0].cellLimitNorthernmostLatitude.ToString()), $"Product File returned {contentFirstLine[8]} , and it should be {scsResponse[0].cellLimitNorthernmostLatitude.ToString()}.");
-            Assert.True(contentFirstLine[9].Contains(scsResponse[0].cellLimitEasternmostLatitude.ToString()), $"Product File returned {contentFirstLine[9]} , and it should be {scsResponse[0].cellLimitEasternmostLatitude.ToString()}.");
+            Assert.True(contentFirstLine[0].Contains(scsResponse[0].productName.ToString()), $"Product File returned productName {contentFirstLine[0]}, instead of expected {scsResponse[0].productName.ToString()}.");
+            Assert.True(contentFirstLine[1].Contains(scsResponse[0].baseCellIssueDate.ToString("yyyyMMdd")), $"Product File returned baseCellIssueDate {contentFirstLine[1]} , instead of expected {scsResponse[0].baseCellIssueDate.ToString("yyyyMMdd")}.");
+            Assert.True(contentFirstLine[2].Equals(scsResponse[0].baseCellEditionNumber.ToString()), $"Product File returned baseCellEditionNumber {contentFirstLine[2]} , instead of expected {scsResponse[0].baseCellEditionNumber.ToString()}.");
+            Assert.True(contentFirstLine[3].Contains(scsResponse[0].issueDateLatestUpdate.ToString("yyyyMMdd")), $"Product File returned issueDateLatestUpdate {contentFirstLine[3]} , instead of expected {scsResponse[0].issueDateLatestUpdate.ToString("yyyyMMdd")}.");
+            Assert.True(contentFirstLine[4].Equals(scsResponse[0].latestUpdateNumber.ToString()), $"Product File returned latestUpdateNumber {contentFirstLine[4]} , instead of expected {scsResponse[0].latestUpdateNumber.ToString()}.");
+            Assert.True(contentFirstLine[5].Equals(scsResponse[0].fileSize.ToString()), $"Product File returned fileSize {contentFirstLine[5]} , instead of expected {scsResponse[0].fileSize.ToString()}.");
+            Assert.True(contentFirstLine[6].Contains(scsResponse[0].cellLimitSouthernmostLatitude.ToString()), $"Product File returned cellLimitSouthernmostLatitude {contentFirstLine[6]} , instead of expected {scsResponse[0].cellLimitSouthernmostLatitude.ToString()}.");
+            Assert.True(contentFirstLine[7].Contains(scsResponse[0].cellLimitWesternmostLatitude.ToString()), $"Product File returned cellLimitWesternmostLatitude {contentFirstLine[7]} , instead of expected {scsResponse[0].cellLimitWesternmostLatitude.ToString()}.");
+            Assert.True(contentFirstLine[8].Contains(scsResponse[0].cellLimitNorthernmostLatitude.ToString()), $"Product File returned cellLimitNorthernmostLatitude {contentFirstLine[8]} , instead of expected {scsResponse[0].cellLimitNorthernmostLatitude.ToString()}.");
+            Assert.True(contentFirstLine[9].Contains(scsResponse[0].cellLimitEasternmostLatitude.ToString()), $"Product File returned cellLimitEasternmostLatitude {contentFirstLine[9]} , instead of expected {scsResponse[0].cellLimitEasternmostLatitude.ToString()}.");
             //verfying last product details
-            Assert.True(contentLastLine[0].Contains(scsResponse[scsResponseLength - 1].productName.ToString()), $"Product File returned {contentLastLine[0]}, and it should be {scsResponse[scsResponseLength - 1].productName.ToString()}.");
-            Assert.True(contentLastLine[1].Contains(scsResponse[scsResponseLength - 1].baseCellIssueDate.ToString("yyyyMMdd")), $"Product File returned {contentLastLine[1]}, and it should be {scsResponse[scsResponseLength - 1].baseCellIssueDate.ToString("yyyyMMdd")}.");
-            Assert.True(contentLastLine[2].Equals(scsResponse[scsResponseLength - 1].baseCellEditionNumber.ToString()), $"Product File returned {contentLastLine[2]}, and it should be {scsResponse[scsResponseLength - 1].baseCellEditionNumber.ToString()}.");
-            Assert.True(contentLastLine[3].Contains(scsResponse[scsResponseLength - 1].issueDateLatestUpdate.ToString("yyyyMMdd")), $"Product File returned {contentLastLine[3]}, and it should be {scsResponse[scsResponseLength - 1].issueDateLatestUpdate.ToString("yyyyMMdd")}.");
-            Assert.True(contentLastLine[4].Equals(scsResponse[scsResponseLength - 1].latestUpdateNumber.ToString()), $"Product File returned {contentLastLine[4]}, and it should be {scsResponse[scsResponseLength - 1].latestUpdateNumber.ToString()}.");
-            Assert.True(contentLastLine[5].Equals(scsResponse[scsResponseLength - 1].fileSize.ToString()), $"Product File returned {contentLastLine[5]}, and it should be {scsResponse[scsResponseLength - 1].fileSize.ToString()}.");
-            Assert.True(contentLastLine[6].Contains(scsResponse[scsResponseLength - 1].cellLimitSouthernmostLatitude.ToString()), $"Product File returned {contentLastLine[6]}, and it should be {scsResponse[scsResponseLength - 1].cellLimitSouthernmostLatitude.ToString()}.");
-            Assert.True(contentLastLine[7].Contains(scsResponse[scsResponseLength - 1].cellLimitWesternmostLatitude.ToString()), $"Product File returned {contentLastLine[7]}, and it should be {scsResponse[scsResponseLength - 1].cellLimitWesternmostLatitude.ToString()}.");
-            Assert.True(contentLastLine[8].Contains(scsResponse[scsResponseLength - 1].cellLimitNorthernmostLatitude.ToString()), $"Product File returned {contentLastLine[8]}, and it should be {scsResponse[scsResponseLength - 1].cellLimitNorthernmostLatitude.ToString()}.");
-            Assert.True(contentLastLine[9].Contains(scsResponse[scsResponseLength - 1].cellLimitEasternmostLatitude.ToString()), $"Product File returned {contentLastLine[9]}, and it should be {scsResponse[scsResponseLength - 1].cellLimitEasternmostLatitude.ToString()}.");
+            Assert.True(contentLastLine[0].Contains(scsResponse[scsResponseLength - 1].productName.ToString()), $"Product File returned productName {contentLastLine[0]}, instead of expected {scsResponse[scsResponseLength - 1].productName.ToString()}.");
+            Assert.True(contentLastLine[1].Contains(scsResponse[scsResponseLength - 1].baseCellIssueDate.ToString("yyyyMMdd")), $"Product File returned baseCellIssueDate {contentLastLine[1]}, instead of expected {scsResponse[scsResponseLength - 1].baseCellIssueDate.ToString("yyyyMMdd")}.");
+            Assert.True(contentLastLine[2].Equals(scsResponse[scsResponseLength - 1].baseCellEditionNumber.ToString()), $"Product File returned baseCellEditionNumber {contentLastLine[2]}, instead of expected {scsResponse[scsResponseLength - 1].baseCellEditionNumber.ToString()}.");
+            Assert.True(contentLastLine[3].Contains(scsResponse[scsResponseLength - 1].issueDateLatestUpdate.ToString("yyyyMMdd")), $"Product File returned issueDateLatestUpdate {contentLastLine[3]}, instead of expected {scsResponse[scsResponseLength - 1].issueDateLatestUpdate.ToString("yyyyMMdd")}.");
+            Assert.True(contentLastLine[4].Equals(scsResponse[scsResponseLength - 1].latestUpdateNumber.ToString()), $"Product File returned latestUpdateNumber {contentLastLine[4]}, instead of expected {scsResponse[scsResponseLength - 1].latestUpdateNumber.ToString()}.");
+            Assert.True(contentLastLine[5].Equals(scsResponse[scsResponseLength - 1].fileSize.ToString()), $"Product File returned fileSize {contentLastLine[5]}, instead of expected {scsResponse[scsResponseLength - 1].fileSize.ToString()}.");
+            Assert.True(contentLastLine[6].Contains(scsResponse[scsResponseLength - 1].cellLimitSouthernmostLatitude.ToString()), $"Product File returned cellLimitSouthernmostLatitude {contentLastLine[6]}, instead of expected {scsResponse[scsResponseLength - 1].cellLimitSouthernmostLatitude.ToString()}.");
+            Assert.True(contentLastLine[7].Contains(scsResponse[scsResponseLength - 1].cellLimitWesternmostLatitude.ToString()), $"Product File returned cellLimitWesternmostLatitude {contentLastLine[7]}, instead of expected {scsResponse[scsResponseLength - 1].cellLimitWesternmostLatitude.ToString()}.");
+            Assert.True(contentLastLine[8].Contains(scsResponse[scsResponseLength - 1].cellLimitNorthernmostLatitude.ToString()), $"Product File returned cellLimitNorthernmostLatitude {contentLastLine[8]}, instead of expected {scsResponse[scsResponseLength - 1].cellLimitNorthernmostLatitude.ToString()}.");
+            Assert.True(contentLastLine[9].Contains(scsResponse[scsResponseLength - 1].cellLimitEasternmostLatitude.ToString()), $"Product File returned cellLimitEasternmostLatitude {contentLastLine[9]}, instead of expected {scsResponse[scsResponseLength - 1].cellLimitEasternmostLatitude.ToString()}.");
         }
 
         public static void CheckReadMeTxtFileContent(string inputFile)
@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] fileContents = fileSecondLineContent.Split("File date:");
 
             //Verifying file contents - second line of the readme file
-            Assert.True(fileSecondLineContent.Contains(fileContents[0]));
+            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
 
             var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
 
@@ -148,11 +148,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 var responseSearchDetails = await apiResponse.ReadAsTypeAsync<ResponseBatchSearchModel>();
                 int fssFileCount = responseSearchDetails.Entries[0].Files.Count;
 
-                Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
+                Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count is {totalFileCount}, Instead of expected count {fssFileCount}");
 
                 foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)));
+                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
                 }
 
             }
@@ -197,7 +197,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)));
+                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
                 }
 
             }
@@ -256,7 +256,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             foreach(var catalogueFilePath in scsCatalogueFilesPath)
             {
-                Assert.True(catalogueFileContent.Contains(catalogueFilePath));
+                Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
             }
            
         }
@@ -266,7 +266,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string catalogueFileContent = File.ReadAllText(inputFile);
             foreach (var product in ProductVersionData)
             {
-                Assert.False(catalogueFileContent.Contains(product.ProductName));
+                Assert.False(catalogueFileContent.Contains(product.ProductName), $"{catalogueFileContent} contains {product.ProductName}, which is incorrect.");
             }
         }
 
