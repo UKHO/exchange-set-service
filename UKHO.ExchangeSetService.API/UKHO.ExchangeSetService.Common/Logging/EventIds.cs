@@ -113,7 +113,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         HistoricSCSResponseFileNotFound = 805106,
         HistoricDateFolderDeleted = 805107,
         HistoricDateFolderNotFound = 805108,
-        DeleteHistoricFoldersAndFilesException = 805109
+        DeleteHistoricFoldersAndFilesException = 805109,
+        RetryHttpClientSCSRequest = 805110,
+        RetryHttpClientFSSRequest = 805111
     }
 
     public static class EventIdExtensions
