@@ -41,7 +41,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             string[] lines = File.ReadAllLines(inputFile);
 
-            //Store file content
+            //Store file content here
             string[] fileContent = lines[0].Split(" ");
 
             string dataServerAndWeek = fileContent[0];
