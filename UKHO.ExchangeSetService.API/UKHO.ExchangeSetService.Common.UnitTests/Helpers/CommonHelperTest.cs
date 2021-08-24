@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -89,7 +88,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task GetRetryPolicyWhenTooManyRequests()
+        public async Task WhenTooManyRequests_GetRetryPolicy()
         {
             // Arrange 
             IServiceCollection services = new ServiceCollection();
@@ -115,7 +114,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task GetRetryPolicyWhenServiceUnavailable()
+        public async Task WhenServiceUnavailable_GetRetryPolicy()
         {
             // Arrange 
             IServiceCollection services = new ServiceCollection();
@@ -138,30 +137,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.False(_isRetryCalled);
             Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
 
-        }
-    }
-
-    public class TooManyRequestsDelegatingHandler : DelegatingHandler
-    {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var httpResponse = new HttpResponseMessage();
-            httpResponse.Headers.Add("retry-after", "3600");
-            httpResponse.RequestMessage = new HttpRequestMessage();
-            httpResponse.RequestMessage.Headers.Add("x-correlation-id", "");
-            httpResponse.StatusCode = HttpStatusCode.TooManyRequests;
-            return Task.FromResult(httpResponse);
-        }
-    }
-
-    public class ServiceUnavailableDelegatingHandler : DelegatingHandler
-    {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var httpResponse = new HttpResponseMessage();
-            httpResponse.RequestMessage = new HttpRequestMessage();
-            httpResponse.StatusCode = HttpStatusCode.ServiceUnavailable;
-            return Task.FromResult(httpResponse);
         }
     }
 }
