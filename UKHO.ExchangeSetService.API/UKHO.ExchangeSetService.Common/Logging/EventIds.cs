@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         UnhandledControllerException = 805063,
         CatalogFileIsNotCreated = 805064,
         UnexpectedDefaultFileExtension = 805065,
-        ExchangeSetNotCreated = 805066,
+        ExchangeSetCreatedWithError = 805066,
         ExchangeSetCreated = 805067,
         CreateProductFileRequestStart = 805068,
         CreateProductFileRequestCompleted = 805069,
