@@ -114,12 +114,14 @@ namespace UKHO.ExchangeSetService.Common.Logging
         HistoricDateFolderDeleted = 805107,
         HistoricDateFolderNotFound = 805108,
         DeleteHistoricFoldersAndFilesException = 805109,
-        AzureBlobStorageIsHealthy = 805110,
-        AzureBlobStorageIsUnhealthy = 805111,
-        AzureMessageQueueIsHealthy = 805112,
-        AzureMessageQueueIsUnhealthy = 805113,
-        AzureWebJobIsHealthy = 805114,
-        AzureWebJobIsUnhealthy = 805115
+        RetryHttpClientSCSRequest = 805110,
+        RetryHttpClientFSSRequest = 805111,
+        AzureBlobStorageIsHealthy = 805112,
+        AzureBlobStorageIsUnhealthy = 805113,
+        AzureMessageQueueIsHealthy = 805114,
+        AzureMessageQueueIsUnhealthy = 805115,
+        AzureWebJobIsHealthy = 805116,
+        AzureWebJobIsUnhealthy = 805117
     }
 
     public static class EventIdExtensions
