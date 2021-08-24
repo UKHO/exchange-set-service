@@ -114,9 +114,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         HistoricDateFolderDeleted = 805107,
         HistoricDateFolderNotFound = 805108,
         DeleteHistoricFoldersAndFilesException = 805109,
-        ExchangeSetCreatedWithErrorPostCallbackUriCalled = 8050110,
-        ExchangeSetCreatedWithErrorPostCallbackUriNotCalled = 805111,
-        ExchangeSetCreatedWithErrorPostCallbackUriNotProvided = 805112
+        RetryHttpClientSCSRequest = 805110,
+        RetryHttpClientFSSRequest = 805111,
+        ExchangeSetCreatedWithErrorPostCallbackUriCalled = 8050112,
+        ExchangeSetCreatedWithErrorPostCallbackUriNotCalled = 805113,
+        ExchangeSetCreatedWithErrorPostCallbackUriNotProvided = 805114
     }
 
     public static class EventIdExtensions
