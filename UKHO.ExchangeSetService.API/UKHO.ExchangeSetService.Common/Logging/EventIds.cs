@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ESSGetProductsFromSpecificDateRequestStart = 805015,
         ESSGetProductsFromSpecificDateRequestCompleted = 805016,
         ESSPostProductIdentifiersRequestStart = 805017,
-        ESSPostProductIdentifiersRequestCompleted = 805018,        
+        ESSPostProductIdentifiersRequestCompleted = 805018,
         ESSPostProductVersionsRequestStart = 805019,
         ESSPostProductVersionsRequestCompleted = 805020,
         SCSResponseStoreRequestStart = 805021,
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         CreateSerialFileRequestCompleted = 805039,
         SerialFileIsNotCreated = 805040,
         CreateZipFileRequestStart = 805041,
-        CreateZipFileRequestCompleted = 805042,       
+        CreateZipFileRequestCompleted = 805042,
         UploadExchangeSetToFssStart = 805043,
         UploadExchangeSetToFssCompleted = 805044,
         UploadFileCreationProcessStarted = 805045,
@@ -103,7 +103,19 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceReadMeFileRequestStart = 805096,
         QueryFileShareServiceReadMeFileRequestCompleted = 805097,
         QueryFileShareServiceReadMeFileNonOkResponse = 805098,
-        ErrorTxtIsUploaded = 805099
+        ErrorTxtIsUploaded = 805099,
+        ESSCleanUpJobRequestStart = 805100,
+        ESSCleanUpJobRequestCompleted = 805101,
+        DeleteHistoricFoldersAndFilesStarted = 805102,
+        DeleteHistoricFoldersAndFilesCompleted = 805103,
+        DeleteHistoricFoldersAndFilesFailed = 805104,
+        HistoricSCSResponseFileDeleted = 805105,
+        HistoricSCSResponseFileNotFound = 805106,
+        HistoricDateFolderDeleted = 805107,
+        HistoricDateFolderNotFound = 805108,
+        DeleteHistoricFoldersAndFilesException = 805109,
+        RetryHttpClientSCSRequest = 805110,
+        RetryHttpClientFSSRequest = 805111
     }
 
     public static class EventIdExtensions

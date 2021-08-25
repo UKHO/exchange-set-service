@@ -30,6 +30,7 @@ using System.Net.Http.Headers;
 using UKHO.ExchangeSetService.Common.Storage;
 using Microsoft.AspNetCore.Authorization;
 using UKHO.ExchangeSetService.Common.HealthCheck;
+using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -124,6 +125,8 @@ namespace UKHO.ExchangeSetService.API
 
             services.Configure<SalesCatalogueConfiguration>(configuration.GetSection("SalesCatalogue"));
 
+            var retryCount = Convert.ToInt32(configuration["RetryConfiguration:RetryCount"]);
+            var sleepDuration = Convert.ToDouble(configuration["RetryConfiguration:SleepDuration"]);
             services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
                 {
                     client.BaseAddress = new Uri(configuration["SalesCatalogue:BaseUrl"]);
@@ -132,7 +135,7 @@ namespace UKHO.ExchangeSetService.API
                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                 }
             )
-            .AddHeaderPropagation();
+            .AddHeaderPropagation().AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), "Sales Catalogue", EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
             services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
@@ -147,7 +150,7 @@ namespace UKHO.ExchangeSetService.API
                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                 }
             )
-            .AddHeaderPropagation();
+            .AddHeaderPropagation().AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
             services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             services.AddScoped<IFileShareService, FileShareService>();
             services.AddScoped<IProductDataService, ProductDataService>();
