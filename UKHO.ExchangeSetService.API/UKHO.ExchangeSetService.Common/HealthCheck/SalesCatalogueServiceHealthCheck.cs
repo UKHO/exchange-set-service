@@ -15,17 +15,17 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
     public class SalesCatalogueServiceHealthCheck : IHealthCheck
     {
         private readonly ISalesCatalogueClient salesCatalogueClient;
-        private readonly IAuthTokenProvider authTokenProvider;
+        private readonly IAuthScsTokenProvider authScsTokenProvider;
         private readonly IOptions<SalesCatalogueConfiguration> salesCatalogueConfig;
         private readonly ILogger<SalesCatalogueService> logger;
 
         public SalesCatalogueServiceHealthCheck(ISalesCatalogueClient salesCatalogueClient,
-                                              IAuthTokenProvider authTokenProvider,
+                                              IAuthScsTokenProvider authScsTokenProvider,
                                               IOptions<SalesCatalogueConfiguration> salesCatalogueConfig,
                                               ILogger<SalesCatalogueService> logger)
         {
             this.salesCatalogueClient = salesCatalogueClient;
-            this.authTokenProvider = authTokenProvider;
+            this.authScsTokenProvider = authScsTokenProvider;
             this.salesCatalogueConfig = salesCatalogueConfig;
             this.logger = logger;
         }
@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             string sinceDateTime = DateTime.UtcNow.AddDays(-salesCatalogueConfig.Value.SinceDays).ToString("R");
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
 
             var salesCatalogueServiceResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);

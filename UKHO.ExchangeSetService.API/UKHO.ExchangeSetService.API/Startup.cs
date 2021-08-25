@@ -78,11 +78,13 @@ namespace UKHO.ExchangeSetService.API
                     {
                         options.Audience = essAzureADConfiguration.ClientId;
                         options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{essAzureADConfiguration.TenantId}";
+                        options.RequireHttpsMetadata = false;
                     })
                     .AddJwtBearer("AzureB2C", jwtOptions =>
                     {
                         jwtOptions.Audience = azureAdB2CConfiguration.ClientId;
                         jwtOptions.Authority = $"{azureAdB2CConfiguration.Instance}{azureAdB2CConfiguration.Domain}/{azureAdB2CConfiguration.SignUpSignInPolicy}/v2.0/";
+                        jwtOptions.RequireHttpsMetadata = false;
                     })
                     .AddJwtBearer("AzureADB2C", options =>
                     {
@@ -93,6 +95,7 @@ namespace UKHO.ExchangeSetService.API
                             ValidAudience = azureAdB2CConfiguration.ClientId,
                             ValidIssuer = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0"
                         };
+                        options.RequireHttpsMetadata = false;
                     });
 
             services.AddAuthorization(options =>
@@ -109,7 +112,8 @@ namespace UKHO.ExchangeSetService.API
             });
             services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("ESSFulfilmentConfiguration"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+            services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
+            services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
             services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
             services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
             services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
@@ -168,6 +172,8 @@ namespace UKHO.ExchangeSetService.API
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 .AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
                 .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck");
+
+            services.AddDistributedMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

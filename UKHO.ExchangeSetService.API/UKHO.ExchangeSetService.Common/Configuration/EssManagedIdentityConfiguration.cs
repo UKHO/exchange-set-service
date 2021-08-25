@@ -6,5 +6,6 @@ namespace UKHO.ExchangeSetService.Common.Configuration
     public class EssManagedIdentityConfiguration
     {
         public string ClientId { get; set; }
+        public int TokenExpiryTimeInMunites { get; set; }
     }
 }

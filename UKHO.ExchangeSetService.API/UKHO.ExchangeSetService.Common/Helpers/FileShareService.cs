@@ -24,19 +24,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public class FileShareService : IFileShareService
     {
         private readonly IFileShareServiceClient fileShareServiceClient;
-        private readonly IAuthTokenProvider authTokenProvider;
+        private readonly IAuthFssTokenProvider authFssTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IMonitorHelper monitorHelper;
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
-                                IAuthTokenProvider authTokenProvider,
+                                IAuthFssTokenProvider authFssTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 ILogger<FileShareService> logger,
                                 IFileSystemHelper fileSystemHelper, IMonitorHelper monitorHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
-            this.authTokenProvider = authTokenProvider;
+            this.authFssTokenProvider = authFssTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
             this.fileSystemHelper = fileSystemHelper;
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<CreateBatchResponse> CreateBatch(string correlationId)
         {
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var jwtSecurityToken = new JwtSecurityToken(accessToken);
             var oid = jwtSecurityToken.Claims.FirstOrDefault(m => m.Type == "oid").Value;
             var uri = $"/batch";
@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
             internalSearchBatchResponse.Entries = new List<BatchDetail>();
             List<Products> internalNotFoundProducts = new List<Products>();
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var productWithAttributes = GenerateQueryForFss(products);
             var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes}";
 
@@ -280,7 +280,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken, queueMessage);
         }
 
@@ -321,7 +321,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
             string filePath = Path.Combine(exchangeSetRootPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
@@ -345,7 +345,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string filePath = string.Empty;
             var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
             HttpResponseMessage httpResponse;
@@ -405,7 +405,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         //Upload either Exchange Set or Error File
         public async Task<bool> UploadFileToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName)
         {
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             bool isUploadZipFile = false;
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileName));
