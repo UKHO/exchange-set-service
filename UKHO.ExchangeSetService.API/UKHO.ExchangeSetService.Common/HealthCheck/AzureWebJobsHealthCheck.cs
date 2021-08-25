@@ -8,19 +8,19 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
     public class AzureWebJobsHealthCheck : IHealthCheck
     {
-        private readonly IAzureWebJobsHealthCheckClient azureWebJobsHealthCheckClient;
+        private readonly IAzureWebJobsHealthCheckService azureWebJobsHealthCheckService;
         private readonly ILogger<AzureWebJobsHealthCheck> logger;
 
-        public AzureWebJobsHealthCheck(IAzureWebJobsHealthCheckClient azureWebJobsHealthCheckClient,
+        public AzureWebJobsHealthCheck(IAzureWebJobsHealthCheckService azureWebJobsHealthCheckService,
                                        ILogger<AzureWebJobsHealthCheck> logger)
         {
-            this.azureWebJobsHealthCheckClient = azureWebJobsHealthCheckClient;
+            this.azureWebJobsHealthCheckService = azureWebJobsHealthCheckService;
             this.logger = logger;
         }
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var healthCheckResult = await azureWebJobsHealthCheckClient.CheckHealthAsync(context);
+            var healthCheckResult = await azureWebJobsHealthCheckService.CheckHealthAsync();
             if (healthCheckResult.Status == HealthStatus.Healthy)
             {
                 logger.LogDebug(EventIds.AzureWebJobIsHealthy.ToEventId(), "Azure webjob is healthy");

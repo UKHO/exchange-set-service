@@ -11,7 +11,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 {
     public class AzureWebJobsHealthCheckTest
     {
-        private IAzureWebJobsHealthCheckClient fakeAzureWebJobsHealthCheckClient;
+        private IAzureWebJobsHealthCheckService fakeAzureWebJobsHealthCheckService;
         private AzureWebJobsHealthCheck azureWebJobsHealthCheck;
         private ILogger<AzureWebJobsHealthCheck> fakeLogger;
 
@@ -19,15 +19,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public void Setup()
         {
             this.fakeLogger = A.Fake<ILogger<AzureWebJobsHealthCheck>>();
-            this.fakeAzureWebJobsHealthCheckClient = A.Fake<IAzureWebJobsHealthCheckClient>();
+            this.fakeAzureWebJobsHealthCheckService = A.Fake<IAzureWebJobsHealthCheckService>();
 
-            azureWebJobsHealthCheck = new AzureWebJobsHealthCheck(fakeAzureWebJobsHealthCheckClient, fakeLogger);
+            azureWebJobsHealthCheck = new AzureWebJobsHealthCheck(fakeAzureWebJobsHealthCheckService, fakeLogger);
         }
 
         [Test]
         public async Task WhenAzureWebJobStatusIsRunning_ThenAzureWebJobsIsHealthy()
         {
-            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckHealthAsync(A<HealthCheckContext>.Ignored, A<CancellationToken>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure webjob is healthy"));
+            A.CallTo(() => fakeAzureWebJobsHealthCheckService.CheckHealthAsync(A<CancellationToken>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure webjob is healthy"));
 
             var response = await azureWebJobsHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureWebJobStatusIsNotRunning_ThenAzureWebJobsIsUnhealthy()
         {
-            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckHealthAsync(A<HealthCheckContext>.Ignored, A<CancellationToken>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure webjob is unhealthy", new Exception("Azure webjob is unhealthy")));
+            A.CallTo(() => fakeAzureWebJobsHealthCheckService.CheckHealthAsync(A<CancellationToken>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure webjob is unhealthy", new Exception("Azure webjob is unhealthy")));
 
             var response = await azureWebJobsHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
