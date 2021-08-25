@@ -38,10 +38,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 return accessToken.AccessToken;
             }
 
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Caching new token for external end point and expires in {ExpiresIn}ms", accessToken.ExpiresIn.Millisecond);
-
             var newAccessToken = await GetNewManagedIdentityAuthAsync(resource);
             AddToCache(resource, newAccessToken);
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}ms.", resource, newAccessToken.ExpiresIn.Millisecond);
 
             return newAccessToken.AccessToken;
         }
