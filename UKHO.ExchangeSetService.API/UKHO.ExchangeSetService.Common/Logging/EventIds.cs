@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         QueryFileShareServiceENCFilesNonOkResponse = 805030,
         DownloadENCFilesRequestStart = 805031,
         DownloadENCFilesRequestCompleted = 805032,
-        DownloadENCFilesNonOkResponse = 805033,        
+        DownloadENCFilesNonOkResponse = 805033,
         ReadMeTextFileNotFound = 805034,
         DownloadReadMeFileRequestStart = 805035,
         DownloadReadMeFileRequestCompleted = 805036,
@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         DeleteHistoricFoldersAndFilesException = 805109,
         RetryHttpClientSCSRequest = 805110,
         RetryHttpClientFSSRequest = 805111,
-        ExchangeSetCreatedWithErrorPostCallbackUriCalled = 8050112,
+        ExchangeSetCreatedWithErrorPostCallbackUriCalled = 805112,
         ExchangeSetCreatedWithErrorPostCallbackUriNotCalled = 805113,
         ExchangeSetCreatedWithErrorPostCallbackUriNotProvided = 805114,
         AzureBlobStorageIsHealthy = 805115,
@@ -124,7 +124,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         AzureMessageQueueIsHealthy = 805117,
         AzureMessageQueueIsUnhealthy = 805118,
         AzureWebJobIsHealthy = 805119,
-        AzureWebJobIsUnhealthy = 805120
+        AzureWebJobIsUnhealthy = 805120,
+        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 805121
     }
 
     public static class EventIdExtensions

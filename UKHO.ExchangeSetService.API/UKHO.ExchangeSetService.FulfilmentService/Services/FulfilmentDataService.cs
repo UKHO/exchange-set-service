@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
-            await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData);
+            await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response);
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetZipFilePath, message.CorrelationId);
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
             if (isZipFileUploaded)
@@ -118,7 +118,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             return searchBatchResponse;
         }
-        private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData)
+        private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
@@ -127,7 +127,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
             await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
-            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse);
+            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salecatalogueProductResponse);
         }
 
         public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
@@ -172,7 +172,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipFileUploaded;
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        public async Task<bool> CreateCatalogFile(string batchId,string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             bool isFileCreated = false;
 
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 DateTime createCatalogFileTaskStartedAt = DateTime.UtcNow;
                 logger.LogInformation(EventIds.CreateCatalogFileRequestStart.ToEventId(), "Create catalog file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                isFileCreated = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse);
+                isFileCreated = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
                 logger.LogInformation(EventIds.CreateCatalogFileRequestCompleted.ToEventId(), "Create catalog file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 DateTime createCatalogFileTaskCompletedAt = DateTime.UtcNow;
                 monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileTaskStartedAt, createCatalogFileTaskCompletedAt, correlationId, null, null, null, batchId);

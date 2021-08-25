@@ -54,15 +54,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
         }
 
         [Test]
-        public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenValidFileNameIsPresentInAzureStorage()
+        public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenAInternalServerErrorResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
 
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+            Assert.AreEqual(500, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 500.");
 
-            bool checkFileNameExistInContainer = await AzureBlobStorageCheck.CheckIfFileNameExist(Config.EssStorageAccountConnectionString, apiResponse);
-            Assert.IsTrue(checkFileNameExistInContainer);
         }
 
         [Test]
@@ -95,18 +93,5 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
             Assert.IsTrue(checkFileNameExistInContainer);
         }
 
-        [Test]
-        public async Task WhenICallTheApiWithProductVersionNotAvailable_ThenValidFileNameIsPresentInAzureStorage()
-        {
-            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
-
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 100, 5));
-            
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
-
-            bool checkFileNameExistInContainer = await AzureBlobStorageCheck.CheckIfFileNameExist(Config.EssStorageAccountConnectionString, apiResponse);
-            Assert.IsTrue(checkFileNameExistInContainer);
-        }
     }
 }
