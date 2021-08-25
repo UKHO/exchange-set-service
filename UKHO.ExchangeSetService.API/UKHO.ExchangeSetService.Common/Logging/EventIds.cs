@@ -118,7 +118,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         RetryHttpClientFSSRequest = 805111,
         ExchangeSetCreatedWithErrorPostCallbackUriCalled = 8050112,
         ExchangeSetCreatedWithErrorPostCallbackUriNotCalled = 805113,
-        ExchangeSetCreatedWithErrorPostCallbackUriNotProvided = 805114
+        ExchangeSetCreatedWithErrorPostCallbackUriNotProvided = 805114,
+        AzureBlobStorageIsHealthy = 805115,
+        AzureBlobStorageIsUnhealthy = 805116,
+        AzureMessageQueueIsHealthy = 805117,
+        AzureMessageQueueIsUnhealthy = 805118,
+        AzureWebJobIsHealthy = 805119,
+        AzureWebJobIsUnhealthy = 805120
     }
 
     public static class EventIdExtensions

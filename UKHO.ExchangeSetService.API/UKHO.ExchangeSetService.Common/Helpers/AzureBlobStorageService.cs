@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
             var instanceCountAndType = GetInstanceCountBasedOnFileSize(fileSizeInMB);
-            var storageAccountWithKey = GetStorageAccountNameAndKey(instanceCountAndType.Item2);
+            var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.Item2);
 
             string storageAccountConnectionString =
                   scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
@@ -116,35 +117,50 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return salesCatalogueProductResponse;
         }
 
-        private (int, string) GetInstanceCountBasedOnFileSize(double fileSizeInMB)
+
+        private (int, ExchangeSetType) GetInstanceCountBasedOnFileSize(double fileSizeInMB)
         {
             if (fileSizeInMB <= storageConfig.Value.SmallExchangeSetSizeInMB)
             {
-                return (smallExchangeSetInstance.GetInstanceNumber(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.SmallExchangeSet.ToString());
+                return (smallExchangeSetInstance.GetInstanceNumber(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.sxs);
             }
             else if (fileSizeInMB > storageConfig.Value.SmallExchangeSetSizeInMB && fileSizeInMB <= storageConfig.Value.LargeExchangeSetSizeInMB)
             {
-                return (mediumExchangeSetInstance.GetInstanceNumber(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.MediumExchangeSet.ToString());
+                return (mediumExchangeSetInstance.GetInstanceNumber(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.mxs);
             }
             else
             {
-                return (largeExchangeSetInstance.GetInstanceNumber(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.LargeExchangeSet.ToString());
+                return (largeExchangeSetInstance.GetInstanceNumber(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.lxs);
             }
         }
 
-        private (string, string) GetStorageAccountNameAndKey(string exchangeSetType)
+        public (string, string) GetStorageAccountNameAndKeyBasedOnExchangeSetType(ExchangeSetType exchangeSetType)
         {
-            if (string.Compare(exchangeSetType, ExchangeSetType.SmallExchangeSet.ToString(), true) == 0)
+            switch (exchangeSetType)
             {
-                return (storageConfig.Value.SmallExchangeSetAccountName, storageConfig.Value.SmallExchangeSetAccountKey);
+                case ExchangeSetType.sxs:
+                    return (storageConfig.Value.SmallExchangeSetAccountName, storageConfig.Value.SmallExchangeSetAccountKey);
+                case ExchangeSetType.mxs:
+                    return (storageConfig.Value.MediumExchangeSetAccountName, storageConfig.Value.MediumExchangeSetAccountKey);
+                case ExchangeSetType.lxs:
+                    return (storageConfig.Value.LargeExchangeSetAccountName, storageConfig.Value.LargeExchangeSetAccountKey);
+                default:
+                    return (string.Empty, string.Empty);
             }
-            else if (string.Compare(exchangeSetType, ExchangeSetType.MediumExchangeSet.ToString(), true) == 0)
+        }
+
+        public int GetInstanceCountBasedOnExchangeSetType(ExchangeSetType exchangeSetType)
+        {
+            switch (exchangeSetType)
             {
-                return (storageConfig.Value.MediumExchangeSetAccountName, storageConfig.Value.MediumExchangeSetAccountKey);
-            }
-            else
-            {
-                return (storageConfig.Value.LargeExchangeSetAccountName, storageConfig.Value.LargeExchangeSetAccountKey);
+                case ExchangeSetType.sxs:
+                    return storageConfig.Value.SmallExchangeSetInstance;
+                case ExchangeSetType.mxs:
+                    return storageConfig.Value.MediumExchangeSetInstance;
+                case ExchangeSetType.lxs:
+                    return storageConfig.Value.LargeExchangeSetInstance;
+                default:
+                    return 1;
             }
         }
     }
