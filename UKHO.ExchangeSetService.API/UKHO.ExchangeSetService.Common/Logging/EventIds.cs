@@ -114,7 +114,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         HistoricDateFolderDeleted = 805107,
         HistoricDateFolderNotFound = 805108,
         DeleteHistoricFoldersAndFilesException = 805109,
-        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 505110
+        RetryHttpClientSCSRequest = 805110,
+        RetryHttpClientFSSRequest = 805111,
+        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 505112
     }
 
     public static class EventIdExtensions
