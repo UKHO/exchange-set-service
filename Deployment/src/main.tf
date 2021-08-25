@@ -72,7 +72,8 @@ module "webapp_service" {
     "APPINSIGHTS_INSTRUMENTATIONKEY"                       = module.app_insights.instrumentation_key
     "ASPNETCORE_ENVIRONMENT"                               = local.env_name
   }
-  tags = local.tags
+  tags                      = local.tags
+  allowed_ips               = var.allowed_ips
 }
 
 module "fulfilment_webapp" {
