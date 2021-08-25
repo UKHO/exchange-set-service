@@ -26,7 +26,7 @@ resource "azurerm_app_service" "small_exchange_set_webapp" {
     ftps_state = "Disabled"
 
     ip_restriction {
-      virtual_network_subnet_id = [var.small_exchange_set_subnets[count.index]]
+      virtual_network_subnet_id = var.small_exchange_set_subnets[count.index]
     }
   }
 
@@ -75,7 +75,7 @@ resource "azurerm_app_service" "medium_exchange_set_webapp" {
     ftps_state = "Disabled"
 
     ip_restriction {
-      virtual_network_subnet_id = [var.medium_exchange_set_subnets[count.index]]
+      virtual_network_subnet_id = var.medium_exchange_set_subnets[count.index]
     }
   }
 
@@ -124,7 +124,7 @@ resource "azurerm_app_service" "large_exchange_set_webapp" {
     ftps_state = "Disabled"
 
     ip_restriction {
-      virtual_network_subnet_id = [var.large_exchange_set_subnets[count.index]]
+      virtual_network_subnet_id = var.large_exchange_set_subnets[count.index]
     }
   }
 
