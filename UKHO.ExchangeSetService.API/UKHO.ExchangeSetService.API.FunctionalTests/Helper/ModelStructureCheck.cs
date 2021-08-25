@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsNotNull(apiResponseData.ExchangeSetUrlExpiryDateTime, $"Response body returns null, instead of valid Exchange Set Url ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime}.");
 
             //Verify expiry datetime
-            var expiryDateTime = DateTime.UtcNow.AddDays(1);
+            var expiryDateTime = DateTime.UtcNow.AddDays(1).AddMinutes(1);
 
             Assert.True(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second), $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
         }

@@ -2,8 +2,11 @@
 {
     public enum ExchangeSetType
     {
-        SmallExchangeSet = 1,
-        MediumExchangeSet = 2,
-        LargeExchangeSet = 3
+        ///<summary>sxs: Small Exchange Set</summary>
+        sxs = 1,
+        ///<summary>mxs: Medium Exchange Set</summary>
+        mxs = 2,
+        ///<summary>lxs: Large Exchange Set</summary>
+        lxs = 3
     }
 }
