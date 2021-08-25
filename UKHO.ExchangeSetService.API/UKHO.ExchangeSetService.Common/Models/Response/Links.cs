@@ -9,5 +9,8 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
 
         [JsonProperty("exchangeSetFileUri")]
         public LinkSetFileUri ExchangeSetFileUri { get; set; }
+
+        [JsonProperty("errorFileUri", NullValueHandling = NullValueHandling.Ignore)]
+        public LinkSetErrorFileUri ExchangeSetErrorFileUri { get; set; }
     }
 }

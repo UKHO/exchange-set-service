@@ -24,10 +24,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IFileShareService fileShareService;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
+        private readonly IAzureBlobStorageService azureBlobStorageService;
+        private readonly IFulfilmentCallBackService fulfilmentCallBackService;
 
         public FulfilmentServiceJob(IConfiguration configuration,
                                     IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
-                                    IFileShareService fileShareService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
+                                    IFileShareService fileShareService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+                                    IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService)
         {
             this.configuration = configuration;
             this.fulFilmentDataService = fulFilmentDataService;
@@ -35,6 +38,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             this.fileSystemHelper = fileSystemHelper;
             this.fileShareService = fileShareService;
             this.fileShareServiceConfig = fileShareServiceConfig;
+            this.azureBlobStorageService = azureBlobStorageService;
+            this.fulfilmentCallBackService = fulfilmentCallBackService;
         }
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] CloudQueueMessage message)
@@ -83,13 +88,24 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 if (isUploaded)
                 {
                     logger.LogError(EventIds.ErrorTxtIsUploaded.ToEventId(), "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", eventId.Id, eventId.Name, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                    logger.LogError(EventIds.ExchangeSetNotCreated.ToEventId(), "Exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
                 }
                 else
                     logger.LogError(EventIds.ErrorTxtNotUploaded.ToEventId(), "Error while uploading error.txt file to file share service for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
             }
             else
-                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+            { 
+                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId); 
+            }
+
+            await SendErrorCallBackResponse(fulfilmentServiceQueueMessage);
+        }
+
+        public async Task SendErrorCallBackResponse(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage)
+        {
+            SalesCatalogueProductResponse salesCatalogueProductResponse = await azureBlobStorageService.DownloadSalesCatalogueResponse(fulfilmentServiceQueueMessage.ScsResponseUri, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+
+            await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, fulfilmentServiceQueueMessage);
         }
     }
 }

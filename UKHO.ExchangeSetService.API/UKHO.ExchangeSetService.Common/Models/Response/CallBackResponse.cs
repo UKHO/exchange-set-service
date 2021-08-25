@@ -2,7 +2,7 @@
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
-    public class CallBackResponse
+    public class CallBackResponse 
     {
         [JsonProperty("specversion")]
         public string SpecVersion { get; set; }
