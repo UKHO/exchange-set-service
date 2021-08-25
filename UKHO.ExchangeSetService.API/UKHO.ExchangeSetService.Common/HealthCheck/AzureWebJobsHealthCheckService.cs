@@ -40,7 +40,6 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 string webJobUri, userNameKey, passwordKey = string.Empty;
                 string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
                 List<WebJobDetails> webJobs = new List<WebJobDetails>();
-                WebJobDetails webJobDetails = new WebJobDetails();
                 foreach (string exchangeSetTypeName in exchangeSetTypes)
                 {
                     Enum.TryParse(exchangeSetTypeName, out ExchangeSetType exchangeSetType);
@@ -49,13 +48,16 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                         userNameKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-username";
                         passwordKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-password";
                         webJobUri = $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
-
                         string userPassword = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey) + ":" + webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
                         userPassword = Convert.ToBase64String(Encoding.Default.GetBytes(userPassword));
-                        webJobDetails.UserPassword = userPassword;
-                        webJobDetails.WebJobUri = webJobUri;
-                        webJobDetails.ExchangeSetType = exchangeSetTypeName;
-                        webJobDetails.Instance = instance;
+
+                        WebJobDetails webJobDetails = new WebJobDetails
+                        {
+                            UserPassword = userPassword,
+                            WebJobUri = webJobUri,
+                            ExchangeSetType = exchangeSetTypeName,
+                            Instance = instance
+                        };
                         webJobs.Add(webJobDetails);
                     }
                 }
