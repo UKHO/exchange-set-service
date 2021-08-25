@@ -31,6 +31,6 @@ variable "app_service_sku" {
 
 }
 
-variable "allowed_ips{
+variable "allowed_ips" {
 
 }
