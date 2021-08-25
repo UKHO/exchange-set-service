@@ -14,7 +14,6 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
     public class AzureWebJobsHealthCheckService : IAzureWebJobsHealthCheckService
     {
-        static WebJobDetails webJobDetails = new WebJobDetails();
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageConfiguration;
         private readonly IWebJobsAccessKeyProvider webJobsAccessKeyProvider;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -41,6 +40,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 string webJobUri, userNameKey, passwordKey = string.Empty;
                 string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
                 List<WebJobDetails> webJobs = new List<WebJobDetails>();
+                WebJobDetails webJobDetails = new WebJobDetails();
                 foreach (string exchangeSetTypeName in exchangeSetTypes)
                 {
                     Enum.TryParse(exchangeSetTypeName, out ExchangeSetType exchangeSetType);
