@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         UnhandledControllerException = 805063,
         CatalogFileIsNotCreated = 805064,
         UnexpectedDefaultFileExtension = 805065,
-        ExchangeSetNotCreated = 805066,
+        ExchangeSetCreatedWithError = 805066,
         ExchangeSetCreated = 805067,
         CreateProductFileRequestStart = 805068,
         CreateProductFileRequestCompleted = 805069,
@@ -115,7 +115,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         HistoricDateFolderNotFound = 805108,
         DeleteHistoricFoldersAndFilesException = 805109,
         RetryHttpClientSCSRequest = 805110,
-        RetryHttpClientFSSRequest = 805111
+        RetryHttpClientFSSRequest = 805111,
+        ExchangeSetCreatedWithErrorPostCallbackUriCalled = 8050112,
+        ExchangeSetCreatedWithErrorPostCallbackUriNotCalled = 805113,
+        ExchangeSetCreatedWithErrorPostCallbackUriNotProvided = 805114
     }
 
     public static class EventIdExtensions
