@@ -121,7 +121,7 @@ resource "azurerm_app_service" "large_exchange_set_webapp" {
     always_on  = true
     ftps_state = "Disabled"
     ip_restriction {
-      virtual_network_subnet_id = var.medium_exchange_set_subnets[count.index]
+      virtual_network_subnet_id = var.large_exchange_set_subnets[count.index]
     }
   }
 
