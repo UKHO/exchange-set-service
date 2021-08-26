@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             bool checkSerialEncFileCreated = false;
             if (!string.IsNullOrWhiteSpace(exchangeSetPath))
-            {              
+            {
                 string serialFilePath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.SerialFileName);
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetPath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
@@ -51,12 +51,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
                     throw new FulfilmentException(EventIds.SerialFileIsNotCreated.ToEventId());
-                }                
+                }
             }
             return checkSerialEncFileCreated;
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
@@ -73,7 +73,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (listFulfilmentData != null && listFulfilmentData.Any())
             {
-                int length = 2;
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
 
                 List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
@@ -81,41 +80,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 foreach (var listItem in listFulfilmentData)
                 {
-                    listItem.Files = listItem.Files.OrderByDescending(
-                                    item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
-
-                    foreach (var item in listItem.Files)
-                    {
-                        string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
-                        string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
-                        string comment = string.Empty;
-                        BoundingRectangle boundingRectangle = new BoundingRectangle();
-
-                        if (mimeType == "BIN")
-                        {
-                            var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
-
-                            //BoundingRectangle and Comment only required for BIN
-                            comment = salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
-                                ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}"
-                                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{GetIssueAndUpdateDate(salescatalogProduct)}";
-
-                            boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
-                            boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
-                            boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
-                            boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
-                        }
-
-                        catBuilder.Add(new CatalogEntry()
-                        {
-                            FileLocation = fileLocation,
-                            FileLongName = "",
-                            Implementation = mimeType,
-                            Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
-                            Comment = comment,
-                            BoundingRectangle = boundingRectangle
-                        });
-                    }
+                    CreateCatalogEntry(listItem, orderPreference, catBuilder, salesCatalogueDataResponse, salesCatalogueProductResponse, exchangeSetRootPath, batchId, correlationId);
                 }
             }
 
@@ -133,6 +98,65 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
             }
+        }
+
+        private void CreateCatalogEntry(FulfilmentDataResponse listItem, List<Tuple<string, string>> orderPreference, ICatalog031Builder catBuilder, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse, string exchangeSetRootPath, string batchId, string correlationId)
+        {
+            int length = 2;
+            listItem.Files = listItem.Files.OrderByDescending(
+                                item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
+
+            foreach (var item in listItem.Files)
+            {
+                string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
+                string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
+                string comment = string.Empty;               
+                BoundingRectangle boundingRectangle = new BoundingRectangle();
+
+                if (mimeType == "BIN")
+                {
+                    var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+                    if (salescatalogProduct == null)
+                    {
+                        logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId(), "Error in sales catalogue service catalogue end point when product details not found for Product:{ProductName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", listItem.ProductName, batchId, correlationId);
+                        throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId());
+                    }
+                    
+                    comment = SetCatalogFileComment(listItem, salescatalogProduct, salesCatalogueProductResponse);
+
+                    boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
+                    boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
+                    boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
+                    boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
+                }
+
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileLocation,
+                    FileLongName = "",
+                    Implementation = mimeType,
+                    Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
+                    Comment = comment,
+                    BoundingRectangle = boundingRectangle
+                });
+            }
+        }
+
+        private string SetCatalogFileComment(FulfilmentDataResponse listItem, SalesCatalogueDataProductResponse salescatalogProduct, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        {
+            string getIssueAndUpdateDate = null;            
+            var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
+
+            if (salescatalogProductResponse.Dates != null)
+            {
+                var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
+                getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
+            }
+
+            //BoundingRectangle and Comment only required for BIN
+            return salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
+                ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
+                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";             
         }
 
         private string GetMimeType(string fileName, string mimeType, string batchId, string correlationId)
@@ -205,7 +229,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             else
             {
-                logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId(), "Error in sales catalogue service catalogue end point for product.txt responded with {ResponseCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", salesCatalogueDataResponse.ResponseCode , batchId, correlationId);
+                logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId(), "Error in sales catalogue service catalogue end point for product.txt responded with {ResponseCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", salesCatalogueDataResponse.ResponseCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId());
             }
         }
@@ -216,23 +240,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return crcHash.ToString("X").PadLeft(crcLength, '0');
         }
 
-        private string GetIssueAndUpdateDate(SalesCatalogueDataProductResponse salescatalogProduct)
+        private string GetIssueAndUpdateDate(Dates dateResponse)
         {
-            string comment = string.Empty;
-            string ISDT = (salescatalogProduct.IssueDateLatestUpdate == null)
-                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDateLatestUpdate.Value.ToString("yyyyMMdd");
-
-            string UADT = (salescatalogProduct.IssueDatePreviousUpdate == null && salescatalogProduct.LatestUpdateNumber == 0)
-                        ? salescatalogProduct.BaseCellIssueDate.ToString("yyyyMMdd") : salescatalogProduct.IssueDatePreviousUpdate.Value.ToString("yyyyMMdd");
-
-            if (ISDT != null && UADT != null)
-                comment = $"UADT={UADT},ISDT={ISDT};";
-            else if (ISDT != null)
-                comment = $"ISDT={ISDT};";
-            else if (UADT != null)
-                comment = $"UADT={UADT};";
-
-            return comment;
+            string UADT = dateResponse.UpdateApplicationDate == null ? null : dateResponse.UpdateApplicationDate.Value.ToString("yyyyMMdd");
+            string ISDT = dateResponse.IssueDate.ToString("yyyyMMdd");
+            return (UADT != null) ? $"UADT={UADT},ISDT={ISDT};" : $"ISDT={ISDT};";
         }
     }
 }

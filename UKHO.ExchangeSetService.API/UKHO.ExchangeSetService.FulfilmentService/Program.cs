@@ -21,6 +21,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
+using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -135,18 +136,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
+
+                 var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
+                 var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                  {
                      client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
-                 });
+                 }).AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
                  services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
                  {
                      client.BaseAddress = new Uri(ConfigurationBuilder["SalesCatalogue:BaseUrl"]);
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
-                 });
+                 }).AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), "Sales Catalogue", EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
+
                  services.AddHttpClient<ICallBackClient, CallBackClient>();
 
                  services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();

@@ -18,5 +18,6 @@
         public string DynamicQueueName { get; set; }
         public double LargeExchangeSetSizeInMB { get; set; }
         public double SmallExchangeSetSizeInMB { get; set; }
+        public string ExchangeSetTypes { get; set; }
     }
 }

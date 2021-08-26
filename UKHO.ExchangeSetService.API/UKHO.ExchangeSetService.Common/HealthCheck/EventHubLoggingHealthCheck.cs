@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             var healthCheckResult = await eventHubLoggingHealthClient.CheckHealthAsync(context);
             if (healthCheckResult.Status == HealthStatus.Healthy)
             {
-                logger.LogDebug(EventIds.EventHubLoggingIsHealthy.ToEventId(), $"Event hub is healthy");
+                logger.LogDebug(EventIds.EventHubLoggingIsHealthy.ToEventId(), "Event hub is healthy");
             }
             else
             {

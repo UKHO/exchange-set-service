@@ -1,4 +1,6 @@
-﻿using Microsoft.WindowsAzure.Storage;
+﻿using Azure.Storage.Blobs;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -31,6 +33,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob)
         {
              return await cloudBlockBlob.DownloadTextAsync();
+        }
+        public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)
+        {
+            BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
+            var blobContainerExists = await container.ExistsAsync();
+            if(blobContainerExists)
+                return HealthCheckResult.Healthy("Azure blob storage is healthy");
+            else
+                return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", new Exception("Azure blob storage connection failed or not available"));
         }
     }
 }

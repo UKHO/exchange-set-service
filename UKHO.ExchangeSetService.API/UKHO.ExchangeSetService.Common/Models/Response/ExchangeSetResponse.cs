@@ -4,9 +4,8 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
-    public class ExchangeSetResponse
+    public class ExchangeSetResponse 
     {
-       
         [JsonProperty("_links")]
         public Links Links { get; set; }
 
