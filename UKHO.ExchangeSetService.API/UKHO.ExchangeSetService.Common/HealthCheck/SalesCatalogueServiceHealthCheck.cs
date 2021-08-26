@@ -35,9 +35,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             string sinceDateTime = DateTime.UtcNow.AddDays(-salesCatalogueConfig.Value.SinceDays).ToString("R");
             var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
-
             var salesCatalogueServiceResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
-
             if (salesCatalogueServiceResponse.StatusCode == HttpStatusCode.OK || salesCatalogueServiceResponse.StatusCode == HttpStatusCode.NotModified)
             {
                 logger.LogDebug(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), "Sales catalogue service is healthy responded with {StatusCode}", salesCatalogueServiceResponse.StatusCode);

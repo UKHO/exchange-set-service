@@ -31,12 +31,12 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
             try
             {
-                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId() + $" of Event Hub")));
+                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId() + " of Event Hub")));
                 return HealthCheckResult.Healthy("Event hub is healthy");
             }
             catch (Exception ex)
             {
-                return HealthCheckResult.Unhealthy( $"Event hub is unhealthy responded with error {ex.Message}", new Exception(ex.Message));
+                return HealthCheckResult.Unhealthy("Event hub is unhealthy", new Exception(ex.Message));
             }
             finally
             {

@@ -104,6 +104,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                                 ProductName = "productName",
                                 EditionNumber = 2,
                                 UpdateNumbers = new List<int?> { 3, 4 },
+                                 Dates = new List<Dates> {
+                            new Dates{ UpdateNumber= 4, UpdateApplicationDate= DateTime.Today, IssueDate = DateTime.Today}
+                        },
                                 Cancellation = new Cancellation {
                                     EditionNumber = 4,
                                     UpdateNumber = 6
@@ -147,7 +150,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
         }
         #endregion
-
+        
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
@@ -173,7 +176,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeConfiguration["HOME"] = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
-            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();          
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Returns(storageAccountConnectionString);
@@ -183,7 +186,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponse, salesCatalogueDataResponse)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse)).Returns(true);
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);

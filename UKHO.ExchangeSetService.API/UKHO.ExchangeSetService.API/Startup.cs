@@ -167,12 +167,17 @@ namespace UKHO.ExchangeSetService.API
             services.AddSingleton<ISmallExchangeSetInstance, SmallExchangeSetInstance>();
             services.AddSingleton<IMediumExchangeSetInstance, MediumExchangeSetInstance>();
             services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
+            services.AddScoped<IAzureWebJobsHealthCheckClient, AzureWebJobsHealthCheckClient>();
+            services.AddScoped<IAzureWebJobsHealthCheckService, AzureWebJobsHealthCheckService>();
+            services.AddSingleton<IWebJobsAccessKeyProvider>(s => new WebJobsAccessKeyProvider(configuration));
 
             services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 .AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
-                .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck");
-
+                .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck")
+                .AddCheck<AzureBlobStorageHealthCheck>("AzureBlobStorageHealthCheck")
+                .AddCheck<AzureMessageQueueHealthCheck>("AzureMessageQueueHealthCheck")
+                .AddCheck<AzureWebJobsHealthCheck>("AzureWebJobsHealthCheck");
             services.AddDistributedMemoryCache();
         }
 
