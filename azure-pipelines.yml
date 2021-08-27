@@ -36,19 +36,11 @@ stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
     jobs:
-      - job:
+      - job: Dependencychecker
         workspace:
-          clean: all # what to clean up before the job runs outputs | resources | all
-        displayName: "DependencyChecker Dotnet Build test publish"
-
+          clean: all
+        displayName: "Dependencychecker"
         steps:
-          - task: PowerShell@2
-            displayName: "Set assembly version numbers based on build ID"
-            inputs:
-              targetType: filePath
-              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
-              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
-
           - task: UseDotNet@2
             displayName: 'Use .NET Core 3.1.x sdk'
             inputs:
@@ -90,6 +82,18 @@ stages:
                 param($ReportLocation)
                 Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
+      - job: UnitTestsAndCodeCoverage
+        workspace:
+          clean: all
+        displayName: "Dotnet Test and Publish Code Coverage"
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore test projects only"
             inputs:
@@ -100,13 +104,6 @@ stages:
               nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
               packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
-
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet build task"
-            inputs:
-              command: "build"
-              projects: "**/*.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: "dotnet test - Perform Unit Tests"
@@ -130,20 +127,42 @@ stages:
               PathtoPublish: "$(Build.ArtifactStagingDirectory)/codecoveragereport"
               ArtifactName: codecoveragereport
 
-          - task: DotNetCoreCLI@2
-            displayName: "Publish functional test"
+      - job: BuildAndPublishAPI
+        workspace:
+          clean: all
+        displayName: "Dotnet Build publish API"
+        steps:
+          - task: PowerShell@2
+            displayName: "Set assembly version numbers based on build ID"
             inputs:
-              command: "publish"
-              publishWebProjects: false
-              projects: "**/*UKHO.ExchangeSetService.API.FunctionalTests.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
-              zipAfterPublish: false
+              targetType: filePath
+              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
+              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Functional test Artifact"
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
-              ArtifactName: functionaltests
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore"
+            inputs:
+              command: restore
+              projects: |
+                **/*.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build task"
+            inputs:
+              command: "build"
+              projects: "**/*.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: "Publish WebAPI"
@@ -196,6 +215,44 @@ stages:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService'
               ArtifactName: ExchangeSetService
 
+      - job: PublishFunctionalTestsAndTerraform
+        workspace:
+          clean: all
+        displayName: "Publish Functional Tests And Terraform"
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore"
+            inputs:
+              command: restore
+              projects: |
+                **/*.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish functional test"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: "**/*UKHO.ExchangeSetService.API.FunctionalTests.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              zipAfterPublish: false
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Functional test Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              ArtifactName: functionaltests
+
           - task: CopyFiles@2
             displayName: Copy EssFulfilment Config
             inputs:
@@ -218,6 +275,8 @@ stages:
 
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
+    variables:
+      - group: "ESS-Dev-Variables"
     jobs:
       - deployment: DevDeployApp
         displayName: "Dev - deploy terraform and dotnet App"
@@ -228,7 +287,6 @@ stages:
           clean: all
         variables:
           - group: "ESS-Deployment-Variables-DEV"
-          - group: "ESS-Dev-Variables"
           - name: "ESSAzureADConfiguration.ClientId"
             value: $(ESSClientId)
           - name: "ESSAzureADConfiguration.TenantId"
@@ -255,16 +313,6 @@ stages:
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Fleet Manager Dev/Test"
-                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
@@ -298,8 +346,31 @@ stages:
                     testRunTitle: "Dev-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
+      - deployment: APIMDevDeploy
+        displayName: "Dev - APIM Deploy"
+        environment: "Ess-Dev"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Fleet Manager Dev/Test"
+                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                    APIMServiceInstance: $(APIM_SERVICE_NAME)
+                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+
   - stage: QAdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
+    variables:
+      - group: "ESS-QA-Variables"
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: QADeployApp
@@ -311,7 +382,6 @@ stages:
           clean: all
         variables:
           - group: "ESS-Deployment-Variables-QA"
-          - group: "ESS-QA-Variables"
           - name: "ESSAzureADConfiguration.ClientId"
             value: $(ESSClientId)
           - name: "ESSAzureADConfiguration.TenantId"
@@ -338,16 +408,6 @@ stages:
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "Fleet Manager Dev/Test"
-                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                      
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
@@ -381,9 +441,32 @@ stages:
                     testRunTitle: "QA-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
+      - deployment: APIMQADeploy
+        displayName: "QA - APIM Deploy"
+        environment: "Ess-Qa"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Fleet Manager Dev/Test"
+                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                    APIMServiceInstance: $(APIM_SERVICE_NAME)
+                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+
   - stage: Livedeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    variables:
+      - group: "ESS-Live-Variables"
     jobs:
       - deployment: LiveDeployApp
         displayName: Live - deploy terraform and dotnet App
@@ -408,6 +491,17 @@ stages:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Live-A-008-02"
 
+      - deployment: APIMLiveDeploy
+        displayName: "Live - APIM Deploy"
+        environment: "Ess-Live"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        strategy:
+          runOnce:
+            deploy:
+              steps:
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
