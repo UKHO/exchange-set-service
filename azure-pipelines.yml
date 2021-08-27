@@ -275,8 +275,6 @@ stages:
 
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
-    variables:
-      - group: "ESS-Dev-Variables"
     jobs:
       - deployment: DevDeployApp
         displayName: "Dev - deploy terraform and dotnet App"
@@ -287,6 +285,7 @@ stages:
           clean: all
         variables:
           - group: "ESS-Deployment-Variables-DEV"
+          - group: "ESS-Dev-Variables"
           - name: "ESSAzureADConfiguration.ClientId"
             value: $(ESSClientId)
           - name: "ESSAzureADConfiguration.TenantId"
@@ -313,6 +312,16 @@ stages:
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Fleet Manager Dev/Test"
+                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                    APIMServiceInstance: $(APIM_SERVICE_NAME)
+                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
@@ -346,31 +355,8 @@ stages:
                     testRunTitle: "Dev-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-      - deployment: APIMDevDeploy
-        displayName: "Dev - APIM Deploy"
-        environment: "Ess-Dev"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Fleet Manager Dev/Test"
-                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
-
   - stage: QAdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
-    variables:
-      - group: "ESS-QA-Variables"
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: QADeployApp
@@ -382,6 +368,7 @@ stages:
           clean: all
         variables:
           - group: "ESS-Deployment-Variables-QA"
+          - group: "ESS-QA-Variables"
           - name: "ESSAzureADConfiguration.ClientId"
             value: $(ESSClientId)
           - name: "ESSAzureADConfiguration.TenantId"
@@ -408,6 +395,16 @@ stages:
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                     AzureSubscription: "Fleet Manager Dev/Test"
+                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                     APIMServiceInstance: $(APIM_SERVICE_NAME)
+                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                      
                 - task: DownloadBuildArtifacts@0
                   displayName: "Download Functional test Artifact"
@@ -441,32 +438,9 @@ stages:
                     testRunTitle: "QA-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-      - deployment: APIMQADeploy
-        displayName: "QA - APIM Deploy"
-        environment: "Ess-Qa"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Fleet Manager Dev/Test"
-                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
-
   - stage: Livedeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
-    variables:
-      - group: "ESS-Live-Variables"
     jobs:
       - deployment: LiveDeployApp
         displayName: Live - deploy terraform and dotnet App
@@ -491,17 +465,6 @@ stages:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
                     AzureSubscription: "Exchange-Set-Service-Live-A-008-02"
 
-      - deployment: APIMLiveDeploy
-        displayName: "Live - APIM Deploy"
-        environment: "Ess-Live"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        strategy:
-          runOnce:
-            deploy:
-              steps:
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
