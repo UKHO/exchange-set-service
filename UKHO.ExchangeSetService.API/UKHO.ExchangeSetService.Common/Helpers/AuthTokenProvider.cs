@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
-            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
+            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(1));
 
             lock (_lock)
             {
