@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var accessToken = GetFromCache(resource);
 
-            if (accessToken.AccessToken != null && accessToken.ExpiresIn > DateTime.UtcNow)
+            if (accessToken != null && accessToken.AccessToken != null && accessToken.ExpiresIn > DateTime.UtcNow)
             {
                 return accessToken.AccessToken;
             }
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
-            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(1));
+            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
 
             lock (_lock)
             {
