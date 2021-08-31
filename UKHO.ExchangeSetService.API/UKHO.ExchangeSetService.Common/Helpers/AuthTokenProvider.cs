@@ -40,7 +40,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var newAccessToken = await GetNewManagedIdentityAuthAsync(resource);
             AddToCache(resource, newAccessToken);
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}ms.", resource, newAccessToken.ExpiresIn.Millisecond);
 
             return newAccessToken.AccessToken;
         }
@@ -54,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return new AccessTokenItem
             {
-                ExpiresIn = DateTime.UtcNow.AddSeconds(accessToken.ExpiresOn.Millisecond),
+                ExpiresIn = DateTime.UtcNow.AddSeconds(accessToken.ExpiresOn.Second),
                 AccessToken = accessToken.Token
             };
         }
@@ -67,6 +66,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 _cache.SetString(key, JsonConvert.SerializeObject(accessTokenItem), options);
             }
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}.", key, JsonConvert.SerializeObject(options));
         }
 
         private AccessTokenItem GetFromCache(string key)
