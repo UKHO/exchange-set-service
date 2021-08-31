@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual("batch", exchangeSetBatchStatusUri[3], $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
 
 
-            var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 1];
+            var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 2];
 
             bool hasGUID = Guid.TryParse(batchID, out Guid guidIdBatch);
 
