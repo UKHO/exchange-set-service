@@ -35,6 +35,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             if (accessToken != null && accessToken.AccessToken != null && accessToken.ExpiresIn > DateTime.UtcNow)
             {
+                logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached token is used for resource {resource} and expires in {ExpiresIn} with token {accessTokenItem}.", resource, JsonConvert.ToString(accessToken.ExpiresIn), JsonConvert.SerializeObject(accessToken));
                 return accessToken.AccessToken;
             }
 
@@ -66,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 _cache.SetString(key, JsonConvert.SerializeObject(accessTokenItem), options);
             }
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}.", key, JsonConvert.SerializeObject(options));
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn} with token {accessTokenItem}.", key, JsonConvert.SerializeObject(options), JsonConvert.SerializeObject(accessTokenItem));
         }
 
         private AccessTokenItem GetFromCache(string key)
