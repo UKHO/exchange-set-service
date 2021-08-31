@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 _cache.SetString(key, JsonConvert.SerializeObject(accessTokenItem), options);
             }
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}.", key, JsonConvert.SerializeObject(options), JsonConvert.SerializeObject(accessTokenItem.ExpiresIn));
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}.", key, JsonConvert.ToString(accessTokenItem.ExpiresIn));
         }
 
         private AccessTokenItem GetFromCache(string key)
