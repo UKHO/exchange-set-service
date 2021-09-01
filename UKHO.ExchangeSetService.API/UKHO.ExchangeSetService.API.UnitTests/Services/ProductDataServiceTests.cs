@@ -72,6 +72,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
             {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+            };
+            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new LinkSetBatchDetailsUri()
+            {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             };
             LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
@@ -81,6 +85,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Common.Models.Response.Links links = new Common.Models.Response.Links()
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
+                ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
                 ExchangeSetFileUri = linkSetFileUri
             };
             List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
@@ -215,7 +220,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ResponseBody = new CreateBatchResponseModel()
                 {
                     BatchId = batchId,
-                    BatchStatusUri = $"http://fss.ukho.gov.uk/batch/{batchId}",
+                    BatchStatusUri = $"http://fss.ukho.gov.uk/batch/{batchId}/status",
+                    ExchangeSetBatchDetailsUri = $"http://fss.ukho.gov.uk/batch/{batchId}",
                     ExchangeSetFileUri = $"http://fss.ukho.gov.uk/batch/{batchId}/files/exchangeset123.zip",
                     BatchExpiryDateTime = "2021-02-17T16:19:32.269Z"
                 },
@@ -356,6 +362,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchStatusUri, result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri);
+            Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchDetailsUri, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
         }
@@ -533,7 +540,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             var azureAdB2CToken = GetAzureAdB2CToken();
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored,A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
@@ -578,6 +585,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchStatusUri, result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri);
+            Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchDetailsUri, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
         }
@@ -649,7 +657,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var azureADToken = GetAzureADToken();
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.BadRequest;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored,A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
@@ -832,6 +840,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchStatusUri, result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri);
+            Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchDetailsUri, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
         }

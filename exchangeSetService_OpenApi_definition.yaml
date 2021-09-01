@@ -316,9 +316,12 @@ components:
           type: object
           required:
             - "exchangeSetBatchStatusUri"
+            - "exchangeSetBatchDetailsUri"
             - "exchangeSetFileUri"
           properties:
             exchangeSetBatchStatusUri:
+              $ref: "#/components/schemas/link"
+            exchangeSetBatchDetailsUri:
               $ref: "#/components/schemas/link"
             exchangeSetFileUri:
               $ref: "#/components/schemas/link"
@@ -355,6 +358,8 @@ components:
       example:
         _links:
           exchangeSetBatchStatusUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+          exchangeSetBatchDetailsUri:
             href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
           exchangeSetFileUri:
             href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
@@ -524,9 +529,13 @@ components:
         data:
           _links:
             exchangeSetBatchStatusUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+            exchangeSetBatchDetailsUri:
               href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             exchangeSetFileUri:
               href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+            errorFileUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/error.txt"
           exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
           requestedProductCount: 22
           exchangeSetCellCount: 15
