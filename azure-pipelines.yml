@@ -26,7 +26,7 @@ variables:
   - name: UKHOAssemblyProduct
     value: "Exchange Set Service"
   - name: UKHOAssemblyCopyright
-    value: "Copyright © UK Hydrographic Office"
+    value: "Copyright Â© UK Hydrographic Office"
   - name: Container
     value: "ukhydrographicoffice/terraform-azure-powershell-unzip:0.14.9"
   - name: DeploymentPool
@@ -205,7 +205,22 @@ stages:
             inputs:
               PathtoPublish: '$(Build.SourcesDirectory)\Deployment'
               ArtifactName: terraformartifact
+          
+          - task: ArchiveFiles@2
+            displayName: "Zip Load Tests"
+            inputs:
+              rootFolderOrFile: '$(Build.SourcesDirectory)/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.LoadTests'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/loadtests/loadtests.zip'
+              replaceExistingArchive: true
 
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Load Tests"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/loadtests/'
+              ArtifactName: LoadTests
+              
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
