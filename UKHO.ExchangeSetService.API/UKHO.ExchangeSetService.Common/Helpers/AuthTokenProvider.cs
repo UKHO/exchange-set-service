@@ -39,13 +39,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 return accessToken.AccessToken;
             }
 
-            var newAccessToken = await GetNewManagedIdentityAuthAsync(resource);
+            var newAccessToken = await GetNewAuthToken(resource);
             AddToCache(resource, newAccessToken);
 
             return newAccessToken.AccessToken;
         }
 
-        private async Task<AccessTokenItem> GetNewManagedIdentityAuthAsync(string resource)
+        private async Task<AccessTokenItem> GetNewAuthToken(string resource)
         {
             var tokenCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityConfiguration.Value.ClientId });
             var accessToken = await tokenCredential.GetTokenAsync(
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
-            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
+            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(accessTokenItem.ExpiresIn.Minute - essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
 
             lock (_lock)
             {
