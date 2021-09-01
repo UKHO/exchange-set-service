@@ -62,7 +62,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
             Assert.AreEqual("duplicateProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'duplicateProduct'");
-           
         }
 
         public static async Task CheckFssBatchResponse(this HttpResponseMessage apiresponse)
@@ -79,7 +78,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual("batch", exchangeSetBatchStatusUri[3], $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
 
 
-            var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 1];
+            var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 2];
 
             bool hasGUID = Guid.TryParse(batchID, out Guid guidIdBatch);
 
