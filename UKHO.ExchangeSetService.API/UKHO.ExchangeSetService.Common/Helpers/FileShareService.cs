@@ -169,6 +169,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             EditionNumber = itemProduct.EditionNumber,
                             ProductName = itemProduct.ProductName,
                             Cancellation = itemProduct.Cancellation,
+                            Dates = itemProduct.Dates,
                             FileSize = itemProduct.FileSize,
                             UpdateNumbers = new List<int?> { itemUpdateNumber }
                         });
