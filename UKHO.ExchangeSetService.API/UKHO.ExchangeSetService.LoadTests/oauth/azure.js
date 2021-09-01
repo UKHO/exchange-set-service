@@ -19,7 +19,7 @@ export function authenticateUsingAzure(tenantId, clientId, clientSecret, scope, 
 
   if (typeof resource == 'string') {
     url = `https://login.microsoftonline.com/${tenantId}/oauth2/token`;
-    requestBody['grant_type'] = 'Implicit';
+      requestBody['grant_type'] = 'client_credentials';
     requestBody['resource'] = resource;
   } else {
     throw 'resource should be either a string or an object containing username and password';
