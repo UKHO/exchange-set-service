@@ -13,41 +13,36 @@ const productIdentifierData_Large = dataHelper.GetProductIdentifierDataforLargeE
 let clientAuthResp = {};
 
 export let options = {
-    discardResponseBodies: true,
     scenarios: {
         ESSCreationSmallExchangeSet: {
             exec: 'ESSCreationSmallExchangeSet',
             executor: 'per-vu-iterations',
-            tags: { EssCreation: 'SmallExchangeSet' },
             startTime: '10s',
             gracefulStop: '5s',
-            vus: 1,
-            iterations: 5,
-            maxDuration: '5m'
+            vus: 25,
+            iterations: 161,
+            maxDuration: '1h'
         },
         ESSCreationMediumExchangeSet: {
             exec: 'ESSCreationMediumExchangeSet',
             executor: 'per-vu-iterations',
-            tags: { EssCreation: 'MediumExchangeSet' },
             startTime: '10s',
             gracefulStop: '5s',
-            vus: 1,
-            iterations: 2,
-            maxDuration: '5m'
+            vus: 5,
+            iterations: 161,
+            maxDuration: '1h'
         },
         ESSCreationLargeExchangeSet: {
             exec: 'ESSCreationLargeExchangeSet',
             executor: 'per-vu-iterations',
-            tags: { EssCreation: 'LargeExchangeSet' },
             startTime: '10s',
             gracefulStop: '5s',
             vus: 1,
-            iterations: 1,
-            maxDuration: '5m'
+            iterations: 170,
+            maxDuration: '1h'
         },
     },
 };
-
 export function setup() {
     // client credentials authentication flow
      let essAuthResp = authenticateUsingAzure(
@@ -63,16 +58,28 @@ export function setup() {
     return clientAuthResp;
 }
 
-export function ESSCreationSmallExchangeSet() {
-    runTestProductIdentifier.ESSCreation(clientAuthResp, productIdentifierData_Small);
+export function ESSCreationSmallExchangeSet(clientAuthResp) {
+    var group_duration = apiClient.GetGroupDuration('SmallEssCreation', () => {
+        runTestProductIdentifier.ESSCreation(clientAuthResp, productIdentifierData_Small, "Small");
+    });
+    SmallExchangeSetCreationTrend.add(group_duration);
+    sleep(1);
 }
 
-export function ESSCreationMediumExchangeSet() {
-    runTestProductIdentifier.ESSCreation(clientAuthResp, productIdentifierData_Medium);
+export function ESSCreationMediumExchangeSet(clientAuthResp) {
+    var group_duration = apiClient.GetGroupDuration('MediumEssCreation', () => {
+        runTestProductIdentifier.ESSCreation(clientAuthResp, productIdentifierData_Medium, "Medium");
+    });
+    MediumExchangeSetCreationTrend.add(group_duration);
+    sleep(1);
 }
 
-export function ESSCreationLargeExchangeSet() {
-    runTestProductIdentifier.ESSCreation(clientAuthResp, productIdentifierData_Large);
+export function ESSCreationLargeExchangeSet(clientAuthResp) {
+    var group_duration = apiClient.GetGroupDuration('LargeEssCreation', () => {
+        runTestProductIdentifier.ESSCreation(clientAuthResp, productIdentifierData_Large, "Large");
+    });
+    LargeExchangeSetCreationTrend.add(group_duration);
+    sleep(1);
 }
 
 export function handleSummary(data) {

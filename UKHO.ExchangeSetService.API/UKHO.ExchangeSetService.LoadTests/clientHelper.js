@@ -3,21 +3,26 @@ import { check, group } from 'k6';
 import { Trend } from 'k6/metrics';
 
 const config = JSON.parse(open('./config.json'));
-let ESSApiTrend = new Trend('EssApi_time');
 
-export function GetESSApiResponse(endPoint, data, essToken) {
+let SmallExchangeSetTrend = new Trend('SmallEssApiResponsetime');
+let LargeExchangeSetTrend = new Trend('LargeEssApiResponsetime');
+let MediumExchangeSetTrend = new Trend('MediumEssApiResponsetime');
+
+export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
     let essResponse;
     var essUrl = `${config.Base_URL}/productData/${endPoint}`;
     group('ESS Api Response', () => {
         essResponse = http.post(essUrl, JSON.stringify(data), { headers: { Authorization: `Bearer ${essToken}`, "Content-Type": "application/json" } });
     });
-    console.log("essResponse", JSON.stringify(essResponse))
     check(essResponse, {
         'is ESS status 200': (essResponse) => essResponse.status === 200,
     });
 
-    ESSApiTrend.add(essResponse.timings.waiting);
-    console.log("ESSApiTrend", ESSApiTrend.name);
+    switch (exchangeSetType) {
+        case "Small": SmallExchangeSetTrend.add(essResponse.timings.waiting); break;
+        case "Medium": MediumExchangeSetTrend.add(essResponse.timings.waiting); break;
+        case "Large": LargeExchangeSetTrend.add(essResponse.timings.waiting); break;
+    }
 
     let jsonResponse = JSON.parse(essResponse.body);
     let batchStatusUrl = JSON.stringify(jsonResponse['_links']['exchangeSetBatchStatusUri']['href']);
@@ -33,3 +38,9 @@ export function GetFSSApiResponse(url, fssToken) {
 
     return fssCommitStatus;
 };
+
+export function GetGroupDuration(groupName, f) {
+    var start = new Date();
+    group(groupName, f);
+    return new Date() - start;
+}
