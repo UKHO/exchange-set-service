@@ -36,19 +36,11 @@ stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
     jobs:
-      - job:
+      - job: Dependencychecker
         workspace:
-          clean: all # what to clean up before the job runs outputs | resources | all
-        displayName: "DependencyChecker Dotnet Build test publish"
-
+          clean: all
+        displayName: "Dependencychecker"
         steps:
-          - task: PowerShell@2
-            displayName: "Set assembly version numbers based on build ID"
-            inputs:
-              targetType: filePath
-              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
-              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
-
           - task: UseDotNet@2
             displayName: 'Use .NET Core 3.1.x sdk'
             inputs:
@@ -90,6 +82,18 @@ stages:
                 param($ReportLocation)
                 Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
+      - job: UnitTestsAndCodeCoverage
+        workspace:
+          clean: all
+        displayName: "Dotnet Test and Publish Code Coverage"
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore test projects only"
             inputs:
@@ -100,13 +104,6 @@ stages:
               nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
               packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
-
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet build task"
-            inputs:
-              command: "build"
-              projects: "**/*.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: "dotnet test - Perform Unit Tests"
@@ -130,20 +127,42 @@ stages:
               PathtoPublish: "$(Build.ArtifactStagingDirectory)/codecoveragereport"
               ArtifactName: codecoveragereport
 
-          - task: DotNetCoreCLI@2
-            displayName: "Publish functional test"
+      - job: BuildAndPublishAPI
+        workspace:
+          clean: all
+        displayName: "Dotnet Build publish API"
+        steps:
+          - task: PowerShell@2
+            displayName: "Set assembly version numbers based on build ID"
             inputs:
-              command: "publish"
-              publishWebProjects: false
-              projects: "**/*UKHO.ExchangeSetService.API.FunctionalTests.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
-              zipAfterPublish: false
+              targetType: filePath
+              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
+              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Functional test Artifact"
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
-              ArtifactName: functionaltests
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore"
+            inputs:
+              command: restore
+              projects: |
+                **/*.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build task"
+            inputs:
+              command: "build"
+              projects: "**/*.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: "Publish WebAPI"
@@ -195,6 +214,44 @@ stages:
             inputs:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService'
               ArtifactName: ExchangeSetService
+
+      - job: PublishFunctionalTestsAndTerraform
+        workspace:
+          clean: all
+        displayName: "Publish Functional Tests And Terraform"
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore"
+            inputs:
+              command: restore
+              projects: |
+                **/*.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish functional test"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: "**/*UKHO.ExchangeSetService.API.FunctionalTests.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              zipAfterPublish: false
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Functional test Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
+              ArtifactName: functionaltests
 
           - task: CopyFiles@2
             displayName: Copy EssFulfilment Config
