@@ -7,11 +7,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public interface IFulfilmentFileShareService
     {
-        Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, string correlationId);
-        Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponses, string exchangeSetRootPath);
+        Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products,string batchId, string correlationId);
+        Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponse, string exchangeSetRootPath);
         Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
         Task<string> SearchReadMeFilePath(string batchId, string correlationId);
-        bool CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
+        Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
         Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath,string correlationId);
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -56,7 +57,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 Type = "test",
                 Source = "test",
                 Subject = "test",
-                Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+                Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                 DataContentType = "application/json",
                 Data = new ExchangeSetResponse()
             };
@@ -111,7 +112,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenIncorrectCallBackPayloadInRequest_ThenCallBackApiIsNotCalled()
         {
-            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = 0;
+            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
 
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string uri) =>
@@ -137,6 +138,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
+        public async Task WhenCallBackApiSocketExceptionFound_ThenSendCallBackResponseReturnsFalse()
+        {
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+              .Throws(new SocketException());
+
+            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
         public async Task WhenCallBackUriInRequest_ThenSendCallBackResponseReturnsTrue()
         {
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -148,6 +160,61 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                });
 
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsTrue(response);
+        }
+
+        [Test]
+        public async Task WhenIncorrectCallBackPayloadErrorInRequest_ThenCallBackApiIsNotCalled()
+        {
+            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
+
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string uri) =>
+               {
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+               });
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
+        public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsFalse()
+        {
+            scsResponseQueueMessage.CallbackUri = "";
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
+        public async Task WhenCallBackApiSocketExceptionFound_ThenSendCallBackErrorResponseReturnsFalse()
+        {
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+              .Throws(new SocketException());
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
+
+            Assert.IsFalse(response);
+        }
+
+        [Test]
+        public async Task WhenCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsTrue()
+        {
+            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string uri) =>
+               {
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+               });
+
+            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
             Assert.IsTrue(response);
         }

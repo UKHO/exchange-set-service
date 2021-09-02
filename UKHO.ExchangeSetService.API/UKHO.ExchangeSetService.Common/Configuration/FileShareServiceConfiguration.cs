@@ -29,5 +29,6 @@
         public string CommentVersion { get; set; }
         public int BatchCommitCutOffTimeInMinutes { get; set; }
         public int BatchCommitDelayTimeInMilliseconds { get; set; }
+        public string ErrorFileName { get; set; }
     }
 }

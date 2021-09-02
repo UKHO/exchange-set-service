@@ -44,6 +44,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         {
             LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
             {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+            };
+            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new LinkSetBatchDetailsUri()
+            {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             };
             LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
@@ -53,6 +57,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Links links = new Links()
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
+                ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
                 ExchangeSetFileUri = linkSetFileUri
             };
             List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
@@ -446,7 +451,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ErrorCode = HttpStatusCode.BadRequest.ToString()
             };
 
-            var exchangeSetResponse = new ExchangeSetResponse(){  };
+            var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,

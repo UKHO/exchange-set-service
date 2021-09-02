@@ -34,17 +34,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
         {
-           var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData());
-            
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData());
+
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
         [Test]
         public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);            
+            string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), accessToken: tamperedEssJwtToken);
-                      
+
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
@@ -75,19 +75,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
+        public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenAInternalServerErrorResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
 
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
-
-            //verify model structure
-            await apiResponse.CheckModelStructureForSuccessResponse();
-            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
-
-            Assert.AreEqual("GB123789", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB123789'");
-            Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
+            Assert.AreEqual(500, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 500.");
 
         }
 

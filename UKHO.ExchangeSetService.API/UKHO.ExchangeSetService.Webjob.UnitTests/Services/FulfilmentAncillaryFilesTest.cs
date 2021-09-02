@@ -28,6 +28,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public string fakeFileName = "test.txt";
         readonly FakeFileHelper fakeFileHelper = new FakeFileHelper();
         public string fakeExchangeSetInfoPath = @"C:\\HOME";
+        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
         [SetUp]
         public void Setup()
@@ -139,12 +140,69 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
-        [Test]
-        public async Task WhenInvalidCreateSerialEncFileRequest_ThenReturnFalseResponse()
+        #region GetSalesCatalogueProductResponse
+        private SalesCatalogueProductResponse GetSalesCatalogueProductResponse()
         {
-            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetPath, null);
+            return new SalesCatalogueProductResponse
+            {                
 
-            Assert.AreEqual(false, response);
+                Products = new List<Products>() {                    
+                    new Products
+                    {
+                        ProductName = "10000002",
+                        EditionNumber = 10,
+                        UpdateNumbers = new List<int?>{3,4},
+                        Dates = new List<Dates> {
+                            new Dates {UpdateNumber=3, UpdateApplicationDate = DateTime.Today , IssueDate = DateTime.Today },                            
+                        },
+                        Cancellation = new Cancellation
+                        {
+                            EditionNumber= 9,
+                            UpdateNumber =3
+                        },
+                        FileSize = 2800
+                    },
+                    new Products
+                    {
+                        ProductName = "10000003",
+                        EditionNumber = 10,
+                        UpdateNumbers = new List<int?>{3,4},
+                         Dates = new List<Dates> {
+                            new Dates {UpdateNumber=3, IssueDate = DateTime.Today },
+                            new Dates {UpdateNumber=4, IssueDate = DateTime.UtcNow },
+                        },
+                        Cancellation = new Cancellation
+                        {
+                            EditionNumber= 4,
+                            UpdateNumber =3
+                        },
+                        FileSize = 5300
+                    }
+                },
+                ProductCounts = new ProductCounts
+                {
+                    RequestedProductCount = 6,
+                    RequestedProductsAlreadyUpToDateCount = 8,
+                    ReturnedProductCount = 2,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>
+                    {
+                        new RequestedProductsNotReturned { ProductName = "10000002", Reason = "productWithdrawn" },
+                        new RequestedProductsNotReturned { ProductName = "10000003", Reason = "invalidProduct"}
+                    }
+                }
+            };
+        }
+        #endregion
+        [Test]
+        public void WhenInvalidCreateSerialEncFileRequest_ThenReturnFulfilmentException()
+        {
+            fakeExchangeSetPath = @"C:\\HOME";
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null); });
         }
 
         [Test]
@@ -153,6 +211,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeExchangeSetPath = @"C:\\HOME";
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
             var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(fakeBatchId, fakeExchangeSetPath, null);
 
@@ -162,13 +221,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         #region CreateProductFile
 
         [Test]
-        public async Task WhenInvalidCreateProductFileRequest_ThenReturnFalseResponseAsync()
+        public void WhenInvalidCreateProductFileRequest_ThenReturnFulfilmentException()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
-            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
-
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse); });
         }
 
         [Test]
@@ -195,7 +253,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             byte[] byteContent = new byte[100];
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            var fulfilmentDataResponses = new List<FulfilmentDataResponse>() {
+            var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000002", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() },
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() }
             };
@@ -206,7 +265,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponses, salesCatalogueDataResponse);
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.AreEqual(true, response);
             Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
@@ -215,13 +274,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInvalidCreateCatalogFileRequest_ThenReturnFalseReponse()
+        public void WhenInvalidCreateCatalogFileRequest_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null, null);
-
-            Assert.AreEqual(false, response);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null, null, null); });
             Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
             Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
         }

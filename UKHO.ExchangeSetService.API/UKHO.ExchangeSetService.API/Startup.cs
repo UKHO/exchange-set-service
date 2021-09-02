@@ -30,6 +30,7 @@ using System.Net.Http.Headers;
 using UKHO.ExchangeSetService.Common.Storage;
 using Microsoft.AspNetCore.Authorization;
 using UKHO.ExchangeSetService.Common.HealthCheck;
+using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -115,6 +116,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
             services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddApplicationInsightsTelemetry();
 
             services.AddHeaderPropagation(options =>
             {
@@ -123,6 +125,8 @@ namespace UKHO.ExchangeSetService.API
 
             services.Configure<SalesCatalogueConfiguration>(configuration.GetSection("SalesCatalogue"));
 
+            var retryCount = Convert.ToInt32(configuration["RetryConfiguration:RetryCount"]);
+            var sleepDuration = Convert.ToDouble(configuration["RetryConfiguration:SleepDuration"]);
             services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
                 {
                     client.BaseAddress = new Uri(configuration["SalesCatalogue:BaseUrl"]);
@@ -131,7 +135,7 @@ namespace UKHO.ExchangeSetService.API
                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                 }
             )
-            .AddHeaderPropagation();
+            .AddHeaderPropagation().AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), "Sales Catalogue", EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
 
             services.Configure<FileShareServiceConfiguration>(configuration.GetSection("FileShareService"));
             services.Configure<EssManagedIdentityConfiguration>(configuration.GetSection("ESSManagedIdentity"));
@@ -146,10 +150,11 @@ namespace UKHO.ExchangeSetService.API
                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                 }
             )
-            .AddHeaderPropagation();
+            .AddHeaderPropagation().AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
             services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             services.AddScoped<IFileShareService, FileShareService>();
             services.AddScoped<IProductDataService, ProductDataService>();
+            services.AddScoped<IMonitorHelper, MonitorHelper>();
             services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
             services.AddScoped<IProductDataProductVersionsValidator, ProductDataProductVersionsValidator>();
             services.AddScoped<IProductDataSinceDateTimeValidator, ProductDataSinceDateTimeValidator>();
@@ -158,11 +163,17 @@ namespace UKHO.ExchangeSetService.API
             services.AddSingleton<ISmallExchangeSetInstance, SmallExchangeSetInstance>();
             services.AddSingleton<IMediumExchangeSetInstance, MediumExchangeSetInstance>();
             services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
+            services.AddScoped<IAzureWebJobsHealthCheckClient, AzureWebJobsHealthCheckClient>();
+            services.AddScoped<IAzureWebJobsHealthCheckService, AzureWebJobsHealthCheckService>();
+            services.AddSingleton<IWebJobsAccessKeyProvider>(s => new WebJobsAccessKeyProvider(configuration));
 
             services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 .AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
-                .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck");
+                .AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck")
+                .AddCheck<AzureBlobStorageHealthCheck>("AzureBlobStorageHealthCheck")
+                .AddCheck<AzureMessageQueueHealthCheck>("AzureMessageQueueHealthCheck")
+                .AddCheck<AzureWebJobsHealthCheck>("AzureWebJobsHealthCheck");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

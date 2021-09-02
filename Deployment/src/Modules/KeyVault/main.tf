@@ -59,9 +59,9 @@ resource "azurerm_key_vault_access_policy" "kv_read_access" {
 }
 
 resource "azurerm_key_vault_secret" "passed_in_secrets" {
-  for_each     = var.secrets
-  name         = each.key
-  value        = each.value
+  count        = length(var.secrets)
+  name         = keys(var.secrets)[count.index]
+  value        = values(var.secrets)[count.index]
   key_vault_id = azurerm_key_vault.kv.id
   tags         = var.tags
 
