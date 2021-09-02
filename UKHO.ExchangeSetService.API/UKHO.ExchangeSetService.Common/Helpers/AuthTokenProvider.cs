@@ -61,12 +61,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
-            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(accessTokenItem.ExpiresIn.Minute - essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
+            var result = (int)accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
+            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(result - essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
 
             lock (_lock)
             {
                 _cache.SetString(key, JsonConvert.SerializeObject(accessTokenItem), options);
-                logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}.", key, JsonConvert.ToString(accessTokenItem.ExpiresIn));
+                logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn} with Sliding Expiration duration {options}.", key, Convert.ToString(accessTokenItem.ExpiresIn), JsonConvert.SerializeObject(options));
             }
         }
 
