@@ -35,7 +35,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             if (accessToken != null && accessToken.AccessToken != null && accessToken.ExpiresIn > DateTime.UtcNow)
             {
-                logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached token is used for resource {resource} and expires in {ExpiresIn}.", resource, JsonConvert.ToString(accessToken.ExpiresIn));
                 return accessToken.AccessToken;
             }
 
@@ -61,13 +60,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
-            var result = (int)accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
-            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(result - essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
+            var tokenExpiryMinutes = (int)accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
+            var deductTokenExpiryMinutes = (essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes < tokenExpiryMinutes ? essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes : 1);
+            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tokenExpiryMinutes - deductTokenExpiryMinutes));
 
             lock (_lock)
             {
                 _cache.SetString(key, JsonConvert.SerializeObject(accessTokenItem), options);
-                logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn} with Sliding Expiration duration {options}.", key, Convert.ToString(accessTokenItem.ExpiresIn), JsonConvert.SerializeObject(options));
+                logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Caching new token for external end point resource {resource} and expires in {ExpiresIn} with sliding expiration duration {options}.", key, Convert.ToString(accessTokenItem.ExpiresIn), JsonConvert.SerializeObject(options));
             }
         }
 
