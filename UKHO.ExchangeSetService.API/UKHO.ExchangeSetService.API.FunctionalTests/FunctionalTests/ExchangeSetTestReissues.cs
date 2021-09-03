@@ -129,7 +129,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public void GlobalTeardown()
         {
             //Clean up downloaded files/folders   
