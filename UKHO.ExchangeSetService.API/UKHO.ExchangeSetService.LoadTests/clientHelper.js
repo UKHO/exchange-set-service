@@ -30,6 +30,28 @@ export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
     return batchStatusUrl;
 };
 
+export function GetESSApiResponseForSinceDateTime(sinceDateTime, essToken, exchangeSetType) {
+    let essResponse;
+    var essUrl = `${config.Base_URL}/productData?sinceDateTime=${sinceDateTime}`;
+    group('ESS Api Response', () => {
+        essResponse = http.post(essUrl, {}, { headers: { Authorization: `Bearer ${essToken}` } });
+    });
+    check(essResponse, {
+        'is ESS status 200': (essResponse) => essResponse.status === 200,
+    });
+
+    switch (exchangeSetType) {
+        case "Small": SmallExchangeSetTrend.add(essResponse.timings.waiting); break;
+        case "Medium": MediumExchangeSetTrend.add(essResponse.timings.waiting); break;
+        case "Large": LargeExchangeSetTrend.add(essResponse.timings.waiting); break;
+    }
+
+    let jsonResponse = JSON.parse(essResponse.body);
+    let batchStatusUrl = JSON.stringify(jsonResponse['_links']['exchangeSetBatchStatusUri']['href']);
+
+    return batchStatusUrl;
+}
+
 export function GetFSSApiResponse(url, fssToken) {
     let fssResponse = http.get(url, { headers: { Authorization: `Bearer ${fssToken}`, "Content-Type": "application/json" } });
 
