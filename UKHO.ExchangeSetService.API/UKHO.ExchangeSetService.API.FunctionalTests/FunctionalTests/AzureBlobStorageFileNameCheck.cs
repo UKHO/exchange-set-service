@@ -34,6 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
         /// When Api with Valid RFC1123DateTime is called
         /// </summary>
         [Test]
+        [Ignore("Ignore this test case for time being since data is not available in real SCS.")]
         public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenValidFileNameIsPresentInAzureStorage()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtToken);
