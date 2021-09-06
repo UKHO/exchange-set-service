@@ -33,19 +33,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var accessToken = GetFromCache(resource);
 
-            if (accessToken.AccessToken != null && accessToken.ExpiresIn > DateTime.UtcNow)
+            if (accessToken != null && accessToken.AccessToken != null && accessToken.ExpiresIn > DateTime.UtcNow)
             {
                 return accessToken.AccessToken;
             }
 
-            var newAccessToken = await GetNewManagedIdentityAuthAsync(resource);
+            var newAccessToken = await GetNewAuthToken(resource);
             AddToCache(resource, newAccessToken);
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Cached new token for external end point resource {resource} and expires in {ExpiresIn}ms.", resource, newAccessToken.ExpiresIn.Millisecond);
 
             return newAccessToken.AccessToken;
         }
 
-        private async Task<AccessTokenItem> GetNewManagedIdentityAuthAsync(string resource)
+        private async Task<AccessTokenItem> GetNewAuthToken(string resource)
         {
             var tokenCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityConfiguration.Value.ClientId });
             var accessToken = await tokenCredential.GetTokenAsync(
@@ -54,18 +53,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return new AccessTokenItem
             {
-                ExpiresIn = DateTime.UtcNow.AddSeconds(accessToken.ExpiresOn.Millisecond),
+                ExpiresIn = DateTime.UtcNow.AddMinutes(accessToken.ExpiresOn.Minute),
                 AccessToken = accessToken.Token
             };
         }
 
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
-            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(essManagedIdentityConfiguration.Value.TokenExpiryTimeInMinutes));
+            var tokenExpiryMinutes = (int)accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
+            var deductTokenExpiryMinutes = (essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes < tokenExpiryMinutes ? essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes : 1);
+            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tokenExpiryMinutes - deductTokenExpiryMinutes));
+            options.SetAbsoluteExpiration(accessTokenItem.ExpiresIn);
 
             lock (_lock)
             {
                 _cache.SetString(key, JsonConvert.SerializeObject(accessTokenItem), options);
+                logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Caching new token for external end point resource {resource} and expires in {ExpiresIn} with sliding expiration duration {options}.", key, Convert.ToString(accessTokenItem.ExpiresIn), JsonConvert.SerializeObject(options));
             }
         }
 

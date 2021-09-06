@@ -41,7 +41,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
             bool checkFileNameExistInContainer = await AzureBlobStorageCheck.CheckIfFileNameExist(Config.EssStorageAccountConnectionString, apiResponse);
-            Assert.IsTrue(checkFileNameExistInContainer);
+            Assert.IsTrue(checkFileNameExistInContainer, $"File name does not exist in the specified container path {Config.EssStorageAccountConnectionString}.");
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             bool checkFileNameExistInContainer = await AzureBlobStorageCheck.CheckIfFileNameExist(Config.EssStorageAccountConnectionString, apiResponse);
-            Assert.IsTrue(checkFileNameExistInContainer);
+            Assert.IsTrue(checkFileNameExistInContainer, $"File name does not exist in the specified container path {Config.EssStorageAccountConnectionString}.");
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
 
             bool checkFileNameExistInContainer = await AzureBlobStorageCheck.CheckIfFileNameExist(Config.EssStorageAccountConnectionString, apiResponse);
-            Assert.IsTrue(checkFileNameExistInContainer);
+            Assert.IsTrue(checkFileNameExistInContainer, $"File name does not exist in the specified container path {Config.EssStorageAccountConnectionString}.");
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
 
             bool checkFileNameExistInContainer = await AzureBlobStorageCheck.CheckIfFileNameExist(Config.EssStorageAccountConnectionString, apiResponse);
-            Assert.IsTrue(checkFileNameExistInContainer);
+            Assert.IsTrue(checkFileNameExistInContainer, $"File name does not exist in the specified container path {Config.EssStorageAccountConnectionString}.");
         }
 
     }

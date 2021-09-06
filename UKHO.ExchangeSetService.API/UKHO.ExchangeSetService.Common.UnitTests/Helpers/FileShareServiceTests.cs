@@ -70,7 +70,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             return new CreateBatchResponseModel()
             {
                 BatchId = batchId,
-                BatchStatusUri = $"http://tempuri.org/batch/{batchId}",
+                BatchStatusUri = $"http://tempuri.org/batch/{batchId}/status",
+                ExchangeSetBatchDetailsUri = $"http://tempuri.org/batch/{batchId}",
                 ExchangeSetFileUri = $"http://tempuri.org/batch/{batchId}/files/",
                 BatchExpiryDateTime = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
             };
@@ -202,6 +203,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
             Assert.AreEqual(createBatchResponse.BatchStatusUri, response.ResponseBody.BatchStatusUri);
+            Assert.AreEqual(createBatchResponse.ExchangeSetBatchDetailsUri, response.ResponseBody.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(createBatchResponse.ExchangeSetFileUri, response.ResponseBody.ExchangeSetFileUri);
         }
 

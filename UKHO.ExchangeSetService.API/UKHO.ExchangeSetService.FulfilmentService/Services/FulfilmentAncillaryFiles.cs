@@ -144,7 +144,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         private string SetCatalogFileComment(FulfilmentDataResponse listItem, SalesCatalogueDataProductResponse salescatalogProduct, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
-            string getIssueAndUpdateDate = null;            
+            string getIssueAndUpdateDate = null;
+            int? cancelledUpdateNumber = null;
             var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
 
             if (salescatalogProductResponse.Dates != null)
@@ -152,9 +153,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
                 getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
             }
+            if (salescatalogProductResponse.Cancellation != null)
+            {
+                cancelledUpdateNumber = salescatalogProductResponse.Cancellation.UpdateNumber;
+            }
 
             //BoundingRectangle and Comment only required for BIN
-            return salescatalogProduct.BaseCellEditionNumber == 0 && salescatalogProduct.LatestUpdateNumber == listItem.UpdateNumber
+            return salescatalogProduct.BaseCellEditionNumber == 0 && cancelledUpdateNumber == listItem.UpdateNumber
                 ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
                 : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";             
         }

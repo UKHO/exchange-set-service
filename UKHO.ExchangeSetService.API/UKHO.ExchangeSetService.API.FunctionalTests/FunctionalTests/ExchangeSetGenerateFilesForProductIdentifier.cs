@@ -9,7 +9,6 @@ using System.Net.Http;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    [Ignore("Ignore all tests since SCS responses are intermittent, returns 503")]
     class ExchangeSetGenerateFilesForProductIdentifier
     {
         private string EssJwtToken { get; set; }
@@ -40,7 +39,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test since SCS stub responses are intermittent")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
@@ -66,12 +64,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test since SCS stub responses are intermittent")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
-           
+
             //Verify Catalog file content
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
@@ -94,7 +91,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test since SCS stub responses are intermittent")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreDownloaded()
         {
             //Get the product details form sales catalogue service

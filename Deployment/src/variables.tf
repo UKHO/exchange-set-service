@@ -12,7 +12,7 @@ locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
   web_app_name		    = "${local.service_name}-${local.env_name}-webapp"
-  key_vault_name		= "${local.service_name}-${local.env_name}-kv"
+  key_vault_name		= "${local.service_name}-ukho-${local.env_name}-kv"
   tags = {
     SERVICE          = "Exchange Set Service"
     ENVIRONMENT      = local.env_name

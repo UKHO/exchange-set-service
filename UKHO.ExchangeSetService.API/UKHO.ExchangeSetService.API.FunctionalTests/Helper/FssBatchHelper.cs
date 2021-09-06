@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 await Task.Delay(5000);
                 var batchStatusResponse = await FssApiClient.GetBatchStatusAsync(batchStatusUri, jwtToken);
-                Assert.AreEqual(200,(int)batchStatusResponse.StatusCode);
+                Assert.AreEqual(200,(int)batchStatusResponse.StatusCode, $"Incorrect status code is returned {batchStatusResponse.StatusCode}, instead of the expected status 200.");
 
                 var batchStatusResponseObj = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(await batchStatusResponse.Content.ReadAsStringAsync());
                 batchStatus = batchStatusResponseObj.Status;
