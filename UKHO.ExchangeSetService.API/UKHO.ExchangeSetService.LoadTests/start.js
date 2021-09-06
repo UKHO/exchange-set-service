@@ -2,6 +2,8 @@ import http from "k6/http";
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 import { authenticateUsingAzure } from './oauth/azure.js';
+import { sleep } from 'k6';
+import { Trend } from 'k6/metrics';
 
 const runTestProductIdentifier = require('./LoadTestForProductIdentifier.js');
 const config = JSON.parse(open('./config.json'));
@@ -9,7 +11,9 @@ const dataHelper = require('./dataHelper.js');
 const productIdentifierData_Small = dataHelper.GetProductIdentifierDataforSmallExchangeSet();
 const productIdentifierData_Medium = dataHelper.GetProductIdentifierDataforMediumExchangeSet();
 const productIdentifierData_Large = dataHelper.GetProductIdentifierDataforLargeExchangeSet();
-
+let SmallExchangeSetCreationTrend = new Trend('SmallEssCreationtime');
+let MediumExchangeSetCreationTrend = new Trend('MediumEssCreationtime');
+let LargeExchangeSetCreationTrend = new Trend('LargeEssCreationtime');
 let clientAuthResp = {};
 
 export let options = {
