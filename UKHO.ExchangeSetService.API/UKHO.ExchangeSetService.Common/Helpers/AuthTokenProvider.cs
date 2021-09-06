@@ -63,6 +63,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var tokenExpiryMinutes = (int)accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
             var deductTokenExpiryMinutes = (essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes < tokenExpiryMinutes ? essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes : 1);
             var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tokenExpiryMinutes - deductTokenExpiryMinutes));
+            options.SetAbsoluteExpiration(accessTokenItem.ExpiresIn);
 
             lock (_lock)
             {
