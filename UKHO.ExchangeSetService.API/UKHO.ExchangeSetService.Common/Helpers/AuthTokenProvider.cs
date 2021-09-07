@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 new TokenRequestContext(scopes: new string[] { resource + "/.default" }) { }
             );
 
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Caching new token is valid for minutes {ExpiresOn} and DeductTokenExpiryMinutes {DeductTokenExpiryMinutes}.", Convert.ToString(accessToken.ExpiresOn), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Caching new token is valid for {ExpiresOn} datetime, {ExpiresOn}min or {ExpiresOn}sec {utcnow} and DeductTokenExpiryMinutes {DeductTokenExpiryMinutes}.", Convert.ToString(accessToken.ExpiresOn), Convert.ToString(accessToken.ExpiresOn.Minute), Convert.ToString(accessToken.ExpiresOn.Second), Convert.ToString(DateTime.UtcNow), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
             return new AccessTokenItem
             {
                 ExpiresIn = DateTime.UtcNow.AddMinutes(accessToken.ExpiresOn.Minute),
@@ -62,6 +62,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
             var tokenExpiryMinutes = (int)accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "accessTokenItem.ExpiresIn {ExpiresIn}, {UtcNow} and {DeductTokenExpiryMinutes}.", Convert.ToString(accessTokenItem.ExpiresIn), Convert.ToString(DateTime.UtcNow), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
             var deductTokenExpiryMinutes = (essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes < tokenExpiryMinutes && essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes > 0 ? essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes : 1);
             var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tokenExpiryMinutes - deductTokenExpiryMinutes));
             options.SetAbsoluteExpiration(accessTokenItem.ExpiresIn);
