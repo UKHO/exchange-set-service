@@ -284,7 +284,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         }
                         if (item.Cancellation != null && item.Cancellation.UpdateNumber == updateNumberItem.Value)
                         {
-                            cancellation.Append(index == 1 ? " (" : " or (");////1st cancellation product
+                            cancellation.Append(" or (");////1st cancellation product
                             cancellation.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
                             cancellation.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.Cancellation.EditionNumber);
                             cancellation.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, item.Cancellation.UpdateNumber);
@@ -295,8 +295,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         index += 1;
                     }
                 }
-                sb.Append(productCount == productIndex ? ")" : ") or ");/////last product or with multiple
-                sb.Append(cancellation.ToString());
+                sb.Append(cancellation.ToString() + (productCount == productIndex ? ")" : ") or "));/////last product or with multiple
                 productIndex += 1;
             }
             sb.Append(")");//// last main )
