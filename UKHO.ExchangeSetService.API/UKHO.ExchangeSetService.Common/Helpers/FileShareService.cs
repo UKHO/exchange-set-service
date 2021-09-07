@@ -204,23 +204,37 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 foreach (var productItem in products)
                 {
-                    if (CheckProductDoesExistInResponseItem(item, productItem) && CheckEditionNumberDoesExistInResponseItem(item, productItem)
-                        && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
+                    var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
+                    var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
+                    var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
+
+                    if (!productList.Contains(compareProducts) && productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
+                        && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value)
                     {
-                        var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
-                        var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
-                        var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
-                        if (!productList.Contains(compareProducts))
+                        var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
+                        if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
                         {
-                            internalSearchBatchResponse.Entries.Add(item);
-                            productList.Add(compareProducts);
+                            CheckProductWithCancellationData(internalSearchBatchResponse, productList, item, productItem, compareProducts, matchEditionNumber);
                         }
+                    }
+                    else if (!productList.Contains(compareProducts) && CheckProductDoesExistInResponseItem(item, productItem)
+                        && CheckEditionNumberDoesExistInResponseItem(item, productItem) && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
+                    {
+                        internalSearchBatchResponse.Entries.Add(item);
+                        productList.Add(compareProducts);
                     }
                 }
                 uri = searchBatchResponse.Links.Next?.Href;
             }
 
             return uri;
+        }
+
+        private void CheckProductWithCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string compareProducts, List<Models.FileShareService.Response.Attribute> matchEditionNumber)
+        {
+            matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
+            internalSearchBatchResponse.Entries.Add(item);
+            productList.Add(compareProducts);
         }
 
         public bool CheckProductDoesExistInResponseItem(BatchDetail batchDetail, Products product)
@@ -250,10 +264,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var productIndex = 1;
             var productCount = products.Count;
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("(");////1st main (
             foreach (var item in products)
             {
+                var cancellation = new StringBuilder();
                 sb.Append("(");////1st product
                 sb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
                 sb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
@@ -267,12 +282,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         {
                             sb.Append("((");
                         }
+                        if (item.Cancellation != null && item.Cancellation.UpdateNumber == updateNumberItem.Value)
+                        {
+                            cancellation.Append(index == 1 ? " (" : " or (");////1st cancellation product
+                            cancellation.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
+                            cancellation.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.Cancellation.EditionNumber);
+                            cancellation.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, item.Cancellation.UpdateNumber);
+                            cancellation.Append(")");
+                        }
                         sb.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, updateNumberItem.Value);
                         sb.Append(lstCount != index ? "or " : "))");
                         index += 1;
                     }
                 }
                 sb.Append(productCount == productIndex ? ")" : ") or ");/////last product or with multiple
+                sb.Append(cancellation.ToString());
                 productIndex += 1;
             }
             sb.Append(")");//// last main )
