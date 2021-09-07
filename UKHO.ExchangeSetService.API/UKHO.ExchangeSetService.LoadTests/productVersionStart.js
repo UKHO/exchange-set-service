@@ -1,20 +1,14 @@
-import { Trend } from 'k6/metrics';
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 import { authenticateUsingAzure } from './oauth/azure.js';
-import { sleep } from 'k6';
+import { sleep, group } from 'k6';
 
 const runTestProductVersion = require('./LoadTestForProductVersions.js');
 const config = JSON.parse(open('./config.json'));
 const dataHelper = require('./dataHelper.js');
 const productVersionData_Small = dataHelper.GetProductVersionDataforSmallExchangeSet();
 const productVersionData_Medium = dataHelper.GetProductVersionDataforMediumExchangeSet();
-const productVersionData_Large = dataHelper.GetProductVersionDataforLargeExchangeSet();
-const apiClient = require('./clientHelper.js');
-
-let SmallExchangeSetCreationTrend = new Trend('SmallEssCreationtime');
-let MediumExchangeSetCreationTrend = new Trend('MediumEssCreationtime');
-let LargeExchangeSetCreationTrend = new Trend('LargeEssCreationtime');
+const productVersionData_Large = dataHelper.GetProductVersionDataforLargeExchangeSet()
 let clientAuthResp = {};
 
 export let options = {
@@ -65,26 +59,23 @@ export function setup() {
 }
 
 export function ESSCreationSmallExchangeSet(clientAuthResp) {
-    var group_duration = apiClient.GetGroupDuration('SmallEssCreation', () => {
+    group('SmallEssCreation', () => {
         runTestProductVersion.ESSCreation(clientAuthResp, productVersionData_Small, "Small");
     });
-    SmallExchangeSetCreationTrend.add(group_duration);
     sleep(1);
 }
 
 export function ESSCreationMediumExchangeSet(clientAuthResp) {
-    var group_duration = apiClient.GetGroupDuration('MediumEssCreation', () => {
+    group('MediumEssCreation', () => {
         runTestProductVersion.ESSCreation(clientAuthResp, productVersionData_Medium, "Medium");
     });
-    MediumExchangeSetCreationTrend.add(group_duration);
     sleep(1);
 }
 
 export function ESSCreationLargeExchangeSet(clientAuthResp) {
-    var group_duration = apiClient.GetGroupDuration('LargeEssCreation', () => {
+    group('LargeEssCreation', () => {
         runTestProductVersion.ESSCreation(clientAuthResp, productVersionData_Large, "Large");
     });
-    LargeExchangeSetCreationTrend.add(group_duration);
     sleep(1);
 }
 
