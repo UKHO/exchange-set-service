@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return new AccessTokenItem
             {
-                ExpiresIn = DateTime.UtcNow.AddMinutes(accessToken.ExpiresOn.Subtract(DateTimeOffset.UtcNow).TotalMinutes),
+                ExpiresIn = DateTime.UtcNow.AddMinutes((accessToken.ExpiresOn - DateTimeOffset.UtcNow).Minutes),
                 AccessToken = accessToken.Token
             };
         }
