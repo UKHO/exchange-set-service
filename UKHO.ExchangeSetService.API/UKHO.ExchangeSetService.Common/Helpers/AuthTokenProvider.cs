@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 new TokenRequestContext(scopes: new string[] { resource + "/.default" }) { }
             );
 
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Caching new token is valid for minutes {ExpiresOn}.", Convert.ToString(accessToken.ExpiresOn));
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "Caching new token is valid for minutes {ExpiresOn} and DeductTokenExpiryMinutes {DeductTokenExpiryMinutes}.", Convert.ToString(accessToken.ExpiresOn), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
             return new AccessTokenItem
             {
                 ExpiresIn = DateTime.UtcNow.AddMinutes(accessToken.ExpiresOn.Minute),
