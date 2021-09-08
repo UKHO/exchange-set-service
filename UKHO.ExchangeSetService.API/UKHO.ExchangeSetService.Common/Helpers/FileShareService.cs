@@ -204,24 +204,28 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 foreach (var productItem in products)
                 {
+                    var matchProductName = item.Attributes.Where(a => a.Key == "CellName").ToList();
+                    var productName = matchProductName.Select(a => a.Value).FirstOrDefault();
                     var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
                     var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
                     var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
-
-                    if (!productList.Contains(compareProducts) && productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
-                        && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value)
+                    if (!productList.Contains(compareProducts))
                     {
-                        var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
-                        if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
+                        if (productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
+                        && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value && productName == productItem.ProductName)
                         {
-                            CheckProductWithCancellationData(internalSearchBatchResponse, productList, item, productItem, compareProducts, matchEditionNumber);
+                            var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
+                            if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
+                            {
+                                CheckProductWithCancellationData(internalSearchBatchResponse, productList, item, productItem, compareProducts, matchEditionNumber);
+                            }
                         }
-                    }
-                    else if (!productList.Contains(compareProducts) && CheckProductDoesExistInResponseItem(item, productItem)
+                        else if (CheckProductDoesExistInResponseItem(item, productItem)
                         && CheckEditionNumberDoesExistInResponseItem(item, productItem) && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
-                    {
-                        internalSearchBatchResponse.Entries.Add(item);
-                        productList.Add(compareProducts);
+                        {
+                            internalSearchBatchResponse.Entries.Add(item);
+                            productList.Add(compareProducts);
+                        }
                     }
                 }
                 uri = searchBatchResponse.Links.Next?.Href;
