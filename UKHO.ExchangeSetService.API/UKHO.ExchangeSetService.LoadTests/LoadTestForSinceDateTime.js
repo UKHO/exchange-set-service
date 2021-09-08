@@ -1,14 +1,26 @@
 import http from 'k6/http';
-import { group, sleep } from 'k6';
+import { group, check } from 'k6';
+import { Trend } from 'k6/metrics';
 
-const apiClient = require('./clientHelper.js');
+let SmallExchangeSetTrend = new Trend('SmallEssApiResponseTime');
+let LargeExchangeSetTrend = new Trend('LargeEssApiResponseTime');
+let MediumExchangeSetTrend = new Trend('MediumEssApiResponseTime');
 
 export function ESSCreation(clientAuthResp, sinceDateTime, exchangeSetType) {
+    let essResponse;
+    var essUrl = `${config.Base_URL}/productData?sinceDateTime=${sinceDateTime}`;
 
-    group('ESS Creation', () => {
-
-        let batchStatusUrl = apiClient.GetESSApiResponseForSinceDateTime(sinceDateTime, `${clientAuthResp.essToken}`, exchangeSetType);
-        sleep(1);
-        console.log("batchStatusUrl", batchStatusUrl);
+    group('ESS Api Response', () => {
+        essResponse = http.post(encodeURI(essUrl), {}, { headers: { Authorization: `Bearer ${clientAuthResp.essToken}`, "Content-Type": "application/json" } });
     });
+
+    check(essResponse, {
+        'is ESS status 200': (essResponse) => essResponse.status === 200,
+    });
+
+    switch (exchangeSetType) {
+        case "Small": SmallExchangeSetTrend.add(essResponse.timings.waiting); break;
+        case "Medium": MediumExchangeSetTrend.add(essResponse.timings.waiting); break;
+        case "Large": LargeExchangeSetTrend.add(essResponse.timings.waiting); break;
+    }
 }
