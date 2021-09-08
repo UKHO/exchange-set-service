@@ -17,30 +17,30 @@ export let options = {
     scenarios: {
         ESSCreationSmallExchangeSet: {
             exec: 'ESSCreationSmallExchangeSet',
-            executor: 'per-vu-iterations',
-            startTime: '10s',
-            gracefulStop: '5s',
-            vus: 25,
-            iterations: 161,
-            maxDuration: '1h'
+            executor: 'constant-arrival-rate',
+            rate: 3,
+            timeUnit: '2s',
+            duration: '1h',
+            preAllocatedVUs: 64,
+            maxVUs: 70
         },
         ESSCreationMediumExchangeSet: {
             exec: 'ESSCreationMediumExchangeSet',
-            executor: 'per-vu-iterations',
-            startTime: '10s',
-            gracefulStop: '5s',
-            vus: 5,
-            iterations: 161,
-            maxDuration: '1h'
+            executor: 'constant-arrival-rate',
+            rate: 3,
+            timeUnit: '2s',
+            duration: '1h',
+            preAllocatedVUs: 64,
+            maxVUs: 70
         },
         ESSCreationLargeExchangeSet: {
             exec: 'ESSCreationLargeExchangeSet',
-            executor: 'per-vu-iterations',
-            startTime: '10s',
-            gracefulStop: '5s',
-            vus: 1,
-            iterations: 170,
-            maxDuration: '1h'
+            executor: 'constant-arrival-rate',
+            rate: 3,
+            timeUnit: '2s',
+            duration: '1h',
+            preAllocatedVUs: 64,
+            maxVUs: 70
         },
     },
 };
@@ -50,7 +50,7 @@ export function setup() {
     let essAuthResp = authenticateUsingAzure(
         `${config.ESS_TENANT_ID}`, `${config.ESS_CLIENT_ID}`, `${config.ESS_CLIENT_SECRET}`, `${config.ESS_SCOPES}`, `${config.ESS_RESOURCE}`
     );
-    clientAuthResp["essToken"] = essAuthResp;
+    clientAuthResp["essToken"] = essAuthResp.access_token;
 
     return clientAuthResp;
 }
