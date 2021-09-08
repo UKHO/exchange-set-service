@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 new TokenRequestContext(scopes: new string[] { resource + "/.default" }) { }
             );
 
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "1 New auth token is valid for ExpiresOn {ExpiresOn} datetime, {ExpiresOn}min or {ExpiresOn}sec utcnow {utcnow} datetime.now {now} and DeductTokenExpiryMinutes {DeductTokenExpiryMinutes}.", Convert.ToString(accessToken.ExpiresOn), Convert.ToString(accessToken.ExpiresOn.Minute), Convert.ToString(accessToken.ExpiresOn.Second), Convert.ToString(DateTime.UtcNow), Convert.ToString(DateTime.Now), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
+            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "1 New auth token is valid for ExpiresOn {ExpiresOn} datetime, {ExpiresOn}min or {ExpiresOn}sec utcoffsetnow {utcnow} datetimeoffset.now {now} utcnow {utcnow} datetime.now {now} and DeductTokenExpiryMinutes {DeductTokenExpiryMinutes}.", Convert.ToString(accessToken.ExpiresOn), Convert.ToString(accessToken.ExpiresOn.Minute), Convert.ToString(accessToken.ExpiresOn.Second), Convert.ToString(DateTimeOffset.UtcNow), Convert.ToString(DateTimeOffset.Now), Convert.ToString(DateTime.UtcNow), Convert.ToString(DateTime.Now), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
             return new AccessTokenItem
             {
                 ExpiresIn = DateTime.UtcNow.AddMinutes(accessToken.ExpiresOn.Minute),
