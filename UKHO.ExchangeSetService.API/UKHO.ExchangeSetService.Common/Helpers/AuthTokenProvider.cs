@@ -51,19 +51,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 new TokenRequestContext(scopes: new string[] { resource + "/.default" }) { }
             );
 
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "1 New auth token is valid for ExpiresOn {ExpiresOn} datetime, {ExpiresOn}min or {ExpiresOn}sec utcoffsetnow {utcnow} datetimeoffset.now {now} utcnow {utcnow} datetime.now {now} and DeductTokenExpiryMinutes {DeductTokenExpiryMinutes}.", Convert.ToString(accessToken.ExpiresOn), Convert.ToString(accessToken.ExpiresOn.Minute), Convert.ToString(accessToken.ExpiresOn.Second), Convert.ToString(DateTimeOffset.UtcNow), Convert.ToString(DateTimeOffset.Now), Convert.ToString(DateTime.UtcNow), Convert.ToString(DateTime.Now), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
             return new AccessTokenItem
             {
-                ExpiresIn = DateTime.UtcNow.AddMinutes(accessToken.ExpiresOn.Minute),
+                ExpiresIn = accessToken.ExpiresOn.UtcDateTime,
                 AccessToken = accessToken.Token
             };
         }
 
         private void AddToCache(string key, AccessTokenItem accessTokenItem)
         {
-            var tokenExpiryMinutes = (int)accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
-            logger.LogInformation(EventIds.CachingExternalEndPointToken.ToEventId(), "2 accessTokenItem.ExpiresIn ExpiresIn{ExpiresIn}, UtcNow{UtcNow} Now {Now} and {DeductTokenExpiryMinutes}.", Convert.ToString(accessTokenItem.ExpiresIn), Convert.ToString(DateTime.UtcNow), Convert.ToString(DateTime.Now), essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes.ToString());
-            var deductTokenExpiryMinutes = (essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes < tokenExpiryMinutes && essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes > 0 ? essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes : 1);
+            var tokenExpiryMinutes = accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
+            var deductTokenExpiryMinutes = essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes < tokenExpiryMinutes ? essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes : 1;
             var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tokenExpiryMinutes - deductTokenExpiryMinutes));
             options.SetAbsoluteExpiration(accessTokenItem.ExpiresIn);
 
