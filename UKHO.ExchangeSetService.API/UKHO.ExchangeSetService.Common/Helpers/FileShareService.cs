@@ -204,15 +204,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 foreach (var productItem in products)
                 {
-                    var matchProductName = item.Attributes.Where(a => a.Key == "CellName").ToList();
-                    var productName = matchProductName.Select(a => a.Value).FirstOrDefault();
                     var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
                     var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
                     var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
                     if (!productList.Contains(compareProducts))
                     {
-                        if (productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
-                        && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value && productName == productItem.ProductName)
+                        if (CheckProductDoesExistInResponseItem(item, productItem) && productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
+                        && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value)
                         {
                             var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
                             if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
@@ -255,7 +253,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var matchProduct = batchDetail.Attributes.Where(a => a.Key == "UpdateNumber");
             var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
-            return product.UpdateNumbers.Where(x => x.Value.ToString() == updateNumber).ToList().Count > 0;
+            return product.UpdateNumbers.Any(x => x.Value.ToString() == updateNumber);
         }
 
         private async Task<SearchBatchResponse> SearchBatchResponse(HttpResponseMessage httpResponse)
