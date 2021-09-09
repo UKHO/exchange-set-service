@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
         private TestConfiguration Config { get; set; }
         private DataHelper DataHelper { get; set; }
 
-        private readonly string sinceDateTime = DateTime.Now.AddDays(-10).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
         private string EssJwtToken { get; set; }
         public ProductIdentifierModel ProductIdentifierModel { get; set; }
 
@@ -34,6 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
         /// When Api with Valid RFC1123DateTime is called
         /// </summary>
         [Test]
+        [Ignore("Ignore this test case for time being since data is not available in real SCS.")]
         public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenValidFileNameIsPresentInAzureStorage()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtToken);
