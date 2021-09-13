@@ -11,7 +11,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Extensions
         public void CheckIsValidDate()
         {
             bool isValidDate = DateTimeExtensions.IsValidDate("08Sep2021", out DateTime fakeFolderDateTime);
-            Assert.False(isValidDate);
+            Assert.IsTrue(isValidDate);
         }
     }
 }
