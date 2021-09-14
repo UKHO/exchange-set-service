@@ -151,7 +151,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
             
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssB2CToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
