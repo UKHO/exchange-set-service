@@ -39,6 +39,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Ignore this test since Re-issue data is not available.")]
         public async Task WhenICallExchangeSetApiWithMultipleReissueProductIdentifiers_ThenEncFilesAreDownloaded()
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetReissueProducts(), accessToken: EssJwtToken);
@@ -67,6 +68,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
+        [Ignore("Ignore this test since Re-issue data is not available.")]
         public async Task WhenICallExchangeSetApiWithAnUpdatePriorToSpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 
@@ -99,6 +101,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
+        [Ignore("Ignore this test since Re-issue data is not available.")]
         public async Task WhenICallExchangeSetApiWithASpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 
