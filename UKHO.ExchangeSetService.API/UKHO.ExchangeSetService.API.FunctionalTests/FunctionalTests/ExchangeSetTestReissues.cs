@@ -39,14 +39,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test since Re-issue data is not available.")]
-        public async Task WhenICallExchangeSetApiWithMultipleReissueProductIdentifiers_ThenEncFilesAreDownloaded()
+        public async Task WhenICallExchangeSetApiWithReissueProductIdentifier_ThenEncFilesAreDownloaded()
         {
-            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetReissueProducts(), accessToken: EssJwtToken);
+            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetReissueProduct(), accessToken: EssJwtToken);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
 
             //Get the product details from sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetReissueProducts(), ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetReissueProduct(), ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
@@ -68,13 +67,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        [Ignore("Ignore this test since Re-issue data is not available.")]
         public async Task WhenICallExchangeSetApiWithAnUpdatePriorToSpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 
             ProductVersionData = new List<ProductVersionModel>();
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("JP5BHTR7", 7, 5));
-            
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("JP5PCGRI", 14, 1));
+
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
 
@@ -101,12 +99,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        [Ignore("Ignore this test since Re-issue data is not available.")]
         public async Task WhenICallExchangeSetApiWithASpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 
             ProductVersionData = new List<ProductVersionModel>();
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("JP5BHTR7", 7, 6));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("JP5PCGRI", 14, 2));
 
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
