@@ -209,21 +209,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
                     if (!productList.Contains(compareProducts))
                     {
-                        if (CheckProductDoesExistInResponseItem(item, productItem) && productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
-                        && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value)
-                        {
-                            var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
-                            if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
-                            {
-                                CheckProductWithCancellationData(internalSearchBatchResponse, productList, item, productItem, compareProducts, matchEditionNumber);
-                            }
-                        }
-                        else if (CheckProductDoesExistInResponseItem(item, productItem)
-                        && CheckEditionNumberDoesExistInResponseItem(item, productItem) && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
-                        {
-                            internalSearchBatchResponse.Entries.Add(item);
-                            productList.Add(compareProducts);
-                        }
+                        CheckProductOrCancellationData(internalSearchBatchResponse, productList, item, productItem, updateNumber, compareProducts);
                     }
                 }
                 uri = searchBatchResponse.Links.Next?.Href;
@@ -232,11 +218,30 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return uri;
         }
 
-        private void CheckProductWithCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string compareProducts, List<Models.FileShareService.Response.Attribute> matchEditionNumber)
+        private void CheckProductOrCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string updateNumber, string compareProducts)
         {
-            matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
-            internalSearchBatchResponse.Entries.Add(item);
-            productList.Add(compareProducts);
+            if (CheckProductDoesExistInResponseItem(item, productItem) && productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
+                                    && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value)
+            {
+                CheckProductWithCancellationData(internalSearchBatchResponse, productList, item, productItem, compareProducts);
+            }
+            else if (CheckProductDoesExistInResponseItem(item, productItem)
+            && CheckEditionNumberDoesExistInResponseItem(item, productItem) && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
+            {
+                internalSearchBatchResponse.Entries.Add(item);
+                productList.Add(compareProducts);
+            }
+        }
+
+        private void CheckProductWithCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string compareProducts)
+        {
+            var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
+            if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
+            {
+                matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
+                internalSearchBatchResponse.Entries.Add(item);
+                productList.Add(compareProducts);
+            }
         }
 
         public bool CheckProductDoesExistInResponseItem(BatchDetail batchDetail, Products product)
