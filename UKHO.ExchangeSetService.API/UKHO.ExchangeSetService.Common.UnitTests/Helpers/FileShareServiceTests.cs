@@ -342,6 +342,129 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null); });
 
         }
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProductsWithCancellation_ThenReturnsSearchBatchResponse()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416050" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+            });
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416051" },
+                                                           new Attribute { Key= "EditionNumber", Value= "3" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+            });
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            var productList = GetProductdetails();
+            productList.Add(new Products {
+                                ProductName = "DE416051",
+                                EditionNumber = 0,
+                                UpdateNumbers = new List<int?> {0},
+                                FileSize = 400,
+                                Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
+                            });
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
+            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+            Assert.AreEqual("13d38bde-5191-4a59-82d5-aa22ca1cc6de", response.Entries[1].BatchId);
+        }
+
+        [Test]
+        public void WhenFssResponseNotFoundForScsProductsWithCancellation_ThenReturnFulfilmentException()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416050" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+            });
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416051" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+            });
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            var productList = GetProductdetails();
+            productList.Add(new Products
+            {
+                ProductName = "DE416051",
+                EditionNumber = 0,
+                UpdateNumbers = new List<int?> { 0 },
+                FileSize = 400,
+                Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
+            });
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null); });
+
+        }
         #endregion GetBatchInfoBasedOnProducts
 
         #region DownloadBatchFile
