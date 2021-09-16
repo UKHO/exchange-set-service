@@ -73,7 +73,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
             
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtTokenNoRole);
 
@@ -85,8 +85,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 2, 0));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
@@ -101,8 +101,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE41AB80", 9, 2));           
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("GB123789", 1, 0));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
-            Assert.AreEqual("DE41AB80", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'DE41AB80'");
+            Assert.AreEqual("GB123789", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB123789'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
         }
 
