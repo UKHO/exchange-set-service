@@ -204,23 +204,44 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 foreach (var productItem in products)
                 {
-                    if (CheckProductDoesExistInResponseItem(item, productItem) && CheckEditionNumberDoesExistInResponseItem(item, productItem)
-                        && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
+                    var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
+                    var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
+                    var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
+                    if (!productList.Contains(compareProducts))
                     {
-                        var matchProduct = item.Attributes.Where(a => a.Key == "UpdateNumber");
-                        var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
-                        var compareProducts = $"{productItem.ProductName}|{productItem.EditionNumber}|{updateNumber}";
-                        if (!productList.Contains(compareProducts))
-                        {
-                            internalSearchBatchResponse.Entries.Add(item);
-                            productList.Add(compareProducts);
-                        }
+                        CheckProductOrCancellationData(internalSearchBatchResponse, productList, item, productItem, updateNumber, compareProducts);
                     }
                 }
                 uri = searchBatchResponse.Links.Next?.Href;
             }
 
             return uri;
+        }
+
+        private void CheckProductOrCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string updateNumber, string compareProducts)
+        {
+            if (CheckProductDoesExistInResponseItem(item, productItem) && productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
+                                    && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value)
+            {
+                CheckProductWithCancellationData(internalSearchBatchResponse, productList, item, productItem, compareProducts);
+            }
+            else if (CheckProductDoesExistInResponseItem(item, productItem)
+            && CheckEditionNumberDoesExistInResponseItem(item, productItem) && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
+            {
+                internalSearchBatchResponse.Entries.Add(item);
+                productList.Add(compareProducts);
+            }
+        }
+
+        private void CheckProductWithCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string compareProducts)
+        {
+            var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
+            if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
+            {
+                matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
+                internalSearchBatchResponse.Entries.Add(item);
+                productList.Add(compareProducts);
+            }
         }
 
         public bool CheckProductDoesExistInResponseItem(BatchDetail batchDetail, Products product)
@@ -237,7 +258,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var matchProduct = batchDetail.Attributes.Where(a => a.Key == "UpdateNumber");
             var updateNumber = matchProduct.Select(a => a.Value).FirstOrDefault();
-            return product.UpdateNumbers.Where(x => x.Value.ToString() == updateNumber).ToList().Count > 0;
+            return product.UpdateNumbers.Any(x => x.Value.ToString() == updateNumber);
         }
 
         private async Task<SearchBatchResponse> SearchBatchResponse(HttpResponseMessage httpResponse)
@@ -250,10 +271,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var productIndex = 1;
             var productCount = products.Count;
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("(");////1st main (
             foreach (var item in products)
             {
+                var cancellation = new StringBuilder();
                 sb.Append("(");////1st product
                 sb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
                 sb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
@@ -267,12 +289,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         {
                             sb.Append("((");
                         }
+                        if (item.Cancellation != null && item.Cancellation.UpdateNumber == updateNumberItem.Value)
+                        {
+                            cancellation.Append(" or (");////1st cancellation product
+                            cancellation.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
+                            cancellation.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.Cancellation.EditionNumber);
+                            cancellation.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, item.Cancellation.UpdateNumber);
+                            cancellation.Append(")");
+                        }
                         sb.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, updateNumberItem.Value);
                         sb.Append(lstCount != index ? "or " : "))");
                         index += 1;
                     }
                 }
-                sb.Append(productCount == productIndex ? ")" : ") or ");/////last product or with multiple
+                sb.Append(cancellation.ToString() + (productCount == productIndex ? ")" : ") or "));/////last product or with multiple
                 productIndex += 1;
             }
             sb.Append(")");//// last main )
