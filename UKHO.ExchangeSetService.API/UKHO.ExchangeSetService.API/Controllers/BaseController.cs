@@ -98,8 +98,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         private IActionResult BuildNotModifiedResponse(ExchangeSetServiceResponse model)
         {
             LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
-
-            httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+            if (model.LastModified != null)
+                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
             return new StatusCodeResult(StatusCodes.Status304NotModified);
         }
 

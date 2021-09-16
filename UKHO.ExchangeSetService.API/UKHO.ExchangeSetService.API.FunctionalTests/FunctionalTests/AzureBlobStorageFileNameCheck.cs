@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
         private TestConfiguration Config { get; set; }
         private DataHelper DataHelper { get; set; }
 
-        private readonly string sinceDateTime = DateTime.Now.AddDays(-10).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
         private string EssJwtToken { get; set; }
         public ProductIdentifierModel ProductIdentifierModel { get; set; }
 
@@ -69,8 +69,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 2, 0));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.FileNameCh
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 5));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB123789", 1, 0));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);

@@ -35,5 +35,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             return new List<string>() { "DE360010", "DE416040" };
         }
+
+        public List<string> GetReissueProduct()
+        {
+            return new List<string>() { "JP5PCGRI" };
+        }
     }
 }
