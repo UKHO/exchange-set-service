@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<string> GetManagedIdentityAuthAsync(string resource)
         {
-            var accessToken = GetFromCache(resource);
+            var accessToken = GetAuthTokenFromCache(resource);
 
             if (accessToken != null && accessToken.AccessToken != null && accessToken.ExpiresIn > DateTime.UtcNow)
             {
@@ -39,7 +39,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
 
             var newAccessToken = await GetNewAuthToken(resource);
-            AddToCache(resource, newAccessToken);
+            AddAuthTokenToCache(resource, newAccessToken);
 
             return newAccessToken.AccessToken;
         }
@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             };
         }
 
-        private void AddToCache(string key, AccessTokenItem accessTokenItem)
+        private void AddAuthTokenToCache(string key, AccessTokenItem accessTokenItem)
         {
             var tokenExpiryMinutes = accessTokenItem.ExpiresIn.Subtract(DateTime.UtcNow).TotalMinutes;
             var deductTokenExpiryMinutes = essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes < tokenExpiryMinutes ? essManagedIdentityConfiguration.Value.DeductTokenExpiryMinutes : 1;
@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        private AccessTokenItem GetFromCache(string key)
+        private AccessTokenItem GetAuthTokenFromCache(string key)
         {
             var item = _cache.GetString(key);
             if (item != null)
