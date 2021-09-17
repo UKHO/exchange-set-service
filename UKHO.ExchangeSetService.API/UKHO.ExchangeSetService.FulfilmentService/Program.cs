@@ -154,7 +154,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.AddHttpClient<ICallBackClient, CallBackClient>();
 
-                 services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+                 services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
+                 services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
                  services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
                  services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
@@ -169,6 +170,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
                  services.Configure<EssCallBackConfiguration>(ConfigurationBuilder.GetSection("ESSCallBackConfiguration"));
+
+                 services.AddDistributedMemoryCache();
              })
               .ConfigureWebJobs(b =>
               {
