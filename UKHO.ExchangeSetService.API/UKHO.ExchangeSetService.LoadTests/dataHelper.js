@@ -3400,3 +3400,21 @@ export function GetProductVersionDataforLargeExchangeSet() {
     ];
     return ProductVersionData;
 };
+
+export function GetSinceDateTimeDataForSmallExchangeSet() {
+    const currentDateTime = new Date();
+    currentDateTime.setDate(currentDateTime.getDate() - 2);
+    return currentDateTime.toUTCString();
+}
+
+export function GetSinceDateTimeDataForMediumExchangeSet() {
+    const currentDateTime = new Date();
+    currentDateTime.setDate(currentDateTime.getDate() - 15);
+    return currentDateTime.toUTCString();
+}
+
+export function GetSinceDateTimeDataForLargeExchangeSet() {
+    const currentDateTime = new Date();
+    currentDateTime.setDate(currentDateTime.getDate() - 36);
+    return currentDateTime.toUTCString();
+}
