@@ -3352,3 +3352,69 @@ export function GetProductIdentifierDataforLargeExchangeSet() {
     ];
     return ProductIdentifierData;
 };
+
+export function GetProductVersionDataforSmallExchangeSet() {
+    let ProductVersionData = [
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        },
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        }
+    ];
+    return ProductVersionData;
+};
+
+export function GetProductVersionDataforMediumExchangeSet() {
+    let ProductVersionData = [
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        },
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        }
+    ];
+    return ProductVersionData;
+};
+
+export function GetProductVersionDataforLargeExchangeSet() {
+    let ProductVersionData = [
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        },
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        }
+    ];
+    return ProductVersionData;
+};
+
+export function GetSinceDateTimeDataForSmallExchangeSet() {
+    const currentDateTime = new Date();
+    currentDateTime.setDate(currentDateTime.getDate() - 2);
+    return currentDateTime.toUTCString();
+}
+
+export function GetSinceDateTimeDataForMediumExchangeSet() {
+    const currentDateTime = new Date();
+    currentDateTime.setDate(currentDateTime.getDate() - 15);
+    return currentDateTime.toUTCString();
+}
+
+export function GetSinceDateTimeDataForLargeExchangeSet() {
+    const currentDateTime = new Date();
+    currentDateTime.setDate(currentDateTime.getDate() - 36);
+    return currentDateTime.toUTCString();
+}
