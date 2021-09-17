@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
     {
         private ILogger<SalesCatalogueService> fakeLogger;
         private IOptions<SalesCatalogueConfiguration> fakeSaleCatalogueConfig;
-        private IAuthTokenProvider fakeAuthTokenProvider;
+        private IAuthScsTokenProvider fakeAuthScsTokenProvider;
         private ISalesCatalogueClient fakeSalesCatalogueClient;
         private SalesCatalogueServiceHealthCheck salesCatalogueServiceHealthCheck;
 
@@ -30,11 +30,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public void Setup()
         {
             this.fakeLogger = A.Fake<ILogger<SalesCatalogueService>>();
-            this.fakeAuthTokenProvider = A.Fake<IAuthTokenProvider>();
+            this.fakeAuthScsTokenProvider = A.Fake<IAuthScsTokenProvider>();
             this.fakeSaleCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { ProductType = "Test", Version = "t1", CatalogueType = "essTest" });
             this.fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
 
-            salesCatalogueServiceHealthCheck = new SalesCatalogueServiceHealthCheck(fakeSalesCatalogueClient, fakeAuthTokenProvider, fakeSaleCatalogueConfig, fakeLogger);
+            salesCatalogueServiceHealthCheck = new SalesCatalogueServiceHealthCheck(fakeSalesCatalogueClient, fakeAuthScsTokenProvider, fakeSaleCatalogueConfig, fakeLogger);
         }
 
         #region GetSalesCatalogueDataProductResponse
@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenSCSClientReturnsOtherThan200And304_ThenSalesCatalougeServiceIsHealthy()
         {
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
+            A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("BadRequest"))) });
 
@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             List<SalesCatalogueDataProductResponse> scsResponse = GetSalesCatalogueDataProductResponse();
 
             var jsonString = JsonConvert.SerializeObject(scsResponse);
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
+            A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
@@ -98,7 +98,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenSCSClientReturns503_ThenSalesCatalougeServiceIsUnhealthy()
         {
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
+            A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.ServiceUnavailable, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("ServiceUnavailable"))) });
 

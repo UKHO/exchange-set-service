@@ -16,17 +16,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public class SalesCatalogueService : ISalesCatalogueService
     {
         private readonly ILogger<SalesCatalogueService> logger;
-        private readonly IAuthTokenProvider authTokenProvider;
+        private readonly IAuthScsTokenProvider authScsTokenProvider;
         private readonly ISalesCatalogueClient salesCatalogueClient;
         private readonly IOptions<SalesCatalogueConfiguration> salesCatalogueConfig;
 
         public SalesCatalogueService(ISalesCatalogueClient salesCatalogueClient,
                                      ILogger<SalesCatalogueService> logger,
-                                     IAuthTokenProvider authTokenProvider,
+                                     IAuthScsTokenProvider authScsTokenProvider,
                                      IOptions<SalesCatalogueConfiguration> salesCatalogueConfig)
         {
             this.logger = logger;
-            this.authTokenProvider = authTokenProvider;
+            this.authScsTokenProvider = authScsTokenProvider;
             this.salesCatalogueConfig = salesCatalogueConfig;
             this.salesCatalogueClient = salesCatalogueClient;
         }
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestStart.ToEventId(), "Get sales catalogue service from specific date time started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestStart.ToEventId(), "Post sales catalogue service for ProductIdentifiers Started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productIdentifiers";
 
             string payloadJson = JsonConvert.SerializeObject(productIdentifiers);
@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             logger.LogInformation(EventIds.SCSPostProductVersionsRequestStart.ToEventId(), "Post sales catalogue service for ProductVersions started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productVersions";
 
             string payloadJson = JsonConvert.SerializeObject(productVersions);
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), "Get sales catalogue service for CatalogueData started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
 
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
             var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
 
             var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId);
