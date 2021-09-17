@@ -3353,8 +3353,45 @@ export function GetProductIdentifierDataforLargeExchangeSet() {
     return ProductIdentifierData;
 };
 
-export function GetProductVersionData() {
+export function GetProductVersionDataforSmallExchangeSet() {
     let ProductVersionData = [
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        },
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        }
+    ];
+    return ProductVersionData;
+};
+
+export function GetProductVersionDataforMediumExchangeSet() {
+    let ProductVersionData = [
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        },
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        }
+    ];
+    return ProductVersionData;
+};
+
+export function GetProductVersionDataforLargeExchangeSet() {
+    let ProductVersionData = [
+        {
+            productName: "DE416080",
+            editionNumber: 9,
+            updateNumber: 1
+        },
         {
             productName: "DE416080",
             editionNumber: 9,
