@@ -1,7 +1,14 @@
 import http from 'k6/http';
 import { check, group } from 'k6';
+import { Trend } from 'k6/metrics';
 
 const config = JSON.parse(open('./config.json'));
+
+let SmallExchangeSetTrendfor25MB = new Trend('SmallEssApiResponsetimefor25MB');
+let SmallExchangeSetTrendfor50MB = new Trend('SmallEssApiResponsetimefor50MB');
+let MediumExchangeSetTrendfor150MB = new Trend('MediumEssApiResponsetimefor150MB');
+let MediumExchangeSetTrendfor300MB = new Trend('MediumEssApiResponsetimeor300MB');
+let LargeExchangeSetTrend = new Trend('LargeEssApiResponsetime');
 
 export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
     let essResponse;
@@ -14,8 +21,10 @@ export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
     });
 
     switch (exchangeSetType) {
-        case "Small": SmallExchangeSetTrend.add(essResponse.timings.waiting); break;
-        case "Medium": MediumExchangeSetTrend.add(essResponse.timings.waiting); break;
+        case "Small_25MB": SmallExchangeSetTrendfor25MB.add(essResponse.timings.waiting); break;
+        case "Small_50MB": SmallExchangeSetTrendfor50MB.add(essResponse.timings.waiting); break;
+        case "Medium_150MB": MediumExchangeSetTrendfor150MB.add(essResponse.timings.waiting); break;
+        case "Medium_300MB": MediumExchangeSetTrendfor300MB.add(essResponse.timings.waiting); break;
         case "Large": LargeExchangeSetTrend.add(essResponse.timings.waiting); break;
     }
 
