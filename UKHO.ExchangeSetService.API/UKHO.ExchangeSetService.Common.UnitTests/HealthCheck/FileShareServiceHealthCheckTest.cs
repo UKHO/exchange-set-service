@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
     {
         private ILogger<FileShareService> fakeLogger;
         private IOptions<FileShareServiceConfiguration> fakeFileShareConfig;
-        private IAuthTokenProvider fakeAuthTokenProvider;
+        private IAuthFssTokenProvider fakeAuthFssTokenProvider;
         private IFileShareServiceClient fakeFileShareServiceClient;
         private FileShareServiceHealthCheck fileShareServiceHealthCheck;
 
@@ -27,12 +27,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public void Setup()
         {
             this.fakeLogger = A.Fake<ILogger<FileShareService>>();
-            this.fakeAuthTokenProvider = A.Fake<IAuthTokenProvider>();
+            this.fakeAuthFssTokenProvider = A.Fake<IAuthFssTokenProvider>();
             this.fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration()
             { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 1, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
 
-            fileShareServiceHealthCheck = new FileShareServiceHealthCheck(fakeFileShareServiceClient, fakeAuthTokenProvider, fakeFileShareConfig, fakeLogger);
+            fileShareServiceHealthCheck = new FileShareServiceHealthCheck(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger);
         }
 
         #region GetFakeToken
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenFSSClientReturnsOtherThan200_ThenFileShareServiceIsUnhealthy()
         {
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("BadRequest"))) });
 
@@ -57,7 +57,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenFSSClientReturns200_ThenFileShareServiceIsHealthy()
         {
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("OK"))) });
 
@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenFSSClientReturns503_ThenFileShareServiceIsUnhealthy()
         {
-            A.CallTo(() => fakeAuthTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.ServiceUnavailable, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("ServiceUnavailable"))) });
 

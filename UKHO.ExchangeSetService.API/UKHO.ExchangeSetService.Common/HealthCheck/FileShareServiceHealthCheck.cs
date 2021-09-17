@@ -14,17 +14,17 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
     public class FileShareServiceHealthCheck : IHealthCheck
     {
         private readonly IFileShareServiceClient fileShareServiceClient;
-        private readonly IAuthTokenProvider authTokenProvider;
+        private readonly IAuthFssTokenProvider authFssTokenProvider;
         private readonly ILogger<FileShareService> logger;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
 
         public FileShareServiceHealthCheck(IFileShareServiceClient fileShareService,
-                                           IAuthTokenProvider authTokenProvider,
+                                           IAuthFssTokenProvider authFssTokenProvider,
                                            IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                            ILogger<FileShareService> logger)
         {
             this.fileShareServiceClient = fileShareService;
-            this.authTokenProvider = authTokenProvider;
+            this.authFssTokenProvider = authFssTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
         }
@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq 'invalid'";
-            var accessToken = await authTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string payloadJson = string.Empty;
             var fileShareServiceResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
             if (fileShareServiceResponse.StatusCode == HttpStatusCode.OK)
