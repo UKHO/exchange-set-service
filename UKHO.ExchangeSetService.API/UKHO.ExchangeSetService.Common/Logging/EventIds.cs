@@ -125,7 +125,8 @@ namespace UKHO.ExchangeSetService.Common.Logging
         AzureMessageQueueIsUnhealthy = 805118,
         AzureWebJobIsHealthy = 805119,
         AzureWebJobIsUnhealthy = 805120,
-        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 805121
+        SalesCatalogueServiceCatalogueDataNotFoundForProduct = 805121,
+        CachingExternalEndPointToken = 805122
     }
 
     public static class EventIdExtensions

@@ -109,7 +109,8 @@ namespace UKHO.ExchangeSetService.API
             });
             services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("ESSFulfilmentConfiguration"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<IAuthTokenProvider, AuthTokenProvider>();
+            services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
+            services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
             services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
             services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
             services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
@@ -174,6 +175,7 @@ namespace UKHO.ExchangeSetService.API
                 .AddCheck<AzureBlobStorageHealthCheck>("AzureBlobStorageHealthCheck")
                 .AddCheck<AzureMessageQueueHealthCheck>("AzureMessageQueueHealthCheck")
                 .AddCheck<AzureWebJobsHealthCheck>("AzureWebJobsHealthCheck");
+            services.AddDistributedMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

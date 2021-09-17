@@ -36,9 +36,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return new List<string>() { "DE360010", "DE416040" };
         }
 
-        public List<string> GetReissueProduct()
+        public List<string> GetReissueProducts()
         {
-            return new List<string>() { "JP5PCGRI" };
+            return new List<string>() { "JP5BHTR7", "JP5P9F59" };
         }
     }
 }
