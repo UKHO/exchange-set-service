@@ -13,5 +13,10 @@ namespace UKHO.ExchangeSetService.API.Extensions
         {
             return DateTime.TryParseExact(data, "ddMMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime);
         }
+        public static int GetValidTillDays(int validPastWeeks)
+        {
+            int daysInWeek = 7;
+            return (daysInWeek * validPastWeeks);
+        }
     }
-}
+} 

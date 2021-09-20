@@ -34,8 +34,8 @@ namespace UKHO.ExchangeSetService.API.Validation
                     .WithMessage("Provided sinceDateTime cannot be a future date.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                     RuleFor(x => x.SinceDateTime)
-                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow.AddDays(-GetValidTillDays())) > 0)
-                    .WithMessage("Provided sinceDateTime must be within last " +configuration["SinceDateTimeDateValidTillDateOfPastWeeks"] + " weeks.")
+                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow.AddDays(-DateTimeExtensions.GetValidTillDays(Convert.ToInt32(this.configuration["ValidPastWeeks"])))) > 0)
+                    .WithMessage("Provided sinceDateTime must be within last " + configuration["ValidPastWeeks"] + " weeks.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                 });
 
@@ -43,13 +43,6 @@ namespace UKHO.ExchangeSetService.API.Validation
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
                 .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
-        }
-
-        private int GetValidTillDays()
-        {
-            int daysInWeek = 7;
-            string validSinceDateTimeTillWeeks = Convert.ToString(configuration["SinceDateTimeDateValidTillDateOfPastWeeks"]);
-            return validSinceDateTimeTillWeeks != null ? (daysInWeek * Convert.ToInt32(validSinceDateTimeTillWeeks)) : 0;
         }
 
         Task<ValidationResult> IProductDataSinceDateTimeValidator.Validate(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
