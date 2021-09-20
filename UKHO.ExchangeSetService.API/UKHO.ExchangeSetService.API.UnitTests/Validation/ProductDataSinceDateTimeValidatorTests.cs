@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         public void Setup()
         {
             var inMemorySettings = new Dictionary<string, string> {
-                {"SinceDateTimeDateValidTillDateOfPastWeeks", "4"}};
+                {"ValidPastWeeks", "4"}};
 
             configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
@@ -79,12 +79,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         [Test]
         public void WhenSinceDateTimeLessThan4WeeksFromCurrentDateInProductDataSinceDateTimeRequest_ThenReturnBadRequest()
         {
-            int validTillDays = (7 * Convert.ToInt32(configuration.GetValue<string>("SinceDateTimeDateValidTillDateOfPastWeeks")));
+            int validTillDays = (7 * Convert.ToInt32(configuration.GetValue<string>("ValidPastWeeks")));
             var model = new ProductDataSinceDateTimeRequest { SinceDateTime = DateTime.UtcNow.AddDays(-validTillDays).ToString("R") };
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            string errorMessage = "Provided sinceDateTime must be within last " + configuration.GetValue<string>("SinceDateTimeDateValidTillDateOfPastWeeks") + " weeks.";
+            string errorMessage = "Provided sinceDateTime must be within last " + configuration.GetValue<string>("ValidPastWeeks") + " weeks.";
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == errorMessage));
         }
 
