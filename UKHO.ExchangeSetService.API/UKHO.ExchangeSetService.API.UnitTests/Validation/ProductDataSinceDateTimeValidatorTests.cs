@@ -84,8 +84,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            string errorMessage = "Provided sinceDateTime cannot be less than " + configuration.GetValue<string>("SinceDateTimeDateValidTillDateOfPastWeeks") + " weeks from current date.";
+            string errorMessage = "Provided sinceDateTime must be within last " + configuration.GetValue<string>("SinceDateTimeDateValidTillDateOfPastWeeks") + " weeks.";
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == errorMessage));
+        }
+
+        [Test]
+        public void WhenSinceDateTimeWithin4WeeksFromCurrentDateInProductDataSinceDateTimeRequest_ThenReturnSuccess()
+        {
+            var model = new ProductDataSinceDateTimeRequest { SinceDateTime = DateTime.UtcNow.AddDays(-1).ToString("R") };
+            var result = validator.TestValidate(model);
+            Assert.IsTrue(result.Errors.Count == 0);
         }
     }
 }
