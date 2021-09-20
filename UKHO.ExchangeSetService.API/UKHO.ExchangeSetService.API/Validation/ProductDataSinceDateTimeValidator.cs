@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.Validation
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                     RuleFor(x => x.SinceDateTime)
                     .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow.AddDays(-GetValidTillDays())) > 0)
-                    .WithMessage("Provided sinceDateTime cannot be less than "+ configuration["SinceDateTimeDateValidTillDateOfPastWeeks"] + " weeks from current date.")
+                    .WithMessage("Provided sinceDateTime must be within last " +configuration["SinceDateTimeDateValidTillDateOfPastWeeks"] + " weeks.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                 });
 
@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.Validation
         private int GetValidTillDays()
         {
             int daysInWeek = 7;
-            string validSinceDateTimeTillWeeks = configuration["SinceDateTimeDateValidTillDateOfPastWeeks"];
+            string validSinceDateTimeTillWeeks = Convert.ToString(configuration["SinceDateTimeDateValidTillDateOfPastWeeks"]);
             return validSinceDateTimeTillWeeks != null ? (daysInWeek * Convert.ToInt32(validSinceDateTimeTillWeeks)) : 0;
         }
 
