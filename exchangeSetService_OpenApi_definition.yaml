@@ -217,7 +217,7 @@ components:
       name: sinceDateTime
       required: true
       description: |
-        The date and time from which changes are requested. Any changes since the date will be returned. The value should be the Last-Modified date returned by the last request to this operation. The date format follows RFC 1123.
+        The date and time from which changes are requested. Any changes since the date will be returned. The value should be the Last-Modified date returned by the last request to this operation. The date format follows RFC 1123. The date and time must be within 28 days and cannot be in future.
       schema:
         type: string
         format: date-time

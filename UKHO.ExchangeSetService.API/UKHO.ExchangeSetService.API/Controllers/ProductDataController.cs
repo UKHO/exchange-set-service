@@ -197,7 +197,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// Provide all the releasable data after a datetime.
         /// </summary>
         /// <remarks>Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.</remarks>
-        /// <param name="sinceDateTime" example="Wed, 21 Oct 2015 07:28:00 GMT" >The date and time from which changes are requested. Any changes since the date will be returned. The value should be the Last-Modified date returned by the last request to this operation. The date format follows RFC 1123.
+        /// <param name="sinceDateTime" example="Wed, 21 Oct 2015 07:28:00 GMT" >The date and time from which changes are requested. Any changes since the date will be returned. The value should be the Last-Modified date returned by the last request to this operation. The date format follows RFC 1123. The date and time must be within 28 days and cannot be in future.
         /// <br/><para><i>Example</i> : Wed, 21 Oct 2015 07:28:00 GMT</para>
         /// </param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>

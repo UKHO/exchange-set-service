@@ -48,12 +48,5 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Extensions
             bool isValidDate = DateTimeExtensions.IsValidRfc1123Format("Tue, 29 Feb 2000 12:16:24 GMT", out DateTime fakeFolderDateTime);
             Assert.IsTrue(isValidDate);
         }
-
-        [Test]
-        public void CheckIsValidWeek_ThenReturnTrue()
-        {
-            int validWeekDays = DateTimeExtensions.GetValidTillDays(1);
-            Assert.AreEqual(7, validWeekDays);
-        }
     }
 }

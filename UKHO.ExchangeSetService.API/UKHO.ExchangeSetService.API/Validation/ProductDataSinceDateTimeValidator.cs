@@ -34,8 +34,8 @@ namespace UKHO.ExchangeSetService.API.Validation
                     .WithMessage("Provided sinceDateTime cannot be a future date.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                     RuleFor(x => x.SinceDateTime)
-                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow.AddDays(-DateTimeExtensions.GetValidTillDays(Convert.ToInt32(this.configuration["ValidPastWeeks"])))) > 0)
-                    .WithMessage("Provided sinceDateTime must be within last " + configuration["ValidPastWeeks"] + " weeks.")
+                    .Must(x => DateTime.Compare(sinceDateTime, DateTime.UtcNow.AddDays(-Convert.ToInt32(this.configuration["MaximumNumerOfDaysValidForSinceDateTimeEndpoint"]))) > 0)
+                    .WithMessage("Provided sinceDateTime must be within last " + configuration["MaximumNumerOfDaysValidForSinceDateTimeEndpoint"] + " days.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                 });
 
