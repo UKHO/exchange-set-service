@@ -42,12 +42,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.monitorHelper = monitorHelper;
         }
 
-        public async Task<CreateBatchResponse> CreateBatch(string userOID, string correlationId)
+        public async Task<CreateBatchResponse> CreateBatch(string userOid, string correlationId)
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var uri = $"/batch";
 
-            CreateBatchRequest createBatchRequest = CreateBatchRequest(userOID);
+            CreateBatchRequest createBatchRequest = CreateBatchRequest(userOid);
 
             string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
 
