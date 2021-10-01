@@ -17,6 +17,7 @@ using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
+using UKHO.ExchangeSetService.API.Configuration;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
@@ -35,6 +36,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
         private readonly IMonitorHelper monitorHelper;
+        private readonly UserIdentifier userIdentifier;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -44,7 +46,8 @@ namespace UKHO.ExchangeSetService.API.Services
             IFileShareService fileShareService,
             ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
             IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration, IOptions<AzureADConfiguration> azureAdConfiguration,
-            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper)
+            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
+            UserIdentifier userIdentifier)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -58,6 +61,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.azureAdConfiguration = azureAdConfiguration;
             this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
             this.monitorHelper = monitorHelper;
+            this.userIdentifier = userIdentifier;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -283,7 +287,7 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             logger.LogInformation(EventIds.FSSCreateBatchRequestStart.ToEventId(), "FSS create batch endpoint request started for _X-Correlation-ID:{CorrelationId}", correlationId);
 
-            var createBatchResponse = await fileShareService.CreateBatch(correlationId);
+            var createBatchResponse = await fileShareService.CreateBatch(userIdentifier.UserIdentity, correlationId);
 
             if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
             {

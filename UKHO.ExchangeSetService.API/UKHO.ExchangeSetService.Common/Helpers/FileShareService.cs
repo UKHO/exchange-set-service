@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -43,14 +42,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.monitorHelper = monitorHelper;
         }
 
-        public async Task<CreateBatchResponse> CreateBatch(string correlationId)
+        public async Task<CreateBatchResponse> CreateBatch(string userOID, string correlationId)
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            var jwtSecurityToken = new JwtSecurityToken(accessToken);
-            var oid = jwtSecurityToken.Claims.FirstOrDefault(m => m.Type == "oid").Value;
             var uri = $"/batch";
 
-            CreateBatchRequest createBatchRequest = CreateBatchRequest(oid);
+            CreateBatchRequest createBatchRequest = CreateBatchRequest(userOID);
 
             string payloadJson = JsonConvert.SerializeObject(createBatchRequest);
 

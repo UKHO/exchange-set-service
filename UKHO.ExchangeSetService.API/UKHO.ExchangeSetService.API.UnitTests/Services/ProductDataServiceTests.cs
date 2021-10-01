@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
@@ -38,6 +39,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IOptions<AzureAdB2CConfiguration> fakeAzureAdB2CConfig;
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
         private IMonitorHelper fakeMonitorHelper;
+        private UserIdentifier fakeUserIdentifier;
 
         [SetUp]
         public void Setup()
@@ -54,7 +56,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAzureAdB2CConfig = A.Fake<IOptions<AzureAdB2CConfiguration>>();
             fakeAzureAdConfig = A.Fake<IOptions<AzureADConfiguration>>();
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
-
+            fakeUserIdentifier = A.Fake<UserIdentifier>();
             fakeAzureAdB2CConfig.Value.ClientId = "9bca10f0-20d9-4b38-88eb-c7aff6b5f571";
             fakeAzureAdB2CConfig.Value.Instance = "https://gk.microsoft.com/";
             fakeAzureAdB2CConfig.Value.TenantId = "9b29766b-896f-46df-8f1a-122d7c822d91";
@@ -63,7 +65,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper);
+            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier);
         }
 
         #region GetExchangeSetResponse
@@ -347,7 +349,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
@@ -388,7 +390,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -456,7 +458,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(string.Empty)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(string.Empty, string.Empty)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -574,7 +576,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -604,7 +606,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -635,7 +637,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -694,7 +696,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(string.Empty)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(string.Empty, string.Empty)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -834,7 +836,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
@@ -860,7 +862,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());// ADB2C Token with File size less than 300 mb
 
