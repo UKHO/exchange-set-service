@@ -27,12 +27,12 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return selectedProductIdentifier;
         }
 
-        public SalesCatalogueResponse GetProductVersion(string productIdentifiers)
+        public SalesCatalogueResponse GetProductVersion(string productVersions)
         {
             var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\ProductVersionResponse.json");
             var myJsonString = File.ReadAllText(folderDetails);
             var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
-            var selectedProductIdentifier = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == productIdentifiers.ToLowerInvariant());
+            var selectedProductIdentifier = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersions.ToLowerInvariant());
             return selectedProductIdentifier;
         }
 
