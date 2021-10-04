@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API
 {
@@ -26,6 +27,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddScoped<SalesCatalogueService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,0 +1,315 @@
+[
+  {
+    "id": "productIdentifier-DE5NOBRK-DE4NO18Q-DE416080",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 76909
+        },
+        {
+          "editionNumber": 2,
+          "productName": "DE5NOBRK",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-07-09T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 85795
+        },
+        {
+          "editionNumber": 9,
+          "productName": "DE416080",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 770543
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-DE260001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "DE260001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-DE5NOBRK-DE5NOBRK",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "DE5NOBRK",
+            "reason": "duplicateProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE5NOBRK",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-07-09T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 85795
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-DE4NO18Q-GB123789",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "GB123789",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 76909
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-DE516510",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE516510",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-04-17T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-04-17T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2015-04-30T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2019-05-31T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 3
+            },
+            {
+              "issueDate": "2021-06-09T00:00:00.0000000Z",
+              "updateNumber": 4
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 38375
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-DE360010-DE416040",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "DE360010",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 54842
+        },
+        {
+          "editionNumber": 11,
+          "productName": "DE416040",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-01-20T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-01-20T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-03-24T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 59752
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-JP5BHTR7-JP5P9F59",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 7,
+          "productName": "JP5BHTR7",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        },
+        {
+          "editionNumber": 7,
+          "productName": "JP5P9F59",
+          "updateNumbers": [
+            3
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-11-13T00:00:00.0000000Z",
+              "updateNumber": 3
+            }
+          ],
+          "fileSize": 666602
+        }
+      ]
+    }
+  }
+]

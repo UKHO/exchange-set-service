@@ -1,0 +1,279 @@
+[
+  {
+    "id": "productVersion-DE416080-9-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "DE416080",
+          "updateNumbers": [
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 4788
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE416080-9-1",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "DE416080",
+          "updateNumbers": [
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 2722
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE216000-2-0-US2WC06M-10-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE216000",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-09-09T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 11285
+        },
+        {
+          "editionNumber": 10,
+          "productName": "US2WC06M",
+          "updateNumbers": [
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-05-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-07-06T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 9228
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE416080-9-1-GB123789-1-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "GB123789",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "DE416080",
+          "updateNumbers": [
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 2722
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE4NO18Q-2-0-DE416080-9-6",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "DE416080",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 2290
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE4NO18Q-2-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 2290
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE416040-11-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 11,
+          "productName": "DE416040",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-24T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 2146
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-JP5BHTR7-7-5",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 7,
+          "productName": "JP5BHTR7",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-JP5BHTR7-7-6",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 7,
+          "productName": "JP5BHTR7",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        }
+      ]
+    }
+  }
+]
