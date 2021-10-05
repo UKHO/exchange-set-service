@@ -167,6 +167,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IAzureWebJobsHealthCheckClient, AzureWebJobsHealthCheckClient>();
             services.AddScoped<IAzureWebJobsHealthCheckService, AzureWebJobsHealthCheckService>();
             services.AddSingleton<IWebJobsAccessKeyProvider>(s => new WebJobsAccessKeyProvider(configuration));
+            services.AddScoped<UserIdentifier>();
 
             services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
