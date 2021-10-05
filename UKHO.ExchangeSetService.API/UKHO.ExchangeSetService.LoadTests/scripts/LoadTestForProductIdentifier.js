@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, group, sleep } from 'k6';
 
-const apiClient = require('./helper/clientHelper.js');
+const apiClient = require('../helper/clientHelper.js');
 
 export function ESSCreation(clientAuthResp, productIdentifierData, exchangeSetType) {
     let fssCommitStatus;
@@ -24,6 +24,7 @@ export function ESSCreation(clientAuthResp, productIdentifierData, exchangeSetTy
     check(fssCommitStatus, {
         "status is Committed": fssCommitStatus === "Committed",
     })
-    console.log("batchStatusUrl", batchStatusUrl);
+
+    // console.log("batchStatusUrl", batchStatusUrl);
     console.log("fssCommitStatus", fssCommitStatus, exchangeSetType);
 }
