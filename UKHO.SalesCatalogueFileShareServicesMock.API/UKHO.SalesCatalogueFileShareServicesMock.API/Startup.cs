@@ -1,15 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Filters;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API
@@ -27,6 +22,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHeaderPropagation(options =>
+            {
+                options.Headers.Add(CorrelationIdMiddleware.XCorrelationIdHeaderKey);
+            });
             services.AddScoped<SalesCatalogueService>();
         }
 

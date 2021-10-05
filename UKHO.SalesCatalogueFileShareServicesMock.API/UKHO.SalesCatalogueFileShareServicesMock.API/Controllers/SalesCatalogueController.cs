@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,25 +12,31 @@ using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 {
     [ApiController]
-    public class SalesCatalogueController : ControllerBase
+    public class SalesCatalogueController : BaseController
     {
         private readonly SalesCatalogueService salesCatalogueService;
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
 
-        public SalesCatalogueController(SalesCatalogueService salesCatalogueService)
+        public SalesCatalogueController(IHttpContextAccessor httpContextAccessor, SalesCatalogueService salesCatalogueService) : base(httpContextAccessor)
         {
             this.salesCatalogueService = salesCatalogueService;
-            ErrorsIdentifiers = new Dictionary<string, string>();
-            ErrorsIdentifiers.Add("source", "productIds");
-            ErrorsIdentifiers.Add("description", "None of the product Ids exist in the database");
-            ErrorsVersions = new Dictionary<string, string>();
-            ErrorsVersions.Add("source", "productVersions");
-            ErrorsVersions.Add("description", "None of the product Ids exist in the database");
-            ErrorsVersions = new Dictionary<string, string>();
-            ErrorsVersions.Add("source", "productSinceDateTime");
-            ErrorsVersions.Add("description", "None of the product Ids exist in the database");
+            ErrorsIdentifiers = new Dictionary<string, string>
+            {
+                { "source", "productIds" },
+                { "description", "None of the product Ids exist in the database" }
+            };
+            ErrorsVersions = new Dictionary<string, string>
+            {
+                { "source", "productVersions" },
+                { "description", "None of the product Ids exist in the database" }
+            };
+            ErrorsSinceDateTime = new Dictionary<string, string>
+            {
+                { "source", "productSinceDateTime" },
+                { "description", "None of the product Ids exist in the database" }
+            };
         }
 
         [HttpGet]
@@ -47,7 +54,6 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return Ok(response);
                 }
             }
-            ////return BadRequest(new { CorrelationId = Guid.NewGuid(), Errors = ErrorsSinceDateTime });
             return BadRequest();
         }
 
@@ -66,7 +72,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return Ok(response);
                 }
             }
-            return BadRequest(new { CorrelationId = Guid.NewGuid(), Errors = ErrorsIdentifiers });
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
         }
 
         [HttpPost]
@@ -91,7 +97,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return Ok(response);
                 }
             }
-            return BadRequest(new { CorrelationId = Guid.NewGuid(), Errors = ErrorsVersions });
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
         }
     }
 }

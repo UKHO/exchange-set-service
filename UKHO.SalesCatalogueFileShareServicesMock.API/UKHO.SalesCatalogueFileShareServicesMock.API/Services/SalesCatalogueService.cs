@@ -20,7 +20,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public SalesCatalogueResponse GetProductIdentifier(string productIdentifiers)
         {
-            var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\ProductIdentifierResponse.json");
+            var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\SCSResponse.json");
             var myJsonString = File.ReadAllText(folderDetails);
             var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
             var selectedProductIdentifier = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == productIdentifiers.ToLowerInvariant());
@@ -29,20 +29,24 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public SalesCatalogueResponse GetProductVersion(string productVersions)
         {
-            var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\ProductVersionResponse.json");
+            var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\SCSResponse.json");
             var myJsonString = File.ReadAllText(folderDetails);
             var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
-            var selectedProductIdentifier = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersions.ToLowerInvariant());
-            return selectedProductIdentifier;
+            var selectedProductVersion = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersions.ToLowerInvariant());
+            return selectedProductVersion;
         }
 
         public SalesCatalogueResponse GetProductSinceDateTime(string sinceDateTime)
         {
-            var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\SinceDateTimeResponse.json");
-            var myJsonString = File.ReadAllText(folderDetails);
-            var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
-            var selectedProductIdentifier = jsonObj.FirstOrDefault();
-            return selectedProductIdentifier;
+            if (!string.IsNullOrWhiteSpace(sinceDateTime))
+            {
+                var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\SCSResponse.json");
+                var myJsonString = File.ReadAllText(folderDetails);
+                var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
+                var selectedProductSinceDateTime = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == "sinceDateTime".ToLowerInvariant());
+                return selectedProductSinceDateTime; 
+            }
+            return null;
         }
     }
 }
