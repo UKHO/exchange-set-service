@@ -5,9 +5,11 @@ import { authenticateUsingAzure } from './oauth/azure.js';
 import { sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
-const runTestProductIdentifier = require('./LoadTestForProductIdentifier.js');
+const runTestProductIdentifier = require('./scripts/LoadTestForProductIdentifier.js');
 const config = JSON.parse(open('./config.json'));
-const dataHelper = require('./dataHelper.js');
+const dataHelper = require('./helper/dataHelper.js');
+const apiClient = require('./helper/clientHelper.js');
+
 const productIdentifierData_Small_25MB = dataHelper.GetProductIdentifierDataforSmallExchangeSet_25MB();
 const productIdentifierData_Small_50MB = dataHelper.GetProductIdentifierDataforSmallExchangeSet_50MB();
 const productIdentifierData_Medium_150MB = dataHelper.GetProductIdentifierDataforMediumExchangeSet_150MB();
@@ -23,63 +25,78 @@ let clientAuthResp = {};
 
 export let options = {
     scenarios: {
-        ESSCreationSmallExchangeSet_25MB: {
-            exec: 'ESSCreationSmallExchangeSet_25MB',
-            executor: 'constant-arrival-rate',
-            rate: 133,
-            timeUnit: '1m',
-            duration: '1h',
-            preAllocatedVUs: 245,
-            maxVUs: 270,
-        },
-        ESSCreationSmallExchangeSet_50MB: {
-            exec: 'ESSCreationSmallExchangeSet_50MB',
-            executor: 'constant-arrival-rate',
-            rate: 26,
-            timeUnit: '1m',
-            duration: '1h',
-            preAllocatedVUs: 48,
-            maxVUs: 50,
-        },
-        ESSCreationMediumExchangeSet_150MB: {
-            exec: 'ESSCreationMediumExchangeSet_150MB',
-            executor: 'constant-arrival-rate',
-            rate: 27,
-            timeUnit: '5m',
-            duration: '1h',
-            preAllocatedVUs: 22,
-            maxVUs: 25,
-        },
-        ESSCreationMediumExchangeSet_300MB: {
-            exec: 'ESSCreationMediumExchangeSet_300MB',
-            executor: 'constant-arrival-rate',
-            rate: 8,
-            timeUnit: '10m',
-            duration: '1h',
-            preAllocatedVUs: 3,
-            maxVUs: 4,
-        },
-        ESSCreationLargeExchangeSet: {
-            exec: 'ESSCreationLargeExchangeSet',
-            executor: 'constant-arrival-rate',
-            rate: 8,
-            timeUnit: '10m',
-            duration: '1h',
-            preAllocatedVUs: 3,
-            maxVUs: 4,
-        },
+      ESSCreationSmallExchangeSet_25MB: {
+        exec: 'ESSCreationSmallExchangeSet_25MB',
+        executor: 'ramping-vus',
+        stages:  [
+          { duration: '5m', target: 10 },
+          { duration: '5m', target: 10 },
+          { duration: '5m', target: 30 },
+          { duration: '35m', target: 30 },
+          { duration: '5m', target: 20 },
+          { duration: '5m', target: 0 }
+        ]
+      },
+      ESSCreationSmallExchangeSet_50MB: {
+        exec: 'ESSCreationSmallExchangeSet_50MB',
+        executor: 'ramping-vus',
+        stages: [
+          { duration: '5m', target: 5 },
+          { duration: '5m', target: 5 },
+          { duration: '5m', target: 10 },
+          { duration: '35m', target: 10 },
+          { duration: '5m', target: 5 },
+          { duration: '5m', target: 0 }
+        ]
+      },
+      ESSCreationMediumExchangeSet_150MB: {
+        exec: 'ESSCreationMediumExchangeSet_150MB',
+        executor: 'ramping-vus',
+        stages: [
+          { duration: '5m', target: 2 },
+          { duration: '5m', target: 2 },
+          { duration: '5m', target: 5 },
+          { duration: '35m', target: 5 },
+          { duration: '5m', target: 2 },
+          { duration: '5m', target: 0 }
+        ]
+      },
+      ESSCreationMediumExchangeSet_300MB: {
+        exec: 'ESSCreationMediumExchangeSet_300MB',
+        executor: 'ramping-vus',
+        stages: [
+          { duration: '5m', target: 1 },
+          { duration: '5m', target: 1 },
+          { duration: '5m', target: 2 },
+          { duration: '35m', target: 2 },
+          { duration: '5m', target: 1 },
+          { duration: '5m', target: 0 }
+        ]
+      },
+      ESSCreationLargeExchangeSet: {
+        exec: 'ESSCreationLargeExchangeSet',
+        executor: 'ramping-vus',
+        stages: [
+          { duration: '10m', target: 1 },
+          { duration: '10m', target: 1 },
+          { duration: '10m', target: 2 },
+          { duration: '20m', target: 2 },
+          { duration: '5m', target: 1 },
+          { duration: '5m', target: 0 }
+          ]
     },
-};
-
+  },
+  
+  };
 
 export function setup() {
-    // client credentials authentication flow
+     // client credentials authentication flow
      let essAuthResp = authenticateUsingAzure(
          `${config.ESS_TENANT_ID}`, `${config.ESS_CLIENT_ID}`, `${config.ESS_CLIENT_SECRET}`, `${config.ESS_SCOPES}`, `${config.ESS_RESOURCE}`
      );
     clientAuthResp["essToken"] = essAuthResp.access_token;
 
-      let fssAuthResp = authenticateUsingAzure(
+     let fssAuthResp = authenticateUsingAzure(
          `${config.FSS_TENANT_ID}`, `${config.FSS_CLIENT_ID}`, `${config.FSS_CLIENT_SECRET}`, `${config.FSS_SCOPES}`, `${config.FSS_RESOURCE}`
      );
     clientAuthResp["fssToken"] = fssAuthResp.access_token;
@@ -130,8 +147,8 @@ export function ESSCreationLargeExchangeSet(clientAuthResp) {
 
 export function handleSummary(data) {
     return {
-        "summary/result.html": htmlReport(data),
+        ["summary/ProductIdentifierResult_"+new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".html"]:htmlReport(data),
         stdout: textSummary(data, { indent: " ", enableColors: true }),
-        "summary/summary.json": JSON.stringify(data),
+        ["summary/ProductIdentifierResult_" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".json"]:JSON.stringify(data),
     }
 }

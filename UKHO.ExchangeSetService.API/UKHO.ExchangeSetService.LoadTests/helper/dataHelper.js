@@ -1,4 +1,3 @@
-
 export function GetProductIdentifierDataforSmallExchangeSet_25MB() {
     let ProductIdentifierData = [
         "CA570182",
@@ -61,7 +60,6 @@ export function GetProductIdentifierDataforSmallExchangeSet_25MB() {
         "US5RI23M",
         "US5WA14M",
         "US5WA31M"
-
     ];
     return ProductIdentifierData;
 };
@@ -86,12 +84,8 @@ export function GetProductIdentifierDataforSmallExchangeSet_50MB() {
         "CA573301",
         "CA573308",
         "CA573312",
-        "CA573362",
         "CA573377",
-        "CA573393",
         "CA573465",
-        "CA576007",
-        "CA576036",
         "CA576037",
         "CA576184",
         "CA576291",
@@ -123,15 +117,12 @@ export function GetProductIdentifierDataforSmallExchangeSet_50MB() {
         "US5CA44M",
         "US5HA54M",
         "US5HA55M",
-        "US5ME10M",
         "US5NY12M",
         "US5RI23M",
         "US5WA14M",
-        "US5WA31M",
         "US3EC08M",
         "US5CN11M",
         "US5FL57M",
-        "US5NH02M",
         "US5VA32M",
         "US2EC02M",
         "US3GC01M",
@@ -148,7 +139,6 @@ export function GetProductIdentifierDataforSmallExchangeSet_50MB() {
         "US4MD20M",
         "US5LA37M",
         "US5TX27M",
-        "US5VA17M",
         "US4DE11M",
         "US4LA31M",
         "US5DE13M",
@@ -158,7 +148,6 @@ export function GetProductIdentifierDataforSmallExchangeSet_50MB() {
         "US4GA11M",
         "US4LA15M",
         "US4NC30M",
-        "US5CA31M",
         "US5OR19M",
         "US3GC07M",
         "US4NY1AM",
@@ -171,7 +160,6 @@ export function GetProductIdentifierDataforSmallExchangeSet_50MB() {
         "US5PR32M",
         "US5SC34M",
         "US5VA16M"
-
     ];
     return ProductIdentifierData;
 };
@@ -586,8 +574,6 @@ export function GetProductIdentifierDataforMediumExchangeSet_300MB() {
         "US4WI33M",
         "US5AK23M",
         "US5FL42M",
-        "US5FL83M",
-        "US5MD21M",
         "US5VA27M",
         "US5VA51M",
         "US5WA18M",
@@ -796,12 +782,8 @@ export function GetProductIdentifierDataforMediumExchangeSet_300MB() {
         "CA573301",
         "CA573308",
         "CA573312",
-        "CA573362",
         "CA573377",
-        "CA573393",
         "CA573465",
-        "CA576007",
-        "CA576036",
         "CA576037",
         "CA576184",
         "CA576291",
@@ -1366,7 +1348,6 @@ export function GetProductIdentifierDataforLargeExchangeSet() {
         "CA476708",
         "CA476735",
         "CA476774",
-        "CA479137",
         "CA479190",
         "CA479240",
         "CA479242",
@@ -2329,8 +2310,6 @@ export function GetProductIdentifierDataforLargeExchangeSet() {
         "US4WI33M",
         "US5AK23M",
         "US5FL42M",
-        "US5FL83M",
-        "US5MD21M",
         "US5VA27M",
         "US5VA51M",
         "US5WA18M",
@@ -2539,12 +2518,8 @@ export function GetProductIdentifierDataforLargeExchangeSet() {
         "CA573301",
         "CA573308",
         "CA573312",
-        "CA573362",
         "CA573377",
-        "CA573393",
         "CA573465",
-        "CA576007",
-        "CA576036",
         "CA576037",
         "CA576184",
         "CA576291",
@@ -3051,8 +3026,6 @@ export function GetProductIdentifierDataforLargeExchangeSet() {
         "US5AK02M",
         "US5AK18M",
         "US5AK27M",
-        "US5AK29M",
-        "US5AK3PM",
         "US5AK65M",
         "US5AK67M",
         "US5AK69M",
