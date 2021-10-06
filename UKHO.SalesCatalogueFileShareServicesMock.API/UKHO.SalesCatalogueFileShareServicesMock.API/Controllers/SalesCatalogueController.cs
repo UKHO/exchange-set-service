@@ -49,9 +49,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 var response = salesCatalogueService.GetProductSinceDateTime(sinceDateTime);
                 if (response != null)
                 {
-                    response.ResponseCode = System.Net.HttpStatusCode.OK;
-                    response.LastModified = DateTime.Now.AddDays(-2);
-                    return Ok(response);
+                    return Ok(response.ResponseBody);
                 }
             }
             return BadRequest();
@@ -67,9 +65,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 var response = salesCatalogueService.GetProductIdentifier("productIdentifier-" + String.Join("-", productIdentifiers));
                 if (response != null)
                 {
-                    response.ResponseCode = System.Net.HttpStatusCode.OK;
-                    response.LastModified = DateTime.Now.AddDays(-2);
-                    return Ok(response);
+                    return Ok(response.ResponseBody);
                 }
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
@@ -82,19 +78,17 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             if (productVersionRequest != null && productVersionRequest.Any())
             {
                 await Task.CompletedTask;
-                var sb = new StringBuilder();
+                var productVersionRequestSearchText = new StringBuilder();
                 bool isInitalIndex = true;
                 foreach (var item in productVersionRequest)
                 {
-                    sb.Append((isInitalIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
+                    productVersionRequestSearchText.Append((isInitalIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
                     isInitalIndex = false;
                 }
-                var response = salesCatalogueService.GetProductVersion("productVersion-" + sb.ToString());
+                var response = salesCatalogueService.GetProductVersion("productVersion-" + productVersionRequestSearchText.ToString());
                 if (response != null)
                 {
-                    response.ResponseCode = System.Net.HttpStatusCode.OK;
-                    response.LastModified = DateTime.Now.AddDays(-2);
-                    return Ok(response);
+                    return Ok(response.ResponseBody);
                 }
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
