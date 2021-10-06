@@ -25,24 +25,6 @@ export let options = {
                 { duration: '5m', target: 0 }
             ]
         },
-        // ESSCreationMediumExchangeSet: {
-        //     exec: 'ESSCreationMediumExchangeSet',
-        //     executor: 'per-vu-iterations',
-        //     startTime: '10s',
-        //     gracefulStop: '5s',
-        //     vus: 5,
-        //     iterations: 161,
-        //     maxDuration: '1h'
-        // },
-        // ESSCreationLargeExchangeSet: {
-        //     exec: 'ESSCreationLargeExchangeSet',
-        //     executor: 'per-vu-iterations',
-        //     startTime: '10s',
-        //     gracefulStop: '5s',
-        //     vus: 1,
-        //     iterations: 170,
-        //     maxDuration: '1h'
-        // },
     },
 };
 

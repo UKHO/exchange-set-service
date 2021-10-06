@@ -27,24 +27,6 @@ export let options = {
                 { duration: '5m', target: 0 }
             ]
         },
-        // ESSCreationMediumExchangeSet: {
-        //     exec: 'ESSCreationMediumExchangeSet',
-        //     executor: 'constant-arrival-rate',
-        //     rate: 3,
-        //     timeUnit: '2s',
-        //     duration: '1h',
-        //     preAllocatedVUs: 64,
-        //     maxVUs: 70
-        // },
-        // ESSCreationLargeExchangeSet: {
-        //     exec: 'ESSCreationLargeExchangeSet',
-        //     executor: 'constant-arrival-rate',
-        //     rate: 3,
-        //     timeUnit: '2s',
-        //     duration: '1h',
-        //     preAllocatedVUs: 64,
-        //     maxVUs: 70
-        // },
     },
 };
 

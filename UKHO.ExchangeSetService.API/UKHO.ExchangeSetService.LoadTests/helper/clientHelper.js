@@ -31,10 +31,7 @@ export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
         case "Large": LargeExchangeSetTrend.add(essResponse.timings.waiting); break;
     }
 
-    let jsonResponse = JSON.parse(essResponse.body);
-    let batchStatusUrl = JSON.stringify(jsonResponse['_links']['exchangeSetBatchStatusUri']['href']);
-
-    return batchStatusUrl;
+    return essResponse;
 };
 
 export function GetFSSApiResponse(url, fssToken) {
