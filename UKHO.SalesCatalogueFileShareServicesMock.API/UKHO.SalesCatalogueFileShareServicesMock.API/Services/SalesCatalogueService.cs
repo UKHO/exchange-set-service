@@ -1,38 +1,32 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 {
     public class SalesCatalogueService
     {
-        private JsonSerializerOptions Options { get; set; } = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
+        private readonly IOptions<SalesCatalogueConfiguration> salesCatalogueConfiguration;
 
-        public SalesCatalogueService()
+        public SalesCatalogueService(IOptions<SalesCatalogueConfiguration> salesCatalogueConfiguration)
         {
+            this.salesCatalogueConfiguration = salesCatalogueConfiguration;
         }
 
         public SalesCatalogueResponse GetProductIdentifier(string productIdentifiers)
         {
-            var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\SCSResponse.json");
-            var myJsonString = File.ReadAllText(folderDetails);
-            var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
-            var selectedProductIdentifier = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == productIdentifiers.ToLowerInvariant());
+            var responseData = FileHelper.ReadJsonFile<List<SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var selectedProductIdentifier = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productIdentifiers.ToLowerInvariant());
             return selectedProductIdentifier;
         }
 
         public SalesCatalogueResponse GetProductVersion(string productVersions)
         {
-            var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\SCSResponse.json");
-            var myJsonString = File.ReadAllText(folderDetails);
-            var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
-            var selectedProductVersion = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersions.ToLowerInvariant());
+            var responseData = FileHelper.ReadJsonFile<List<SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var selectedProductVersion = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersions.ToLowerInvariant());
             return selectedProductVersion;
         }
 
@@ -40,10 +34,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
         {
             if (!string.IsNullOrWhiteSpace(sinceDateTime))
             {
-                var folderDetails = Path.Combine(Directory.GetCurrentDirectory(), $"Data\\SalesCatalogueService\\SCSResponse.json");
-                var myJsonString = File.ReadAllText(folderDetails);
-                var jsonObj = JsonSerializer.Deserialize<List<SalesCatalogueResponse>>(myJsonString, Options);
-                var selectedProductSinceDateTime = jsonObj.FirstOrDefault(a => a.Id.ToLowerInvariant() == "sinceDateTime".ToLowerInvariant());
+                var responseData = FileHelper.ReadJsonFile<List<SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+                var selectedProductSinceDateTime = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == "sinceDateTime".ToLowerInvariant());
                 return selectedProductSinceDateTime; 
             }
             return null;
