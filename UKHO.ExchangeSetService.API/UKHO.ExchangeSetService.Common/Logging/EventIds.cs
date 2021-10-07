@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         SCSPostProductIdentifiersRequestStart = 805004,
         /// <summary>
-        /// 805005 - Request for sales catalogue service product vesrions endpoint is started.
+        /// 805005 - Request for sales catalogue service product versions endpoint is started.
         /// </summary>
         SCSPostProductVersionsRequestStart = 805005,
         /// <summary>
@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         SCSPostProductVersionsRequestCompleted = 805006,
         /// <summary>
-        /// 805007 - Request// information is loggged successfully.
+        /// 805007 - Request/response information is logged successfully.
         /// </summary>
         LogRequest = 805007,
         /// <summary>
@@ -102,11 +102,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         SCSResponseStoredToBlobStorage = 805023,
         /// <summary>
-        /// 805024 - Request for starting web job for creating exchange set is started.
+        /// 805024 - Create exchange set web job is started.
         /// </summary>
         CreateExchangeSetRequestStart = 805024,
         /// <summary>
-        /// 805025 - Request for starting web job for creating exchange set is completed.
+        /// 805025 - Create exchange set web job is completed.
         /// </summary>
         CreateExchangeSetRequestCompleted = 805025,
         /// <summary>
@@ -270,11 +270,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         UnexpectedDefaultFileExtension = 805065,
         /// <summary>
-        /// 805066 - Exchange set is created successfully.
+        /// 805066 - Exchange set is created with error.
         /// </summary>
         ExchangeSetCreatedWithError = 805066,
         /// <summary>
-        /// 805067 - Exchange set is created with error.
+        /// 805067 - Exchange set is created successfully.
         /// </summary>
         ExchangeSetCreated = 805067,
         /// <summary>
@@ -406,7 +406,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         ErrorTxtIsUploaded = 805099,
         /// <summary>
-        /// 805100 - Request for starting clean web job for exchange set is started.
+        /// 805100 - Exchange set cleanup web job is started.
         /// </summary>
         ESSCleanUpJobRequestStart = 805100,
         /// <summary>
@@ -442,7 +442,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         HistoricDateFolderNotFound = 805108,
         /// <summary>
-        /// 805109 - An exception occured while deleteing historic folders and files of exchange set.
+        /// 805109 - An exception occurred while deleting historic folders and files of exchange set.
         /// </summary>
         DeleteHistoricFoldersAndFilesException = 805109,
         /// <summary>
