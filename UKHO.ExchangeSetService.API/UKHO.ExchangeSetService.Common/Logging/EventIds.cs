@@ -410,7 +410,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         ESSCleanUpJobRequestStart = 805100,
         /// <summary>
-        /// 805101 - Request for starting clean web job for exchange set is completed.
+        /// 805101 - Exchange set cleanup web job is completed.
         /// </summary>
         ESSCleanUpJobRequestCompleted = 805101,
         /// <summary>
