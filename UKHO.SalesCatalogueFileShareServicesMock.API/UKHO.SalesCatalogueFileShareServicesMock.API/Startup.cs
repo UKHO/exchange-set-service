@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Filters;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
@@ -28,6 +29,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
                 options.Headers.Add(CorrelationIdMiddleware.XCorrelationIdHeaderKey);
             });
             services.AddScoped<SalesCatalogueService>();
+            services.Configure<SalesCatalogueConfiguration>(Configuration.GetSection("SalesCatalogue"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
