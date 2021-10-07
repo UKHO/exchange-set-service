@@ -12,14 +12,14 @@ using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 {
     [ApiController]
-    public class SalesCatalogueController : BaseController
+    public class SalesCatalogueServiceController : BaseController
     {
         private readonly SalesCatalogueService salesCatalogueService;
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
 
-        public SalesCatalogueController(IHttpContextAccessor httpContextAccessor, SalesCatalogueService salesCatalogueService) : base(httpContextAccessor)
+        public SalesCatalogueServiceController(IHttpContextAccessor httpContextAccessor, SalesCatalogueService salesCatalogueService) : base(httpContextAccessor)
         {
             this.salesCatalogueService = salesCatalogueService;
             ErrorsIdentifiers = new Dictionary<string, string>
