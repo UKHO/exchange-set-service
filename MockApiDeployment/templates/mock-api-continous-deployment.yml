@@ -1,0 +1,39 @@
+parameters:
+  - name: AzureSubscription
+    type: string
+
+steps:
+  - task: PowerShell@2
+    displayName: "terraform QCdeploy"
+    inputs:
+      targetType: filePath
+      filePath: '$(Pipeline.Workspace)/mockapiterraformartifact/mock_api_terraform_run.ps1'
+      arguments: '-deploymentResourceGroupName $(DeploymentResourceGroupName) -deploymentStorageAccountName $(DeploymentStorageAccountName) -workSpace $(WorkSpace)'
+    env:
+      ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
+      ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
+      ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
+      ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
+
+  - task: FileTransform@1
+    displayName: "File Transform: WebAppSettings"
+    inputs:
+      folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
+      fileType: 'json'
+      targetFiles: '**/appsettings.json'
+
+  - task: FileTransform@1
+    displayName: "File Transform: WebJob"
+    inputs:
+      folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
+      fileType: 'json'
+      targetFiles: '**/appsettings.json'
+
+  - task: AzureCLI@2
+    displayName: "Mock API deployment"
+    inputs:
+      azureSubscription: "${{ parameters.AzureSubscription }}"
+      scriptType: 'pscore'
+      scriptLocation: 'scriptPath'
+      scriptPath: '$(Pipeline.Workspace)/mockapiterraformartifact/mock_api_deployment.ps1'
+      arguments: '-essWebAppName $essWebAppName -essApipackagePath "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip" -mockWebAppName $mockWebAppName -mockApipackagePath "" -essFulfilmentWebAppname $essFulfilmentWebAppname -essFulfilmentpackagePath "$(Pipeline.Workspace)/ExchangeSetService/ExchangeSetFulFilmentService.zip" -webAppResourceGroup $webAppResourceGroup'
