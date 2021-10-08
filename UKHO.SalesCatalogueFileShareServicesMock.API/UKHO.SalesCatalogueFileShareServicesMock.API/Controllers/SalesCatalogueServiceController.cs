@@ -40,7 +40,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         }
 
         [HttpGet]
-        [Route("v1/productData/encs57/product")]
+        [Route("v1/productData/encs57/products")]
         public async Task<IActionResult> ProductsSinceDateTime(string sinceDateTime)
         {
             if (!string.IsNullOrEmpty(sinceDateTime))
@@ -56,7 +56,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         }
 
         [HttpPost]
-        [Route("v1/productData/encs57/product/productIdentifiers")]
+        [Route("v1/productData/encs57/products/productIdentifiers")]
         public async Task<IActionResult> ProductIdentifiers(List<string> productIdentifiers)
         {
             if (productIdentifiers != null && productIdentifiers.Any())
@@ -72,7 +72,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         }
 
         [HttpPost]
-        [Route("v1/productData/encs57/product/productVersions")]
+        [Route("v1/productData/encs57/products/productVersions")]
         public async Task<IActionResult> ProductVersions(List<ProductVersionRequest> productVersionRequest)
         {
             if (productVersionRequest != null && productVersionRequest.Any())
