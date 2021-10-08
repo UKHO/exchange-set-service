@@ -28,13 +28,12 @@ terraform plan -out "mockapiterraform.deployment.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform plan" ; throw "Error" }
 
 Write-output "Executing terraform apply"
-#terraform apply  "mockapiterraform.deployment.tfplan"
+terraform apply  "mockapiterraform.deployment.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform apply" ; throw "Error" }
 
 Write-output "Terraform output as json"
 $terraformOutput = terraform output -json | ConvertFrom-Json
 
-write-output "Set JSON output into pipeline variables"
 write-output "$terraformOutput"
 
 write-output "Set JSON output into pipeline variables"
