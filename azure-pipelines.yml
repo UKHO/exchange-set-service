@@ -340,7 +340,13 @@ stages:
             displayName: "Publish WebAPI Artifact"
             inputs:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)\MockWebAPI'
-              ArtifactName: MockWebAPI     
+              ArtifactName: MockWebAPI 
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Mock terraform Artifacts"
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)\MockApiDeployment'
+              ArtifactName: mockapiterraformartifact              
               
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
