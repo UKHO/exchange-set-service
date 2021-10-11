@@ -13,11 +13,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
     {
         [HttpPost]
         [Route("batch")]
-        public async Task<IActionResult> CreateBatch(string correlationId)
+        public IActionResult CreateBatch(string correlationId)
         {
             if (!string.IsNullOrEmpty(correlationId))
             {
-                await Task.CompletedTask;
                 return Ok(new CreateBatchResponse());
             }
             return BadRequest();

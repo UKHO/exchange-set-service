@@ -46,6 +46,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
 
             app.UseAuthorization();
 
+            app.UseCorrelationIdMiddleware();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
