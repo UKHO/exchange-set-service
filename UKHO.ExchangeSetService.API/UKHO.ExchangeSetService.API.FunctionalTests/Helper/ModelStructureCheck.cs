@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] exchangeSetBatchStatusUri = apiResponseData.Links.ExchangeSetBatchStatusUri.Href.Split('/');
 
             //Verify the exchangeSetBatchStatusUri format for batch
-            Assert.AreEqual("batch", exchangeSetBatchStatusUri[3], $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
+            Assert.AreEqual("batch", exchangeSetBatchStatusUri[4], $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
 
 
             var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 2];
@@ -93,18 +93,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] ExchangeSetFileUri = apiResponseData.Links.ExchangeSetFileUri.Href.Split('/');
 
             //Verify the ExchangeSetFileUri format for batch
-            Assert.AreEqual("batch", ExchangeSetFileUri[3], $"Exchange set returned File URI {apiResponseData.Links.ExchangeSetFileUri.Href}, which is wrong format.");
+            Assert.AreEqual("batch", ExchangeSetFileUri[4], $"Exchange set returned File URI {apiResponseData.Links.ExchangeSetFileUri.Href}, which is wrong format.");
             //Verify the ExchangeSetFileUri format for files
-            Assert.AreEqual("files", ExchangeSetFileUri[5], $"Exchange set returned File URI {apiResponseData.Links.ExchangeSetFileUri.Href}, which is wrong format.");
+            Assert.AreEqual("files", ExchangeSetFileUri[6], $"Exchange set returned File URI {apiResponseData.Links.ExchangeSetFileUri.Href}, which is wrong format.");
 
-            var fileBatchId = ExchangeSetFileUri[4];
+            var fileBatchId = ExchangeSetFileUri[5];
             hasGUID = Guid.TryParse(fileBatchId, out Guid guidIdFile);
 
             //Verify the ExchangeSetFileUri format for BatchID
             Assert.IsTrue(hasGUID, $"Exchange set returned file URI contains BatchId {fileBatchId} is not a valid GUID");
 
             //Verify the File format for ExchangeSetFileUri
-            Assert.AreEqual(Config.ExchangeSetFileName, ExchangeSetFileUri[6], $"Exchange set returned File URI contains file name  {ExchangeSetFileUri[6]}, instead of expected file name {Config.ExchangeSetFileName}.");
+            Assert.AreEqual(Config.ExchangeSetFileName, ExchangeSetFileUri[7], $"Exchange set returned File URI contains file name  {ExchangeSetFileUri[7]}, instead of expected file name {Config.ExchangeSetFileName}.");
 
             // verify both batch ID of ExchangeSetBatchStatusUri and ExchangeSetFileUri are the same
             Assert.AreEqual(batchID, fileBatchId, $"The Batch ID of ExchangeSetBatchStatusUri {batchID} and ExchangeSetFileUri {fileBatchId} are not equal.");
