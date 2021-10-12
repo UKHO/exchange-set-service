@@ -182,7 +182,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
-            var response = await fileShareService.CreateBatch(string.Empty);
+            var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
             Assert.IsNull(response.ResponseBody);
         }
@@ -198,7 +198,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
-            var response = await fileShareService.CreateBatch(string.Empty);
+            var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
 
             Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
@@ -219,6 +219,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
+            string userOID = null;
             var createBatchResponse = GetCreateBatchResponse();
             var jsonString = JsonConvert.SerializeObject(createBatchResponse);
 
@@ -237,7 +238,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             //Method call
-            var response = await fileShareService.CreateBatch(correlationIdParam);
+            var response = await fileShareService.CreateBatch(userOID, correlationIdParam);
 
             //Test
             Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
