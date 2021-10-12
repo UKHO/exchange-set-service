@@ -36,4 +36,4 @@ steps:
       scriptType: 'pscore'
       scriptLocation: 'scriptPath'
       scriptPath: '$(Pipeline.Workspace)/mockapiterraformartifact/mock_api_deployment.ps1'
-      arguments: '-essWebAppName $essWebAppName -essApipackagePath "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip" -mockWebAppName $mockWebAppName -mockApipackagePath "" -essFulfilmentWebAppname $essFulfilmentWebAppname -essFulfilmentpackagePath "$(Pipeline.Workspace)/ExchangeSetService/ExchangeSetFulFilmentService.zip" -webAppResourceGroup $webAppResourceGroup'
+      arguments: '-essWebAppName $(essWebAppName) -essApipackagePath "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip" -mockWebAppName $(mockWebAppName) -mockApipackagePath "" -essFulfilmentWebAppname $(essFulfilmentWebAppname) -essFulfilmentpackagePath "$(Pipeline.Workspace)/ExchangeSetService/ExchangeSetFulFilmentService.zip" -webAppResourceGroup $(webAppResourceGroup)'

@@ -36,6 +36,8 @@ terraform output -json
 Write-output "Terraform output as json"
 $terraformOutput = terraform output -json | ConvertFrom-Json
 
+write-output "ess_webappname : $terraformOutput.ess_webappname.value"
+
 write-output "$terraformOutput"
 
 write-output "Set JSON output into pipeline variables"
