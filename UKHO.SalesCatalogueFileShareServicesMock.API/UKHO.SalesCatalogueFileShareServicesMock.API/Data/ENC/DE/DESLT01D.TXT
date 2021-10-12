@@ -1,0 +1,5 @@
+SOLLTIEFEN
+Die eingetragenen Solltiefen geben Tiefen
+unter Kartennull an, die angestrebt werden.
+Es muss damit gerechnet werden, dass sie
+nicht überall vorhanden sind.
