@@ -36,10 +36,6 @@ terraform output -json
 Write-output "Terraform output as json"
 $terraformOutput = terraform output -json | ConvertFrom-Json
 
-write-output "ess_webappname : $terraformOutput.ess_webappname.value"
-
-write-output "$terraformOutput"
-
 write-output "Set JSON output into pipeline variables"
 Write-Host "##vso[task.setvariable variable=essWebAppName]$($terraformOutput.ess_webappname.value)"
 Write-Host "##vso[task.setvariable variable=mockWebAppName]$($terraformOutput.mock_webappname.value)"
@@ -48,3 +44,6 @@ Write-Host "##vso[task.setvariable variable=EssApiUrl]$($terraformOutput.ess_web
 Write-Host "##vso[task.setvariable variable=webAppResourceGroup]$($terraformOutput.webapp_rg.value)"
 Write-Host "##vso[task.setvariable variable=KeyVaultSettings.ServiceUri]$($terraformOutput.keyvault_uri.value)"
 Write-Host "##vso[task.setvariable variable=ESSManagedIdentity.ClientId]$($terraformOutput.ess_managed_user_identity_client_id.value)"
+Write-Host "##vso[task.setvariable variable=FileShareService.BaseUrl]$($terraformOutput.scs_fss_mock_web_app_url.value)"
+Write-Host "##vso[task.setvariable variable=SalesCatalogue.BaseUrl]$($terraformOutput.scs_fss_mock_web_app_url.value)"
+Write-Host "##vso[task.setvariable variable=ESSFulfilmentStorageConfiguration.QueueName]$($terraformOutput.storage_account_queue_name.value)"

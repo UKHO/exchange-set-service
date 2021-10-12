@@ -44,7 +44,16 @@ module "key_vault" {
     "service_identity" = module.user_identity.service_identity_principal_id
   }
   secrets = {
-    "AzureStorageConfiguration--ConnectionString"          = module.storage.storage_connection_string
+    "AzureStorageConfiguration--ConnectionString"               = module.storage.storage_connection_string
+    "ESSFulfilmentConfiguration--SmallExchangeSetAccountName"   = module.storage.storage_account_name
+    "ESSFulfilmentConfiguration--SmallExchangeSetAccountKey"    = module.storage.storage_primary_access_key
+    "ESSFulfilmentConfiguration--MediumExchangeSetAccountName"  = module.storage.storage_account_name
+    "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"   = module.storage.storage_primary_access_key
+    "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"   = module.storage.storage_account_name
+    "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.storage.storage_primary_access_key
+    "ESSFulfilmentStorageConfiguration--StorageAccountName"     = module.storage.storage_account_name
+    "ESSFulfilmentStorageConfiguration--StorageAccountKey"      = module.storage.storage_primary_access_key
+    "AzureWebJobsStorage"                                       = module.storage.storage_connection_string
   }
   tags                                         = local.tags
 }

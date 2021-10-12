@@ -29,3 +29,11 @@ value = azurerm_resource_group.webapp_rg.name
 output "keyvault_uri"{
   value = module.key_vault.keyvault_uri
 }
+
+output "ess_managed_user_identity_client_id"{
+    value = module.user_identity.service_client_id
+}
+
+output "storage_account_queue_name"{
+    value = module.storage.storage_account_queue_name
+}

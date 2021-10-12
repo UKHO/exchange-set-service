@@ -463,8 +463,15 @@ stages:
             value: $(AutoTestClientSecret_NoAuth)
           - name: "AzureAdB2CTestConfiguration.ClientSecret"
             value: $(AUTOTEST-ESS-SECRET)
-          - name: "WorkSpace"
+            #This variables are overridden since they are different from dev and we have used same library
+          - name: "Environment"
             value: "qc"
+          - name: "ESSFulfilmentConfiguration.SmallExchangeSetInstance"
+            value: 1
+          - name: "ESSFulfilmentConfiguration.MediumExchangeSetInstance"
+            value: 1
+          - name: "ESSFulfilmentConfiguration.LargeExchangeSetInstance"
+            value: 1
         strategy:
           runOnce:
             deploy:
