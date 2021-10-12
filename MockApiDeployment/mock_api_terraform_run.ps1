@@ -31,6 +31,8 @@ Write-output "Executing terraform apply"
 terraform apply  "mockapiterraform.deployment.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform apply" ; throw "Error" }
 
+terraform output -json
+
 Write-output "Terraform output as json"
 $terraformOutput = terraform output -json | ConvertFrom-Json
 
