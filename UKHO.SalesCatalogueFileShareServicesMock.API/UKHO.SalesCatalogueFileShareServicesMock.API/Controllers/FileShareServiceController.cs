@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers

@@ -4,9 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
