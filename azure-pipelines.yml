@@ -512,6 +512,16 @@ stages:
                     testRunTitle: "QC-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
+                - task: AzureCLI@2
+                  condition: succeededOrFailed()
+                  displayName: "Delete WebApp resource group"
+                  inputs:
+                    azureSubscription: "${{ parameters.AzureSubscription }}"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: '$(Pipeline.Workspace)/mockapiterraformartifact/CheckAndDeleteResourceGroup.ps1'
+                    arguments: '-resourceGroup $(webAppResourceGroup)'
+
   - stage: QAdeploy
     dependsOn:
     - Devdeploy

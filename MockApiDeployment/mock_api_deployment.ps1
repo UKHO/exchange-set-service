@@ -8,12 +8,13 @@ param (
     [Parameter(Mandatory = $true)] [string] $webAppResourceGroup
 )
 
-echo "essApipackagePath : $essApipackage"
-echo "mockApipackagePath : $mockApipackage"
-echo "essFulfilmentpackagePath : $essFulfilmentpackage"
+echo "essApipackagePath : $essApipackagePath"
+echo "mockApipackagePath : $mockApipackagePath"
+echo "essFulfilmentpackagePath : $essFulfilmentpackagePath"
 echo "essWebAppName : $essWebAppName"
 echo "mockWebAppName : $mockWebAppName"
 echo "essFulfilmentWebAppname : $essFulfilmentWebAppname"
+echo "ResourceGroup : $webAppResourceGroup"
 
 function DeployWebApp($webAppName, $package, $webAppRGroup){
     
