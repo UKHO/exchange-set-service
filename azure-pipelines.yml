@@ -516,7 +516,7 @@ stages:
                   condition: succeededOrFailed()
                   displayName: "Delete WebApp resource group"
                   inputs:
-                    azureSubscription: "${{ parameters.AzureSubscription }}"
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: '$(Pipeline.Workspace)/mockapiterraformartifact/CheckAndDeleteResourceGroup.ps1'
