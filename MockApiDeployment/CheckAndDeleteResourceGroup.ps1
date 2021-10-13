@@ -15,5 +15,8 @@ if ($rgExists) {
 
     echo "Resource group delete completed ..."
 }
+else
+{
+    echo "Resource group $resourceGroup doesn't exists returing from script ..."
+}
 
-echo "Resource group $resourceGroup doesn't exists returing from script ..."
