@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             this.fakeLogger = A.Fake<ILogger<FileShareService>>();
             this.fakeAuthFssTokenProvider = A.Fake<IAuthFssTokenProvider>();
             this.fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration()
-            { BaseUrl = "http://tempuri.org", PublicBaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
+            { BaseUrl = "http://tempuri.org", PublicBaseUrl = "http://filetempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
