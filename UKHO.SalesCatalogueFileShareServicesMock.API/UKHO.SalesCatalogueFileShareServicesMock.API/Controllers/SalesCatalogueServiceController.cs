@@ -4,9 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
@@ -41,11 +39,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpGet]
         [Route("v1/productData/encs57/products")]
-        public async Task<IActionResult> ProductsSinceDateTime(string sinceDateTime)
+        public IActionResult ProductsSinceDateTime(string sinceDateTime)
         {
             if (!string.IsNullOrEmpty(sinceDateTime))
             {
-                await Task.CompletedTask;
                 var response = salesCatalogueService.GetProductSinceDateTime(sinceDateTime);
                 if (response != null)
                 {
@@ -57,11 +54,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpPost]
         [Route("v1/productData/encs57/products/productIdentifiers")]
-        public async Task<IActionResult> ProductIdentifiers(List<string> productIdentifiers)
+        public IActionResult ProductIdentifiers(List<string> productIdentifiers)
         {
             if (productIdentifiers != null && productIdentifiers.Any())
             {
-                await Task.CompletedTask;
                 var response = salesCatalogueService.GetProductIdentifier("productIdentifier-" + String.Join("-", productIdentifiers));
                 if (response != null)
                 {
@@ -73,11 +69,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpPost]
         [Route("v1/productData/encs57/products/productVersions")]
-        public async Task<IActionResult> ProductVersions(List<ProductVersionRequest> productVersionRequest)
+        public IActionResult ProductVersions(List<ProductVersionRequest> productVersionRequest)
         {
             if (productVersionRequest != null && productVersionRequest.Any())
             {
-                await Task.CompletedTask;
                 var productVersionRequestSearchText = new StringBuilder();
                 bool isInitalIndex = true;
                 foreach (var item in productVersionRequest)
