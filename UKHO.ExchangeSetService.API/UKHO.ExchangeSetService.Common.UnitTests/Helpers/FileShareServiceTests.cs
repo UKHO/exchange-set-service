@@ -70,9 +70,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             return new CreateBatchResponseModel()
             {
                 BatchId = batchId,
-                BatchStatusUri = $"http://tempuri.org/batch/{batchId}/status",
-                ExchangeSetBatchDetailsUri = $"http://tempuri.org/batch/{batchId}",
-                ExchangeSetFileUri = $"http://tempuri.org/batch/{batchId}/files/",
+                BatchStatusUri = $"http://filetempuri.org/batch/{batchId}/status",
+                ExchangeSetBatchDetailsUri = $"http://filetempuri.org/batch/{batchId}",
+                ExchangeSetFileUri = $"http://filetempuri.org/batch/{batchId}/files/",
                 BatchExpiryDateTime = DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
             };
         }
