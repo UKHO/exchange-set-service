@@ -3,6 +3,7 @@
     public class FileShareServiceConfiguration
     {
         public string FileDirectoryPath { get; set; }
+        public string FileDirectoryPathForENC { get; set; }
         public string ScsResponseFile { get; set; }
     }
 }

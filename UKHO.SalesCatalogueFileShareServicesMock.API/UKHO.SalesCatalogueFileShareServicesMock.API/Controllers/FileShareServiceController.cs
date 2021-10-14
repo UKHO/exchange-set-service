@@ -39,13 +39,24 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (limit != null && !string.IsNullOrEmpty(filter))
             {
-                var response = fileShareService.GetGetBatches(filter);
+                var response = fileShareService.GetBatches(filter);
                 if (response != null)
                 {
                     return Ok(response);
                 }
             }
             return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("/batch/{batchId}/files/{filesName}")]
+        public FileResult DownloadENCFile(string filesName)
+        {
+            string path = fileShareService.GetENCFilePath(filesName);
+
+            byte[] bytes = System.IO.File.ReadAllBytes(path);
+
+            return File(bytes, "application/octet-stream", filesName);
         }
     }
 }
