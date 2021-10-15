@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     ExchangeSetResponse exchangeSetResponse = SetExchangeSetResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
                     exchangeSetResponse.Links.ExchangeSetFileUri = null;
-                    exchangeSetResponse.Links.ExchangeSetErrorFileUri = new LinkSetErrorFileUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ErrorFileName}" };
+                    exchangeSetResponse.Links.ExchangeSetErrorFileUri = new LinkSetErrorFileUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ErrorFileName}" };
 
                     CallBackResponse callBackResponse = SetCallBackResponse(exchangeSetResponse);
                     callBackResponse.Subject = essCallBackConfiguration.Value.ErrorSubject;
@@ -153,9 +153,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 Links = new Links()
                 {
-                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status" },
-                    ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
-                    ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fileShareServiceConfig.Value.BaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}" }
+                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status" },
+                    ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
+                    ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}" }
                 },
                 ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
                 RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
