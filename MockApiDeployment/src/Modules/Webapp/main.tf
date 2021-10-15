@@ -1,5 +1,11 @@
+resource "random_string" "unique_string" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
 resource "azurerm_app_service_plan" "app_service_plan" {
-  name                = "${var.service_name}-${var.env_name}-asp"
+  name                = "${var.service_name}-${var.env_name}-${random_string.unique_string.result}-asp"
   location            = var.location
   resource_group_name = var.resource_group_name
   
@@ -8,12 +14,6 @@ resource "azurerm_app_service_plan" "app_service_plan" {
 	size = var.app_service_sku.size
   }
   tags                = var.tags
-}
-
-resource "random_string" "unique_string" {
-  length  = 5
-  special = false
-  upper   = false
 }
 
 resource "azurerm_app_service" "fulfillment_webapp" {
@@ -35,7 +35,7 @@ resource "azurerm_app_service" "fulfillment_webapp" {
 }
 
 resource "azurerm_app_service" "scs_fss_mock_webapp" {
-  name                = "${var.service_name}-${var.env_name}-scs-fss-mock-${random_string.unique_string.result}-webapp"
+  name                = "${var.service_name}-${var.env_name}-mock-${random_string.unique_string.result}-webapp"
   location            = var.location
   resource_group_name = var.resource_group_name
   app_service_plan_id = azurerm_app_service_plan.app_service_plan.id
@@ -58,7 +58,7 @@ resource "azurerm_app_service" "scs_fss_mock_webapp" {
 }
 
 resource "azurerm_app_service" "ess_webapp" {
-  name                = "${var.service_name}-${var.env_name}-ess-${random_string.unique_string.result}-webapp"
+  name                = "${var.service_name}-${var.env_name}-${random_string.unique_string.result}-webapp"
   location            = var.location
   resource_group_name = var.resource_group_name
   app_service_plan_id = azurerm_app_service_plan.app_service_plan.id

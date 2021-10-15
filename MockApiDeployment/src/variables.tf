@@ -15,7 +15,7 @@ variable "app_service_sku" {
 
 locals {
   env_name				= lower(terraform.workspace)
-  service_name			= "essfunctionaltest"
+  service_name			= "essft"
   key_vault_name		= "${local.service_name}-${local.env_name}-kv"
   storage_account_name  = "ft${local.env_name}storageukho"
   managed_identity_name = "${local.service_name}-${local.env_name}-service-identity"
