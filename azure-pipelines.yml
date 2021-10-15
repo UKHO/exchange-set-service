@@ -479,38 +479,6 @@ stages:
                 - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
                   parameters:
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-                    
-                - task: DownloadBuildArtifacts@0
-                  displayName: "Download Functional test Artifact"
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'functionaltests'
-                    downloadPath: '$(Build.SourcesDirectory)'
-
-                - task: FileTransform@1
-                  displayName: "File Transform: functionaltests"
-                  inputs:
-                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    fileType: json
-                    targetFiles: '**/appsettings.json'
-
-                - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
-                  inputs:
-                    packageType: sdk
-                    version: 3.1.x
-
-                - task: DotNetCoreCLI@2
-                  displayName: "Run Functional tests"
-                  inputs:
-                    command: "test"
-                    projects: |
-                      **/*FunctionalTest*.dll
-                      !**/*TestAdapter.dll
-                      !**/obj/**
-                    testRunTitle: "QC-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   condition: succeededOrFailed()
