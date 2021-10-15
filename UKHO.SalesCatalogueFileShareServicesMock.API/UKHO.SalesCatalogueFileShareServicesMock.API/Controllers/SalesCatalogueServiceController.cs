@@ -13,6 +13,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
     public class SalesCatalogueServiceController : BaseController
     {
         private readonly SalesCatalogueService salesCatalogueService;
+     
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
@@ -85,6 +86,18 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 {
                     return Ok(response.ResponseBody);
                 }
+            }
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
+        }
+
+        [HttpGet]
+        [Route("v1/productData/encs57/catalogue/essData")]
+        public IActionResult SCSessData()
+        {
+            var response = salesCatalogueService.GetSCSessData();
+            if (response != null)
+            {
+                return Ok(response.ResponseBody);
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
         }
