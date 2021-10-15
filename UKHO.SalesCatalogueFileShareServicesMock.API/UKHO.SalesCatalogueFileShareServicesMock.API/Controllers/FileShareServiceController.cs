@@ -52,9 +52,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("/batch/{batchId}/files/{filesName}")]
         public FileResult DownloadENCFile(string filesName)
         {
-            string path = fileShareService.GetENCFilePath(filesName);
-
-            byte[] bytes = System.IO.File.ReadAllBytes(path);
+            byte[] bytes = fileShareService.GetENCFilePath(filesName);
 
             return File(bytes, "application/octet-stream", filesName);
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System;
 using System.IO;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
@@ -24,28 +25,20 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return null;
         }
 
-        public string GetENCFilePath(string filesName)
+        public byte[] GetENCFilePath(string filesName)
         {
-            string filePath; 
-            string fileType = filesName.Substring(filesName.IndexOf(".") + 1, 3);
+            string filePath, fileType = Path.GetExtension(filesName);
+            string[] filePaths;
+            byte[] bytes = null;
 
-            if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && fileType == "TXT")
+            if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC))
             {
-                string[] filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, "*.TXT");
+                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
                 filePath = filePaths[0];
-                return filePath;
+                bytes = File.ReadAllBytes(filePath);
+                return bytes;
             }
-            else
-            {
-                if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC))
-                {
-                    string[] filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, "*.000");
-                    filePath = filePaths[0];
-                    return filePath;
-                }
-            }
-
-            return null;
+            return bytes;
         }
     }
 }
