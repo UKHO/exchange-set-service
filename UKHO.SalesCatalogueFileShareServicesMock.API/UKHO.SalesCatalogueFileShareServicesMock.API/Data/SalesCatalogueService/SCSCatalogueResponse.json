@@ -1,6 +1,4 @@
-[
-  {
-    "id": "SCSCatalogueEssData",
+{
     "responseBody": [
       {
         "baseCellEditionNumber": 1,
@@ -68996,4 +68994,3 @@
       }
     ]
   }
-]

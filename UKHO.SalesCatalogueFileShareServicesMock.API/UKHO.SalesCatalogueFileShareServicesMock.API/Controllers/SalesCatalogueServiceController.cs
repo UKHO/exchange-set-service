@@ -92,9 +92,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpGet]
         [Route("v1/productData/encs57/catalogue/essData")]
-        public IActionResult SCSessData()
+        public IActionResult ScsEssData()
         {
-            var response = salesCatalogueService.GetSCSessData();
+            var response = salesCatalogueService.GetScsEssData();
             if (response != null)
             {
                 return Ok(response.ResponseBody);

@@ -41,12 +41,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return null;
         }
 
-        public SalesCatalogueEssReponse GetSCSessData()
-        {           
-                var responseData = FileHelper.ReadJsonFile<List<SalesCatalogueEssReponse>>(salesCatalogueConfiguration.Value.FileDirectoryPath + salesCatalogueConfiguration.Value.ScsCatalogueResponseFile);
-                var selectedscsessData = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == "SCSCatalogueEssData".ToLowerInvariant());
-                return selectedscsessData; 
-              
+        public SalesCatalogueDataResponse GetScsEssData()
+        {
+            var responseData = FileHelper.ReadJsonFile<SalesCatalogueDataResponse>(salesCatalogueConfiguration.Value.FileDirectoryPath + salesCatalogueConfiguration.Value.ScsCatalogueResponseFile);
+            return responseData; 
         }
     }
 }
