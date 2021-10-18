@@ -22,6 +22,10 @@ variable "m_spoke_subnet" {
   type = string
 }
 
+variable "allowed_ips" {
+
+}
+
 variable "tags" {
 
 }
