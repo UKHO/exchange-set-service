@@ -41,7 +41,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return null;
         }
 
-        public SalesCatalogueDataResponse GetScsEssData()
+        public SalesCatalogueDataResponse GetEssData()
         {
             var responseData = FileHelper.ReadJsonFile<SalesCatalogueDataResponse>(salesCatalogueConfiguration.Value.FileDirectoryPath + salesCatalogueConfiguration.Value.ScsCatalogueResponseFile);
             return responseData; 
