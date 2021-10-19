@@ -246,6 +246,22 @@ paths:
                   "ext_expires_in": 3599,
                   "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Imwzc1EtNTBjQ0g0eEJWWkxIVEd3blNSNzY4MCJ9.eyJhdWQiOiI0ZTE1NGYyYi0wNWM2LTQwZDEtODdiNy0wYWYwNTI5ZTBhNTEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZTkyYzk4MWItZDY4OS00Y2MzLTgyNDUtMGQ3MTBlMjQ2YmNhL3YyLjAiLCJpYXQiOjE2MzI0NzU1OTAsIm5iZiI6MTYzMjQ3NTU5MCwiZXhwIjoxNjMyNDc5NDkwLCJhaW8iOiJFMlpnWUdpZTJhSmhQT0ZDWTdQR3NxYUhaWi9tQXdBPSIsImF6cCI6IjJmMzJmNmY3LTFmMmYtNDNjZS1hZmQ3LWYzM2Y5M2NiN2U2MSIsImF6cGFjciI6IjEiLCJvaWQiOiJkNmY4ZDg0My0zZTY1LTQ5YTAtODdkNy0zMTBkMGNiM2UzOGUiLCJyaCI6IjAuQVNJQUc1Z3M2WW5XdzB5Q1JRMXhEaVJyeXZmMk1pOHZIODVEcjlmelA1UExmbUVpQUFBLiIsInN1YiI6ImQ2ZjhkODQzLTNlNjUtNDlhMC04N2Q3LTMxMGQwY2IzZTM4ZSIsInRpZCI6ImU5MmM5ODFiLWQ2ODktNGNjMy04MjQ1LTBkNzEwZTI0NmJjYSIsInV0aSI6IlREVmtmenZuS2txVEdRUXNEWjItQUEiLCJ2ZXIiOiIyLjAifQ.W-TB97v6D56UuPCstaSrfLFbc9gE6W1VHD5t0RLo_EK-1LuaTvQ0aqJtaYCRnXnd6RmMIIml3ckHxFL0lZlYUoSjszIMFkb1w0aH5SxD-GOfY-dktvGKdMVxqtyjJJg1IV7V3Dv1BYI24RnGPfcJG73-af7vcTRjE5KFeW_kOMVAfCAcZOV9dJ7BJULfEdHlK8ZFUb2hEzFkoORGdlrpNIJ7-QEhB9Kcnxa9QtA4z8lMtWESx-q17N88fmlaz87kEKEjX3pIP7k2l_y5BNtNAxK0h995pZ9hHNe4-UBH-xjvfuDa6IbCsZD1J1IW7AO1bXCjGGvc31PtJqEc5FRdQQ"
                 }
+        400:
+          description: Bad request - Request missing client_id and/or client_secret.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+              example:
+                {
+                  "correlationId": "184ef711-b039-4c24-b81a-89081d8f324c",
+                  "errors": [
+                    {
+                      "source": "request",
+                      "description": "request missing client_id and/or client_secret"
+                    }
+                  ]
+                }
         401:
           $ref: "#/components/responses/unauthorised"
         403:

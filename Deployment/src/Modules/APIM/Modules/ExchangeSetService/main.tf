@@ -100,24 +100,36 @@ resource "azurerm_api_management_api_operation_policy" "client_credentials_token
             <!-- Retrieve values from request body -->
             <set-variable name="ClientId" value="@(context.Request.Body?.As<JObject>(preserveContent: true)["client_id"]?.ToString())" />
             <set-variable name="ClientSecret" value="@(context.Request.Body?.As<JObject>(preserveContent: true)["client_secret"]?.ToString())" />
-			
-            <!-- Validate the required fields --> 
+			<set-variable name="X-Correlation-ID" value="@(Guid.NewGuid().ToString())" />
+            <set-header name="X-Correlation-ID" exists-action="skip">
+                <value>@((string)context.Variables["X-Correlation-ID"])</value>
+            </set-header>
+            <!-- Validate the required fields -->
             <choose>
                 <when condition="@(string.IsNullOrWhiteSpace(context.Variables.GetValueOrDefault<string>("ClientId")) ||
-                                string.IsNullOrWhiteSpace(context.Variables.GetValueOrDefault<string>("ClientSecret")))">
+                                    string.IsNullOrWhiteSpace(context.Variables.GetValueOrDefault<string>("ClientSecret")))">
                     <return-response>
                         <set-status code="400" reason="Bad Request" />
                         <set-header name="Content-Type" exists-action="override">
                             <value>application/json</value>
                         </set-header>
-                        <set-body>@(new JObject(                               
-                               new JProperty("error", "invalid_request"),
-                               new JProperty("error_description","Request missing client_id and/or client_secret.")                              
-                           ).ToString())</set-body>
+                        <set-header name="X-Correlation-ID">
+                            <value>@(context.Request.Headers["X-Correlation-ID"][0])</value>
+                        </set-header>
+                        <set-body template="liquid">{
+                                "correlationId": "{{context.Request.Headers["X-Correlation-ID"]}}",
+                                "errors": [
+                                            {
+                                                "source": "Request",
+                                                "description": "Request missing client_id and/or client_secret"
+                                            }
+                                        ]
+                                    }
+                            </set-body>
                     </return-response>
                 </when>
             </choose>
-            <!-- Send request to generate token url with required values -->
+            <!-- Send request to generate-token url with required values -->
             <send-request mode="new" response-variable-name="tokenResponse" timeout="60" ignore-error="true">            
                 <set-url>https://login.microsoftonline.com/${var.client_credentials_tenant_id}/oauth2/v2.0/token</set-url>
                 <set-method>POST</set-method>
@@ -129,16 +141,54 @@ resource "azurerm_api_management_api_operation_policy" "client_credentials_token
                    }
                 </set-body>
             </send-request>
-            <return-response>
-                <set-status code="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusCode)" reason="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusReason)" />
-                <set-header name="Content-Type" exists-action="override">
-                    <value>application/json</value>
-                </set-header>
-                <set-body template="none">@{
-                    var body = ((IResponse)context.Variables["tokenResponse"]).Body.As<JObject>();
-                    return body.ToString();
-                }</set-body>
-            </return-response> 
+            <choose>
+                <when condition="@(((IResponse)context.Variables["tokenResponse"]).StatusCode == 400)">
+                    <set-variable name="source" value="@{ 
+                        return ((IResponse)context.Variables["tokenResponse"]).Body.As<JObject>(true)["error"].ToString();
+                        }" />
+                    <set-variable name="errorMessage" value="@{ 
+                        return ((IResponse)context.Variables["tokenResponse"]).Body.As<JObject>()["error_description"].ToString();
+                    }" />
+                    <!-- Retrieve only the error description and exclude trace id, time stamp, etc. -->
+                    <set-variable name="errorDescription" value="@{ 
+                        return ((string)context.Variables["errorMessage"]).Substring(0, ((string)context.Variables["errorMessage"]).IndexOf("\r"));
+                    }" />
+                    <return-response>
+                        <set-status code="400" reason="Bad Request" />
+                        <set-header name="Content-Type" exists-action="override">
+                            <value>application/json</value>
+                        </set-header>
+                        <set-header name="X-Correlation-ID">
+                            <value>@(context.Request.Headers["X-Correlation-ID"][0])</value>
+                        </set-header>
+                        <set-body template="liquid">{
+                                "correlationId": "{{context.Request.Headers["X-Correlation-ID"]}}",
+                                "errors": [
+                                            {
+                                                "source": "{{context.Variables["source"]}}",
+											    "description": "{{context.Variables["errorDescription"]}}"
+                                            }
+                                        ]
+                                    }
+                            </set-body>
+                    </return-response>
+                </when>
+                <otherwise>
+                    <return-response>
+                        <set-status code="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusCode)" reason="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusReason)" />
+                        <set-header name="Content-Type" exists-action="override">
+                            <value>application/json</value>
+                        </set-header>
+                        <set-header name="X-Correlation-ID">
+                            <value>@(context.Request.Headers["X-Correlation-ID"][0])</value>
+                        </set-header>
+                        <set-body template="none">@{
+                            var body = ((IResponse)context.Variables["tokenResponse"]).Body.As<JObject>();
+                            return body.ToString();
+                        }</set-body>
+                    </return-response>
+                </otherwise>
+            </choose>
         </inbound>        
     </policies>
     XML
