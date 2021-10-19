@@ -64,6 +64,19 @@ variable "product_quota" {
     }
 }
 
+variable "client_credentials_tenant_id" {
+	type = string
+}
+
+variable "client_credentials_scope" {
+	type = string
+}
+
+variable "client_credentials_operation_id" {
+    type = string
+    default = "getESSTokenUsingClientCredentials"
+}
+
 locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"

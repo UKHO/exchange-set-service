@@ -5,7 +5,7 @@ resource "azurerm_storage_account" "small_exchange_set_storage" {
   account_tier = "Standard"
   account_replication_type = "LRS"
   account_kind = "StorageV2"
-
+  allow_blob_public_access  = false
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
@@ -36,7 +36,7 @@ resource "azurerm_storage_account" "medium_exchange_set_storage" {
   account_tier = "Standard"
   account_replication_type = "LRS"
   account_kind = "StorageV2"
-
+  allow_blob_public_access     = false
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
@@ -67,7 +67,7 @@ resource "azurerm_storage_account" "large_exchange_set_storage" {
   account_tier = "Standard"
   account_replication_type = "LRS"
   account_kind = "StorageV2"
-
+  allow_blob_public_access     = false
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
