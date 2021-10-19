@@ -25,7 +25,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return null;
         }
 
-        public byte[] GetENCFilePath(string filesName)
+        public byte[] GetEncFileData(string filesName)
         {
             string filePath, fileType = Path.GetExtension(filesName);
             string[] filePaths;
