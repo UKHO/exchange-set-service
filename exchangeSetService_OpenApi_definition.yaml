@@ -219,7 +219,7 @@ paths:
                 properties:
                   client_id:
                     type: string
-                    description: The application ID that's assigned to the distributor's app. This will be provided to the distributor when they register their application
+                    description: The application ID that's assigned to the distributor's app. This will be provided to the distributor when they register their application.
                   client_secret:
                     type: string
                     description: The client secret that you generated for the distributor's app when the app was registered. The client secret must be URL-encoded before being sent. 
