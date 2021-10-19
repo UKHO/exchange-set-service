@@ -12,6 +12,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class FileContentHelper
     {
+        private static TestConfiguration Config = new TestConfiguration();
         private static FssApiClient FssApiClient = new FssApiClient();
 
 
@@ -22,11 +23,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+            var batchId = batchStatusUrl.Split('/')[5];
 
-            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
 
-            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.ExchangeSetFileName}";
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 

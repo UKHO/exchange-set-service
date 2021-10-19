@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             this.fakeLogger = A.Fake<ILogger<FileShareService>>();
             this.fakeAuthFssTokenProvider = A.Fake<IAuthFssTokenProvider>();
             this.fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration()
-            { BaseUrl = "http://tempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
+            { BaseUrl = "http://tempuri.org", PublicBaseUrl = "http://filetempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
@@ -202,9 +202,16 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
-            Assert.AreEqual(createBatchResponse.BatchStatusUri, response.ResponseBody.BatchStatusUri);
-            Assert.AreEqual(createBatchResponse.ExchangeSetBatchDetailsUri, response.ResponseBody.ExchangeSetBatchDetailsUri);
-            Assert.AreEqual(createBatchResponse.ExchangeSetFileUri, response.ResponseBody.ExchangeSetFileUri);
+            
+            //assert the mocked API response returned to CreateBatch contains the internal BaseUrl
+            Assert.IsTrue(createBatchResponse.BatchStatusUri.Contains(fakeFileShareConfig.Value.BaseUrl));
+            Assert.IsTrue(createBatchResponse.ExchangeSetBatchDetailsUri.Contains(fakeFileShareConfig.Value.BaseUrl));
+            Assert.IsTrue(createBatchResponse.ExchangeSetFileUri.Contains(fakeFileShareConfig.Value.BaseUrl));
+
+            //assert FileShareService.CreateBatch() is correctly replacing the internal BaseUrl with PublicUrl
+            Assert.AreEqual(createBatchResponse.BatchStatusUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.BatchStatusUri);
+            Assert.AreEqual(createBatchResponse.ExchangeSetBatchDetailsUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.ExchangeSetBatchDetailsUri);
+            Assert.AreEqual(createBatchResponse.ExchangeSetFileUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.ExchangeSetFileUri);
         }
 
         [Test]
