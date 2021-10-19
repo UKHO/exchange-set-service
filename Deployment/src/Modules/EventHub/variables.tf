@@ -13,6 +13,19 @@ variable "location" {
 variable "logstashStorageName"{
   type=string
 }
+
+variable "agent_subnet" {
+  type = string
+}
+
+variable "m_spoke_subnet" {
+  type = string
+}
+
+variable "allowed_ips" {
+
+}
+
 variable "tags" {
 
 }

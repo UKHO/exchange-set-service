@@ -39,3 +39,5 @@ steps:
       TF_VAR_apim_rg: ${{ parameters.APIMResourceGroup }}
       TF_VAR_apim_name: ${{ parameters.APIMServiceInstance }}
       TF_VAR_apim_api_backend_url: $(EssApiUrl)
+      TF_VAR_client_credentials_tenant_id: $(AzureAdB2CConfiguration.TenantId)
+      TF_VAR_client_credentials_scope: "$(AzureAdB2CConfiguration.ClientId)/.default"

@@ -14,4 +14,7 @@ module "exchange_set_service" {
   apim_api_openapi					= local.apim_api_openapi
   product_rate_limit				= var.product_rate_limit
   product_quota						= var.product_quota
+  client_credentials_operation_id   = var.client_credentials_operation_id
+  client_credentials_tenant_id      = var.client_credentials_tenant_id
+  client_credentials_scope          = var.client_credentials_scope
 }

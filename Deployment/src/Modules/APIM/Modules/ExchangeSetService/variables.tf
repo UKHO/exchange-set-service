@@ -54,3 +54,15 @@ variable "apim_api_description" {
 variable "apim_api_openapi" {
   type = string
 }
+
+variable "client_credentials_operation_id" {
+  type    = string  
+}
+
+variable "client_credentials_tenant_id" {
+  type    = string  
+}
+
+variable "client_credentials_scope" {
+  type    = string  
+}
