@@ -35,7 +35,8 @@ export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
 };
 
 export function GetFSSApiResponse(url, fssToken) {
-    let fssResponse = http.get(url, { headers: { Authorization: `Bearer ${fssToken}`, "Content-Type": "application/json" } });
+    var urlPortion = url.split("/fss-qa"); 
+    let fssResponse = http.get(`${config.FSS_URL}${urlPortion[1]}`, { headers: { Authorization: `Bearer ${fssToken}`, "Content-Type": "application/json" } });
 
     var batchStatusResponse = JSON.parse(fssResponse.body)
     let fssCommitStatus = JSON.parse(JSON.stringify(batchStatusResponse['status']));
