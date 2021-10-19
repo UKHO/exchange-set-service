@@ -287,6 +287,66 @@ stages:
             inputs:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)/loadtests/'
               ArtifactName: LoadTests
+
+      - job: BuildAndPublishMockAPIAndTerraform
+        workspace:
+          clean: all
+        displayName: "Build and Publish Mock API And Terraform"
+        steps:
+          - task: PowerShell@2
+            displayName: "Set assembly version numbers based on build ID"
+            inputs:
+              targetType: filePath
+              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
+              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$(UKHOAssemblyProduct) Mock"'
+
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core 3.1.x sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore"
+            inputs:
+              command: restore
+              projects: |
+                **/*.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build task"
+            inputs:
+              command: "build"
+              projects: "**/*UKHO.SalesCatalogueFileShareServicesMock.API.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
+              workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish MockWebAPI"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: '**/*UKHO.SalesCatalogueFileShareServicesMock.API.csproj'
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\MockWebAPI'
+              zipAfterPublish: true
+              modifyOutputPath: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish WebAPI Artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)\MockWebAPI'
+              ArtifactName: MockWebAPI 
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Mock terraform Artifacts"
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)\MockApiDeployment'
+              ArtifactName: mockapiterraformartifact              
               
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
@@ -370,7 +430,70 @@ stages:
                     testRunTitle: "Dev-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
+  - stage: QCdeploy
+    dependsOn:
+    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    displayName: "QCdeploy (inc terraform, mock webapp deploy)"
+    jobs:
+      - deployment: QCDeployApp
+        displayName: "QC - deploy terraform and WebApps"
+        environment: "Ess-Dev"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        variables:
+          - group: "ESS-Deployment-Variables-DEV"
+          - group: "ESS-Dev-Variables"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
+          - name: "AzureAdB2CTestConfiguration.ClientSecret"
+            value: $(AUTOTEST-ESS-SECRET)
+            #This variables are overridden since they are different from dev and we have used same library
+          - name: "Environment"
+            value: "qc"
+          - name: "ESSFulfilmentConfiguration.SmallExchangeSetInstance"
+            value: 1
+          - name: "ESSFulfilmentConfiguration.MediumExchangeSetInstance"
+            value: 1
+          - name: "ESSFulfilmentConfiguration.LargeExchangeSetInstance"
+            value: 1
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
+                  parameters:
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+
+                - task: AzureCLI@2
+                  condition: succeededOrFailed()
+                  displayName: "Delete WebApp resource group"
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: '$(Pipeline.Workspace)/mockapiterraformartifact/CheckAndDeleteResourceGroup.ps1'
+                    arguments: '-resourceGroup $(webAppResourceGroup)'
+
   - stage: QAdeploy
+    dependsOn:
+    - Devdeploy
+    - QCdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
