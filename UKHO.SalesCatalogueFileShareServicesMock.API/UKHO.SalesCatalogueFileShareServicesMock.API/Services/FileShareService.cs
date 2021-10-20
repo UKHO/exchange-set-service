@@ -29,7 +29,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public byte[] GetFileData(string filesName)
         {
-            string filePath, fileType = Path.GetExtension(filesName);
+            string fileType = Path.GetExtension(filesName);
             string[] filePaths;
             byte[] bytes = null;
 
@@ -43,7 +43,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             }
             if (filePaths != null && filePaths.Any())
             {
-                filePath = filePaths[0];
+                string filePath = filePaths[0];
                 bytes = File.ReadAllBytes(filePath); 
             }
             return bytes;
