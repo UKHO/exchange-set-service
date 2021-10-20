@@ -59,4 +59,11 @@ resource "azurerm_storage_account" "logstashStorage" {
   access_tier               = "Hot"
   enable_https_traffic_only = true
   tags                      = var.tags
+  allow_blob_public_access  = false
+  network_rules {
+    default_action             = "Deny"
+    ip_rules                   = var.allowed_ips
+    bypass                     = ["Logging", "Metrics", "AzureServices"]
+    virtual_network_subnet_ids = [var.m_spoke_subnet,var.agent_subnet]
+  }
 }
