@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
@@ -18,25 +19,32 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public SearchBatchResponse GetBatches(string filter)
         {
-            if (!string.IsNullOrEmpty(filter))
+            var response = FileHelper.ReadJsonFile<SearchBatchResponse>(fileShareServiceConfiguration.Value.FileDirectoryPath + fileShareServiceConfiguration.Value.ScsResponseFile);
+            if (filter.Contains("README.TXT", StringComparison.OrdinalIgnoreCase))
             {
-                return FileHelper.ReadJsonFile<SearchBatchResponse>(fileShareServiceConfiguration.Value.FileDirectoryPath + fileShareServiceConfiguration.Value.ScsResponseFile); 
+                response.Entries.RemoveRange(1, response.Entries.Count - 1);
             }
-            return null;
+            return response;
         }
 
-        public byte[] GetEncFileData(string filesName)
+        public byte[] GetFileData(string filesName)
         {
             string filePath, fileType = Path.GetExtension(filesName);
             string[] filePaths;
             byte[] bytes = null;
 
-            if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC))
+            if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
             {
-                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
+                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");                
+            }
+            else
+            {
+                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForReadme, filesName);
+            }
+            if (filePaths != null && filePaths.Any())
+            {
                 filePath = filePaths[0];
-                bytes = File.ReadAllBytes(filePath);
-                return bytes;
+                bytes = File.ReadAllBytes(filePath); 
             }
             return bytes;
         }

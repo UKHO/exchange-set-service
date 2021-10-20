@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
@@ -50,9 +51,13 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpGet]
         [Route("/batch/{batchId}/files/{filesName}")]
-        public FileResult DownloadENCFile(string filesName)
+        public FileResult DownloadFile(string filesName)
         {
-            byte[] bytes = fileShareService.GetEncFileData(filesName);
+            byte[] bytes = null;
+            if (!string.IsNullOrEmpty(filesName))
+            {
+                bytes = fileShareService.GetFileData(filesName);
+            }
 
             return File(bytes, "application/octet-stream", filesName);
         }
