@@ -214,7 +214,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         CellLimitNorthernmostLatitude = Convert.ToDecimal(product.CellLimitNorthernmostLatitude.ToString(Convert.ToString("f10"))),
                         CellLimitEasternmostLatitude = Convert.ToDecimal(product.CellLimitEasternmostLatitude.ToString(Convert.ToString("f10"))),
                         BaseCellUpdateNumber = product.BaseCellUpdateNumber,
-                        LastUpdateNumberForPreviousEdition = product.LastUpdateNumberForPreviousEdition,
+                        LastUpdateNumberForPreviousEdition = product.LastUpdateNumberPreviousEdition,
                         BaseCellLocation = product.BaseCellLocation,
                         CancelledCellReplacements = String.Join(";", product.CancelledCellReplacements)
                     });
