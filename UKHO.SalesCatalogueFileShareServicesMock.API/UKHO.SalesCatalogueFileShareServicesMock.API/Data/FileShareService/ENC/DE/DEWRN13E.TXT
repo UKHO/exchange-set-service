@@ -1,0 +1,10 @@
+Wind farm Baltic 1
+Regulations
+The safety zone is prohibited for vessels with more than 24 meters length.
+The safety zone is prohibited for vessels with a length less than 24 meters
+under the following circumstances:
+- a visual range less than 1000 meters
+- in the night
+- wind force with more than 6 Bft
+- trawling
+Prohibited in the safety zone: berthing, mooring, anchoring.
