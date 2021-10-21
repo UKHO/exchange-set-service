@@ -143,7 +143,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                         CancelledCellReplacements = new List<string>() { },
                         Compression = true,
                         IssueDateLatestUpdate = DateTime.Today,
-                        LastUpdateNumberForPreviousEdition = 0,
+                        LastUpdateNumberPreviousEdition = 0,
                         TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
                     }
                 }
