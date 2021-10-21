@@ -1,0 +1,7 @@
+SOLLTIEFEN
+Tiefenzahlen mit dem Zusatz "m" sind Tiefen unter Kartennull,
+deren Erhaltung angestrebt wird. Es muss damit gerechnet werden,
+dass sie nicht überall vorhanden sind.
+Durch Versandung sind diese Tiefen kurzfristigen Veränderungen
+unterworfen. Besondere Vorsicht ist auf den Gewässern außerhalb
+des Tonnenstrichs und im Bereich der Uferböschungen geboten.

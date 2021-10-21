@@ -29,7 +29,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
                 options.Headers.Add(CorrelationIdMiddleware.XCorrelationIdHeaderKey);
             });
             services.AddScoped<SalesCatalogueService>();
+            services.AddScoped<FileShareService>();
             services.Configure<SalesCatalogueConfiguration>(Configuration.GetSection("SalesCatalogue"));
+            services.Configure<FileShareServiceConfiguration>(Configuration.GetSection("FileShareService"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,0 +1,7 @@
+MAINTAINED DEPTHS
+Soundings followed by an "m" are depths below Chart Datum,
+which are intended to be maintained. It has to be anticipated
+that they are not present everywhere.
+These depths are liable to change due to silting. Particular
+caution is recommended in waters outside the line of buoys
+and in bank slope areas.
