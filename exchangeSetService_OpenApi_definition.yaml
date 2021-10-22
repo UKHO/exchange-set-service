@@ -354,10 +354,10 @@ components:
             type: string
             description: The unique product identifiers.
           editionNumber:
-            type: number
+            type: integer
             description: The edition number.
           updateNumber:
-            type: number
+            type: integer
             description: The update number, if applicable.
       example:
         [
@@ -394,13 +394,13 @@ components:
           format: date-time
           description: Custom exchange sets are only available on the File Share Service for a limited time. After this time the file will expire and will no longer be available to download.
         requestedProductCount:
-          type: number
+          type: integer
           description: Number of products explicitly requested.
         exchangeSetCellCount:
-          type: number
+          type: integer
           description: Number of products that have data included in the produced Exchange Set.
         requestedProductsAlreadyUpToDateCount:
-          type: number
+          type: integer
         requestedProductsNotInExchangeSet:
           type: array
           description: |

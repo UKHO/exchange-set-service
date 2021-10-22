@@ -141,40 +141,10 @@ resource "azurerm_api_management_api_operation_policy" "client_credentials_token
                 </set-body>
             </send-request>
             <choose>
-                <when condition="@(((IResponse)context.Variables["tokenResponse"]).StatusCode == 400)">
-                    <set-variable name="source" value="@{ 
-                        return ((IResponse)context.Variables["tokenResponse"]).Body.As<JObject>(true)["error"].ToString();
-                        }" />
-                    <set-variable name="errorMessage" value="@{ 
-                        return ((IResponse)context.Variables["tokenResponse"]).Body.As<JObject>()["error_description"].ToString();
-                    }" />
-                    <!-- Retrieve only the error description and exclude trace id, time stamp, etc. -->
-                    <set-variable name="errorDescription" value="@{ 
-                        return ((string)context.Variables["errorMessage"]).Substring(0, ((string)context.Variables["errorMessage"]).IndexOf("\r"));
-                    }" />
+                <when condition="@(((IResponse)context.Variables["tokenResponse"]).StatusCode == 200)">
                     <return-response>
-                        <set-status code="400" reason="Bad Request" />
-                        <set-header name="Content-Type" exists-action="override">
-                            <value>application/json</value>
-                        </set-header>
-                        <set-header name="X-Correlation-ID">
-                            <value>@(context.Request.Headers["X-Correlation-ID"][0])</value>
-                        </set-header>
-                        <set-body template="liquid">{
-                                "correlationId": "{{context.Request.Headers["X-Correlation-ID"]}}",
-                                "errors": [
-                                            {
-                                                "source": "{{context.Variables["source"]}}",
-											    "description": "{{context.Variables["errorDescription"]}}"
-                                            }
-                                        ]
-                                    }
-                            </set-body>
-                    </return-response>
-                </when>
-                <otherwise>
-                    <return-response>
-                        <set-status code="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusCode)" reason="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusReason)" />
+                        <set-status code="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusCode)" 
+                        reason="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusReason)" />
                         <set-header name="Content-Type" exists-action="override">
                             <value>application/json</value>
                         </set-header>
@@ -185,7 +155,42 @@ resource "azurerm_api_management_api_operation_policy" "client_credentials_token
                             var body = ((IResponse)context.Variables["tokenResponse"]).Body.As<JObject>();
                             return body.ToString();
                         }</set-body>
-                    </return-response>
+                    </return-response>                    
+                </when>
+                <otherwise>
+                    <set-variable name="source" value="@{ 
+                        return ((IResponse)context.Variables["tokenResponse"]).Body?.As<JObject>(true)["error"]?.ToString();
+                        }" />
+                    <set-variable name="errorMessage" value="@{ 
+                        return ((IResponse)context.Variables["tokenResponse"]).Body?.As<JObject>()["error_description"]?.ToString();
+                    }" />
+                    <!-- Retrieve only the error description and exclude trace id, time stamp, etc. -->
+                    <set-variable name="errorDescription" value="@{ 
+                        return ((string)context.Variables["errorMessage"])?.Substring(0, ((string)context.Variables["errorMessage"]).IndexOf("\r"));
+                    }" />
+                    <return-response>
+                        <set-status code="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusCode)" 
+                        reason="@(((IResponse)context.Variables.GetValueOrDefault<IResponse>("tokenResponse")).StatusReason)" />
+                        
+                        <set-header name="Content-Type" exists-action="override">
+                            <value>application/json</value>
+                        </set-header>
+                        
+                        <set-header name="X-Correlation-ID">
+                            <value>@(context.Request.Headers["X-Correlation-ID"][0])</value>
+                        </set-header>
+                        
+                        <set-body template="liquid">{
+                                "correlationId": "{{context.Request.Headers["X-Correlation-ID"]}}",
+                                "errors": [
+                                            {
+                                                "source": "{{context.Variables["source"]}}",
+											    "description": "{{context.Variables["errorDescription"]}}"
+                                            }
+                                        ]
+                                    }
+                            </set-body>
+                    </return-response>                    
                 </otherwise>
             </choose>
         </inbound>        
