@@ -1,0 +1,6 @@
+MAGNETKOMPASS-ABLENKUNGEN
+Magnetkompass-Ablenkungen bis zu 70° können in der
+Nähe des Hochspannungs-Gleichstromkabels auftreten.
+Das Kabel ist möglichst rechtwinklig zügig zu queren
+und die Magnetkompass-Selbststeueranlage vorher
+auszuschalten. Näheres siehe Seehandbuch. 

@@ -1,0 +1,5 @@
+ATTENTION
+For reasons of scale, bathymetry has not been
+fully depicted. Mariners should consult a more
+appropriate usage band before attempting to
+navigate in this area.

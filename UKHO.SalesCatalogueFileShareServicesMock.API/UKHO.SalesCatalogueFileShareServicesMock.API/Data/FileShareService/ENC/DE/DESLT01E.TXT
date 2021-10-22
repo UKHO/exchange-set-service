@@ -1,0 +1,5 @@
+MAINTAINED DEPTHS
+The maintained depths charted are reduced to
+Chart Datum. They are intended to be maintained.
+It must be taken into account that they are
+not always present everywhere.

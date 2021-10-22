@@ -1,0 +1,6 @@
+MAGNETIC COMPASS DEFLECTIONS
+Magnetic compass deflections of up to 70° can
+occur near the high-voltage direct-current cable.
+Switch off your magnetic compass autopilot before
+you sail across the cable. Whenever possible, do
+so quickly and at a right angle. See "Seehandbuch".

@@ -6,7 +6,7 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
 {
     public class SalesCatalogueDataProductResponse
     {
-        public int? LastUpdateNumberForPreviousEdition { get; set; }
+        public int? LastUpdateNumberPreviousEdition { get; set; }
         public int? BaseCellUpdateNumber { get; set; }
         public bool Encryption { get; set; }
         public bool Compression { get; set; }

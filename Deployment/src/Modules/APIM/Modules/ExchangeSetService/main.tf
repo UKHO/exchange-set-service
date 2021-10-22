@@ -100,9 +100,8 @@ resource "azurerm_api_management_api_operation_policy" "client_credentials_token
             <!-- Retrieve values from request body -->
             <set-variable name="ClientId" value="@(context.Request.Body?.As<JObject>(preserveContent: true)["client_id"]?.ToString())" />
             <set-variable name="ClientSecret" value="@(context.Request.Body?.As<JObject>(preserveContent: true)["client_secret"]?.ToString())" />
-			<set-variable name="X-Correlation-ID" value="@(Guid.NewGuid().ToString())" />
             <set-header name="X-Correlation-ID" exists-action="skip">
-                <value>@((string)context.Variables["X-Correlation-ID"])</value>
+                <value>@(Guid.NewGuid().ToString())</value>
             </set-header>
             <!-- Validate the required fields -->
             <choose>
