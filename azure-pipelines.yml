@@ -480,16 +480,6 @@ stages:
                   parameters:
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
-                - task: AzureCLI@2
-                  condition: succeededOrFailed()
-                  displayName: "Delete WebApp resource group"
-                  inputs:
-                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-                    scriptType: 'pscore'
-                    scriptLocation: 'scriptPath'
-                    scriptPath: '$(Pipeline.Workspace)/mockapiterraformartifact/CheckAndDeleteResourceGroup.ps1'
-                    arguments: '-resourceGroup $(webAppResourceGroup)'
-
   - stage: QAdeploy
     dependsOn:
     - Devdeploy
