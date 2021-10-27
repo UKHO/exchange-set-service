@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -11,10 +13,24 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
     public class FileShareService
     {
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration;
+        protected IConfiguration configuration;
 
-        public FileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration)
+        public FileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration,
+                                IConfiguration configuration)
         {
             this.fileShareServiceConfiguration = fileShareServiceConfiguration;
+            this.configuration = configuration;
+        }
+
+        public BatchResponse CreateBatch(BatchRequest batchRequest)
+        {
+            string homeDirectoryPath = configuration["HOME"];
+            string folderName = fileShareServiceConfiguration.Value.FileDirectoryName;
+            Guid Id = Guid.NewGuid();
+            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, Id.ToString());
+
+            FileHelper.CheckAndCreateFolder(batchFolderPath);
+            return new BatchResponse() { BatchId= Id };
         }
 
         public SearchBatchResponse GetBatches(string filter)
@@ -47,6 +63,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 bytes = File.ReadAllBytes(filePath); 
             }
             return bytes;
+        }
+
+        public bool UploadBlockOfFile(string batchid, string fileName, Object data)
+        {
+            string homeDirectoryPath = configuration["HOME"];
+            string folderName = fileShareServiceConfiguration.Value.FileDirectoryName;
+            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
+
+            FileHelper.CreateFileContentWithBytes(batchFolderPath, (byte[])data);
+            return true;
         }
     }
 }

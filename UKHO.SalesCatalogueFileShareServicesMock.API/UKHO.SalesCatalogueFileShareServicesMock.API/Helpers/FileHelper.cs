@@ -16,5 +16,20 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
             var myJsonString = File.ReadAllText(folderDetails);
             return JsonSerializer.Deserialize<T>(myJsonString, Options);
         }
+        public static void CheckAndCreateFolder(string folderPath)
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+        }
+        public static void CreateFileContentWithBytes(string outputFileName, byte[] content)
+        {
+            using (var output = File.OpenWrite(outputFileName))
+            {
+                output.Write(content, 0, content.Length);
+            }
+        }
+
     }
 }

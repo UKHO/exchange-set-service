@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
+using System.Net;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
@@ -24,12 +26,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         }
 
         [HttpPost]
-        [Route("batch")]
-        public IActionResult CreateBatch(string correlationId)
+        [Route("/batch")]
+        public IActionResult CreateBatch([FromBody] BatchRequest batchRequest)
         {
-            if (!string.IsNullOrEmpty(correlationId))
+            if (batchRequest != null && !string.IsNullOrEmpty(batchRequest.BusinessUnit))
             {
-                return Ok(new CreateBatchResponse());
+                var response = fileShareService.CreateBatch(batchRequest);
+                if (response != null)
+                {
+                    return Ok(response);
+                }
             }
             return BadRequest();
         }
@@ -60,6 +66,30 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
 
             return File(bytes, "application/octet-stream", filesName);
+        }
+
+        [HttpPut]
+        [Route("batch/{batchId}/files/{fileName}/{blockId}")]
+        [Produces("application/json")]
+        [Consumes("application/octet-stream")]
+        public IActionResult UploadBlockOfFile( [FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
+                                                           [FromRoute, SwaggerParameter(Required = true)] string fileName,
+                                                           [FromRoute, SwaggerParameter(Required = true)] string blockId,
+                                                           [FromHeader(Name = "Content-Length"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] decimal? contentLength,
+                                                           [FromHeader(Name = "Content-MD5"), SwaggerSchema(Format = "byte"), SwaggerParameter(Required = true)] string contentMD5,
+                                                           [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
+                                                           [FromBody] Object data )
+        {
+            if (batchId != null && data != null)
+            {
+                var response = fileShareService.UploadBlockOfFile(batchId, fileName, data);
+                if (response)
+                {
+                    return StatusCode((int)HttpStatusCode.Created);
+                }
+            }
+
+            return BadRequest();
         }
     }
 }
