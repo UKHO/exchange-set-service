@@ -31,5 +31,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
             }
         }
 
+        public static bool CheckBatchWithZipFileExist(string filePathWithFileName)
+        {
+            if (!string.IsNullOrEmpty(filePathWithFileName))
+            {
+                return File.Exists(filePathWithFileName);
+            }
+            return false;
+        }
+
     }
 }

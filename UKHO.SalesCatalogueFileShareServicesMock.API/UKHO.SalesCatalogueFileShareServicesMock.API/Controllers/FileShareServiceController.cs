@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
@@ -14,6 +16,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
     {
         private readonly FileShareService fileShareService;
         public Dictionary<string, string> ErrorsCreateBatch { get; set; }
+        public Dictionary<string, string> ErrorsPutBlocksInFile { get; set; }
+        public Dictionary<string, string> ErrorsCommitBatch { get; set; }
 
         public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService) : base(httpContextAccessor)
         {
@@ -22,6 +26,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 { "source", "RequestBody" },
                 { "description", "Either body is null or malformed." }
+            };
+            ErrorsPutBlocksInFile = new Dictionary<string, string>
+            {
+                { "source", "BatchId" },
+                { "description", "Invalid or non-existing batch ID." }
+            };
+            ErrorsCommitBatch = new Dictionary<string, string>
+            {
+                { "source", "BatchId" },
+                { "description", "BatchId does not exist." }
             };
         }
 
@@ -90,6 +104,42 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
 
             return BadRequest();
+        }
+
+        [HttpPut]
+        [Route("batch/{batchId}/files/{fileName}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public IActionResult PutBlocksInFile([FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
+                                                               [FromRoute, SwaggerParameter(Required = true)] string fileName,
+                                                               [FromBody, SwaggerParameter(Required = true)] FileCommitPayload payload)
+        {
+            if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName))
+            {
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName);
+                if (response)
+                {
+                    return StatusCode((int)HttpStatusCode.NoContent);
+                }
+            }
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsPutBlocksInFile });
+        }
+
+        [HttpPut]
+        [Route("/batch/{batchId}")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public IActionResult CommitBatch([FromRoute] string batchId, [FromBody] List<BatchCommitRequest> body)
+        {
+            if (!string.IsNullOrEmpty(batchId) && body != null)
+            {
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, body.Select(a => a.FileName).FirstOrDefault());
+                if (response)
+                {
+                    return Accepted(new BatchCommitResponse() { Status = new Status { URI = $"/batch/{batchId}/status" } });
+                }
+            }
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsCommitBatch });
         }
     }
 }
