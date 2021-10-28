@@ -94,7 +94,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                                            [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
                                                            [FromBody] Object data )
         {
-            if (batchId != null && data != null)
+            if (!string.IsNullOrEmpty(batchId) && data != null)
             {
                 var response = fileShareService.UploadBlockOfFile(batchId, fileName, data);
                 if (response)
@@ -102,7 +102,6 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return StatusCode((int)HttpStatusCode.Created);
                 }
             }
-
             return BadRequest();
         }
 

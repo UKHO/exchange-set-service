@@ -25,7 +25,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
         public BatchResponse CreateBatch(BatchRequest batchRequest)
         {
             string homeDirectoryPath = configuration["HOME"];
-            string folderName = fileShareServiceConfiguration.Value.FileDirectoryName;
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             Guid Id = Guid.NewGuid();
             string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, Id.ToString());
 
@@ -68,22 +68,25 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
         public bool UploadBlockOfFile(string batchid, string fileName, Object data)
         {
             string homeDirectoryPath = configuration["HOME"];
-            string folderName = fileShareServiceConfiguration.Value.FileDirectoryName;
-            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            string uploadBlockFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid);
+            string uploadBlockFilePath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
 
-            FileHelper.CreateFileContentWithBytes(batchFolderPath, (byte[])data);
-            return true;
+            if (FileHelper.CheckFolderExists(uploadBlockFolderPath))
+            {
+                FileHelper.CreateFileContentWithBytes(uploadBlockFilePath, (byte[])data);
+                return true;
+            }
+            return false;
         }
 
         public bool CheckBatchWithZipFileExist(string batchid, string fileName)
         {
             string homeDirectoryPath = configuration["HOME"];
-            string folderName = fileShareServiceConfiguration.Value.FileDirectoryName;
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
 
             return FileHelper.CheckBatchWithZipFileExist(batchFolderPath);
         }
-
-
     }
 }

@@ -39,6 +39,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
             }
             return false;
         }
-
+        public static bool CheckFolderExists(string filePath)
+        {
+            return Directory.Exists(filePath);
+        }
     }
 }
