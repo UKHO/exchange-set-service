@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,8 +18,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsCreateBatch { get; set; }
         public Dictionary<string, string> ErrorsPutBlocksInFile { get; set; }
         public Dictionary<string, string> ErrorsCommitBatch { get; set; }
+        protected IConfiguration configuration;
 
-        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService) : base(httpContextAccessor)
+        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration) : base(httpContextAccessor)
         {
             this.fileShareService = fileShareService;
             ErrorsCreateBatch = new Dictionary<string, string>
@@ -37,6 +38,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 { "source", "BatchId" },
                 { "description", "BatchId does not exist." }
             };
+            this.configuration = configuration;
         }
 
         [HttpPost]
@@ -45,10 +47,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (batchRequest != null && !string.IsNullOrEmpty(batchRequest.BusinessUnit))
             {
-                var response = fileShareService.CreateBatch(batchRequest);
+                var response = fileShareService.CreateBatch(configuration["HOME"]);
                 if (response != null)
                 {
-                    return Ok(response);
+                    return Created("", response);
                 }
             }
             return BadRequest();
@@ -70,16 +72,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         }
 
         [HttpGet]
-        [Route("/batch/{batchId}/files/{filesName}")]
-        public FileResult DownloadFile(string filesName)
+        [Route("/batch/{batchId}/files/{fileName}")]
+        public FileResult DownloadFile(string fileName)
         {
             byte[] bytes = null;
-            if (!string.IsNullOrEmpty(filesName))
+            if (!string.IsNullOrEmpty(fileName))
             {
-                bytes = fileShareService.GetFileData(filesName);
+                bytes = fileShareService.GetFileData(fileName);
             }
 
-            return File(bytes, "application/octet-stream", filesName);
+            return File(bytes, "application/octet-stream", fileName);
         }
 
         [HttpPut]
@@ -92,11 +94,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                                            [FromHeader(Name = "Content-Length"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] decimal? contentLength,
                                                            [FromHeader(Name = "Content-MD5"), SwaggerSchema(Format = "byte"), SwaggerParameter(Required = true)] string contentMD5,
                                                            [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
-                                                           [FromBody] Object data )
+                                                           [FromBody] object data )
         {
-            if (!string.IsNullOrEmpty(batchId) && data != null)
+            if (!string.IsNullOrEmpty(batchId) && data != null && !string.IsNullOrEmpty(blockId) && !string.IsNullOrEmpty(contentMD5) && !string.IsNullOrEmpty(contentType))
             {
-                var response = fileShareService.UploadBlockOfFile(batchId, fileName, data);
+                var response = fileShareService.UploadBlockOfFile(batchId, fileName, data, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.Created);
@@ -113,9 +115,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                                                [FromRoute, SwaggerParameter(Required = true)] string fileName,
                                                                [FromBody, SwaggerParameter(Required = true)] FileCommitPayload payload)
         {
-            if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName))
+            if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName) && payload != null)
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName);
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.NoContent);
@@ -132,7 +134,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId) && body != null)
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, body.Select(a => a.FileName).FirstOrDefault());
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, body.Select(a => a.FileName).FirstOrDefault(), configuration["HOME"]);
                 if (response)
                 {
                     return Accepted(new BatchCommitResponse() { Status = new Status { URI = $"/batch/{batchId}/status" } });

@@ -1,11 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers; 
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -13,24 +11,20 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
     public class FileShareService
     {
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration;
-        protected IConfiguration configuration;
 
-        public FileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration,
-                                IConfiguration configuration)
+        public FileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration)
         {
             this.fileShareServiceConfiguration = fileShareServiceConfiguration;
-            this.configuration = configuration;
         }
 
-        public BatchResponse CreateBatch(BatchRequest batchRequest)
+        public BatchResponse CreateBatch(string homeDirectoryPath)
         {
-            string homeDirectoryPath = configuration["HOME"];
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
-            Guid Id = Guid.NewGuid();
-            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, Id.ToString());
-
+            Guid batchId = Guid.NewGuid();
+            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchId.ToString());
+            
             FileHelper.CheckAndCreateFolder(batchFolderPath);
-            return new BatchResponse() { BatchId= Id };
+            return new BatchResponse() { BatchId= batchId };
         }
 
         public SearchBatchResponse GetBatches(string filter)
@@ -65,9 +59,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return bytes;
         }
 
-        public bool UploadBlockOfFile(string batchid, string fileName, Object data)
+        public bool UploadBlockOfFile(string batchid, string fileName, object data, string homeDirectoryPath)
         {
-            string homeDirectoryPath = configuration["HOME"];
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             string uploadBlockFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid);
             string uploadBlockFilePath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
@@ -80,9 +73,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return false;
         }
 
-        public bool CheckBatchWithZipFileExist(string batchid, string fileName)
+        public bool CheckBatchWithZipFileExist(string batchid, string fileName, string homeDirectoryPath)
         {
-            string homeDirectoryPath = configuration["HOME"];
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
 
