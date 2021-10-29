@@ -1,0 +1,17 @@
+parameters:
+- name: environment
+  type: string
+
+jobs:
+  - job: Run_ADDS_E2E_tests
+    displayName: Run ADDS E2E tests
+    condition: and(succeeded(), eq('${{ parameters.environment }}', 'QA'))
+    container: $[variables.AzurePsContainer]
+    steps:
+    - task: PowerShell@2
+      displayName: "Run ADDS E2E pipeline tests"
+      inputs:
+          pwsh: true
+          targetType: filePath
+          filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1' 
+          arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'

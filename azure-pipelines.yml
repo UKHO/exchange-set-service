@@ -31,6 +31,8 @@ variables:
     value: "ukhydrographicoffice/terraform-azure-powershell-unzip:0.14.9"
   - name: DeploymentPool
     value: "UKHO Ubuntu 1804"
+  - name: AzurePsContainer
+    value: mcr.microsoft.com/dotnet/core/sdk:3.1-bionic
 
 stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
@@ -575,6 +577,10 @@ stages:
                       !**/obj/**
                     testRunTitle: "QA-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+
+                - template: Deployment/templates/adds-end-to-end.yml
+                  parameters:
+                    environment: QA
 
   - stage: Livedeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
