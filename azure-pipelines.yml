@@ -581,7 +581,6 @@ stages:
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests
         dependsOn: QADeployApp
-        condition: and(succeeded(), eq('${{ parameters.environment }}', 'QA'))
         container: $[variables.azurepscontainer]
         steps:
         - task: PowerShell@2          
