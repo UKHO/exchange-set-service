@@ -578,9 +578,19 @@ stages:
                     testRunTitle: "QA-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-                - template: Deployment/templates/adds-end-to-end.yml
-                  parameters:
-                    environment: QA
+      - job: Run_ADDS_E2E_tests
+        displayName: Run ADDS E2E tests
+        dependsOn: QADeployApp
+        condition: and(succeeded(), eq('${{ parameters.environment }}', 'QA'))
+        container: $[variables.azurepscontainer]
+        steps:
+        - task: PowerShell@2          
+          displayName: "Run ADDS E2E pipeline tests"
+          inputs:
+              pwsh: true
+              targetType: filePath
+              filePath: '$(System.DefaultWorkingDirectory)/ADDS-e2e-tests.ps1' 
+              arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
 
   - stage: Livedeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
