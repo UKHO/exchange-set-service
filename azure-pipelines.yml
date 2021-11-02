@@ -430,22 +430,6 @@ stages:
                     testRunTitle: "Dev-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-      - job: Run_ADDS_E2E_tests
-        displayName: Run ADDS E2E tests
-        dependsOn: DevDeployApp
-        pool: $(DeploymentPool)
-        variables:
-          - group: "ADDS-E2E"
-        container: ${{variables.Container}}
-        steps:
-        - task: PowerShell@2          
-          displayName: "Run ADDS E2E pipeline tests"
-          inputs:
-              pwsh: true
-              targetType: filePath
-              filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
-              arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
-
   - stage: QCdeploy
     dependsOn:
     - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
