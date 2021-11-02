@@ -31,8 +31,6 @@ variables:
     value: "ukhydrographicoffice/terraform-azure-powershell-unzip:0.14.9"
   - name: DeploymentPool
     value: "UKHO Ubuntu 1804"
-  - name: AzurePsContainer
-    value: mcr.microsoft.com/dotnet/core/sdk:3.1-bionic
 
 stages:
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
@@ -432,6 +430,22 @@ stages:
                     testRunTitle: "Dev-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
+      - job: Run_ADDS_E2E_tests
+        displayName: Run ADDS E2E tests
+        dependsOn: DevDeployApp
+        pool: $(DeploymentPool)
+        variables:
+          - group: "ADDS-E2E"
+        container: ${{variables.Container}}
+        steps:
+        - task: PowerShell@2          
+          displayName: "Run ADDS E2E pipeline tests"
+          inputs:
+              pwsh: true
+              targetType: filePath
+              filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
+              arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
+
   - stage: QCdeploy
     dependsOn:
     - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
@@ -497,7 +511,7 @@ stages:
     - Devdeploy
     - QCdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
-    # condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: QADeployApp
         displayName: QA - deploy terraform and dotnet App
@@ -581,7 +595,10 @@ stages:
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests
         dependsOn: QADeployApp
-        container: $[variables.azurepscontainer]
+        pool: $(DeploymentPool)
+        variables:
+          - group: "ADDS-E2E"
+        container: ${{variables.Container}}
         steps:
         - task: PowerShell@2          
           displayName: "Run ADDS E2E pipeline tests"
