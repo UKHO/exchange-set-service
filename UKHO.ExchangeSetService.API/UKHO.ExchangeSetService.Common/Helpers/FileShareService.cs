@@ -117,7 +117,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var productList = new List<string>();
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
             int queryCount = 0;
-            logger.LogInformation(EventIds.FileShareServicePreparingToQueryENCFilesStart.ToEventId(), "File share service request started preparing to Quering ENC files for BatchId:{batchId} based on {sbLog} and _X-Correlation-ID:{CorrelationId}", batchId, productWithAttributes.Item2, correlationId);
+            logger.LogInformation(EventIds.FileShareServicePreparingToQueryENCFilesStart.ToEventId(), "File share service request started preparing to quering ENC files for BatchId:{batchId} based on {sbLog} and _X-Correlation-ID:{CorrelationId}", batchId, productWithAttributes.Item2, correlationId);
             do
             {
                 queryCount++;
@@ -135,7 +135,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
             internalSearchBatchResponse.QueryCount = queryCount;
             CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
-            logger.LogInformation(EventIds.FileShareServicePreparingToQueryENCFilesCompleted.ToEventId(), "File share service request completed preparing and Quering ENC files for BatchId:{batchId} based on {sbLog} and _X-Correlation-ID:{CorrelationId}", batchId, productWithAttributes.Item2, correlationId);
+            logger.LogInformation(EventIds.FileShareServicePreparingToQueryENCFilesCompleted.ToEventId(), "File share service request completed preparing and quering ENC files for BatchId:{batchId} based on {sbLog} and _X-Correlation-ID:{CorrelationId}", batchId, productWithAttributes.Item2, correlationId);
             return internalSearchBatchResponse;
         }
 

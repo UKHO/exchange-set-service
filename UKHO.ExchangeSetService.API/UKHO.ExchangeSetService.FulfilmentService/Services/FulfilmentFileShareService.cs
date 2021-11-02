@@ -80,10 +80,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             foreach (var item in fulfilmentDataResponse)
             {
-                logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesStart.ToEventId(), "File share service request started preparing to download ENC files for BatchId:{batchId} based on Product/CellName:{ProductName},  EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Hrefs: [{FileUri}] and _X-Correlation-ID:{CorrelationId}", message.BatchId, item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.CorrelationId);
+                logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesStart.ToEventId(), "File share service request started preparing to download ENC files for BatchId:{batchId} based on Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}] and _X-Correlation-ID:{CorrelationId}", message.BatchId, item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.CorrelationId);
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
                 await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message);
-                logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesCompleted.ToEventId(), "File share service request completed preparing and downloading ENC files for BatchId:{batchId} based on Product/CellName:{ProductName},  EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Hrefs: [{FileUri}] and _X-Correlation-ID:{CorrelationId}", message.BatchId, item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.CorrelationId);
+                logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesCompleted.ToEventId(), "File share service request completed preparing and downloading ENC files for BatchId:{batchId} based on Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}] and _X-Correlation-ID:{CorrelationId}", message.BatchId, item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.CorrelationId);
             }
         }
 

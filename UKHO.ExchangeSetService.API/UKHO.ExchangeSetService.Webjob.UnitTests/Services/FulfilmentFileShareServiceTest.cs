@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
@@ -18,6 +19,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private IOptions<FileShareServiceConfiguration> fakefileShareServiceConfig;
         private IFileShareService fakefileShareService;
         public FulfilmentFileShareService fulfilmentFileShareService;
+        public ILogger<FulfilmentFileShareService> fakeLogger;
         public bool fakeIsFileUploaded = false;
         public bool fakeIsZipFileCreated = false;
         public string fakeExchangeSetRootPath = @"D:\\Downloads\";
@@ -29,8 +31,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakefileShareService = A.Fake<IFileShareService>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01" });
+            fakeLogger = A.Fake<ILogger<FulfilmentFileShareService>>();
 
-            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService);
+            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeLogger);
         }
         private List<Products> GetProductdetails()
         {
