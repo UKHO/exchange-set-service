@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             List<Products> internalNotFoundProducts = new List<Products>();
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var productWithAttributes = GenerateQueryForFss(products);
-            var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes}";
+            var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
 
             HttpResponseMessage httpResponse;
 
@@ -117,6 +117,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var productList = new List<string>();
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
             int queryCount = 0;
+            logger.LogInformation(EventIds.FileShareServicePreparingToQueryENCFilesStart.ToEventId(), "File share service request started preparing to Quering ENC files for BatchId:{batchId} based on {sbLog} and _X-Correlation-ID:{CorrelationId}", batchId, productWithAttributes.Item2, correlationId);
             do
             {
                 queryCount++;
@@ -134,6 +135,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
             internalSearchBatchResponse.QueryCount = queryCount;
             CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
+            logger.LogInformation(EventIds.FileShareServicePreparingToQueryENCFilesCompleted.ToEventId(), "File share service request completed preparing and Quering ENC files for BatchId:{batchId} based on {sbLog} and _X-Correlation-ID:{CorrelationId}", batchId, productWithAttributes.Item2, correlationId);
             return internalSearchBatchResponse;
         }
 
@@ -265,11 +267,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return JsonConvert.DeserializeObject<SearchBatchResponse>(body);
         }
 
-        public string GenerateQueryForFss(List<Products> products)
+        public (string, string) GenerateQueryForFss(List<Products> products)
         {
             var productIndex = 1;
             var productCount = products.Count;
             var sb = new StringBuilder();
+            var sbLog = new StringBuilder();
             sb.Append("(");////1st main (
             foreach (var item in products)
             {
@@ -301,10 +304,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     }
                 }
                 sb.Append(cancellation.ToString() + (productCount == productIndex ? ")" : ") or "));/////last product or with multiple
+                sbLog.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", item.ProductName, item.EditionNumber.ToString(), string.Join(",", item?.UpdateNumbers.Select(a=>a.Value.ToString())));
+                if (cancellation.Length > 0)
+                {
+                    sbLog.AppendFormat("\n with Cancellation Product/CellName:{0}, EditionNumber:{1} and UpdateNumber:{2}", item.ProductName, item.Cancellation.EditionNumber.ToString(), item.Cancellation.UpdateNumber.ToString());
+                }
                 productIndex += 1;
             }
             sb.Append(")");//// last main )
-            return sb.ToString();
+            return (sb.ToString(), sbLog.ToString());
         }
 
         public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage)

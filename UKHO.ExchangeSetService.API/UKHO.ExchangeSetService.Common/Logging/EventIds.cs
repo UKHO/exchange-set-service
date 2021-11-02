@@ -496,7 +496,23 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805122 - New access token is added to cache for external end point resource.
         /// </summary>
-        CachingExternalEndPointToken = 805122
+        CachingExternalEndPointToken = 805122,
+        /// <summary>
+        ///  805123 - Start preparing to downloading ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        /// </summary>
+        FileShareServicePreparingToDownloadENCFilesStart = 805123,
+        /// <summary>
+        ///  805124 - Completed preparing and downloading ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        /// </summary>
+        FileShareServicePreparingToDownloadENCFilesCompleted = 805124,
+        /// <summary>
+        /// 805125 - Start preparing to Quering ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        /// </summary>
+        FileShareServicePreparingToQueryENCFilesStart = 805125,
+        /// <summary>
+        /// 805126 - Completed preparing and Quering ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        /// </summary>
+        FileShareServicePreparingToQueryENCFilesCompleted = 805126
     }
 
     public static class EventIdExtensions

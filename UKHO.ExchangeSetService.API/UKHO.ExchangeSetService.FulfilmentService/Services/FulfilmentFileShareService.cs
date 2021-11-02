@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
@@ -15,12 +17,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileShareService fileShareService;
+        private readonly ILogger<FulfilmentFileShareService> logger;
 
-        public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig, 
-            IFileShareService fileShareService)
+        public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+            IFileShareService fileShareService, ILogger<FulfilmentFileShareService> logger)
         {
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileShareService = fileShareService;
+            this.logger = logger;
         }
 
         public List<Products> SliceFileShareServiceProductsWithUpdateNumber(List<Products> products)
@@ -76,8 +80,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             foreach (var item in fulfilmentDataResponse)
             {
+                logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesStart.ToEventId(), "File share service request started preparing to download ENC files for BatchId:{batchId} based on Product/CellName:{ProductName},  EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Hrefs: [{FileUri}] and _X-Correlation-ID:{CorrelationId}", message.BatchId, item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.CorrelationId);
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
                 await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message);
+                logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesCompleted.ToEventId(), "File share service request completed preparing and downloading ENC files for BatchId:{batchId} based on Product/CellName:{ProductName},  EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Hrefs: [{FileUri}] and _X-Correlation-ID:{CorrelationId}", message.BatchId, item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.CorrelationId);
             }
         }
 
