@@ -508,11 +508,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805125 - Preparing to query ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
-        FileShareServicePreparingToQueryENCFilesStart = 805125,
+        FileShareServicePreparingToSearchSetOfENCsStarted = 805125,
         /// <summary>
         /// 805126 - Completed query for ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
-        FileShareServiceQueryENCFilesCompleted = 805126
+        FileShareServiceSearchQueryForSetOfENCsCompleted = 805126
     }
 
     public static class EventIdExtensions

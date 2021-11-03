@@ -117,7 +117,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var productList = new List<string>();
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
             int queryCount = 0;
-            logger.LogInformation(EventIds.FileShareServicePreparingToQueryENCFilesStart.ToEventId(), "Preparing file share service search request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, batchId, correlationId);
+            logger.LogInformation(EventIds.FileShareServicePreparingToSearchSetOfENCsStarted.ToEventId(), "Preparing file share service search request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, batchId, correlationId);
             do
             {
                 queryCount++;
@@ -135,7 +135,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
             internalSearchBatchResponse.QueryCount = queryCount;
             CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount);
-            logger.LogInformation(EventIds.FileShareServiceQueryENCFilesCompleted.ToEventId(), "Completed file share service search request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, batchId, correlationId);
+            logger.LogInformation(EventIds.FileShareServiceSearchQueryForSetOfENCsCompleted.ToEventId(), "Completed file share service search request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, batchId, correlationId);
             return internalSearchBatchResponse;
         }
 
