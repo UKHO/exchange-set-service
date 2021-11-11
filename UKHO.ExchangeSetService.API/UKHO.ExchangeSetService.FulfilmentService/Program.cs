@@ -146,7 +146,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                  })
-                 .SetHandlerLifetime(TimeSpan.FromMinutes(retryCount))
                  .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
                  
                  services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
@@ -155,7 +154,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                  })
-                 .SetHandlerLifetime(TimeSpan.FromMinutes(retryCount))
                  .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), "Sales Catalogue", EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
 
                  services.AddHttpClient<ICallBackClient, CallBackClient>();

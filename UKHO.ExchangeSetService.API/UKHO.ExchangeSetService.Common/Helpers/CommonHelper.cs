@@ -76,8 +76,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return Policy
                 .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable)
                 .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
-                .OrResult(r => r.StatusCode == HttpStatusCode.BadRequest && requestType == "File Share")
-                .OrResult(r => r.StatusCode == HttpStatusCode.InternalServerError && requestType == "File Share")
                 .WaitAndRetryAsync(retryCount, (retryAttempt) =>
                 {
                     return TimeSpan.FromSeconds(Math.Pow(sleepDuration, (retryAttempt - 1)));
