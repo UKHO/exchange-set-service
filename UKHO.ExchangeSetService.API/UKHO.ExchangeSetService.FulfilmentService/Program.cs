@@ -22,7 +22,6 @@ using Azure.Security.KeyVault.Secrets;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
-using System.Threading;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
