@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test for time being, since cancellation product data not available in file share service")]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenACorrectResponseIsReturned()
         {
             string sinceDatetime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
@@ -42,6 +42,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetOnlyProductIdentifierData(), accessToken: EssJwtToken);
@@ -52,6 +53,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenAInternalServerErrorResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
@@ -62,6 +64,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheApiWithAValidProductVersion_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
@@ -77,6 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheApiWithValidAndInvalidProductVersion_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
@@ -91,6 +95,5 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             await apiResponse.CheckFssBatchResponse();
 
         }
-
     }
 }

@@ -31,6 +31,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region Set DateTime Api
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheDateTimeApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
@@ -41,6 +42,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheDateTimeApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string invalidB2cToken = EssB2CToken.Remove(EssB2CToken.Length - 2).Insert(EssB2CToken.Length - 2, "AA");
@@ -50,6 +52,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheDateTimeApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
@@ -59,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test for time being, since cancellation product data not available in file share service")]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheDateTimeApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssB2CToken);
@@ -72,6 +75,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region ProductIdentifier Api
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheProductIdentifierApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData());
@@ -80,6 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheProductIdentifierApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string invalidB2cToken = EssB2CToken.Remove(EssB2CToken.Length - 2).Insert(EssB2CToken.Length - 2, "AA");
@@ -89,6 +94,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheProductIdentifierApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssB2CCustomizedToken);
@@ -97,6 +103,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheProductIdentifiersApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssB2CToken);
@@ -109,6 +116,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region ProductVersion Api
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheProductVersionApiWithOutB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
@@ -121,6 +129,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheProductVersionApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string invalidB2cToken = EssB2CToken.Remove(EssB2CToken.Length - 2).Insert(EssB2CToken.Length - 2, "AA");
@@ -135,6 +144,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheProductVersionApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
@@ -147,6 +157,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheProductVersionApiWithAValidB2cToken_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
