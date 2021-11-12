@@ -43,5 +43,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
         {
             return Directory.Exists(filePath);
         }
+        public static string GetBatchFolderPath(string contentRootPath)
+        {
+            string[] directories = contentRootPath.Split(Path.DirectorySeparatorChar);
+            return directories[0] + "\\" + directories[1];
+        }
     }
 }
