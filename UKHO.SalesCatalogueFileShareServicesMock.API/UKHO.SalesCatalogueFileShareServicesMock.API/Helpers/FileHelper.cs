@@ -23,12 +23,12 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
                 Directory.CreateDirectory(folderPath);
             }
         }
-        public static void CreateFileContentWithBytes(string outputFileName, byte[] content)
+        public static void CreateFileContentWithBytes(string uploadBlockFilePath, byte[] content)
         {
-            bool validationFlag = GetPathValidation(outputFileName);
+            bool validationFlag = ValidateFilePath(uploadBlockFilePath);
             if (validationFlag)
             {
-                using (var output = File.OpenWrite(outputFileName))
+                using (var output = File.OpenWrite(uploadBlockFilePath))
                 {
                     output.Write(content, 0, content.Length);
                 }
@@ -37,23 +37,27 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
 
         public static bool CheckBatchWithZipFileExist(string filePathWithFileName)
         {
-            var path = filePathWithFileName; 
-            if (!string.IsNullOrEmpty(path))
+            bool validationFlag = ValidateFilePath(filePathWithFileName);
+            if(validationFlag && !string.IsNullOrEmpty(filePathWithFileName))
             {
-                return File.Exists(path);
+                    return File.Exists(filePathWithFileName);
             }
             return false;
         }
 
-        public static bool CheckFolderExists(string homeDirectoryPath, string folderName, string batchid)
+        public static bool CheckFolderExists(string filePath)
         {
-            string uploadBlockFilePath = Path.Combine(homeDirectoryPath, folderName, batchid);
-            return Directory.Exists(uploadBlockFilePath);
+            bool validationFlag = ValidateFilePath(filePath);
+            if (validationFlag)
+            {
+                return Directory.Exists(filePath);
+            }
+            return false;
         }
 
-        public static bool GetPathValidation(string outputFileName)
+        public static bool ValidateFilePath(string filePath)
         {
-            bool possiblePath = outputFileName.IndexOfAny(Path.GetInvalidPathChars()) == -1;
+            bool possiblePath = filePath.IndexOfAny(Path.GetInvalidPathChars()) == -1;
             return possiblePath;
         }
     }
