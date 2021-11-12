@@ -6,5 +6,6 @@
         public string FileDirectoryPathForENC { get; set; }
         public string FileDirectoryPathForReadme { get; set; }
         public string ScsResponseFile { get; set; }
+        public string FolderDirectoryName { get; set; }
     }
 }

@@ -28,6 +28,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
             {
                 options.Headers.Add(CorrelationIdMiddleware.XCorrelationIdHeaderKey);
             });
+            services.AddControllers(o => o.InputFormatters.Insert(0, new BinaryRequestBodyFormatter()));
+
             services.AddScoped<SalesCatalogueService>();
             services.AddScoped<FileShareService>();
             services.Configure<SalesCatalogueConfiguration>(Configuration.GetSection("SalesCatalogue"));
