@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
@@ -21,9 +19,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsPutBlocksInFile { get; set; }
         public Dictionary<string, string> ErrorsCommitBatch { get; set; }
 
-        private readonly IWebHostEnvironment _hostingEnvironment;
+        protected IConfiguration configuration;
 
-        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration, IWebHostEnvironment hostingEnvironment) : base(httpContextAccessor)
+        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration) : base(httpContextAccessor)
         {
             this.fileShareService = fileShareService;
             ErrorsCreateBatch = new Dictionary<string, string>
@@ -41,19 +39,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 { "source", "BatchId" },
                 { "description", "BatchId does not exist." }
             };
-            this._hostingEnvironment = hostingEnvironment;
+            this.configuration = configuration;
         }
 
         [HttpPost]
         [Route("/batch")]
         public IActionResult CreateBatch([FromBody] BatchRequest batchRequest)
         {
-            string contentRootPath = _hostingEnvironment.ContentRootPath;
-
             if (batchRequest != null && !string.IsNullOrEmpty(batchRequest.BusinessUnit))
             {
-                string batchFolderPath = FileHelper.GetBatchFolderPath(contentRootPath);
-                var response = fileShareService.CreateBatch(batchFolderPath);
+                var response = fileShareService.CreateBatch(configuration["HOME"]);
                 if (response != null)
                 {
                     return Created(string.Empty, response);
@@ -101,11 +96,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                                 [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
                                                 [FromBody] object data )
         {
-            string contentRootPath = _hostingEnvironment.ContentRootPath;
             if (!string.IsNullOrEmpty(batchId) && data != null && !string.IsNullOrEmpty(blockId) && !string.IsNullOrEmpty(contentMD5) && !string.IsNullOrEmpty(contentType))
             {
-                string batchFolderPath = FileHelper.GetBatchFolderPath(contentRootPath);
-                var response = fileShareService.UploadBlockOfFile(batchId, fileName, data, batchFolderPath);
+                var response = fileShareService.UploadBlockOfFile(batchId, fileName, data, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.Created);
@@ -122,11 +115,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                              [FromRoute, SwaggerParameter(Required = true)] string fileName,
                                              [FromBody, SwaggerParameter(Required = true)] FileCommitPayload payload)
         {
-            string contentRootPath = _hostingEnvironment.ContentRootPath;
             if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName) && payload != null)
             {
-                string batchFolderPath = FileHelper.GetBatchFolderPath(contentRootPath);
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, batchFolderPath);
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.NoContent);
@@ -141,11 +132,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Produces("application/json")]
         public IActionResult CommitBatch([FromRoute] string batchId, [FromBody] List<BatchCommitRequest> body)
         {
-            string contentRootPath = _hostingEnvironment.ContentRootPath;
             if (!string.IsNullOrEmpty(batchId) && body != null)
             {
-                string batchFolderPath = FileHelper.GetBatchFolderPath(contentRootPath);
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, body.Select(a => a.FileName).FirstOrDefault(), batchFolderPath);
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, body.Select(a => a.FileName).FirstOrDefault(), configuration["HOME"]);
                 if (response)
                 {
                     return Accepted(new BatchCommitResponse() { Status = new Status { URI = $"/batch/{batchId}/status" } });

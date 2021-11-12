@@ -62,10 +62,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
         public bool UploadBlockOfFile(string batchid, string fileName, object data, string homeDirectoryPath)
         {
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
-            string uploadBlockFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid);
             string uploadBlockFilePath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
 
-            if (FileHelper.CheckFolderExists(uploadBlockFolderPath))
+            if (FileHelper.CheckFolderExists(homeDirectoryPath, folderName, batchid))
             {
                 FileHelper.CreateFileContentWithBytes(uploadBlockFilePath, (byte[])data);
                 return true;

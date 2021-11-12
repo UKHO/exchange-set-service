@@ -25,28 +25,36 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
         }
         public static void CreateFileContentWithBytes(string outputFileName, byte[] content)
         {
-            using (var output = File.OpenWrite(outputFileName))
+            bool validationFlag = GetPathValidation(outputFileName);
+            if (validationFlag)
             {
-                output.Write(content, 0, content.Length);
+                using (var output = File.OpenWrite(outputFileName))
+                {
+                    output.Write(content, 0, content.Length);
+                }
             }
         }
 
         public static bool CheckBatchWithZipFileExist(string filePathWithFileName)
         {
-            if (!string.IsNullOrEmpty(filePathWithFileName))
+            var path = filePathWithFileName; 
+            if (!string.IsNullOrEmpty(path))
             {
-                return File.Exists(filePathWithFileName);
+                return File.Exists(path);
             }
             return false;
         }
-        public static bool CheckFolderExists(string filePath)
+
+        public static bool CheckFolderExists(string homeDirectoryPath, string folderName, string batchid)
         {
-            return Directory.Exists(filePath);
+            string uploadBlockFilePath = Path.Combine(homeDirectoryPath, folderName, batchid);
+            return Directory.Exists(uploadBlockFilePath);
         }
-        public static string GetBatchFolderPath(string contentRootPath)
+
+        public static bool GetPathValidation(string outputFileName)
         {
-            string[] directories = contentRootPath.Split(Path.DirectorySeparatorChar);
-            return directories[0] + "\\" + directories[1];
+            bool possiblePath = outputFileName.IndexOfAny(Path.GetInvalidPathChars()) == -1;
+            return possiblePath;
         }
     }
 }
