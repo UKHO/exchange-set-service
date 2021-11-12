@@ -50,7 +50,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 var response = fileShareService.CreateBatch(configuration["HOME"]);
                 if (response != null)
                 {
-                    return Created("", response);
+                    return Created(string.Empty, response);
                 }
             }
             return BadRequest();
@@ -89,12 +89,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Produces("application/json")]
         [Consumes("application/octet-stream")]
         public IActionResult UploadBlockOfFile( [FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
-                                                           [FromRoute, SwaggerParameter(Required = true)] string fileName,
-                                                           [FromRoute, SwaggerParameter(Required = true)] string blockId,
-                                                           [FromHeader(Name = "Content-Length"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] decimal? contentLength,
-                                                           [FromHeader(Name = "Content-MD5"), SwaggerSchema(Format = "byte"), SwaggerParameter(Required = true)] string contentMD5,
-                                                           [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
-                                                           [FromBody] object data )
+                                                [FromRoute, SwaggerParameter(Required = true)] string fileName, [FromRoute, SwaggerParameter(Required = true)] string blockId,
+                                                [FromHeader(Name = "Content-Length"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] decimal? contentLength,
+                                                [FromHeader(Name = "Content-MD5"), SwaggerSchema(Format = "byte"), SwaggerParameter(Required = true)] string contentMD5,
+                                                [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
+                                                [FromBody] object data )
         {
             if (!string.IsNullOrEmpty(batchId) && data != null && !string.IsNullOrEmpty(blockId) && !string.IsNullOrEmpty(contentMD5) && !string.IsNullOrEmpty(contentType))
             {
@@ -112,8 +111,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Produces("application/json")]
         [Consumes("application/json")]
         public IActionResult PutBlocksInFile([FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
-                                                               [FromRoute, SwaggerParameter(Required = true)] string fileName,
-                                                               [FromBody, SwaggerParameter(Required = true)] FileCommitPayload payload)
+                                             [FromRoute, SwaggerParameter(Required = true)] string fileName,
+                                             [FromBody, SwaggerParameter(Required = true)] FileCommitPayload payload)
         {
             if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName) && payload != null)
             {

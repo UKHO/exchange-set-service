@@ -15,13 +15,12 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Filters
 
         public override bool CanRead(InputFormatterContext context)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (context == null) 
+            { 
+                throw new ArgumentNullException(nameof(context)); 
+            }
 
-            var contentType = context.HttpContext.Request.ContentType;
-            if (contentType == "application/octet-stream")
-                return true;
-
-            return false;
+            return context.HttpContext.Request.ContentType == "application/octet-stream";
         }
 
 
