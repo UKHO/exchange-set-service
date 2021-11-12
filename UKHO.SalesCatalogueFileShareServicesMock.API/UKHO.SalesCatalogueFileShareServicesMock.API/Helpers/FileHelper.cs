@@ -25,8 +25,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
         }
         public static void CreateFileContentWithBytes(string uploadBlockFilePath, byte[] content)
         {
-            bool validationFlag = ValidateFilePath(uploadBlockFilePath);
-            if (validationFlag)
+            if (ValidateFilePath(uploadBlockFilePath))
             {
                 using (var output = File.OpenWrite(uploadBlockFilePath))
                 {
@@ -37,8 +36,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
 
         public static bool CheckBatchWithZipFileExist(string filePathWithFileName)
         {
-            bool validationFlag = ValidateFilePath(filePathWithFileName);
-            if(validationFlag && !string.IsNullOrEmpty(filePathWithFileName))
+            if(ValidateFilePath(filePathWithFileName))
             {
                     return File.Exists(filePathWithFileName);
             }
@@ -47,8 +45,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
 
         public static bool CheckFolderExists(string filePath)
         {
-            bool validationFlag = ValidateFilePath(filePath);
-            if (validationFlag)
+            if (ValidateFilePath(filePath))
             {
                 return Directory.Exists(filePath);
             }
@@ -57,8 +54,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
 
         public static bool ValidateFilePath(string filePath)
         {
-            bool possiblePath = filePath.IndexOfAny(Path.GetInvalidPathChars()) == -1;
-            return possiblePath;
+            return !string.IsNullOrEmpty(filePath) && filePath.IndexOfAny(Path.GetInvalidPathChars()) == -1;
         }
     }
 }
