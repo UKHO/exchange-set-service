@@ -43,11 +43,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             string[] filePaths;
             byte[] bytes = null;
             var setZipPath = Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId);
-            if (!string.IsNullOrEmpty(setZipPath) && Directory.Exists(setZipPath) && string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(setZipPath) && FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase))
             {
                 filePaths = Directory.GetFiles(Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId), filesName);
             }
-            else if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
+            else if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
             {
                 filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
             }
