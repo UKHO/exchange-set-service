@@ -35,10 +35,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
-
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallExchangeSetApiWithMultipleReissueProductIdentifiers_ThenEncFilesAreDownloaded()
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetReissueProducts(), accessToken: EssJwtToken);
@@ -61,12 +61,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
 
                 }
-
             }
         }
 
-
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallExchangeSetApiWithAnUpdatePriorToSpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 
@@ -93,12 +92,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
 
                 }
-
             }
         }
 
-
         [Test]
+        [Category("QCOnlyTest")]
         public async Task WhenICallExchangeSetApiWithASpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 
@@ -125,7 +123,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
 
                 }
-
             }
         }
 
@@ -135,7 +132,5 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Clean up downloaded files/folders   
             FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
         }
-
-
     }
 }
