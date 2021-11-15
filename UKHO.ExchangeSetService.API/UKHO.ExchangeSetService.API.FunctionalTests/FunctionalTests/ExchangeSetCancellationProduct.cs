@@ -46,13 +46,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
-            string[] batchUri = batchStatusUrl.Split("/");
-            var batchId = batchUri[batchUri.Length - 1];
+            var batchId = batchStatusUrl.Split('/')[5];
 
-            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";           
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl.ToString(), FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
 
-            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.ExchangeSetFileName}";
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
@@ -86,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
-            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE516510", 1, 1));
+            ProductVersiondata.Add(DataHelper.GetProductVersionModelData("DE516510", 2, 1));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
@@ -95,13 +96,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
-            string[] batchUri = batchStatusUrl.Split("/");
-            var batchId = batchUri[batchUri.Length - 1];
+            var batchId = batchStatusUrl.Split('/')[5];
 
-            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(batchStatusUrl.ToString(), FssJwtToken);
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl.ToString(), FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
 
-            var downloadFileUrl = apiResponseData.Links.ExchangeSetFileUri.Href;
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.ExchangeSetFileName}";
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
