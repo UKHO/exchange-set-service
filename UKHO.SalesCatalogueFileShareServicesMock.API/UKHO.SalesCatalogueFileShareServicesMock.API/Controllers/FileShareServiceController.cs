@@ -8,6 +8,7 @@ using System.Net;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 {
@@ -19,6 +20,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsPutBlocksInFile { get; set; }
         public Dictionary<string, string> ErrorsCommitBatch { get; set; }
 
+        public Dictionary<string, string> ErrorsAddFileinBatch { get; set; }
         protected IConfiguration configuration;
 
         public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration) : base(httpContextAccessor)
@@ -28,6 +30,13 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 { "source", "RequestBody" },
                 { "description", "Either body is null or malformed." }
+            };
+            ErrorsAddFileinBatch = new Dictionary<string, string>
+            {
+
+                { "source","FileError" },
+                { "description","Error while creating file" }
+
             };
             ErrorsPutBlocksInFile = new Dictionary<string, string>
             {
@@ -89,12 +98,12 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("batch/{batchId}/files/{fileName}/{blockId}")]
         [Produces("application/json")]
         [Consumes("application/octet-stream")]
-        public IActionResult UploadBlockOfFile( [FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
+        public IActionResult UploadBlockOfFile([FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
                                                 [FromRoute, SwaggerParameter(Required = true)] string fileName, [FromRoute, SwaggerParameter(Required = true)] string blockId,
                                                 [FromHeader(Name = "Content-Length"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] decimal? contentLength,
                                                 [FromHeader(Name = "Content-MD5"), SwaggerSchema(Format = "byte"), SwaggerParameter(Required = true)] string contentMD5,
                                                 [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
-                                                [FromBody] object data )
+                                                [FromBody] object data)
         {
             if (!string.IsNullOrEmpty(batchId) && data != null && !string.IsNullOrEmpty(blockId) && !string.IsNullOrEmpty(contentMD5) && !string.IsNullOrEmpty(contentType))
             {
@@ -141,6 +150,43 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 }
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsCommitBatch });
+        }
+
+        [HttpPost]
+        [Route("batch/{batchId}/files/{fileName}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public IActionResult AddFileToBatch([FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
+                                           [FromRoute, SwaggerParameter(Required = true)] string fileName,
+                                           [FromHeader(Name = "X-MIME-Type"), SwaggerSchema(Format = "MIME")] string contentType,
+                                           [FromHeader(Name = "X-Content-Size"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] long? xContentSize,
+                                           [FromBody] FileRequest attributes)
+        {
+            if (!string.IsNullOrEmpty(batchId))
+            {
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
+                if (response)
+                {
+                    return StatusCode((int)HttpStatusCode.Created);
+                }
+            }
+            return StatusCode((int)HttpStatusCode.InternalServerError, "Error while creating file");
+        }
+
+        [HttpGet]
+        [Route("/batch/{batchId}/status")]
+        [Produces("application/json")]
+        public IActionResult GetBatchStatus([FromRoute][Required] string batchId)
+        {
+            if (!string.IsNullOrEmpty(batchId))
+            {
+                BatchStatusResponse batchStatusResponse = fileShareService.GetBatchStatus(batchId,configuration["HOME"]);
+                if (batchStatusResponse.Status == "Committed")
+                {
+                    return new OkObjectResult(batchStatusResponse);
+                }
+            }
+            return StatusCode((int)HttpStatusCode.Unauthorized);
         }
     }
 }
