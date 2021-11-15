@@ -37,15 +37,19 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return response;
         }
 
-        public byte[] GetFileData(string filesName)
+        public byte[] GetFileData(string homeDirectoryPath, string batchId, string filesName)
         {
             string fileType = Path.GetExtension(filesName);
             string[] filePaths;
             byte[] bytes = null;
-
-            if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
+            var setZipPath = Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId);
+            if (!string.IsNullOrEmpty(setZipPath) && Directory.Exists(setZipPath) && string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase))
             {
-                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");                
+                filePaths = Directory.GetFiles(Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId), filesName);
+            }
+            else if (Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
+            {
+                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
             }
             else
             {
@@ -54,7 +58,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             if (filePaths != null && filePaths.Any())
             {
                 string filePath = filePaths[0];
-                bytes = File.ReadAllBytes(filePath); 
+                bytes = File.ReadAllBytes(filePath);
             }
             return bytes;
         }
