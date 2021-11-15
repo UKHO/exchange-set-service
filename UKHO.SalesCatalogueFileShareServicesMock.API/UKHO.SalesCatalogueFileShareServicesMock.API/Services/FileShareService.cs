@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -82,11 +82,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return FileHelper.CheckBatchWithZipFileExist(batchFolderPath);
         }
 
-        public bool CleanUp(CleanUpRequest batchIdRequest,  string homeDirectoryPath)
+        public bool CleanUp(List<string> batchId,  string homeDirectoryPath)
         {
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             bool deleteFlag = false;
-            foreach (var item in batchIdRequest.BatchId)
+            foreach (var item in batchId)
             {
                 string uploadBlockFolderPath = Path.Combine(homeDirectoryPath, folderName, item);
                 var response = FileHelper.CleanUp(uploadBlockFolderPath);

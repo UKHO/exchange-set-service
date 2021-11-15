@@ -145,11 +145,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpPost]
         [Route("/cleanUp")]
-        public IActionResult CleanUp([FromBody] CleanUpRequest cleanUpRequest)
+        public IActionResult CleanUp([FromBody] List<string> batchId)
         {
-            if (cleanUpRequest != null)
+            if (batchId != null)
             {
-                var response = fileShareService.CleanUp(cleanUpRequest, configuration["HOME"]);
+                var response = fileShareService.CleanUp(batchId, configuration["HOME"]);
                 if (response)
                 {
                     return Ok();
