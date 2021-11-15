@@ -43,9 +43,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             string[] filePaths;
             byte[] bytes = null;
             var setZipPath = Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId);
-            if (!string.IsNullOrEmpty(setZipPath) && FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(setZipPath) && FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) 
+                && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase))
             {
-                filePaths = Directory.GetFiles(Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId), filesName);
+                filePaths = Directory.GetFiles(setZipPath, filesName);
             }
             else if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
             {
