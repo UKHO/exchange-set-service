@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers; 
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -15,6 +15,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
         public FileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration)
         {
             this.fileShareServiceConfiguration = fileShareServiceConfiguration;
+        }
+
+        public BatchResponse CreateBatch(string homeDirectoryPath)
+        {
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            Guid batchId = Guid.NewGuid();
+            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchId.ToString());
+            
+            FileHelper.CheckAndCreateFolder(batchFolderPath);
+            return new BatchResponse() { BatchId= batchId };
         }
 
         public SearchBatchResponse GetBatches(string filter)
@@ -47,6 +57,28 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 bytes = File.ReadAllBytes(filePath); 
             }
             return bytes;
+        }
+
+        public bool UploadBlockOfFile(string batchid, string fileName, object data, string homeDirectoryPath)
+        {
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            string uploadBlockFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid);
+            string uploadBlockFilePath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
+
+            if (FileHelper.CheckFolderExists(uploadBlockFolderPath))
+            {
+                FileHelper.CreateFileContentWithBytes(uploadBlockFilePath, (byte[])data);
+                return true;
+            }
+            return false;
+        }
+
+        public bool CheckBatchWithZipFileExist(string batchid, string fileName, string homeDirectoryPath)
+        {
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
+
+            return FileHelper.CheckBatchWithZipFileExist(batchFolderPath);
         }
     }
 }
