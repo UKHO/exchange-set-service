@@ -142,5 +142,20 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsCommitBatch });
         }
+
+        [HttpPost]
+        [Route("/cleanUp")]
+        public IActionResult CleanUp([FromBody] CleanUpRequest cleanUpRequest)
+        {
+            if (cleanUpRequest != null)
+            {
+                var response = fileShareService.CleanUp(cleanUpRequest, configuration["HOME"]);
+                if (response)
+                {
+                    return Ok();
+                }
+            }
+            return BadRequest();
+        }
     }
 }

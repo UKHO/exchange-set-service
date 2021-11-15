@@ -56,5 +56,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
         {
             return !string.IsNullOrEmpty(filePath) && filePath.IndexOfAny(Path.GetInvalidPathChars()) == -1;
         }
+
+        public static bool CleanUp(string filePath)
+        {
+            if (CheckFolderExists(filePath))
+            {
+                DirectoryInfo di = new DirectoryInfo(filePath);
+                di.Delete(true);
+                return true;
+            }
+            return false;
+        }
     }
 }

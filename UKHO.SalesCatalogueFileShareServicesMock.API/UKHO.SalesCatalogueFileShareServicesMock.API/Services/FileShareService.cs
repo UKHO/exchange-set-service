@@ -3,7 +3,8 @@ using System;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers; 
+using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -79,6 +80,22 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
 
             return FileHelper.CheckBatchWithZipFileExist(batchFolderPath);
+        }
+
+        public bool CleanUp(CleanUpRequest batchIdRequest,  string homeDirectoryPath)
+        {
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            bool deleteFlag = false;
+            foreach (var item in batchIdRequest.BatchId)
+            {
+                string uploadBlockFolderPath = Path.Combine(homeDirectoryPath, folderName, item);
+                var response = FileHelper.CleanUp(uploadBlockFolderPath);
+                if (response)
+                {
+                    deleteFlag = true;
+                }
+            }
+            return deleteFlag;
         }
     }
 }
