@@ -3,7 +3,8 @@ using System;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers; 
+using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -83,7 +84,20 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid, fileName);
 
-            return FileHelper.CheckBatchWithZipFileExist(batchFolderPath);
+            return FileHelper.ValidateFilePath(batchFolderPath) && FileHelper.CheckBatchWithZipFileExist(batchFolderPath);
+        }
+        public BatchStatusResponse GetBatchStatus(string batchId, string homeDirectoryPath)
+        {
+            BatchStatusResponse batchStatusResponse = new BatchStatusResponse();
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchId);
+
+            if (FileHelper.ValidateFilePath(batchFolderPath) && FileHelper.CheckFolderExists(batchFolderPath))
+            {
+                batchStatusResponse.BatchId = batchId;
+                batchStatusResponse.Status = "Committed";
+            }
+            return batchStatusResponse;
         }
     }
 }

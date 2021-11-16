@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
@@ -18,7 +19,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsCreateBatch { get; set; }
         public Dictionary<string, string> ErrorsPutBlocksInFile { get; set; }
         public Dictionary<string, string> ErrorsCommitBatch { get; set; }
-
+        public Dictionary<string, string> ErrorsAddFileinBatch { get; set; }
         protected IConfiguration configuration;
 
         public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration) : base(httpContextAccessor)
@@ -38,6 +39,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 { "source", "BatchId" },
                 { "description", "BatchId does not exist." }
+            };
+            ErrorsAddFileinBatch = new Dictionary<string, string>
+            {
+                { "source","FileError" },
+                { "description","Error while creating file" }
             };
             this.configuration = configuration;
         }
@@ -141,6 +147,44 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 }
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsCommitBatch });
+        }
+
+
+        [HttpPost]
+        [Route("batch/{batchId}/files/{fileName}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public IActionResult AddFileToBatch([FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
+                                                  [FromRoute, SwaggerParameter(Required = true)] string fileName,
+                                                  [FromHeader(Name = "X-MIME-Type"), SwaggerSchema(Format = "MIME")] string contentType,
+                                                  [FromHeader(Name = "X-Content-Size"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] long? xContentSize,
+                                                  [FromBody] FileRequest attributes)
+        {
+            if (!string.IsNullOrEmpty(batchId))
+            {
+                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
+                if (response)
+                {
+                    return StatusCode((int)HttpStatusCode.Created);
+                }
+            }
+            return StatusCode((int)HttpStatusCode.InternalServerError, new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsAddFileinBatch });
+        }
+
+        [HttpGet]
+        [Route("/batch/{batchId}/status")]
+        [Produces("application/json")]
+        public IActionResult GetBatchStatus([FromRoute][Required] string batchId)
+        {
+            if (!string.IsNullOrEmpty(batchId))
+            {
+                BatchStatusResponse batchStatusResponse = fileShareService.GetBatchStatus(batchId, configuration["HOME"]);
+                if (batchStatusResponse.Status == "Committed")
+                {
+                    return new OkObjectResult(batchStatusResponse);
+                }
+            }
+            return StatusCode((int)HttpStatusCode.Unauthorized);
         }
     }
 }
