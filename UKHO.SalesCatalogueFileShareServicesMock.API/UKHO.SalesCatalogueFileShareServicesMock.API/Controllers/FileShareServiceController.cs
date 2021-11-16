@@ -160,7 +160,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                             [FromHeader(Name = "X-Content-Size"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] long? xContentSize,
                                             [FromBody] FileRequest attributes)
         {
-            if (!string.IsNullOrEmpty(batchId) && attributes != null)
+            if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName))
             {
                 var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
                 if (response)
