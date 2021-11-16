@@ -83,12 +83,12 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpGet]
         [Route("/batch/{batchId}/files/{fileName}")]
-        public FileResult DownloadFile(string fileName)
+        public FileResult DownloadFile(string batchId, string fileName)
         {
             byte[] bytes = null;
             if (!string.IsNullOrEmpty(fileName))
             {
-                bytes = fileShareService.GetFileData(fileName);
+                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
             }
 
             return File(bytes, "application/octet-stream", fileName);
