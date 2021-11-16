@@ -155,26 +155,26 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Produces("application/json")]
         [Consumes("application/json")]
         public IActionResult AddFileToBatch([FromRoute, SwaggerSchema(Format = "GUID"), SwaggerParameter(Required = true)] string batchId,
-                                                  [FromRoute, SwaggerParameter(Required = true)] string fileName,
-                                                  [FromHeader(Name = "X-MIME-Type"), SwaggerSchema(Format = "MIME")] string contentType,
-                                                  [FromHeader(Name = "X-Content-Size"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] long? xContentSize,
-                                                  [FromBody] FileRequest attributes)
+                                            [FromRoute, SwaggerParameter(Required = true)] string fileName,
+                                            [FromHeader(Name = "X-MIME-Type"), SwaggerSchema(Format = "MIME")] string contentType,
+                                            [FromHeader(Name = "X-Content-Size"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] long? xContentSize,
+                                            [FromBody] FileRequest attributes)
         {
-            if (!string.IsNullOrEmpty(batchId))
+            if (!string.IsNullOrEmpty(batchId) && attributes != null)
             {
                 var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
                 if (response)
                 {
-                    return StatusCode((int)HttpStatusCode.Created);
+                    return StatusCode(StatusCodes.Status201Created);
                 }
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError, new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsAddFileinBatch });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsAddFileinBatch });
         }
 
         [HttpGet]
         [Route("/batch/{batchId}/status")]
         [Produces("application/json")]
-        public IActionResult GetBatchStatus([FromRoute][Required] string batchId)
+        public IActionResult GetBatchStatus([FromRoute, Required] string batchId)
         {
             if (!string.IsNullOrEmpty(batchId))
             {
@@ -184,7 +184,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return new OkObjectResult(batchStatusResponse);
                 }
             }
-            return StatusCode((int)HttpStatusCode.Unauthorized);
+            return Unauthorized();
         }
     }
 }
