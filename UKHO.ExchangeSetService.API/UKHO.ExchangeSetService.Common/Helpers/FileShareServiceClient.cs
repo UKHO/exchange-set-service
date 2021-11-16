@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri, string correlationId="")
+        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri,CancellationToken cancellationToken, string correlationId="")
         {
             HttpContent content = null;
 
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
 
             httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-            var response = await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await httpClient.SendAsync(httpRequestMessage, cancellationToken);
             return response;
         }
 
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
 
-        public async Task<HttpResponseMessage> UploadFileBlockAsync(HttpMethod method, string baseUrl,string batchId, string fileName, string blockId, byte[] blockBytes, byte[] md5Hash, string accessToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
+        public async Task<HttpResponseMessage> UploadFileBlockAsync(HttpMethod method, string baseUrl,string batchId, string fileName, string blockId, byte[] blockBytes, byte[] md5Hash, string accessToken, CancellationToken cancellationToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
         {
             string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}/{blockId}";
 
@@ -86,7 +86,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            return await httpClient.SendAsync(httpRequestMessage, cancellationToken);
 
         }
 

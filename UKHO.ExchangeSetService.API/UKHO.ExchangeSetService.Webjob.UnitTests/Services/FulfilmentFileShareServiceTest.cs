@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -64,9 +65,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse()
         {
-            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
+            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetSearchBatchResponse());
 
-            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(),null, null);
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(),null, null,null, CancellationToken.None);
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOf(typeof(List<FulfilmentDataResponse>), result);
@@ -77,9 +78,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfillmentDataNullResponse()
         {
-            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored,A<string>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
+            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored,A<string>.Ignored, A<string>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetSearchBatchResponse());
 
-            var result = await fulfilmentFileShareService.QueryFileShareServiceData(null, null, null);
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(null, null, null, null, CancellationToken.None);
 
             Assert.IsNull(result);
         }
@@ -94,7 +95,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
             };
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "");
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "",null, CancellationToken.None);
             Assert.IsNotNull(result);
         }
 
@@ -106,7 +107,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
             };
             var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "");
+            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "", null, CancellationToken.None);
             Assert.IsNotNull(result);
         }
 

@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -65,18 +67,44 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 List<FulfilmentDataResponse> fulfilmentDataResponse = new List<FulfilmentDataResponse>();
                 object sync = new object();
                 int fileShareServiceSearchQueryCount = 0;
+                var cTs = new CancellationTokenSource();
+                CancellationToken cToken = cTs.Token;
+
                 var tasks = productsList.Select(async item =>
                 {
-                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
+              ///  using CancellationTokenRegistration ctr = cToken.Register(() => item. ));
+                fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath,cTs, cToken).ConfigureAwait(false);
                     int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
                     }
-                    listFulfilmentData.AddRange(fulfilmentDataResponse);
-                    
+                    if (cToken.IsCancellationRequested)
+                    {
+                        cTs.Cancel();
+                        ////cToken.ThrowIfCancellationRequested();
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in QueryAndDownloadFileShareServiceFiles {cancellationTokenSource.Token} and batchId:{message.BatchId} and {e.message}", JsonConvert.SerializeObject(cTs.Token), message.BatchId);
+                        throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
+                    }
+                    listFulfilmentData.AddRange(fulfilmentDataResponse);                    
                 });
-                await Task.WhenAll(tasks);
+                
+                try
+                {
+                    await Task.WhenAll(tasks).ConfigureAwait(false);                
+                }
+                catch (TaskCanceledException e)
+                {
+                    cTs.Cancel();
+                    ////Console.WriteLine($"{nameof(OperationCanceledException)} thrown with message: {e.Message}");
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in FulfilmentDataservice {cancellationTokenSource.Token} and batchId:{message.BatchId} and {e.message}", JsonConvert.SerializeObject(cTs.Token), message.BatchId, e.Message);
+                    throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
+                }
+                finally
+                    {
+                    cTs.Dispose();
+                }
+                
                 DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
                 int downloadedENCFileCount = 0;
                 foreach (var item in listFulfilmentData)
@@ -104,16 +132,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, message.BatchId, message.CorrelationId);
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
+        public async Task<List<FulfilmentDataResponse>> QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId(), "File share service search query request started for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.BatchId, message.CorrelationId);
+            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.BatchId, message.CorrelationId, cancellationTokenSource, cancellationToken);
             logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestCompleted.ToEventId(), "File share service search query request completed for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
 
             if (searchBatchResponse != null && searchBatchResponse.Any())
             {
                 logger.LogInformation(EventIds.DownloadENCFilesRequestStart.ToEventId(), "File share service download request started for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
+                await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
                 logger.LogInformation(EventIds.DownloadENCFilesRequestCompleted.ToEventId(), "File share service download request completed for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
             }
             return searchBatchResponse;

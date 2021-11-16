@@ -512,7 +512,12 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805126 - Completed query for ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
-        FileShareServiceSearchQueryForSetOfENCsCompleted = 805126
+        FileShareServiceSearchQueryForSetOfENCsCompleted = 805126,
+        /// <summary>
+        /// 805127 - Cancellation tokken called when any of the async task in Parllel thread is failed
+        /// </summary>
+        CancellationTokenEvent = 805127
+
     }
 
     public static class EventIdExtensions
