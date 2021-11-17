@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Net.Http;
+using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -21,6 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string ScsJwtToken { get; set; }
         private string DownloadedFolderPath { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
+        private readonly List<string> cleanUpBatchIdList = new List<string>();
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -35,6 +37,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), accessToken: EssJwtToken);
+            //Get the BatchId
+            var batchId = await ApiEssResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
         }
 
@@ -121,10 +126,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [OneTimeTearDown]
-        public void GlobalTeardown()
+        public async Task GlobalTeardown()
         {
-            //Clean up downloaded files/folders   
-            FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
+            
+            //Clean up batches from local foldar 
+            var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
         }
 
     }

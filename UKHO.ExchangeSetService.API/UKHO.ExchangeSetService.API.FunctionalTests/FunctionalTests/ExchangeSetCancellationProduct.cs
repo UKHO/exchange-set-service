@@ -17,12 +17,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
         public ProductIdentifierModel ProductIdentifierModel { get; set; }
+        private FssApiClient FssApiClient { get; set; }
+        private readonly List<string> cleanUpBatchIdList = new List<string>();
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
+            FssApiClient = new FssApiClient();
             ProductIdentifierModel = new ProductIdentifierModel();
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();
@@ -47,6 +50,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
 
             var batchId = batchStatusUrl.Split('/')[5];
+
+            cleanUpBatchIdList.Add(batchId);
 
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";           
 
@@ -98,6 +103,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var batchId = batchStatusUrl.Split('/')[5];
 
+            cleanUpBatchIdList.Add(batchId);
+
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl.ToString(), FssJwtToken);
@@ -130,11 +137,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
-        [TearDown]
-        public void CleanUpExchangeSetTeardown()
+        [OneTimeTearDown]
+        public async Task GlobalTeardown()
         {
-            //Clean up downloaded files/folders   
-            CancellationFileHelper.DeleteDirectory(Config.ExchangeSetFileName);
+            //Clean up batches from local foldar 
+            var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
         }
+   
     }
 }

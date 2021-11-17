@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string EssJwtToken { get; set; }
         private string EssJwtTokenNoRole { get; set; }
         private string EssJwtCustomizedToken { get; set; }
+        private FssApiClient FssApiClient { get; set; }
+        private string FssJwtToken { get; set; }
+        private readonly List<string> cleanUpBatchIdList = new List<string>();
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [SetUp]
@@ -22,10 +26,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
+            FssApiClient = new FssApiClient();
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();
             EssJwtTokenNoRole = await authTokenProvider.GetEssTokenNoAuth();
             EssJwtCustomizedToken = authTokenProvider.GenerateCustomToken();
+            FssJwtToken = await authTokenProvider.GetFssToken();
         }
 
         [Test]
@@ -65,6 +71,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtTokenNoRole);
             
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
         }
 
         [Test]
@@ -76,6 +86,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
         }        
 
         [Test]
@@ -84,6 +98,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 200.");
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
+
         }
 
         [TestCase(0, TestName = "Current DateTime with valid RFC1123 format")]
@@ -143,6 +162,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "callbackUri"));
             Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Invalid callbackUri format."));
+        }
+
+        [OneTimeTearDown]
+        public async Task GlobalTeardown()
+        {
+            //Clean up batches from local foldar 
+            var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
         }
 
     }

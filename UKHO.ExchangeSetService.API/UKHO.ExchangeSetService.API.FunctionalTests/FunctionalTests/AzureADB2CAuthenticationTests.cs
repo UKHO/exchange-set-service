@@ -11,20 +11,27 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     class AzureADB2CAuthenticationTests
     {
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
+        private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
         private string EssB2CToken { get; set; }        
         private string EssB2CCustomizedToken { get; set; }
         public DataHelper DataHelper { get; set; }
-
+        private string FssJwtToken { get; set; }
+        private readonly List<string> cleanUpBatchIdList = new List<string>();
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+
+        
 
         [SetUp]
         public async Task SetupAsync()
         {
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
+            FssApiClient = new FssApiClient();
+            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             AzureB2CAuthTokenProvider b2cAuthTokenProvider = new AzureB2CAuthTokenProvider();
             EssB2CToken = await b2cAuthTokenProvider.GetToken();
+            FssJwtToken = await authTokenProvider.GetFssToken();
             EssB2CCustomizedToken = b2cAuthTokenProvider.GenerateCustomToken();
             DataHelper = new DataHelper();
         }
@@ -70,6 +77,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
+            
         }
         #endregion
 
@@ -111,6 +123,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
         }
         #endregion
 
@@ -169,7 +185,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
         }
         #endregion
+
+        [OneTimeTearDown]
+        public async Task GlobalTeardown()
+        {
+            //Clean up batches from local foldar 
+            var apiResponse=await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+        }
     }
 }
