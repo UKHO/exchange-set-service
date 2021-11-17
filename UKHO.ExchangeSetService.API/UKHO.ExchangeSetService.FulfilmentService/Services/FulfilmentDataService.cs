@@ -71,8 +71,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 CancellationToken cToken = cTs.Token;
 
                 var tasks = productsList.Select(async item =>
-                {
-                    ///  using CancellationTokenRegistration ctr = cToken.Register(() => item. ));
+                {                    
                     fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath, cTs, cToken).ConfigureAwait(false);
                     int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
@@ -81,29 +80,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     }
                     if (cToken.IsCancellationRequested)
                     {
-                        cTs.Cancel();
-                      ///// int currentId = (int)Task.CurrentId;                       
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in QueryAndDownloadFileShareServiceFiles {cancellationTokenSource.Token} and batchId:{message.BatchId} and at time :{DateTime.UtcNow;}", JsonConvert.SerializeObject(cTs.Token), DateTime.UtcNow, message.BatchId);
-                        throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
+                        cTs.Cancel();                      
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled in QueryAndDownloadFileShareServiceFiles with {cancellationTokenSource.Token} at Time:{DateTime.UtcNow} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cTs.Token), DateTime.UtcNow, message.BatchId, message.CorrelationId);
+                        throw new OperationCanceledException();
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
-                });
-
-                try
-                {
-                    /////try to remove this configure.await and check also try catch fially block also instead of dispose use finally
-                    await Task.WhenAll(tasks).ConfigureAwait(false);                   
-                }
-                catch (TaskCanceledException e)
-                {
-                    cTs.Cancel();
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in FulfilmentDataservice {cancellationTokenSource.Token} and batchId:{message.BatchId} and at time:{DateTime.UtcNow} and {e.message}", JsonConvert.SerializeObject(cTs.Token), message.BatchId, DateTime.UtcNow, e.Message);
-                    throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
-                }
-                finally
-                {
-                    cTs.Dispose();
-                }
+                });              
+                    
+                  await Task.WhenAll(tasks).ConfigureAwait(false); 
 
                 DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
                 int downloadedENCFileCount = 0;

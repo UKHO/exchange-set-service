@@ -52,36 +52,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products,string batchId, string correlationId, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, string batchId, string correlationId, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             if (products != null && products.Any())
             {
-               //// if (!cancellationToken.IsCancellationRequested)
-                ////{
-                    var batchProducts = SliceFileShareServiceProducts(products);
-                    var listBatchDetails = new List<BatchDetail>();
-                    int fileShareServiceSearchQueryCount = 0;
-                    foreach (var item in batchProducts)
-                    {
-                        if(!cancellationToken.IsCancellationRequested)
-                        {
-                            var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId, cancellationTokenSource, cancellationToken);
-                            listBatchDetails.AddRange(result.Entries);
-                            fileShareServiceSearchQueryCount += result.QueryCount;
-                        }
-                    }
+                var batchProducts = SliceFileShareServiceProducts(products);
+                var listBatchDetails = new List<BatchDetail>();
+                int fileShareServiceSearchQueryCount = 0;
+                foreach (var item in batchProducts)
+                {
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId, cancellationTokenSource, cancellationToken);
+                    listBatchDetails.AddRange(result.Entries);
+                    fileShareServiceSearchQueryCount += result.QueryCount;
+                }
 
-                    var fulFilmentDataResponse = SetFulfilmentDataResponse(new SearchBatchResponse()
-                    {
-                        Entries = listBatchDetails
-                    });
-                    if (fulFilmentDataResponse.Count > 0)
-                        fulFilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount = fileShareServiceSearchQueryCount;
-                    return fulFilmentDataResponse;
-               //// }
-              ////  cancellationTokenSource.Cancel();
+                var fulFilmentDataResponse = SetFulfilmentDataResponse(new SearchBatchResponse()
+                {
+                    Entries = listBatchDetails
+                });
+                if (fulFilmentDataResponse.Count > 0)
+                    fulFilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount = fileShareServiceSearchQueryCount;
+                return fulFilmentDataResponse;
             }
-            return null;           
+            return null;
         }
 
         public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponse, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
@@ -105,12 +98,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var listFulfilmentData = new List<FulfilmentDataResponse>();
             foreach (var item in searchBatchResponse.Entries)
             {
-                listFulfilmentData.Add(new FulfilmentDataResponse { 
+                listFulfilmentData.Add(new FulfilmentDataResponse
+                {
                     BatchId = item.BatchId,
-                    EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b=>b.Value).FirstOrDefault()),
+                    EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b => b.Value).FirstOrDefault()),
                     ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault(),
                     UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault()),
-                    FileUri = item.Files?.Select(a=>a.Links.Get.Href),
+                    FileUri = item.Files?.Select(a => a.Links.Get.Href),
                     Files = item.Files
                 });
             }
@@ -118,11 +112,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
         public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
-           return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);            
+            return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);
         }
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
-           return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
+            return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
         public async Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
