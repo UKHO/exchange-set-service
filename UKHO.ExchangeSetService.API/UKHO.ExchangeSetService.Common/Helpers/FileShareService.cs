@@ -118,36 +118,36 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var productList = new List<string>();
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
             int queryCount = 0;
-          ////  using var client = new WebClient();
+
             logger.LogInformation(EventIds.FileShareServicePreparingToSearchSetOfENCsStarted.ToEventId(), "Preparing file share service search request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, batchId, correlationId);
-            if (!cancellationToken.IsCancellationRequested)
+
+            do
             {
-                do
+                queryCount++;
+                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, correlationId);
+
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    /////using CancellationTokenRegistration ctr = cancellationToken.Register(() => client.CancelAsync());                   
-                        queryCount++;
-                        httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, correlationId);
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        if (httpResponse.IsSuccessStatusCode)
-                        {
-                            uri = await SelectLatestPublishedDateBatch(products, internalSearchBatchResponse, uri, httpResponse, productList);
-                        }
-                        else
-                        {
-                            cancellationTokenSource.Cancel();
-                            ///// cancellationToken.ThrowIfCancellationRequested();
-                            logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken called while searching ENC files with {cancellationTokenSource.Token} uri:{RequestUri} , responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
-                            throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
-                            ////logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
-                            ////throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
-                        }
-                        
-                    }                   
-                } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
-                internalSearchBatchResponse.QueryCount = queryCount;
-                CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
-            }
+                    uri = await SelectLatestPublishedDateBatch(products, internalSearchBatchResponse, uri, httpResponse, productList);
+                }
+                else
+                {
+                    cancellationTokenSource.Cancel();
+                    ///// cancellationToken.ThrowIfCancellationRequested();
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken called while searching ENC files with {cancellationTokenSource.Token} and at time:{Datetime.UtcNow} and uri:{RequestUri} , responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token),DateTime.UtcNow, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
+                    ////logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    ////throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
+                }
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken when source is true and operation cancelled is called and cancellationTokensource data:{cancellationTokenSource.Token} and uri:{RequestUri} responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    throw new OperationCanceledException();
+                }
+            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+            internalSearchBatchResponse.QueryCount = queryCount;
+            CheckProductsExistsInFileShareService(products, correlationId, batchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
+
             logger.LogInformation(EventIds.FileShareServiceSearchQueryForSetOfENCsCompleted.ToEventId(), "Completed file share service search request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, batchId, correlationId);
             return internalSearchBatchResponse;
         }
@@ -166,7 +166,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Any() ? internalNotFoundProducts.Distinct() : products);
                     cancellationTokenSource.Cancel();
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellation token event called while searching ENC files and no data found while querying for products:{internalNotFoundProductsPayLoadJson} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, batchId, correlationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellation token event called while searching ENC files and no data found while querying for products:{internalNotFoundProductsPayLoadJson} and {cancellationTokenSource.Token} and at time:{DateTime.UtcNow} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, batchId, correlationId);
                     throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
                     ////logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuerying.ToEventId(), "Error in file share service while searching ENC files and no data found while querying for products:{internalNotFoundProductsPayLoadJson} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, batchId, correlationId);
                     ////throw new FulfilmentException(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuerying.ToEventId());
@@ -345,9 +345,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             bool result = false;
             foreach (var item in uri)
-            {
-                if (!cancellationToken.IsCancellationRequested)
-                {
+            {              
                     HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item, CancellationToken.None, queueMessage.CorrelationId);
                     var fileName = item.Split("/").Last();
                     if (httpResponse.IsSuccessStatusCode)
@@ -363,10 +361,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     else
                     {
                         cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in file share service while downloading ENC file:{fileName} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
+                        logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Cancellation Token is cancelled--Error in file share service and {cancellationTokenSource.Token} and at time:{DateTime.UtcNow} while downloading ENC file:{fileName} with uri:{RequestUri} responded with {StatusCode} at time:{DateTime.UtcNow} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow,fileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode,DateTime.UtcNow, queueMessage.BatchId, queueMessage.CorrelationId);
                         throw new FulfilmentException(EventIds.DownloadENCFilesNonOkResponse.ToEventId());
                     }
-                }
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "cancellation token requested while downloading file --Error in file share service and {cancellationTokenSource.Token} and at time:{DateTime.UtcNow} while downloading ENC file:{fileName} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token),DateTime.UtcNow, fileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
+                    throw new OperationCanceledException();
+                }               
             }
             return result;
         }

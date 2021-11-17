@@ -72,8 +72,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 var tasks = productsList.Select(async item =>
                 {
-              ///  using CancellationTokenRegistration ctr = cToken.Register(() => item. ));
-                fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath,cTs, cToken).ConfigureAwait(false);
+                    ///  using CancellationTokenRegistration ctr = cToken.Register(() => item. ));
+                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath, cTs, cToken).ConfigureAwait(false);
                     int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -82,29 +82,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     if (cToken.IsCancellationRequested)
                     {
                         cTs.Cancel();
-                        ////cToken.ThrowIfCancellationRequested();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in QueryAndDownloadFileShareServiceFiles {cancellationTokenSource.Token} and batchId:{message.BatchId} and {e.message}", JsonConvert.SerializeObject(cTs.Token), message.BatchId);
+                      ///// int currentId = (int)Task.CurrentId;                       
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in QueryAndDownloadFileShareServiceFiles {cancellationTokenSource.Token} and batchId:{message.BatchId} and at time :{DateTime.UtcNow;}", JsonConvert.SerializeObject(cTs.Token), DateTime.UtcNow, message.BatchId);
                         throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
                     }
-                    listFulfilmentData.AddRange(fulfilmentDataResponse);                    
+                    listFulfilmentData.AddRange(fulfilmentDataResponse);
                 });
-                
+
                 try
                 {
-                    await Task.WhenAll(tasks).ConfigureAwait(false);                
+                    /////try to remove this configure.await and check also try catch fially block also instead of dispose use finally
+                    await Task.WhenAll(tasks).ConfigureAwait(false);                   
                 }
                 catch (TaskCanceledException e)
                 {
                     cTs.Cancel();
-                    ////Console.WriteLine($"{nameof(OperationCanceledException)} thrown with message: {e.Message}");
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in FulfilmentDataservice {cancellationTokenSource.Token} and batchId:{message.BatchId} and {e.message}", JsonConvert.SerializeObject(cTs.Token), message.BatchId, e.Message);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Cancellationtoken in FulfilmentDataservice {cancellationTokenSource.Token} and batchId:{message.BatchId} and at time:{DateTime.UtcNow} and {e.message}", JsonConvert.SerializeObject(cTs.Token), message.BatchId, DateTime.UtcNow, e.Message);
                     throw new FulfilmentException(EventIds.CancellationTokenEvent.ToEventId());
                 }
                 finally
-                    {
+                {
                     cTs.Dispose();
                 }
-                
+
                 DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
                 int downloadedENCFileCount = 0;
                 foreach (var item in listFulfilmentData)
@@ -122,7 +122,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await fulfilmentCallBackService.SendCallBackResponse(response, message);
                 monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
                 return "Exchange Set Created Successfully";
-            }            
+            }
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             return "Exchange Set Is Not Created";
         }
@@ -170,7 +170,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "File share service download request started for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "File share service download request completed for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;                
+                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
                 monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
             }
         }
@@ -192,7 +192,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             DateTime createZipFileTaskCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, createZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
             if (isZipFileCreated)
-            {               
+            {
                 logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Upload exchange set zip file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 isZipFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
                 logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Upload exchange set zip file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
@@ -200,7 +200,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipFileUploaded;
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId,string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             bool isFileCreated = false;
 
