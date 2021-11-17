@@ -29,6 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
         {
            
@@ -38,6 +39,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
@@ -47,6 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
         {
                       
@@ -56,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test case for time being since data is not available in real SCS.")]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheApiWithNoRoleToken_ThenACorrectResponseIsReturned()
         {
            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtTokenNoRole);
@@ -65,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("Ignore this test case for time being since data is not available in real SCS.")]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssJwtToken);
@@ -76,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }        
 
         [Test]
-        [Ignore("Ignore this test case for time being since data is not available in real SCS.")]
+        [Category("QCOnlyTest")]
         public async Task WhenICallTheApiWithAValidDateWithCallBackUri_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
@@ -85,6 +88,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [TestCase(0, TestName = "Current DateTime with valid RFC1123 format")]
         [TestCase(1, TestName = "Future DateTime with valid RFC1123 format")]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithACurrentOrFutureRFC1123DateTime_ThenABadRequestStatusIsReturned(int days)
         {
             string sinceDatetime = DateTime.Now.AddDays(days).AddHours(1).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
@@ -100,6 +104,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("Mon, 02 Mar 2021 00:00:00 GMT", TestName = "Invalid day but valid RFC1123 Format")]
         [TestCase("01 Mar 2021 00:00:00 GMT", TestName = "Invalid RFC format 'DD MMM YYYY HH24:MI:SS GMT'")]
         [TestCase("01 03 2021", TestName = "Invalid RFC format 'DD MM YYYY'")]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithInValidRFC1123DateTime_ThenABadRequestStatusIsReturned(string sinceDatetime)
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, accessToken: EssJwtToken);
@@ -113,6 +118,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [TestCase("", TestName = "Provided Empty DateTime in query parameter")]
         [TestCase(null, TestName = "Provided Null DateTime in query parameter")]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithANullDateTime_ThenABadRequestStatusIsReturned(string sinceDatetime)
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, accessToken: EssJwtToken);
@@ -128,6 +134,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
         [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
         [TestCase("https://", TestName = "Callback URL with only https request")]
+        [Category("SmokeTest")]
         public async Task WhenICallTheApiWithInvalidCallbackURI_ThenABadRequestResponseIsReturned(string callBackUrl)
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, callBackUrl, accessToken: EssJwtToken);
