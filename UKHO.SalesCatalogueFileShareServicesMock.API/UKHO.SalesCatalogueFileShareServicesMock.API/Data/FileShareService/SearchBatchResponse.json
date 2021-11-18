@@ -9,6 +9,26 @@
         {
           "key": "Product Type",
           "value": "AVCS"
+        },
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "CellName"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "0"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
         }
       ],
       "businessUnit": "ADDS",
