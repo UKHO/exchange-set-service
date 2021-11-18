@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -61,6 +63,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 int fileShareServiceSearchQueryCount = 0;
                 foreach (var item in batchProducts)
                 {
+                   if (cancellationToken.IsCancellationRequested)
+                    {                        
+                        var productDetail = new StringBuilder();
+                        foreach (var productitem in item)
+                        {
+                            productDetail.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", productitem.ProductName, productitem.EditionNumber.ToString(), string.Join(",", productitem?.UpdateNumbers.Select(a => a.Value.ToString())));
+                        }
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, productDetail.ToString(), batchId, correlationId);
+                        throw new OperationCanceledException();
+                   }
                     var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId, cancellationTokenSource, cancellationToken);
                     listBatchDetails.AddRange(result.Entries);
                     fileShareServiceSearchQueryCount += result.QueryCount;
@@ -81,6 +93,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             foreach (var item in fulfilmentDataResponse)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while downloading for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. CancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, message.BatchId, message.CorrelationId);
+                    throw new OperationCanceledException();
+                }
                 logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesStart.ToEventId(), "Preparing file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.BatchId, message.CorrelationId);
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
                 await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message, cancellationTokenSource, cancellationToken);

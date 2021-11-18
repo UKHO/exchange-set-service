@@ -71,8 +71,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 CancellationToken cToken = cTs.Token;
 
                 var tasks = productsList.Select(async item =>
-                {                    
-                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath, cTs, cToken).ConfigureAwait(false);
+                {
+                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath, cTs, cToken);
                     int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -85,9 +85,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         throw new OperationCanceledException();
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
-                });              
-                    
-                  await Task.WhenAll(tasks).ConfigureAwait(false); 
+                });
+
+                await Task.WhenAll(tasks);
 
                 DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
                 int downloadedENCFileCount = 0;
