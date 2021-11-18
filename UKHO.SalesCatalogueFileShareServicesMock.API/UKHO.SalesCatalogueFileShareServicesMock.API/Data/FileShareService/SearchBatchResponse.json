@@ -26930,7 +26930,7 @@
       ]
     }
   ],
-  "_Links": {
+  "links": {
     "self": {
       "href": "/batch?limit=400&start=0&$filter=%24batch%28ProductCode%29%20eq%20%27AVCS%27%20and%20%20%28%24batch%28CellName%29%20eq%20%27DE5NOBRK%27%20or%20%24batch%28CellName%29%20eq%20%27DE4NO18Q%27%20or%20%24batch%28CellName%29%20eq%20%27DE416080%27%20or%20%24batch%28CellName%29%20eq%20%27DE260001%27%20or%20%24batch%28CellName%29%20eq%20%27DE516510%27%20or%20%24batch%28CellName%29%20eq%20%27DE416040%27%20or%20%24batch%28CellName%29%20eq%20%27JP5BHTR7%27%20or%20%24batch%28CellName%29%20eq%20%27JP5P9F59%27%20or%20%24batch%28CellName%29%20eq%20%27DE216000%27%20or%20%24batch%28CellName%29%20eq%20%27US2WC06M%27%29"
     },
