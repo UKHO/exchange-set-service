@@ -427,7 +427,7 @@ stages:
                       **/*FunctionalTest*.dll
                       !**/*TestAdapter.dll
                       !**/obj/**
-                    arguments: '--filter Category=SmokeTest'
+                    arguments: '--filter Category=QCOnlyTest'
                     testRunTitle: "Dev-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
