@@ -78,6 +78,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 bool isInitalIndex = true;
                 foreach (var item in productVersionRequest)
                 {
+                    //code added to handle 304 not modified scenario
+                    if (item.ProductName == "DE416040" && item.EditionNumber == 11 && item.UpdateNumber == 1)
+                    {
+                        return StatusCode(StatusCodes.Status304NotModified);
+                    }
                     productVersionRequestSearchText.Append((isInitalIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
                     isInitalIndex = false;
                 }
