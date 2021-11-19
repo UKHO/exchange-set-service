@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
-            using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Append))
+            using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
             {
                 stream.CopyTo(outputFileStream);
             }
