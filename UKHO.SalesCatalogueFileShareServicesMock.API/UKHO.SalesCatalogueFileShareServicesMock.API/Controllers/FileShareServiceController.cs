@@ -67,7 +67,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("/batch")]
         public IActionResult GetBatches([FromQuery] int? limit, [FromQuery] int start = 0, [FromQuery(Name = "$filter")] string filter = "")
         {
-            if (limit != null && !string.IsNullOrEmpty(filter))
+            if (!string.IsNullOrEmpty(filter))
             {
                 var response = fileShareService.GetBatches(filter);
                 if (response != null)
@@ -162,7 +162,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName))
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
+                var response = fileShareService.CheckBatchFolderExists(batchId, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode(StatusCodes.Status201Created);
