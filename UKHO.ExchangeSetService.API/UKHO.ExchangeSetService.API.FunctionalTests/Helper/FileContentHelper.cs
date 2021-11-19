@@ -162,15 +162,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             if (Directory.Exists(downloadedEncFolderPath) && responseSearchDetails.Entries.Count > 0)
             {
                 totalFileCount = FileCountInDirectories(downloadedEncFolderPath);
-                string[] fileNames = Directory.GetFiles(downloadedEncFolderPath).Select(file => Path.GetFileName(file)).ToArray();
-                int fssFileCount = responseSearchDetails.Entries[0].Files.Count;
-                Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
-
-                foreach (var fileName in fileNames)
-                {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
-                }
-
+               
+                Assert.AreEqual(2, totalFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count 2");
+                
             }
             else
             {
