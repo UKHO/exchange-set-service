@@ -24,8 +24,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public void MonitorRequest(string message, DateTime startedAt, DateTime completedAt, string correlationId, int? fileShareServiceSearchQueryCount = null, int? downloadedENCFileCount = null, long? fileSizeInBytes = null, string batchId = null)
         {
             string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
-            this.telemetryClient.InstrumentationKey = instrumentationKey;
-            this.telemetryClient.TrackEvent(message,
+            if (!string.IsNullOrEmpty(instrumentationKey))
+            {
+                this.telemetryClient.InstrumentationKey = instrumentationKey;
+                this.telemetryClient.TrackEvent(message,
                                new Dictionary<string, string>
                                {
                                     {"CorrelationId",correlationId },
@@ -37,6 +39,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                     {requestCompletedAt,$"{completedAt:MM/dd/yyyy hh:mm:ss.fff tt}" },
                                     {runtimeDurationInMs,$"{completedAt.Subtract(startedAt.ToUniversalTime()).TotalMilliseconds}" }
                                });
+
+            }
         }
     }
 }
