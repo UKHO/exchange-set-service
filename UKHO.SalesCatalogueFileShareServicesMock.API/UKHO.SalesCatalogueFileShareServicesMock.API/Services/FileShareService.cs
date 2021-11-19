@@ -85,6 +85,15 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
             return FileHelper.ValidateFilePath(batchFolderPath) && FileHelper.CheckBatchWithZipFileExist(batchFolderPath);
         }
+
+        public bool CheckBatchFolderExists(string batchid, string homeDirectoryPath)
+        {
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchid);
+
+            return FileHelper.CheckFolderExists(batchFolderPath);
+        }
+
         public BatchStatusResponse GetBatchStatus(string batchId, string homeDirectoryPath)
         {
             BatchStatusResponse batchStatusResponse = new BatchStatusResponse();

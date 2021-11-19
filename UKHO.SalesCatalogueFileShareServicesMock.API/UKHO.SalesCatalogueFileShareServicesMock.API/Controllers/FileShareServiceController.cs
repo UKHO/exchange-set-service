@@ -162,7 +162,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName))
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
+                var response = fileShareService.CheckBatchFolderExists(batchId, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode(StatusCodes.Status201Created);
