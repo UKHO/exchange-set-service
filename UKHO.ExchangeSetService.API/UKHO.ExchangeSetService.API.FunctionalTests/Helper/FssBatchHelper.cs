@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
             {
-                stream.CopyTo(outputFileStream);
+                await stream.CopyToAsync(outputFileStream);
             }
 
             WriteToConsole($"Temp file {tempFilePath} has been created to download file contents. {downloadFileUrl}");
