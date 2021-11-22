@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 stream.CopyTo(outputFileStream);
             }
 
-            WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
+            WriteToConsole($"Temp file {tempFilePath} has been created to download file contents. {downloadFileUrl}");
 
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
