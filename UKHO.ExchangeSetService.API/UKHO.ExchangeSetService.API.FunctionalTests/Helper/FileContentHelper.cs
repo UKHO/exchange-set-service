@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder =await FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolder =FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
             return downloadFolderPath;

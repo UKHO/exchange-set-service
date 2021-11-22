@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
@@ -43,6 +44,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> ExtractDownloadedFolder(string downloadFileUrl, string jwtToken)
         {
+            Thread.Sleep(10000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.ExchangeSetFileName);
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
             Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
@@ -70,14 +72,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Console.WriteLine($"{DateTime.Now} - {message}");
         }
 
-        public static async Task<string> RenameFolder(string pathInput)
+        public static string RenameFolder(string pathInput)
         {
             string fileName = Path.GetFileName(pathInput);
             if (fileName.Contains(".zip"))
             {
                 fileName = fileName.Replace(".zip", "");
             }
-            await Task.CompletedTask;
+           
             return fileName; 
         }
 
