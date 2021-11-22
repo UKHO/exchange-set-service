@@ -51,10 +51,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
             {
-                await stream.CopyToAsync(outputFileStream);
+                stream.CopyTo(outputFileStream);
             }
 
-            WriteToConsole($"Temp file {tempFilePath} has been created to download file contents. {downloadFileUrl}");
+            WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
 
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
@@ -70,14 +70,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Console.WriteLine($"{DateTime.Now} - {message}");
         }
 
-        public static string RenameFolder(string pathInput)
+        public static async Task<string> RenameFolder(string pathInput)
         {
             string fileName = Path.GetFileName(pathInput);
             if (fileName.Contains(".zip"))
             {
                 fileName = fileName.Replace(".zip", "");
             }
-
+            await Task.CompletedTask;
             return fileName; 
         }
 
