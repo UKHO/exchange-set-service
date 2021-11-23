@@ -160,10 +160,13 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                             [FromHeader(Name = "X-Content-Size"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] long? xContentSize,
                                             [FromBody] FileRequest attributes)
         {
-            var response = fileShareService.CheckBatchFolderExists(batchId, configuration["HOME"]);
-            if (response)
+            if (!string.IsNullOrEmpty(batchId))
             {
-                return StatusCode(StatusCodes.Status201Created);
+                var response = fileShareService.CheckBatchFolderExists(batchId, configuration["HOME"]);
+                if (response)
+                {
+                    return StatusCode(StatusCodes.Status201Created);
+                }
             }
             return StatusCode(StatusCodes.Status500InternalServerError, new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsAddFileinBatch });
         }
