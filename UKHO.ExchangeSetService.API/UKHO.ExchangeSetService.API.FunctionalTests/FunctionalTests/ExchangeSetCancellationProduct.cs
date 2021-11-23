@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolder =FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
 
@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolder =FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
             //Verify Cancellation details

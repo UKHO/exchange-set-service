@@ -76,8 +76,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 var productVersionRequestSearchText = new StringBuilder();
                 bool isInitalIndex = true;
+                const string NotModifiedProductName = "DE416040";
+                const int NotModifiedEditionNumber = 11;
+                const int NotModifiedUpdateNumber = 1;
                 foreach (var item in productVersionRequest)
                 {
+                    //code added to handle 304 not modified scenario
+                    if (item.ProductName == NotModifiedProductName && item.EditionNumber == NotModifiedEditionNumber && item.UpdateNumber == NotModifiedUpdateNumber)
+                    {
+                        return StatusCode(StatusCodes.Status304NotModified);
+                    }
                     productVersionRequestSearchText.Append((isInitalIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
                     isInitalIndex = false;
                 }

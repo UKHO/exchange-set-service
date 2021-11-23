@@ -20,6 +20,7 @@ module "webapp_service" {
     "ASPNETCORE_ENVIRONMENT"                               = local.env_name
     "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
+    "APPINSIGHTS_INSTRUMENTATIONKEY"                       = "NOT_CONFIGURED"
   }
   tags = local.tags
 
