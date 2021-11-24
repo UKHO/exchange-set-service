@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
@@ -43,13 +44,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> ExtractDownloadedFolder(string downloadFileUrl, string jwtToken)
         {
+            //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Thread.Sleep()' to avoid intermittent failure in the pipe.
+            Thread.Sleep(10000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.ExchangeSetFileName);
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
             Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
-            using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Append))
+            using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
             {
                 stream.CopyTo(outputFileStream);
             }
@@ -77,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 fileName = fileName.Replace(".zip", "");
             }
-
+           
             return fileName; 
         }
 

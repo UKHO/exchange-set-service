@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolder =FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
             return downloadFolderPath;
@@ -157,29 +157,45 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             var responseSearchDetails = await apiResponse.ReadAsTypeAsync<ResponseBatchSearchModel>();
-
-
             if (Directory.Exists(downloadedEncFolderPath) && responseSearchDetails.Entries.Count > 0)
             {
                 totalFileCount = FileCountInDirectories(downloadedEncFolderPath);
                 string[] fileNames = Directory.GetFiles(downloadedEncFolderPath).Select(file => Path.GetFileName(file)).ToArray();
-                int fssFileCount = responseSearchDetails.Entries[0].Files.Count;
+                int fssFileCount = 0;
+                ResponseBatchDetailsModel responseBatchDetailsModel = new ResponseBatchDetailsModel();
+                ExtractEncFileCount(productName, editionNumber, updateNumber, responseSearchDetails, ref fssFileCount, ref responseBatchDetailsModel);
                 Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
 
                 foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
+                    Assert.IsTrue(responseBatchDetailsModel.Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
                 }
-
             }
             else
             {
                 Assert.AreEqual(totalFileCount, responseSearchDetails.Count, $"Downloaded Enc files count {responseSearchDetails.Count}, Instead of expected count {totalFileCount}");
             }
-
-
         }
 
+        private static void ExtractEncFileCount(string productName, int? editionNumber, int? updateNumber, ResponseBatchSearchModel responseSearchDetails, ref int fssFileCount, ref ResponseBatchDetailsModel responseBatchDetailsModel)
+        {
+            foreach (var item in responseSearchDetails.Entries)
+            {
+                if (fssFileCount == 0 && CheckProductDoesExistInSearchResponse(item, productName, editionNumber.ToString(), updateNumber.ToString()))
+                {
+                    fssFileCount = item.Files.Count;
+                    responseBatchDetailsModel = item;
+                    break;
+                }
+            }
+        }
+
+        public static bool CheckProductDoesExistInSearchResponse(ResponseBatchDetailsModel batchDetail, string productName, string editionNumber, string updateNumber)
+        {
+            return batchDetail.Attributes.Any(a => a.Key == "CellName" && a.Value == productName) && 
+                batchDetail.Attributes.Any(a => a.Key == "EditionNumber" && a.Value == editionNumber) && 
+                batchDetail.Attributes.Any(a => a.Key == "UpdateNumber" && a.Value == updateNumber);
+        }
 
         public static string CreateFssSearchQuery(string productName, string editionNumber, string updateNumber)
         {

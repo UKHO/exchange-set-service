@@ -631,6 +631,79 @@
     }
   },
   {
+    "id": "productVersion-DE416080-9-1-DE4NO18Q-2-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "DE416080",
+          "updateNumbers": [
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 2722
+        },
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 2290
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE4NO18Q-2-0-DE4NO18Q-2-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "DE4NO18Q",
+            "reason": "duplicateProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 2290
+        }
+      ]
+    }
+  },
+  {
     "id": "sinceDateTime",
     "responseBody": {
       "productCounts": {

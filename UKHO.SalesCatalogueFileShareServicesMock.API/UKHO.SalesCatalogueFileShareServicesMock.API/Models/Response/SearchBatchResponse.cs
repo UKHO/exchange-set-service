@@ -11,8 +11,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response
 
         public List<BatchDetail> Entries { get; set; }
 
-        [JsonProperty("_links")]
-        public PagingLinks Links { get; set; }
+        public PagingLinks _Links { get; set; }
 
         [JsonIgnore]
         public int QueryCount { get; set; }
