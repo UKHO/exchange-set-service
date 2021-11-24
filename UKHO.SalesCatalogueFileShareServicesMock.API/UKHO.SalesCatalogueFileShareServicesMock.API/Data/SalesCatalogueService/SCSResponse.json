@@ -590,6 +590,47 @@
     }
   },
   {
+    "id": "productVersion-DE516510-2-1",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE516510",
+          "updateNumbers": [
+            2,
+            3,
+            4
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-05-31T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 3
+            },
+            {
+              "issueDate": "2021-06-09T00:00:00.0000000Z",
+              "updateNumber": 4
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 6510
+        }
+      ]
+    }
+  },
+  {
     "id": "sinceDateTime",
     "responseBody": {
       "productCounts": {
