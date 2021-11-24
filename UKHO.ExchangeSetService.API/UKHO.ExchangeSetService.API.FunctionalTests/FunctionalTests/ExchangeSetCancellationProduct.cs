@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             cleanUpBatchIdList.Add(batchId);
 
-            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";           
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl.ToString(), FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder =FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
 
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 var editionNumber = product.Cancellation.EditionNumber;
                 Assert.AreEqual(0, editionNumber, $"Incorrect edition number is returned {editionNumber}, instead of 0.");
 
-                var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count-1];
+                var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count - 1];
 
                 CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
                 CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder =FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
             //Verify Cancellation details
@@ -137,13 +137,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public async Task GlobalTeardown()
         {
-            //Clean up batches from local foldar 
-            var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            //Clean up downloaded files/folders   
+            CancellationFileHelper.DeleteDirectory(Config.ExchangeSetFileName);
+            
+            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
+            {
+                //Clean up batches from local foldar 
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            }
         }
-   
     }
 }

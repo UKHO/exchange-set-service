@@ -13,14 +13,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
         private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
-        private string EssB2CToken { get; set; }        
+        private string EssB2CToken { get; set; }
         private string EssB2CCustomizedToken { get; set; }
         public DataHelper DataHelper { get; set; }
         private string FssJwtToken { get; set; }
         private readonly List<string> cleanUpBatchIdList = new List<string>();
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
-        
+
 
         [SetUp]
         public async Task SetupAsync()
@@ -81,7 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
             cleanUpBatchIdList.Add(batchId);
-            
+
         }
         #endregion
 
@@ -179,7 +179,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
-            
+
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssB2CToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
 
@@ -195,9 +195,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [OneTimeTearDown]
         public async Task GlobalTeardown()
         {
-            //Clean up batches from local foldar 
-            var apiResponse=await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
+            {
+                //Clean up batches from local foldar 
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            }
         }
     }
 }
