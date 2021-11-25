@@ -23,6 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string DownloadedFolderPath { get; set; }
         private List<ProductVersionModel> ProductVersionData { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
+        private readonly List<string> CleanUpBatchIdList = new List<string>();
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -39,6 +40,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersionData = new List<ProductVersionModel>();
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416040", 11, 0));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
+            //Get the BatchId
+            var batchId = await ApiEssResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
 
         }
@@ -69,8 +73,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Verify README.TXT file content
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
-
-
         }
 
         [Test]
@@ -86,7 +88,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
             FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
-
         }
 
         [Test]
@@ -121,16 +122,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
 
                 }
-
             }
         }
 
         [OneTimeTearDown]
-        public void GlobalTeardown()
+        public async Task GlobalTeardown()
         {
             //Clean up downloaded files/folders   
             FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
-        }
 
+            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            {
+                //Clean up batches from local foldar 
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            }
+        }
     }
 }

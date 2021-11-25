@@ -186,5 +186,20 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             return Unauthorized();
         }
+
+        [HttpPost]
+        [Route("/cleanUp")]
+        public IActionResult CleanUp([FromBody] List<string> batchId)
+        {
+            if (batchId != null && batchId.Count > 0)
+            {
+                var response = fileShareService.CleanUp(batchId, configuration["HOME"]);
+                if (response)
+                {
+                    return Ok();
+                }
+            }
+            return BadRequest();
+        }
     }
 }
