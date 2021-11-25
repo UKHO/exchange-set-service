@@ -38,6 +38,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
+        public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         [SetUp]
         public void Setup()
         {
@@ -259,14 +260,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region GetBatchInfoBasedOnProducts
         [Test]
         public void WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsFulfilmentException()
-        {
-            CancellationTokenSource cts = new CancellationTokenSource();
+        {           
          A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null, cts, CancellationToken.None); });
+                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null, cancellationTokenSource, CancellationToken.None); });
         }
 
         [Test]
@@ -313,8 +313,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
-            var searchBatchResponse = GetSearchBatchResponse();
-            CancellationTokenSource cts = new CancellationTokenSource();
+            var searchBatchResponse = GetSearchBatchResponse();         
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
@@ -350,7 +349,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cts, CancellationToken.None); });
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, CancellationToken.None); });
         }
 
         [Test]
@@ -425,8 +424,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
-            var searchBatchResponse = GetSearchBatchResponse();
-            CancellationTokenSource cts = new CancellationTokenSource();
+            var searchBatchResponse = GetSearchBatchResponse();         
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
@@ -473,7 +471,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cts, CancellationToken.None); });
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, CancellationToken.None); });
 
         }
         #endregion GetBatchInfoBasedOnProducts
@@ -503,7 +501,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenReturnFulfilmentException()
         {
-            CancellationTokenSource cts = new CancellationTokenSource();
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
@@ -517,7 +514,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cts, CancellationToken.None); });
+                 async delegate { await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None); });
         }
         #endregion
 

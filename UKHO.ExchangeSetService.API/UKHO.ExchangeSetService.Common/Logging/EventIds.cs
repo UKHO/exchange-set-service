@@ -514,7 +514,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceSearchQueryForSetOfENCsCompleted = 805126,
         /// <summary>
-        /// 805127 - Cancellation tokken called when any of the async task in Parllel thread is failed
+        /// 805127 - Cancellation of task/token is called/requested when any of the async task in parallel thread is failed.
         /// </summary>
         CancellationTokenEvent = 805127
 

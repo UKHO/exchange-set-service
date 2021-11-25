@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         {
                             productDetail.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", productitem.ProductName, productitem.EditionNumber.ToString(), string.Join(",", productitem?.UpdateNumbers.Select(a => a.Value.ToString())));
                         }
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, productDetail.ToString(), batchId, correlationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), productDetail.ToString(), batchId, correlationId);
                         throw new OperationCanceledException();
                    }
                     var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId, cancellationTokenSource, cancellationToken);
@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while downloading for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. CancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, message.BatchId, message.CorrelationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while downloading ENC file for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. CancellationToken:{cancellationTokenSource.Token}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
                     throw new OperationCanceledException();
                 }
                 logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesStart.ToEventId(), "Preparing file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.BatchId, message.CorrelationId);

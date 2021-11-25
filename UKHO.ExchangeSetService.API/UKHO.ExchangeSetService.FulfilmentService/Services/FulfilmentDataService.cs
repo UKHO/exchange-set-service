@@ -67,21 +67,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 List<FulfilmentDataResponse> fulfilmentDataResponse = new List<FulfilmentDataResponse>();
                 object sync = new object();
                 int fileShareServiceSearchQueryCount = 0;
-                var cTs = new CancellationTokenSource();
-                CancellationToken cToken = cTs.Token;
+                var cancellationTokenSource = new CancellationTokenSource();
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
 
                 var tasks = productsList.Select(async item =>
                 {
-                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath, cTs, cToken);
+                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
                     int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
                     }
-                    if (cToken.IsCancellationRequested)
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        cTs.Cancel();                      
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled in QueryAndDownloadFileShareServiceFiles with {cancellationTokenSource.Token} at Time:{DateTime.UtcNow} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cTs.Token), DateTime.UtcNow, message.BatchId, message.CorrelationId);
+                        cancellationTokenSource.Cancel();                      
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryAndDownloadFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
                         throw new OperationCanceledException();
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
