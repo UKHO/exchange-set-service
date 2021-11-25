@@ -512,7 +512,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805126 - Completed query for ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
-        FileShareServiceSearchQueryForSetOfENCsCompleted = 805126
+        FileShareServiceSearchQueryForSetOfENCsCompleted = 805126,
+        DownloadENCFiles307RedirectResponse = 805127,
+        DownloadReadmeFile307RedirectResponse = 805128
     }
 
     public static class EventIdExtensions
