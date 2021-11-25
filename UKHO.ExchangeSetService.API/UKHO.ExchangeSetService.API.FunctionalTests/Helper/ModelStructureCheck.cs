@@ -117,5 +117,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Assert.True(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second), $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
         }
+
+        public static async Task<string> GetBatchId(this HttpResponseMessage apiResponse)
+        {
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+            var batchId = apiResponseData.Links.ExchangeSetBatchStatusUri.Href.Split('/')[5];
+            return batchId;
+
+        }
     }
 }
