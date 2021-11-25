@@ -17,7 +17,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string EssJwtCustomizedToken { get; set; }
         private FssApiClient FssApiClient { get; set; }
         private string FssJwtToken { get; set; }
-        private readonly List<string> cleanUpBatchIdList = new List<string>();
+        private readonly List<string> CleanUpBatchIdList = new List<string>();
 
         [SetUp]
         public async Task SetupAsync()
@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(batchId);
+            CleanUpBatchIdList.Add(batchId);
 
         }
 
@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(batchId);
+            CleanUpBatchIdList.Add(batchId);
 
         }
 
@@ -137,7 +137,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(batchId);
+            CleanUpBatchIdList.Add(batchId);
 
         }
 
@@ -158,7 +158,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(batchId);
+            CleanUpBatchIdList.Add(batchId);
 
         }
 
@@ -175,7 +175,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(batchId);
+            CleanUpBatchIdList.Add(batchId);
         }
 
         [TestCase("DE416080", 10, 6, TestName = "EditionNumber Unavailable")]
@@ -246,10 +246,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [OneTimeTearDown]
         public async Task GlobalTeardown()
         {
-            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
+            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
             {
                 //Clean up batches from local foldar 
-                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
         }

@@ -115,8 +115,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             bool deleteFlag = false;
             foreach (var item in batchId)
             {
-                string uploadBlockFolderPath = Path.Combine(homeDirectoryPath, folderName, item);
-                var response = FileHelper.CleanUp(uploadBlockFolderPath);
+                string exchangeSetZipFolderPath = Path.Combine(homeDirectoryPath, folderName, item);
+                var response = FileHelper.CleanUp(exchangeSetZipFolderPath);
                 if (response)
                 {
                     deleteFlag = true;

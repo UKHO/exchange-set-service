@@ -191,7 +191,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("/cleanUp")]
         public IActionResult CleanUp([FromBody] List<string> batchId)
         {
-            if (batchId != null)
+            if (batchId != null && batchId.Count > 0)
             {
                 var response = fileShareService.CleanUp(batchId, configuration["HOME"]);
                 if (response)
