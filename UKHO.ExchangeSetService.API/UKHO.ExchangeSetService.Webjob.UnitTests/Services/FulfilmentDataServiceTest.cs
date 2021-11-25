@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -30,6 +31,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFulfilmentAncillaryFiles fakeFulfilmentAncillaryFiles;
         public IFulfilmentSalesCatalogueService fakeFulfilmentSalesCatalogueService;
         public IFulfilmentCallBackService fakeFulfilmentCallBackService;
+        public IFulfilmentDataService fakeFulfilmentDataService;
         public string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
         public IMonitorHelper fakeMonitorHelper;
 
@@ -42,6 +44,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
             fakeConfiguration = A.Fake<IConfiguration>();
             fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
+            fakeFulfilmentDataService = A.Fake<IFulfilmentDataService>();
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
             {
                 BaseUrl = "http://tempuri.org",
@@ -150,7 +153,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
         }
         #endregion
-        
+
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
@@ -176,7 +179,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeConfiguration["HOME"] = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
-            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();          
+            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
               .Returns(storageAccountConnectionString);
@@ -194,6 +197,32 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
             Assert.AreEqual("Exchange Set Created Successfully", salesCatalogueResponseFile);
+        }
+        [Test]
+        public void WhenIsCancellationRequestedinExchangeSet_ThenThrowCancelledException()
+        {
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
+
+            string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
+            fakeConfiguration["HOME"] = @"D:\\Downloads";  
+
+            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
+             .Returns(storageAccountConnectionString);
+            var productList = new List<Products> {
+                            new Products {
+                                ProductName = "DE5NOBRK",
+                                EditionNumber = 0,
+                                UpdateNumbers = new List<int?> {0,1},
+                                FileSize = 400
+                            }
+                        };
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+
+            Assert.ThrowsAsync<TaskCanceledException>(async () => await fulfilmentDataService.QueryAndDownloadFileShareServiceFiles(scsResponseQueueMessage, productList, null, cancellationTokenSource, cancellationToken));
         }
 
         [Test]

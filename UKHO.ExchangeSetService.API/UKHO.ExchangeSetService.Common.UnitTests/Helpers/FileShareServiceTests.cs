@@ -516,6 +516,56 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                  async delegate { await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None); });
         }
+
+        [Test]
+        public void WhenIsCancellationRequestedinDownloadBatchFiles_ThenThrowCancelledException()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.BadRequest,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
+                 });
+
+            cancellationTokenSource.Cancel();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken));
+        }
+
+        [Test]
+        public void WhenIsCancellationRequestedinGetBatchInfoBasedOnProducts_ThenThrowCancelledException()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.BadRequest,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad Request!!!!")))
+                 });
+            var productList = GetProductdetails();
+            productList.Add(new Products
+            {
+                ProductName = "DE416051",
+                EditionNumber = 0,
+                UpdateNumbers = new List<int?> { 0 },
+                FileSize = 400,
+                Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
+            });
+
+            cancellationTokenSource.Cancel();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, cancellationToken));
+        }
+
         #endregion
 
         #region SearchReadMeFilePath
