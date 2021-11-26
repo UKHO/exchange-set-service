@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -51,7 +54,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products,string batchId, string correlationId)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, string batchId, string correlationId, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             if (products != null && products.Any())
             {
@@ -60,7 +63,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 int fileShareServiceSearchQueryCount = 0;
                 foreach (var item in batchProducts)
                 {
-                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId);
+                   if (cancellationToken.IsCancellationRequested)
+                    {                        
+                        var productDetail = new StringBuilder();
+                        foreach (var productitem in item)
+                        {
+                            productDetail.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", productitem.ProductName, productitem.EditionNumber.ToString(), string.Join(",", productitem?.UpdateNumbers.Select(a => a.Value.ToString())));
+                        }
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), productDetail.ToString(), batchId, correlationId);
+                        throw new OperationCanceledException();
+                   }
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId, cancellationTokenSource, cancellationToken);
                     listBatchDetails.AddRange(result.Entries);
                     fileShareServiceSearchQueryCount += result.QueryCount;
                 }
@@ -76,13 +89,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return null;
         }
 
-        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponse, string exchangeSetRootPath)
+        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponse, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             foreach (var item in fulfilmentDataResponse)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while downloading ENC file for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. CancellationToken:{cancellationTokenSource.Token}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
+                    throw new OperationCanceledException();
+                }
                 logger.LogInformation(EventIds.FileShareServicePreparingToDownloadENCFilesStart.ToEventId(), "Preparing file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.BatchId, message.CorrelationId);
                 var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
-                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message);
+                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message, cancellationTokenSource, cancellationToken);
                 logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesCompleted.ToEventId(), "Completed file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.BatchId, message.CorrelationId);
             }
         }
@@ -97,12 +115,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var listFulfilmentData = new List<FulfilmentDataResponse>();
             foreach (var item in searchBatchResponse.Entries)
             {
-                listFulfilmentData.Add(new FulfilmentDataResponse { 
+                listFulfilmentData.Add(new FulfilmentDataResponse
+                {
                     BatchId = item.BatchId,
-                    EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b=>b.Value).FirstOrDefault()),
+                    EditionNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "EditionNumber").Select(b => b.Value).FirstOrDefault()),
                     ProductName = item.Attributes?.Where(a => a.Key == "CellName").Select(b => b.Value).FirstOrDefault(),
                     UpdateNumber = Convert.ToInt32(item.Attributes?.Where(a => a.Key == "UpdateNumber").Select(b => b.Value).FirstOrDefault()),
-                    FileUri = item.Files?.Select(a=>a.Links.Get.Href),
+                    FileUri = item.Files?.Select(a => a.Links.Get.Href),
                     Files = item.Files
                 });
             }
@@ -110,11 +129,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
         public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
-           return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);            
+            return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);
         }
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
-           return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
+            return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
         public async Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {

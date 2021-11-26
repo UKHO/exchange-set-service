@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
-
+       
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
@@ -141,7 +141,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                  {
-                     client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
+                     client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);                     
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                  })

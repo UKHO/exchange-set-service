@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -37,6 +38,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
+        public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         [SetUp]
         public void Setup()
         {
@@ -47,7 +49,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
-
+            
             fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileSystemHelper, fakeMonitorHelper);
         }
 
@@ -179,7 +181,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenFSSClientReturnsOtherThan201_ThenCreateBatchReturnsSameStatusAndNullInResponse()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
@@ -195,7 +197,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
 
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
 
             var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
@@ -233,8 +235,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             //Mock
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, };
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                .Invokes((HttpMethod method, string postBody, string accessToken, string uri,CancellationToken cancellationToken, string correlationId) =>
                 {
                     accessTokenParam = accessToken;
                     uriParam = uri;
@@ -258,13 +260,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region GetBatchInfoBasedOnProducts
         [Test]
         public void WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsFulfilmentException()
-        {
-            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+        {           
+         A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null); });
+                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null, cancellationTokenSource, CancellationToken.None); });
         }
 
         [Test]
@@ -283,8 +285,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,CancellationToken cancellationToken, string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -294,7 +296,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null, null, CancellationToken.None);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -311,7 +313,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
-            var searchBatchResponse = GetSearchBatchResponse();
+            var searchBatchResponse = GetSearchBatchResponse();         
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
@@ -327,8 +329,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -347,8 +349,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null); });
-
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, CancellationToken.None); });
         }
 
         [Test]
@@ -387,8 +388,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -405,7 +406,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 FileSize = 400,
                                 Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
                             });
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, null, CancellationToken.None);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -423,7 +424,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
-            var searchBatchResponse = GetSearchBatchResponse();
+            var searchBatchResponse = GetSearchBatchResponse();         
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
@@ -449,8 +450,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -470,7 +471,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null); });
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, CancellationToken.None); });
 
         }
         #endregion GetBatchInfoBasedOnProducts
@@ -480,7 +481,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenGetBatchInfoBasedOnProductsReturns200_ThenDownloadBatchFiles()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
                  {
                      StatusCode = HttpStatusCode.OK,
@@ -491,7 +492,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                      Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!")))
                  });
 
-            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage());
+            var response = await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
@@ -501,7 +502,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public void WhenGetBatchInfoBasedOnProductsReturnsOtherThan200_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
                  {
                      StatusCode = HttpStatusCode.BadRequest,
@@ -513,8 +514,58 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage()); });
+                 async delegate { await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None); });
         }
+
+        [Test]
+        public void WhenIsCancellationRequestedinDownloadBatchFiles_ThenThrowCancelledException()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.BadRequest,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request")))
+                 });
+
+            cancellationTokenSource.Cancel();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.DownloadBatchFiles(new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken));
+        }
+
+        [Test]
+        public void WhenIsCancellationRequestedinGetBatchInfoBasedOnProducts_ThenThrowCancelledException()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.BadRequest,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad Request!!!!")))
+                 });
+            var productList = GetProductdetails();
+            productList.Add(new Products
+            {
+                ProductName = "DE416051",
+                EditionNumber = 0,
+                UpdateNumbers = new List<int?> { 0 },
+                FileSize = 400,
+                Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
+            });
+
+            cancellationTokenSource.Cancel();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, cancellationToken));
+        }
+
         #endregion
 
         #region SearchReadMeFilePath
@@ -522,7 +573,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public void WhenInvalidSearchReadMeFileRequest_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
@@ -543,8 +594,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationid) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -575,8 +626,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationid) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -612,8 +663,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationid) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -651,8 +702,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationid) =>
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
