@@ -266,7 +266,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null, cancellationTokenSource, CancellationToken.None); });
+                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, null); });
         }
 
         [Test]
@@ -296,7 +296,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), null, null, null, CancellationToken.None);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -349,7 +349,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, CancellationToken.None); });
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty); });
         }
 
         [Test]
@@ -406,7 +406,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 FileSize = 400,
                                 Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
                             });
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, null, CancellationToken.None);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -471,7 +471,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, CancellationToken.None); });
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty); });
 
         }
         #endregion GetBatchInfoBasedOnProducts
@@ -563,7 +563,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, null, null, cancellationTokenSource, cancellationToken));
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty));
         }
 
         #endregion

@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return listSubUpdateNumberProduts;
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, string batchId, string correlationId, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
         {
             if (products != null && products.Any())
             {
@@ -63,17 +63,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 int fileShareServiceSearchQueryCount = 0;
                 foreach (var item in batchProducts)
                 {
-                   if (cancellationToken.IsCancellationRequested)
-                    {                        
+                    if (cancellationToken.IsCancellationRequested)
+                    {
                         var productDetail = new StringBuilder();
                         foreach (var productitem in item)
                         {
                             productDetail.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", productitem.ProductName, productitem.EditionNumber.ToString(), string.Join(",", productitem?.UpdateNumbers.Select(a => a.Value.ToString())));
                         }
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), productDetail.ToString(), batchId, correlationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, productDetail.ToString(), message.BatchId, message.CorrelationId);
                         throw new OperationCanceledException();
-                   }
-                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, batchId, correlationId, cancellationTokenSource, cancellationToken);
+                    }
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
                     listBatchDetails.AddRange(result.Entries);
                     fileShareServiceSearchQueryCount += result.QueryCount;
                 }

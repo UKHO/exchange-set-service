@@ -118,16 +118,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<List<FulfilmentDataResponse>> QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
-            logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId(), "File share service search query request started for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.BatchId, message.CorrelationId, cancellationTokenSource, cancellationToken);
-            logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestCompleted.ToEventId(), "File share service search query request completed for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-
-            if (searchBatchResponse != null && searchBatchResponse.Any())
-            {
-                logger.LogInformation(EventIds.DownloadENCFilesRequestStart.ToEventId(), "File share service download request started for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
-                logger.LogInformation(EventIds.DownloadENCFilesRequestCompleted.ToEventId(), "File share service download request completed for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-            }
+            logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId(), "File share service search query and download request started for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+            logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestCompleted.ToEventId(), "File share service search query and download request completed for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
             return searchBatchResponse;
         }
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse)
