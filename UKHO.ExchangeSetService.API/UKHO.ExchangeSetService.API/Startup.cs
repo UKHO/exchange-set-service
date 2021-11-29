@@ -39,7 +39,7 @@ namespace UKHO.ExchangeSetService.API
     {
         private readonly IConfiguration configuration;
         public const string ExchangeSetService = "ExchangeSetService";
-        private const int time = 3;
+        private const int time = 5;
 
         public Startup(IWebHostEnvironment env)
         {
