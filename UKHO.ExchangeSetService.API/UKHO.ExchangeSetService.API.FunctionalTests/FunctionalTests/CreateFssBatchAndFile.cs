@@ -16,17 +16,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public DataHelper DataHelper { get; set; }
         public ProductIdentifierModel ProductIdentifierModel { get; set; }
         private string EssJwtToken { get; set; }
+        private FssApiClient FssApiClient { get; set; }
+        private string FssJwtToken { get; set; }
+        private readonly List<string> CleanUpBatchIdList = new List<string>();
 
         [SetUp]
         public async Task SetupAsync()
         {
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
+            FssApiClient = new FssApiClient();
             ProductIdentifierModel = new ProductIdentifierModel();
             DataHelper = new DataHelper();
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();
-
+            FssJwtToken = await authTokenProvider.GetFssToken();
         }
 
         [Test]
@@ -39,6 +43,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify FssBatchResponse
             await apiResponse.CheckFssBatchResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
+
+
         }
 
         [Test]
@@ -50,6 +60,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify FssBatchResponse
             await apiResponse.CheckFssBatchResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
         }
 
         [Test]
@@ -77,6 +91,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify FssBatchResponse
             await apiResponse.CheckFssBatchResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
         }
 
         [Test]
@@ -94,6 +112,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //verify FssBatchResponse
             await apiResponse.CheckFssBatchResponse();
 
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
+
+        }
+
+        [OneTimeTearDown]
+        public async Task GlobalTeardown()
+        {
+            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            {
+                //Clean up batches from local foldar 
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            }
         }
     }
 }

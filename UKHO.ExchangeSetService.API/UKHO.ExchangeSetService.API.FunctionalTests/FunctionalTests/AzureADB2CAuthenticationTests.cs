@@ -11,20 +11,25 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     class AzureADB2CAuthenticationTests
     {
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
+        private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
-        private string EssB2CToken { get; set; }        
+        private string EssB2CToken { get; set; }
         private string EssB2CCustomizedToken { get; set; }
         public DataHelper DataHelper { get; set; }
-
-        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        private string FssJwtToken { get; set; }
+        private readonly List<string> CleanUpBatchIdList = new List<string>();
+        private readonly string SinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [SetUp]
         public async Task SetupAsync()
         {
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
+            FssApiClient = new FssApiClient();
+            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             AzureB2CAuthTokenProvider b2cAuthTokenProvider = new AzureB2CAuthTokenProvider();
             EssB2CToken = await b2cAuthTokenProvider.GetToken();
+            FssJwtToken = await authTokenProvider.GetFssToken();
             EssB2CCustomizedToken = b2cAuthTokenProvider.GenerateCustomToken();
             DataHelper = new DataHelper();
         }
@@ -35,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheDateTimeApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -46,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheDateTimeApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string invalidB2cToken = EssB2CToken.Remove(EssB2CToken.Length - 2).Insert(EssB2CToken.Length - 2, "AA");
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: invalidB2cToken);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: invalidB2cToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -56,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheDateTimeApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssB2CCustomizedToken);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssB2CCustomizedToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -65,11 +70,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest")]
         public async Task WhenICallTheDateTimeApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssB2CToken);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssB2CToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
+
         }
         #endregion
 
@@ -111,6 +121,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
         }
         #endregion
 
@@ -163,13 +177,28 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
 
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
-            
+
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssB2CToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
+
+            //Get the BatchId
+            var batchId = await apiResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
         }
         #endregion
+
+        [OneTimeTearDown]
+        public async Task GlobalTeardown()
+        {
+            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            {
+                //Clean up batches from local foldar 
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            }
+        }
     }
 }

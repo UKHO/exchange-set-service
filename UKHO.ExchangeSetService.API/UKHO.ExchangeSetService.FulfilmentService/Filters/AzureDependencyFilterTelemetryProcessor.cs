@@ -1,6 +1,8 @@
 ﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using System;
+
 namespace UKHO.ExchangeSetService.FulfilmentService.Filters
 {
     public class AzureDependencyFilterTelemetryProcessor : ITelemetryProcessor
@@ -18,7 +20,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Filters
                 && dependency.Name == "GET addsfssqastorage"
                 && dependency.Type == "Azure blob")
             {
-                ////dependency.Data = "testing";
+                dependency.Data = new Uri(dependency.Data.ToString()).GetLeftPart(UriPartial.Path);
+                inner.Process(item);
                 return;
             }
             inner.Process(item);

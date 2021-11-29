@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -65,18 +67,28 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 List<FulfilmentDataResponse> fulfilmentDataResponse = new List<FulfilmentDataResponse>();
                 object sync = new object();
                 int fileShareServiceSearchQueryCount = 0;
+                var cancellationTokenSource = new CancellationTokenSource();
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
                 var tasks = productsList.Select(async item =>
                 {
-                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath);
+                    fulfilmentDataResponse = await QueryAndDownloadFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
                     int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
                     }
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Cancel();                      
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryAndDownloadFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
+                        throw new OperationCanceledException();
+                    }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
-                    
                 });
+
                 await Task.WhenAll(tasks);
+
                 DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
                 int downloadedENCFileCount = 0;
                 foreach (var item in listFulfilmentData)
@@ -94,7 +106,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await fulfilmentCallBackService.SendCallBackResponse(response, message);
                 monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
                 return "Exchange Set Created Successfully";
-            }            
+            }
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             return "Exchange Set Is Not Created";
         }
@@ -104,16 +116,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, message.BatchId, message.CorrelationId);
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath)
+        public async Task<List<FulfilmentDataResponse>> QueryAndDownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId(), "File share service search query request started for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.BatchId, message.CorrelationId);
+            var searchBatchResponse = await fulfilmentFileShareService.QueryFileShareServiceData(products, message.BatchId, message.CorrelationId, cancellationTokenSource, cancellationToken);
             logger.LogInformation(EventIds.QueryFileShareServiceENCFilesRequestCompleted.ToEventId(), "File share service search query request completed for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
 
             if (searchBatchResponse != null && searchBatchResponse.Any())
             {
                 logger.LogInformation(EventIds.DownloadENCFilesRequestStart.ToEventId(), "File share service download request started for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath);
+                await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, searchBatchResponse, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
                 logger.LogInformation(EventIds.DownloadENCFilesRequestCompleted.ToEventId(), "File share service download request completed for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
             }
             return searchBatchResponse;
@@ -142,7 +154,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestStart.ToEventId(), "File share service download request started for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
                 logger.LogInformation(EventIds.DownloadReadMeFileRequestCompleted.ToEventId(), "File share service download request completed for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;                
+                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
                 monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
             }
         }
@@ -164,7 +176,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             DateTime createZipFileTaskCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, createZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
             if (isZipFileCreated)
-            {               
+            {
                 logger.LogInformation(EventIds.UploadExchangeSetToFssStart.ToEventId(), "Upload exchange set zip file request started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 isZipFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
                 logger.LogInformation(EventIds.UploadExchangeSetToFssCompleted.ToEventId(), "Upload exchange set zip file request completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
@@ -172,7 +184,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipFileUploaded;
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId,string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             bool isFileCreated = false;
 

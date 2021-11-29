@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq 'invalid'";
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string payloadJson = string.Empty;
-            var fileShareServiceResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri);
+            var fileShareServiceResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None);
             if (fileShareServiceResponse.StatusCode == HttpStatusCode.OK)
             {
                 logger.LogDebug(EventIds.FileShareServiceIsHealthy.ToEventId(), "File share service is healthy responded with {StatusCode}", fileShareServiceResponse.StatusCode);
