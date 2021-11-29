@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
-using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
@@ -14,7 +13,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
-        public ProductIdentifierModel ProductIdentifierModel { get; set; }
+       
 
 
         [OneTimeSetUp]
@@ -27,7 +26,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
-            ProductIdentifierModel = new ProductIdentifierModel();
+           
             var ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE260001" }, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)ApiEssResponse.StatusCode, $"Incorrect status code is returned {ApiEssResponse.StatusCode}, instead of the expected status 200.");
         }
