@@ -513,8 +513,12 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805126 - Completed query for ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
         FileShareServiceSearchQueryForSetOfENCsCompleted = 805126,
-        DownloadENCFiles307RedirectResponse = 805127,
-        DownloadReadmeFile307RedirectResponse = 805128
+        /// <summary>
+        /// 805127 - Cancellation of task/token is called/requested when any of the async task in parallel thread is failed.
+        /// </summary>
+        CancellationTokenEvent = 805127
+        DownloadENCFiles307RedirectResponse = 805128,
+        DownloadReadmeFile307RedirectResponse = 805129
     }
 
     public static class EventIdExtensions

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
@@ -106,6 +107,22 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 batchStatusResponse.Status = "Committed";
             }
             return batchStatusResponse;
+        }
+
+        public bool CleanUp(List<string> batchId,  string homeDirectoryPath)
+        {
+            string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
+            bool deleteFlag = false;
+            foreach (var item in batchId)
+            {
+                string exchangeSetZipFolderPath = Path.Combine(homeDirectoryPath, folderName, item);
+                var response = FileHelper.CleanUp(exchangeSetZipFolderPath);
+                if (response)
+                {
+                    deleteFlag = true;
+                }
+            }
+            return deleteFlag;
         }
     }
 }

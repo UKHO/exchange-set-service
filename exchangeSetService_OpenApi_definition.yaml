@@ -49,7 +49,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/productIdentifiers"
-            example: ["GB123456", "GB160060", "AU334550"]
+            example: ["GB102505", "GB100160", "AU334550"]
 
       responses:
         "200":
@@ -361,8 +361,8 @@ components:
             description: The update number, if applicable.
       example:
         [
-          { "productName": "AU895561", "editionNumber": 4, "updateNumber": 1 },
-          { "productName": "GB100625", "editionNumber": 6, "updateNumber": 0 },
+          { "productName": "CA276271", "editionNumber": 7, "updateNumber": 10 },
+          { "productName": "GB100160", "editionNumber": 36, "updateNumber": 0 },
         ]
 
     ####################################

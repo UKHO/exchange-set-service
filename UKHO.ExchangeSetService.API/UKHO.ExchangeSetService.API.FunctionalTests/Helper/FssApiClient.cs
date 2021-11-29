@@ -1,4 +1,7 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -90,5 +93,32 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
         }
+
+        /// <summary>
+        /// Clean Up Batches
+        /// </summary>  
+        /// <param name="baseUri">Fss Base url</param>
+        /// <param name="batchIds">List of batch Ids</param>       
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> CleanUpBatchesAsync(string baseUri,List<string> batchIds, string accessToken = null)
+        {
+            string uri = $"{baseUri}/cleanUp";
+
+            string payloadJson = JsonConvert.SerializeObject(batchIds);
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+
+        }
+
     }
 }
