@@ -119,14 +119,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
             int queryCount = 0;
 
-            logger.LogInformation(EventIds.FileShareServicePreparingToSearchSetOfENCsStarted.ToEventId(), "Preparing file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, DateTime.UtcNow, message.BatchId, message.CorrelationId);
+            logger.LogInformation(EventIds.FileShareServicePreparingToSearchSetOfENCsStarted.ToEventId(), "Preparing file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, message.BatchId, message.CorrelationId);
 
             do
             {
                 queryCount++;
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files with cancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} and uri:{Uri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, uri, message.BatchId, message.CorrelationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files with cancellationToken:{cancellationTokenSource.Token} and uri:{Uri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), uri, message.BatchId, message.CorrelationId);
                     throw new OperationCanceledException();
                 }
                 httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, message.CorrelationId);
@@ -139,7 +139,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     cancellationTokenSource.Cancel();
                     logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching and downloading ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while searching and downloading ENC files with cancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while searching and downloading ENC files with cancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
                     throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
                 }
 
@@ -373,7 +373,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var fileName = item.Split("/").Last();
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while downloading ENC file:{fileName} from File Share Service with CancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} with uri:{Uri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, uri, queueMessage.BatchId, queueMessage.CorrelationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while downloading ENC file:{fileName} from File Share Service with CancellationToken:{cancellationTokenSource.Token} with uri:{Uri} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, JsonConvert.SerializeObject(cancellationTokenSource.Token), uri, queueMessage.BatchId, queueMessage.CorrelationId);
                     throw new OperationCanceledException();
                 }
                 HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item, CancellationToken.None, queueMessage.CorrelationId);
@@ -392,7 +392,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     cancellationTokenSource.Cancel();
                     logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in file share service while downloading ENC file:{fileName} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled while downloading ENC file:{fileName} from File Share Service with CancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while downloading ENC file:{fileName} from File Share Service with CancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
                     throw new FulfilmentException(EventIds.DownloadENCFilesNonOkResponse.ToEventId());
                 }
 
@@ -593,7 +593,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> CreateFile(FileCreateMetaData fileCreateMetaData, string accessToken, string correlationId)
         {
-            logger.LogInformation(EventIds.CreateFileInBatchStart.ToEventId(), "File:{FileName} creation in batch started at time:{DateTime.UtcNow} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.FileName, DateTime.UtcNow, fileCreateMetaData.BatchId, correlationId);
+            logger.LogInformation(EventIds.CreateFileInBatchStart.ToEventId(), "File:{FileName} creation in batch started for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.FileName, fileCreateMetaData.BatchId, correlationId);
             HttpResponseMessage httpResponse;
 
             string mimetype = fileCreateMetaData.FileName == fileShareServiceConfig.Value.ExchangeSetFileName ? "application/zip" : "text/plain";
@@ -620,23 +620,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             };
             var blockSizeInMultipleOfKBs = uploadMessage.BlockSizeInMultipleOfKBs <= 0
                                             || uploadMessage.BlockSizeInMultipleOfKBs > 4096 ? 1024 : uploadMessage.BlockSizeInMultipleOfKBs;
-
             long blockSize = blockSizeInMultipleOfKBs * 1024;
             List<string> blockIdList = new List<string>();
             List<Task> ParallelBlockUploadTasks = new List<Task>();
             long uploadedBytes = 0;
             int blockNum = 0;
-            CancellationTokenSource cts = new CancellationTokenSource();
-            CancellationToken cToken = cts.Token;
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
             while (uploadedBytes < customFileInfo.Length)
             {
                 blockNum++;
-
                 int readBlockSize = (int)(customFileInfo.Length - uploadedBytes <= blockSize ? customFileInfo.Length - uploadedBytes : blockSize);
                 string blockId = CommonHelper.GetBlockIds(blockNum);
-                if (cToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while uploading blocks in File Share Service with CancellationToken:{cancellationToken.Source} at Time:{DateTime.UtcNow} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", JsonConvert.SerializeObject(cts.Token), DateTime.UtcNow, blockId, customFileInfo.Name, batchId, correlationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while uploading blocks in File Share Service with CancellationToken:{cancellationToken.Source} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), blockId, customFileInfo.Name, batchId, correlationId);
                     throw new OperationCanceledException();
                 }
                 var blockUploadMetaData = new UploadBlockMetaData()
@@ -648,21 +646,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     Offset = uploadedBytes,
                     Length = readBlockSize,
                     FileName = customFileInfo.Name
-
                 };
-                ParallelBlockUploadTasks.Add(UploadFileBlockMetaData(blockUploadMetaData, correlationId, cts, cToken));
-
+                ParallelBlockUploadTasks.Add(UploadFileBlockMetaData(blockUploadMetaData, correlationId, cancellationTokenSource, cancellationToken));
                 blockIdList.Add(blockId);
                 uploadedBytes += readBlockSize;
-                //run uploads in parallel
+                //run uploads in parallel	
                 if (ParallelBlockUploadTasks.Count >= fileShareServiceConfig.Value.ParallelUploadThreadCount)
                 {
                     Task.WaitAll(ParallelBlockUploadTasks.ToArray());
                     ParallelBlockUploadTasks.Clear();
-                    cts.Dispose();
                 }
             }
-
             if (ParallelBlockUploadTasks.Count > 0)
             {
                 await Task.WhenAll(ParallelBlockUploadTasks);
@@ -687,7 +681,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 cancellationTokenSource.Cancel();
                 logger.LogError(EventIds.UploadFileBlockNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
-                logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in uploading file blocks with CancellationToken:{ cancellationTokenSource.Token} at time:{DateTime.UtcNow} with uri {RequestUri} responded with {StatusCode} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
+                logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in uploading file blocks with CancellationToken:{ cancellationTokenSource.Token} with uri {RequestUri} responded with {StatusCode} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
                 throw new FulfilmentException(EventIds.UploadFileBlockNonOkResponse.ToEventId());
             }
         }
