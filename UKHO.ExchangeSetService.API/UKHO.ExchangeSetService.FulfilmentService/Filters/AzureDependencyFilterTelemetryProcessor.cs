@@ -1,27 +1,27 @@
 ﻿using Microsoft.ApplicationInsights.Channel;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
-namespace UKHO.ExchangeSetService.FulfilmentService.Configuration
+namespace UKHO.ExchangeSetService.FulfilmentService.Filters
 {
     public class AzureDependencyFilterTelemetryProcessor : ITelemetryProcessor
     {
-        private readonly ITelemetryProcessor _inner;
+        private readonly ITelemetryProcessor inner;
 
         public AzureDependencyFilterTelemetryProcessor(ITelemetryProcessor inner)
         {
-            _inner = inner;
+            this.inner = inner;
         }
 
         public void Process(ITelemetry item)
         {
-            if (item is Microsoft.ApplicationInsights.DataContracts.DependencyTelemetry dependency
-                && dependency.Success == true
+            if (item is DependencyTelemetry dependency
                 && dependency.Name == "GET addsfssqastorage"
                 && dependency.Type == "Azure blob")
             {
                 ////dependency.Data = "testing";
                 return;
             }
-            _inner.Process(item);
+            inner.Process(item);
         }
     }
 }

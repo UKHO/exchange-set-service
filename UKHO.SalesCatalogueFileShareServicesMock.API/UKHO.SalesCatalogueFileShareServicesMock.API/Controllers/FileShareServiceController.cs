@@ -80,14 +80,18 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpGet]
         [Route("/batch/{batchId}/files/{fileName}")]
-        public FileResult DownloadFile(string batchId, string fileName)
+        public ActionResult DownloadFile(string batchId, string fileName)
         {
             byte[] bytes = null;
             if (!string.IsNullOrEmpty(fileName))
             {
                 bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
             }
-
+            if (fileName == "DE260001.000")
+            {
+                HttpContext.Response.Headers.Add("Location", "https://essdevstorage2.blob.core.windows.net/ess-fulfilment/V01X01.zip");
+                return StatusCode((int)HttpStatusCode.RedirectKeepVerb);
+            }
             return File(bytes, "application/octet-stream", fileName);
         }
 

@@ -23,6 +23,7 @@ using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 using Microsoft.ApplicationInsights.Extensibility;
+using UKHO.ExchangeSetService.FulfilmentService.Filters;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
