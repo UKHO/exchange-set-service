@@ -22,6 +22,7 @@ using Azure.Security.KeyVault.Secrets;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -175,6 +176,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<EssCallBackConfiguration>(ConfigurationBuilder.GetSection("ESSCallBackConfiguration"));
 
                  services.AddDistributedMemoryCache();
+
+                 // Add App Insights telemetry
+                 var buildServiceProvider = services.BuildServiceProvider();
+                 var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
+                 var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
+                 telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next));
+                 telemetryProcessorChainBuilder.Build();
+
              })
               .ConfigureWebJobs(b =>
               {

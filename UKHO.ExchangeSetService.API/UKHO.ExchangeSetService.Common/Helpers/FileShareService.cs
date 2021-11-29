@@ -330,6 +330,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item, queueMessage.CorrelationId);
                 var fileName = item.Split("/").Last();
                 var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
+                var serverValue = httpResponse.Headers.Server.ToString().Split('/').First();
 
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -340,7 +341,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         await CopyFileToFolder(httpResponse, path);
                         result = true;
                     }
-                    if (!string.IsNullOrEmpty(httpResponse.RequestMessage.RequestUri.Query))
+                    if (serverValue == "Windows-Azure-Blob")
                     {
                         logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "File share service download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, requestUri, queueMessage.BatchId, queueMessage.CorrelationId);
                     }
@@ -373,12 +374,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             HttpResponseMessage httpReadMeFileResponse;
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, correlationId);
             var requestUri = new Uri(httpReadMeFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
+            var serverValue = httpReadMeFileResponse.Headers.Server.ToString().Split('/').First();
 
             if (httpReadMeFileResponse.IsSuccessStatusCode)
             {
                 using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
                 {
-                    if (!string.IsNullOrEmpty(httpReadMeFileResponse.RequestMessage.RequestUri.Query))
+                    if (serverValue == "Windows-Azure-Blob")
                     {
                         logger.LogInformation(EventIds.DownloadReadmeFile307RedirectResponse.ToEventId(), "File share service download readme.txt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
                     }
