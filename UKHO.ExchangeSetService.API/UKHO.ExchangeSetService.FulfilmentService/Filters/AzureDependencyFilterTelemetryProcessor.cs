@@ -8,17 +8,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Filters
     public class AzureDependencyFilterTelemetryProcessor : ITelemetryProcessor
     {
         private readonly ITelemetryProcessor inner;
+        private readonly string dependancyName;
+        private readonly string dependancyType;
 
-        public AzureDependencyFilterTelemetryProcessor(ITelemetryProcessor inner)
+        public AzureDependencyFilterTelemetryProcessor(ITelemetryProcessor inner, string dependancyName, string dependancyType)
         {
             this.inner = inner;
+            this.dependancyName = dependancyName;
+            this.dependancyType = dependancyType;
         }
 
         public void Process(ITelemetry item)
         {
             if (item is DependencyTelemetry dependency
-                && dependency.Name == "GET addsfssqastorage"
-                && dependency.Type == "Azure blob")
+                && dependency.Name == dependancyName
+                && dependency.Type == dependancyType)
             {
                 dependency.Data = new Uri(dependency.Data.ToString()).GetLeftPart(UriPartial.Path);
                 inner.Process(item);

@@ -125,7 +125,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              })
              .ConfigureServices((hostContext, services) =>
              {
-                 services.BuildServiceProvider();
+                 var buildServiceProvider = services.BuildServiceProvider();
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
@@ -178,11 +178,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.AddDistributedMemoryCache();
 
-                 // Add App Insights telemetry
-                 var buildServiceProvider = services.BuildServiceProvider();
+                 // Add App Insights Telemetry Filter
                  var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
                  var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
-                 telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next));
+                 var dependancyName = ConfigurationBuilder["AzureDependencyFilterTelemetryConfiguration:DependencyName"];
+                 var dependancyType = ConfigurationBuilder["AzureDependencyFilterTelemetryConfiguration:DependencyType"];
+
+                 telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next, dependancyName, dependancyType));
                  telemetryProcessorChainBuilder.Build();
 
              })

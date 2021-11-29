@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
@@ -21,8 +23,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsCommitBatch { get; set; }
         public Dictionary<string, string> ErrorsAddFileinBatch { get; set; }
         protected IConfiguration configuration;
+        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration;
 
-        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration) : base(httpContextAccessor)
+        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration, IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration) : base(httpContextAccessor)
         {
             this.fileShareService = fileShareService;
             ErrorsCreateBatch = new Dictionary<string, string>
@@ -46,6 +49,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 { "description","Error while creating file" }
             };
             this.configuration = configuration;
+            this.fileShareServiceConfiguration = fileShareServiceConfiguration;
         }
 
         [HttpPost]
@@ -89,7 +93,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             if (fileName == "DE260001.000")
             {
-                HttpContext.Response.Headers.Add("Location", "https://essdevstorage2.blob.core.windows.net/ess-fulfilment/V01X01.zip");
+                HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
                 return StatusCode((int)HttpStatusCode.RedirectKeepVerb);
             }
             return File(bytes, "application/octet-stream", fileName);
