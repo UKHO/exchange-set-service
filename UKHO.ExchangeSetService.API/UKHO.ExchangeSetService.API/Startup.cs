@@ -38,8 +38,7 @@ namespace UKHO.ExchangeSetService.API
     public class Startup
     {
         private readonly IConfiguration configuration;
-        public const string ExchangeSetService = "ExchangeSetService";
-        private const int time = 5;
+        public const string ExchangeSetService = "ExchangeSetService";    
 
         public Startup(IWebHostEnvironment env)
         {
@@ -149,8 +148,7 @@ namespace UKHO.ExchangeSetService.API
                     client.BaseAddress = new Uri(configuration["FileShareService:BaseUrl"]);
                     var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetService,
                                                 Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
-                    client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
-                    client.Timeout= TimeSpan.FromMinutes(time);
+                    client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);                    
                 }
             )
           
