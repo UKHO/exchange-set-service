@@ -39,6 +39,7 @@ namespace UKHO.ExchangeSetService.API
     {
         private readonly IConfiguration configuration;
         public const string ExchangeSetService = "ExchangeSetService";
+        private const int time = 3;
 
         public Startup(IWebHostEnvironment env)
         {
@@ -149,8 +150,10 @@ namespace UKHO.ExchangeSetService.API
                     var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetService,
                                                 Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
                     client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                    client.Timeout= TimeSpan.FromMinutes(time);
                 }
             )
+          
             .AddHeaderPropagation().AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
             services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             services.AddScoped<IFileShareService, FileShareService>();
