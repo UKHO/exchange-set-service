@@ -517,9 +517,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805127 - Cancellation of task/token is called/requested when any of the async task in parallel thread is failed.
         /// </summary>
         CancellationTokenEvent = 805127,
-     
+        /// <summary>
+        /// 805128 -Completed download of 307 response ENC files from the file share service.
+        /// </summary>
         DownloadENCFiles307RedirectResponse = 805128,
-     
+        /// <summary>
+        /// 805129 - Completed download of 307 response README files from the file share service.
+        /// </summary>
         DownloadReadmeFile307RedirectResponse = 805129
     }
 
