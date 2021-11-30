@@ -181,14 +181,28 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("DE416080", 10, 6, TestName = "EditionNumber Unavailable")]
         [TestCase("DE416080", 9, 10, TestName = "UpdateNumber Unavailable")]
         [Category("SmokeTest")]
-        public async Task WhenICallTheApiWithAProductVersionNotAvailable_ThenAInternalServerErrorResponseIsReturned(string productname, int editionnumber, int updatenumber)
+        public async Task WhenICallTheApiWithAProductVersionNotAvailable_ThenASuccessStatusIsReturned(string productname, int editionnumber, int updatenumber)
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
 
             ProductVersiondata.Add(DataHelper.GetProductVersionModelData(productname, editionnumber, updatenumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
-            Assert.AreEqual(500, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 500.");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            //Verify requested product count
+            Assert.AreEqual(1, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 1.");
+
+            Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
+            // Verify ExchangeSetCellCount
+            Assert.AreEqual(0, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 0.");
+
+            //Check RequestedProductsNotInExchangeSet is not empty
+            Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
+            Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
+
         }
 
         [Test]
