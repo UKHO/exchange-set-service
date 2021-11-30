@@ -87,15 +87,17 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public ActionResult DownloadFile(string batchId, string fileName)
         {
             byte[] bytes = null;
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
-            }
+
             if (fileName == "DE260001.000")
             {
                 HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
                 return StatusCode((int)HttpStatusCode.RedirectKeepVerb);
             }
+            if (!string.IsNullOrEmpty(fileName) )
+            {
+                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
+            }
+         
             return File(bytes, "application/octet-stream", fileName);
         }
 
@@ -208,6 +210,19 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 }
             }
             return BadRequest();
+        }
+        [HttpGet]
+        [Route("/batch/{batchId}/redirectFiles/{fileName}")]
+        public ActionResult RedirectDownloadFile(string batchId, string fileName)
+        {
+            byte[] bytes = null;
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
+                HttpContext.Response.Headers.Add("x-redirect-status", "true");
+            }
+
+            return File(bytes, "application/octet-stream", fileName);
         }
     }
 }
