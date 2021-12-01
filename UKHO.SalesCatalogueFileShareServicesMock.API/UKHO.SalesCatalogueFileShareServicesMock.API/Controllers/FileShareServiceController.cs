@@ -91,7 +91,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             if (fileName == "DE260001.000")
             {
                 HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
-                return StatusCode((int)HttpStatusCode.RedirectKeepVerb);
+                return StatusCode(StatusCodes.Status307TemporaryRedirect);
             }
             if (!string.IsNullOrEmpty(fileName) )
             {

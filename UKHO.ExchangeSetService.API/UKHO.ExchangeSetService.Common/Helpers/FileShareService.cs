@@ -358,10 +358,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item, CancellationToken.None, queueMessage.CorrelationId);
 
                 var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
-                var serverValue = httpResponse.Headers.Server.ToString().Split('/').First();
 
                 if (httpResponse.IsSuccessStatusCode)
                 {
+                    var serverValue = httpResponse.Headers.Server.ToString().Split('/').First();
                     fileSystemHelper.CheckAndCreateFolder(downloadPath);
                     string path = Path.Combine(downloadPath, fileName);
                     if (!File.Exists(path))
@@ -405,11 +405,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             HttpResponseMessage httpReadMeFileResponse;
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, CancellationToken.None, correlationId);
 
-            var requestUri = new Uri(httpReadMeFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
-            var serverValue = httpReadMeFileResponse.Headers.Server.ToString().Split('/').First();
+            var requestUri = new Uri(httpReadMeFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);  
 
             if (httpReadMeFileResponse.IsSuccessStatusCode)
             {
+                var serverValue = httpReadMeFileResponse.Headers.Server.ToString().Split('/').First();
                 using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
                 {
                     if (serverValue == serverHeaderValue)

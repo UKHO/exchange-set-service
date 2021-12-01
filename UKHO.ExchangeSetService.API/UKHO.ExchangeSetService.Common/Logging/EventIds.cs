@@ -518,7 +518,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         CancellationTokenEvent = 805127,
         /// <summary>
-        /// 805128 -Completed download of 307 response ENC files from the file share service.
+        /// 805128 - Completed download of 307 response ENC files from the file share service.
         /// </summary>
         DownloadENCFiles307RedirectResponse = 805128,
         /// <summary>

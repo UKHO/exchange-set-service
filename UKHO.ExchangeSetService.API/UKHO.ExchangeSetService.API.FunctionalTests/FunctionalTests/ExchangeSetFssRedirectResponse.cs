@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
-    class ExcangeSetFssRedirectResponse
+    class ExchangeSetFssRedirectResponse
     {
         private string EssJwtToken { get; set; }
         private string FssJwtToken { get; set; }
@@ -13,8 +13,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
-       
-
 
         [OneTimeSetUp]
         public async Task SetupAsync()
