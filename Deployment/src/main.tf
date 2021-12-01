@@ -192,3 +192,12 @@ module "fulfilment_keyvaults" {
   }
   tags                                      = local.tags
 }
+
+module "azure-dashboard" {
+  source         = "./modules/azuredashboard"
+  name           = "ESS-${var.environment}-Monitoring-Dashboard"
+  location       = local.location
+  environment    = var.environment
+  resource_group = azurerm_resource_group.resource_group
+  tags           = var.tags
+}
