@@ -181,10 +181,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  // Add App Insights Telemetry Filter
                  var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
                  var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
-                 var dependancyName = ConfigurationBuilder["AzureDependencyFilterTelemetryConfiguration:DependencyName"];
-                 var dependancyType = ConfigurationBuilder["AzureDependencyFilterTelemetryConfiguration:DependencyType"];
-
-                 telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next, dependancyName, dependancyType));
+                 telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next));
                  telemetryProcessorChainBuilder.Build();
 
              })

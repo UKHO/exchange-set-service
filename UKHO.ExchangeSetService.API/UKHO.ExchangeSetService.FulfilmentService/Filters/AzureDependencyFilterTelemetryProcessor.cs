@@ -10,23 +10,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Filters
     public class AzureDependencyFilterTelemetryProcessor : ITelemetryProcessor
     {
         private readonly ITelemetryProcessor inner;
-        private readonly string dependancyName;
-        private readonly string dependancyType;
-
-        public AzureDependencyFilterTelemetryProcessor(ITelemetryProcessor inner, string dependancyName, string dependancyType)
+        public AzureDependencyFilterTelemetryProcessor(ITelemetryProcessor inner)
         {
             this.inner = inner;
-            this.dependancyName = dependancyName;
-            this.dependancyType = dependancyType;
         }
 
         public void Process(ITelemetry item)
         {
             if (item is DependencyTelemetry dependency
-                && dependency.Name == dependancyName
-                && dependency.Type == dependancyType)
+                && dependency.Type == "Azure blob" && dependency.Data.Contains("skoid"))
             {
-                dependency.Data = new Uri(dependency.Data.ToString()).GetLeftPart(UriPartial.Path);
+                dependency.Data = new Uri(dependency.Data).GetLeftPart(UriPartial.Path);
                 inner.Process(item);
                 return;
             }
