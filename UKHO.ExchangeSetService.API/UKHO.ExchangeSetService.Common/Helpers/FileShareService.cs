@@ -29,6 +29,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly ILogger<FileShareService> logger;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IMonitorHelper monitorHelper;
+        private const string ServerHeaderValue = "Windows-Azure-Blob";
+
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthFssTokenProvider authFssTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -378,8 +380,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item, CancellationToken.None, queueMessage.CorrelationId);
 
+                var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
+
                 if (httpResponse.IsSuccessStatusCode)
                 {
+                    var serverValue = httpResponse.Headers.Server.ToString().Split('/').First();
                     fileSystemHelper.CheckAndCreateFolder(downloadPath);
                     string path = Path.Combine(downloadPath, fileName);
                     if (!File.Exists(path))
@@ -387,12 +392,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         await CopyFileToFolder(httpResponse, path);
                         result = true;
                     }
+                    if (serverValue == ServerHeaderValue)
+                    {
+                        logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "File share service download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, requestUri, queueMessage.BatchId, queueMessage.CorrelationId);
+                    }
                 }
                 else
                 {
                     cancellationTokenSource.Cancel();
-                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in file share service while downloading ENC file:{fileName} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while downloading ENC file:{fileName} from File Share Service with CancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
+                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in file share service while downloading ENC file:{fileName} with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, requestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while downloading ENC file:{fileName} from File Share Service with CancellationToken:{cancellationTokenSource.Token} with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, JsonConvert.SerializeObject(cancellationTokenSource.Token), requestUri, httpResponse.StatusCode, queueMessage.BatchId, queueMessage.CorrelationId);
                     throw new FulfilmentException(EventIds.DownloadENCFilesNonOkResponse.ToEventId());
                 }
 
@@ -418,16 +427,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             HttpResponseMessage httpReadMeFileResponse;
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, CancellationToken.None, correlationId);
+
+            var requestUri = new Uri(httpReadMeFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);  
+
             if (httpReadMeFileResponse.IsSuccessStatusCode)
             {
+                var serverValue = httpReadMeFileResponse.Headers.Server.ToString().Split('/').First();
                 using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
                 {
+                    if (serverValue == ServerHeaderValue)
+                    {
+                        logger.LogInformation(EventIds.DownloadReadmeFile307RedirectResponse.ToEventId(), "File share service download readme.txt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
+                    }
                     return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
                 }
             }
             else
             {
-                logger.LogError(EventIds.DownloadReadMeFileNonOkResponse.ToEventId(), "Error in file share service while downloading readme.txt file with uri:{RequestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", httpReadMeFileResponse.RequestMessage.RequestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
+                logger.LogError(EventIds.DownloadReadMeFileNonOkResponse.ToEventId(), "Error in file share service while downloading readme.txt file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.DownloadReadMeFileNonOkResponse.ToEventId());
             }
         }
