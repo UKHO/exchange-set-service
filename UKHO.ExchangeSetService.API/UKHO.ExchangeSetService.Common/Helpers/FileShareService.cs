@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly ILogger<FileShareService> logger;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IMonitorHelper monitorHelper;
-        public const string serverHeaderValue = "Windows-Azure-Blob";
+        private const string ServerHeaderValue = "Windows-Azure-Blob";
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthFssTokenProvider authFssTokenProvider,
@@ -369,7 +369,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         await CopyFileToFolder(httpResponse, path);
                         result = true;
                     }
-                    if (serverValue == serverHeaderValue)
+                    if (serverValue == ServerHeaderValue)
                     {
                         logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "File share service download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, requestUri, queueMessage.BatchId, queueMessage.CorrelationId);
                     }
@@ -412,7 +412,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var serverValue = httpReadMeFileResponse.Headers.Server.ToString().Split('/').First();
                 using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
                 {
-                    if (serverValue == serverHeaderValue)
+                    if (serverValue == ServerHeaderValue)
                     {
                         logger.LogInformation(EventIds.DownloadReadmeFile307RedirectResponse.ToEventId(), "File share service download readme.txt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
                     }
