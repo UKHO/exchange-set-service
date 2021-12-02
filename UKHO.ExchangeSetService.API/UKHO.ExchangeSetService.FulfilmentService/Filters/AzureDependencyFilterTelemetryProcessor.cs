@@ -2,11 +2,9 @@
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Filters
 {
-    [ExcludeFromCodeCoverage]
     public class AzureDependencyFilterTelemetryProcessor : ITelemetryProcessor
     {
         private readonly ITelemetryProcessor inner;
