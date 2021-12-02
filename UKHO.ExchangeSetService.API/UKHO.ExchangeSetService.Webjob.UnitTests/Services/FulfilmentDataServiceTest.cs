@@ -222,7 +222,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             CancellationToken cancellationToken = cancellationTokenSource.Token;
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
 
-            Assert.ThrowsAsync<TaskCanceledException>(async () => await fulfilmentDataService.QueryAndDownloadFileShareServiceFiles(scsResponseQueueMessage, productList, null, cancellationTokenSource, cancellationToken));
+            Assert.ThrowsAsync<TaskCanceledException>(async () => await fulfilmentDataService.QueryFileShareServiceFiles(scsResponseQueueMessage, productList, null, cancellationTokenSource, cancellationToken));
         }
 
         [Test]
