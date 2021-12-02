@@ -260,7 +260,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
-                await StartPreparingForDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
             }
         }
 
@@ -272,19 +272,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
-                await StartPreparingForDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
             }
         }
 
-        private async Task StartPreparingForDownload(BatchDetail item, Products productItem, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        private async Task PerformBatchFileDownload(BatchDetail item, Products productItem, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
-            var ProductName = productItem.ProductName;
-            var EditionNumber = Convert.ToString(productItem.EditionNumber);
-            var UpdateNumber = item.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
-            logger.LogInformation(EventIds.DownloadENCFilesRequestStart.ToEventId(), "File share service download request started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", ProductName, EditionNumber, UpdateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
-            var downloadPath = Path.Combine(exchangeSetRootPath, ProductName.Substring(0, 2), ProductName, EditionNumber, UpdateNumber);
+            var productName = productItem.ProductName;
+            var editionNumber = Convert.ToString(productItem.EditionNumber);
+            var updateNumber = item.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
+            logger.LogInformation(EventIds.DownloadENCFilesRequestStart.ToEventId(), "File share service download request started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
+            var downloadPath = Path.Combine(exchangeSetRootPath, productName.Substring(0, 2), productName, editionNumber, updateNumber);
             await DownloadBatchFiles(item.Files.Select(a => a.Links.Get.Href).ToList(), downloadPath, message, cancellationTokenSource, cancellationToken);
-            logger.LogInformation(EventIds.DownloadENCFilesRequestCompleted.ToEventId(), "File share service download request completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", ProductName, EditionNumber, UpdateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
+            logger.LogInformation(EventIds.DownloadENCFilesRequestCompleted.ToEventId(), "File share service download request completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
         }
 
         public bool CheckProductDoesExistInResponseItem(BatchDetail batchDetail, Products product)
