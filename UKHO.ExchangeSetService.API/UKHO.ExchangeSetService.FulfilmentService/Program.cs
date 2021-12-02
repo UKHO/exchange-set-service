@@ -146,7 +146,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);                     
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
-                     client.Timeout = TimeSpan.FromMinutes(Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:RetryTime"]));
+                     client.Timeout = TimeSpan.FromMinutes(Convert.ToDouble(ConfigurationBuilder["FileShareService:TimeOutInMins"]));
                  })
                  .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
                  
