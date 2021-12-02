@@ -498,21 +498,21 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         CachingExternalEndPointToken = 805122,
         /// <summary>
-        ///  805123 -Preparing to download ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        ///  805123 - Started download of ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
-        FileShareServicePreparingToDownloadENCFilesStart = 805123,
+        FileShareServiceDownloadENCFilesStart = 805123,
         /// <summary>
-        ///  805124 -Completed download of ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        ///  805124 - Completed download of ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
         FileShareServiceDownloadENCFilesCompleted = 805124,
         /// <summary>
-        /// 805125 - Preparing to query ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        /// 805125 - Started query and download for ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
-        FileShareServicePreparingToSearchSetOfENCsStarted = 805125,
+        FileShareServiceSearchDownloadForENCFilesStart = 805125,
         /// <summary>
-        /// 805126 - Completed query for ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
+        /// 805126 - Completed query and download for ENC files based on Product/CellName EditionNumber and UpdateNumber from file share service.
         /// </summary>
-        FileShareServiceSearchQueryForSetOfENCsCompleted = 805126,
+        FileShareServiceSearchDownloadForENCFilesCompleted = 805126,
         /// <summary>
         /// 805127 - Cancellation of task/token is called/requested when any of the async task in parallel thread is failed.
         /// </summary>
