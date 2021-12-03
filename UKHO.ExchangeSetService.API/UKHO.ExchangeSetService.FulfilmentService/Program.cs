@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
-       
+        
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
@@ -146,6 +146,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);                     
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                     client.Timeout = TimeSpan.FromMinutes(Convert.ToDouble(ConfigurationBuilder["FileShareService:TimeOutInMins"]));
                  })
                  .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
                  
