@@ -194,7 +194,7 @@ module "fulfilment_keyvaults" {
 }
 
 module "azure-dashboard" {
-  source         = "./modules/azuredashboard"
+  source         = "./Modules/azuredashboard"
   name           = "ESS-${local.env_name}-Monitoring-Dashboard"
   location       = azurerm_resource_group.rg.location
   environment    = local.env_name
