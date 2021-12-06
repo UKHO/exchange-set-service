@@ -22,6 +22,8 @@ using Azure.Security.KeyVault.Secrets;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
+using Microsoft.ApplicationInsights.Extensibility;
+using UKHO.ExchangeSetService.FulfilmentService.Filters;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -31,7 +33,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
-       
+        
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
@@ -123,7 +125,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              })
              .ConfigureServices((hostContext, services) =>
              {
-                 services.BuildServiceProvider();
+                 var buildServiceProvider = services.BuildServiceProvider();
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
@@ -144,6 +146,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);                     
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                     client.Timeout = TimeSpan.FromMinutes(Convert.ToDouble(ConfigurationBuilder["FileShareService:TimeOutInMins"]));
                  })
                  .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
                  
@@ -175,6 +178,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<EssCallBackConfiguration>(ConfigurationBuilder.GetSection("ESSCallBackConfiguration"));
 
                  services.AddDistributedMemoryCache();
+
+                 // Add App Insights Telemetry Filter
+                 var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
+                 var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
+                 telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next));
+                 telemetryProcessorChainBuilder.Build();
+
              })
               .ConfigureWebJobs(b =>
               {

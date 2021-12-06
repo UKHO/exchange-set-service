@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
@@ -21,8 +23,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsCommitBatch { get; set; }
         public Dictionary<string, string> ErrorsAddFileinBatch { get; set; }
         protected IConfiguration configuration;
+        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration;
 
-        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration) : base(httpContextAccessor)
+        public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration, IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration) : base(httpContextAccessor)
         {
             this.fileShareService = fileShareService;
             ErrorsCreateBatch = new Dictionary<string, string>
@@ -46,6 +49,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 { "description","Error while creating file" }
             };
             this.configuration = configuration;
+            this.fileShareServiceConfiguration = fileShareServiceConfiguration;
         }
 
         [HttpPost]
@@ -80,14 +84,20 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         [HttpGet]
         [Route("/batch/{batchId}/files/{fileName}")]
-        public FileResult DownloadFile(string batchId, string fileName)
+        public ActionResult DownloadFile(string batchId, string fileName)
         {
             byte[] bytes = null;
-            if (!string.IsNullOrEmpty(fileName))
+
+            if (fileName == "DE260001.000")
+            {
+                HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
+                return StatusCode(StatusCodes.Status307TemporaryRedirect);
+            }
+            if (!string.IsNullOrEmpty(fileName) )
             {
                 bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
             }
-
+         
             return File(bytes, "application/octet-stream", fileName);
         }
 
@@ -200,6 +210,19 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 }
             }
             return BadRequest();
+        }
+        [HttpGet]
+        [Route("/batch/{batchId}/redirectFiles/{fileName}")]
+        public ActionResult RedirectDownloadFile(string batchId, string fileName)
+        {
+            byte[] bytes = null;
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
+                HttpContext.Response.Headers.Add("x-redirect-status", "true");
+            }
+
+            return File(bytes, "application/octet-stream", fileName);
         }
     }
 }

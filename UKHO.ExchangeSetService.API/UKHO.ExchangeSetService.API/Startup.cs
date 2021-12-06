@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API
     public class Startup
     {
         private readonly IConfiguration configuration;
-        public const string ExchangeSetService = "ExchangeSetService";
+        public const string ExchangeSetService = "ExchangeSetService";    
 
         public Startup(IWebHostEnvironment env)
         {
@@ -148,9 +148,10 @@ namespace UKHO.ExchangeSetService.API
                     client.BaseAddress = new Uri(configuration["FileShareService:BaseUrl"]);
                     var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetService,
                                                 Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
-                    client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
+                    client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);                    
                 }
             )
+          
             .AddHeaderPropagation().AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
             services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             services.AddScoped<IFileShareService, FileShareService>();
