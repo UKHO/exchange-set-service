@@ -381,7 +381,7 @@
                           }
                         }
                       ],
-                      "title": "QUEUE - (Avg Queue Count for essdevlxsstorageukho/essdevmxsstorageukho/essdevsxsstorageukho)",
+                      "title": "QUEUE - (Avg Queue Count for ess${environment}lxsstorageukho/ess${environment}mxsstorageukho/ess${environment}sxsstorageukho)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
