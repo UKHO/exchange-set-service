@@ -349,7 +349,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${subscription_id}/resourceGroups/ess-${environment}-rg/providers/Microsoft.Storage/storageAccounts/essdevlxsstorageukho"
+                            "id": "/subscriptions/${subscription_id}/resourceGroups/ess-${environment}-rg/providers/Microsoft.Storage/storageAccounts/ess${environment}lxsstorageukho"
                           },
                           "name": "QueueCount",
                           "aggregationType": 4,
@@ -360,7 +360,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${subscription_id}/resourceGroups/ess-${environment}-rg/providers/Microsoft.Storage/storageAccounts/essdevmxsstorageukho"
+                            "id": "/subscriptions/${subscription_id}/resourceGroups/ess-${environment}-rg/providers/Microsoft.Storage/storageAccounts/ess${environment}mxsstorageukho"
                           },
                           "name": "QueueCount",
                           "aggregationType": 4,
@@ -371,7 +371,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${subscription_id}/resourceGroups/ess-${environment}-rg/providers/Microsoft.Storage/storageAccounts/essdevsxsstorageukho"
+                            "id": "/subscriptions/${subscription_id}/resourceGroups/ess-${environment}-rg/providers/Microsoft.Storage/storageAccounts/ess${environment}sxsstorageukho"
                           },
                           "name": "QueueCount",
                           "aggregationType": 4,
@@ -381,7 +381,7 @@
                           }
                         }
                       ],
-                      "title": "QUEUE - (Avg Queue Count for essdevlxsstorageukho/essdevmxsstorageukho/essdevsxsstorageukho)",
+                      "title": "QUEUE - (Avg Queue Count for ess${environment}lxsstorageukho/ess${environment}mxsstorageukho/ess${environment}sxsstorageukho)",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
