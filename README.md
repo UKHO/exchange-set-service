@@ -24,7 +24,7 @@ To generate an authorization token in Postman follow these steps:
 
 #### Get Authorization for the environment's App Registration
 
-Ask ### TBC ### (or service Owner if service is live) to give you Roles for the ESS App Registration:
+Ask Calypso (or service Owner) to give you Roles for the ESS App Registration:
 
 * `ESS-API-DEV`
 * `ESS-API-QA`
@@ -44,13 +44,21 @@ Auth URL - `https://login.microsoftonline.com/9134ca48-663d-4a05-968a-31a42f0aed
 
 Client ID:
 
-* DEV ### TBC ###
+| Environment | Client ID |
+| -- | -- |
+| DEV | 80a6c68b-59aa-49a4-939a-7968ff79d676 |
+| QA | 644e4406-4e92-4e5d-bdc5-3b233884f900 |
+| LIVE | fd4cb7ab-ed8f-4398-bafa-4f83284febbe |
 * QA ### TBC ###
 * LIVE ### TBC ###
 
 Scope:
 
-* DEV ### TBC ###/.default
+| Environment | Scope |
+| -- | -- |
+| DEV | 80a6c68b-59aa-49a4-939a-7968ff79d676/.default |
+| QA | 644e4406-4e92-4e5d-bdc5-3b233884f900/.default |
+| LIVE | fd4cb7ab-ed8f-4398-bafa-4f83284febbe/.default |
 * QA ### TBC ###/.default
 * LIVE ### TBC ###/.default
 
