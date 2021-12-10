@@ -17,26 +17,23 @@ export let options = {
     scenarios: {
         ESSCreationSmallExchangeSet: {
             exec: 'ESSCreationSmallExchangeSet',
-            executor: 'ramping-vus',
-            stages: [
-                { duration: '5m', target: 10 },
-                { duration: '5m', target: 10 },
-                { duration: '5m', target: 30 },
-                { duration: '35m', target: 30 },
-                { duration: '5m', target: 20 },
-                { duration: '5m', target: 0 }
-            ]
+            executor: 'per-vu-iterations',
+            startTime: '10s',
+            gracefulStop: '5s',
+            vus: 5,
+            iterations: 400,
+            maxDuration: '1h'
         },
     },
 };
 
 export function setup() {
     // client credentials authentication flow
-     let essAuthResp = authenticateUsingAzure(
-         `${config.ESS_TENANT_ID}`, `${config.ESS_CLIENT_ID}`, `${config.ESS_CLIENT_SECRET}`, `${config.ESS_SCOPES}`, `${config.ESS_RESOURCE}`
-     );
-     clientAuthResp["essToken"] = essAuthResp.access_token;
-    
+    let essAuthResp = authenticateUsingAzure(
+        `${config.ESS_TENANT_ID}`, `${config.ESS_CLIENT_ID}`, `${config.ESS_CLIENT_SECRET}`, `${config.ESS_SCOPES}`, `${config.ESS_RESOURCE}`
+    );
+    clientAuthResp["essToken"] = essAuthResp.access_token;
+
     return clientAuthResp;
 }
 

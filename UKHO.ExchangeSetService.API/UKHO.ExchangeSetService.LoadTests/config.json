@@ -10,5 +10,9 @@
   "FSS_CLIENT_ID": "",
   "FSS_CLIENT_SECRET": "",
   "FSS_RESOURCE": "",
-  "FSS_SCOPES": ""
+  "FSS_SCOPES": "",
+  "DownloadFile": {
+    "MaxDownloadBlockSizeInBytes": "10485760",
+    "DownloadFlag": "Yes"
+  }
 }
