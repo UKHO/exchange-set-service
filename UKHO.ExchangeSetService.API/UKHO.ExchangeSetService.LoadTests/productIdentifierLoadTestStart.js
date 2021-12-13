@@ -37,11 +37,11 @@ let MediumExchangeSetEndtoEndTrendfor300MB = new Trend('MediumEssEndtoEndtimefor
 let LargeExchangeSetEndtoEndTrend = new Trend('LargeEssEndtoEndtime');
 
 let clientAuthResp = {};
-let fssDetailsResponse;
-let downloadFlag = config.DownloadFile.DownloadFlag
+let fssDetailsResponse, fssFileName, fileName ="V01X01.zip";
+let downloadFlag = config.DownloadFile.DownloadFlag;
 
 export let options = {
-  scenarios: {
+    scenarios: {
         ESSCreationSmallExchangeSet_25MB: {
             exec: 'ESSCreationSmallExchangeSet_25MB',
             executor: 'per-vu-iterations',
@@ -91,7 +91,7 @@ export let options = {
             iterations: 3,
             maxDuration: '1h'
         },
-  },
+    },
 };
 
 export function setup() {
@@ -115,7 +115,9 @@ export function ESSCreationSmallExchangeSet_25MB(clientAuthResp) {
   });
   SmallExchangeSetCreationTrendfor25MB.add(group_duration);
   
-  if (downloadFlag == "Yes")
+  fssFileName = fssDetailsResponse['files'][0]['filename'];
+
+  if (downloadFlag && fileName == fssFileName)
   {
     var group_durationFileDownload = apiClient.GetGroupDuration('Small_25MB_EssCreation', () => {    
       apiDownloadClient.fileDownload(`${clientAuthResp.fssToken}`, fssDetailsResponse);
@@ -135,7 +137,9 @@ export function ESSCreationSmallExchangeSet_50MB(clientAuthResp) {
   });
   SmallExchangeSetCreationTrendfor50MB.add(group_duration);
 
-  if(downloadFlag == "Yes")
+  fssFileName = fssDetailsResponse['files'][0]['filename'];
+
+  if(downloadFlag && fileName == fssFileName)
   {
     var group_durationFileDownload = apiClient.GetGroupDuration('Small_50MB_EssCreation', () => {    
       apiDownloadClient.fileDownload(`${clientAuthResp.fssToken}`, fssDetailsResponse);
@@ -154,7 +158,9 @@ export function ESSCreationMediumExchangeSet_150MB(clientAuthResp) {
   });
   MediumExchangeSetCreationTrendfor150MB.add(group_duration);
 
-  if(downloadFlag == "Yes")
+  fssFileName = fssDetailsResponse['files'][0]['filename'];
+
+  if(downloadFlag && fileName == fssFileName)
   {
     var group_durationFileDownload = apiClient.GetGroupDuration('Medium_150MB_EssCreation', () => {    
       apiDownloadClient.fileDownload(`${clientAuthResp.fssToken}`, fssDetailsResponse);
@@ -173,7 +179,9 @@ export function ESSCreationMediumExchangeSet_300MB(clientAuthResp) {
   });
   MediumExchangeSetCreationTrendfor300MB.add(group_duration);
 
-  if(downloadFlag == "Yes")
+  fssFileName = fssDetailsResponse['files'][0]['filename'];
+
+  if(downloadFlag && fileName == fssFileName)
   {
     var group_durationFileDownload = apiClient.GetGroupDuration('Medium_300MB_EssCreation', () => {    
       apiDownloadClient.fileDownload(`${clientAuthResp.fssToken}`, fssDetailsResponse);
@@ -192,7 +200,9 @@ export function ESSCreationLargeExchangeSet(clientAuthResp) {
   });
   LargeExchangeSetCreationTrend.add(group_duration);
 
-  if(downloadFlag == "Yes")
+  fssFileName = fssDetailsResponse['files'][0]['filename'];
+
+  if(downloadFlag && fileName == fssFileName)
   {
     var group_durationFileDownload = apiClient.GetGroupDuration('LargeEssCreation', () => {    
       apiDownloadClient.fileDownload(`${clientAuthResp.fssToken}`, fssDetailsResponse);
