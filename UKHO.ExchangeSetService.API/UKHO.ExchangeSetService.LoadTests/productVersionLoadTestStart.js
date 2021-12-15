@@ -19,7 +19,7 @@ export let options = {
             startTime: '10s',
             gracefulStop: '5s',
             vus: 5,
-            iterations: 400,
+            iterations: 30,
             maxDuration: '1h'
         },
     },
