@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
             var batchId = subDirectory.Name;
             string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
 
-            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(scsResponseFileName, storageAccountConnectionString, containerName);
+            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(scsResponseFileName, storageAccountConnectionString, containerName);
             var response = await cloudBlockBlob.DeleteIfExistsAsync();
 
             if (response)

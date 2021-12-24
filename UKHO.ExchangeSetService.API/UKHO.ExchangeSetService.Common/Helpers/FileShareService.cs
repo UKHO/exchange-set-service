@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
@@ -27,6 +28,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAuthFssTokenProvider authFssTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
+        private readonly IFileShareServiceCache fileShareServiceCache;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IMonitorHelper monitorHelper;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
@@ -35,12 +37,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 IAuthFssTokenProvider authFssTokenProvider,
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 ILogger<FileShareService> logger,
+                                IFileShareServiceCache fileShareServiceCache,
                                 IFileSystemHelper fileSystemHelper, IMonitorHelper monitorHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
             this.authFssTokenProvider = authFssTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
+            this.fileShareServiceCache = fileShareServiceCache;
             this.fileSystemHelper = fileSystemHelper;
             this.monitorHelper = monitorHelper;
         }
@@ -107,49 +111,55 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
         {
-            SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse();
-            internalSearchBatchResponse.Entries = new List<BatchDetail>();
-            List<Products> internalNotFoundProducts = new List<Products>();
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            var productWithAttributes = GenerateQueryForFss(products);
-            var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
-
-            HttpResponseMessage httpResponse;
-
-            string payloadJson = string.Empty;
-            var productList = new List<string>();
-            var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
-            int queryCount = 0;
-
-            logger.LogInformation(EventIds.FileShareServiceSearchDownloadForENCFilesStart.ToEventId(), "Started file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, message.BatchId, message.CorrelationId);
-
-            do
+            SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse 
             {
-                queryCount++;
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files with cancellationToken:{cancellationTokenSource.Token} and uri:{Uri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), uri, message.BatchId, message.CorrelationId);
-                    throw new OperationCanceledException();
-                }
-                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, message.CorrelationId);
+                Entries = new List<BatchDetail>()
+            };
+            List<Products> cacheProductsNotFound = await fileShareServiceCache.GetNonCacheProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+            if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
+            {
+                List<Products> internalNotFoundProducts = new List<Products>();
+                var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+                var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
+                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
 
-                if (httpResponse.IsSuccessStatusCode)
-                {
-                    uri = await SelectLatestPublishedDateBatch(products, internalSearchBatchResponse, uri, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
-                }
-                else
-                {
-                    cancellationTokenSource.Cancel();
-                    logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while searching ENC files with cancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
-                    throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
-                }
+                HttpResponseMessage httpResponse;
 
-            } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
-            internalSearchBatchResponse.QueryCount = queryCount;
-            CheckProductsExistsInFileShareService(products, message.CorrelationId, message.BatchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
+                string payloadJson = string.Empty;
+                var productList = new List<string>();
+                var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
+                int queryCount = 0;
 
-            logger.LogInformation(EventIds.FileShareServiceSearchDownloadForENCFilesCompleted.ToEventId(), "Completed file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, message.BatchId, message.CorrelationId);
+                logger.LogInformation(EventIds.FileShareServiceSearchDownloadForENCFilesStart.ToEventId(), "Started file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, message.BatchId, message.CorrelationId);
+
+                do
+                {
+                    queryCount++;
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files with cancellationToken:{cancellationTokenSource.Token} and uri:{Uri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), uri, message.BatchId, message.CorrelationId);
+                        throw new OperationCanceledException();
+                    }
+                    httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, message.CorrelationId);
+
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        uri = await SelectLatestPublishedDateBatch(cacheProductsNotFound, internalSearchBatchResponse, uri, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                    }
+                    else
+                    {
+                        cancellationTokenSource.Cancel();
+                        logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while searching ENC files with cancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
+                        throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
+                    }
+
+                } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+                internalSearchBatchResponse.QueryCount = queryCount;
+                CheckProductsExistsInFileShareService(products, message.CorrelationId, message.BatchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
+
+                logger.LogInformation(EventIds.FileShareServiceSearchDownloadForENCFilesCompleted.ToEventId(), "Completed file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, message.BatchId, message.CorrelationId);
+            }            
             return internalSearchBatchResponse;
         }
 
@@ -285,7 +295,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var updateNumber = item.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
             logger.LogInformation(EventIds.DownloadENCFilesRequestStart.ToEventId(), "File share service download request started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
             var downloadPath = Path.Combine(exchangeSetRootPath, productName.Substring(0, 2), productName, editionNumber, updateNumber);
-            await DownloadBatchFiles(item.Files.Select(a => a.Links.Get.Href).ToList(), downloadPath, message, cancellationTokenSource, cancellationToken);
+            await DownloadBatchFiles(item, item.Files.Select(a => a.Links.Get.Href).ToList(), downloadPath, message, cancellationTokenSource, cancellationToken);
             logger.LogInformation(EventIds.DownloadENCFilesRequestCompleted.ToEventId(), "File share service download request completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
         }
 
@@ -318,56 +328,62 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var productCount = products.Count;
             var sb = new StringBuilder();
             var sbLog = new StringBuilder();
-            sb.Append("(");////1st main (
-            foreach (var item in products)
+            if (products != null && products.Any())
             {
-                var cancellation = new StringBuilder();
-                sb.Append("(");////1st product
-                sb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
-                sb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
-                var lstCount = item.UpdateNumbers.Count;
-                var index = 1;
-                if (item.UpdateNumbers != null && item.UpdateNumbers.Any())
+                sb.Append("(");////1st main (
+                foreach (var item in products)
                 {
-                    foreach (var updateNumberItem in item.UpdateNumbers)
+                    var itemSb = new StringBuilder();
+                    var cancellation = new StringBuilder();
+                    itemSb.Append("(");////1st product
+                    itemSb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
+                    itemSb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
+                    var lstCount = item.UpdateNumbers.Count;
+                    var index = 1;
+                    if (item.UpdateNumbers != null && item.UpdateNumbers.Any())
                     {
-                        if (index == 1)
+                        foreach (var updateNumberItem in item.UpdateNumbers)
                         {
-                            sb.Append("((");
+                            if (index == 1)
+                            {
+                                itemSb.Append("((");
+                            }
+                            if (item.Cancellation != null && item.Cancellation.UpdateNumber == updateNumberItem.Value)
+                            {
+                                cancellation.Append(" or (");////1st cancellation product
+                                cancellation.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
+                                cancellation.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.Cancellation.EditionNumber);
+                                cancellation.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, item.Cancellation.UpdateNumber);
+                                cancellation.Append(")");
+                                item.IgnoreCache = true;
+                            }
+                            itemSb.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, updateNumberItem.Value);
+                            itemSb.Append(lstCount != index ? "or " : "))");
+                            index += 1;
                         }
-                        if (item.Cancellation != null && item.Cancellation.UpdateNumber == updateNumberItem.Value)
-                        {
-                            cancellation.Append(" or (");////1st cancellation product
-                            cancellation.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
-                            cancellation.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.Cancellation.EditionNumber);
-                            cancellation.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, item.Cancellation.UpdateNumber);
-                            cancellation.Append(")");
-                        }
-                        sb.AppendFormat(fileShareServiceConfig.Value.UpdateNumber, updateNumberItem.Value);
-                        sb.Append(lstCount != index ? "or " : "))");
-                        index += 1;
                     }
+                    itemSb.Append(cancellation.ToString() + (productCount == productIndex ? ")" : ") or "));/////last product or with multiple
+                    sbLog.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", item.ProductName, item.EditionNumber.ToString(), string.Join(",", item?.UpdateNumbers.Select(a => a.Value.ToString())));
+                    if (cancellation.Length > 0)
+                    {
+                        sbLog.AppendFormat("\n with Cancellation Product/CellName:{0}, EditionNumber:{1} and UpdateNumber:{2}", item.ProductName, item.Cancellation.EditionNumber.ToString(), item.Cancellation.UpdateNumber.ToString());
+                    }
+                    productIndex += 1;
+                    sb.Append(itemSb.ToString());
                 }
-                sb.Append(cancellation.ToString() + (productCount == productIndex ? ")" : ") or "));/////last product or with multiple
-                sbLog.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", item.ProductName, item.EditionNumber.ToString(), string.Join(",", item?.UpdateNumbers.Select(a => a.Value.ToString())));
-                if (cancellation.Length > 0)
-                {
-                    sbLog.AppendFormat("\n with Cancellation Product/CellName:{0}, EditionNumber:{1} and UpdateNumber:{2}", item.ProductName, item.Cancellation.EditionNumber.ToString(), item.Cancellation.UpdateNumber.ToString());
-                }
-                productIndex += 1;
+                sb.Append(")");//// last main )
             }
-            sb.Append(")");//// last main )
             return (sb.ToString(), sbLog.ToString());
         }
 
-        public async Task<bool> DownloadBatchFiles(IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        public async Task<bool> DownloadBatchFiles(BatchDetail entry, IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            return await ProcessBatchFile(uri, downloadPath, payloadJson, accessToken, queueMessage, cancellationTokenSource, cancellationToken);
+            return await ProcessBatchFile(entry, uri, downloadPath, payloadJson, accessToken, queueMessage, cancellationTokenSource, cancellationToken);
         }
 
-        private async Task<bool> ProcessBatchFile(IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        private async Task<bool> ProcessBatchFile(BatchDetail entry, IEnumerable<string> uri, string downloadPath, string payloadJson, string accessToken, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             bool result = false;
             foreach (var item in uri)
@@ -390,6 +406,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     if (!File.Exists(path))
                     {
                         await CopyFileToFolder(httpResponse, path);
+                        if (!entry.IgnoreCache)
+                        {
+                            await fileShareServiceCache.CopyFileToBlob(httpResponse, path, fileName, entry.BatchId); 
+                        }
                         result = true;
                     }
                     if (serverValue == ServerHeaderValue)
@@ -405,6 +425,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     throw new FulfilmentException(EventIds.DownloadENCFilesNonOkResponse.ToEventId());
                 }
 
+            }
+            if (!entry.IsCached && !entry.IgnoreCache)
+            {
+                var fssResponseCache = new FssResponseCache
+                {
+                    BatchId = entry.BatchId,
+                    PartitionKey = entry.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault(),
+                    RowKey = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault() + "|" + entry.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault(),
+                    Response = JsonConvert.SerializeObject(entry)
+                };
+
+                await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssResponseCache);
             }
             return result;
         }

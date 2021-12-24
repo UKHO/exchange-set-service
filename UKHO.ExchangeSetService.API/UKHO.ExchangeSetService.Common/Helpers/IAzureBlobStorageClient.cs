@@ -7,7 +7,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IAzureBlobStorageClient
     {
-        CloudBlockBlob GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName);
+        Task<CloudBlockBlob> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName);
         CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString);
         Task UploadFromStreamAsync(CloudBlockBlob cloudBlockBlob, MemoryStream ms);
         Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob);

@@ -108,49 +108,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void WhenValidRequest_ThenDownloadFileShareServiceFilesReturnsFile()
-        {
-            var message = new SalesCatalogueServiceResponseQueueMessage()
-            {
-                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
-            };
-            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
-                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
-            };
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "", null, CancellationToken.None);
-            Assert.IsNotNull(result);
-        }
-
-        [Test]
-        public void WhenInValidRequest_ThenDownloadFileShareServiceFilesReturnsNoFile()
-        {
-            var message = new SalesCatalogueServiceResponseQueueMessage()
-            {
-                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
-            };
-            var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-            var result = fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "", null, CancellationToken.None);
-            Assert.IsNotNull(result);
-        }
-
-        [Test]
-        public void WhenIsCancellationRequested_ThenDownloadFileShareServiceFilesReturnsThrowCancelledException()
-        {
-            var message = new SalesCatalogueServiceResponseQueueMessage()
-            {
-                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
-            };
-            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
-                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
-            };
-
-            cancellationTokenSource.Cancel();
-            CancellationToken cancellationToken = cancellationTokenSource.Token;
-
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fulfilmentFileShareService.DownloadFileShareServiceFiles(message, fulfilmentDataResponse, "", cancellationTokenSource, cancellationToken));
-        }
-
-        [Test]
         public async Task WhenValidSearchReadMeFileRequest_ThenReturnFilePath()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
