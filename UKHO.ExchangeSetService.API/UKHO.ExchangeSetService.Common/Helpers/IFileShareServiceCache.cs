@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Net.Http;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
@@ -11,7 +11,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public interface IFileShareServiceCache
     {
         Task<List<Products>> GetNonCacheProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken);
-        Task CopyFileToBlob(HttpResponseMessage httpResponse, string path, string fileName, string batchId);
+        Task CopyFileToBlob(Stream stream, string fileName, string batchId);
         Task InsertOrMergeFssCacheDetail(FssResponseCache fssResponseCache);
     }
 }

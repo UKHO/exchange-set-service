@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -113,17 +112,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return internalProductsNotFound;
         }
 
-        public async Task CopyFileToBlob(HttpResponseMessage httpResponse, string path, string fileName, string batchId)
+        public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.FssCacheStorageAccountName, fssCacheConfiguration.Value.FssCacheStorageAccountKey);
             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
             if (!await cloudBlockBlob.ExistsAsync())
             {
-                using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
-                {
-                    await cloudBlockBlob.UploadFromStreamAsync(stream);
-                }
+                await cloudBlockBlob.UploadFromStreamAsync(stream);
             }
         }
 

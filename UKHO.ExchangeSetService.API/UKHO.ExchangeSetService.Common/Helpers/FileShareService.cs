@@ -405,11 +405,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     string path = Path.Combine(downloadPath, fileName);
                     if (!File.Exists(path))
                     {
-                        await CopyFileToFolder(httpResponse, path);
-                        if (!entry.IgnoreCache)
-                        {
-                            await fileShareServiceCache.CopyFileToBlob(httpResponse, path, fileName, entry.BatchId); 
-                        }
+                        await CopyFileToFolder(httpResponse, path, fileName, entry);                        
                         result = true;
                     }
                     if (serverValue == ServerHeaderValue)
@@ -441,11 +437,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return result;
         }
 
-        private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path)
+        private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path, string fileName, BatchDetail entry)
         {
-            using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+            byte[] bytes = fileSystemHelper.ReadFully(await httpResponse.Content.ReadAsStreamAsync());
+            fileSystemHelper.CreateFileCopy(path, new MemoryStream(bytes));
+            if (!entry.IgnoreCache)
             {
-                fileSystemHelper.CreateFileCopy(path, stream);
+                await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
             }
         }
 
