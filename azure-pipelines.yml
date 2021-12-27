@@ -186,7 +186,7 @@ stages:
               command: "publish"
               publishWebProjects: false
               projects: "**/*UKHO.ExchangeSetService.FulfilmentService.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\continuous\ESSFulfilmentWebJob'
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\continuous\ESSFulfilmentWebJob'
               zipAfterPublish: false
               modifyOutputPath: false
 
@@ -196,14 +196,14 @@ stages:
               command: "publish"
               publishWebProjects: false
               projects: "**/*UKHO.ExchangeSetService.CleanUpJob.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\triggered\ESSCleanUpWebJob'
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\triggered\ESSCleanUpWebJob'
               zipAfterPublish: false
               modifyOutputPath: false
 
           - task: ArchiveFiles@2
             displayName: "Zip ESS fulfilment service"
             inputs:
-              rootFolderOrFile: '$(Build.BinariesDirectory)\ExchangeSetFulFilmentService\'
+              rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\'
               includeRootFolder: false
               archiveType: "zip"
               archiveFile: '$(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\ExchangeSetFulFilmentService.zip'
