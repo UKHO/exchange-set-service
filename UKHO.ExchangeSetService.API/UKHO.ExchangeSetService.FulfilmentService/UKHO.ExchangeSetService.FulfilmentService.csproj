@@ -7,9 +7,6 @@
 	<PropertyGroup>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
-  <PropertyGroup>
-    <RuntimeFrameworkVersion>3.1.413</RuntimeFrameworkVersion>
-  </PropertyGroup>
   <ItemGroup>
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.local.overrides.json" />
@@ -57,7 +54,6 @@
     </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.csproj" />
 		<ProjectReference Include="..\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj" />
 	</ItemGroup>
 
