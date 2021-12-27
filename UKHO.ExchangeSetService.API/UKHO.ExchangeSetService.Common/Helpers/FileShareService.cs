@@ -408,7 +408,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     string path = Path.Combine(downloadPath, fileName);
                     if (!File.Exists(path))
                     {
-                        await CopyFileToFolder(httpResponse, path, fileName, entry);                        
+                        await CopyFileToFolder(httpResponse, path, fileName, entry, queueMessage);                        
                         result = true;
                     }
                     if (serverValue == ServerHeaderValue)
@@ -438,20 +438,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     RowKey = $"{editionNumber}|{updateNumber}",
                     Response = JsonConvert.SerializeObject(entry)
                 };
-                logger.LogInformation(EventIds.FileShareServiceResponseStoreRequestStart.ToEventId(), "File share service insert/merge request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
+                logger.LogInformation(EventIds.FileShareServiceSearchResponseStoreToCacheStart.ToEventId(), "File share service search response insert/merge request in azure table for cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
                 await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssResponseCache);
-                logger.LogInformation(EventIds.FileShareServiceResponseStoreRequestStart.ToEventId(), "File share service insert/merge request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
+                logger.LogInformation(EventIds.FileShareServiceSearchResponseStoreToCacheCompleted.ToEventId(), "File share service search response insert/merge request in azure table for cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
             }
             return result;
         }
 
-        private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path, string fileName, BatchDetail entry)
+        private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path, string fileName, BatchDetail entry, SalesCatalogueServiceResponseQueueMessage queueMessage)
         {
             byte[] bytes = fileSystemHelper.ReadFully(await httpResponse.Content.ReadAsStreamAsync());
             fileSystemHelper.CreateFileCopy(path, new MemoryStream(bytes));
             if (!entry.IgnoreCache && fssCacheConfiguration.Value.IsFssCacheEnabled)
             {
+                logger.LogInformation(EventIds.FileShareServiceUploadENCFilesToCacheStart.ToEventId(), "File share service upload ENC file request to cache blob container started for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
                 await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
+                logger.LogInformation(EventIds.FileShareServiceUploadENCFilesToCacheCompleted.ToEventId(), "File share service upload ENC file request to cache blob container completed for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
             }
         }
 
