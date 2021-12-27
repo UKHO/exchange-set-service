@@ -6,10 +6,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	</PropertyGroup>
-  <PropertyGroup>
-    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
-  </PropertyGroup>  
+	</PropertyGroup> 
   <ItemGroup>
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.local.overrides.json" />
