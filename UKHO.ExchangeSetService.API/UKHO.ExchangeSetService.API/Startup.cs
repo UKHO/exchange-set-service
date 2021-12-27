@@ -108,7 +108,7 @@ namespace UKHO.ExchangeSetService.API
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("ESSFulfilmentConfiguration"));
-            services.Configure<FssCacheConfiguration>(configuration.GetSection("FssCacheConfiguration"));
+            services.Configure<CacheConfiguration>(configuration.GetSection("CacheConfiguration"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
             services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();

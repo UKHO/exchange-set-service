@@ -29,6 +29,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
         private readonly IFileShareServiceCache fileShareServiceCache;
+        private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IMonitorHelper monitorHelper;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
@@ -38,6 +39,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 ILogger<FileShareService> logger,
                                 IFileShareServiceCache fileShareServiceCache,
+                                IOptions<CacheConfiguration> fssCacheConfiguration,
                                 IFileSystemHelper fileSystemHelper, IMonitorHelper monitorHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
@@ -45,6 +47,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
             this.fileShareServiceCache = fileShareServiceCache;
+            this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
             this.monitorHelper = monitorHelper;
         }
@@ -115,7 +118,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 Entries = new List<BatchDetail>()
             };
-            List<Products> cacheProductsNotFound = await fileShareServiceCache.GetNonCacheProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+            List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCacheProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken) : products;
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
                 List<Products> internalNotFoundProducts = new List<Products>();
@@ -422,17 +425,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
 
             }
-            if (!entry.IsCached && !entry.IgnoreCache)
+            if (fssCacheConfiguration.Value.IsFssCacheEnabled && !(entry.IsCached && entry.IgnoreCache))
             {
+                var productName = entry.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
+                var editionNumber = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
+                var updateNumber = entry.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
+
                 var fssResponseCache = new FssResponseCache
                 {
                     BatchId = entry.BatchId,
-                    PartitionKey = entry.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault(),
-                    RowKey = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault() + "|" + entry.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault(),
+                    PartitionKey = productName,
+                    RowKey = $"{editionNumber}|{updateNumber}",
                     Response = JsonConvert.SerializeObject(entry)
                 };
-
+                logger.LogInformation(EventIds.FileShareServiceResponseStoreRequestStart.ToEventId(), "File share service insert/merge request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
                 await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssResponseCache);
+                logger.LogInformation(EventIds.FileShareServiceResponseStoreRequestStart.ToEventId(), "File share service insert/merge request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
             }
             return result;
         }
@@ -441,7 +449,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             byte[] bytes = fileSystemHelper.ReadFully(await httpResponse.Content.ReadAsStreamAsync());
             fileSystemHelper.CreateFileCopy(path, new MemoryStream(bytes));
-            if (!entry.IgnoreCache)
+            if (!entry.IgnoreCache && fssCacheConfiguration.Value.IsFssCacheEnabled)
             {
                 await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
             }

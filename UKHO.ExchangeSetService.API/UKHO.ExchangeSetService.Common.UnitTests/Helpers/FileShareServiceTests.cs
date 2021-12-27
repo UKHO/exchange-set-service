@@ -31,6 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IFileSystemHelper fakeFileSystemHelper;
         private IMonitorHelper fakeMonitorHelper;
         private IFileShareServiceCache fakeFileShareServiceCache;
+        private IOptions<CacheConfiguration> fakeCacheConfiguration;
 
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeFolderPath = "C:\\HOME";
@@ -51,8 +52,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             this.fakeFileShareServiceCache = A.Fake<IFileShareServiceCache>();
             this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
-            
-            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeFileSystemHelper, fakeMonitorHelper);
+            this.fakeCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
+
+            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeCacheConfiguration, fakeFileSystemHelper, fakeMonitorHelper);
         }
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()

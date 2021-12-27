@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IAzureTableStorageClient azureTableStorageClient;
         private readonly ILogger<FileShareServiceCache> logger;
         private readonly ISalesCatalogueStorageService azureStorageService;
-        private readonly IOptions<FssCacheConfiguration> fssCacheConfiguration;
+        private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
         private const string CONTENT_TYPE = "application/json";
 
@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             IAzureTableStorageClient azureTableStorageClient,
             ILogger<FileShareServiceCache> logger,
             ISalesCatalogueStorageService azureStorageService,
-            IOptions<FssCacheConfiguration> fssCacheConfiguration,
+            IOptions<CacheConfiguration> fssCacheConfiguration,
             IFileSystemHelper fileSystemHelper)
         {
             this.azureBlobStorageClient = azureBlobStorageClient;
@@ -70,30 +70,30 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}";
                     if (!productList.Contains(compareProducts))
                     {
-                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.FssCacheStorageAccountName, fssCacheConfiguration.Value.FssCacheStorageAccountKey);
-                        ////logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
+                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
                         var cacheInfo = (FssResponseCache)await azureTableStorageClient.RetrieveAsync<FssResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, "CachingFssResponse", storageConnectionString);
-                        ////logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
+                        logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
                             internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
                             var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+                            logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheStart.ToEventId(), "File share service download request from cache container started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
                             foreach (var fileItem in internalBatchDetail.Files?.Select(a => a.Links.Get.Href))
                             {
                                 var uriArray = fileItem.Split("/");
                                 var fileName = uriArray[^1];
                                 fileSystemHelper.CheckAndCreateFolder(downloadPath);
                                 string path = Path.Combine(downloadPath, fileName);
-                                ////logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheStart.ToEventId(), "File share service download request from cache container started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
                                 if (!File.Exists(path))
                                 {
                                     CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
                                     await cloudBlockBlob.DownloadToFileAsync(path, FileMode.Create);
                                 }
-                                ////logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted.ToEventId(), "File share service download request from cache container completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
                                 updateNumbers.Add(itemUpdateNumber.Value);
                                 internalBatchDetail.IsCached = internalBatchDetail.IgnoreCache = true;
                             }
+                            logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted.ToEventId(), "File share service download request from cache container completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
                             internalSearchBatchResponse.Entries.Add(internalBatchDetail);
                             productList.Add(compareProducts);
                         }
@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.FssCacheStorageAccountName, fssCacheConfiguration.Value.FssCacheStorageAccountKey);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
             if (!await cloudBlockBlob.ExistsAsync())
@@ -125,8 +125,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task InsertOrMergeFssCacheDetail(FssResponseCache fssResponseCache)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.FssCacheStorageAccountName, fssCacheConfiguration.Value.FssCacheStorageAccountKey);
-            await azureTableStorageClient.InsertOrMergeAsync(fssResponseCache, fssCacheConfiguration.Value.FssCacheTableName, storageConnectionString);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            await azureTableStorageClient.InsertOrMergeAsync(fssResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
         }
     }
 }

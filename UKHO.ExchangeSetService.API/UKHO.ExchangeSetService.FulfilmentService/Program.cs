@@ -128,7 +128,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  var buildServiceProvider = services.BuildServiceProvider();
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
-                 services.Configure<FssCacheConfiguration>(ConfigurationBuilder.GetSection("FssCacheConfiguration"));
+                 services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
                  services.Configure<SalesCatalogueConfiguration>(ConfigurationBuilder.GetSection("SalesCatalogue"));
          

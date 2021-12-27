@@ -524,7 +524,31 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805129 - Completed download of 307 response README files from the file share service.
         /// </summary>
-        DownloadReadmeFile307RedirectResponse = 805129
+        DownloadReadmeFile307RedirectResponse = 805129,
+        /// <summary>
+        /// 805130 - Request for searching ENC files from file share service cache azure table storage is started.
+        /// </summary>
+        FileShareServiceSearchENCFilesFromCacheStart = 805130,
+        /// <summary>
+        /// 805131 - Request for searching ENC files from file share service cache azure table storage is Completed.
+        /// </summary>
+        FileShareServiceSearchENCFilesFromCacheCompleted = 805131,
+        /// <summary>
+        /// 805132 - Request for downloading ENC files from file share service cache container is started.
+        /// </summary>
+        FileShareServiceDownloadENCFilesFromCacheStart = 805132,
+        /// <summary>
+        /// 805133 - Request for downloading ENC files from file share service cache container is Completed.
+        /// </summary>
+        FileShareServiceDownloadENCFilesFromCacheCompleted = 805133,
+        /// <summary>
+        /// 805134 - Request for storing file share service response in azure table storage is started.
+        /// </summary>
+        FileShareServiceResponseStoreRequestStart = 805134,
+        /// <summary>
+        /// 805135 - Request for storing file share service response in azure table storage is completed.
+        /// </summary>
+        FileShareServiceResponseStoreRequestCompleted = 805135
     }
 
     public static class EventIdExtensions
