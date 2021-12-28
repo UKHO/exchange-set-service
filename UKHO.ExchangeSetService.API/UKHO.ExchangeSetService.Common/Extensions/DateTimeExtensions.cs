@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace UKHO.ExchangeSetService.API.Extensions
+namespace UKHO.ExchangeSetService.Common.Extensions
 {
     public static class DateTimeExtensions
     {
@@ -14,4 +14,4 @@ namespace UKHO.ExchangeSetService.API.Extensions
             return DateTime.TryParseExact(data, "ddMMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime);
         }
     }
-} 
+}
