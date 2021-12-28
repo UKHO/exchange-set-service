@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.WindowsAzure.Storage.Blob;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -19,5 +21,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite);
         void CreateFileCopy(string filePath, Stream stream);
         byte[] ReadFully(Stream input);
+        Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
     }
 }

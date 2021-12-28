@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 if (!File.Exists(path))
                                 {
                                     CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
-                                    await cloudBlockBlob.DownloadToFileAsync(path, FileMode.Create);
+                                    await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
                                 }
                                 updateNumbers.Add(itemUpdateNumber.Value);
                                 internalBatchDetail.IsCached = internalBatchDetail.IgnoreCache = true;

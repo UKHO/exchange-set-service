@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Blob;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -149,5 +151,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 return ms.ToArray();
             }
         }
+
+         public async Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
+        {
+            await cloudBlockBlob.DownloadToFileAsync(path, FileMode.Create);
+        } 
     }
 }
