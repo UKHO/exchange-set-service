@@ -426,7 +426,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
 
             }
-            if (fssCacheConfiguration.Value.IsFssCacheEnabled && !(entry.IsCached && entry.IgnoreCache))
+            if (fssCacheConfiguration.Value.IsFssCacheEnabled && !entry.IgnoreCache && !entry.IsCached)
             {
                 var productName = entry.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
                 var editionNumber = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
