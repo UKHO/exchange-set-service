@@ -285,6 +285,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
             {
                 matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
+                item.IgnoreCache = true;
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
                 await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
