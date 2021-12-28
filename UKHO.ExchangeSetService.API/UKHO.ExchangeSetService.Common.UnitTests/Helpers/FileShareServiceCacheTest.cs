@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,16 +29,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IFileSystemHelper fakeFileSystemHelper;
         private IFileShareServiceCache fileShareServiceCache;
 
-        //////public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         [SetUp]
         public void Setup()
         {
-            this.fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
-            this.fakeAzureTableStorageClient = A.Fake<IAzureTableStorageClient>();
-            this.fakeLogger = A.Fake<ILogger<FileShareServiceCache>>();
-            this.fakeAzureStorageService = A.Fake<ISalesCatalogueStorageService>();
-            this.fakeCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
-            this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
+            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
+            fakeAzureTableStorageClient = A.Fake<IAzureTableStorageClient>();
+            fakeLogger = A.Fake<ILogger<FileShareServiceCache>>();
+            fakeAzureStorageService = A.Fake<ISalesCatalogueStorageService>();
+            fakeCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
+            fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             fakeCacheConfiguration.Value.CacheStorageAccountKey = "testaccountkey";
             fakeCacheConfiguration.Value.CacheStorageAccountName = "testessstorage";
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
@@ -112,16 +112,26 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
         }
 
-        [Test]
-        public async Task WhenGetNonCacheProductDataForFssReturnProductList()
+        private FssResponseCache GetResponseCache()
         {
-            string exchangeSetRootPath = @"C:\\HOME";
-            var cachingResponse = new FssResponseCache() { BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", PartitionKey = "DE416050", RowKey = "2|0", Response = JsonConvert.SerializeObject(GetBatchDetail()) };
+            return new FssResponseCache()
+            {
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+                PartitionKey = "DE416050",
+                RowKey = "2|0",
+                Response = JsonConvert.SerializeObject(GetBatchDetail())
+            };
+        }
+        [Test]
+        public async Task WhenGetNonCacheProductDataForFssReturnsProductListFound()
+        {
+            string exchangeSetRootPath = @"C:\\HOME";          
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveAsync<FssResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveAsync<FssResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
+
             var response = await fileShareServiceCache.GetNonCacheProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
             Assert.IsNotNull(response);
@@ -129,7 +139,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenGetNonCacheProductDataForFssReturnProductListNotFound()
+        public async Task WhenGetNonCacheProductDataForFssReturnsProductListNotFound()
         {
             var cachingResponse = new FssResponseCache() { };
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
@@ -141,31 +151,22 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.IsInstanceOf(typeof(List<Products>), response);
         }
 
-        ////////////[Test]
-        ////////////public async Task WhenCopyFileToBlobReturnsUploadBlobTrue()
-        ////////////{
-        ////////////    string fakeBatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc";
-        ////////////    byte[] byteContent = new byte[100];
-        ////////////    Stream fakeStream = new MemoryStream(byteContent);
-        ////////////    string fakeFileName = "DE41650.000";
-        ////////////    CloudBlockBlob clb = new CloudBlockBlob(new System.Uri("http://tempuri.org/blob"));
-        ////////////    clb.ExistsAsync()
-        ////////////    A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-        ////////////    A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(clb);
-        ////////////    A.CallTo(() => fakeAzureTableStorageClient.)
-        ////////////    await fileShareServiceCache.CopyFileToBlob(fakeStream, fakeFileName, fakeBatchId);
-        ////////////    ////// Assert.IsTrue();
-        ////////////    Assert.IsTrue(true);
-        ////////////}
+        [Test]
+        public void WhenGetNonCacheProductDataForFssReturnsCancellation()
+        {
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareServiceCache.GetNonCacheProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), string.Empty, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken));
+        }       
 
         [Test]
         public async Task WhenInsertOrMergeFssCacheDetailReturnsTrue()
-        {
-
-            var cachingResponse = new FssResponseCache() { BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", PartitionKey = "DE416050", RowKey = "2|0", Response = JsonConvert.SerializeObject(GetBatchDetail()) };
+        {            
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
-            await fileShareServiceCache.InsertOrMergeFssCacheDetail(cachingResponse);
+            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+            await fileShareServiceCache.InsertOrMergeFssCacheDetail(GetResponseCache());
 
             Assert.IsNotNull(true);
         }
