@@ -146,6 +146,8 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"   = module.fulfilment_storage.medium_exchange_set_primary_access_key
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"   = module.fulfilment_storage.large_exchange_set_name
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
+        "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
+        "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
@@ -175,6 +177,8 @@ module "fulfilment_keyvaults" {
     "ESSFulfilmentStorageConfiguration--StorageAccountName"     = module.fulfilment_storage.small_exchange_set_name
     "ESSFulfilmentStorageConfiguration--StorageAccountKey"      = module.fulfilment_storage.small_exchange_set_primary_access_key
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.small_exchange_set_connection_string
+    "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
+    "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
   }
   medium_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
@@ -182,6 +186,8 @@ module "fulfilment_keyvaults" {
     "ESSFulfilmentStorageConfiguration--StorageAccountName"     = module.fulfilment_storage.medium_exchange_set_name
     "ESSFulfilmentStorageConfiguration--StorageAccountKey"      = module.fulfilment_storage.medium_exchange_set_primary_access_key
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.medium_exchange_set_connection_string
+    "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
+    "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
   }
   large_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
@@ -189,6 +195,8 @@ module "fulfilment_keyvaults" {
     "ESSFulfilmentStorageConfiguration--StorageAccountName"     = module.fulfilment_storage.large_exchange_set_name
     "ESSFulfilmentStorageConfiguration--StorageAccountKey"      = module.fulfilment_storage.large_exchange_set_primary_access_key
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.large_exchange_set_connection_string
+    "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
+    "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
   }
   tags                                      = local.tags
 }
@@ -200,4 +208,19 @@ module "azure-dashboard" {
   environment    = local.env_name
   resource_group = azurerm_resource_group.rg
   tags           = local.tags
+}
+module "cache_storage" {
+  source                                = "./Modules/CacheStorage"
+  resource_group_name                   = azurerm_resource_group.rg.name
+  allowed_ips                           = var.allowed_ips
+  location                              = var.location
+  tags                                  = local.tags
+  small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
+  medium_exchange_set_subnets           = data.azurerm_subnet.medium_exchange_set_subnet[*].id
+  large_exchange_set_subnets            = data.azurerm_subnet.large_exchange_set_subnet[*].id
+  m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
+  agent_subnet                          = data.azurerm_subnet.agent_subnet.id
+  exchange_set_config                   = local.config_data.ESSFulfilmentConfiguration
+  env_name                              = local.env_name
+  service_name                          = local.service_name
 }
