@@ -2,9 +2,8 @@
 using System;
 using UKHO.ExchangeSetService.Common.Extensions;
 
-namespace UKHO.ExchangeSetService.API.UnitTests.Extensions
+namespace UKHO.ExchangeSetService.Common.UnitTests.Extensions
 {
-    [TestFixture]
     public class DateTimeExtensionsTest
     {
         [Test]

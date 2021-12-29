@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Configuration;
-using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
