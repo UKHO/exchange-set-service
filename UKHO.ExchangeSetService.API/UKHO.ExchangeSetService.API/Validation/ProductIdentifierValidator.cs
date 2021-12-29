@@ -3,7 +3,7 @@ using FluentValidation.Results;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using UKHO.ExchangeSetService.API.Extensions;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation

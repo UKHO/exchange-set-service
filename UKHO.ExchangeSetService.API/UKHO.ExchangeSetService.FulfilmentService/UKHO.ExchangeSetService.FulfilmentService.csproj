@@ -6,8 +6,8 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	</PropertyGroup>
-	<ItemGroup>
+	</PropertyGroup> 
+  <ItemGroup>
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.local.overrides.json" />
 	</ItemGroup>
@@ -54,7 +54,6 @@
     </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.csproj" />
 		<ProjectReference Include="..\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj" />
 	</ItemGroup>
 

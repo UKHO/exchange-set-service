@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UKHO.ExchangeSetService.API.Extensions
+namespace UKHO.ExchangeSetService.Common.Extensions
 {
     public static class CallbackUriExtensions
     {
