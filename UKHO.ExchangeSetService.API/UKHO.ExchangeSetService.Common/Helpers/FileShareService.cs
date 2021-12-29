@@ -285,6 +285,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
             {
                 matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
+                item.IgnoreCache = true;
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
                 await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
@@ -425,7 +426,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
 
             }
-            if (fssCacheConfiguration.Value.IsFssCacheEnabled && !(entry.IsCached && entry.IgnoreCache))
+            if (fssCacheConfiguration.Value.IsFssCacheEnabled && !entry.IgnoreCache && !entry.IsCached)
             {
                 var productName = entry.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
                 var editionNumber = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
