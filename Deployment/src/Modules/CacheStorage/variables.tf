@@ -17,10 +17,6 @@ variable "allowed_ips" {
 
 }
 
-variable "exchange_set_config"{
-
-}
-
 variable "service_name" {
   type = string
 }
