@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             CreateFileCopyIsCalled = true;
         }
 
-        public byte[] ReadFully(Stream input)
+        public byte[] ConvertStreamToByteArray(Stream input)
         {
             byte[] byteContent = new byte[100];
             return byteContent;

@@ -138,7 +138,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return secondLine ?? string.Empty;
         }
 
-        public byte[] ReadFully(Stream input)
+        public byte[] ConvertStreamToByteArray(Stream input)
         {
             byte[] buffer = new byte[16 * 1024];
             using (MemoryStream ms = new MemoryStream())

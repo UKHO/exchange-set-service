@@ -2,7 +2,7 @@
 
 namespace UKHO.ExchangeSetService.Common.Models.AzureTableEntities
 {
-    public class FssResponseCache : TableEntity
+    public class FssSearchResponseCache : TableEntity
     {
         public string BatchId { get; set; }
         public string Response { get; set; }

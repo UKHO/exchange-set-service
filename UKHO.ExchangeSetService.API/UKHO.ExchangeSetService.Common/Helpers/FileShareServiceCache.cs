@@ -71,11 +71,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     if (!productList.Contains(compareProducts))
                     {
                         var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-                        var cacheInfo = (FssResponseCache)await azureTableStorageClient.RetrieveAsync<FssResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+                        var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
-                            internalBatchDetail = await CheckIfCacheProductsExistsinBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
-                            logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted.ToEventId(), "File share service download request from cache container completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
+                            internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
                             internalSearchBatchResponse.Entries.Add(internalBatchDetail);
                             productList.Add(compareProducts);
                         }
@@ -94,7 +93,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return internalProductsNotFound;
         }
 
-        private async Task<BatchDetail> CheckIfCacheProductsExistsinBlob(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, string storageConnectionString, FssResponseCache cacheInfo)
+        private async Task<BatchDetail> CheckIfCacheProductsExistsInBlob(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, string storageConnectionString, FssSearchResponseCache cacheInfo)
         {
             BatchDetail internalBatchDetail;
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
@@ -116,7 +115,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 updateNumbers.Add(itemUpdateNumber.Value);
                 internalBatchDetail.IsCached = internalBatchDetail.IgnoreCache = true;
             }
-
+            logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted.ToEventId(), "File share service download request from cache container completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
             return internalBatchDetail;
         }
 
@@ -131,10 +130,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public async Task InsertOrMergeFssCacheDetail(FssResponseCache fssResponseCache)
+        public async Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache)
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            await azureTableStorageClient.InsertOrMergeAsync(fssResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+            await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
         }
     }
 }

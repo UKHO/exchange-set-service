@@ -12,6 +12,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         Task<List<Products>> GetNonCacheProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken);
         Task CopyFileToBlob(Stream stream, string fileName, string batchId);
-        Task InsertOrMergeFssCacheDetail(FssResponseCache fssResponseCache);
+        Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache);
     }
 }

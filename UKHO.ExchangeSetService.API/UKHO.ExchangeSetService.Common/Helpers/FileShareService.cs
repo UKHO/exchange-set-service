@@ -432,7 +432,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var editionNumber = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
                 var updateNumber = entry.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
 
-                var fssResponseCache = new FssResponseCache
+                var fssSearchResponseCache = new FssSearchResponseCache
                 {
                     BatchId = entry.BatchId,
                     PartitionKey = productName,
@@ -440,7 +440,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     Response = JsonConvert.SerializeObject(entry)
                 };
                 logger.LogInformation(EventIds.FileShareServiceSearchResponseStoreToCacheStart.ToEventId(), "File share service search response insert/merge request in azure table for cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
-                await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssResponseCache);
+                await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
                 logger.LogInformation(EventIds.FileShareServiceSearchResponseStoreToCacheCompleted.ToEventId(), "File share service search response insert/merge request in azure table for cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
             }
             return result;
@@ -448,7 +448,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task CopyFileToFolder(HttpResponseMessage httpResponse, string path, string fileName, BatchDetail entry, SalesCatalogueServiceResponseQueueMessage queueMessage)
         {
-            byte[] bytes = fileSystemHelper.ReadFully(await httpResponse.Content.ReadAsStreamAsync());
+            byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
             fileSystemHelper.CreateFileCopy(path, new MemoryStream(bytes));
             if (!entry.IgnoreCache && fssCacheConfiguration.Value.IsFssCacheEnabled)
             {

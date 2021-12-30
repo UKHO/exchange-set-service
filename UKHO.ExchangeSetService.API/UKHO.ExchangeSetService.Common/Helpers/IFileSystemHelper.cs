@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         byte[] ReadAllBytes(string filePath);
         bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite);
         void CreateFileCopy(string filePath, Stream stream);
-        byte[] ReadFully(Stream input);
+        byte[] ConvertStreamToByteArray(Stream input);
         Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
     }
 }

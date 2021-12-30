@@ -6,8 +6,8 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	</PropertyGroup>
-	<ItemGroup>
+	</PropertyGroup> 
+  <ItemGroup>
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.local.overrides.json" />
 	</ItemGroup>
