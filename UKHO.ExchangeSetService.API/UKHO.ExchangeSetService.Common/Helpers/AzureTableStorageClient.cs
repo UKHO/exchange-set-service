@@ -12,18 +12,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var retrieveOperation = TableOperation.Retrieve<TElement>(partitionKey, rowKey);
             return await ExecuteTableOperation(retrieveOperation, tableName, storageAccountConnectionString) as ITableEntity;
         }
+
         public async Task<ITableEntity> InsertOrMergeIntoTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString)
         {
             var insertOrMergeOperation = TableOperation.InsertOrMerge(entity);
             return await ExecuteTableOperation(insertOrMergeOperation, tableName, storageAccountConnectionString) as ITableEntity;
         }
-        public async Task<ITableEntity> DeleteFromTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString)
-        {
-            var deleteOperation = TableOperation.Delete(entity);
-            return await ExecuteTableOperation(deleteOperation, tableName, storageAccountConnectionString) as ITableEntity;
-        }
-
-        public async Task<CloudTable> GetAzureTable(string tableName, string storageAccountConnectionString)
+       
+        private async Task<CloudTable> GetAzureTable(string tableName, string storageAccountConnectionString)
         {
             var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
             var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());

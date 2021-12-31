@@ -45,14 +45,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             fileShareServiceCache = new FileShareServiceCache(fakeAzureBlobStorageClient, fakeAzureTableStorageClient, fakeLogger, fakeAzureStorageService, fakeCacheConfiguration, fakeFileSystemHelper);
         }
+
         private (string, string) GetStorageAccountConnectionStringAndContainerName()
         {
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessstorage; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
             string containerName = "testContainer";
             return (storageAccountConnectionString, containerName);
         }
-
-        #region GetProductDetails
+     
         private List<Products> GetProductdetails()
         {
             return new List<Products> {
@@ -63,8 +63,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 FileSize = 400
                             }
                         };
-        }
-        #endregion
+        }    
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
@@ -122,8 +121,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Response = JsonConvert.SerializeObject(GetBatchDetail())
             };
         }
+
         [Test]
-        public async Task WhenGetNonCacheProductDataForFssIsCalled_ThenReturnProductNotFound()
+        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFound()
         {
             string exchangeSetRootPath = @"C:\\HOME";          
 
@@ -132,32 +132,32 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
 
-            var response = await fileShareServiceCache.GetNonCacheProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
+            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
             
             Assert.AreEqual(0, response.Count);          
         }
 
         [Test]
-        public async Task WhenGetNonCacheProductDataForFssIsCalled_ThenReturnProductFound()
+        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductFound()
         {
             var cachingResponse = new FssSearchResponseCache() { };
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
 
-            var response = await fileShareServiceCache.GetNonCacheProductDataForFss(GetProductdetails(), null, string.Empty, GetScsResponseQueueMessage(), null, CancellationToken.None);
+            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), null, string.Empty, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
             Assert.IsNotNull(response);
             Assert.AreEqual(1, response.Count);           
         }
 
         [Test]
-        public void WhenCancellationRequestedInGetNonCacheProductDataForFss_ThenThrowOperationCanceledException()
+        public void WhenCancellationRequestedInGetNonCachedProductDataForFss_ThenThrowOperationCanceledException()
         {
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
             
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareServiceCache.GetNonCacheProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), string.Empty, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken));
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), string.Empty, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken));
         }       
 
         [Test]

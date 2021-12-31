@@ -266,7 +266,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public void WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsFulfilmentException()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCacheProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
@@ -295,7 +295,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCacheProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri,CancellationToken cancellationToken, string correlationId) =>
                {
@@ -345,7 +345,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCacheProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -428,7 +428,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 FileSize = 400,
                                 Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
                             });
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCacheProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(productList);
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(productList);
             var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
 
             Assert.IsNotNull(response);
@@ -478,7 +478,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCacheProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -573,7 +573,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public void WhenIsCancellationRequestedinGetBatchInfoBasedOnProducts_ThenThrowCancelledException()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCacheProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
                  {

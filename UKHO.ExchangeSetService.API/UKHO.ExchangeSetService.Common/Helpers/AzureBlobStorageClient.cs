@@ -21,6 +21,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
             return cloudBlockBlob;
         }
+
         public CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString)
         {
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
@@ -31,10 +32,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             await cloudBlockBlob.UploadFromStreamAsync(ms);
         }
+
         public async Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob)
         {
              return await cloudBlockBlob.DownloadTextAsync();
         }
+
         public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)
         {
             BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
