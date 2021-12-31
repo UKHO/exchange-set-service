@@ -93,8 +93,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         public byte[] ReadAllBytes(string filePath)
-        {            
-            return File.ReadAllBytes(filePath);            
+        {
+            return File.ReadAllBytes(filePath);
         }
 
         public bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite)
@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public void CreateFileCopy(string filePath, Stream stream)
         {
-            if(stream != null)
+            if (stream != null)
             {
                 using (var outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
                 {
@@ -152,9 +152,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-         public async Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
+        public async Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
         {
             await cloudBlockBlob.DownloadToFileAsync(path, FileMode.Create);
-        } 
+        }
     }
 }

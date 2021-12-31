@@ -41,6 +41,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
         }
+
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             var internalProductsNotFound = new List<Products>();
