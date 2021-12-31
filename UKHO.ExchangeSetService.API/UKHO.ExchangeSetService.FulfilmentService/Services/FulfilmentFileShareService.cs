@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -87,22 +86,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 return fulFilmentDataResponse;
             }
             return null;
-        }
-
-        public async Task DownloadFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<FulfilmentDataResponse> fulfilmentDataResponse, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
-        {
-            foreach (var item in fulfilmentDataResponse)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while downloading ENC file for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. CancellationToken:{cancellationTokenSource.Token}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
-                    throw new OperationCanceledException();
-                }
-                logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesStart.ToEventId(), "Started file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.BatchId, message.CorrelationId);
-                var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, Convert.ToString(item.EditionNumber), Convert.ToString(item.UpdateNumber));
-                await fileShareService.DownloadBatchFiles(item.FileUri, downloadPath, message, cancellationTokenSource, cancellationToken);
-                logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesCompleted.ToEventId(), "Completed file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, item.UpdateNumber, item.FileUri, message.BatchId, message.CorrelationId);
-            }
         }
 
         public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)

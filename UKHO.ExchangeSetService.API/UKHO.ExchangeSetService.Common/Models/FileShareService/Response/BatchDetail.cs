@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
 {
@@ -18,5 +19,11 @@ namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
         public DateTime? ExpiryDate { get; set; }
 
         public IEnumerable<BatchFile> Files { get; set; }
+       
+        [JsonIgnore]
+        public bool IsCached { get; set; }
+        
+        [JsonIgnore]
+        public bool IgnoreCache { get; set; }
     }
 }

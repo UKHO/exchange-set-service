@@ -128,6 +128,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  var buildServiceProvider = services.BuildServiceProvider();
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
+                 services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
                  services.Configure<SalesCatalogueConfiguration>(ConfigurationBuilder.GetSection("SalesCatalogue"));
          
@@ -138,6 +139,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
+                 services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
+                 services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
+
 
                  var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);

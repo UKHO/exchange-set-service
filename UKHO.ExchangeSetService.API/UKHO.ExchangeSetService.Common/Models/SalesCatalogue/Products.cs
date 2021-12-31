@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
 {
@@ -10,5 +11,7 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public List<Dates> Dates { get; set; }
         public Cancellation Cancellation { get; set; }
         public int? FileSize { get; set; }
+        [JsonIgnore]
+        public bool IgnoreCache { get; set; }
     }    
 }

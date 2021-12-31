@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.WindowsAzure.Storage.Blob;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
@@ -72,6 +74,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void CreateFileCopy(string filePath, Stream stream)
         {
             CreateFileCopyIsCalled = true;
+        }
+
+        public byte[] ConvertStreamToByteArray(Stream input)
+        {
+            byte[] byteContent = new byte[100];
+            return byteContent;
+        }
+
+        public Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

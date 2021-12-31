@@ -108,6 +108,7 @@ namespace UKHO.ExchangeSetService.API
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("ESSFulfilmentConfiguration"));
+            services.Configure<CacheConfiguration>(configuration.GetSection("CacheConfiguration"));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
             services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
@@ -116,6 +117,8 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
             services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
             services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
+            services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
+            services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddApplicationInsightsTelemetry();
 

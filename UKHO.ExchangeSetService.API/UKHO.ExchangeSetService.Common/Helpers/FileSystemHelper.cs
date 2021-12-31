@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Blob;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -91,8 +93,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         public byte[] ReadAllBytes(string filePath)
-        {            
-            return File.ReadAllBytes(filePath);            
+        {
+            return File.ReadAllBytes(filePath);
         }
 
         public bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite)
@@ -114,7 +116,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public void CreateFileCopy(string filePath, Stream stream)
         {
-            if(stream != null)
+            if (stream != null)
             {
                 using (var outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
                 {
@@ -134,6 +136,25 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 secondLine = sr.ReadLine();
             }
             return secondLine ?? string.Empty;
+        }
+
+        public byte[] ConvertStreamToByteArray(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
+        }
+
+        public async Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
+        {
+            await cloudBlockBlob.DownloadToFileAsync(path, FileMode.Create);
         }
     }
 }

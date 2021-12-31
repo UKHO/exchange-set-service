@@ -12,14 +12,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     [ExcludeFromCodeCoverage]
     public class AzureBlobStorageClient : IAzureBlobStorageClient
     {
-        public CloudBlockBlob GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
+        public async Task<CloudBlockBlob> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
         {
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
             CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
             CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
+            await cloudBlobContainer.CreateIfNotExistsAsync();
             CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
             return cloudBlockBlob;
         }
+
         public CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString)
         {
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
@@ -30,10 +32,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             await cloudBlockBlob.UploadFromStreamAsync(ms);
         }
+
         public async Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob)
         {
              return await cloudBlockBlob.DownloadTextAsync();
         }
+
         public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)
         {
             BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);

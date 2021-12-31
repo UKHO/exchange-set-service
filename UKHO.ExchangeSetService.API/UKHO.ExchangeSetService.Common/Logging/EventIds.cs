@@ -524,7 +524,39 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805129 - Completed download of 307 response README files from the file share service.
         /// </summary>
-        DownloadReadmeFile307RedirectResponse = 805129
+        DownloadReadmeFile307RedirectResponse = 805129,
+        /// <summary>
+        /// 805130 - Request for searching ENC files from ESS cache azure table storage is started.
+        /// </summary>
+        FileShareServiceSearchENCFilesFromCacheStart = 805130,
+        /// <summary>
+        /// 805131 - Request for searching ENC files from ESS cache azure table storage is completed.
+        /// </summary>
+        FileShareServiceSearchENCFilesFromCacheCompleted = 805131,
+        /// <summary>
+        /// 805132 - Request for downloading ENC files from ESS cache azure blob container is started.
+        /// </summary>
+        FileShareServiceDownloadENCFilesFromCacheStart = 805132,
+        /// <summary>
+        /// 805133 - Request for downloading ENC files from ESS cache azure blob container is completed.
+        /// </summary>
+        FileShareServiceDownloadENCFilesFromCacheCompleted = 805133,
+        /// <summary>
+        /// 805134 - Request for storing file share service search response in azure table storage is started.
+        /// </summary>
+        FileShareServiceSearchResponseStoreToCacheStart = 805134,
+        /// <summary>
+        /// 805135 - Request for storing file share service search response in azure table storage is completed.
+        /// </summary>
+        FileShareServiceSearchResponseStoreToCacheCompleted = 805135,
+        /// <summary>
+        /// 805136 - Request for uploading ENC files to ESS cache azure blob container is started.
+        /// </summary>
+        FileShareServiceUploadENCFilesToCacheStart = 805136,
+        /// <summary>
+        /// 805137 - Request for uploading ENC files to ESS cache azure blob container is completed.
+        /// </summary>
+        FileShareServiceUploadENCFilesToCacheCompleted = 805137
     }
 
     public static class EventIdExtensions

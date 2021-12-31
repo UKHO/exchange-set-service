@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             string storageAccountConnectionString =
                   scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
-            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
+            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
 
             await UploadSalesCatalogueServiceResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
