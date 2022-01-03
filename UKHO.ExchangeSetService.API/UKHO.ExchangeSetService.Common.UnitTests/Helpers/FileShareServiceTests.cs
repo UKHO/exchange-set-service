@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             this.fakeFileShareServiceCache = A.Fake<IFileShareServiceCache>();
             this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
-            this.fakeCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
+            this.fakeCacheConfiguration = Options.Create(new CacheConfiguration { CacheStorageAccountKey = "key", CacheStorageAccountName = "cache", FssSearchCacheTableName = "AnyName", IsFssCacheEnabled = true });
 
             fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeCacheConfiguration, fakeFileSystemHelper, fakeMonitorHelper);
         }
@@ -512,6 +512,38 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var batchDetail = GetSearchBatchResponse();
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,A<CancellationToken>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage()
+                 {
+                     StatusCode = HttpStatusCode.OK,
+                     RequestMessage = new HttpRequestMessage()
+                     {
+                         RequestUri = new Uri("http://test.com")
+                     },
+                     Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Received Fulfilment Data Successfully!!!!")))
+                 });
+
+            var response = await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(bool), response);
+        }
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProductsReturns200_ThenDownloadBatchFilesToCache()
+        {
+            var batchDetail = GetSearchBatchResponse();
+            batchDetail.Entries.Add(new BatchDetail
+            {
+                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dj",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416051" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+            });
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
                  {
                      StatusCode = HttpStatusCode.OK,

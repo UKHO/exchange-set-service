@@ -45,9 +45,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             var internalProductsNotFound = new List<Products>();
-            Products internalProductItemNotFound;
-            BatchDetail internalBatchDetail;
-            List<string> productList = new List<string>();
 
             foreach (var item in products)
             {
@@ -56,26 +53,27 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumbers:[{UpdateNumbers}]. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, string.Join(",", item?.UpdateNumbers.Select(a => a.Value.ToString())), queueMessage.BatchId, queueMessage.CorrelationId);
                     throw new OperationCanceledException();
                 }
-                internalProductItemNotFound = new Products
+                var internalProductItemNotFound = new Products
                 {
                     Cancellation = item.Cancellation,
                     Dates = item.Dates,
                     EditionNumber = item.EditionNumber,
                     FileSize = item.FileSize,
-                    ProductName = item.ProductName
+                    ProductName = item.ProductName,
+                    UpdateNumbers = new List<int?>()
                 };
-                internalProductItemNotFound.UpdateNumbers = new List<int?>();
                 List<int?> updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
                 {
                     var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}";
+                    var productList = new List<string>();
                     if (!productList.Contains(compareProducts))
                     {
                         var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
                         var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
-                            internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
+                            var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
                             internalSearchBatchResponse.Entries.Add(internalBatchDetail);
                             productList.Add(compareProducts);
                         }
@@ -96,9 +94,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task<BatchDetail> CheckIfCacheProductsExistsInBlob(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, string storageConnectionString, FssSearchResponseCache cacheInfo)
         {
-            BatchDetail internalBatchDetail;
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
-            internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
+            var internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
             var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
             logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheStart.ToEventId(), "File share service download request from cache container started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
@@ -114,7 +111,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
                 }
                 updateNumbers.Add(itemUpdateNumber.Value);
-                internalBatchDetail.IsCached = internalBatchDetail.IgnoreCache = true;
+                internalBatchDetail.IgnoreCache = true;
             }
             logger.LogInformation(EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted.ToEventId(), "File share service download request from cache container completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
             return internalBatchDetail;
