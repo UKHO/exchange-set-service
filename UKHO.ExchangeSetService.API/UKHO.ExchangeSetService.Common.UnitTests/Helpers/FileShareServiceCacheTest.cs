@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -28,6 +29,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IOptions<CacheConfiguration> fakeCacheConfiguration;
         private IFileSystemHelper fakeFileSystemHelper;
         private IFileShareServiceCache fileShareServiceCache;
+        ////private CloudBlob fakeCloudBlob;
 
         [SetUp]
         public void Setup()
@@ -42,6 +44,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeCacheConfiguration.Value.CacheStorageAccountName = "testessstorage";
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
             fakeCacheConfiguration.Value.IsFssCacheEnabled = true;
+            ////fakeCloudBlob = A.Fake<CloudBlob>();
 
             fileShareServiceCache = new FileShareServiceCache(fakeAzureBlobStorageClient, fakeAzureTableStorageClient, fakeLogger, fakeAzureStorageService, fakeCacheConfiguration, fakeFileSystemHelper);
         }
@@ -148,6 +151,19 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.IsNotNull(response);
             Assert.AreEqual(1, response.Count);           
+        }
+
+        [Test]
+        public async Task WhenCopyFileToBlobForCacheIsCalled_ThenReturnVoid()
+        {
+            var _cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(_cloudBlob);
+            A.CallTo(() => _cloudBlob.ExistsAsync()).Returns(false);
+
+            await fileShareServiceCache.CopyFileToBlob(new MemoryStream(), string.Empty, string.Empty);
+
+            Assert.IsNotNull(true);
         }
 
         [Test]
