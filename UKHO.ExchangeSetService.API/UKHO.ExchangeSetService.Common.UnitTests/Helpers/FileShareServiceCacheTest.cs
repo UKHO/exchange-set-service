@@ -29,7 +29,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IOptions<CacheConfiguration> fakeCacheConfiguration;
         private IFileSystemHelper fakeFileSystemHelper;
         private IFileShareServiceCache fileShareServiceCache;
-        ////private CloudBlob fakeCloudBlob;
 
         [SetUp]
         public void Setup()
@@ -44,7 +43,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeCacheConfiguration.Value.CacheStorageAccountName = "testessstorage";
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
             fakeCacheConfiguration.Value.IsFssCacheEnabled = true;
-            ////fakeCloudBlob = A.Fake<CloudBlob>();
 
             fileShareServiceCache = new FileShareServiceCache(fakeAzureBlobStorageClient, fakeAzureTableStorageClient, fakeLogger, fakeAzureStorageService, fakeCacheConfiguration, fakeFileSystemHelper);
         }
