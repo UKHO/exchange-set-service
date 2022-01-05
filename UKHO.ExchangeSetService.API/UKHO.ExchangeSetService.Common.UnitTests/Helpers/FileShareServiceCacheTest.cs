@@ -152,12 +152,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenCopyFileToBlobForCacheIsCalled_ThenReturnVoid()
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task WhenCopyFileToBlobForCacheIsCalled_ThenReturnVoid(bool state)
         {
             var _cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(_cloudBlob);
-            A.CallTo(() => _cloudBlob.ExistsAsync()).Returns(false);
+            A.CallTo(() => _cloudBlob.ExistsAsync()).Returns(state);
 
             await fileShareServiceCache.CopyFileToBlob(new MemoryStream(), string.Empty, string.Empty);
 
