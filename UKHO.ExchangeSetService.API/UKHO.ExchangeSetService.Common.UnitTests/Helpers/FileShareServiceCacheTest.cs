@@ -166,6 +166,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             await fileShareServiceCache.CopyFileToBlob(stream, fileName, batchId);
             A.CallTo(() => cloudBlob.UploadFromStreamAsync(stream)).MustHaveHappenedOnceExactly();
         }
+
         [Test]
         public async Task WhenFileExistsInBlob_ThenCopyFileToBlobDoesNothing()
         {
