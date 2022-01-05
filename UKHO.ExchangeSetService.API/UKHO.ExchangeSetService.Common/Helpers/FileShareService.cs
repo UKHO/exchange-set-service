@@ -407,7 +407,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var serverValue = httpResponse.Headers.Server.ToString().Split('/').First();
                     fileSystemHelper.CheckAndCreateFolder(downloadPath);
                     string path = Path.Combine(downloadPath, fileName);
-                    if (!File.Exists(path))
+                    if (!fileSystemHelper.CheckFileExists(path))
                     {
                         await CopyFileToFolder(httpResponse, path, fileName, entry, queueMessage);                        
                         result = true;
@@ -426,7 +426,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
 
             }
-            if (fssCacheConfiguration.Value.IsFssCacheEnabled && !entry.IgnoreCache && !entry.IsCached)
+            if (fssCacheConfiguration.Value.IsFssCacheEnabled && !entry.IgnoreCache)
             {
                 var productName = entry.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
                 var editionNumber = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
