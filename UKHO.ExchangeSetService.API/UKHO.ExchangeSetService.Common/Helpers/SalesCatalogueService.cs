@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -31,68 +32,84 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.salesCatalogueClient = salesCatalogueClient;
         }
 
-        public async Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime, string correlationId)
+        public Task<SalesCatalogueResponse> GetProductsFromSpecificDateAsync(string sinceDateTime, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestStart.ToEventId(), "Get sales catalogue service from specific date time started for _X-Correlation-ID:{CorrelationId}", correlationId);
+            return logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.SCSGetProductsFromSpecificDateRequestStart, 
+                EventIds.SCSGetProductsFromSpecificDateRequestCompleted, 
+                "Get sales catalogue service from specific date time for _X-Correlation-ID:{CorrelationId}",
+                async () =>  {
+                    var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+                    var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
 
-            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
-            var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
+                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
 
-            var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
-
-            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
-
-            logger.LogInformation(EventIds.SCSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Get sales catalogue service from specific date time completed for _X-Correlation-ID:{CorrelationId}", correlationId);
-            return response;
+                    SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+                    return response;
+                },
+                correlationId);
         }
 
-        public async Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers, string correlationId)
+        public Task<SalesCatalogueResponse> PostProductIdentifiersAsync(List<string> productIdentifiers, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestStart.ToEventId(), "Post sales catalogue service for ProductIdentifiers Started for _X-Correlation-ID:{CorrelationId}", correlationId);
+            return logger.LogStartEndAndElapsedTime(EventIds.SCSPostProductIdentifiersRequestStart, 
+                EventIds.SCSPostProductIdentifiersRequestCompleted,
+                "Post sales catalogue service for ProductIdentifiers for _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
 
-            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
-            var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productIdentifiers";
+                    var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+                    var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productIdentifiers";
 
-            string payloadJson = JsonConvert.SerializeObject(productIdentifiers);
+                    string payloadJson = JsonConvert.SerializeObject(productIdentifiers);
 
-            var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
+                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
-            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
-
-            logger.LogInformation(EventIds.SCSPostProductIdentifiersRequestCompleted.ToEventId(), "Post sales catalogue service for ProductIdentifiers completed for _X-Correlation-ID:{CorrelationId}", correlationId);
-            return response;
+                    var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+                    
+                    return response;
+                },
+                correlationId);
         }
 
-        public async Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions, string correlationId)
+        public Task<SalesCatalogueResponse> PostProductVersionsAsync(List<ProductVersionRequest> productVersions,
+            string correlationId)
         {
-            logger.LogInformation(EventIds.SCSPostProductVersionsRequestStart.ToEventId(), "Post sales catalogue service for ProductVersions started for _X-Correlation-ID:{CorrelationId}", correlationId);
+            return logger.LogStartEndAndElapsedTime(EventIds.SCSPostProductVersionsRequestStart,
+                EventIds.SCSPostProductVersionsRequestCompleted,
+                "Post sales catalogue service for ProductVersions for _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
 
-            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
-            var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productVersions";
+                    var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+                    var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productVersions";
 
-            string payloadJson = JsonConvert.SerializeObject(productVersions);
+                    string payloadJson = JsonConvert.SerializeObject(productVersions);
 
-            var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
+                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
-            SalesCatalogueResponse response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
-
-            logger.LogInformation(EventIds.SCSPostProductVersionsRequestCompleted.ToEventId(), "Post sales catalogue service for ProductVersions completed for _X-Correlation-ID:{CorrelationId}", correlationId);
-            return response;
+                    var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+                    
+                    return response;
+                },
+                correlationId);
         }
 
-        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId)
+        public Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId)
         {
-            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestStart.ToEventId(), "Get sales catalogue service for CatalogueData started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            return logger.LogStartEndAndElapsedTime(EventIds.SCSGetSalesCatalogueDataRequestStart,
+                EventIds.SCSGetSalesCatalogueDataRequestCompleted,
+                "Get sales catalogue service for CatalogueData for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+                    var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
 
-            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
-            var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
+                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId);
 
-            var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId);
-
-            SalesCatalogueDataResponse response = await CreateSalesCatalogueDataResponse(httpResponse, batchId, correlationId);
-
-            logger.LogInformation(EventIds.SCSGetSalesCatalogueDataRequestCompleted.ToEventId(), "Get sales catalogue service for CatalogueData completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-            return response;
+                    var response = await CreateSalesCatalogueDataResponse(httpResponse, batchId, correlationId);
+                    return response;
+                }, batchId, correlationId);
         }
 
         private async Task<SalesCatalogueResponse> CreateSalesCatalogueServiceResponse(HttpResponseMessage httpResponse, string correlationId)
