@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Enums;
@@ -133,36 +134,39 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
                 int queryCount = 0;
 
-                logger.LogInformation(EventIds.FileShareServiceSearchDownloadForENCFilesStart.ToEventId(), "Started file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, message.BatchId, message.CorrelationId);
-
-                do
+                return await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchDownloadForENCFilesStart,
+                EventIds.FileShareServiceSearchDownloadForENCFilesCompleted,
+                "File share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
                 {
-                    queryCount++;
-                    if (cancellationToken.IsCancellationRequested)
+                    do
                     {
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files with cancellationToken:{cancellationTokenSource.Token} and uri:{Uri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), uri, message.BatchId, message.CorrelationId);
-                        throw new OperationCanceledException();
-                    }
-                    httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, message.CorrelationId);
+                        queryCount++;
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files with cancellationToken:{cancellationTokenSource.Token} and uri:{Uri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), uri, message.BatchId, message.CorrelationId);
+                            throw new OperationCanceledException();
+                        }
+                        httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, message.CorrelationId);
 
-                    if (httpResponse.IsSuccessStatusCode)
-                    {
-                        uri = await SelectLatestPublishedDateBatch(cacheProductsNotFound, internalSearchBatchResponse, uri, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
-                    }
-                    else
-                    {
-                        cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while searching ENC files with cancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
-                        throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
-                    }
+                        if (httpResponse.IsSuccessStatusCode)
+                        {
+                            uri = await SelectLatestPublishedDateBatch(cacheProductsNotFound, internalSearchBatchResponse, uri, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                        }
+                        else
+                        {
+                            cancellationTokenSource.Cancel();
+                            logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
+                            logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while searching ENC files with cancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
+                            throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
+                        }
 
-                } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
-                internalSearchBatchResponse.QueryCount = queryCount;
-                CheckProductsExistsInFileShareService(products, message.CorrelationId, message.BatchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
-
-                logger.LogInformation(EventIds.FileShareServiceSearchDownloadForENCFilesCompleted.ToEventId(), "Completed file share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productWithAttributes.Item2, message.BatchId, message.CorrelationId);
-            }            
+                    } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+                    internalSearchBatchResponse.QueryCount = queryCount;
+                    CheckProductsExistsInFileShareService(products, message.CorrelationId, message.BatchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
+                    return internalSearchBatchResponse;
+                }, productWithAttributes.Item2, message.BatchId, message.CorrelationId);
+            }
             return internalSearchBatchResponse;
         }
 
@@ -292,15 +296,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        private async Task PerformBatchFileDownload(BatchDetail item, Products productItem, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        private Task PerformBatchFileDownload(BatchDetail item, Products productItem, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             var productName = productItem.ProductName;
             var editionNumber = Convert.ToString(productItem.EditionNumber);
             var updateNumber = item.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
-            logger.LogInformation(EventIds.DownloadENCFilesRequestStart.ToEventId(), "File share service download request started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
-            var downloadPath = Path.Combine(exchangeSetRootPath, productName.Substring(0, 2), productName, editionNumber, updateNumber);
-            await DownloadBatchFiles(item, item.Files.Select(a => a.Links.Get.Href).ToList(), downloadPath, message, cancellationTokenSource, cancellationToken);
-            logger.LogInformation(EventIds.DownloadENCFilesRequestCompleted.ToEventId(), "File share service download request completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
+            return logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadENCFilesRequestStart, EventIds.DownloadENCFilesRequestCompleted,
+                "File share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    var downloadPath = Path.Combine(exchangeSetRootPath, productName.Substring(0, 2), productName, editionNumber, updateNumber);
+                    return await DownloadBatchFiles(item, item.Files.Select(a => a.Links.Get.Href).ToList(), downloadPath, message, cancellationTokenSource, cancellationToken);
+                }, productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
         }
 
         public bool CheckProductDoesExistInResponseItem(BatchDetail batchDetail, Products product)
@@ -439,9 +446,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     RowKey = $"{editionNumber}|{updateNumber}",
                     Response = JsonConvert.SerializeObject(entry)
                 };
-                logger.LogInformation(EventIds.FileShareServiceSearchResponseStoreToCacheStart.ToEventId(), "File share service search response insert/merge request in azure table for cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
-                await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
-                logger.LogInformation(EventIds.FileShareServiceSearchResponseStoreToCacheCompleted.ToEventId(), "File share service search response insert/merge request in azure table for cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
+                    "File share service search response insert/merge request in azure table for cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () =>
+                    {
+                        await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
+                        return result;
+                    }, productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
             }
             return result;
         }
@@ -452,9 +463,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             fileSystemHelper.CreateFileCopy(path, new MemoryStream(bytes));
             if (!entry.IgnoreCache && fssCacheConfiguration.Value.IsFssCacheEnabled)
             {
-                logger.LogInformation(EventIds.FileShareServiceUploadENCFilesToCacheStart.ToEventId(), "File share service upload ENC file request to cache blob container started for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
-                await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
-                logger.LogInformation(EventIds.FileShareServiceUploadENCFilesToCacheCompleted.ToEventId(), "File share service upload ENC file request to cache blob container completed for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceUploadENCFilesToCacheStart, EventIds.FileShareServiceUploadENCFilesToCacheCompleted,
+                    "File share service upload ENC file request to cache blob container for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () => {
+                        await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
+                        return Task.CompletedTask;
+                    }, entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
             }
         }
 
