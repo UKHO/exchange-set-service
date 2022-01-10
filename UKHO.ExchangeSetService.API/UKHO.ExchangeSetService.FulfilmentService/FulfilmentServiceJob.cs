@@ -53,8 +53,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             try
             {
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
-                    EventIds.CreateExchangeSetRequestCompleted, 
-                    "Create Exchange Set web job started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                    EventIds.CreateExchangeSetRequestCompleted,
+                    "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                     async () => {
                         return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate);
                     },
