@@ -140,9 +140,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
         {
-            logger.LogInformation(EventIds.QueryFileShareServiceReadMeFileRequestStart.ToEventId(), "File share service search query request started for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-            string readMeFilePath = await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
-            logger.LogInformation(EventIds.QueryFileShareServiceReadMeFileRequestCompleted.ToEventId(), "File share service search query request completed for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            string readMeFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
+                  EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
+                  "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () =>
+                  {
+                      return await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
+                  },
+               batchId, correlationId);
 
             if (!string.IsNullOrWhiteSpace(readMeFilePath))
             {
@@ -150,8 +155,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
                    EventIds.DownloadReadMeFileRequestCompleted,
                    "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                   async () => {
-                      return  await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
+                   async () =>
+                   {
+                       return await fulfilmentFileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
                    },
                 batchId, correlationId);
 
@@ -176,11 +182,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             bool isZipFileUploaded = false;
             bool isZipFileCreated = false; 
             DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
-            await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
+            isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
                        EventIds.CreateZipFileRequestCompleted,
                        "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                        async () => {
-                           return isZipFileCreated = await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId);
+                           return await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId);
                        },
                        batchId, correlationId);
 
@@ -188,11 +194,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, createZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
             if (isZipFileCreated)
             {
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
+                 isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
                        EventIds.UploadExchangeSetToFssCompleted,
                        "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                        async () => {
-                           return isZipFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
+                           return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
                        },
                    batchId, correlationId);
             }
@@ -206,11 +212,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
             {
                 DateTime createCatalogFileTaskStartedAt = DateTime.UtcNow;
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
+                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
                         EventIds.CreateCatalogFileRequestCompleted,
                         "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () => {
-                            return isFileCreated = await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
+                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
                         },
                         batchId, correlationId);
 
@@ -228,11 +234,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
             {
                 DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestStart,
+                isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestStart,
                         EventIds.CreateProductFileRequestCompleted,
                         "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () => {
-                            return isProductFileCreated = await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
+                            return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
                         },
                         batchId, correlationId);
 
