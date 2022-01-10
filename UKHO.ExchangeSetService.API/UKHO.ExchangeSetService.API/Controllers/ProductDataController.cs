@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
@@ -63,56 +64,56 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
+        public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
         {
-            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestStart.ToEventId(), "Product Identifiers Endpoint Started  for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-
-            if (productIdentifiers == null || productIdentifiers.Length == 0)
-            {
-                var error = new List<Error>
-                {
-                    new Error()
+            return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
+                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}", 
+                async() => {
+                    if (productIdentifiers == null || productIdentifiers.Length == 0)
                     {
-                        Source = "requestBody",
-                        Description = "Either body is null or malformed."
+                        var error = new List<Error>
+                        {
+                            new Error()
+                            {
+                                Source = "requestBody",
+                                Description = "Either body is null or malformed."
+                            }
+                        };
+                        return BuildBadRequestErrorResponse(error);
                     }
-                };
-                return BuildBadRequestErrorResponse(error);
-            }
-            ProductIdentifierRequest productIdentifierRequest = new ProductIdentifierRequest()
-            {
-                ProductIdentifier = productIdentifiers,
-                CallbackUri = callbackUri,
-                CorrelationId = GetCurrentCorrelationId()
-            };
+                    var productIdentifierRequest = new ProductIdentifierRequest()
+                    {
+                        ProductIdentifier = productIdentifiers,
+                        CallbackUri = callbackUri,
+                        CorrelationId = GetCurrentCorrelationId()
+                    };
 
-            var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
+                    var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
 
-            if (!validationResult.IsValid)
-            {
-                List<Error> errors;
+                    if (!validationResult.IsValid)
+                    {
+                        List<Error> errors;
 
-                if (validationResult.HasBadRequestErrors(out errors))
-                {
-                    return BuildBadRequestErrorResponse(errors);
-                }
-            }
-            AzureAdB2C azureAdB2C = new AzureAdB2C()
-            {
-                AudToken = TokenAudience,
-                IssToken = TokenIssuer
-            };
+                        if (validationResult.HasBadRequestErrors(out errors))
+                        {
+                            return BuildBadRequestErrorResponse(errors);
+                        }
+                    }
+                    var azureAdB2C = new AzureAdB2C()
+                    {
+                        AudToken = TokenAudience,
+                        IssToken = TokenIssuer
+                    };
 
-            var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest, azureAdB2C);
+                    var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest, azureAdB2C);
 
-            if (productDetail.IsExchangeSetTooLarge)
-            {
-                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-                return BuildBadRequestErrorResponseForTooLargeExchangeSet();
-            }
-            Logger.LogInformation(EventIds.ESSPostProductIdentifiersRequestCompleted.ToEventId(), "Product Identifiers Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
-
-            return GetEssResponse(productDetail);
+                    if (productDetail.IsExchangeSetTooLarge)
+                    {
+                        Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+                        return BuildBadRequestErrorResponseForTooLargeExchangeSet();
+                    }
+                    return GetEssResponse(productDetail);
+                }, GetCurrentCorrelationId());
         }
 
         /// <summary>
@@ -143,56 +144,56 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri)
+        public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri)
         {
-            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestStart.ToEventId(), "Product Versions Endpoint Started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-
-            if (productVersionsRequest == null || !productVersionsRequest.Any())
-            {
-                var error = new List<Error>
-                {
-                    new Error()
+            return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
+                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId}",
+                async () => {
+                    if (productVersionsRequest == null || !productVersionsRequest.Any())
                     {
-                        Source = "requestBody",
-                        Description = "Either body is null or malformed."
+                        var error = new List<Error>
+                        {
+                            new Error()
+                            {
+                                Source = "requestBody",
+                                Description = "Either body is null or malformed."
+                            }
+                        };
+                        return BuildBadRequestErrorResponse(error);
                     }
-                };
-                return BuildBadRequestErrorResponse(error);
-            }
-            ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest
-            {
-                ProductVersions = productVersionsRequest,
-                CallbackUri = callbackUri,
-                CorrelationId = GetCurrentCorrelationId()
-            };
+                    ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest
+                    {
+                        ProductVersions = productVersionsRequest,
+                        CallbackUri = callbackUri,
+                        CorrelationId = GetCurrentCorrelationId()
+                    };
 
-            var validationResult = await productDataService.ValidateProductDataByProductVersions(request);
+                    var validationResult = await productDataService.ValidateProductDataByProductVersions(request);
 
-            if (!validationResult.IsValid)
-            {
-                List<Error> errors;
+                    if (!validationResult.IsValid)
+                    {
+                        List<Error> errors;
 
-                if (validationResult.HasBadRequestErrors(out errors))
-                {
-                    return BuildBadRequestErrorResponse(errors);
-                }
-            }
-            AzureAdB2C azureAdB2C = new AzureAdB2C()
-            {
-                AudToken = TokenAudience,
-                IssToken = TokenIssuer
-            };
+                        if (validationResult.HasBadRequestErrors(out errors))
+                        {
+                            return BuildBadRequestErrorResponse(errors);
+                        }
+                    }
+                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    {
+                        AudToken = TokenAudience,
+                        IssToken = TokenIssuer
+                    };
 
-            var productDetail = await productDataService.CreateProductDataByProductVersions(request, azureAdB2C);
+                    var productDetail = await productDataService.CreateProductDataByProductVersions(request, azureAdB2C);
 
-            if (productDetail.IsExchangeSetTooLarge)
-            {
-                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
-                return BuildBadRequestErrorResponseForTooLargeExchangeSet();
-            }
-            Logger.LogInformation(EventIds.ESSPostProductVersionsRequestCompleted.ToEventId(), "Product Versions Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
-
-            return GetEssResponse(productDetail);
+                    if (productDetail.IsExchangeSetTooLarge)
+                    {
+                        Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
+                        return BuildBadRequestErrorResponseForTooLargeExchangeSet();
+                    }
+                    return GetEssResponse(productDetail);
+                }, GetCurrentCorrelationId());            
         }
 
         /// <summary>
@@ -220,53 +221,55 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
+        public virtual Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
             [FromQuery] string callbackUri)
         {
-            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId(), "Product Data SinceDateTime Endpoint Started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-
-            ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
-            {
-                SinceDateTime = sinceDateTime,
-                CallbackUri = callbackUri,
-                CorrelationId = GetCurrentCorrelationId()
-            };
-
-            if (productDataSinceDateTimeRequest.SinceDateTime == null)
-            {
-                var error = new List<Error>
-                {
-                    new Error()
+            return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
+                "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId}",
+                async () => {
+                    ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
                     {
-                        Source = "sinceDateTime",
-                        Description = "Query parameter 'sinceDateTime' is required."
+                        SinceDateTime = sinceDateTime,
+                        CallbackUri = callbackUri,
+                        CorrelationId = GetCurrentCorrelationId()
+                    };
+
+                    if (productDataSinceDateTimeRequest.SinceDateTime == null)
+                    {
+                        var error = new List<Error>
+                        {
+                            new Error()
+                            {
+                                Source = "sinceDateTime",
+                                Description = "Query parameter 'sinceDateTime' is required."
+                            }
+                        };
+                        return BuildBadRequestErrorResponse(error);
                     }
-                };
-                return BuildBadRequestErrorResponse(error);
-            }
 
-            var validationResult = await productDataService.ValidateProductDataSinceDateTime(productDataSinceDateTimeRequest);
+                    var validationResult = await productDataService.ValidateProductDataSinceDateTime(productDataSinceDateTimeRequest);
 
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
-            {
-                return BuildBadRequestErrorResponse(errors);
-            }
-            AzureAdB2C azureAdB2C = new AzureAdB2C()
-            {
-                AudToken = TokenAudience,
-                IssToken = TokenIssuer
-            };
+                    if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
+                    {
+                        return BuildBadRequestErrorResponse(errors);
+                    }
+                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    {
+                        AudToken = TokenAudience,
+                        IssToken = TokenIssuer
+                    };
 
-            var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest, azureAdB2C);
+                    var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest, azureAdB2C);
 
-            if (productDetail.IsExchangeSetTooLarge)
-            {
-                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
-                return BuildBadRequestErrorResponseForTooLargeExchangeSet();
-            }
-            Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
+                    if (productDetail.IsExchangeSetTooLarge)
+                    {
+                        Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
+                        return BuildBadRequestErrorResponseForTooLargeExchangeSet();
+                    }
 
-            return GetEssResponse(productDetail);
+                    return GetEssResponse(productDetail);
+                }, GetCurrentCorrelationId());
+            
         }
     }
 }
