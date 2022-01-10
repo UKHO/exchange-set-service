@@ -663,24 +663,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return await WriteBlockFile(writeBlocksToFileMetaData, correlationId);
         }
 
-        public async Task<bool> CreateFile(FileCreateMetaData fileCreateMetaData, string accessToken, string correlationId)
+        public Task<bool> CreateFile(FileCreateMetaData fileCreateMetaData, string accessToken, string correlationId)
         {
-            logger.LogInformation(EventIds.CreateFileInBatchStart.ToEventId(), "File:{FileName} creation in batch started for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.FileName, fileCreateMetaData.BatchId, correlationId);
-            HttpResponseMessage httpResponse;
+            return logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateFileInBatchStart, EventIds.CreateFileInBatchCompleted,
+                    "File:{FileName} creation in batch for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () => {
+                        HttpResponseMessage httpResponse;
 
-            string mimetype = fileCreateMetaData.FileName == fileShareServiceConfig.Value.ExchangeSetFileName ? "application/zip" : "text/plain";
+                        string mimetype = fileCreateMetaData.FileName == fileShareServiceConfig.Value.ExchangeSetFileName ? "application/zip" : "text/plain";
 
-            httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, new FileCreateModel(), accessToken, fileShareServiceConfig.Value.BaseUrl, fileCreateMetaData.BatchId, fileCreateMetaData.FileName, fileCreateMetaData.Length, mimetype, correlationId);
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                logger.LogInformation(EventIds.CreateFileInBatchCompleted.ToEventId(), "File:{FileName} creation in batch completed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.FileName, fileCreateMetaData.BatchId, correlationId);
-                return true;
-            }
-            else
-            {
-                logger.LogError(EventIds.CreateFileInBatchNonOkResponse.ToEventId(), "Error while creating/adding file:{FileName} in batch with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.FileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, fileCreateMetaData.BatchId, correlationId);
-                throw new FulfilmentException(EventIds.CreateFileInBatchNonOkResponse.ToEventId());
-            }
+                        httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, new FileCreateModel(), accessToken, fileShareServiceConfig.Value.BaseUrl, fileCreateMetaData.BatchId, fileCreateMetaData.FileName, fileCreateMetaData.Length, mimetype, correlationId);
+                        if (!httpResponse.IsSuccessStatusCode)
+                        {
+                            logger.LogError(EventIds.CreateFileInBatchNonOkResponse.ToEventId(), "Error while creating/adding file:{FileName} in batch with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileCreateMetaData.FileName, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, fileCreateMetaData.BatchId, correlationId);
+                            throw new FulfilmentException(EventIds.CreateFileInBatchNonOkResponse.ToEventId());
+                        }
+                        return true;
+                    }, fileCreateMetaData.FileName, fileCreateMetaData.BatchId, correlationId);
         }
 
         public async Task<List<string>> UploadBlockFile(string batchId, CustomFileInfo customFileInfo, string accessToken, string correlationId)
@@ -737,46 +736,44 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return blockIdList;
         }
 
-        public async Task UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData, string correlationId, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        public Task UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData, string correlationId, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
-            logger.LogInformation(EventIds.UploadFileBlockStarted.ToEventId(), "UploadFileBlock started for BlockId:{BlockId} and file:{FileName} and Batch:{BatchId} and _X-Correlation-ID:{CorrelationId}", UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
+            return logger.LogStartEndAndElapsedTime(EventIds.UploadFileBlockStarted, EventIds.UploadFileBlockCompleted,
+                    "UploadFileBlock for BlockId:{BlockId} and file:{FileName} and Batch:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () => {
+                        byte[] byteData = fileSystemHelper.UploadFileBlockMetaData(UploadBlockMetaData);
+                        var blockMd5Hash = CommonHelper.CalculateMD5(byteData);
+                        HttpResponseMessage httpResponse;
+                        httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, UploadBlockMetaData.BatchId, UploadBlockMetaData.FileName, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken, cancellationToken, correlationId);
 
-            byte[] byteData = fileSystemHelper.UploadFileBlockMetaData(UploadBlockMetaData);
-            var blockMd5Hash = CommonHelper.CalculateMD5(byteData);
-            HttpResponseMessage httpResponse;
-            httpResponse = await fileShareServiceClient.UploadFileBlockAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, UploadBlockMetaData.BatchId, UploadBlockMetaData.FileName, UploadBlockMetaData.BlockId, byteData, blockMd5Hash, UploadBlockMetaData.JwtToken, cancellationToken, correlationId);
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                logger.LogInformation(EventIds.UploadFileBlockCompleted.ToEventId(), "UploadFileBlock completed for BlockId:{BlockId} and file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
-            }
-            else
-            {
-                cancellationTokenSource.Cancel();
-                logger.LogError(EventIds.UploadFileBlockNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
-                logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in uploading file blocks with CancellationToken:{ cancellationTokenSource.Token} with uri {RequestUri} responded with {StatusCode} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
-                throw new FulfilmentException(EventIds.UploadFileBlockNonOkResponse.ToEventId());
-            }
+                        if (!httpResponse.IsSuccessStatusCode)
+                        {
+                            cancellationTokenSource.Cancel();
+                            logger.LogError(EventIds.UploadFileBlockNonOkResponse.ToEventId(), "Error in uploading file blocks with uri {RequestUri} responded with {StatusCode} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
+                            logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in uploading file blocks with CancellationToken:{ cancellationTokenSource.Token} with uri {RequestUri} responded with {StatusCode} for BlockId:{BlockId} and file:{FileName} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
+                            throw new FulfilmentException(EventIds.UploadFileBlockNonOkResponse.ToEventId());
+                        }
+                    }, UploadBlockMetaData.BlockId, UploadBlockMetaData.FileName, UploadBlockMetaData.BatchId, correlationId);
         }
 
-        public async Task<bool> WriteBlockFile(WriteBlocksToFileMetaData writeBlocksToFileMetaData, string correlationId)
+        public Task<bool> WriteBlockFile(WriteBlocksToFileMetaData writeBlocksToFileMetaData, string correlationId)
         {
-            logger.LogInformation(EventIds.WriteBlocksToFileStart.ToEventId(), "Write Blocks to file:{FileName} started for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);
-            WriteBlockFileModel writeBlockfileModel = new WriteBlockFileModel()
-            {
-                BlockIds = writeBlocksToFileMetaData.BlockIds
-            };
-            HttpResponseMessage httpResponse;
-            httpResponse = await fileShareServiceClient.WriteBlockInFileAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, writeBlocksToFileMetaData.BatchId, writeBlocksToFileMetaData.FileName, writeBlockfileModel, writeBlocksToFileMetaData.AccessToken, correlationId: correlationId);
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                logger.LogInformation(EventIds.WriteBlocksToFileCompleted.ToEventId(), "Write Blocks to file:{FileName} completed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);
-                return true;
-            }
-            else
-            {
-                logger.LogError(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Error in writing Blocks with uri:{RequestUri} responded with {StatusCode} for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);
-                throw new FulfilmentException(EventIds.WriteBlockToFileNonOkResponse.ToEventId());
-            }
+            return logger.LogStartEndAndElapsedTimeAsync(EventIds.WriteBlocksToFileStart, EventIds.WriteBlockToFileNonOkResponse,
+                    "Write Blocks to file:{FileName} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () => {
+                        WriteBlockFileModel writeBlockfileModel = new WriteBlockFileModel()
+                        {
+                            BlockIds = writeBlocksToFileMetaData.BlockIds
+                        };
+                        HttpResponseMessage httpResponse;
+                        httpResponse = await fileShareServiceClient.WriteBlockInFileAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, writeBlocksToFileMetaData.BatchId, writeBlocksToFileMetaData.FileName, writeBlockfileModel, writeBlocksToFileMetaData.AccessToken, correlationId: correlationId);
+                        if (!httpResponse.IsSuccessStatusCode)
+                        {
+                            logger.LogError(EventIds.WriteBlockToFileNonOkResponse.ToEventId(), "Error in writing Blocks with uri:{RequestUri} responded with {StatusCode} for file:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);
+                            throw new FulfilmentException(EventIds.WriteBlockToFileNonOkResponse.ToEventId());
+                        }
+                        return true;
+                    }, writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);            
         }
 
         public async Task<bool> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData, string correlationId)
