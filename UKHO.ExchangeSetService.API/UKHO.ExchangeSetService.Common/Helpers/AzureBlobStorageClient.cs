@@ -47,5 +47,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
                 return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", new Exception("Azure blob storage connection failed or not available"));
         }
+
+        public async Task<bool> DeleteCacheContainer(string storageAccountConnectionString, string containerName)
+        {
+            BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
+            return await container.DeleteIfExistsAsync();
+        }
     }
 }

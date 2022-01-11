@@ -34,5 +34,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var tableResult = await table.ExecuteAsync(tableOperation);
             return tableResult.Result;
         }
+
+        public async Task<ITableEntity> DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString, string containerName)
+        {
+            var deleteOperation = TableOperation.Delete(entity);
+            return await ExecuteTableOperation(deleteOperation, tableName, storageAccountConnectionString) as ITableEntity;
+        }
     }
 }

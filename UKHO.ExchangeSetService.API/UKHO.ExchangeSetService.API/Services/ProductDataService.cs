@@ -18,6 +18,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.API.Configuration;
+using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
@@ -37,6 +38,10 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
         private readonly IMonitorHelper monitorHelper;
         private readonly UserIdentifier userIdentifier;
+        private readonly IAzureTableStorageClient azureTableStorageClient;
+        private readonly ISalesCatalogueStorageService azureStorageService;
+        private readonly IAzureBlobStorageClient azureBlobStorageClient;
+
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -47,7 +52,10 @@ namespace UKHO.ExchangeSetService.API.Services
             ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
             IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration, IOptions<AzureADConfiguration> azureAdConfiguration,
             IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
-            UserIdentifier userIdentifier)
+            UserIdentifier userIdentifier,
+            IAzureTableStorageClient azureTableStorageClient,
+            ISalesCatalogueStorageService azureStorageService,
+            IAzureBlobStorageClient azureBlobStorageClient)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -62,6 +70,9 @@ namespace UKHO.ExchangeSetService.API.Services
             this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
             this.monitorHelper = monitorHelper;
             this.userIdentifier = userIdentifier;
+            this.azureTableStorageClient = azureTableStorageClient;
+            this.azureStorageService = azureStorageService;
+            this.azureBlobStorageClient = azureBlobStorageClient;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -333,6 +344,33 @@ namespace UKHO.ExchangeSetService.API.Services
 
             logger.LogInformation(EventIds.SCSResponseStoreRequestCompleted.ToEventId(), "SCS response store request completed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             return result;
+        }
+
+        public async Task<bool> DeleteSearchAndDownloadCacheData(EventGridCacheDataRequest eventGridCacheDataRequest)
+        {
+            var cellName = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
+            var editionNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
+            var updateNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString();
+            var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(cellName, editionNumber + "|" + updateNumber, "CachingFssResponse", storageConnectionString);
+         
+            if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
+            {
+                var cacheTableData = new CacheTableData
+                {
+                    BatchId = cacheInfo.BatchId,
+                    PartitionKey = cacheInfo.PartitionKey,
+                    RowKey = cacheInfo.RowKey,
+                    ETag = "*"
+                };
+
+                await azureTableStorageClient.DeleteAsync(cacheTableData, "CachingFssResponse", storageConnectionString, essFulfilmentStorageconfig.Value.StorageContainerName);
+
+                var response = await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString, cacheTableData.BatchId);
+                return response;
+            }
+            else
+                return false;
         }
     }
 }

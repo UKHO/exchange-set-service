@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Collections.Generic;
@@ -267,6 +270,30 @@ namespace UKHO.ExchangeSetService.API.Controllers
             Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
 
             return GetEssResponse(productDetail);
+        }
+
+        
+        [HttpPost]
+        [Route("/clearSearchDownloadCacheData")]
+        public virtual async Task<IActionResult> Post([FromBody] object request)
+        {
+            //Deserializing the request 
+            var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent[]>(request.ToString()).FirstOrDefault();
+            var data = eventGridEvent.Data as JObject;
+            var eventGridCacheDataRequest = (eventGridEvent.Data as JObject).ToObject<EventGridCacheDataRequest>();
+
+            if (data != null && eventGridCacheDataRequest != null)
+            {
+                var response = await productDataService.DeleteSearchAndDownloadCacheData(eventGridCacheDataRequest);
+                if (response)
+                {
+                    return Ok();
+                }
+                return BadRequest();
+            }
+            else
+                return BadRequest();
+
         }
     }
 }
