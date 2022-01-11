@@ -275,16 +275,14 @@ namespace UKHO.ExchangeSetService.API.Controllers
         
         [HttpPost]
         [Route("/clearSearchDownloadCacheData")]
-        public virtual async Task<IActionResult> ClearSearchDownloadCacheData([FromBody] object request)
+        public virtual async Task<IActionResult> ClearSearchDownloadCacheData([FromBody] object request, [FromServices] ILogger<ProductDataController> logger)
         {
-            ////Deserializing the request 
-            var customEventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent[]>(request.ToString()).FirstOrDefault();
-            var eventGridCacheDataRequest = (customEventGridEvent.Data as JObject).ToObject<EventGridCacheDataRequest>();
-
-            ////Validation
-            var validationResult = await productDataService.ValidateEventGridCacheDataRequest(eventGridCacheDataRequest);
-
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
+            //Deserializing the request 
+            var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent[]>(request.ToString()).FirstOrDefault();
+            var data = eventGridEvent.Data as JObject;
+            var eventGridCacheDataRequest = (eventGridEvent.Data as JObject).ToObject<EventGridCacheDataRequest>();
+            logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear cache Event started for Data:{eventGridCaheDataRequest} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data, Formatting.Indented), GetCurrentCorrelationId());
+            if (data != null && eventGridCacheDataRequest != null)
             {
                 return BuildBadRequestErrorResponse(errors);
             }

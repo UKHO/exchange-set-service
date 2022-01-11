@@ -360,7 +360,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var updateNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString();
             var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(cellName, editionNumber + "|" + updateNumber, "CachingFssResponse", storageConnectionString);
-         
+          
             if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
             {
                 var cacheTableData = new CacheTableData

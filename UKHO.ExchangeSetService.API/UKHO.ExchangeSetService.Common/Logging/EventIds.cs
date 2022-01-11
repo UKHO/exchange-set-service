@@ -556,7 +556,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805137 - Request for uploading ENC files to ESS cache azure blob container is completed.
         /// </summary>
-        FileShareServiceUploadENCFilesToCacheCompleted = 805137
+        FileShareServiceUploadENCFilesToCacheCompleted = 805137,
+        /// <summary>
+        /// 805138 - Request for clearing cache Search and Download from ESS is started.
+        /// </summary>
+        ESSClearCacheSearchDownloadEventStart = 805138,
+        /// <summary>
+        /// 805139 - Request for clearing cache Search and Download from ESS is completed.
+        /// </summary>
+        ESSClearCacheSearchDownloadEventCompleted = 805139,
     }
 
     public static class EventIdExtensions

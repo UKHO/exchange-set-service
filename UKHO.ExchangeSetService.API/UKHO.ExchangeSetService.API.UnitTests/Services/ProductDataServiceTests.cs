@@ -40,7 +40,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
         private IMonitorHelper fakeMonitorHelper;
         private UserIdentifier fakeUserIdentifier;
-
+        private IAzureTableStorageClient fakeAzureTableStorageClient;
+        private ISalesCatalogueStorageService fakeAzureStorageService;
+        private IAzureBlobStorageClient fakeAzureBlobStorageClient;
+        private IEventGridCacheDataRequestValidator fakeEventGridCacheDataRequestValidator;
         [SetUp]
         public void Setup()
         {
@@ -62,10 +65,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAzureAdB2CConfig.Value.TenantId = "9b29766b-896f-46df-8f1a-122d7c822d91";
             fakeAzureAdConfig.Value.MicrosoftOnlineLoginUrl = "https://www.microsoft.com/";
             fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;
-
+            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
+            fakeAzureStorageService = A.Fake<ISalesCatalogueStorageService>();
+            fakeAzureTableStorageClient =  A.Fake<IAzureTableStorageClient>();
+            fakeEventGridCacheDataRequestValidator = A.Fake<IEventGridCacheDataRequestValidator>();
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier);
+            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEventGridCacheDataRequestValidator);
         }
 
         #region GetExchangeSetResponse
