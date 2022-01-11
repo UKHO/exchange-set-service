@@ -41,7 +41,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IAzureTableStorageClient azureTableStorageClient;
         private readonly ISalesCatalogueStorageService azureStorageService;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
-
+        private readonly IEventGridCacheDataRequestValidator eventGridCacheDataRequestValidator;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -55,7 +55,8 @@ namespace UKHO.ExchangeSetService.API.Services
             UserIdentifier userIdentifier,
             IAzureTableStorageClient azureTableStorageClient,
             ISalesCatalogueStorageService azureStorageService,
-            IAzureBlobStorageClient azureBlobStorageClient)
+            IAzureBlobStorageClient azureBlobStorageClient,
+            IEventGridCacheDataRequestValidator eventGridCacheDataRequestValidator)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -73,6 +74,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.azureTableStorageClient = azureTableStorageClient;
             this.azureStorageService = azureStorageService;
             this.azureBlobStorageClient = azureBlobStorageClient;
+            this.eventGridCacheDataRequestValidator = eventGridCacheDataRequestValidator;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -344,6 +346,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
             logger.LogInformation(EventIds.SCSResponseStoreRequestCompleted.ToEventId(), "SCS response store request completed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             return result;
+        }
+
+        public Task<ValidationResult> ValidateEventGridCacheDataRequest(EventGridCacheDataRequest eventGridCacheDataRequest)
+        {
+            return eventGridCacheDataRequestValidator.Validate(eventGridCacheDataRequest);
         }
 
         public async Task<bool> DeleteSearchAndDownloadCacheData(EventGridCacheDataRequest eventGridCacheDataRequest)

@@ -275,25 +275,27 @@ namespace UKHO.ExchangeSetService.API.Controllers
         
         [HttpPost]
         [Route("/clearSearchDownloadCacheData")]
-        public virtual async Task<IActionResult> Post([FromBody] object request)
+        public virtual async Task<IActionResult> ClearSearchDownloadCacheData([FromBody] object request)
         {
-            //Deserializing the request 
-            var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent[]>(request.ToString()).FirstOrDefault();
-            var data = eventGridEvent.Data as JObject;
-            var eventGridCacheDataRequest = (eventGridEvent.Data as JObject).ToObject<EventGridCacheDataRequest>();
+            ////Deserializing the request 
+            var customEventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent[]>(request.ToString()).FirstOrDefault();
+            var eventGridCacheDataRequest = (customEventGridEvent.Data as JObject).ToObject<EventGridCacheDataRequest>();
 
-            if (data != null && eventGridCacheDataRequest != null)
+            ////Validation
+            var validationResult = await productDataService.ValidateEventGridCacheDataRequest(eventGridCacheDataRequest);
+
+            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
             {
-                var response = await productDataService.DeleteSearchAndDownloadCacheData(eventGridCacheDataRequest);
-                if (response)
-                {
-                    return Ok();
-                }
-                return BadRequest();
+                return BuildBadRequestErrorResponse(errors);
             }
-            else
-                return BadRequest();
-
+                
+            ////Business logic
+            var response = await productDataService.DeleteSearchAndDownloadCacheData(eventGridCacheDataRequest);
+            if (response)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }
