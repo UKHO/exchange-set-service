@@ -42,6 +42,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly ISalesCatalogueStorageService azureStorageService;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private readonly IEventGridCacheDataRequestValidator eventGridCacheDataRequestValidator;
+        private readonly IOptions<CacheConfiguration> cacheConfiguration;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -56,7 +57,8 @@ namespace UKHO.ExchangeSetService.API.Services
             IAzureTableStorageClient azureTableStorageClient,
             ISalesCatalogueStorageService azureStorageService,
             IAzureBlobStorageClient azureBlobStorageClient,
-            IEventGridCacheDataRequestValidator eventGridCacheDataRequestValidator)
+            IEventGridCacheDataRequestValidator eventGridCacheDataRequestValidator,
+            IOptions<CacheConfiguration> cacheConfiguration)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -75,6 +77,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.azureStorageService = azureStorageService;
             this.azureBlobStorageClient = azureBlobStorageClient;
             this.eventGridCacheDataRequestValidator = eventGridCacheDataRequestValidator;
+            this.cacheConfiguration = cacheConfiguration;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -358,8 +361,8 @@ namespace UKHO.ExchangeSetService.API.Services
             var cellName = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
             var editionNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
             var updateNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString();
-            var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(cellName, editionNumber + "|" + updateNumber, "CachingFssResponse", storageConnectionString);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
+            var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(cellName, editionNumber + "|" + updateNumber, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
           
             if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
             {
@@ -371,7 +374,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     ETag = "*"
                 };
 
-                await azureTableStorageClient.DeleteAsync(cacheTableData, "CachingFssResponse", storageConnectionString, essFulfilmentStorageconfig.Value.StorageContainerName);
+                await azureTableStorageClient.DeleteAsync(cacheTableData, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString, essFulfilmentStorageconfig.Value.StorageContainerName);
 
                 var response = await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString, cacheTableData.BatchId);
                 return response;

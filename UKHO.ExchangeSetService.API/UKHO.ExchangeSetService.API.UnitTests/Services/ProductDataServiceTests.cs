@@ -44,6 +44,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private ISalesCatalogueStorageService fakeAzureStorageService;
         private IAzureBlobStorageClient fakeAzureBlobStorageClient;
         private IEventGridCacheDataRequestValidator fakeEventGridCacheDataRequestValidator;
+        private IOptions<CacheConfiguration> fakeFssCacheConfiguration;
+
         [SetUp]
         public void Setup()
         {
@@ -69,9 +71,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAzureStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeAzureTableStorageClient =  A.Fake<IAzureTableStorageClient>();
             fakeEventGridCacheDataRequestValidator = A.Fake<IEventGridCacheDataRequestValidator>();
+            fakeFssCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
+
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEventGridCacheDataRequestValidator);
+            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEventGridCacheDataRequestValidator, fakeFssCacheConfiguration);
         }
 
         #region GetExchangeSetResponse
