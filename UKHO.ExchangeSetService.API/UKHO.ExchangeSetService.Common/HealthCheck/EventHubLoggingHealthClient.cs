@@ -6,9 +6,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.Logging.EventHubLogProvider;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
@@ -32,9 +34,16 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
             try
             {
-                var jsonEventId = JsonConvert.SerializeObject(EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId());
+                var logEntry = new LogEntry
+                {
+                    Timestamp = DateTime.UtcNow,
+                    Level = LogLevel.Information.ToString(),
+                    MessageTemplate = "Event Hub Logging Event Data For Health Check",
+                    EventId = EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId()
+                };
+                var jsonLogEntry = JsonConvert.SerializeObject(logEntry);
 
-                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(jsonEventId)));
+                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(jsonLogEntry)));
 
                 return HealthCheckResult.Healthy("Event hub is healthy");
             }
