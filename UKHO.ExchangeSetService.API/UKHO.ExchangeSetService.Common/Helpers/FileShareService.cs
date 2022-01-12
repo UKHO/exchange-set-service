@@ -124,7 +124,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 List<Products> internalNotFoundProducts = new List<Products>();
                 var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
                 var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
-                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter={fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
+                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
 
                 HttpResponseMessage httpResponse;
 
