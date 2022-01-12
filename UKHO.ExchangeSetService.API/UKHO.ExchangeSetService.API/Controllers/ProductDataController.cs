@@ -281,7 +281,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
             var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent[]>(request.ToString()).FirstOrDefault();
             var data = eventGridEvent.Data as JObject;
             var eventGridCacheDataRequest = (eventGridEvent.Data as JObject).ToObject<EventGridCacheDataRequest>();           
+            
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear Cache Event started for Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), eventGridCacheDataRequest, GetCurrentCorrelationId());
+            
             ////Validation
             var validationResult = await productDataService.ValidateEventGridCacheDataRequest(eventGridCacheDataRequest);
 
@@ -289,7 +291,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             {
                 return BuildBadRequestErrorResponse(errors);
             }
-            ////Business logic
+
             var response = await productDataService.DeleteSearchAndDownloadCacheData(eventGridCacheDataRequest, GetCurrentCorrelationId());
             if (response)
             {

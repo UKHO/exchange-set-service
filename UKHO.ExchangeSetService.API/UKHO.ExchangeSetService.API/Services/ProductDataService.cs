@@ -358,14 +358,17 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<bool> DeleteSearchAndDownloadCacheData(EventGridCacheDataRequest eventGridCacheDataRequest, string correlationId)
         {
+            var productCode = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "ProductCode").Select(a => a.Value).FirstOrDefault();
             var cellName = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
             var editionNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
             var updateNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
+
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
-            logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventStart.ToEventId(), "Search and Download cache data deletion from table and Blob started for ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cellName, correlationId);
             var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(cellName, editionNumber + "|" + updateNumber, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
-          
-            if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
+
+            logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventStart.ToEventId(), "Search and Download cache data deletion from table and Blob started for ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cellName, correlationId);
+            
+            if (ValidateCacheAttributeData(productCode, cellName, editionNumber, updateNumber, eventGridCacheDataRequest.BusinessUnit) && cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
             {
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataTableStart.ToEventId(), "Search and Download cache data from table deletion started for ProductName:{cellName} and BatchId:{cacheInfo.BatchId} and _X-Correlation-ID:{CorrelationId}", cellName, cacheInfo.BatchId, correlationId);
                 var cacheTableData = new CacheTableData
@@ -385,6 +388,11 @@ namespace UKHO.ExchangeSetService.API.Services
             else
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheNoDataFoundEvent.ToEventId(), "No product found in Search and Download Cache table:{cacheConfiguration.Value.FssSearchCacheTableName} and ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, cellName, correlationId);
             return false;
+        }
+
+        private bool ValidateCacheAttributeData(string productCode, string cellName, string editionNumber, string updateNumber, string businessUnit)
+        {
+            return (productCode == "AVCS" && !string.IsNullOrWhiteSpace(cellName) && !string.IsNullOrWhiteSpace(editionNumber) && !string.IsNullOrWhiteSpace(updateNumber) && businessUnit == "ADDS");
         }
     }
 }
