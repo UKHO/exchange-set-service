@@ -21,6 +21,6 @@ namespace UKHO.ExchangeSetService.API.Services
         Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest, AzureAdB2C azureAdB2C);
 
         Task<ValidationResult> ValidateEventGridCacheDataRequest(EventGridCacheDataRequest eventGridCacheDataRequest);
-        Task<bool> DeleteSearchAndDownloadCacheData(EventGridCacheDataRequest eventGridCacheDataRequest);
+        Task<bool> DeleteSearchAndDownloadCacheData(EventGridCacheDataRequest eventGridCacheDataRequest, string correlationId);
     }
 }

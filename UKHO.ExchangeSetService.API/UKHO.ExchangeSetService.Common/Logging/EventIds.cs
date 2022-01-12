@@ -558,13 +558,33 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceUploadENCFilesToCacheCompleted = 805137,
         /// <summary>
-        /// 805138 - Request for clearing cache Search and Download from ESS is started.
+        /// 805138 - Request for clearing Search and Download Cache Data from ESS is started.
         /// </summary>
         ESSClearCacheSearchDownloadEventStart = 805138,
         /// <summary>
-        /// 805139 - Request for clearing cache Search and Download from ESS is completed.
+        /// 805139 - Request for clearing Search and Download Cache Data from ESS is completed.
         /// </summary>
         ESSClearCacheSearchDownloadEventCompleted = 805139,
+        /// <summary>
+        /// 805140 - Started Deleting Search and Download Cache Data from ESS Cache Table and Blob
+        /// </summary>
+        DeleteSearchDownloadCacheDataEventStart = 805140,
+        /// <summary>
+        /// 805141 - Completed Deleting Search and Download Cache Data from ESS Cache Table and Blob
+        /// </summary>
+        DeleteSearchDownloadCacheDataEventCompleted = 805141,
+        /// <summary>
+        /// 805142 - Started Deleting Search and Download Cache Data from ESS Cache Table
+        /// </summary>
+        DeleteSearchDownloadCacheDataTableStart = 805142,
+        /// <summary>
+        /// 805143 - Completed Deleting Search and Download Cache Data from ESS Cache Table
+        /// </summary>
+        DeleteSearchDownloadCacheDataTableCompleted = 805143,
+        /// <summary>
+        /// 805144 - No Data found in Caching Search and Downlaod Table in ESS
+        /// </summary>
+        DeleteSearchDownloadCacheNoDataFoundEvent = 805144
     }
 
     public static class EventIdExtensions

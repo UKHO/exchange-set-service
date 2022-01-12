@@ -356,16 +356,18 @@ namespace UKHO.ExchangeSetService.API.Services
             return eventGridCacheDataRequestValidator.Validate(eventGridCacheDataRequest);
         }
 
-        public async Task<bool> DeleteSearchAndDownloadCacheData(EventGridCacheDataRequest eventGridCacheDataRequest)
+        public async Task<bool> DeleteSearchAndDownloadCacheData(EventGridCacheDataRequest eventGridCacheDataRequest, string correlationId)
         {
             var cellName = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
             var editionNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
             var updateNumber = eventGridCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
+            logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventStart.ToEventId(), "Search and Download cache data deletion from table and Blob started for ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cellName, correlationId);
             var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(cellName, editionNumber + "|" + updateNumber, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
           
             if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
             {
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataTableStart.ToEventId(), "Search and Download cache data from table deletion started for ProductName:{cellName} and BatchId:{cacheInfo.BatchId} and _X-Correlation-ID:{CorrelationId}", cellName, cacheInfo.BatchId, correlationId);
                 var cacheTableData = new CacheTableData
                 {
                     BatchId = cacheInfo.BatchId,
@@ -375,12 +377,14 @@ namespace UKHO.ExchangeSetService.API.Services
                 };
 
                 await azureTableStorageClient.DeleteAsync(cacheTableData, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString, essFulfilmentStorageconfig.Value.StorageContainerName);
-
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataTableCompleted.ToEventId(), "Search and Download cache data from table deletion completed for table:{cacheConfiguration.Value.FssSearchCacheTableName} for BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, cacheTableData.BatchId, correlationId);
                 var response = await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString, cacheTableData.BatchId);
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data from table and Blob completed for ProductName:{cellName} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", cellName, cacheTableData.BatchId, correlationId);
                 return response;
             }
             else
-                return false;
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheNoDataFoundEvent.ToEventId(), "No product found in Search and Download Cache table:{cacheConfiguration.Value.FssSearchCacheTableName} and ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, cellName, correlationId);
+            return false;
         }
     }
 }
