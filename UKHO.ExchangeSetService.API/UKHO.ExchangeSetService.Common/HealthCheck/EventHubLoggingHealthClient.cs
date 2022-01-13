@@ -39,13 +39,14 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     Timestamp = DateTime.UtcNow,
                     Level = LogLevel.Information.ToString(),
                     MessageTemplate = "Event Hub Logging Event Data For Health Check",
+                    LogProperties =
+                    {
+                        { "_Environment", eventHubLoggingConfiguration.Value.Environment },
+                        { "_System",      eventHubLoggingConfiguration.Value.System },
+                        { "_Service",     eventHubLoggingConfiguration.Value.Service },
+                        { "_NodeName",    eventHubLoggingConfiguration.Value.NodeName }
+                    },
                     EventId = EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId()
-                    LogProperties ={
-                        {"_System", eventHubLoggingConfiguration.Value.System},
-                        {"_Service", eventHubLoggingConfiguration.Value.Service},
-                        {"_NodeName", eventHubLoggingConfiguration.Value.NodeName},
-                        {"_Environment", eventHubLoggingConfiguration.Value.Environment}
-                    }
                 };
                 var jsonLogEntry = JsonConvert.SerializeObject(logEntry);
 
