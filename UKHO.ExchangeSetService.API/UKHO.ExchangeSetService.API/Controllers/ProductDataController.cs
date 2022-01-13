@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Collections.Generic;
@@ -270,36 +267,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
             Logger.LogInformation(EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId(), "Product Data SinceDateTime Endpoint Completed for BatchId:{batchId} and _X-Correlation-ID:{correlationId}", productDetail.BatchId, GetCurrentCorrelationId());
 
             return GetEssResponse(productDetail);
-        }
-
-        
-        [HttpPost]
-        [Route("api/clearSearchDownloadCacheData")]
-        public virtual async Task<IActionResult> ClearSearchDownloadCacheData([FromBody] object request)
-        {
-            //Deserializing the request 
-            var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent[]>(request.ToString()).FirstOrDefault();
-            var data = eventGridEvent.Data as JObject;
-            var eventGridCacheDataRequest = (eventGridEvent.Data as JObject).ToObject<EventGridCacheDataRequest>();           
-            
-            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear Cache Event started for Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), eventGridCacheDataRequest, GetCurrentCorrelationId());
-            
-            ////Validation
-            var validationResult = await productDataService.ValidateEventGridCacheDataRequest(eventGridCacheDataRequest);
-
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
-            {
-                return BuildBadRequestErrorResponse(errors);
-            }
-
-            var response = await productDataService.DeleteSearchAndDownloadCacheData(eventGridCacheDataRequest, GetCurrentCorrelationId());
-            if (response)
-            {
-                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{} with OK response and _X-Correlation-ID:{correlationId}", eventGridCacheDataRequest.BatchId, GetCurrentCorrelationId());
-                return Ok();
-            }
-            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event returned with BadRequest response and response:{response} and _X-Correlation-ID:{correlationId}", response, GetCurrentCorrelationId());
-            return BadRequest();
         }
     }
 }

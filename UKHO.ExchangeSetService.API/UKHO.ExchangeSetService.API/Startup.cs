@@ -182,7 +182,8 @@ namespace UKHO.ExchangeSetService.API
                 .AddCheck<AzureWebJobsHealthCheck>("AzureWebJobsHealthCheck");
             services.AddDistributedMemoryCache();
 
-            services.AddScoped<IEventGridCacheDataRequestValidator, EventGridCacheDataRequestValidator>();
+            services.AddScoped<IEnterpriseEventCacheDataRequestValidator, EnterpriseEventCacheDataRequestValidator>();
+            services.AddScoped<IEssWebhookService, EssWebhookService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

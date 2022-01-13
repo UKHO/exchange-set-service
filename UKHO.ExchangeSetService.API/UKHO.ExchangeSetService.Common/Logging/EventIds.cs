@@ -576,11 +576,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805142 - Started Deleting Search and Download Cache Data from ESS Cache Table
         /// </summary>
-        DeleteSearchDownloadCacheDataTableStart = 805142,
+        DeleteSearchDownloadCacheDataFromTableStarted = 805142,
         /// <summary>
         /// 805143 - Completed Deleting Search and Download Cache Data from ESS Cache Table
         /// </summary>
-        DeleteSearchDownloadCacheDataTableCompleted = 805143,
+        DeleteSearchDownloadCacheDataFromTableCompleted = 805143,
         /// <summary>
         /// 805144 - No Data found in Caching Search and Downlaod Table in ESS
         /// </summary>
@@ -588,7 +588,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805145 - Invalid Request Data found in Caching Search and Downlaod in ESS
         /// </summary>
-        DeleteInvalidSearchDownloadCacheDataEvent = 805145
+        DeleteSearchDownloadInvalidCacheDataFoundEvent = 805145,
+
+        DeleteSearchDownloadCacheDataFromContainerStarted = 805146,
+        DeleteSearchDownloadCacheDataFromContainerCompleted = 805147
     }
 
     public static class EventIdExtensions

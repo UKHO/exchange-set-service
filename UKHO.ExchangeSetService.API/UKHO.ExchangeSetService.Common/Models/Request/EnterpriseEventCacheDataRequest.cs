@@ -41,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
         public List<Attribute> Attributes { get; set; }
     }
 
-    public class EventGridCacheDataRequest
+    public class EnterpriseEventCacheDataRequest
     {
         public LinksNew Links { get; set; }
         public string BusinessUnit { get; set; }

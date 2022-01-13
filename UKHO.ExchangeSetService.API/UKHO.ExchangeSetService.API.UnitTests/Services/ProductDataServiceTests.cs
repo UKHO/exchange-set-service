@@ -43,11 +43,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
         private IMonitorHelper fakeMonitorHelper;
         private UserIdentifier fakeUserIdentifier;
-        private IAzureTableStorageClient fakeAzureTableStorageClient;
-        private ISalesCatalogueStorageService fakeAzureStorageService;
-        private IAzureBlobStorageClient fakeAzureBlobStorageClient;
-        private IEventGridCacheDataRequestValidator fakeEventGridCacheDataRequestValidator;
-        private IOptions<CacheConfiguration> fakeFssCacheConfiguration;
 
         [SetUp]
         public void Setup()
@@ -70,18 +65,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAzureAdB2CConfig.Value.TenantId = "9b29766b-896f-46df-8f1a-122d7c822d91";
             fakeAzureAdConfig.Value.MicrosoftOnlineLoginUrl = "https://www.microsoft.com/";
             fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;
-            fakeAzureBlobStorageClient = A.Fake<IAzureBlobStorageClient>();
-            fakeAzureStorageService = A.Fake<ISalesCatalogueStorageService>();
-            fakeAzureTableStorageClient = A.Fake<IAzureTableStorageClient>();
-            fakeEventGridCacheDataRequestValidator = A.Fake<IEventGridCacheDataRequestValidator>();
-            fakeFssCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
-            fakeFssCacheConfiguration.Value.CacheBusinessUnit = "ADDS";
-            fakeFssCacheConfiguration.Value.CacheProductCode = "AVCS";
+          
 
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEventGridCacheDataRequestValidator, fakeFssCacheConfiguration);
+            , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier);
         }
 
         public string fakeCorrelationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
@@ -918,7 +907,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             };
         }
 
-        private EventGridCacheDataRequest GetCacheRequestData()
+        private EnterpriseEventCacheDataRequest GetCacheRequestData()
         {
             BatchDetails linkBatchDetails = new BatchDetails()
             {
@@ -938,7 +927,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 BatchStatus = linkBatchStatus,
                 Get = linkGet
             };
-            return new EventGridCacheDataRequest
+            return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
                 BusinessUnit = "ADDS",
@@ -952,7 +941,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             };
         }
 
-        private EventGridCacheDataRequest GetInvalidCacheRequestData()
+        private EnterpriseEventCacheDataRequest GetInvalidCacheRequestData()
         {
             BatchDetails linkBatchDetails = new BatchDetails()
             {
@@ -972,7 +961,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 BatchStatus = linkBatchStatus,
                 Get = linkGet
             };
-            return new EventGridCacheDataRequest
+            return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
                 BusinessUnit = "ABC",
