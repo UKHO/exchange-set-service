@@ -395,7 +395,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             }
             else
-                logger.LogInformation(EventIds.DeleteInvalidSearchDownloadCacheDataFoundEvent.ToEventId(), "Inavlid data found in Search and Download Request for _X-Correlation-ID:{CorrelationId}", correlationId);
+                logger.LogInformation(EventIds.DeleteInvalidSearchDownloadCacheDataEvent.ToEventId(), "Invalid data found in Search and Download Request for CellName:{cellName} and _X-Correlation-ID:{CorrelationId}", cellName, correlationId);
             return false;
         }
 

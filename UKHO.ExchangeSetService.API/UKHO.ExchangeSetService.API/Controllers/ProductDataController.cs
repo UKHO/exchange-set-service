@@ -274,7 +274,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         
         [HttpPost]
-        [Route("/clearSearchDownloadCacheData")]
+        [Route("api/clearSearchDownloadCacheData")]
         public virtual async Task<IActionResult> ClearSearchDownloadCacheData([FromBody] object request)
         {
             //Deserializing the request 
