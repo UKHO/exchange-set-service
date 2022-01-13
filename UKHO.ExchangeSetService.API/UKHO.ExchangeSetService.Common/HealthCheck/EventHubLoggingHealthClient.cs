@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
@@ -39,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     Timestamp = DateTime.UtcNow,
                     Level = LogLevel.Information.ToString(),
                     MessageTemplate = "Event Hub Logging Event Data For Health Check",
-                    LogProperties =
+                    LogProperties = new Dictionary<string, object>
                     {
                         { "_Environment", eventHubLoggingConfiguration.Value.Environment },
                         { "_System",      eventHubLoggingConfiguration.Value.System },
