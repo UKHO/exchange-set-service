@@ -584,7 +584,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805144 - No Data found in Caching Search and Downlaod Table in ESS
         /// </summary>
-        DeleteSearchDownloadCacheNoDataFoundEvent = 805144
+        DeleteSearchDownloadCacheNoDataFoundEvent = 805144,
+        /// <summary>
+        /// 805145 - Invalid request Data found in Caching Search and Downlaod in ESS
+        /// </summary>
+        DeleteInvalidSearchDownloadCacheDataFoundEvent = 805145
     }
 
     public static class EventIdExtensions
