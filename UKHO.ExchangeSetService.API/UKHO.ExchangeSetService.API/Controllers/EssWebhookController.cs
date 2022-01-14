@@ -4,16 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
-using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
@@ -32,7 +29,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpOptions]
-        [Route("/test")]
         public IActionResult Options()
         {
             using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
@@ -48,8 +44,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpPost]
-        [Route("/clearSearchDownloadCacheData")]
-        public virtual async Task<IActionResult> ClearSearchDownloadCacheData([FromBody] JObject request)
+        [Route("/PostEssWebhook")]
+        public virtual async Task<IActionResult> PostEssWebhook([FromBody] JObject request)
         {
             var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString());
             var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
@@ -58,9 +54,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             var validationResult = await essWebhookService.ValidateEventGridCacheDataRequest(data);
 
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
+            if (!validationResult.IsValid)
             {
-                return BuildBadRequestErrorResponse(errors);
+                return Ok();
             }
 
             await essWebhookService.DeleteSearchAndDownloadCacheData(data, GetCurrentCorrelationId());
