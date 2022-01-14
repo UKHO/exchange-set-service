@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 var logEntry = new LogEntry
                 {
                     Timestamp = DateTime.UtcNow,
-                    Level = LogLevel.Information.ToString(),
+                    Level = LogLevel.Trace.ToString(),
                     MessageTemplate = "Event Hub Logging Event Data For Health Check",
                     LogProperties = new Dictionary<string, object>
                     {
