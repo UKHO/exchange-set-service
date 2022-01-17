@@ -29,6 +29,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpOptions]
+        [Route("/Options")]
         public IActionResult Options()
         {
             using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
