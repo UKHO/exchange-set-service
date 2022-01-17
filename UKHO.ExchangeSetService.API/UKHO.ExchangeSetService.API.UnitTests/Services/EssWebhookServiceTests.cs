@@ -16,6 +16,7 @@ using Attribute = UKHO.ExchangeSetService.Common.Models.Request.Attribute;
 using UKHO.ExchangeSetService.API.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Cosmos.Table;
+using FluentValidation.Results;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
@@ -145,6 +146,20 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         #region ClearSearchAndDownloadCache
+
+        [Test]
+        public async Task WhenInvalidCacheDataRequest_ThenValidateEventGridCacheDataRequestReturnsOKWithInvalidFlag()
+        {
+            A.CallTo(() => fakeEnterpriseEventCacheDataRequestValidator.Validate(A<EnterpriseEventCacheDataRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                    {new ValidationFailure("PostESSWebhook", "OK")}));
+
+            var result = await service.ValidateEventGridCacheDataRequest(new EnterpriseEventCacheDataRequest()
+            { Attributes = new List<Attribute>() { new Attribute() { Key = null } } });
+
+            Assert.IsFalse(result.IsValid);        
+        }
+
         [Test]
         public async Task WhenCacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseTrue()
         {
