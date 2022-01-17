@@ -58,3 +58,8 @@ output "web_app_resource_group" {
 output "ess_managed_user_identity_client_id"{
     value = module.user_identity.ess_service_client_id
 }
+
+output "cache_storage_connection_string"{
+    value = module.cache_storage.cache_storage_connection_string
+    sensitive = true
+}
