@@ -106,7 +106,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var partitionKey = apiScsResponseData.Products[0].ProductName;
             var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0];
 
-           //Check caching info
+            Console.WriteLine("Storange conn " + Config.EssStorageAccountConnectionString);
+            Console.WriteLine("table cache " + Config.ClearCacheConfig.FssSearchCacheTableName);
+            Console.WriteLine("connection string " + Config.ClearCacheConfig.CacheStorageConnectionString);
+            //Check caching info
             var tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync< FssSearchResponseCache > (partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
            
             // Verify the Cache is generated
