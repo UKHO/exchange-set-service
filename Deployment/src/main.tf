@@ -177,7 +177,6 @@ module "fulfilment_keyvaults" {
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.small_exchange_set_connection_string
     "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
-    "CacheConfiguration--CacheStorageConnectionString"          = module.cache_storage.cache_storage_connection_string
 
   }
   medium_exchange_set_secrets = {

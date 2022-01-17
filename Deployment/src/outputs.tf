@@ -61,4 +61,5 @@ output "ess_managed_user_identity_client_id"{
 
 output "cache_storage_connection_string"{
     value = module.cache_storage.cache_storage_connection_string
+    sensitive = true
 }
