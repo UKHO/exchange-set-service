@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public FileShareService FssConfig = new FileShareService();
         public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
         public SalesCatalogue ScsAuthConfig = new SalesCatalogue();
-        public ClearCache ClearCacheConfig = new ClearCache();
+        public CacheConfiguration ClearCacheConfig = new CacheConfiguration();
 
         public class EssAuthorizationTokenConfiguration
         {
@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public bool IsRunningOnLocalMachine { get; set; }
         }
 
-        public class ClearCache
+        public class CacheConfiguration
         {
             public string CacheStorageConnectionString { get; set; }
             public string FssSearchCacheTableName { get; set; }        
@@ -93,6 +93,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("FileShareService", FssConfig);
             ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
             ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
+            Console.WriteLine("Storange conn " + Config.EssStorageAccountConnectionString);
+            Console.WriteLine("table cache " + Config.ClearCacheConfig.FssSearchCacheTableName);
+            Console.WriteLine("connection string " + Config.ClearCacheConfig.CacheStorageConnectionString);
 
         }
     }
