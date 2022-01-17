@@ -379,8 +379,6 @@ stages:
             value: $(AutoTestClientSecret_NoAuth)
           - name: "AzureAdB2CTestConfiguration.ClientSecret"
             value: $(AUTOTEST-ESS-SECRET)
-          - name: "CacheConfiguration.CacheStorageConnectionString"
-            value: $(AUTOTEST-CACHE-STORAGE-CONNECTION-STRING)
 
         strategy:
           runOnce:
@@ -467,8 +465,6 @@ stages:
             value: $(AutoTestClientSecret_NoAuth)
           - name: "AzureAdB2CTestConfiguration.ClientSecret"
             value: $(AUTOTEST-ESS-SECRET)
-          - name: "CacheConfiguration.CacheStorageConnectionString"
-            value: $(AUTOTEST-CACHE-STORAGE-CONNECTION-STRING)
             #This variables are overridden since they are different from dev and we have used same library
           - name: "Environment"
             value: "qc"
