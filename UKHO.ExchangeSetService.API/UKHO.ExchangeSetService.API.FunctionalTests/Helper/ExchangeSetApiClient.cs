@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -102,6 +105,25 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
         }
+
+        public async Task<HttpResponseMessage> PostEssWebhookAsync([FromBody] JObject request, string accessToken = null)
+        {
+            string uri = $"{apiHost}/PostEssWebhook";
+            var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString());
+            var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
+           
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(data.ToString(), Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+        }
+
     }
 
 }
