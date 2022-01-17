@@ -40,7 +40,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 HttpContext.Response.Headers.Add("WebHook-Allowed-Rate", "*");
                 HttpContext.Response.Headers.Add("WebHook-Allowed-Origin", webhookRequestOrigin);
             }
-
             return Ok();
         }
 
@@ -51,13 +50,14 @@ namespace UKHO.ExchangeSetService.API.Controllers
             var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString());
             var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
 
-            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear Cache Event started for Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), data, GetCurrentCorrelationId());
+            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear Cache Event started for Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), GetCurrentCorrelationId());
 
             var validationResult = await essWebhookService.ValidateEventGridCacheDataRequest(data);
 
             if (!validationResult.IsValid)
             {
-                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadValidationEvent.ToEventId(), "Clear Cache Search and Download Event- BusinessUnit and Attributes are null and _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadValidationEvent.ToEventId(), "Invalid data i.e.BusinessUnit:{data.BusinessUnit} or Attributes are null in payload from Enterprise event for Clear Cache Search and Download Event and _X-Correlation-ID:{correlationId}", data.BusinessUnit, GetCurrentCorrelationId());
+                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{} with OK response and _X-Correlation-ID:{correlationId}", data.BatchId, GetCurrentCorrelationId());
                 return GetCacheResponse();
             }
 
