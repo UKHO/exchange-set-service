@@ -56,14 +56,15 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             if (!validationResult.IsValid)
             {
-                return Ok();
+                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadValidationEvent.ToEventId(), "Clear Cache Search and Download Event- BusinessUnit and Attributes are null and _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+                return GetCacheResponse();
             }
 
             await essWebhookService.DeleteSearchAndDownloadCacheData(data, GetCurrentCorrelationId());
 
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{} with OK response and _X-Correlation-ID:{correlationId}", data.BatchId, GetCurrentCorrelationId());
-            
-            return Ok();
+
+            return GetCacheResponse();
         }
     }
 }
