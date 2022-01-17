@@ -9,20 +9,6 @@ namespace UKHO.ExchangeSetService.Common.Extensions
 {
     public static class LoggerExtensions
     {
-        public static void LogStartEndAndElapsedTime<T>(this ILogger<T> logger,
-            EventIds startEventId,
-            EventIds completedEventId,
-            string messageFormat,
-            Action action,
-            params object[] messageArguments)
-        {
-            logger.LogStartEndAndElapsedTime(startEventId, completedEventId, messageFormat, () =>
-            {
-                action();
-                return 1;
-            }, messageArguments);
-        }
-
         public static R LogStartEndAndElapsedTime<T, R>(this ILogger<T> logger,
             EventIds startEventId,
             EventIds completedEventId,
