@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);          
             ConfigurationRoot.Bind("FileShareService", FssConfig);
             ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
-            ConfigurationRoot.Bind("ClearCache", ClearCacheConfig);
+            ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
 
         }
     }
