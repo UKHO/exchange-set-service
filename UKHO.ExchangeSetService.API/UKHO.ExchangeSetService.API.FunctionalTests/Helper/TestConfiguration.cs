@@ -93,10 +93,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("FileShareService", FssConfig);
             ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
             ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
-            Console.WriteLine("Storange conn " + Config.EssStorageAccountConnectionString);
-            Console.WriteLine("table cache " + Config.ClearCacheConfig.FssSearchCacheTableName);
-            Console.WriteLine("connection string " + Config.ClearCacheConfig.CacheStorageConnectionString);
-
         }
     }
 }
