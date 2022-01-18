@@ -55,6 +55,5 @@ Write-Host "##vso[task.setvariable variable=EssApiUrl]$env:SERVICE_DNS_URL"
 Write-Host "##vso[task.setvariable variable=KeyVaultSettings.ServiceUri]$($terraformOutput.keyvault_uri.value)"
 Write-Host "##vso[task.setvariable variable=EssStorageAccountConnectionString;issecret=true]$($terraformOutput.storage_connection_string.value)"
 Write-Host "##vso[task.setvariable variable=ESSManagedIdentity.ClientId]$($terraformOutput.ess_managed_user_identity_client_id.value)"
-Write-Host "##vso[task.setvariable variable=CacheConfiguration.CacheStorageConnectionString;issecret=true]$($terraformOutput.cache_storage_connection_string.value)"
 
 $terraformOutput | ConvertTo-Json -Depth 5 > $terraformJsonOutputFile

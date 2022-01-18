@@ -38,7 +38,7 @@ output "storage_account_queue_name"{
     value = module.storage.storage_account_queue_name
 }
 
-output "qc_storage_connection_string"{
+output "cache_qc_storage_connection_string"{
     value = module.storage.storage_connection_string
     sensitive = true
 }
