@@ -37,3 +37,8 @@ output "ess_managed_user_identity_client_id"{
 output "storage_account_queue_name"{
     value = module.storage.storage_account_queue_name
 }
+
+output "qc_storage_connection_string"{
+    value = module.storage.storage_connection_string
+    sensitive = true
+}
