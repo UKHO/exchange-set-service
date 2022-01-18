@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             {
                 Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
             };
-            LinksNew links = new LinksNew()
+            CacheLinks links = new CacheLinks()
             {
                 BatchDetails = linkBatchDetails,
                 BatchStatus = linkBatchStatus,
@@ -95,8 +95,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
             fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            fakeCacheJson["Data"] = JObject.FromObject(new { Data = GetCacheRequestData() });
-           
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
+
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
             var result = (OkObjectResult)await fakeWebHookController.PostEssWebhook(fakeCacheJson);

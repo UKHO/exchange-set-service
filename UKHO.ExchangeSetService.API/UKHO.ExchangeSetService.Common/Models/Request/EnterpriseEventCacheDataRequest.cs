@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
         public string Href { get; set; }
     }
 
-    public class LinksNew
+    public class CacheLinks
     {
         public BatchDetails BatchDetails { get; set; }
         public BatchStatus BatchStatus { get; set; }
@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
 
     public class File
     {
-        public LinksNew Links { get; set; }
+        public CacheLinks Links { get; set; }
         public string Hash { get; set; }
         public int FileSize { get; set; }
         public string MimeType { get; set; }
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
 
     public class EnterpriseEventCacheDataRequest
     {
-        public LinksNew Links { get; set; }
+        public CacheLinks Links { get; set; }
         public string BusinessUnit { get; set; }
         public List<Attribute> Attributes { get; set; }
         public List<File> Files { get; set; }

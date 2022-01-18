@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             {
                 Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
             };
-            LinksNew links = new LinksNew()
+            CacheLinks links = new CacheLinks()
             {
                 BatchDetails = linkBatchDetails,
                 BatchStatus = linkBatchStatus,
@@ -125,7 +125,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             {
                 Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
             };
-            LinksNew links = new LinksNew()
+            CacheLinks links = new CacheLinks()
             {
                 BatchDetails = linkBatchDetails,
                 BatchStatus = linkBatchStatus,

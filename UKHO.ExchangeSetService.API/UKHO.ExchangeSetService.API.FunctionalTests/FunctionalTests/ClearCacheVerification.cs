@@ -119,7 +119,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
             essCacheJson["Source"] = "AcceptanceTest";
             essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            essCacheJson["Data"] = JObject.FromObject(new { Data = GetCacheRequestData() });
+            essCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostEssWebhookAsync(essCacheJson, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");

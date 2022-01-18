@@ -109,11 +109,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public async Task<HttpResponseMessage> PostEssWebhookAsync([FromBody] JObject request, string accessToken = null)
         {
             string uri = $"{apiHost}/PostEssWebhook";
-            var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString());
-            var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
-           
+            string payloadJson = JsonConvert.SerializeObject(request);
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-            { Content = new StringContent(data.ToString(), Encoding.UTF8, "application/json") })
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
             {
                 if (accessToken != null)
                 {
@@ -123,7 +121,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
         }
-
     }
 
 }
