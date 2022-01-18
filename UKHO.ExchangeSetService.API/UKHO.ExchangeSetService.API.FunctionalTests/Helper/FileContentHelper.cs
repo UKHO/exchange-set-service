@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static void CheckSerialEncFileContent(string inputFile)
         {
-            string[] lines = System.IO.File.ReadAllLines(inputFile);
+            string[] lines = File.ReadAllLines(inputFile);
 
             //Store file content here
             string[] fileContent = lines[0].Split(" ");
@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static void CheckProductFileContent(string inputFile, dynamic scsResponse)
         {
-            string[] fileContent = System.IO.File.ReadAllLines(inputFile);
+            string[] fileContent = File.ReadAllLines(inputFile);
 
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static void CheckReadMeTxtFileContent(string inputFile)
         {
 
-            string[] lines = System.IO.File.ReadAllLines(inputFile);
+            string[] lines = File.ReadAllLines(inputFile);
             var fileSecondLineContent = lines[1];
 
             string[] fileContents = fileSecondLineContent.Split("File date:");
@@ -219,7 +219,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static void CheckCatalogueFileContent(string inputFile, ScsProductResponseModel scsResponse)
         {
             List<string> scsCatalogueFilesPath = new List<string>();
-            string catalogueFileContent = System.IO.File.ReadAllText(inputFile);
+            string catalogueFileContent = File.ReadAllText(inputFile);
 
 
             foreach (var item in scsResponse.Products)
@@ -250,7 +250,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static void CheckCatalogueFileNoContent(string inputFile, List<ProductVersionModel> ProductVersionData)
         {
-            string catalogueFileContent = System.IO.File.ReadAllText(inputFile);
+            string catalogueFileContent = File.ReadAllText(inputFile);
             foreach (var product in ProductVersionData)
             {
                 Assert.False(catalogueFileContent.Contains(product.ProductName), $"{catalogueFileContent} contains {product.ProductName}, which is incorrect.");
@@ -261,7 +261,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             string path = Path.GetTempPath();
 
-            if (Directory.Exists(path) && System.IO.File.Exists(Path.Combine(path, fileName)))
+            if (Directory.Exists(path) && File.Exists(Path.Combine(path, fileName)))
             {
                 string folder = Path.GetFileName(Path.Combine(path, fileName));
                 if (folder.Contains(".zip"))
@@ -273,9 +273,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 Directory.Delete(Path.Combine(path, folder), true);
 
                 //Delete V01X01.zip file from temp Directory
-                if (System.IO.File.Exists(Path.Combine(path, fileName)))
+                if (File.Exists(Path.Combine(path, fileName)))
                 {
-                    System.IO.File.Delete(Path.Combine(path, fileName));
+                    File.Delete(Path.Combine(path, fileName));
                 }
 
 

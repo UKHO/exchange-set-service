@@ -86,7 +86,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static bool CheckforFileExist(string filePath, string fileName)
         {
-            return (Directory.Exists(filePath) && System.IO.File.Exists(Path.Combine(filePath, fileName)));
+            return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath, fileName)));
         }       
     }
 }

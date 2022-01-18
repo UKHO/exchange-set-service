@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
         public string Href { get; set; }
     }
 
-    public class File
+    public class CacheFile
     {
         public CacheLinks Links { get; set; }
         public string Hash { get; set; }
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
         public CacheLinks Links { get; set; }
         public string BusinessUnit { get; set; }
         public List<Attribute> Attributes { get; set; }
-        public List<File> Files { get; set; }
+        public List<CacheFile> Files { get; set; }
         public string BatchId { get; set; }
         public DateTime BatchPublishedDate { get; set; }
     }
