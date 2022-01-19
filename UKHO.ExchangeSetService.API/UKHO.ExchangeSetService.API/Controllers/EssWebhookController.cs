@@ -29,14 +29,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpOptions]
-        [Route("/Options")]
+        [Route("/options")]
         public IActionResult Options()
         {
             using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
-                var webhookRequestOrigin = HttpContext.Request.Headers["WebHook-Request-Origin"].FirstOrDefault();
-                ////var webhookRequestCallback = HttpContext.Request.Headers["WebHook-Request-Callback"];
-                ////var webhookRequestRate = HttpContext.Request.Headers["WebHook-Request-Rate"];
+                var webhookRequestOrigin = HttpContext.Request.Headers["WebHook-Request-Origin"].FirstOrDefault();                
                 HttpContext.Response.Headers.Add("WebHook-Allowed-Rate", "*");
                 HttpContext.Response.Headers.Add("WebHook-Allowed-Origin", webhookRequestOrigin);
             }
@@ -44,7 +42,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpPost]
-        [Route("/PostEssWebhook")]
+        [Route("/postEssWebhook")]
         public virtual async Task<IActionResult> PostEssWebhook([FromBody] JObject request)
         {
             var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString());
