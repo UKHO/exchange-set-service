@@ -144,8 +144,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
                 BatchPublishedDate = DateTime.UtcNow
             };
-        }
-
-       
+        }       
     }
 }
