@@ -31,7 +31,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private IEnterpriseEventCacheDataRequestValidator fakeEnterpriseEventCacheDataRequestValidator;       
         private ILogger<EssWebhookService> fakeLogger;
         private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfig;
-
+        private const string FakeCorrelationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
+      
         [SetUp]
         public void Setup()
         {           
@@ -41,15 +42,64 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
             fakeEnterpriseEventCacheDataRequestValidator = A.Fake<IEnterpriseEventCacheDataRequestValidator>();
             fakeLogger = A.Fake<ILogger<EssWebhookService>>();
-            fakeEssFulfilmentStorageConfig = A.Fake <IOptions<EssFulfilmentStorageConfiguration>>();
+            fakeEssFulfilmentStorageConfig = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
             fakeCacheConfiguration.Value.CacheBusinessUnit = "ADDS";
             fakeCacheConfiguration.Value.CacheProductCode = "AVCS";
 
             service= new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig);
         }
 
-        public string fakeCorrelationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
-       
+        [Test]
+        public async Task WhenInvalidCacheDataRequest_ThenValidateEventGridCacheDataRequestReturnsOKWithInvalidFlag()
+        {
+            A.CallTo(() => fakeEnterpriseEventCacheDataRequestValidator.Validate(A<EnterpriseEventCacheDataRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                    {new ValidationFailure("PostESSWebhook", "OK")}));
+
+            var result = await service.ValidateEventGridCacheDataRequest(new EnterpriseEventCacheDataRequest()
+            { Attributes = new List<Attribute>() { new Attribute() { Key = null } } });
+
+            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            Assert.IsFalse(result.IsValid);
+        }
+
+        [Test]
+        public async Task WhenInvalidRequestDataInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
+        {
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored));
+
+            await service.DeleteSearchAndDownloadCacheData(GetInvalidCacheRequestData(), FakeCorrelationId);            
+        }
+
+        [Test]
+        public async Task WhenNoCacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
+        {
+            var cachingResponse = new FssSearchResponseCache() { };
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
+
+            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(), FakeCorrelationId);
+
+            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenCacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseTrue()
+        {
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
+
+            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(), FakeCorrelationId);
+
+            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+        }
+
         private string GetStorageAccountConnectionString()
         {
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessstorage; AccountKey = testaccountkey;";
@@ -143,55 +193,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
                 BatchPublishedDate = DateTime.UtcNow
             };
-        }
-
-        #region ClearSearchAndDownloadCache
-
-        [Test]
-        public async Task WhenInvalidCacheDataRequest_ThenValidateEventGridCacheDataRequestReturnsOKWithInvalidFlag()
-        {
-            A.CallTo(() => fakeEnterpriseEventCacheDataRequestValidator.Validate(A<EnterpriseEventCacheDataRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>
-                    {new ValidationFailure("PostESSWebhook", "OK")}));
-
-            var result = await service.ValidateEventGridCacheDataRequest(new EnterpriseEventCacheDataRequest()
-            { Attributes = new List<Attribute>() { new Attribute() { Key = null } } });
-
-            Assert.IsFalse(result.IsValid);        
-        }
-
-        [Test]
-        public async Task WhenCacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseTrue()
-        {
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
-            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored));
-
-            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(), fakeCorrelationId);
-            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
-        }
-
-        [Test]
-        public async Task WhenInvalidRequestDataInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
-        {
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
-            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored));
-
-           await service.DeleteSearchAndDownloadCacheData(GetInvalidCacheRequestData(), fakeCorrelationId);
-           A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();           
-        }
-
-        [Test]
-        public async Task WhenNoCacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
-        {
-            var cachingResponse = new FssSearchResponseCache() { };
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
-
-            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(), fakeCorrelationId);
-            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceOrLess();
-        }
-        #endregion
+        }      
     }
 }

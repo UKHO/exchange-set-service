@@ -23,8 +23,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         private EssWebhookController fakeWebHookController;
         private IEssWebhookService fakeEssWebhookService;
         private IHttpContextAccessor fakeHttpContextAccessor;
-        private ILogger<EssWebhookController> fakeLogger;
-
+        private ILogger<EssWebhookController> fakeLogger;     
+        
         [SetUp]
         public void Setup()
         {
@@ -32,6 +32,55 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
             fakeLogger = A.Fake<ILogger<EssWebhookController>>();
             fakeWebHookController = new EssWebhookController(fakeHttpContextAccessor, fakeLogger, fakeEssWebhookService);
+        }
+       
+        [Test]
+        public void WhenValidHeaderRequestedInNewFilesPublishedOptions_ThenReturnsOkResponse()
+        {
+            fakeWebHookController.ControllerContext.HttpContext = new DefaultHttpContext();
+            fakeHttpContextAccessor.HttpContext.Request.Headers.Add("WebHook-Request-Origin", "test.example.com");
+
+            var result = (OkObjectResult)fakeWebHookController.NewFilesPublishedOptions();
+
+            Assert.AreEqual(200, result.StatusCode);
+        }
+
+        [Test]
+        public async Task WhenNullDataRequestedInNewFilesPublished_ThenValidateNulldata()
+        {
+            var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
+            fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
+            fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            fakeCacheJson["Data"] = JObject.FromObject(new { Data = string.Empty });
+
+            var validationMessage = new ValidationFailure("PostESSWebhook", "BadRequest")
+            {
+                ErrorCode = HttpStatusCode.OK.ToString()
+            };
+
+            A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
+
+            var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
+
+            Assert.AreEqual(200, result.StatusCode);
+        }
+
+        [Test]
+        public async Task WhenValidDataRequestedInNewFilesPublished_ThenDeleteFromStorage()
+        {
+            var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
+            fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
+            fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
+
+            A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+            A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored));
+
+            var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
+
+            Assert.AreEqual(200, result.StatusCode);
         }
 
         private EnterpriseEventCacheDataRequest GetCacheRequestData()
@@ -66,54 +115,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
                 BatchPublishedDate = DateTime.UtcNow
             };
-        }
-
-        [Test]
-        public void WhenValidHeaderRequestedInOptions_ThenReturnsOkResponse()
-        {
-            fakeWebHookController.ControllerContext.HttpContext = new DefaultHttpContext();
-            fakeHttpContextAccessor.HttpContext.Request.Headers.Add("WebHook-Request-Origin", "test.example.com");
-
-            var result = (OkObjectResult)fakeWebHookController.Options();
-
-            Assert.AreEqual(200, result.StatusCode);
-        }
-
-        [Test]
-        public async Task WhenNullDataRequestedInPostEssWebhook_ThenValidateNulldata()
-        {
-            var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");            
-            fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
-            fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";            
-            fakeCacheJson["Data"] = JObject.FromObject(new { Data = string.Empty }); 
-
-            var validationMessage = new ValidationFailure("PostESSWebhook", "BadRequest")
-            {
-                ErrorCode = HttpStatusCode.OK.ToString()
-            };
-
-            A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
-                 .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
-
-            var result = (OkObjectResult)await fakeWebHookController.PostEssWebhook(fakeCacheJson);
-            
-            Assert.AreEqual(200, result.StatusCode);
-        }
-
-        [Test]
-        public async Task WhenValidDataRequestedInPostEssWebhook_ThenDeleteFromStorage()
-        {            
-            var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
-            fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
-            fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
-
-            A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
-                 .Returns(new ValidationResult(new List<ValidationFailure>()));
-            var result = (OkObjectResult)await fakeWebHookController.PostEssWebhook(fakeCacheJson);
-
-            Assert.AreEqual(200, result.StatusCode);            
-        }
+        }      
     }
 }
 

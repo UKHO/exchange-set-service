@@ -46,6 +46,72 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             CleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
         }
+
+        [Test]
+        [Category("QCOnlyTest")]
+        public async Task WhenICallExchangeSetApiWithProductIdentifiers_AndCalledClearCache_ThenItsClearTheCache()
+        {
+            //Get the product details form sales catalogue service
+            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, new List<string>() { "DE290001" }, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+
+            foreach (var product in apiScsResponseData.Products)
+            {
+                string productName = product.ProductName;
+                int editionNumber = product.EditionNumber;
+
+                //Enc file download verification
+                foreach (var updateNumber in product.UpdateNumbers)
+                {
+                    await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+
+                }
+
+            }
+            var partitionKey = apiScsResponseData.Products[0].ProductName;
+            var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0];
+
+            Console.WriteLine("Storange conn " + Config.EssStorageAccountConnectionString);
+            Console.WriteLine("table cache " + Config.ClearCacheConfig.FssSearchCacheTableName);
+            Console.WriteLine("connection string " + Config.ClearCacheConfig.CacheStorageConnectionString);
+            //Check caching info
+            var tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+
+            // Verify the Cache is generated
+            Assert.IsNotNull(tableCacheCheck);
+            Assert.IsNotEmpty(tableCacheCheck.Response);
+
+            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
+            essCacheJson["Source"] = "AcceptanceTest";
+            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            essCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
+
+            var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
+
+            //Check caching info
+            tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+
+            // Verify the No Cache available
+            Assert.IsNull(tableCacheCheck);
+        }
+
+        [OneTimeTearDown]
+        public async Task GlobalTeardown()
+        {
+            //Clean up downloaded files/folders   
+            FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
+
+            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            {
+                //Clean up batches from local foldar 
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+            }
+        }
+
         private EnterpriseEventCacheDataRequest GetCacheRequestData()
         {
             BatchDetails linkBatchDetails = new BatchDetails()
@@ -80,70 +146,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             };
         }
 
-        [Test]
-        [Category("QCOnlyTest")]
-        public async Task WhenICallExchangeSetApiWithProductIdentifiers_AndCalledClearCache_ThenItsClearTheCache()
-        {
-            //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, new List<string>() { "DE290001" }, ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
-
-            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
-
-            foreach (var product in apiScsResponseData.Products)
-            {
-                string productName = product.ProductName;
-                int editionNumber = product.EditionNumber;
-
-                //Enc file download verification
-                foreach (var updateNumber in product.UpdateNumbers)
-                {
-                    await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
-
-                }
-
-            }
-            var partitionKey = apiScsResponseData.Products[0].ProductName;
-            var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0];
-
-            Console.WriteLine("Storange conn " + Config.EssStorageAccountConnectionString);
-            Console.WriteLine("table cache " + Config.ClearCacheConfig.FssSearchCacheTableName);
-            Console.WriteLine("connection string " + Config.ClearCacheConfig.CacheStorageConnectionString);
-            //Check caching info
-            var tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync< FssSearchResponseCache > (partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
-           
-            // Verify the Cache is generated
-            Assert.IsNotNull(tableCacheCheck);
-            Assert.IsNotEmpty(tableCacheCheck.Response);
-
-            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
-            essCacheJson["Source"] = "AcceptanceTest";
-            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            essCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
-
-            var apiClearCacheResponse = await ExchangeSetApiClient.PostEssWebhookAsync(essCacheJson, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
-
-            //Check caching info
-            tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
-
-            // Verify the No Cache available
-            Assert.IsNull(tableCacheCheck);
-
-        }
-
-        [OneTimeTearDown]
-        public async Task GlobalTeardown()
-        {
-            //Clean up downloaded files/folders   
-            FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
-
-            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
-            {
-                //Clean up batches from local foldar 
-                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
-                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
-            }
-        }
+       
     }
 }

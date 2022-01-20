@@ -29,8 +29,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpOptions]
-        [Route("/options")]
-        public IActionResult Options()
+        [Route("/newfilespublished")]
+        public IActionResult NewFilesPublishedOptions()
         {
             using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
@@ -42,8 +42,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpPost]
-        [Route("/postEssWebhook")]
-        public virtual async Task<IActionResult> PostEssWebhook([FromBody] JObject request)
+        [Route("/newfilespublished")]
+        public virtual async Task<IActionResult> NewFilesPublished([FromBody] JObject request)
         {
             var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString());
             var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
