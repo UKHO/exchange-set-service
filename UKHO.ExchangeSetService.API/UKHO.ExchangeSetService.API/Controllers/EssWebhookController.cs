@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 HttpContext.Response.Headers.Add("WebHook-Allowed-Rate", "*");
                 HttpContext.Response.Headers.Add("WebHook-Allowed-Origin", webhookRequestOrigin);
             }
-            return Ok();
+            return GetCacheResponse();
         }
 
         [HttpPost]

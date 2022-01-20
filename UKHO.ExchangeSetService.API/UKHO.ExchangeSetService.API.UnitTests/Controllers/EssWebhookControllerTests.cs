@@ -69,6 +69,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
+        public void WhenValidHeaderRequestedInOptions_ThenReturnsOkResponse()
+        {
+            fakeWebHookController.ControllerContext.HttpContext = new DefaultHttpContext();
+            fakeHttpContextAccessor.HttpContext.Request.Headers.Add("WebHook-Request-Origin", "test.example.com");
+
+            var result = (OkObjectResult)fakeWebHookController.Options();
+
+            Assert.AreEqual(200, result.StatusCode);
+        }
+
+        [Test]
         public async Task WhenNullDataRequestedInPostEssWebhook_ThenValidateNulldata()
         {
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");            
