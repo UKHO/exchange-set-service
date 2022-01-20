@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -91,6 +94,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             string payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+        }
+
+        public async Task<HttpResponseMessage> PostNewFilesPublishedAsync([FromBody] JObject request, string accessToken = null)
+        {
+            string uri = $"{apiHost}/webhook/newfilespublished";
+            string payloadJson = JsonConvert.SerializeObject(request);
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
             {

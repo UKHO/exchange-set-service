@@ -61,13 +61,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAzureAdB2CConfig.Value.Instance = "https://gk.microsoft.com/";
             fakeAzureAdB2CConfig.Value.TenantId = "9b29766b-896f-46df-8f1a-122d7c822d91";
             fakeAzureAdConfig.Value.MicrosoftOnlineLoginUrl = "https://www.microsoft.com/";
-            fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;
+            fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;        
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
             , fakeAzureAdB2CConfig, fakeAzureAdConfig, fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier);
         }
-
+        
         #region GetExchangeSetResponse
 
         private ExchangeSetResponse GetExchangeSetResponse()
@@ -870,6 +870,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpStatusCode);
         }
 
-        #endregion ProductDataSinceDateTime
+        #endregion ProductDataSinceDateTime       
     }
 }

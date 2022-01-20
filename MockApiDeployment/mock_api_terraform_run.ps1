@@ -45,3 +45,4 @@ Write-Host "##vso[task.setvariable variable=ESSManagedIdentity.ClientId]$($terra
 Write-Host "##vso[task.setvariable variable=FileShareService.BaseUrl]$($terraformOutput.scs_fss_mock_web_app_url.value)"
 Write-Host "##vso[task.setvariable variable=SalesCatalogue.BaseUrl]$($terraformOutput.scs_fss_mock_web_app_url.value)"
 Write-Host "##vso[task.setvariable variable=ESSFulfilmentStorageConfiguration.QueueName]$($terraformOutput.storage_account_queue_name.value)"
+Write-Host "##vso[task.setvariable variable=CacheConfiguration.CacheStorageConnectionString;issecret=true]$($terraformOutput.cache_qc_storage_connection_string.value)"
