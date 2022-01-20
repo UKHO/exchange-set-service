@@ -108,7 +108,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public async Task<HttpResponseMessage> PostNewFilesPublishedAsync([FromBody] JObject request, string accessToken = null)
         {
-            string uri = $"{apiHost}/newfilespublished";
+            string uri = $"{apiHost}/webhook/newfilespublished";
             string payloadJson = JsonConvert.SerializeObject(request);
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
