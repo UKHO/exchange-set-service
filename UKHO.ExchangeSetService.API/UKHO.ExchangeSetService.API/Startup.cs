@@ -119,6 +119,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
             services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
+            services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddApplicationInsightsTelemetry();
 

@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.DeleteSearchDownloadCacheNoDataFoundEvent.ToEventId(), "No Product found in Search and Download Cache table:{cacheConfiguration.Value.FssSearchCacheTableName} and ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, cellName, correlationId);
+                    logger.LogInformation(EventIds.DeleteSearchDownloadCacheNoDataFoundEvent.ToEventId(), "No Matching Product found in Search and Download Cache table:{cacheConfiguration.Value.FssSearchCacheTableName} and ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, cellName, correlationId);
                 }
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data deletion from table and Blob completed for ProductName:{cellName} and _X-Correlation-ID:{CorrelationId}", cellName, correlationId);
             }

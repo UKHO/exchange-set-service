@@ -600,7 +600,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805148 - Request for validation event for clear Cache Search and Download in ESS
         /// </summary>
-        ESSClearCacheSearchDownloadValidationEvent = 805148
+        ESSClearCacheSearchDownloadValidationEvent = 805148,
+        /// <summary>
+        /// 805149 - Check if event triggered is by B2C or AdB2C user in ESS
+        /// </summary>
+        ESSB2CUserValidationEvent = 505149
     }
 
     public static class EventIdExtensions

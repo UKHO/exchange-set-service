@@ -32,12 +32,11 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IMapper mapper;
         private readonly IFileShareService fileShareService;
         private readonly ILogger<FileShareService> logger;
-        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
-        private readonly IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration;
-        private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
+        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;        
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
         private readonly IMonitorHelper monitorHelper;
         private readonly UserIdentifier userIdentifier;
+        private readonly IAzureAdB2CHelper azureAdB2CHelper;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -45,10 +44,9 @@ namespace UKHO.ExchangeSetService.API.Services
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
-            ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
-            IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration, IOptions<AzureADConfiguration> azureAdConfiguration,
+            ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,            
             IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
-            UserIdentifier userIdentifier)
+            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -57,12 +55,11 @@ namespace UKHO.ExchangeSetService.API.Services
             this.mapper = mapper;
             this.fileShareService = fileShareService;
             this.logger = logger;
-            this.exchangeSetStorageProvider = exchangeSetStorageProvider;
-            this.azureAdB2CConfiguration = azureAdB2CConfiguration;
-            this.azureAdConfiguration = azureAdConfiguration;
+            this.exchangeSetStorageProvider = exchangeSetStorageProvider;          
             this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
             this.monitorHelper = monitorHelper;
             this.userIdentifier = userIdentifier;
+            this.azureAdB2CHelper = azureAdB2CHelper;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -73,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
-                bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
+                bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, productIdentifierRequest.CorrelationId);
                 if (isAzureB2C)
                 {
                     var checkFileResponse = CheckIfExchangeSetTooLarge(fileSize);
@@ -106,23 +103,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             return response;
         }
-
-        public bool IsAzureB2CUser(AzureAdB2C azureAdB2C)
-        {
-            bool isAzureB2CUser = false;
-            string b2CAuthority = $"{azureAdB2CConfiguration.Value.Instance}{azureAdB2CConfiguration.Value.TenantId}/v2.0/";// for B2C Token
-            string adB2CAuthority = $"{azureAdConfiguration.Value.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.Value.TenantId}/v2.0";// for AdB2C Token
-            string audience = azureAdB2CConfiguration.Value.ClientId;
-            if (azureAdB2C.IssToken == b2CAuthority && azureAdB2C.AudToken == audience)
-            {
-                isAzureB2CUser = true;
-            }
-            else if (azureAdB2C.IssToken == adB2CAuthority && azureAdB2C.AudToken == audience)
-            {
-                isAzureB2CUser = true;
-            }
-            return isAzureB2CUser;
-        }
+             
         public ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
         {
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
@@ -159,7 +140,7 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
-                bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
+                bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, request.CorrelationId);
                 if (isAzureB2C)
                 {
                     var checkFileResponse = CheckIfExchangeSetTooLarge(fileSize);
@@ -219,7 +200,7 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
-                bool isAzureB2C = IsAzureB2CUser(azureAdB2C);
+                bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, productDataSinceDateTimeRequest.CorrelationId);
                 if (isAzureB2C)
                 {
                     var checkFileResponse = CheckIfExchangeSetTooLarge(fileSize);
