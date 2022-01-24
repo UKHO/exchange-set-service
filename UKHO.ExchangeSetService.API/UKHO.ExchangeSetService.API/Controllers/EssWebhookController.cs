@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -63,9 +66,14 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 return GetCacheResponse();
             }
 
+            var knownTypesBinder = new KnownTypesBinder
+            {
+                KnownTypes = new List<Type> { typeof(CustomEventGridEvent) }
+            };
             var settings = new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.None
+                TypeNameHandling = TypeNameHandling.Objects,
+                SerializationBinder = knownTypesBinder
             };
             var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString(), settings);
             var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
@@ -88,6 +96,22 @@ namespace UKHO.ExchangeSetService.API.Controllers
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{productName} with OK response and _X-Correlation-ID:{correlationId}", productName, GetCurrentCorrelationId());
 
             return GetCacheResponse();
+        }
+    }
+
+    public class KnownTypesBinder : ISerializationBinder
+    {
+        public IList<Type> KnownTypes { get; set; }
+
+        public Type BindToType(string assemblyName, string typeName)
+        {
+            return KnownTypes.SingleOrDefault(t => t.Name == typeName);
+        }
+
+        public void BindToName(Type serializedType, out string assemblyName, out string typeName)
+        {
+            assemblyName = null;
+            typeName = serializedType.Name;
         }
     }
 }
