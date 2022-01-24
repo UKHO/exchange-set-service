@@ -53,7 +53,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.IsTrue(result);
         }        
 
-        #region AzureADB2CToken
         private AzureAdB2C GetAzureADToken()
         {
             return new AzureAdB2C()
@@ -80,6 +79,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 IssToken = "https://www.microsoft.com/0b29766b-896f-46df-8f1a-122d7c000d91/v2.0"
             };
         }
-        #endregion AzureB2CToken
+        
     }
 }
