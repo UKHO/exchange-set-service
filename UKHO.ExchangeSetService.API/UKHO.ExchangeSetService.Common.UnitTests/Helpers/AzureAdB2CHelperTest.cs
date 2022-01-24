@@ -62,6 +62,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 IssToken = string.Empty
             };
         }
+
         private AzureAdB2C GetAzureB2CToken()
         {
             return new AzureAdB2C()
