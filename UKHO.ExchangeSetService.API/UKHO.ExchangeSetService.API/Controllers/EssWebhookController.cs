@@ -62,8 +62,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed as Azure AD Authentication failed with OK response and _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
                 return GetCacheResponse();
             }
-
-            var eventGridEvent = JsonConvert.DeserializeObject<CustomEventGridEvent>(request.ToString());
+            
+            var eventGridEvent = new CustomEventGridEvent();
+            JsonConvert.PopulateObject(request.ToString(), eventGridEvent);          
             var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
 
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), GetCurrentCorrelationId());
