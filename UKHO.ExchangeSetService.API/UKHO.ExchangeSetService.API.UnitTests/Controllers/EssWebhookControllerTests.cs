@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenB2CUserRequestedNewFilesPublished_ThenAuthorize()
+        public async Task WhenB2CUserRequestedNewFilesPublished_ThenAuthorizeUser()
         {
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";

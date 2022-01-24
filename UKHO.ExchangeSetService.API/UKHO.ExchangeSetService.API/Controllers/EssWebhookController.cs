@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             if (!validationResult.IsValid)
             {
-                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadValidationEvent.ToEventId(), "Required attributes missing in event data from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}", data.BusinessUnit, GetCurrentCorrelationId());
+                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadValidationEvent.ToEventId(), "Required attributes missing in event data from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
                 Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{productName} as required data was missing in payload with OK response and _X-Correlation-ID:{correlationId}", productName, GetCurrentCorrelationId());
                 return GetCacheResponse();
             }
