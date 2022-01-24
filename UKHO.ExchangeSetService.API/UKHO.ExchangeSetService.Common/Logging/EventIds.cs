@@ -604,7 +604,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805149 - Check if event triggered is by B2C or AdB2C user in ESS
         /// </summary>
-        ESSB2CUserValidationEvent = 505149
+        ESSB2CUserValidationEvent = 805149
     }
 
     public static class EventIdExtensions
