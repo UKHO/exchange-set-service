@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Models.Request;
 namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
+    [Authorize]
     public class EssWebhookController : BaseController<EssWebhookController>
     {
         private readonly IEssWebhookService essWebhookService;
@@ -47,7 +48,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         [HttpPost]
         [Route("/webhook/newfilespublished")]
-        [Authorize]
         public virtual async Task<IActionResult> NewFilesPublished([FromBody] JObject request)
         {
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear Cache Event started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
