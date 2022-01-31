@@ -604,7 +604,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805149 - Check if event triggered is by B2C or AdB2C user in ESS
         /// </summary>
-        ESSB2CUserValidationEvent = 805149
+        ESSB2CUserValidationEvent = 805149,
+        /// <summary>
+        /// 805150 - Started processing the Options request for the New Files Published event webhook
+        /// </summary>
+        NewFilesPublishedWebhookOptionsCallStarted = 805150,
+        /// <summary>
+        /// 805151 - Completed processing the Options request for the New Files Published event webhook
+        /// </summary>
+        NewFilesPublishedWebhookOptionsCallCompleted = 805151
     }
 
     public static class EventIdExtensions

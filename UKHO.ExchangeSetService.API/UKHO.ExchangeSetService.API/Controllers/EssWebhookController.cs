@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -36,12 +34,15 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Route("/webhook/newfilespublished")]
         public IActionResult NewFilesPublishedOptions()
         {
-            using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
-            {
-                var webhookRequestOrigin = HttpContext.Request.Headers["WebHook-Request-Origin"].FirstOrDefault();
-                HttpContext.Response.Headers.Add("WebHook-Allowed-Rate", "*");
-                HttpContext.Response.Headers.Add("WebHook-Allowed-Origin", webhookRequestOrigin);
-            }
+            var webhookRequestOrigin = HttpContext.Request.Headers["WebHook-Request-Origin"].FirstOrDefault();
+
+            Logger.LogInformation(EventIds.NewFilesPublishedWebhookOptionsCallStarted.ToEventId(), "Started processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}", webhookRequestOrigin);
+
+            HttpContext.Response.Headers.Add("WebHook-Allowed-Rate", "*");
+            HttpContext.Response.Headers.Add("WebHook-Allowed-Origin", webhookRequestOrigin);
+
+            Logger.LogInformation(EventIds.NewFilesPublishedWebhookOptionsCallCompleted.ToEventId(), "Completed processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}", webhookRequestOrigin);
+
             return GetCacheResponse();
         }
 
@@ -50,13 +51,13 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual async Task<IActionResult> NewFilesPublished([FromBody] JObject request)
         {
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear Cache Event started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-            var azureAdB2C = new AzureAdB2C()
+            var azureAdB2C = new AzureAdB2C
             {
                 AudToken = TokenAudience,
                 IssToken = TokenIssuer
             };
-            bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, GetCurrentCorrelationId());
-            if (isAzureB2C)
+
+            if (azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, GetCurrentCorrelationId()))
             {
                 Logger.LogInformation(EventIds.ESSB2CUserValidationEvent.ToEventId(), "Event was triggered with invalid Azure AD token from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
                 Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed as Azure AD Authentication failed with OK response and _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
