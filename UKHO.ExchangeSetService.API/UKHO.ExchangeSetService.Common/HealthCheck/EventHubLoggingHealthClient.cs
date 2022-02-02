@@ -2,12 +2,16 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.Logging.EventHubLogProvider;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
@@ -31,7 +35,24 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
             try
             {
-                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId() + " of Event Hub")));
+                var logEntry = new LogEntry
+                {
+                    Timestamp = DateTime.UtcNow,
+                    Level = LogLevel.Trace.ToString(),
+                    MessageTemplate = "Event Hub Logging Event Data For Health Check",
+                    LogProperties = new Dictionary<string, object>
+                    {
+                        { "_Environment", eventHubLoggingConfiguration.Value.Environment },
+                        { "_System",      eventHubLoggingConfiguration.Value.System },
+                        { "_Service",     eventHubLoggingConfiguration.Value.Service },
+                        { "_NodeName",    eventHubLoggingConfiguration.Value.NodeName }
+                    },
+                    EventId = EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId()
+                };
+                var jsonLogEntry = JsonConvert.SerializeObject(logEntry);
+
+                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(jsonLogEntry)));
+
                 return HealthCheckResult.Healthy("Event hub is healthy");
             }
             catch (Exception ex)
