@@ -556,7 +556,63 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805137 - Request for uploading ENC files to ESS cache azure blob container is completed.
         /// </summary>
-        FileShareServiceUploadENCFilesToCacheCompleted = 805137
+        FileShareServiceUploadENCFilesToCacheCompleted = 805137,
+        /// <summary>
+        /// 805138 - Request for clearing Search and Download Cache Data from ESS is started.
+        /// </summary>
+        ESSClearCacheSearchDownloadEventStart = 805138,
+        /// <summary>
+        /// 805139 - Request for clearing Search and Download Cache Data from ESS is completed.
+        /// </summary>
+        ESSClearCacheSearchDownloadEventCompleted = 805139,
+        /// <summary>
+        /// 805140 - Started Deleting Search and Download Cache Data from ESS Cache Table and Blob
+        /// </summary>
+        DeleteSearchDownloadCacheDataEventStart = 805140,
+        /// <summary>
+        /// 805141 - Completed Deleting Search and Download Cache Data from ESS Cache Table and Blob
+        /// </summary>
+        DeleteSearchDownloadCacheDataEventCompleted = 805141,
+        /// <summary>
+        /// 805142 - Started Deleting Search and Download Cache Data from ESS Cache Table
+        /// </summary>
+        DeleteSearchDownloadCacheDataFromTableStarted = 805142,
+        /// <summary>
+        /// 805143 - Completed Deleting Search and Download Cache Data from ESS Cache Table
+        /// </summary>
+        DeleteSearchDownloadCacheDataFromTableCompleted = 805143,
+        /// <summary>
+        /// 805144 - No Data found in Caching Search and Download Table in ESS
+        /// </summary>
+        DeleteSearchDownloadCacheNoDataFoundEvent = 805144,
+        /// <summary>
+        /// 805145 - Invalid Request Data found in Caching Search and Download in ESS
+        /// </summary>
+        DeleteSearchDownloadInvalidCacheDataFoundEvent = 805145,
+        /// <summary>
+        /// 805146 - Started Deleting Search and Download cache data from container in ESS
+        /// </summary>
+        DeleteSearchDownloadCacheDataFromContainerStarted = 805146,
+        /// <summary>
+        /// 805147 - Completed Deleting Search and Download cache data from container in ESS
+        /// </summary>
+        DeleteSearchDownloadCacheDataFromContainerCompleted = 805147,
+        /// <summary>
+        /// 805148 - Request for validation event for clear Cache Search and Download in ESS
+        /// </summary>
+        ESSClearCacheSearchDownloadValidationEvent = 805148,
+        /// <summary>
+        /// 805149 - Check if event triggered is by B2C or AdB2C user in ESS
+        /// </summary>
+        ESSB2CUserValidationEvent = 805149,
+        /// <summary>
+        /// 805150 - Started processing the Options request for the New Files Published event webhook
+        /// </summary>
+        NewFilesPublishedWebhookOptionsCallStarted = 805150,
+        /// <summary>
+        /// 805151 - Completed processing the Options request for the New Files Published event webhook
+        /// </summary>
+        NewFilesPublishedWebhookOptionsCallCompleted = 805151
     }
 
     public static class EventIdExtensions

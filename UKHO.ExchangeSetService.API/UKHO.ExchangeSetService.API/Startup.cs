@@ -119,6 +119,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
             services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
+            services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddApplicationInsightsTelemetry();
 
@@ -181,6 +182,9 @@ namespace UKHO.ExchangeSetService.API
                 .AddCheck<AzureMessageQueueHealthCheck>("AzureMessageQueueHealthCheck")
                 .AddCheck<AzureWebJobsHealthCheck>("AzureWebJobsHealthCheck");
             services.AddDistributedMemoryCache();
+
+            services.AddScoped<IEnterpriseEventCacheDataRequestValidator, EnterpriseEventCacheDataRequestValidator>();
+            services.AddScoped<IEssWebhookService, EssWebhookService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

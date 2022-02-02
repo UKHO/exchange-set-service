@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildInternalServerErrorResponse();
             }
         }
-
+       
         private IActionResult BuildNotModifiedResponse(ExchangeSetServiceResponse model)
         {
             LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
@@ -108,6 +108,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
             if (model.LastModified != null)
                 httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
             return Ok(model.ExchangeSetResponse);
+        }
+
+        protected IActionResult GetCacheResponse()
+        {
+            return new OkObjectResult(StatusCodes.Status200OK);
         }
 
         private void LogError(EventId eventId, List<Error> errors, string errorType, string correlationId)
