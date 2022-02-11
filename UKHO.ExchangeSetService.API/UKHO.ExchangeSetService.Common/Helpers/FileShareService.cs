@@ -335,12 +335,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public (string, string) GenerateQueryForFss(List<Products> products)
         {
-            var productIndex = 1;
-            var productCount = products.Count;
             var sb = new StringBuilder();
             var sbLog = new StringBuilder();
             if (products != null && products.Any())
             {
+                var productCount = products.Count;
+                var productIndex = 1;
+
                 sb.Append("(");////1st main (
                 foreach (var item in products)
                 {
@@ -349,10 +350,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     itemSb.Append("(");////1st product
                     itemSb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
                     itemSb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
-                    var lstCount = item.UpdateNumbers.Count;
-                    var index = 1;
                     if (item.UpdateNumbers != null && item.UpdateNumbers.Any())
                     {
+                        var lstCount = item.UpdateNumbers.Count;
+                        var index = 1;
+
                         foreach (var updateNumberItem in item.UpdateNumbers)
                         {
                             if (index == 1)
@@ -689,14 +691,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 UploadSize = customFileInfo.Length,
                 BlockSizeInMultipleOfKBs = fileShareServiceConfig.Value.BlockSizeInMultipleOfKBs
             };
-            var blockSizeInMultipleOfKBs = uploadMessage.BlockSizeInMultipleOfKBs <= 0
-                                            || uploadMessage.BlockSizeInMultipleOfKBs > 4096 ? 1024 : uploadMessage.BlockSizeInMultipleOfKBs;
+            long blockSizeInMultipleOfKBs = uploadMessage.BlockSizeInMultipleOfKBs <= 0 || uploadMessage.BlockSizeInMultipleOfKBs > 4096
+                ? 1024
+                : uploadMessage.BlockSizeInMultipleOfKBs;
             long blockSize = blockSizeInMultipleOfKBs * 1024;
             List<string> blockIdList = new List<string>();
             List<Task> ParallelBlockUploadTasks = new List<Task>();
             long uploadedBytes = 0;
             int blockNum = 0;
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
             while (uploadedBytes < customFileInfo.Length)
             {
