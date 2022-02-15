@@ -200,7 +200,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// Provide all the releasable data after a datetime.
         /// </summary>
         /// <remarks>Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.</remarks>
-        /// <param name="sinceDateTime" example="Wed, 21 Oct 2015 07:28:00 GMT" >The date and time from which changes are requested. Any changes since the date will be returned. The value should be the Last-Modified date returned by the last request to this operation. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
+        /// <param name="sinceDateTime" example="Wed, 21 Oct 2015 07:28:00 GMT" >The date and time from which changes are requested. Any changes since the date will be returned. The value should be the value in the `Date` header returned by the last request to this operation. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
         /// <br/><para><i>Example</i> : Wed, 21 Oct 2015 07:28:00 GMT</para>
         /// </param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
@@ -215,9 +215,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Route("/productData")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.OK, name: "Last-Modified", type: "string", description: "Returns the date and time the file was last modified. The date format is in RFC 1123 format.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.OK, name: "Date", type: "string", description: "Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "<p>A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</p><p>If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</p>")]
-        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.NotModified, name: "Last-Modified", type: "string", description: "Returns the date and time the file was last modified. The date format is in RFC 1123 format.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.NotModified, name: "Date", type: "string", description: "Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
