@@ -350,6 +350,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     itemSb.Append("(");////1st product
                     itemSb.AppendFormat(fileShareServiceConfig.Value.CellName, item.ProductName);
                     itemSb.AppendFormat(fileShareServiceConfig.Value.EditionNumber, item.EditionNumber);
+                    var updateNumbers = string.Empty;
                     if (item.UpdateNumbers != null && item.UpdateNumbers.Any())
                     {
                         var lstCount = item.UpdateNumbers.Count;
@@ -374,9 +375,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             itemSb.Append(lstCount != index ? "or " : "))");
                             index += 1;
                         }
+
+                        updateNumbers = string.Join(",", item.UpdateNumbers.Select(a => a.Value.ToString()));
                     }
-                    itemSb.Append(cancellation.ToString() + (productCount == productIndex ? ")" : ") or "));/////last product or with multiple
-                    sbLog.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", item.ProductName, item.EditionNumber.ToString(), string.Join(",", item?.UpdateNumbers.Select(a => a.Value.ToString())));
+                    itemSb.Append(cancellation + (productCount == productIndex ? ")" : ") or "));/////last product or with multiple
+                    sbLog.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", item.ProductName, item.EditionNumber.ToString(), updateNumbers);
                     if (cancellation.Length > 0)
                     {
                         sbLog.AppendFormat("\n with Cancellation Product/CellName:{0}, EditionNumber:{1} and UpdateNumber:{2}", item.ProductName, item.Cancellation.EditionNumber.ToString(), item.Cancellation.UpdateNumber.ToString());
