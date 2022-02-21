@@ -232,7 +232,7 @@ namespace UKHO.ExchangeSetService.API
 
             builder.AddEnvironmentVariables();
 
-            var tempConfig = builder.Build();
+            using var tempConfig = builder.Build() as ConfigurationRoot;
             string kvServiceUri = tempConfig["KeyVaultSettings:ServiceUri"];
 
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
