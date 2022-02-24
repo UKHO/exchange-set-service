@@ -54,10 +54,6 @@ paths:
       responses:
         "200":
           description: A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
-          headers:
-            Last-Modified:
-              schema:
-                $ref: "#/components/schemas/Last-Modified"
           content:
             application/json:
               schema:
@@ -81,11 +77,11 @@ paths:
 
         "500":
           $ref: "#/components/responses/internalServerError"
-          
+
       callbacks:
         fulfilmentResponse:
           $ref: "#/components/callbacks/fulfilmentResponse"
-          
+
   /productData/productVersions:
     post:
       summary: Given a set of ENC versions (e.g. Edition x Update y) provide any later releasable files.
@@ -143,10 +139,10 @@ paths:
 
         "500":
           $ref: "#/components/responses/internalServerError"
-      
+
       callbacks:
         fulfilmentResponse:
-          $ref: "#/components/callbacks/fulfilmentResponse"    
+          $ref: "#/components/callbacks/fulfilmentResponse"
 
   /productData:
     post:
@@ -167,9 +163,10 @@ paths:
 
             If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
-            Last-Modified:
+            Date:
+              description: Returns the current date and time on the server and should be used in subsequent requests this operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
               schema:
-                $ref: "#/components/schemas/Last-Modified"
+                $ref: "#/components/schemas/Date-Header"
           content:
             application/json:
               schema:
@@ -178,9 +175,9 @@ paths:
         "304":
           description: Not modified.
           headers:
-            Last-Modified:
+            Date:
               schema:
-                $ref: "#/components/schemas/Last-Modified"
+                $ref: "#/components/schemas/Date-Header"
 
         "400":
           description: Bad request.
@@ -200,7 +197,7 @@ paths:
 
         "500":
           $ref: "#/components/responses/internalServerError"
-      
+
       callbacks:
         fulfilmentResponse:
           $ref: "#/components/callbacks/fulfilmentResponse"
@@ -212,17 +209,17 @@ paths:
       description: |
         Returns a token direct from AAD using Client Credentials
       requestBody:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  client_id:
-                    type: string
-                    description: The application ID that's assigned to the distributor's app. This will be provided to the distributor when they register their application.
-                  client_secret:
-                    type: string
-                    description: The client secret that has been generated for the distributor's app when the app was registered. The client secret must be URL-encoded before being sent. 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                  description: The application ID that's assigned to the distributor's app. This will be provided to the distributor when they register their application.
+                client_secret:
+                  type: string
+                  description: The client secret that has been generated for the distributor's app when the app was registered. The client secret must be URL-encoded before being sent.
       responses:
         200:
           description: OK.
@@ -232,13 +229,13 @@ paths:
                 type: object
                 properties:
                   token_type:
-                      type: string
+                    type: string
                   expires_in:
-                      type: string
+                    type: string
                   ext_expires_in:
-                      type: string
+                    type: string
                   access_token:
-                      type: string
+                    type: string
               example: |
                 {
                   "token_type": "Bearer",
@@ -256,11 +253,11 @@ paths:
                 {
                   "correlationId": "184ef711-b039-4c24-b81a-89081d8f324c",
                   "errors": [
-                    {
-                      "source": "request",
-                      "description": "request missing client_id and/or client_secret"
-                    }
-                  ]
+                      {
+                        "source": "request",
+                        "description": "request missing client_id and/or client_secret"
+                      }
+                    ]
                 }
         401:
           $ref: "#/components/responses/unauthorised"
@@ -281,7 +278,7 @@ components:
       name: sinceDateTime
       required: true
       description: |
-        The date and time from which changes are requested. Any changes since the date will be returned. The value should be the Last-Modified date returned by the last request to this operation. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
+        The date and time from which changes are requested. Any changes since the date will be returned. The value should be the value in the `Date` header returned by the last request to this operation. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
       schema:
         type: string
         format: date-time
@@ -441,6 +438,12 @@ components:
       type: string
       format: date-time
       description: Returns the date and time the file was last modified. The date format is in RFC 1123 format.
+      example: Wed, 21 Oct 2015 07:28:00 GMT
+
+    Date-Header:
+      type: string
+      format: date-time
+      description: Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
       example: Wed, 21 Oct 2015 07:28:00 GMT
 
     ####################################
@@ -623,7 +626,7 @@ components:
     ######################
     #      callbacks     #
     ######################
-    
+
   callbacks:
     fulfilmentResponse:
       '{$request.query.callbackUri}':
@@ -631,11 +634,11 @@ components:
           summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
           description: |
             Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
-    
+
             ## Data:
-    
+
             The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
-    
+
           requestBody:
             content:
               application/json:
