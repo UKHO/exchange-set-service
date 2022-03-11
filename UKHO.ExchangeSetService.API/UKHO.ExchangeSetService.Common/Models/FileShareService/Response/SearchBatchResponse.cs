@@ -11,7 +11,7 @@ namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
 
         public List<BatchDetail> Entries { get; set; }
 
-        [JsonProperty("_Links")]
+        [JsonProperty("_links")]
         public PagingLinks Links { get; set; }
 
         [JsonIgnore]
