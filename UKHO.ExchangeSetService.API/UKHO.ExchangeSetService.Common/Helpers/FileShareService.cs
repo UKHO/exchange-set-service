@@ -151,7 +151,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                         if (httpResponse.IsSuccessStatusCode)
                         {
-                            uri = await SelectLatestPublishedDateBatch(cacheProductsNotFound, internalSearchBatchResponse, uri, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                            uri = await SelectLatestPublishedDateBatch(cacheProductsNotFound, internalSearchBatchResponse, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
                         }
                         else
                         {
@@ -236,7 +236,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        private async Task<string> SelectLatestPublishedDateBatch(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string uri, HttpResponseMessage httpResponse, List<string> productList, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
+        private async Task<string> SelectLatestPublishedDateBatch(List<Products> products, SearchBatchResponse internalSearchBatchResponse, HttpResponseMessage httpResponse, List<string> productList, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
         {
             SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
             foreach (var item in searchBatchResponse.Entries)
@@ -256,10 +256,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         await CheckProductOrCancellationData(internalSearchBatchResponse, productList, item, productItem, updateNumber, compareProducts, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
                     }
                 }
-                uri = searchBatchResponse.Links.Next?.Href;
             }
 
-            return uri;
+            return searchBatchResponse.Links?.Next?.Href;
         }
 
         private async Task CheckProductOrCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string updateNumber, string compareProducts, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
