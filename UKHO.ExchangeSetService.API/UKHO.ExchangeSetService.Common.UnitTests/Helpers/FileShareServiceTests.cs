@@ -976,7 +976,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        [Ignore("This test will be fixed in a separate branch")]
         public void WhenInvalidUploadZipFileRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
