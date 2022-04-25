@@ -17,7 +17,7 @@ locals {
     SERVICE          = "Exchange Set Service"
     ENVIRONMENT      = local.env_name
     SERVICE_OWNER    = "UKHO"
-    RESPONSIBLE_TEAM = "Mastek"
+    RESPONSIBLE_TEAM = "Abzu"
     CALLOUT_TEAM     = "On-Call_N/A"
     COST_CENTRE      = "A.008.02"
   }
