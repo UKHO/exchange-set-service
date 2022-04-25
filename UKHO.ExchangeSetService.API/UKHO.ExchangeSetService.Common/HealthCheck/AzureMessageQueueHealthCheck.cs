@@ -45,23 +45,20 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     logger.LogDebug(EventIds.AzureMessageQueueIsHealthy.ToEventId(), "Azure message queue is healthy");
                     return HealthCheckResult.Healthy("Azure message queue is healthy");
                 }
-                else
-                {
-                    logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), messageQueuesHealth.Exception, "Azure message queue is unhealthy with error {Message}", messageQueuesHealth.Result.Exception.Message);
-                    return HealthCheckResult.Unhealthy("Azure message queue is unhealthy", messageQueuesHealth.Exception);
-                }
+
+                logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), messageQueuesHealth.Exception, "Azure message queue is unhealthy with error {Message}", messageQueuesHealth.Result.Exception.Message);
+                return HealthCheckResult.Unhealthy("Azure message queue is unhealthy", messageQueuesHealth.Exception);
             }
             catch (Exception ex)
             {
-                logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), ex, "Azure message queue is unhealthy with error {Message}", ex.Message);
-                return HealthCheckResult.Unhealthy("Azure message queue is unhealthy", ex);
+                logger.LogError(EventIds.EventHubLoggingIsUnhealthy.ToEventId(), ex, "Health check for Azure Message Queue threw an exception");
+                return HealthCheckResult.Unhealthy("Health check for Azure Message Queue threw an exception", ex);
             }
         }
 
         private async Task<HealthCheckResult> CheckAllMessageQueuesHealth()
         {
             string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
-            string storageAccountConnectionString, queueName = string.Empty;
 
             HealthCheckResult messageQueueHealthStatus = new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy");
             foreach (string exchangeSetTypeName in exchangeSetTypes)
@@ -69,9 +66,9 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 Enum.TryParse(exchangeSetTypeName, out ExchangeSetType exchangeSetType);
                 for (int i = 1; i <= azureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(exchangeSetType); i++)
                 {
-                    queueName = string.Format(essFulfilmentStorageConfiguration.Value.DynamicQueueName, i);
+                    var queueName = string.Format(essFulfilmentStorageConfiguration.Value.DynamicQueueName, i);
                     var storageAccountWithKey = azureBlobStorageService.GetStorageAccountNameAndKeyBasedOnExchangeSetType(exchangeSetType);
-                    storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
+                    var storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
                     messageQueueHealthStatus = await azureMessageQueueHelper.CheckMessageQueueHealth(storageAccountConnectionString, queueName);
                     if (messageQueueHealthStatus.Status == HealthStatus.Unhealthy)
                     {

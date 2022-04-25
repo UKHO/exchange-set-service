@@ -35,41 +35,33 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
-            try
+            string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
+            List<WebJobDetails> webJobs = new List<WebJobDetails>();
+            foreach (string exchangeSetTypeName in exchangeSetTypes)
             {
-                string webJobUri, userNameKey, passwordKey = string.Empty;
-                string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
-                List<WebJobDetails> webJobs = new List<WebJobDetails>();
-                foreach (string exchangeSetTypeName in exchangeSetTypes)
+                Enum.TryParse(exchangeSetTypeName, out ExchangeSetType exchangeSetType);
+                for (int instance = 1; instance <= azureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(exchangeSetType); instance++)
                 {
-                    Enum.TryParse(exchangeSetTypeName, out ExchangeSetType exchangeSetType);
-                    for (int instance = 1; instance <= azureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(exchangeSetType); instance++)
+                    string userNameKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-username";
+                    string passwordKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-password";
+                    string webJobUri = $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
+                    string userPassword = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey) + ":" + webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
+                    userPassword = Convert.ToBase64String(Encoding.Default.GetBytes(userPassword));
+
+                    WebJobDetails webJobDetails = new WebJobDetails
                     {
-                        userNameKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-username";
-                        passwordKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-password";
-                        webJobUri = $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
-                        string userPassword = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey) + ":" + webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
-                        userPassword = Convert.ToBase64String(Encoding.Default.GetBytes(userPassword));
-
-                        WebJobDetails webJobDetails = new WebJobDetails
-                        {
-                            UserPassword = userPassword,
-                            WebJobUri = webJobUri,
-                            ExchangeSetType = exchangeSetTypeName,
-                            Instance = instance
-                        };
-                        webJobs.Add(webJobDetails);
-                    }
+                        UserPassword = userPassword,
+                        WebJobUri = webJobUri,
+                        ExchangeSetType = exchangeSetTypeName,
+                        Instance = instance
+                    };
+                    webJobs.Add(webJobDetails);
                 }
-                var webJobsHealth = azureWebJobsHealthCheckClient.CheckAllWebJobsHealth(webJobs);
-                await Task.WhenAll(webJobsHealth);
+            }
+            var webJobsHealth = azureWebJobsHealthCheckClient.CheckAllWebJobsHealth(webJobs);
+            await Task.WhenAll(webJobsHealth);
 
-                return webJobsHealth.Result;
-            }
-            catch (Exception ex)
-            {
-                return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(ex.Message));
-            }
+            return webJobsHealth.Result;
         }
     }
 }

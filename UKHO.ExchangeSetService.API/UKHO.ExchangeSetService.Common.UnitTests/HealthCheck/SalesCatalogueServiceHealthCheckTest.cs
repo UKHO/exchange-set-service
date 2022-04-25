@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         #endregion
 
         [Test]
-        public async Task WhenSCSClientReturnsOtherThan200And304_ThenSalesCatalougeServiceIsHealthy()
+        public async Task WhenSCSClientReturnsOtherThan200And304_ThenSalesCatalogueServiceIsHealthy()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
-        public async Task WhenSCSClientReturns200_ThenSalesCatalougeServiceIsHealthy()
+        public async Task WhenSCSClientReturns200_ThenSalesCatalogueServiceIsHealthy()
         {
             List<SalesCatalogueDataProductResponse> scsResponse = GetSalesCatalogueDataProductResponse();
 
@@ -96,11 +96,23 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
-        public async Task WhenSCSClientReturns503_ThenSalesCatalougeServiceIsUnhealthy()
+        public async Task WhenSCSClientReturns503_ThenSalesCatalogueServiceIsUnhealthy()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.ServiceUnavailable, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("ServiceUnavailable"))) });
+
+            var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
+
+        [Test]
+        public async Task WhenSCSClientThrowsException_ThenSalesCatalogueServiceIsUnhealthy()
+        {
+            A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Throws<Exception>();
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 

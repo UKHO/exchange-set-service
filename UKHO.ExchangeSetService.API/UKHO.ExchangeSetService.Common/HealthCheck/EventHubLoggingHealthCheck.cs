@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var healthCheckResult = await eventHubLoggingHealthClient.CheckHealthAsync(context);
+            var healthCheckResult = await eventHubLoggingHealthClient.CheckHealthAsync(context, cancellationToken);
             if (healthCheckResult.Status == HealthStatus.Healthy)
             {
                 logger.LogDebug(EventIds.EventHubLoggingIsHealthy.ToEventId(), "Event hub is healthy");

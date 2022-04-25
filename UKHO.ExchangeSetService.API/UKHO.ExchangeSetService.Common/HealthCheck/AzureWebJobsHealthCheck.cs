@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using System;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,16 +21,24 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var healthCheckResult = await azureWebJobsHealthCheckService.CheckHealthAsync();
-            if (healthCheckResult.Status == HealthStatus.Healthy)
+            try
             {
-                logger.LogDebug(EventIds.AzureWebJobIsHealthy.ToEventId(), "Azure webjob is healthy");
+                var healthCheckResult = await azureWebJobsHealthCheckService.CheckHealthAsync(cancellationToken);
+                if (healthCheckResult.Status == HealthStatus.Healthy)
+                {
+                    logger.LogDebug(EventIds.AzureWebJobIsHealthy.ToEventId(), "Azure webjob is healthy");
+                }
+                else
+                {
+                    logger.LogError(EventIds.AzureWebJobIsUnhealthy.ToEventId(), healthCheckResult.Exception, "Azure webjob is unhealthy with error {Message}", healthCheckResult.Exception.Message);
+                }
+                return healthCheckResult;
             }
-            else
+            catch (Exception ex)
             {
-                logger.LogError(EventIds.AzureWebJobIsUnhealthy.ToEventId(), healthCheckResult.Exception, "Azure webjob is unhealthy with error {Message}", healthCheckResult.Exception.Message);
+                logger.LogError(EventIds.EventHubLoggingIsUnhealthy.ToEventId(), ex, "Health check for Azure Webjob threw an exception");
+                return HealthCheckResult.Unhealthy("Health check for Azure Webjob threw an exception", ex);
             }
-            return healthCheckResult;
         }
     }
 }
