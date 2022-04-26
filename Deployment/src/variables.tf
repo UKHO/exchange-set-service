@@ -16,8 +16,8 @@ locals {
   tags = {
     SERVICE          = "Exchange Set Service"
     ENVIRONMENT      = local.env_name
-    SERVICE_OWNER    = "UKHO"
-    RESPONSIBLE_TEAM = "Mastek"
+    SERVICE_OWNER    = "Robin Chapman"
+    RESPONSIBLE_TEAM = "Abzu"
     CALLOUT_TEAM     = "On-Call_N/A"
     COST_CENTRE      = "A.008.02"
   }

@@ -22,8 +22,8 @@ locals {
   tags = {
     SERVICE          = "test"
     ENVIRONMENT      = "functionaltest-${local.env_name}"
-    SERVICE_OWNER    = "UKHO"
-    RESPONSIBLE_TEAM = "Mastek"
+    SERVICE_OWNER    = "Robin Chapman"
+    RESPONSIBLE_TEAM = "Abzu"
     CALLOUT_TEAM     = "On-Call_N/A"
     COST_CENTRE      = "P.431"
   }
