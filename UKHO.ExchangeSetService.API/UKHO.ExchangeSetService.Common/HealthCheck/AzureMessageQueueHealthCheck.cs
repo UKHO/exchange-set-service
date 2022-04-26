@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
             catch (Exception ex)
             {
-                logger.LogError(EventIds.EventHubLoggingIsUnhealthy.ToEventId(), ex, "Health check for Azure Message Queue threw an exception");
+                logger.LogError(EventIds.AzureMessageQueueIsUnhealthy.ToEventId(), ex, "Health check for Azure Message Queue threw an exception");
                 return HealthCheckResult.Unhealthy("Health check for Azure Message Queue threw an exception", ex);
             }
         }

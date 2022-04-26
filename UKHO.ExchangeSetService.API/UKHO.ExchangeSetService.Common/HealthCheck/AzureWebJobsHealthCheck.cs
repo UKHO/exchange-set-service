@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
             catch (Exception ex)
             {
-                logger.LogError(EventIds.EventHubLoggingIsUnhealthy.ToEventId(), ex, "Health check for Azure Webjob threw an exception");
+                logger.LogError(EventIds.AzureWebJobIsUnhealthy.ToEventId(), ex, "Health check for Azure Webjob threw an exception");
                 return HealthCheckResult.Unhealthy("Health check for Azure Webjob threw an exception", ex);
             }
         }
