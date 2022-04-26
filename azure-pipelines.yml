@@ -10,6 +10,14 @@ trigger:
   - main
   - release/*
 
+schedules:
+- cron: "0 4 * * 1"
+  displayName: "Weekly NVD Check Build"
+  branches:
+    include:
+    - main
+  always: true
+
 pool: NautilusBuild
 
 variables:
