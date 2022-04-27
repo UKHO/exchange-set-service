@@ -43,5 +43,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
         }
+
+        [Test]
+        public async Task WhenCheckHealthAsyncThrowException_ThenReturnUnhealthy()
+        {
+            A.CallTo(() => fakeAzureWebJobsHealthCheckService.CheckHealthAsync(A<CancellationToken>.Ignored)).Throws<Exception>();
+
+            var response = await azureWebJobsHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
     }
 }

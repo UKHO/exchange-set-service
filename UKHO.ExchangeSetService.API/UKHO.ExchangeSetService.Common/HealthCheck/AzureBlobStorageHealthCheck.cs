@@ -58,8 +58,8 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
             catch (Exception ex)
             {
-                logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), ex, "Azure blob storage is unhealthy with error {Message}", ex.Message);
-                return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", ex);
+                logger.LogError(EventIds.AzureBlobStorageIsUnhealthy.ToEventId(), ex, "Health check for Azure Blob Storage threw an exception");
+                return HealthCheckResult.Unhealthy("Health check for Azure Blob Storage threw an exception", ex);
             }
         }
     }

@@ -34,16 +34,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
-        public async Task WhenAzureWebJobsHealthCheckThrowException_ThenReturnUnhealthy()
-        {
-            fakeEssFulfilmentStorageConfiguration.Value.ExchangeSetTypes = null;
-
-            var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
-
-            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
-        }
-
-        [Test]
         public async Task WhenAzureWebJobStatusIsNotRunning_ThenReturnUnhealthy()
         {
             A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);

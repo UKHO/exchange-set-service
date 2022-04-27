@@ -66,5 +66,38 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
         }
+
+        [Test]
+        public async Task WhenGetInstanceCountBasedOnExchangeSetTypeThrowsException_ThenAzureMessageQueueIsUnhealthy()
+        {
+            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Throws<Exception>();
+
+            var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
+
+        [Test]
+        public async Task WhenGetStorageAccountConnectionStringThrowsException_ThenAzureMessageQueueIsUnhealthy()
+        {
+            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Throws<Exception>();
+
+            var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
+
+        [Test]
+        public async Task WhenCheckMessageQueueHealthThrowsException_ThenAzureMessageQueueIsUnhealthy()
+        {
+            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Throws<Exception>();
+
+            var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
     }
 }
