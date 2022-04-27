@@ -63,5 +63,26 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
         }
+
+        [Test]
+        public async Task WhenGetStorageAccountConnectionStringThrowsException_ThenAzureBlobStorageServiceIsUnhealthy()
+        {
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Throws<Exception>();
+
+            var response = await azureBlobStorageHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
+
+        [Test]
+        public async Task WhenCheckBlobContainerHealthThrowsException_ThenAzureBlobStorageServiceIsUnhealthy()
+        {
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeAzureBlobStorageClient.CheckBlobContainerHealth(A<string>.Ignored, A<string>.Ignored)).Throws<Exception>();
+
+            var response = await azureBlobStorageHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
     }
 }

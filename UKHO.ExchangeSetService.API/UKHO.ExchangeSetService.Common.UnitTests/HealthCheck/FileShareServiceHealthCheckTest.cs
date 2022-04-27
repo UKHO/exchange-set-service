@@ -78,5 +78,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
         }
+
+        [Test]
+        public async Task WhenFSSClientThrowsException_ThenFileShareServiceIsUnhealthy()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                .Throws<Exception>();
+
+            var response = await fileShareServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
     }
 }

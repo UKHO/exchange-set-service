@@ -32,19 +32,25 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            string sinceDateTime = DateTime.UtcNow.AddDays(-salesCatalogueConfig.Value.SinceDays).ToString("R");
-            var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
-            var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
-            var salesCatalogueServiceResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
-            if (salesCatalogueServiceResponse.StatusCode == HttpStatusCode.OK || salesCatalogueServiceResponse.StatusCode == HttpStatusCode.NotModified)
+            try
             {
-                logger.LogDebug(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), "Sales catalogue service is healthy responded with {StatusCode}", salesCatalogueServiceResponse.StatusCode);
-                return HealthCheckResult.Healthy("Sales catalogue service is healthy");
-            }
-            else
-            {
+                string sinceDateTime = DateTime.UtcNow.AddDays(-salesCatalogueConfig.Value.SinceDays).ToString("R");
+                var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
+                var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
+                var salesCatalogueServiceResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
+                if (salesCatalogueServiceResponse.StatusCode == HttpStatusCode.OK || salesCatalogueServiceResponse.StatusCode == HttpStatusCode.NotModified)
+                {
+                    logger.LogDebug(EventIds.SalesCatalogueServiceIsHealthy.ToEventId(), "Sales catalogue service is healthy responded with {StatusCode}", salesCatalogueServiceResponse.StatusCode);
+                    return HealthCheckResult.Healthy("Sales catalogue service is healthy");
+                }
+
                 logger.LogError(EventIds.SalesCatalogueServiceIsUnhealthy.ToEventId(), "Sales catalogue service is unhealthy responded with {StatusCode} for request uri {RequestUri}", salesCatalogueServiceResponse.StatusCode, salesCatalogueServiceResponse.RequestMessage.RequestUri);
                 return HealthCheckResult.Unhealthy("Sales catalogue service is unhealthy");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIds.SalesCatalogueServiceIsUnhealthy.ToEventId(), ex, "Health check for the Sales Catalogue Service threw an exception");
+                return HealthCheckResult.Unhealthy("Health check for the Sales Catalogue Service threw an exception", ex);
             }
         }
     }
