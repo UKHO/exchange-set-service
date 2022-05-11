@@ -976,28 +976,31 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        [Ignore("This test will be fixed in a separate branch")]
         public void WhenInvalidUploadZipFileRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
             fakeFileShareConfig.Value.BaseUrl = null;
-            byte[] byteData = new byte[1024];
-            var responseBatchStatusModel = GetBatchStatusResponse();
-            responseBatchStatusModel.Status = "";
-            var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
-
+            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
+            
             var GetFileInfoDetails = GetFileInfo();
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
-            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
-            .Returns(httpResponse);
-            A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-            .Returns(httpResponse);
+            
+            var badUploadResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
 
+            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(badUploadResponse);
+             
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                    async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
