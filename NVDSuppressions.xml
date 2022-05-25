@@ -227,4 +227,17 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
     </notes>
     <cve>CVE-2018-8292</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Http:2.2.2
+    See https://nvd.nist.gov/vuln/detail/CVE-2020-1045 for full details of this CVE.
+    A security feature bypass vulnerability exists in the way Microsoft ASP.NET Core parses encoded cookie names.
+    The ASP.NET Core cookie parser decodes entire cookie strings which could allow a malicious attacker to set a second cookie with the name being percent encoded.
+    Affected software - Any .NET Core 3.1 application running on .NET Core 3.1.7 or lower & any .NET Core 2.1 application running on .NET Core 2.1.21 or lower
+    ESS is pinned to .Net core SDK > 3.1.419 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2020-1045</cve>
+  </suppress>
 </suppressions>
