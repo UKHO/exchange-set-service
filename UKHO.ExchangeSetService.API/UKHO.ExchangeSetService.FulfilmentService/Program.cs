@@ -180,6 +180,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
                  services.Configure<EssCallBackConfiguration>(ConfigurationBuilder.GetSection("ESSCallBackConfiguration"));
+                 services.Configure<PeriodicOutputServiceConfiguration>(ConfigurationBuilder.GetSection("PeriodicOutputServiceConfiguration"));
 
                  services.AddDistributedMemoryCache();
 

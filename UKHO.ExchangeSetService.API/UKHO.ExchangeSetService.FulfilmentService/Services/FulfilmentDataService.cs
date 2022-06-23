@@ -28,6 +28,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
         private readonly IMonitorHelper monitorHelper;
+        private readonly IFileSystemHelper fileSystemHelper;
+
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     ILogger<FulfilmentDataService> logger,
@@ -36,7 +38,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
                                     IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
                                     IFulfilmentCallBackService fulfilmentCallBackService,
-                                    IMonitorHelper monitorHelper)
+                                    IMonitorHelper monitorHelper,
+                                    IFileSystemHelper fileSystemHelper)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -47,12 +50,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentSalesCatalogueService = fulfilmentSalesCatalogueService;
             this.fulfilmentCallBackService = fulfilmentCallBackService;
             this.monitorHelper = monitorHelper;
+            this.fileSystemHelper = fileSystemHelper;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
+
+            if(CommonHelper.Pos)
+            {
+                var largeMediaExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, "M01X02");
+                fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
+                return "Exchange Set Created";
+            }
+
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);

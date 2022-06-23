@@ -27,11 +27,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IAzureBlobStorageService azureBlobStorageService;
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
+        private readonly IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration;
 
         public FulfilmentServiceJob(IConfiguration configuration,
                                     IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                     IFileShareService fileShareService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                    IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService)
+                                    IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
+                                    IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
         {
             this.configuration = configuration;
             this.fulFilmentDataService = fulFilmentDataService;
@@ -41,6 +43,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentCallBackService = fulfilmentCallBackService;
+            this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
         }
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] CloudQueueMessage message)
@@ -49,13 +52,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             string homeDirectoryPath = configuration["HOME"];
             string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
             string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate, fulfilmentServiceQueueMessage.BatchId);
+            double fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(fulfilmentServiceQueueMessage.FileSize);
+
+            CommonHelper.Pos = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
 
             try
             {
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
                     EventIds.CreateExchangeSetRequestCompleted,
                     "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                    async () => {
+                    async () =>
+                    {
                         return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate);
                     },
                 fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
@@ -97,8 +104,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     logger.LogError(EventIds.ErrorTxtNotUploaded.ToEventId(), "Error while uploading error.txt file to file share service for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
             }
             else
-            { 
-                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId); 
+            {
+                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
             }
 
             await SendErrorCallBackResponse(fulfilmentServiceQueueMessage);
