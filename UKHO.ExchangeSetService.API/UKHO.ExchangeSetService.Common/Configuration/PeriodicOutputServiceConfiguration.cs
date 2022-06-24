@@ -6,6 +6,6 @@ namespace UKHO.ExchangeSetService.Common.Configuration
     public class PeriodicOutputServiceConfiguration
     {
         public double LargeMediaExchangeSetSizeInMB { get; set; }
-        public string MediaSetFolderName { get; set; }
+        public string LargeExchangeSetFolderName { get; set; }
     }
 }

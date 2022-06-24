@@ -285,5 +285,30 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         #endregion
+
+        #region CreateMediaFile
+        [Test]
+        public void WhenInvalidCreateMediaFileRequest_ThenReturnFulfilmentException()
+        {
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1"); });
+        }
+
+        [Test]
+        public async Task WhenValidCreateMediaFileRequest_ThenReturnTrueResponse()
+        {
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+
+            var response = await fulfilmentAncillaryFiles.CreateMediaFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1");
+
+            Assert.AreEqual(true, response);
+        }
+        #endregion
     }
 }

@@ -34,6 +34,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFulfilmentDataService fakeFulfilmentDataService;
         public string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
         public IMonitorHelper fakeMonitorHelper;
+        public IFileSystemHelper fakeFileSystemHelper;
+        public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;
 
         [SetUp]
         public void Setup()
@@ -69,8 +71,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
             fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
+            fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
+            fakePeriodicOutputServiceConfiguration = Options.Create(new PeriodicOutputServiceConfiguration()
+            {
+                LargeMediaExchangeSetSizeInMB = 1,
+                LargeExchangeSetFolderName = "M0{0}X02"
+            });
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakePeriodicOutputServiceConfiguration);
         }
 
         #region GetScsResponseQueueMessage
@@ -205,7 +213,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-            fakeConfiguration["HOME"] = @"D:\\Downloads";  
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
              .Returns(storageAccountConnectionString);
