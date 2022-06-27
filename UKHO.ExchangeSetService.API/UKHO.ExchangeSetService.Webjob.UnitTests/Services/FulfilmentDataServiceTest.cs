@@ -257,7 +257,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeExchangeSetCreatedSuccessfully()
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             CommonHelper.IsPeriodicOutputService = true;
