@@ -16,6 +16,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
+
     [ExcludeFromCodeCoverage]
     public class FulfilmentServiceJob
     {
