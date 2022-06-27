@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
 
-            if (CommonHelper.Pos)
+            if (CommonHelper.IsPeriodicOutputService)
             {
                 List<Task> ParallelCreateFolderTasks = new List<Task> { };
                 var dvdNumbers = Enumerable.Range(1, 2);
@@ -149,6 +149,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                    },
                message.BatchId, message.CorrelationId);
         }
+
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -283,14 +284,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return salesCatalogueTypeResponse;
         }
 
-        public Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
+        public async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
         {
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
             var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, "INFO");
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetInfoPath);
             var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, "ADC");
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetAdcPath);
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
     }
 }

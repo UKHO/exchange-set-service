@@ -255,5 +255,18 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.AreEqual("Exchange Set Is Not Created", salesCatalogueResponseFile);
         }
+
+        [Test]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeExchangeSetCreatedSuccessfully()
+        {
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            CommonHelper.IsPeriodicOutputService = true;
+
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
+
+            string largeExchangeSet = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
+
+            Assert.AreEqual("Exchange Set Created", largeExchangeSet);
+        }
     }
 }

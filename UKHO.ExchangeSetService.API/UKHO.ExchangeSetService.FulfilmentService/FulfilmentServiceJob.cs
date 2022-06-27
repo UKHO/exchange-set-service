@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate, fulfilmentServiceQueueMessage.BatchId);
             double fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(fulfilmentServiceQueueMessage.FileSize);
 
-            CommonHelper.Pos = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
+            CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
 
             try
             {
