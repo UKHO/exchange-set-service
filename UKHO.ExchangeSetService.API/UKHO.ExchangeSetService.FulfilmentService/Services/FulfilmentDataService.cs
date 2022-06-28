@@ -287,9 +287,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
         {
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
-            var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, periodicOutputServiceConfiguration.Value.LargeExchangeSetInfoFolder);
+            var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, periodicOutputServiceConfiguration.Value.LargeExchangeSetInfoFolderName);
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetInfoPath);
-            var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, periodicOutputServiceConfiguration.Value.LargeExchangeSetAdcFolder);
+            var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, periodicOutputServiceConfiguration.Value.LargeExchangeSetAdcFolderName);
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetAdcPath);
             await Task.CompletedTask;
         }
