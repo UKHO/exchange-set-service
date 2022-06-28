@@ -75,7 +75,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakePeriodicOutputServiceConfiguration = Options.Create(new PeriodicOutputServiceConfiguration()
             {
                 LargeMediaExchangeSetSizeInMB = 1,
-                LargeExchangeSetFolderName = "M0{0}X02"
+                LargeExchangeSetFolderName = "M0{0}X02",
+                LargeExchangeSetInfoFolder = "INFO",
+                LargeExchangeSetAdcFolder = "ADC"
             });
 
             fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakePeriodicOutputServiceConfiguration);
