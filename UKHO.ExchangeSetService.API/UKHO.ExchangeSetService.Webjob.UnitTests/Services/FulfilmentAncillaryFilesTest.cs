@@ -19,6 +19,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     public class FulfilmentAncillaryFilesTest
     {
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;        
         public ILogger<FulfilmentAncillaryFiles> fakeLogger;
         public IFileSystemHelper fakeFileSystemHelper;
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
@@ -55,7 +56,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             });
             fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeLogger, fakeFileShareServiceConfig, fakeFileSystemHelper);
+            fakePeriodicOutputServiceConfiguration = Options.Create(new PeriodicOutputServiceConfiguration()
+            {
+                LargeMediaExchangeSetSizeInMB = 1,
+                LargeExchangeSetFolderName = "M0{0}X02",
+                LargeExchangeSetMediaFileName = "MEDIA.TXT",
+                LargeExchangeSetInfoFolderName = "INFO",
+                LargeExchangeSetAdcFolderName = "ADC"
+            });
+            fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeLogger, fakeFileShareServiceConfig, fakeFileSystemHelper, fakePeriodicOutputServiceConfiguration);
         }
 
         public List<BatchFile> GetFiles()

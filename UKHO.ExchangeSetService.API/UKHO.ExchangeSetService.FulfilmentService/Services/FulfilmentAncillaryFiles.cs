@@ -23,12 +23,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly int crcLength = 8;
+        private readonly IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration;
 
-        public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
+        public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper, IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
         {
             this.logger = logger;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileSystemHelper = fileSystemHelper;
+            this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
         }
 
         public async Task<bool> CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
@@ -257,7 +259,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             bool checkMediaFileCreated = false;
             if (!string.IsNullOrWhiteSpace(folderpath))
             {
-                string mediaFilePath = Path.Combine(folderpath, "MEDIA.TXT");
+                string mediaFilePath = Path.Combine(folderpath, periodicOutputServiceConfiguration.Value.LargeExchangeSetMediaFileName);
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
                 int substringvalue = 2;
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);

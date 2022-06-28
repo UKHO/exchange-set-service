@@ -76,6 +76,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             {
                 LargeMediaExchangeSetSizeInMB = 1,
                 LargeExchangeSetFolderName = "M0{0}X02",
+                LargeExchangeSetMediaFileName = "MEDIA.TXT",
                 LargeExchangeSetInfoFolderName = "INFO",
                 LargeExchangeSetAdcFolderName = "ADC"
             });
