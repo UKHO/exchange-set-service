@@ -24,6 +24,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
         public SalesCatalogue ScsAuthConfig = new SalesCatalogue();
         public CacheConfiguration ClearCacheConfig = new CacheConfiguration();
+        public PeriodicOutputServiceConfiguration POSConfig = new PeriodicOutputServiceConfiguration();
 
         public class EssAuthorizationTokenConfiguration
         {
@@ -70,6 +71,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string LocalTestToken { get; set; } 
         }       
 
+        public class PeriodicOutputServiceConfiguration
+        {
+            public string LargeExchangeSetFolderName1 { get; set; }
+            public string LargeExchangeSetFolderName2 { get; set; }
+            public string LargeExchangeSetMediaFileName { get; set; }
+            public string LargeExchangeSetAdcFolderName { get; set; }
+            public string LargeExchangeSetInfoFolderName { get; set; }
+        }
+
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
@@ -93,6 +103,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("FileShareService", FssConfig);
             ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
             ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
+            ConfigurationRoot.Bind("PeriodicOutputServiceConfiguration", POSConfig);
         }
     }
 }

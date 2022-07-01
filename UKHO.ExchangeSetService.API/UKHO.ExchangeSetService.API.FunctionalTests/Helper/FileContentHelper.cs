@@ -12,6 +12,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class FileContentHelper
     {
+        private const string FileContent_avcs = "AVCS";
+        private const string FileContent_base = "Base";
+        private const string FileContent_dvd = "Media','DVD_SERVICE'";
+
         private static TestConfiguration Config = new TestConfiguration();
         private static FssApiClient FssApiClient = new FssApiClient();
 
@@ -280,6 +284,54 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
 
             }
+
+        }
+
+        public static async Task<string> ExchangeSetLargeFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
+        {
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+            var batchId = batchStatusUrl.Split('/')[5];
+            return batchId;
+        }
+
+        public static void CheckMediaTxtFileContent(string inputFile,int folderNumber)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+
+            //Store file content here
+            string[] fileContent = lines[0].Split(" ");
+            
+            string dataServerAndWeek = fileContent[0];
+            string dateAndCdType = fileContent[3];
+            string formatVersionAndExchangeSetNumber = fileContent[9];
+
+            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+
+            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+
+            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+
+            Assert.AreEqual(formatVersionAndExchangeSetNumber, $"M0{folderNumber}X02", $"Expected format {formatVersionAndExchangeSetNumber}");
+
+            string[] fileContent_1 = lines[1].Split(" ");
+
+            string FolderInitial = fileContent_1[0];
+            string Avcs = fileContent_1[1];
+            string WeekNumber_Year = fileContent_1[2];
+            string baseContent = fileContent_1[3];
+            string dvd_service = fileContent_1[4];
+
+            Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO",$"Incorrect FolderInitial is returned 'M{FolderInitial}'.");
+            Assert.AreEqual(Avcs, FileContent_avcs, $"Incorrect file content is returned 'M{Avcs}'.");
+            Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
+            Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
 
         }
 
