@@ -41,6 +41,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAMediaTxtFileIsGenerated()
         {
             for (int i = 1; i <= 2; i++)
@@ -53,6 +54,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAINFOFolderIsGenerated()
         {
             for (int i = 1; i <= 2; i++)
@@ -63,6 +65,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAADCFolderIsGenerated()
         {
             for (int i = 1; i <= 2; i++)
