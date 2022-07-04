@@ -92,8 +92,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static bool CheckforFolderExist(string filePath, string folderName)
         {
-            Console.WriteLine(Path.Combine(filePath, folderName));
-            return (Directory.Exists(filePath) && Directory.Exists(Path.Combine(filePath, folderName)));
+            Console.WriteLine(Path.Combine(filePath, folderName).Replace("/", "\\"));
+            return (Directory.Exists(filePath) && Directory.Exists(Path.Combine(filePath, folderName).Replace("/","\\")));
         }
     }
 }
