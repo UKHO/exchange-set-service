@@ -46,10 +46,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             for (int i = 1; i <= 2; i++)
             {
-                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(Path.GetTempPath(), $"{currentDate}/{BatchId}/M0{i}X02/"), Config.POSConfig.LargeExchangeSetMediaFileName);
+                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}/{BatchId}/M0{i}X02/"), Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
 
-                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(Path.GetTempPath(), $"{currentDate}/{BatchId}/M0{i}X02/{Config.POSConfig.LargeExchangeSetMediaFileName}"), i);
+                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}/{BatchId}/M0{i}X02/{Config.POSConfig.LargeExchangeSetMediaFileName}"), i);
             }
         }
 
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             for (int i = 1; i <= 2; i++)
             {
-                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Path.GetTempPath(), $"{currentDate}/{BatchId}/M0{i}X02/"), Config.POSConfig.LargeExchangeSetInfoFolderName);
+                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}/{BatchId}/M0{i}X02/"), Config.POSConfig.LargeExchangeSetInfoFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
             }
         }
@@ -70,9 +70,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             for (int i = 1; i <= 2; i++)
             {
-                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Path.GetTempPath(), $"{currentDate}/{BatchId}/M0{i}X02/{Config.POSConfig.LargeExchangeSetInfoFolderName}"),Config.POSConfig.LargeExchangeSetAdcFolderName);
+                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}/{BatchId}/M0{i}X02/{Config.POSConfig.LargeExchangeSetInfoFolderName}"),Config.POSConfig.LargeExchangeSetAdcFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
             }
         }
+       
     }
 }

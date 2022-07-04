@@ -18,6 +18,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string ExchangeSetCatalogueType;
         public string ExchangeSetEncRootFolder;
         public string ExchangeSetCatalogueFile;
+        public string DirectoryPath;
         public int FileDownloadWaitTime { get; set; }
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public FileShareService FssConfig = new FileShareService();
@@ -78,6 +79,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string LargeExchangeSetMediaFileName { get; set; }
             public string LargeExchangeSetAdcFolderName { get; set; }
             public string LargeExchangeSetInfoFolderName { get; set; }
+            public string DirectoryPath { get; set; }
         }
 
         public TestConfiguration()
