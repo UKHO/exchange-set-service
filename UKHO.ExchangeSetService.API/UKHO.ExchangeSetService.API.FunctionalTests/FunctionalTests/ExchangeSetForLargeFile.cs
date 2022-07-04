@@ -68,12 +68,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAADCFolderIsGenerated()
         {
-            string path;
+            ////string path;
             for (int i = 1; i <= 2; i++)
             {
-                path = Path.Combine(Config.POSConfig.DirectoryPath, currentDate, BatchId, "M0"+i+"X02", Config.POSConfig.LargeExchangeSetInfoFolderName);
-                ////bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, currentDate,$"\\{BatchId}\\M0{i}X02\\{Config.POSConfig.LargeExchangeSetInfoFolderName}\\"),Config.POSConfig.LargeExchangeSetAdcFolderName);
-                bool checkFolder = FssBatchHelper.CheckforFolderExist(path, Config.POSConfig.LargeExchangeSetAdcFolderName);
+                ////path = Path.Combine(Config.POSConfig.DirectoryPath, currentDate, BatchId, "M0"+i+"X02", Config.POSConfig.LargeExchangeSetInfoFolderName);
+                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\{Config.POSConfig.LargeExchangeSetInfoFolderName}\\"),Config.POSConfig.LargeExchangeSetAdcFolderName);
+                ////bool checkFolder = FssBatchHelper.CheckforFolderExist(path, Config.POSConfig.LargeExchangeSetAdcFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
             }
         }
