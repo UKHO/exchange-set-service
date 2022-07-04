@@ -46,7 +46,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             for (int i = 1; i <= 2; i++)
             {
-                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\"), Config.POSConfig.LargeExchangeSetMediaFileName);
+                ////bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\"), Config.POSConfig.LargeExchangeSetMediaFileName);
+                bool checkFile = FssBatchHelper.CheckforLargeFileExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02"), Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
 
                 FileContentHelper.CheckMediaTxtFileContent(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\{Config.POSConfig.LargeExchangeSetMediaFileName}"), i);

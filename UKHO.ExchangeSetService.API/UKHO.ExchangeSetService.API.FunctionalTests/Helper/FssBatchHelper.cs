@@ -90,13 +90,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath, fileName)));
         }
 
+        public static bool CheckforLargeFileExist(string filePath, string fileName)
+        {
+            string filepath_1 = (Path.Combine(filePath, fileName).Replace("/", "\\"));
+            Console.WriteLine(filepath_1);
+            return (File.Exists(filepath_1));
+        }
+
         public static bool CheckforFolderExist(string filePath, string folderName)
         {
             Thread.Sleep(10000);
             Console.WriteLine(Path.Combine(filePath, folderName).Replace("/", "\\"));
-            Console.WriteLine(filePath + " " + Directory.Exists(filePath));
+            string folderPath = Path.Combine(filePath, folderName).Replace("/", "\\");
             ////return (Directory.Exists(filePath) && Directory.Exists(Path.Combine(filePath, folderName).Replace("/","\\")));
-            return (Directory.Exists(Path.Combine(filePath, folderName).Replace("/","\\")));
+            return (Directory.Exists(folderPath));
         }
     }
 }
