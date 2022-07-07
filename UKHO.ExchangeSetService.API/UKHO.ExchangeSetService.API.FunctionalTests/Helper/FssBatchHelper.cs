@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 await Task.Delay(5000);
                 var batchStatusResponse = await FssApiClient.GetBatchStatusAsync(batchStatusUri, jwtToken);
-                Assert.AreEqual(200,(int)batchStatusResponse.StatusCode, $"Incorrect status code is returned {batchStatusResponse.StatusCode}, instead of the expected status 200 for url {batchStatusUri}.");
+                Assert.AreEqual(200, (int)batchStatusResponse.StatusCode, $"Incorrect status code is returned {batchStatusResponse.StatusCode}, instead of the expected status 200 for url {batchStatusUri}.");
 
                 var batchStatusResponseObj = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(await batchStatusResponse.Content.ReadAsStringAsync());
                 batchStatus = batchStatusResponseObj.Status;
@@ -47,6 +47,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Thread.Sleep()' to avoid intermittent failure in the pipe.
             Thread.Sleep(20000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.ExchangeSetFileName);
+
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
             Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
@@ -65,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             return extractPath;
-            
+
         }
 
         private static void WriteToConsole(string message)
@@ -80,30 +81,52 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 fileName = fileName.Replace(".zip", "");
             }
-           
-            return fileName; 
+
+            return fileName;
         }
 
         public static bool CheckforFileExist(string filePath, string fileName)
         {
-            Console.WriteLine(Path.Combine(filePath, fileName));
             return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath, fileName)));
         }
 
         public static bool CheckforLargeFileExist(string filePath, string fileName)
         {
             string filepath_1 = (Path.Combine(filePath, fileName).Replace("/", "\\"));
-            Console.WriteLine(filepath_1);
             return (File.Exists(filepath_1));
         }
 
         public static bool CheckforFolderExist(string filePath, string folderName)
         {
-            Thread.Sleep(10000);
-            Console.WriteLine(Path.Combine(filePath, folderName).Replace("/", "\\"));
             string folderPath = Path.Combine(filePath, folderName).Replace("/", "\\");
-            ////return (Directory.Exists(filePath) && Directory.Exists(Path.Combine(filePath, folderName).Replace("/","\\")));
             return (Directory.Exists(folderPath));
+        }
+
+        public static async Task<string> ExtractDownloadedFolderForLargeFiles(string downloadFileUrl, string jwtToken, string folderName)
+        {
+            //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Thread.Sleep()' to avoid intermittent failure in the pipe.
+            string LargeFolderName = folderName + ".zip";
+            string tempFilePath = Path.Combine(Path.GetTempPath(), LargeFolderName);
+
+            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
+            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
+
+            Stream stream = await response.Content.ReadAsStreamAsync();
+
+            using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
+            {
+                stream.CopyTo(outputFileStream);
+            }
+
+            WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
+
+            string zipPath = tempFilePath;
+            string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
+
+            ZipFile.ExtractToDirectory(zipPath, extractPath);
+
+            return extractPath;
+
         }
     }
 }

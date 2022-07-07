@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.IO;
 using System.Threading;
 using System;
-using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -17,12 +16,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
-        private string BatchId { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
-
-        private readonly List<string> CleanUpBatchIdList = new List<string>();
-
+        
         public string currentDate = DateTime.UtcNow.ToString("ddMMMyyyy");
+        private string DownloadedFolderPath { get; set; }
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -36,50 +33,60 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForBigFile(), accessToken: EssJwtToken);
             Thread.Sleep(5000); //File creation takes time
-            BatchId = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken);
-            CleanUpBatchIdList.Add(BatchId);            
         }
 
         [Test]
         [Category("SmokeTest")]
-        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAMediaTxtFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAMediaTxtFileIsGenerated()
         {
             for (int i = 1; i <= 2; i++)
             {
-                ////bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\"), Config.POSConfig.LargeExchangeSetMediaFileName);
-                bool checkFile = FssBatchHelper.CheckforLargeFileExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02"), Config.POSConfig.LargeExchangeSetMediaFileName);
+                var FolderName = $"M0{i}X02";
+                DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
+                bool checkFile = FssBatchHelper.CheckforLargeFileExist(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
 
-                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\{Config.POSConfig.LargeExchangeSetMediaFileName}"), i);
+                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(DownloadedFolderPath, $"{Config.POSConfig.LargeExchangeSetMediaFileName}"), i);
             }
         }
 
         [Test]
         [Category("SmokeTest")]
-        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAINFOFolderIsGenerated()
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAINFOFolderIsGenerated()
         {
             for (int i = 1; i <= 2; i++)
             {
-                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02"), Config.POSConfig.LargeExchangeSetInfoFolderName);
-                ////bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, currentDate, BatchId, $"M0{i}X02"), Config.POSConfig.LargeExchangeSetInfoFolderName);
+                var FolderName = $"M0{i}X02";
+                DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
+                bool checkFolder = FssBatchHelper.CheckforFolderExist(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
+                
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
             }
         }
 
         [Test]
         [Category("SmokeTest")]
-        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAADCFolderIsGenerated()
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAADCFolderIsGenerated()
         {
-            ////string path;
             for (int i = 1; i <= 2; i++)
             {
-                ////path = Path.Combine(Config.POSConfig.DirectoryPath, currentDate, BatchId, "M0"+i+"X02", Config.POSConfig.LargeExchangeSetInfoFolderName);
-                ////bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\{Config.POSConfig.LargeExchangeSetInfoFolderName}\\"),Config.POSConfig.LargeExchangeSetAdcFolderName);
-                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(Config.POSConfig.DirectoryPath, $"{currentDate}\\{BatchId}\\M0{i}X02\\{Config.POSConfig.LargeExchangeSetInfoFolderName}"), Config.POSConfig.LargeExchangeSetAdcFolderName);
-                ////bool checkFolder = FssBatchHelper.CheckforFolderExist(path, Config.POSConfig.LargeExchangeSetAdcFolderName);
+                var FolderName = $"M0{i}X02";
+                DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
+                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
+                
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
             }
         }
-       
+
+        [TearDown]
+        public void GlobalTeardown()
+        {
+            //Clean up downloaded files/ folders
+            for (int i = 1; i <= 2; i++)
+            {
+                var FolderName = $"M0{i}X02.zip";
+                FileContentHelper.DeleteDirectory(FolderName);
+            }
+        }
     }
 }
