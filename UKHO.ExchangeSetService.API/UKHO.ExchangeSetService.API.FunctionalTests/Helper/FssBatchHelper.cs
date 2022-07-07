@@ -124,7 +124,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
             ZipFile.ExtractToDirectory(zipPath, extractPath);
-
+            
+            WriteToConsole($"File has been extracted to {extractPath}");
+            
             return extractPath;
 
         }
