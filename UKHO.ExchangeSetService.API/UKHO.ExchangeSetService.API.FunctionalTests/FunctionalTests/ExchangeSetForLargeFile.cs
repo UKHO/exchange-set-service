@@ -43,10 +43,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 var FolderName = $"M0{i}X02";
                 DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
-                bool checkFile = FssBatchHelper.CheckforLargeFileExist(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
+                bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
 
-                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(DownloadedFolderPath, $"{Config.POSConfig.LargeExchangeSetMediaFileName}"), i);
+                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetMediaFileName), i);
             }
         }
 

@@ -90,16 +90,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return (Directory.Exists(filePath) && File.Exists(Path.Combine(filePath, fileName)));
         }
 
-        public static bool CheckforLargeFileExist(string filePath, string fileName)
-        {
-            string filepath_1 = (Path.Combine(filePath, fileName).Replace("/", "\\"));
-            return (File.Exists(filepath_1));
-        }
-
         public static bool CheckforFolderExist(string filePath, string folderName)
         {
-            string folderPath = Path.Combine(filePath, folderName).Replace("/", "\\");
-            return (Directory.Exists(folderPath));
+            return Directory.Exists(Path.Combine(filePath, folderName));
         }
 
         public static async Task<string> ExtractDownloadedFolderForLargeFiles(string downloadFileUrl, string jwtToken, string folderName)
