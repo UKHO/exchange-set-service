@@ -58,8 +58,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 stream.CopyTo(outputFileStream);
             }
 
-            WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
-
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
@@ -110,8 +108,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 stream.CopyTo(outputFileStream);
             }
-
-            WriteToConsole($"Temp file {tempFilePath} has been created to download file contents.");
 
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
