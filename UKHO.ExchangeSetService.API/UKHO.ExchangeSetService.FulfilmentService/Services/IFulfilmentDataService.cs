@@ -6,5 +6,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public interface IFulfilmentDataService
     {
         Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate);
+        Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName);
     }
 }

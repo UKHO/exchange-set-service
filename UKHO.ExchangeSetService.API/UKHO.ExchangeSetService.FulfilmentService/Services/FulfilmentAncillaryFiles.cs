@@ -23,14 +23,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly int crcLength = 8;
-        private readonly IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration;
 
-        public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper, IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
+        public FulfilmentAncillaryFiles(ILogger<FulfilmentAncillaryFiles> logger, IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileSystemHelper fileSystemHelper)
         {
             this.logger = logger;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.fileSystemHelper = fileSystemHelper;
-            this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
         }
 
         public async Task<bool> CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
@@ -254,19 +252,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return (UADT != null) ? $"UADT={UADT},ISDT={ISDT};" : $"ISDT={ISDT};";
         }
 
-        public async Task<bool> CreateMediaFile(string batchId, string folderpath, string correlationId, string exchangeset)
+        public async Task<bool> CreateMediaFile(string batchId, string folderpath, string correlationId, string baseNumber)
         {
             bool checkMediaFileCreated = false;
             if (!string.IsNullOrWhiteSpace(folderpath))
             {
-                string mediaFilePath = Path.Combine(folderpath, periodicOutputServiceConfiguration.Value.LargeExchangeSetMediaFileName);
+                string mediaFilePath = Path.Combine(folderpath, "MEDIA.TXT");
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
-                int substringvalue = 2;
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
-                var mediaFileContent = String.Format("GBWK{0:D2}_{1}   {2:D4}{3:D2}{4:D2}BASE      M0{5}X02",
-                                        weekNumber, DateTime.UtcNow.Year.ToString("D4").Substring(substringvalue), DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, exchangeset);
+                
+                var mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
                 mediaFileContent += Environment.NewLine;
-                mediaFileContent += String.Format("M{0},'UKHO AVCS Week{1:D2}_{2} Base Media','DVD_SERVICE'", exchangeset, weekNumber, DateTime.UtcNow.Year.ToString("D2").Substring(substringvalue));
+                mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
                 fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
                 await Task.CompletedTask;
 

@@ -29,7 +29,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
         private readonly IMonitorHelper monitorHelper;
         private readonly IFileSystemHelper fileSystemHelper;
-        private readonly IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
@@ -40,8 +39,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
                                     IFulfilmentCallBackService fulfilmentCallBackService,
                                     IMonitorHelper monitorHelper,
-                                    IFileSystemHelper fileSystemHelper,
-                                    IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
+                                    IFileSystemHelper fileSystemHelper)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -53,27 +51,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentCallBackService = fulfilmentCallBackService;
             this.monitorHelper = monitorHelper;
             this.fileSystemHelper = fileSystemHelper;
-            this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
-
-            if (CommonHelper.IsPeriodicOutputService)
-            {
-                List<Task> ParallelCreateFolderTasks = new List<Task> { };
-                var dvdNumbers = Enumerable.Range(1, 2);
-                Parallel.ForEach(dvdNumbers, dvdNumber =>
-                {
-                    ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName, dvdNumber.ToString()))));
-                    ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, dvdNumber.ToString()));
-                });
-                await Task.WhenAll(ParallelCreateFolderTasks);
-                ParallelCreateFolderTasks.Clear();
-                return "Exchange Set Created";
-            }
 
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -131,6 +114,23 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             return "Exchange Set Is Not Created";
+        }
+
+        public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
+        {
+            string homeDirectoryPath = configuration["HOME"];
+            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+            var dvdNumbers = Enumerable.Range(1, 2);
+
+            Parallel.ForEach(dvdNumbers, dvdNumber =>
+            {
+                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()))));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, dvdNumber.ToString()));
+            });
+            await Task.WhenAll(ParallelCreateFolderTasks);
+            ParallelCreateFolderTasks.Clear();
+
+            return "Large Exchange Set Created Successfully";
         }
 
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(SalesCatalogueServiceResponseQueueMessage message)
@@ -287,9 +287,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
         {
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
-            var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, periodicOutputServiceConfiguration.Value.LargeExchangeSetInfoFolderName);
+            var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, "INFO");
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetInfoPath);
-            var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, periodicOutputServiceConfiguration.Value.LargeExchangeSetAdcFolderName);
+            var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, "ADC");
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetAdcPath);
             await Task.CompletedTask;
         }

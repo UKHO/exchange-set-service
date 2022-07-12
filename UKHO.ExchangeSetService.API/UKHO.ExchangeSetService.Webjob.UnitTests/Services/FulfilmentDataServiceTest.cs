@@ -72,16 +72,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            fakePeriodicOutputServiceConfiguration = Options.Create(new PeriodicOutputServiceConfiguration()
-            {
-                LargeMediaExchangeSetSizeInMB = 1,
-                LargeExchangeSetFolderName = "M0{0}X02",
-                LargeExchangeSetMediaFileName = "MEDIA.TXT",
-                LargeExchangeSetInfoFolderName = "INFO",
-                LargeExchangeSetAdcFolderName = "ADC"
-            });
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakePeriodicOutputServiceConfiguration);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper);
         }
 
         #region GetScsResponseQueueMessage
@@ -263,13 +255,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-            CommonHelper.IsPeriodicOutputService = true;
-
+            
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
 
-            string largeExchangeSet = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
+            string largeExchangeSet = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
 
-            Assert.AreEqual("Exchange Set Created", largeExchangeSet);
+            Assert.AreEqual("Large Exchange Set Created Successfully", largeExchangeSet);
         }
     }
 }

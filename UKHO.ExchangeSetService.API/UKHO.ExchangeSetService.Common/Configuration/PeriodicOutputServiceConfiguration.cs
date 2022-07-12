@@ -7,8 +7,5 @@ namespace UKHO.ExchangeSetService.Common.Configuration
     {
         public double LargeMediaExchangeSetSizeInMB { get; set; }
         public string LargeExchangeSetFolderName { get; set; }
-        public string LargeExchangeSetMediaFileName { get; set; }        
-        public string LargeExchangeSetInfoFolderName { get; set; }
-        public string LargeExchangeSetAdcFolderName { get; set; }
     }
 }
