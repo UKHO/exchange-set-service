@@ -612,7 +612,27 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805151 - Completed processing the Options request for the New Files Published event webhook
         /// </summary>
-        NewFilesPublishedWebhookOptionsCallCompleted = 805151
+        NewFilesPublishedWebhookOptionsCallCompleted = 805151,
+        /// <summary>
+        /// 805152 - Request for creating media.txt file for large media exchange set is started
+        /// </summary>
+        CreateMediaFileRequestStart = 805152,
+        /// <summary>
+        /// 805153 - Request for creating media.txt file for large media exchange set is completed
+        /// </summary>
+        CreateMediaFileRequestCompleted = 805153,
+        /// <summary>
+        /// 805154 - Request for creating media.txt file for large media exchange set is failed.
+        /// </summary>
+        MediaFileIsNotCreated = 805154,
+        /// <summary>
+        /// 805155 - Create large exchange set web job is started.
+        /// </summary>
+        CreateLargeExchangeSetRequestStart = 805155,
+        /// <summary>
+        /// 805156 - Create large exchange set web job is completed.
+        /// </summary>
+        CreateLargeExchangeSetRequestCompleted = 805156
     }
 
     public static class EventIdExtensions

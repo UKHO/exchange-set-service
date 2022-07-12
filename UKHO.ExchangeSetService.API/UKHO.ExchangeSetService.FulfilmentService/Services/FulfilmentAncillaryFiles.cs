@@ -110,7 +110,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
                 string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
-                string comment = string.Empty;               
+                string comment = string.Empty;
                 BoundingRectangle boundingRectangle = new BoundingRectangle();
 
                 if (mimeType == "BIN")
@@ -121,7 +121,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId(), "Error in sales catalogue service catalogue end point when product details not found for Product:{ProductName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", listItem.ProductName, batchId, correlationId);
                         throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId());
                     }
-                    
+
                     comment = SetCatalogFileComment(listItem, salescatalogProduct, salesCatalogueProductResponse);
 
                     boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
@@ -161,7 +161,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             //BoundingRectangle and Comment only required for BIN
             return salescatalogProduct.BaseCellEditionNumber == 0 && cancelledUpdateNumber == listItem.UpdateNumber
                 ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
-                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";             
+                : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";
         }
 
         private string GetMimeType(string fileName, string mimeType, string batchId, string correlationId)
@@ -250,6 +250,32 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             string UADT = dateResponse.UpdateApplicationDate == null ? null : dateResponse.UpdateApplicationDate.Value.ToString("yyyyMMdd");
             string ISDT = dateResponse.IssueDate.ToString("yyyyMMdd");
             return (UADT != null) ? $"UADT={UADT},ISDT={ISDT};" : $"ISDT={ISDT};";
+        }
+
+        public async Task<bool> CreateMediaFile(string batchId, string folderpath, string correlationId, string baseNumber)
+        {
+            bool checkMediaFileCreated = false;
+            if (!string.IsNullOrWhiteSpace(folderpath))
+            {
+                string mediaFilePath = Path.Combine(folderpath, "MEDIA.TXT");
+                fileSystemHelper.CheckAndCreateFolder(folderpath);
+                int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
+                
+                var mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
+                mediaFileContent += Environment.NewLine;
+                mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
+                fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
+                await Task.CompletedTask;
+
+                if (fileSystemHelper.CheckFileExists(mediaFilePath))
+                    checkMediaFileCreated = true;
+                else
+                {
+                    logger.LogError(EventIds.MediaFileIsNotCreated.ToEventId(), "Error in creating media.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.MediaFileIsNotCreated.ToEventId());
+                }
+            }
+            return checkMediaFileCreated;
         }
     }
 }

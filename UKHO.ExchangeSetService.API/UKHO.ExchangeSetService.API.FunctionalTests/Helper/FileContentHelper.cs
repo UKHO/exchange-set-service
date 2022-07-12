@@ -12,10 +12,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class FileContentHelper
     {
+        private const string FileContent_avcs = "AVCS";
+        private const string FileContent_base = "Base";
+        private const string FileContent_dvd = "Media','DVD_SERVICE'";
+
         private static TestConfiguration Config = new TestConfiguration();
         private static FssApiClient FssApiClient = new FssApiClient();
-
-
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
@@ -34,12 +36,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder =FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
             var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
             return downloadFolderPath;
         }
-
 
         public static void CheckSerialEncFileContent(string inputFile)
         {
@@ -57,11 +58,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-
             Assert.AreEqual(dateAndCdType, $"{currentDate}UPDATE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-
             Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00U01X01"), $"Expected format version {formatVersionAndExchangeSetNumber}");
-
         }
 
         public static void CheckProductFileContent(string inputFile, dynamic scsResponse)
@@ -73,7 +71,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
             Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
             Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
-          
         }
 
         public static void CheckReadMeTxtFileContent(string inputFile)
@@ -94,7 +91,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task CheckDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, string accessToken)
         {
-
             //Get Countrycode
             string countryCode = productName.Substring(0, 2);
 
@@ -125,7 +121,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 {
                     Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
                 }
-
             }
         }
 
@@ -139,7 +134,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             int folderCount = listUpdateNumberPath.Count;
 
             Assert.AreEqual(0, folderCount, $"Downloaded Enc folder count {folderCount}, Instead of expected count 0");
-
         }
 
         public static async Task GetDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, int? updateNumber, string accessToken)
@@ -192,8 +186,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static bool CheckProductDoesExistInSearchResponse(ResponseBatchDetailsModel batchDetail, string productName, string editionNumber, string updateNumber)
         {
-            return batchDetail.Attributes.Any(a => a.Key == "CellName" && a.Value == productName) && 
-                batchDetail.Attributes.Any(a => a.Key == "EditionNumber" && a.Value == editionNumber) && 
+            return batchDetail.Attributes.Any(a => a.Key == "CellName" && a.Value == productName) &&
+                batchDetail.Attributes.Any(a => a.Key == "EditionNumber" && a.Value == editionNumber) &&
                 batchDetail.Attributes.Any(a => a.Key == "UpdateNumber" && a.Value == updateNumber);
         }
 
@@ -205,22 +199,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static List<string> GetDirectories(string path, string searchPattern)
         {
-
             return Directory.GetDirectories(path, searchPattern).ToList();
-
         }
 
         public static int FileCountInDirectories(string path)
         {
             return Directory.GetFiles(path).Length;
-
         }
 
         public static void CheckCatalogueFileContent(string inputFile, ScsProductResponseModel scsResponse)
         {
             List<string> scsCatalogueFilesPath = new List<string>();
             string catalogueFileContent = File.ReadAllText(inputFile);
-
 
             foreach (var item in scsResponse.Products)
             {
@@ -245,7 +235,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
             }
-
         }
 
         public static void CheckCatalogueFileNoContent(string inputFile, List<ProductVersionModel> ProductVersionData)
@@ -269,20 +258,74 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     folder = folder.Replace(".zip", "");
                 }
 
-                //Delete V01XO1 Directory and sub directories from temp Directory
+                //Delete V01XO1/M01XO2/M02XO2 Directory and sub directories from temp Directory
                 Directory.Delete(Path.Combine(path, folder), true);
 
-                //Delete V01X01.zip file from temp Directory
+                //Delete V01X01.zip/M01XO2.zip/M02XO2.zip file from temp Directory
                 if (File.Exists(Path.Combine(path, fileName)))
                 {
                     File.Delete(Path.Combine(path, fileName));
                 }
-
-
             }
 
         }
 
+        public static async Task<string> ExchangeSetLargeFile(HttpResponseMessage apiEssResponse, string FssJwtToken, string FolderName)
+        {
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/c6637401-dd91-4756-ad97-6e0dda0e53f6/status"; //here BatchId is hardcoded and will be made dynamic in future
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
+
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/c6637401-dd91-4756-ad97-6e0dda0e53f6/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl.ToString(), FssJwtToken, FolderName);
+
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            return downloadFolderPath;
+        }
+
+        public static void CheckMediaTxtFileContent(string inputFile, int folderNumber)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+
+            //Store file content here
+            string[] fileContent = lines[0].Split(" ");
+
+            string dataServerAndWeek = fileContent[0];
+            string dateAndCdType = fileContent[3];
+            string formatVersionAndExchangeSetNumber = fileContent[9];
+
+            ////string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+            ////Below static values are used temporarily as respective functionality will be developed and deployed in future sprints. Once that's implemented the above code will be used
+            string weekNumber = "26";
+            string year = "22";
+            string currentDate = "20220706";
+
+            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.AreEqual(formatVersionAndExchangeSetNumber, $"M0{folderNumber}X02", $"Expected format {formatVersionAndExchangeSetNumber}");
+
+            string[] fileContent_1 = lines[1].Split(" ");
+
+            string FolderInitial = fileContent_1[0];
+            string Avcs = fileContent_1[1];
+            string WeekNumber_Year = fileContent_1[2];
+            string baseContent = fileContent_1[3];
+            string dvd_service = fileContent_1[4];
+
+            Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned 'M{FolderInitial}'.");
+            Assert.AreEqual(Avcs, FileContent_avcs, $"Incorrect file content is returned 'M{Avcs}'.");
+            Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
+            Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
+        }
     }
 }
 

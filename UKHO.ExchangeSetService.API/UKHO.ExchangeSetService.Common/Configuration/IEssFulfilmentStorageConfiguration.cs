@@ -17,5 +17,6 @@
         public string QueueName { get; set; }
         public double LargeExchangeSetSizeInMB { get; set; }
         public double SmallExchangeSetSizeInMB { get; set; }
+        public double LargeMediaExchangeSetSizeInMB { get; set; }
     }
 }

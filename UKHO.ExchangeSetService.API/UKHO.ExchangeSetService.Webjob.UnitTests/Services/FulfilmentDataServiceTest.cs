@@ -34,6 +34,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFulfilmentDataService fakeFulfilmentDataService;
         public string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
         public IMonitorHelper fakeMonitorHelper;
+        public IFileSystemHelper fakeFileSystemHelper;
+        public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;
 
         [SetUp]
         public void Setup()
@@ -69,8 +71,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
             fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
+            fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper);
         }
 
         #region GetScsResponseQueueMessage
@@ -205,7 +208,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-            fakeConfiguration["HOME"] = @"D:\\Downloads";  
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
              .Returns(storageAccountConnectionString);
@@ -246,6 +249,18 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
             Assert.AreEqual("Exchange Set Is Not Created", salesCatalogueResponseFile);
+        }
+
+        [Test]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully()
+        {
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
+
+            string largeExchangeSet = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
+
+            Assert.AreEqual("Large Exchange Set Created Successfully", largeExchangeSet);
         }
     }
 }

@@ -19,5 +19,6 @@
         public double LargeExchangeSetSizeInMB { get; set; }
         public double SmallExchangeSetSizeInMB { get; set; }
         public string ExchangeSetTypes { get; set; }
+        public double LargeMediaExchangeSetSizeInMB { get; set; }
     }
 }

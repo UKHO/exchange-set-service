@@ -40,5 +40,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             return new List<string>() { "JP5BHTR7", "JP5P9F59" };
         }
+
+        public List<string> GetProductIdentifiersForBigFile()
+        {
+           return new List<string>() { "US2ARCGD","CA379151","DE110000" };
+        }
     }
 }

@@ -133,9 +133,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 return (mediumExchangeSetInstance.GetInstanceNumber(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.mxs);
             }
-            else
+            else if (fileSizeInMB > storageConfig.Value.LargeExchangeSetSizeInMB && fileSizeInMB <= storageConfig.Value.LargeMediaExchangeSetSizeInMB)
             {
                 return (largeExchangeSetInstance.GetInstanceNumber(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.lxs);
+            }
+            else
+            {
+                return (largeExchangeSetInstance.GetInstanceNumber(1), ExchangeSetType.lxs);
             }
         }
 

@@ -28,6 +28,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
         private readonly IMonitorHelper monitorHelper;
+        private readonly IFileSystemHelper fileSystemHelper;
+
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
                                     ILogger<FulfilmentDataService> logger,
@@ -36,7 +38,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
                                     IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
                                     IFulfilmentCallBackService fulfilmentCallBackService,
-                                    IMonitorHelper monitorHelper)
+                                    IMonitorHelper monitorHelper,
+                                    IFileSystemHelper fileSystemHelper)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -47,12 +50,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentSalesCatalogueService = fulfilmentSalesCatalogueService;
             this.fulfilmentCallBackService = fulfilmentCallBackService;
             this.monitorHelper = monitorHelper;
+            this.fileSystemHelper = fileSystemHelper;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
+
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
@@ -80,7 +85,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     }
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        cancellationTokenSource.Cancel();                      
+                        cancellationTokenSource.Cancel();
                         logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
                         throw new OperationCanceledException();
                     }
@@ -111,6 +116,23 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return "Exchange Set Is Not Created";
         }
 
+        public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
+        {
+            string homeDirectoryPath = configuration["HOME"];
+            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+            var dvdNumbers = Enumerable.Range(1, 2);
+
+            Parallel.ForEach(dvdNumbers, dvdNumber =>
+            {
+                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()))));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, dvdNumber.ToString()));
+            });
+            await Task.WhenAll(ParallelCreateFolderTasks);
+            ParallelCreateFolderTasks.Clear();
+
+            return "Large Exchange Set Created Successfully";
+        }
+
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(SalesCatalogueServiceResponseQueueMessage message)
         {
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, message.BatchId, message.CorrelationId);
@@ -118,14 +140,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
-           return await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceENCFilesRequestStart,
-                  EventIds.QueryFileShareServiceENCFilesRequestCompleted,
-                  "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                  async () => {
-                      return await fulfilmentFileShareService.QueryFileShareServiceData(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
-                  },
-              message.BatchId, message.CorrelationId);
+            return await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceENCFilesRequestStart,
+                   EventIds.QueryFileShareServiceENCFilesRequestCompleted,
+                   "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                   async () =>
+                   {
+                       return await fulfilmentFileShareService.QueryFileShareServiceData(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                   },
+               message.BatchId, message.CorrelationId);
         }
+
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -171,7 +195,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
                       EventIds.CreateSerialFileRequestCompleted,
                       "Create serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                      async () => {
+                      async () =>
+                      {
                           return await fulfilmentAncillaryFiles.CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
                       },
                   batchId, correlationId);
@@ -180,12 +205,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId)
         {
             bool isZipFileUploaded = false;
-            bool isZipFileCreated = false; 
+            bool isZipFileCreated = false;
             DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
             isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
                        EventIds.CreateZipFileRequestCompleted,
                        "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                       async () => {
+                       async () =>
+                       {
                            return await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId);
                        },
                        batchId, correlationId);
@@ -194,13 +220,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, createZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
             if (isZipFileCreated)
             {
-                 isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
-                       EventIds.UploadExchangeSetToFssCompleted,
-                       "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                       async () => {
-                           return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
-                       },
-                   batchId, correlationId);
+                isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
+                      EventIds.UploadExchangeSetToFssCompleted,
+                      "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                      async () =>
+                      {
+                          return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId);
+                      },
+                  batchId, correlationId);
             }
             return isZipFileUploaded;
         }
@@ -215,7 +242,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
                         EventIds.CreateCatalogFileRequestCompleted,
                         "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () => {
+                        async () =>
+                        {
                             return await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
                         },
                         batchId, correlationId);
@@ -237,7 +265,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestStart,
                         EventIds.CreateProductFileRequestCompleted,
                         "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () => {
+                        async () =>
+                        {
                             return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse);
                         },
                         batchId, correlationId);
@@ -253,6 +282,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(batchId, correlationId);
             return salesCatalogueTypeResponse;
+        }
+
+        public async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
+        {
+            fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
+            var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, "INFO");
+            fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetInfoPath);
+            var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, "ADC");
+            fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetAdcPath);
+            await Task.CompletedTask;
         }
     }
 }
