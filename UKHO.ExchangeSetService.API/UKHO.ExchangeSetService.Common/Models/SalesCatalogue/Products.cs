@@ -13,5 +13,12 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public int? FileSize { get; set; }
         [JsonIgnore]
         public bool IgnoreCache { get; set; }
-    }    
+        public List<Bundle> Bundle { get; set; }
+    }
+
+    public class Bundle
+    {
+        public int BundleType { get; set; }
+        public string Location { get; set; }
+    }
 }

@@ -115,7 +115,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
         {
-            SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse 
+            SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse
             {
                 Entries = new List<BatchDetail>()
             };
@@ -278,7 +278,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
-                await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                if (CommonHelper.IsPeriodicOutputService)
+                    await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                else
+                    await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
             }
         }
 
@@ -291,7 +294,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 item.IgnoreCache = true;
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
-                await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                if (CommonHelper.IsPeriodicOutputService)
+                    await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                else
+                    await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
             }
         }
 
@@ -305,6 +311,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 async () =>
                 {
                     var downloadPath = Path.Combine(exchangeSetRootPath, productName.Substring(0, 2), productName, editionNumber, updateNumber);
+                    return await DownloadBatchFiles(item, item.Files.Select(a => a.Links.Get.Href).ToList(), downloadPath, message, cancellationTokenSource, cancellationToken);
+                }, productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
+        }
+
+        private Task PerformBatchFileDownloadForLargeMediaExchangeSet(BatchDetail item, Products productItem, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        {
+            var productName = productItem.ProductName;
+            var editionNumber = Convert.ToString(productItem.EditionNumber);
+            var updateNumber = item.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
+            var bundleInfo = productItem.Bundle.FirstOrDefault().Location.Split(";");
+            exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleInfo[0].Substring(1, 1), bundleInfo[1]);
+
+            return logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadENCFilesRequestStart, EventIds.DownloadENCFilesRequestCompleted,
+                "File share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    var downloadPath = Path.Combine(exchangeSetRootPath, productName.Substring(0, 2), productName, editionNumber);
                     return await DownloadBatchFiles(item, item.Files.Select(a => a.Links.Get.Href).ToList(), downloadPath, message, cancellationTokenSource, cancellationToken);
                 }, productName, editionNumber, updateNumber, item.Files.Select(a => a.Links.Get.Href), message.BatchId, message.CorrelationId);
         }
@@ -420,7 +443,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     string path = Path.Combine(downloadPath, fileName);
                     if (!fileSystemHelper.CheckFileExists(path))
                     {
-                        await CopyFileToFolder(httpResponse, path, fileName, entry, queueMessage);                        
+                        await CopyFileToFolder(httpResponse, path, fileName, entry, queueMessage);
                         result = true;
                     }
                     if (serverValue == ServerHeaderValue)
@@ -469,7 +492,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceUploadENCFilesToCacheStart, EventIds.FileShareServiceUploadENCFilesToCacheCompleted,
                     "File share service upload ENC file request to cache blob container for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                    async () => {
+                    async () =>
+                    {
                         await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
                         return Task.CompletedTask;
                     }, entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
@@ -487,7 +511,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             HttpResponseMessage httpReadMeFileResponse;
             httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, CancellationToken.None, correlationId);
 
-            var requestUri = new Uri(httpReadMeFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);  
+            var requestUri = new Uri(httpReadMeFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
 
             if (httpReadMeFileResponse.IsSuccessStatusCode)
             {
@@ -671,7 +695,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateFileInBatchStart, EventIds.CreateFileInBatchCompleted,
                     "File:{FileName} creation in batch for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                    async () => {
+                    async () =>
+                    {
                         HttpResponseMessage httpResponse;
 
                         string mimetype = fileCreateMetaData.FileName == fileShareServiceConfig.Value.ExchangeSetFileName ? "application/zip" : "text/plain";
@@ -745,7 +770,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             return logger.LogStartEndAndElapsedTime(EventIds.UploadFileBlockStarted, EventIds.UploadFileBlockCompleted,
                     "UploadFileBlock for BlockId:{BlockId} and file:{FileName} and Batch:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                    async () => {
+                    async () =>
+                    {
                         byte[] byteData = fileSystemHelper.UploadFileBlockMetaData(UploadBlockMetaData);
                         var blockMd5Hash = CommonHelper.CalculateMD5(byteData);
                         HttpResponseMessage httpResponse;
@@ -765,7 +791,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.WriteBlocksToFileStart, EventIds.WriteBlockToFileNonOkResponse,
                     "Write Blocks to file:{FileName} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                    async () => {
+                    async () =>
+                    {
                         WriteBlockFileModel writeBlockfileModel = new WriteBlockFileModel()
                         {
                             BlockIds = writeBlocksToFileMetaData.BlockIds
@@ -778,7 +805,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             throw new FulfilmentException(EventIds.WriteBlockToFileNonOkResponse.ToEventId());
                         }
                         return true;
-                    }, writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);            
+                    }, writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);
         }
 
         public Task<bool> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData, string correlationId)
@@ -820,7 +847,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     string bodyJson = await httpResponse.Content.ReadAsStringAsync();
                     ResponseBatchStatusModel responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
                     return (BatchStatus)Enum.Parse(typeof(BatchStatus), responseBatchStatusModel.Status.ToString());
-                }, batchStatusMetaData.FileName, batchStatusMetaData.BatchId, correlationId);            
+                }, batchStatusMetaData.FileName, batchStatusMetaData.BatchId, correlationId);
         }
     }
 }
