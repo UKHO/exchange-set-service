@@ -17,6 +17,7 @@ using UKHO.ExchangeSetService.FulfilmentService.Services;
 using System.Reflection;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.IO.Abstractions;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
@@ -176,6 +177,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddSingleton<IMediumExchangeSetInstance, MediumExchangeSetInstance>();
                  services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
                  services.AddScoped<IFulfilmentCallBackService, FulfilmentCallBackService>();
+                 services.AddScoped<IFileSystem, FileSystem>();
 
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));

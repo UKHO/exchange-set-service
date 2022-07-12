@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
@@ -83,6 +84,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         public Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IDirectoryInfo[] GetDirectoryInfo(string path)
         {
             throw new System.NotImplementedException();
         }
