@@ -24,6 +24,7 @@ using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 using Microsoft.ApplicationInsights.Extensibility;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
+using System.IO.Abstractions;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -141,7 +142,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
-
+                 services.AddScoped<IFileSystem, FileSystem>();                
 
                  var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);

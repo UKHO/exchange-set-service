@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
@@ -22,5 +23,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CreateFileCopy(string filePath, Stream stream);
         byte[] ConvertStreamToByteArray(Stream input);
         Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
+        IDirectoryInfo[] GetDirectoryInfo(string path);
     }
 }

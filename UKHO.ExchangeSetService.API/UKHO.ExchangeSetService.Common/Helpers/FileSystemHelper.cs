@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.IO.Abstractions;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
@@ -12,6 +13,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     [ExcludeFromCodeCoverage]
     public class FileSystemHelper : IFileSystemHelper
     {
+        private readonly IFileSystem _fileSystem;
+        public FileSystemHelper(IFileSystem fileSystem)
+        {
+            _fileSystem = fileSystem;
+        }
+
         public void CheckAndCreateFolder(string folderPath)
         {
             if (!Directory.Exists(folderPath))
@@ -148,6 +155,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
         {
             await cloudBlockBlob.DownloadToFileAsync(path, FileMode.Create);
+        }
+
+        public IDirectoryInfo[] GetDirectoryInfo(string path)
+        {
+            IDirectoryInfo rootDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(path);
+            return rootDirectory.GetDirectories();
         }
     }
 }

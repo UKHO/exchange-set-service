@@ -126,6 +126,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()))));
                 ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, dvdNumber.ToString()));
+                ParallelCreateFolderTasks.Add(GetReadmeFiles(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
@@ -292,6 +293,26 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, "ADC");
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetAdcPath);
             await Task.CompletedTask;
+        }
+
+        public async Task GetReadmeFiles(string batchId, string exchangeSetPath, string correlationId)
+        {
+            var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+            List<string> encFolderList = new List<string>();
+            foreach (var directory in baseDirectory)
+            {
+                var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
+                encFolderList.Add(encFolder);
+            }
+            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+
+            Parallel.ForEach(encFolderList, encFolderList =>
+            {
+                ParallelCreateFolderTasks.Add(DownloadReadMeFile(batchId, encFolderList.ToString(), correlationId));
+            });
+            await Task.WhenAll(ParallelCreateFolderTasks);
+            ParallelCreateFolderTasks.Clear();
         }
     }
 }

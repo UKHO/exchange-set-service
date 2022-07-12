@@ -7,5 +7,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate);
         Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName);
+        Task GetReadmeFiles(string batchId, string exchangeSetPath, string correlationId);
     }
 }
