@@ -119,6 +119,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
         {
             string homeDirectoryPath = configuration["HOME"];
+
+            #region Temporary Base Folder Creation
+            //Temporary code for base folder creation
+            List<Task> ParallelTaskForBaseFolder = new List<Task> { };
+            var baseNumbers = Enumerable.Range(1, 9);
+            Parallel.ForEach(baseNumbers, baseNumber =>
+            {
+                string folderPath = string.Format(Path.Combine(largeExchangeSetFolderName, "B{1}"), baseNumber < 6 ? 1 : 2, baseNumber);
+                fileSystemHelper.CheckAndCreateFolder(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, folderPath));
+            });
+            await Task.WhenAll(ParallelTaskForBaseFolder);
+            ParallelTaskForBaseFolder.Clear();
+            #endregion
+
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
             var dvdNumbers = Enumerable.Range(1, 2);
 
