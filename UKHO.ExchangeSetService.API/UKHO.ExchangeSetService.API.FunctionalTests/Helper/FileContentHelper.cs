@@ -327,7 +327,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
         }
 
-        public static void CheckReadMeTxtFileContentForExtraLargeExchangeSet(string inputFile)
+        public static void CheckReadMeTxtFileContentForLargeMediaExchangeSet(string inputFile)
         {
 
             string[] lines = File.ReadAllLines(inputFile);

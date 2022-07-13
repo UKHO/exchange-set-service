@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
                     //Verify README.TXT file content
-                    FileContentHelper.CheckReadMeTxtFileContentForExtraLargeExchangeSet(Path.Combine(DownloadedFolderPath, $"B{j}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+                    FileContentHelper.CheckReadMeTxtFileContentForLargeMediaExchangeSet(Path.Combine(DownloadedFolderPath, $"B{j}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
 
                     j++;
                     var folderName = $"B{j}";
