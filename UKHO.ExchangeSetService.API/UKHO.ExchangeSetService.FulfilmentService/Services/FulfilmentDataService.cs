@@ -297,10 +297,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
         {
-            bool isAllEncFileCreated = false;
-            await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
+            DateTime createLargeMediaSerialEncFileTaskStartedAt = DateTime.UtcNow;
+
+            return await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
                       EventIds.CreateSerialFileRequestCompleted,
-                      "Create large media exchange set serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                      "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
                           var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
@@ -313,12 +314,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                               ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectory.ToString(), correlationId, baseFolderNumber.ToString()));
                           });
                           await Task.WhenAll(ParallelBaseFolderTasks);
-                          isAllEncFileCreated = await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));
-                          ParallelBaseFolderTasks.Clear();
-                          return isAllEncFileCreated;
+
+                          DateTime createLargeMediaSerialEncFileTaskCompletedAt = DateTime.UtcNow;
+                          monitorHelper.MonitorRequest("Create Large Media Serial Enc File Task", createLargeMediaSerialEncFileTaskStartedAt, createLargeMediaSerialEncFileTaskCompletedAt, correlationId, null, null, null, batchId);
+
+                          return await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));                          
                       },
                   batchId, correlationId);
-            return isAllEncFileCreated;
         }
     }
 }
