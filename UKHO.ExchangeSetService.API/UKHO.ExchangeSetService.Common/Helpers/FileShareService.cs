@@ -210,7 +210,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             Cancellation = itemProduct.Cancellation,
                             Dates = itemProduct.Dates,
                             FileSize = itemProduct.FileSize,
-                            UpdateNumbers = new List<int?> { itemUpdateNumber }
+                            UpdateNumbers = new List<int?> { itemUpdateNumber },
+                            Bundle = itemProduct.Bundle
                         });
                     }
                 }

@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string containerName = "testContainer";
             return (storageAccountConnectionString, containerName);
         }
-     
+
         private List<Products> GetProductdetails()
         {
             return new List<Products> {
@@ -62,10 +62,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 ProductName = "DE416050",
                                 EditionNumber = 2,
                                 UpdateNumbers = new List<int?> {0},
-                                FileSize = 400
+                                FileSize = 400,
+                                Bundle = new List<Bundle> { new Bundle { BundleType = 0, Location = "M1;B1" } }
                             }
                         };
-        }    
+        }
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
@@ -104,7 +105,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             return new BatchDetail
             {
                 BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
-                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "/batch/26067645-643e-4a56-xy5f-19977b4ae876/files/Test.TXT" } } } },
                 Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,
@@ -127,16 +128,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFound()
         {
-            string exchangeSetRootPath = @"C:\\HOME";          
+            string exchangeSetRootPath = @"C:\\HOME";
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
+            CommonHelper.IsPeriodicOutputService = false;
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
-            
-            Assert.AreEqual(0, response.Count);          
+
+            Assert.AreEqual(0, response.Count);
         }
 
         [Test]
@@ -149,7 +151,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), null, string.Empty, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
             Assert.IsNotNull(response);
-            Assert.AreEqual(1, response.Count);           
+            Assert.AreEqual(1, response.Count);
         }
 
         [Test]
@@ -188,18 +190,38 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            
+
             Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), string.Empty, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken));
-        }       
+        }
 
         [Test]
         public async Task WhenInsertOrMergeFssCacheDetail_ThenReturnTrue()
-        {            
+        {
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
             await fileShareServiceCache.InsertOrMergeFssCacheDetail(GetResponseCache());
 
             Assert.IsNotNull(true);
         }
+
+        #region LargeMediaExchangeSet
+
+        [Test]
+        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSet()
+        {
+            string exchangeSetRootPath = @"C:\\HOME";
+
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
+            CommonHelper.IsPeriodicOutputService = true;
+
+            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
+
+            Assert.AreEqual(0, response.Count);
+        }
+
+        #endregion
     }
 }

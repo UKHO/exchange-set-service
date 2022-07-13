@@ -122,7 +122,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         var fileName = uriArray[^1];
                         fileSystemHelper.CheckAndCreateFolder(downloadPath);
                         string path = Path.Combine(downloadPath, fileName);
-                        if (!File.Exists(path))
+                        if (!fileSystemHelper.CheckFileExists(path))
                         {
                             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
                             await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
