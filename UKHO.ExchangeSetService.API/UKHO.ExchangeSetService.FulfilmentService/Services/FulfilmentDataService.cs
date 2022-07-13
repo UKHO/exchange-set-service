@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             Parallel.ForEach(dvdNumbers, dvdNumber =>
             {
-                ////ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()))));
+                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()))));
                 ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, dvdNumber.ToString()));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);

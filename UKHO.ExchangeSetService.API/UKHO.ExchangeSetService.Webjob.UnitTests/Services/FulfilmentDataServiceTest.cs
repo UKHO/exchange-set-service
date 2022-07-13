@@ -111,15 +111,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                                 EditionNumber = 2,
                                 UpdateNumbers = new List<int?> { 3, 4 },
                                  Dates = new List<Dates> {
-                            new Dates{ UpdateNumber= 4, UpdateApplicationDate= DateTime.Today, IssueDate = DateTime.Today}
-                        },
+                            new Dates{ UpdateNumber= 4, UpdateApplicationDate= DateTime.Today, IssueDate = DateTime.Today}},
                                 Cancellation = new Cancellation {
                                     EditionNumber = 4,
                                     UpdateNumber = 6
                                 },
-                                FileSize = 400
-                            }
+                                FileSize = 400,
+                                Bundle = new List<Bundle> {new Bundle{BundleType = 0,Location = "M1:B1"}}
                         }
+                    }
             };
         }
         #endregion
@@ -156,17 +156,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
         }
         #endregion
-
-        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
-        {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
-              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
-
-            Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>().And.Message.EqualTo("Storage account accesskey not found"),
-                    async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate); });
-        }
 
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsExchangeSetCreatedSuccessfully()
@@ -255,8 +244,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-            
+
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
 
             string largeExchangeSet = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
 
