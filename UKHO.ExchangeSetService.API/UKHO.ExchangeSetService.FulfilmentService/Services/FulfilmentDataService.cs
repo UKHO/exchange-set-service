@@ -309,7 +309,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.CompletedTask;
         }
 
-        public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
+        private async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
         {
             DateTime createLargeMediaSerialEncFileTaskStartedAt = DateTime.UtcNow;
 
@@ -322,10 +322,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                                   .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
 
                           List<Task<bool>> ParallelBaseFolderTasks = new List<Task<bool>> { };
-                          Parallel.ForEach(baseDirectory, baseDirectory =>
+                          Parallel.ForEach(baseDirectory, baseDirectoryFolder =>
                           {
-                              string baseFolderNumber = baseDirectory.ToString().Substring(baseDirectory.ToString().Length - 1);
-                              ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectory.ToString(), correlationId, baseFolderNumber.ToString()));
+                              string baseFolderNumber = baseDirectoryFolder.ToString().Substring(baseDirectoryFolder.ToString().Length - 1);
+                              ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectoryFolder.ToString(), correlationId, baseFolderNumber.ToString()));
                           });
                           await Task.WhenAll(ParallelBaseFolderTasks);
 
