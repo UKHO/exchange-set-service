@@ -142,8 +142,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
-
-
+                 
                  var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>

@@ -320,7 +320,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string baseContent = fileContent_1[3];
             string dvd_service = fileContent_1[4];
 
-            Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned 'M{FolderInitial}'.");
+            Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned '{FolderInitial}'.");
             Assert.AreEqual(Avcs, FileContent_avcs, $"Incorrect file content is returned 'M{Avcs}'.");
             Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");

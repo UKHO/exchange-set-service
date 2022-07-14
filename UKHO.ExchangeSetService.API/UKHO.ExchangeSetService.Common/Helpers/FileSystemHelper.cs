@@ -14,10 +14,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public class FileSystemHelper : IFileSystemHelper
     {
         private readonly IFileSystem _fileSystem;
-
         public FileSystemHelper(IFileSystem fileSystem)
         {
-            _fileSystem =  fileSystem;
+            _fileSystem = fileSystem;
         }
 
         public void CheckAndCreateFolder(string folderPath)
