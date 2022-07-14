@@ -299,7 +299,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return salesCatalogueTypeResponse;
         }
 
-        public async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
+        private async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
         {
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
             var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, "INFO");
@@ -309,10 +309,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.CompletedTask;
         }
 
-        public async Task GetReadmeFiles(string batchId, string exchangeSetPath, string correlationId)
+        private async Task GetReadmeFiles(string batchId, string exchangeSetPath, string correlationId)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                        .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+           
             List<string> encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
             {
@@ -321,9 +322,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
 
-            Parallel.ForEach(encFolderList, encFolderList =>
+            Parallel.ForEach(encFolderList, encFolder =>
             {
-                ParallelCreateFolderTasks.Add(DownloadReadMeFile(batchId, encFolderList.ToString(), correlationId));
+                ParallelCreateFolderTasks.Add(DownloadReadMeFile(batchId, encFolder, correlationId));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
