@@ -318,11 +318,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
+                          var baseDirectorys = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                                                   .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
 
                           List<Task<bool>> ParallelBaseFolderTasks = new List<Task<bool>> { };
-                          Parallel.ForEach(baseDirectory, baseDirectoryFolder =>
+                          Parallel.ForEach(baseDirectorys, baseDirectoryFolder =>
                           {
                               string baseFolderNumber = baseDirectoryFolder.ToString().Substring(baseDirectoryFolder.ToString().Length - 1);
                               ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectoryFolder.ToString(), correlationId, baseFolderNumber.ToString()));

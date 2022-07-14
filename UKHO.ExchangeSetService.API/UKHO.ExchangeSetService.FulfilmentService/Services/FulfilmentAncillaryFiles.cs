@@ -254,7 +254,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CreateMediaFile(string batchId, string folderpath, string correlationId, string baseNumber)
         {
-            bool checkMediaFileCreated = false;
+            bool isMediaFileCreated = false;
             if (!string.IsNullOrWhiteSpace(folderpath))
             {
                 string mediaFilePath = Path.Combine(folderpath, "MEDIA.TXT");
@@ -268,19 +268,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await Task.CompletedTask;
 
                 if (fileSystemHelper.CheckFileExists(mediaFilePath))
-                    checkMediaFileCreated = true;
+                    isMediaFileCreated = true;
                 else
                 {
                     logger.LogError(EventIds.MediaFileIsNotCreated.ToEventId(), "Error in creating media.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
                     throw new FulfilmentException(EventIds.MediaFileIsNotCreated.ToEventId());
                 }
             }
-            return checkMediaFileCreated;
+            return isMediaFileCreated;
         }
 
         public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId, string baseNumber)
         {
-            bool checkSerialEncFileCreated = false;
+            bool isSerialEncFileCreated = false;
             if (!string.IsNullOrWhiteSpace(exchangeSetPath))
             {
                 string serialFilePath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.SerialFileName);
@@ -293,14 +293,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await Task.CompletedTask;
 
                 if (fileSystemHelper.CheckFileExists(serialFilePath))
-                    checkSerialEncFileCreated = true;
+                    isSerialEncFileCreated = true;
                 else
                 {
                     logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating large media exchange set serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
                     throw new FulfilmentException(EventIds.SerialFileIsNotCreated.ToEventId());
                 }
             }
-            return checkSerialEncFileCreated;
+            return isSerialEncFileCreated;
         }
     }
 }
