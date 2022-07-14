@@ -140,7 +140,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()))));
                 ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, dvdNumber.ToString()));
-                ParallelCreateFolderTasks.Add(GetReadmeFiles(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
@@ -309,7 +309,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.CompletedTask;
         }
 
-        private async Task GetReadmeFiles(string batchId, string exchangeSetPath, string correlationId)
+        private async Task DownloadLargeMediaReadMeFile(string batchId, string exchangeSetPath, string correlationId)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                        .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
