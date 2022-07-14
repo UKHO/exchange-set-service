@@ -119,6 +119,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
         {
             string homeDirectoryPath = configuration["HOME"];
+
+            #region Temporary Base Folder Creation
+            //Temporary code for base folder creation
+            List<Task> ParallelTaskForBaseFolder = new List<Task> { };
+            var baseNumbers = Enumerable.Range(1, 9);
+            Parallel.ForEach(baseNumbers, baseNumber =>
+            {
+                string folderPath = string.Format(Path.Combine(largeExchangeSetFolderName, "B{1}"), baseNumber < 6 ? 1 : 2, baseNumber);
+                fileSystemHelper.CheckAndCreateFolder(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, folderPath));
+            });
+            await Task.WhenAll(ParallelTaskForBaseFolder);
+            ParallelTaskForBaseFolder.Clear();
+            #endregion
+
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
             var dvdNumbers = Enumerable.Range(1, 2);
 
@@ -126,6 +140,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 ParallelCreateFolderTasks.Add(CreatePosFolderStructure(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()))));
                 ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, dvdNumber.ToString()));
+                ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
@@ -284,7 +299,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return salesCatalogueTypeResponse;
         }
 
-        public async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
+        private async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
         {
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
             var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, "INFO");
@@ -292,6 +307,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, "ADC");
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetAdcPath);
             await Task.CompletedTask;
+        }
+
+        private async Task DownloadLargeMediaReadMeFile(string batchId, string exchangeSetPath, string correlationId)
+        {
+            var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+           
+            List<string> encFolderList = new List<string>();
+            foreach (var directory in baseDirectory)
+            {
+                var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
+                encFolderList.Add(encFolder);
+            }
+            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+
+            Parallel.ForEach(encFolderList, encFolder =>
+            {
+                ParallelCreateFolderTasks.Add(DownloadReadMeFile(batchId, encFolder, correlationId));
+            });
+            await Task.WhenAll(ParallelCreateFolderTasks);
+            ParallelCreateFolderTasks.Clear();
         }
     }
 }
