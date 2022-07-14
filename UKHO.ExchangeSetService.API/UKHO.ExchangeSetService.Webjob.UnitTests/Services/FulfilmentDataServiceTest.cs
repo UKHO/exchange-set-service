@@ -260,8 +260,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var b2 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => b1.Name).Returns("B1");
             A.CallTo(() => b2.Name).Returns("B2");
-            IDirectoryInfo[]  directoryInfos = {b1,b2};    
-            
+            IDirectoryInfo[] directoryInfos = { b1, b2 };
+
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));

@@ -314,7 +314,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                        .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
-           
+
             List<string> encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
             {
@@ -354,7 +354,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                           DateTime createLargeMediaSerialEncFileTaskCompletedAt = DateTime.UtcNow;
                           monitorHelper.MonitorRequest("Create Large Media Serial Enc File Task", createLargeMediaSerialEncFileTaskStartedAt, createLargeMediaSerialEncFileTaskCompletedAt, correlationId, null, null, null, batchId);
 
-                          return await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));                          
+                          return await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));
                       },
                   batchId, correlationId);
         }

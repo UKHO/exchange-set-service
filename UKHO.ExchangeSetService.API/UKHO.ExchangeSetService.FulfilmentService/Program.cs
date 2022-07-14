@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
-        
+
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
@@ -69,10 +69,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     builder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
                 }
 
-                #if DEBUG
+#if DEBUG
                 //Add development overrides configuration
                 builder.AddJsonFile("appsettings.local.overrides.json", true, true);
-                #endif
+#endif
 
                 //Add environment variables
                 builder.AddEnvironmentVariables();
@@ -83,13 +83,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              {
                  builder.AddConfiguration(ConfigurationBuilder.GetSection("Logging"));
 
-                 #if DEBUG
+#if DEBUG
                  builder.AddSerilog(new LoggerConfiguration()
                                  .WriteTo.File("Logs/UKHO.ExchangeSetService.FulfilmentServiceLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
                                  .MinimumLevel.Information()
                                  .MinimumLevel.Override("UKHO", LogEventLevel.Debug)
                                  .CreateLogger(), dispose: true);
-                 #endif
+#endif
 
                  builder.AddConsole();
 
@@ -132,7 +132,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
                  services.Configure<SalesCatalogueConfiguration>(ConfigurationBuilder.GetSection("SalesCatalogue"));
-         
+
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
                  services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
@@ -142,18 +142,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
-                 
+
                  var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
                  services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
                  {
-                     client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);                     
+                     client.BaseAddress = new Uri(ConfigurationBuilder["FileShareService:BaseUrl"]);
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                      client.Timeout = TimeSpan.FromMinutes(Convert.ToDouble(ConfigurationBuilder["FileShareService:TimeOutInMins"]));
                  })
                  .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
-                 
+
                  services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
                  {
                      client.BaseAddress = new Uri(ConfigurationBuilder["SalesCatalogue:BaseUrl"]);

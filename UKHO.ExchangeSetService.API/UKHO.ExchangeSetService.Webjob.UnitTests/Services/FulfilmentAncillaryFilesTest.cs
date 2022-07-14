@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     public class FulfilmentAncillaryFilesTest
     {
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
-        public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;        
+        public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;
         public ILogger<FulfilmentAncillaryFiles> fakeLogger;
         public IFileSystemHelper fakeFileSystemHelper;
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             });
             fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            
+
             fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeLogger, fakeFileShareServiceConfig, fakeFileSystemHelper);
         }
 
@@ -146,16 +146,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private SalesCatalogueProductResponse GetSalesCatalogueProductResponse()
         {
             return new SalesCatalogueProductResponse
-            {                
+            {
 
-                Products = new List<Products>() {                    
+                Products = new List<Products>() {
                     new Products
                     {
                         ProductName = "10000002",
                         EditionNumber = 10,
                         UpdateNumbers = new List<int?>{3,4},
                         Dates = new List<Dates> {
-                            new Dates {UpdateNumber=3, UpdateApplicationDate = DateTime.Today , IssueDate = DateTime.Today },                            
+                            new Dates {UpdateNumber=3, UpdateApplicationDate = DateTime.Today , IssueDate = DateTime.Today },
                         },
                         Cancellation = new Cancellation
                         {
