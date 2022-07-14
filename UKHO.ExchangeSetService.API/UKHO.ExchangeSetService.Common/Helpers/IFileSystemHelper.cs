@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CheckAndCreateFolder(string folderPath);
         bool CreateFileContent(string fileName, string content);
         bool CheckDirectoryAndFileExists(string rootPath, string zipFilePath);
-        void CreateZipFile(string rootPath,string zipFileName);
+        void CreateZipFile(string rootPath, string zipFileName);
         CustomFileInfo GetFileInfo(string filePath);
         byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData);
         List<FileDetail> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData);

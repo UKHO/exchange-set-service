@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     public class FulfilmentAncillaryFilesTest
     {
         public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
-        public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;        
+        public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;
         public ILogger<FulfilmentAncillaryFiles> fakeLogger;
         public IFileSystemHelper fakeFileSystemHelper;
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             });
             fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            
+
             fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeLogger, fakeFileShareServiceConfig, fakeFileSystemHelper);
         }
 
@@ -146,16 +146,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private SalesCatalogueProductResponse GetSalesCatalogueProductResponse()
         {
             return new SalesCatalogueProductResponse
-            {                
+            {
 
-                Products = new List<Products>() {                    
+                Products = new List<Products>() {
                     new Products
                     {
                         ProductName = "10000002",
                         EditionNumber = 10,
                         UpdateNumbers = new List<int?>{3,4},
                         Dates = new List<Dates> {
-                            new Dates {UpdateNumber=3, UpdateApplicationDate = DateTime.Today , IssueDate = DateTime.Today },                            
+                            new Dates {UpdateNumber=3, UpdateApplicationDate = DateTime.Today , IssueDate = DateTime.Today },
                         },
                         Cancellation = new Cancellation
                         {
@@ -308,6 +308,31 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
             var response = await fulfilmentAncillaryFiles.CreateMediaFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1");
+
+            Assert.AreEqual(true, response);
+        }
+        #endregion
+
+        #region CreateLargeMediaSerialEncFile
+        [Test]
+        public void WhenInvalidCreateLargeMediaSerialEncFileRequest_ThenReturnFulfilmentException()
+        {
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1"); });
+        }
+
+        [Test]
+        public async Task WhenValidCreateLargeMediaSerialEncFileRequest_ThenReturnTrueResponse()
+        {
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+
+            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1");
 
             Assert.AreEqual(true, response);
         }

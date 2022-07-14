@@ -343,6 +343,29 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Assert.AreEqual(DateTime.Parse(expectedUtcDateTime), DateTime.Parse(utcDateTime), $"Response body returned ExpiryDateTime {utcDateTime}, different than the expected value.");
         }
+
+        public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int folderNumber)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+
+            //Store file content here
+            string[] fileContent = lines[0].Split(" ");
+
+            string dataServerAndWeek = fileContent[0];
+            string dateAndCdType = fileContent[3];
+            string formatVersionAndExchangeSetNumber = fileContent[9];
+
+            ////string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+            string weekNumber = "25";
+            string year = "22";
+            string currentDate = "20220623";
+
+            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{folderNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+        }
     }
 }
 

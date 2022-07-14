@@ -87,6 +87,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
         public IDirectoryInfo[] GetDirectoryInfo(string path)
         {
             throw new System.NotImplementedException();

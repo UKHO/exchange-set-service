@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("SmokeTest")]
-        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAINFOFolderIsGenerated()
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderIsGenerated()
         {
             for (int i = 1; i <= 2; i++)
             {
@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("SmokeTest")]
-        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAADCFolderIsGenerated()
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderIsGenerated()
         {
             for (int i = 1; i <= 2; i++)
             {
@@ -95,6 +95,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                     //Verify README.TXT file content
                     FileContentHelper.CheckReadMeTxtFileContentForLargeMediaExchangeSet(Path.Combine(DownloadedFolderPath, $"B{j}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+
+                    j++;
+                    var folderName = $"B{j}";
+                    checkFolder = FssBatchHelper.CheckforFolderExist(DownloadedFolderPath, folderName);
+                } while (checkFolder);
+            }
+        }
+
+        [Test]
+        [Category("SmokeTest")]
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenASerialEncFileIsGenerated()
+        {
+            int j = 1;
+            for (int i = 1; i <= 2; i++)
+            {
+                var FolderName = $"M0{i}X02";
+                bool checkFolder;
+                DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
+                do
+                {
+                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, $"B{j}"), Config.ExchangeSetSerialEncFile);
+                    Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, $"B{j}")}");
+
+                    //Verify Serial.ENC file content
+                    FileContentHelper.CheckSerialEncFileContentForLargeMediaExchangeSet(Path.Combine(DownloadedFolderPath, $"B{j}", Config.ExchangeSetSerialEncFile),j);
 
                     j++;
                     var folderName = $"B{j}";
