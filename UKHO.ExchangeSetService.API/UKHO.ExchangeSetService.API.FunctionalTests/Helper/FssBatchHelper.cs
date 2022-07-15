@@ -119,5 +119,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return extractPath;
 
         }
+
+        public static string [] CheckforDirectories(string filePath)
+        {
+            return (Directory.GetDirectories(filePath));
+        }
     }
 }

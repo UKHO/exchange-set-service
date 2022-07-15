@@ -4,7 +4,6 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using System.Net.Http;
 using System.IO;
 using System.Threading;
-using System;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -17,10 +16,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
-        
-        public string currentDate = DateTime.UtcNow.ToString("ddMMMyyyy");
         private string DownloadedFolderPath { get; set; }
 
+        ////A hard-coded batch has been used to run the below tests becasue the dependent functionalities are part of the future sprint development
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
@@ -39,14 +37,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAMediaTxtFileIsGenerated()
         {
-            for (int i = 1; i <= 2; i++)
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                var FolderName = $"M0{i}X02";
+                var FolderName = $"M0{mediaNumber}X02";
                 DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
                 bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
 
-                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetMediaFileName), i);
+                FileContentHelper.CheckMediaTxtFileContent(Path.Combine(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetMediaFileName), mediaNumber);
             }
         }
 
@@ -54,9 +52,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderIsGenerated()
         {
-            for (int i = 1; i <= 2; i++)
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                var FolderName = $"M0{i}X02";
+                var FolderName = $"M0{mediaNumber}X02";
                 DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
                 
@@ -68,9 +66,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderIsGenerated()
         {
-            for (int i = 1; i <= 2; i++)
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                var FolderName = $"M0{i}X02";
+                var FolderName = $"M0{mediaNumber}X02";
                 DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
                 
@@ -82,22 +80,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
-            int j = 1;
-            for (int i = 1; i <= 2; i++)
+            int baseNumber = 1;
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                var FolderName = $"M0{i}X02";
+                var FolderName = $"M0{mediaNumber}X02";
                 bool checkFolder;
                 DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
                 do
                 {
-                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, $"B{j}", Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
+                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
                     Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
                     //Verify README.TXT file content
-                    FileContentHelper.CheckReadMeTxtFileContentForLargeMediaExchangeSet(Path.Combine(DownloadedFolderPath, $"B{j}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+                    FileContentHelper.CheckReadMeTxtFileContentForLargeMediaExchangeSet(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
 
-                    j++;
-                    var folderName = $"B{j}";
+                    baseNumber++;
+                    var folderName = $"B{baseNumber}";
                     checkFolder = FssBatchHelper.CheckforFolderExist(DownloadedFolderPath, folderName);
                 } while (checkFolder);
             }
@@ -107,22 +105,58 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenASerialEncFileIsGenerated()
         {
-            int j = 1;
-            for (int i = 1; i <= 2; i++)
+            int baseNumber = 1;
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                var FolderName = $"M0{i}X02";
+                var FolderName = $"M0{mediaNumber}X02";
                 bool checkFolder;
                 DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
                 do
                 {
-                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, $"B{j}"), Config.ExchangeSetSerialEncFile);
-                    Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, $"B{j}")}");
+                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, $"B{baseNumber}"), Config.ExchangeSetSerialEncFile);
+                    Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, $"B{baseNumber}")}");
 
                     //Verify Serial.ENC file content
-                    FileContentHelper.CheckSerialEncFileContentForLargeMediaExchangeSet(Path.Combine(DownloadedFolderPath, $"B{j}", Config.ExchangeSetSerialEncFile),j);
+                    FileContentHelper.CheckSerialEncFileContentForLargeMediaExchangeSet(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetSerialEncFile), baseNumber);
 
-                    j++;
-                    var folderName = $"B{j}";
+                    baseNumber++;
+                    var folderName = $"B{baseNumber}";
+                    checkFolder = FssBatchHelper.CheckforFolderExist(DownloadedFolderPath, folderName);
+                } while (checkFolder);
+            }
+        }
+
+        [Test]
+        [Category("SmokeTest")]
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreGenerated()
+        {
+            int baseNumber = 1;
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
+            {
+                var FolderName = $"M0{mediaNumber}X02";
+                bool checkFolder;
+                DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
+                do
+                {
+                    string [] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder));
+                    
+                    foreach (var folder in checkDirectories)
+                    {
+                        string[] checksubDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, folder));
+                        
+                        foreach (var updateFolder in checksubDirectories)
+                        {
+                            string[] checkupdateDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, folder, updateFolder));
+
+                            foreach (var encFile in checkupdateDirectories)
+                            {
+                                int totalFileCount = FileContentHelper.FileCountInDirectories(encFile);
+                                Assert.That(totalFileCount > 0, $"No files available in the folder: {encFile}");
+                            }
+                        }
+                    }
+                    baseNumber++;
+                    var folderName = $"B{baseNumber}";
                     checkFolder = FssBatchHelper.CheckforFolderExist(DownloadedFolderPath, folderName);
                 } while (checkFolder);
             }
@@ -131,10 +165,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TearDown]
         public void GlobalTeardown()
         {
-            //Clean up downloaded files/ folders
-            for (int i = 1; i <= 2; i++)
+            //Clean up downloaded files/folders
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                var FolderName = $"M0{i}X02.zip";
+                var FolderName = $"M0{mediaNumber}X02.zip";
                 FileContentHelper.DeleteDirectory(FolderName);
             }
         }

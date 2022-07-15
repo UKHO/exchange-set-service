@@ -368,4 +368,3 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
     }
 }
-
