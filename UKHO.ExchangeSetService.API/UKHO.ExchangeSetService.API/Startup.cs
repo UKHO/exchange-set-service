@@ -31,6 +31,7 @@ using UKHO.ExchangeSetService.Common.Storage;
 using Microsoft.AspNetCore.Authorization;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Logging;
+using System.IO.Abstractions;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -173,6 +174,7 @@ namespace UKHO.ExchangeSetService.API
             services.AddScoped<IAzureWebJobsHealthCheckService, AzureWebJobsHealthCheckService>();
             services.AddSingleton<IWebJobsAccessKeyProvider>(s => new WebJobsAccessKeyProvider(configuration));
             services.AddScoped<UserIdentifier>();
+            services.AddScoped<IFileSystem, FileSystem>();
 
             services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")

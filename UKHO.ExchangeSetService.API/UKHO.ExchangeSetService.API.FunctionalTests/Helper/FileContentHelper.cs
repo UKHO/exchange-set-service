@@ -274,12 +274,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
-            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/c6637401-dd91-4756-ad97-6e0dda0e53f6/status"; //here BatchId is hardcoded and will be made dynamic in future
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/status"; //here BatchId is hardcoded and will be made dynamic in future
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
-            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/c6637401-dd91-4756-ad97-6e0dda0e53f6/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl.ToString(), FssJwtToken, FolderName);
 
@@ -304,9 +304,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
             ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
             ////Below static values are used temporarily as respective functionality will be developed and deployed in future sprints. Once that's implemented the above code will be used
-            string weekNumber = "26";
+            string weekNumber = "25";
             string year = "22";
-            string currentDate = "20220706";
+            string currentDate = "20220623";
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
@@ -320,11 +320,51 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string baseContent = fileContent_1[3];
             string dvd_service = fileContent_1[4];
 
-            Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned 'M{FolderInitial}'.");
+            Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned '{FolderInitial}'.");
             Assert.AreEqual(Avcs, FileContent_avcs, $"Incorrect file content is returned 'M{Avcs}'.");
             Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
             Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
+        }
+
+        public static void CheckReadMeTxtFileContentForLargeMediaExchangeSet(string inputFile)
+        {
+
+            string[] lines = File.ReadAllLines(inputFile);
+            var fileSecondLineContent = lines[1];
+
+            string[] fileContents = fileSecondLineContent.Split("File date:");
+
+            //Verifying file contents - second line of the readme file
+            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
+
+            var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
+            var expectedUtcDateTime = "2022-06-17 15:00:00";
+
+            Assert.AreEqual(DateTime.Parse(expectedUtcDateTime), DateTime.Parse(utcDateTime), $"Response body returned ExpiryDateTime {utcDateTime}, different than the expected value.");
+        }
+
+        public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int folderNumber)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+
+            //Store file content here
+            string[] fileContent = lines[0].Split(" ");
+
+            string dataServerAndWeek = fileContent[0];
+            string dateAndCdType = fileContent[3];
+            string formatVersionAndExchangeSetNumber = fileContent[9];
+
+            ////string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+            string weekNumber = "25";
+            string year = "22";
+            string currentDate = "20220623";
+
+            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{folderNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
     }
 }

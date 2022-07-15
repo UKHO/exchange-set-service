@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
@@ -11,7 +12,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CheckAndCreateFolder(string folderPath);
         bool CreateFileContent(string fileName, string content);
         bool CheckDirectoryAndFileExists(string rootPath, string zipFilePath);
-        void CreateZipFile(string rootPath,string zipFileName);
+        void CreateZipFile(string rootPath, string zipFileName);
         CustomFileInfo GetFileInfo(string filePath);
         byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData);
         List<FileDetail> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData);
@@ -22,5 +23,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CreateFileCopy(string filePath, Stream stream);
         byte[] ConvertStreamToByteArray(Stream input);
         Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
+        IDirectoryInfo[] GetDirectoryInfo(string path);
     }
 }
