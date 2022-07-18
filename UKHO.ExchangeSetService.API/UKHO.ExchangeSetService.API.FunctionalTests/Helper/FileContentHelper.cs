@@ -344,7 +344,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(DateTime.Parse(expectedUtcDateTime), DateTime.Parse(utcDateTime), $"Response body returned ExpiryDateTime {utcDateTime}, different than the expected value.");
         }
 
-        public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int folderNumber)
+        public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int baseNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
 
@@ -364,8 +364,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{folderNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
     }
 }
-

@@ -97,5 +97,39 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
                 });
         }
+
+        //Temporary code to add bundle info to SCS response
+        public static SalesCatalogueProductResponse AddBundleInfo(SalesCatalogueProductResponse salesCatalogueProductResponse)
+        {
+            if (salesCatalogueProductResponse != null && salesCatalogueProductResponse.ProductCounts.ReturnedProductCount > 0)
+            {
+                foreach (var item in salesCatalogueProductResponse.Products)
+                {
+                    item.Bundle = new List<Bundle>
+                    {
+                        new Bundle { BundleType = 0, Location = GetLocation() }
+                    };
+                }
+            }
+            return salesCatalogueProductResponse;
+        }
+
+        //Temporary code to add bundle info to SCS response
+        private static string GetLocation()
+        {
+            var rand = new Random();
+            var dvdNum = rand.Next(1, 3);
+
+            if (dvdNum == 1)
+            {
+                var baseNum = rand.Next(1, 5);
+                return "M" + dvdNum + ";B" + baseNum;
+            }
+            else
+            {
+                var baseNum = rand.Next(5, 9);
+                return "M" + dvdNum + ";B" + baseNum;
+            }
+        }
     }
 }

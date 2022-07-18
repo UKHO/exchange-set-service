@@ -27,6 +27,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
         private const string CONTENT_TYPE = "application/json";
+        private const int StringLength = 2;
 
         public FileShareServiceCache(IAzureBlobStorageClient azureBlobStorageClient,
             IAzureTableStorageClient azureTableStorageClient,
@@ -62,7 +63,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     EditionNumber = item.EditionNumber,
                     FileSize = item.FileSize,
                     ProductName = item.ProductName,
-                    UpdateNumbers = new List<int?>()
+                    UpdateNumbers = new List<int?>(),
+                    Bundle = item.Bundle
                 };
                 List<int?> updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
@@ -99,7 +101,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
             var internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
-            var downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, 2), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+            string downloadPath;
+
+            if (CommonHelper.IsPeriodicOutputService)
+            {
+                var bundleLocation = item.Bundle.FirstOrDefault().Location.Split(";");
+                exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleLocation[0].Substring(1, 1), bundleLocation[1]);
+                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
+            }
+            else
+                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceDownloadENCFilesFromCacheStart, EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted,
                 "File share service download request from cache container for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
@@ -110,7 +122,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         var fileName = uriArray[^1];
                         fileSystemHelper.CheckAndCreateFolder(downloadPath);
                         string path = Path.Combine(downloadPath, fileName);
-                        if (!File.Exists(path))
+                        if (!fileSystemHelper.CheckFileExists(path))
                         {
                             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
                             await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);

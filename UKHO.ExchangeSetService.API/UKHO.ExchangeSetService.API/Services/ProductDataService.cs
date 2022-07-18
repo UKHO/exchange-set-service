@@ -66,6 +66,10 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
+
+            //Temporary code to add bundle info to SCS response
+            salesCatalogueResponse.ResponseBody = CommonHelper.AddBundleInfo(salesCatalogueResponse.ResponseBody);
+
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {

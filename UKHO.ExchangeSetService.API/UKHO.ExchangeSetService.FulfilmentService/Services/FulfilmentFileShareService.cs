@@ -46,6 +46,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         currentProductSub.ProductName = item.ProductName;
                         currentProductSub.FileSize = item.FileSize;
                         currentProductSub.Cancellation = item.Cancellation;
+                        currentProductSub.Bundle = item.Bundle;
                         listSubUpdateNumberProduts.Add(currentProductSub);
                     }
                 }

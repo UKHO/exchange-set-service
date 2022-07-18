@@ -99,7 +99,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 ProductName = "DE416050",
                                 EditionNumber = 0,
                                 UpdateNumbers = new List<int?> {0},
-                                FileSize = 400
+                                FileSize = 400,
+                                Bundle = new List<Bundle>
+                            {
+                                new Bundle
+                                {
+                                    BundleType = 0,
+                                    Location = "M1;B1"
+                                }
+                            }
                             }
                         };
         }
@@ -161,7 +169,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Length = 21833
             };
             return customFileInfo;
-        }        
+        }
 
         private List<FileDetail> GetFileDetails()
         {
@@ -208,7 +216,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
-            
+
             //assert the mocked API response returned to CreateBatch contains the internal BaseUrl
             Assert.IsTrue(createBatchResponse.BatchStatusUri.Contains(fakeFileShareConfig.Value.BaseUrl));
             Assert.IsTrue(createBatchResponse.ExchangeSetBatchDetailsUri.Contains(fakeFileShareConfig.Value.BaseUrl));
@@ -240,7 +248,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, };
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
-                .Invokes((HttpMethod method, string postBody, string accessToken, string uri,CancellationToken cancellationToken, string correlationId) =>
+                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                 {
                     accessTokenParam = accessToken;
                     uriParam = uri;
@@ -287,7 +295,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
                 RequestMessage = new HttpRequestMessage()
                 {
                     RequestUri = new Uri("http://test.com")
@@ -297,7 +308,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string accessToken, string uri,CancellationToken cancellationToken, string correlationId) =>
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
                    accessTokenParam = accessToken;
                    uriParam = uri;
@@ -324,7 +335,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
-            var searchBatchResponse = GetSearchBatchResponse();         
+            var searchBatchResponse = GetSearchBatchResponse();
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
@@ -337,11 +348,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), 
-                RequestMessage = new HttpRequestMessage()
+            var httpResponse = new HttpResponseMessage()
             {
-                RequestUri = new Uri("http://test.com")
-            }
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
@@ -402,7 +416,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
                 RequestMessage = new HttpRequestMessage()
                 {
                     RequestUri = new Uri("http://test.com")
@@ -421,14 +438,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
             var productList = GetProductdetails();
-            productList.Add(new Products {
-                                ProductName = "DE416051",
-                                EditionNumber = 0,
-                                UpdateNumbers = new List<int?> {0},
-                                FileSize = 400,
-                                Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
-                            });
+            productList.Add(new Products
+            {
+                ProductName = "DE416051",
+                EditionNumber = 0,
+                UpdateNumbers = new List<int?> { 0 },
+                FileSize = 400,
+                Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
+            });
             A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(productList);
+            CommonHelper.IsPeriodicOutputService = false;
+
             var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
 
             Assert.IsNotNull(response);
@@ -447,7 +467,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
-            var searchBatchResponse = GetSearchBatchResponse();         
+            var searchBatchResponse = GetSearchBatchResponse();
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
@@ -470,7 +490,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
                 RequestMessage = new HttpRequestMessage()
                 {
                     RequestUri = new Uri("http://test.com")
@@ -511,7 +534,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             var batchDetail = GetSearchBatchResponse();
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,A<CancellationToken>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
                  {
                      StatusCode = HttpStatusCode.OK,
@@ -565,7 +588,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             var batchDetail = GetSearchBatchResponse();
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored,A<CancellationToken>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
                  {
                      StatusCode = HttpStatusCode.BadRequest,
@@ -726,7 +749,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             var searchBatchResponse = GetReadMeFileDetails();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) ,RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
             httpResponse.Headers.Add("Server", "test/10.0");
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
@@ -890,7 +913,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
             A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
-            A.CallTo(() => fakeFileSystemHelper.UploadCommitBatch(A<BatchCommitMetaData>.Ignored)).Returns(fileDetail); 
+            A.CallTo(() => fakeFileSystemHelper.UploadCommitBatch(A<BatchCommitMetaData>.Ignored)).Returns(fileDetail);
             A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
             A.CallTo(() => fakeFileShareServiceClient.WriteBlockInFileAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<WriteBlockFileModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -984,11 +1007,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileShareConfig.Value.BaseUrl = null;
             fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
             fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
-            
+
             var GetFileInfoDetails = GetFileInfo();
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
-            
+
             var badUploadResponse = new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.BadRequest,
@@ -1000,10 +1023,133 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(badUploadResponse);
-             
+
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                    async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
         }
         #endregion UploadZipFile
+
+        #region LargeMediaExchangeSet
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSet()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            CommonHelper.IsPeriodicOutputService = true;
+
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
+            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+        }
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProductsWithCancellation_ThenReturnsSearchBatchResponseForLargeMediaExchangeSet()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416050" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+            });
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416051" },
+                                                           new Attribute { Key= "EditionNumber", Value= "3" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+            });
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            var productList = GetProductdetails();
+            productList.Add(new Products
+            {
+                ProductName = "DE416051",
+                EditionNumber = 0,
+                UpdateNumbers = new List<int?> { 0 },
+                FileSize = 400,
+                Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 },
+                Bundle = new List<Bundle> { new Bundle { BundleType = 0, Location = "M1;B1" } }
+            });
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(productList);
+            CommonHelper.IsPeriodicOutputService = true;
+
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
+            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+            Assert.AreEqual("13d38bde-5191-4a59-82d5-aa22ca1cc6de", response.Entries[1].BatchId);
+        }
+
+        #endregion
     }
 }

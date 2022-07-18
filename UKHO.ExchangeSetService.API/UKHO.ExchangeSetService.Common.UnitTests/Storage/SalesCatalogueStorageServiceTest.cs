@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using System.Collections.Generic;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Storage;
 
@@ -40,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
         #region GetStorageAccountConnectionString
 
         [Test]
-        public void WhenValidGetStorageAccountConnectionStringRequest_ThenReturnKeyNotFoundExceptionResponse()
+        public void WhenValidGetStorageAccountConnectionStringRequest_ThenReturnValidResponse()
         {
             fakeStorageConfig.Value.StorageAccountKey = "Test";
             var response = salesCatalogueStorageService.GetStorageAccountConnectionString();
@@ -48,6 +49,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
             Assert.NotNull(response);
             Assert.AreEqual("DefaultEndpointsProtocol=https;AccountName=test;AccountKey=Test;EndpointSuffix=core.windows.net", response);
         }
+
+        [Test]
+        public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
+        {
+            string expectedErrorMessage = "Storage account accesskey not found";
+
+            var ex = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageAccountConnectionString(null, null));
+
+            Assert.AreEqual(expectedErrorMessage, ex.Message);
+        }
+
         #endregion
     }
 }
