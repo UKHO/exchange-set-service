@@ -101,26 +101,35 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                     RequestedProductCount = 6,
                     RequestedProductsAlreadyUpToDateCount = 8,
                     ReturnedProductCount = 2,
-                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
-                                new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
-                                new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
-                            }
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>
+                    {
+                        new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
+                        new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
+                    }
                 },
-                Products = new List<Products> {
-                            new Products {
-                                ProductName = "productName",
-                                EditionNumber = 2,
-                                UpdateNumbers = new List<int?> { 3, 4 },
-                                 Dates = new List<Dates> {
-                            new Dates{ UpdateNumber= 4, UpdateApplicationDate= DateTime.Today, IssueDate = DateTime.Today}},
-                                Cancellation = new Cancellation {
-                                    EditionNumber = 4,
-                                    UpdateNumber = 6
-                                },
-                                FileSize = 400,
-                                Bundle = new List<Bundle> {new Bundle{BundleType = 0,Location = "M1:B1"}}
+                Products = new List<Products>
+                {
+                    new Products
+                    {
+                        ProductName = "productName",
+                        EditionNumber = 2,
+                        UpdateNumbers = new List<int?> { 3, 4 },
+                        Dates = new List<Dates>
+                        {
+                            new Dates{ UpdateNumber= 4, UpdateApplicationDate= DateTime.Today, IssueDate = DateTime.Today}
+                        },
+                        Cancellation = new Cancellation
+                        {
+                            EditionNumber = 4,
+                            UpdateNumber = 6
+                        },
+                        FileSize = 400,
+                        Bundle = new List<Bundle>
+                        {
+                            new Bundle{BundleType = 0,Location = "M1:B1"}
                         }
                     }
+                }
             };
         }
         #endregion
