@@ -142,11 +142,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     
                     foreach (var folder in checkDirectories)
                     {
-                        string[] checksubDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, folder));
+                        string[] checksubDirectories = FssBatchHelper.CheckforDirectories(folder);
                         
                         foreach (var updateFolder in checksubDirectories)
                         {
-                            string[] checkupdateDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(DownloadedFolderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, folder, updateFolder));
+                            string[] checkupdateDirectories = FssBatchHelper.CheckforDirectories(updateFolder);
 
                             foreach (var encFile in checkupdateDirectories)
                             {
