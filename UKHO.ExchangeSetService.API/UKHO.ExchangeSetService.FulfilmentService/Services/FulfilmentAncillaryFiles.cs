@@ -10,10 +10,10 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
-using UKHO.Torus.Enc.Core.EncCatalogue;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using UKHO.Torus.Enc.Core;
 using UKHO.Torus.Core;
+using UKHO.Torus.Enc.Core;
+using UKHO.Torus.Enc.Core.EncCatalogue;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -260,11 +260,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string mediaFilePath = Path.Combine(folderpath, "MEDIA.TXT");
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
+                var basefolders = fileSystemHelper.GetDirectoryInfo(folderpath)
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
 
-                var mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
-                mediaFileContent += Environment.NewLine;
+                string mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
+                mediaFileContent += Environment.NewLine;              
                 mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
-                fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
+                mediaFileContent += Environment.NewLine;
+                foreach (var directory in basefolders)
+                {
+                    var baseFolderName = directory;
+#pragma warning disable S1643 // Strings should not be concatenated using '+' in a loop
+                    mediaFileContent += $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS VOLUME1','ENC data for producers EE, FI, FR, LT, LV, SE',, ";
+#pragma warning restore S1643 // Strings should not be concatenated using '+' in a loop
+                }
+                    fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
                 await Task.CompletedTask;
 
                 if (fileSystemHelper.CheckFileExists(mediaFilePath))
