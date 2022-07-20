@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -267,14 +268,26 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 mediaFileContent += Environment.NewLine;              
                 mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
                 mediaFileContent += Environment.NewLine;
+                StringBuilder sb = new StringBuilder();
                 foreach (var directory in basefolders)
                 {
-                    var baseFolderName = directory;
-#pragma warning disable S1643 // Strings should not be concatenated using '+' in a loop
-                    mediaFileContent += $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS VOLUME1','ENC data for producers EE, FI, FR, LT, LV, SE',, ";
-#pragma warning restore S1643 // Strings should not be concatenated using '+' in a loop
+                    var baseFolderName = directory.Name;
+                    var baseDigit = baseFolderName.Remove(0,1);
+                    string path = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
+                    string[] subdirectoryEntries = Directory.GetDirectories(path);
+
+                    List<string> countryCodes = new List<string>();                  
+                    foreach (string codes in subdirectoryEntries)
+                    {
+                        var dirName = new DirectoryInfo(codes).Name;
+                        countryCodes.Add(dirName);
+                    }
+                    string content = $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS VOLUME{baseDigit}','ENC data for producers {string.Join(",", countryCodes)}',,";
+                    sb.AppendLine(content);
+
                 }
-                    fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
+                mediaFileContent += sb.ToString();
+                fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
                 await Task.CompletedTask;
 
                 if (fileSystemHelper.CheckFileExists(mediaFilePath))
