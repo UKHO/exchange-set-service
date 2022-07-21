@@ -265,18 +265,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                        .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
 
                 string mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
-                mediaFileContent += Environment.NewLine;              
+                mediaFileContent += Environment.NewLine;
                 mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
                 mediaFileContent += Environment.NewLine;
                 StringBuilder sb = new StringBuilder();
                 foreach (var directory in basefolders)
                 {
                     var baseFolderName = directory.Name;
-                    var baseDigit = baseFolderName.Remove(0,1);
+                    var baseDigit = baseFolderName.Remove(0, 1);
                     string path = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
-                    string[] subdirectoryEntries = Directory.GetDirectories(path);
+                    string[] subdirectoryEntries = fileSystemHelper.GetDirectories(path);
 
-                    List<string> countryCodes = new List<string>();                  
+                    List<string> countryCodes = new List<string>();
                     foreach (string codes in subdirectoryEntries)
                     {
                         var dirName = new DirectoryInfo(codes).Name;
