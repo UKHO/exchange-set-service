@@ -392,8 +392,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                           var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, string.Format(rootFolderName, 2)))
                                                   .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
-                        
-                          string lastBaseDirectoryNumber =  baseLastDirectory != null && !string.IsNullOrWhiteSpace(baseLastDirectory.ToString())  ? baseLastDirectory.ToString().Substring(baseLastDirectory.ToString().Length - 1): "9";
+
+                          string lastBaseDirectoryNumber = baseLastDirectory != null && !string.IsNullOrWhiteSpace(baseLastDirectory.ToString()) ? baseLastDirectory.ToString().Substring(baseLastDirectory.ToString().Length - 1) : "9";
 
                           List<Task<bool>> ParallelBaseFolderTasks = new List<Task<bool>> { };
                           Parallel.ForEach(baseDirectorys, baseDirectoryFolder =>
