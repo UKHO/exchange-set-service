@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                             {
                                 new Bundle
                                 {
-                                    BundleType = 0,
+                                    BundleType = "DVD",
                                     Location = "M1;B1"
                                 }
                             }
@@ -1137,7 +1137,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 UpdateNumbers = new List<int?> { 0 },
                 FileSize = 400,
                 Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 },
-                Bundle = new List<Bundle> { new Bundle { BundleType = 0, Location = "M1;B1" } }
+                Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
             });
             A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(productList);
             CommonHelper.IsPeriodicOutputService = true;
