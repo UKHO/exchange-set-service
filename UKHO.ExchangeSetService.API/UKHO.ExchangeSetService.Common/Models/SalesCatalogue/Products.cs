@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
 
     public class Bundle
     {
-        public int BundleType { get; set; }
+        public string BundleType { get; set; }
         public string Location { get; set; }
     }
 }
