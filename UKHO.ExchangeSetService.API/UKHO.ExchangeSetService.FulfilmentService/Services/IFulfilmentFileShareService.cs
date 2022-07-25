@@ -13,5 +13,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         Task<string> SearchReadMeFilePath(string batchId, string correlationId);
         Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
         Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId);
+        Task<bool> UploadZipFileForLargeMediaExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string mediaZipFileName);
+        Task<bool> CommitLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId);
     }
 }

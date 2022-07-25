@@ -127,5 +127,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             return await fileShareService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, fileShareServiceConfig.Value.ExchangeSetFileName);
         }
+
+        public async Task<bool> UploadZipFileForLargeMediaExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string mediaZipFileName)
+        {
+            return await fileShareService.UploadLargeMediaFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, mediaZipFileName + ".zip");
+        }
+
+        public async Task<bool> CommitLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId)
+        {
+            return await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(batchId, exchangeSetZipPath, correlationId);
+        }
     }
 }

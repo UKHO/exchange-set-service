@@ -162,5 +162,31 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             IDirectoryInfo rootDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(path);
             return rootDirectory.GetDirectories();
         }
+
+        public string[] GetFiles(string path)
+        {
+            return _fileSystem.Directory.GetFiles(path);
+        }
+
+        public List<FileDetail> UploadLargeMediaCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList)
+        {
+            List<FileDetail> fileDetails = new List<FileDetail>();
+
+            foreach (var item in batchCommitMetaDataList)
+            {
+                FileInfo fileInfo = new FileInfo(item.FullFileName);
+                using var fs = fileInfo.OpenRead();
+                var fileMd5Hash = CommonHelper.CalculateMD5(fs);
+
+                FileDetail fileDetail = new FileDetail()
+                {
+                    FileName = fileInfo.Name,
+                    Hash = Convert.ToBase64String(fileMd5Hash)
+                };
+                fileDetails.Add(fileDetail);
+            }
+
+            return fileDetails;
+        }
     }
 }

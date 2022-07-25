@@ -92,5 +92,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public string[] GetFiles(string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<FileDetail> UploadLargeMediaCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
