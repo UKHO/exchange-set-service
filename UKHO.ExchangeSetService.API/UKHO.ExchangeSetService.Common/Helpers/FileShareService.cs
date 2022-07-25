@@ -926,7 +926,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         watch.Stop();
                         logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchCommitMetaDataList[0].FileName, batchStatusMetaData.BatchId, correlationId);
                         throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
-
                     }
                     await Task.Delay(fileShareServiceConfig.Value.BatchCommitDelayTimeInMilliseconds);
                 }

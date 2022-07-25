@@ -34,6 +34,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IOptions<CacheConfiguration> fakeCacheConfiguration;
 
         public string fakeFilePath = "C:\\HOME\\test.txt";
+        public string fakeLargeMediaZipFilePath = "D:\\HOME\\M01X01.zip";
         public string fakeFolderPath = "C:\\HOME";
         public string fakeZipFilepath = "D:\\UKHO\\V01X01";
         public string fakeExchangeSetPath = @"D:\UKHO";
@@ -177,6 +178,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             { new FileDetail() { FileName = "V01X01.zip", Hash = "Testdata" } };
             return lstFileDetails;
         }
+
+        private List<FileDetail> GetLargeMediaFileDetails()
+        {
+            List<FileDetail> lstFileDetails = new List<FileDetail>()
+            { 
+                new FileDetail() { FileName = "M01X02.zip", Hash = "Testdata" },
+                new FileDetail() { FileName = "M02X02.zip", Hash = "Testdata"} 
+            };
+            return lstFileDetails;
+        }
+
         private ResponseBatchStatusModel GetBatchStatusResponse()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
@@ -1148,6 +1160,107 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
             Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
             Assert.AreEqual("13d38bde-5191-4a59-82d5-aa22ca1cc6de", response.Entries[1].BatchId);
+        }
+
+        [Test]
+        public async Task WhenValidUploadLargeMediaZipFileRequest_ThenReturnTrue()
+        {
+            fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
+            fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
+            byte[] byteData = new byte[1024];
+
+            var responseBatchStatusModel = GetBatchStatusResponse();
+            var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var GetFileInfoDetails = GetFileInfo();
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            .Returns(httpResponse);
+            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
+
+            var response = await fileShareService.UploadLargeMediaFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeLargeMediaZipFilePath);
+            Assert.AreEqual(true, response);
+        }
+
+        [Test]
+        public void WhenInvalidUploadLargeMediaZipFileRequest_ThenReturnFulfilmentException()
+        {
+            fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
+            fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
+
+            var GetFileInfoDetails = GetFileInfo();
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+
+            var badUploadResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
+
+            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(badUploadResponse);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeLargeMediaZipFilePath); });
+        }
+
+        [Test]
+        public async Task WhenValidCommitAndGetBatchStatusForLargeMediaExchangeSet_ThenReturnTrue()
+        {
+            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
+            string[] zipFileList = { "Test1.zip, Test2.zip" };
+
+            var responseBatchStatusModel = GetBatchStatusResponse();
+            var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var GetFileInfoDetails = GetFileInfo();
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(zipFileList);
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+            A.CallTo(() => fakeFileSystemHelper.UploadLargeMediaCommitBatch(A<List<BatchCommitMetaData>>.Ignored)).Returns(GetLargeMediaFileDetails());
+            A.CallTo(() => fakeFileShareServiceClient.CommitBatchAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<BatchCommitModel>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(httpResponse);
+            A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(httpResponse);
+
+            var response = await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null);
+
+            Assert.AreEqual(true, response);
+        }
+
+        [Test]
+        public void WhenInvalidCommitAndGetBatchStatusForLargeMediaExchangeSet_ThenReturnFulfilmentException()
+        {
+            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
+            string[] zipFileList = { "Test1.zip, Test2.zip" };
+            var badCommitBatchResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
+            var GetFileInfoDetails = GetFileInfo();
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(zipFileList);
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+            A.CallTo(() => fakeFileSystemHelper.UploadLargeMediaCommitBatch(A<List<BatchCommitMetaData>>.Ignored)).Returns(GetLargeMediaFileDetails());
+            A.CallTo(() => fakeFileShareServiceClient.CommitBatchAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<BatchCommitModel>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(badCommitBatchResponse);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                   async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
         }
 
         #endregion
