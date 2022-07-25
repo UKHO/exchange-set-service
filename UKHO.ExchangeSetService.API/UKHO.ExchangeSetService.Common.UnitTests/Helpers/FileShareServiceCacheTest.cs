@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 EditionNumber = 2,
                                 UpdateNumbers = new List<int?> {0},
                                 FileSize = 400,
-                                Bundle = new List<Bundle> { new Bundle { BundleType = 0, Location = "M1;B1" } }
+                                Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
                             }
                         };
         }

@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                         FileSize = 400,
                         Bundle = new List<Bundle>
                         {
-                            new Bundle{BundleType = 0,Location = "M1:B1"}
+                            new Bundle{BundleType = "0",Location = "M1:B1"}
                         }
                     }
                 }
