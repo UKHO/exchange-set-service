@@ -132,7 +132,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId), largeExchangeSetFolderName, dvdNumber.ToString(), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
-                ////CreateCatalogFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString())), message.CorrelationId, response.Item3, salesCatalogueDataResponse, salecatalogueProductResponse);
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
