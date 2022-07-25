@@ -362,7 +362,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(byteContent, fakeFileHelper.ReadAllBytes(fakeFileName));
         }
         [Test]
-        public void WhenInvalidCreateLargeExchangeSetCatalogFileRequest__ThenReturnFulfilmentException()
+        public void WhenInvalidCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
