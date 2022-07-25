@@ -162,5 +162,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             IDirectoryInfo rootDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(path);
             return rootDirectory.GetDirectories();
         }
+        public IDirectoryInfo GetParent(string path)
+        {
+            return _fileSystem.Directory.GetParent(path);
+        }
     }
 }

@@ -24,5 +24,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         byte[] ConvertStreamToByteArray(Stream input);
         Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
         IDirectoryInfo[] GetDirectoryInfo(string path);
+        IDirectoryInfo GetParent(string path);
     }
 }
