@@ -274,12 +274,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
-            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/status"; //here BatchId is hardcoded and will be made dynamic in future
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/320cc08f-b85d-423a-b026-407526d12dd6/status"; //here BatchId is hardcoded and will be made dynamic in future
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
-            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/320cc08f-b85d-423a-b026-407526d12dd6/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl.ToString(), FssJwtToken, FolderName);
 
@@ -365,6 +365,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
             Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+        }
+
+        public static void CheckProductFileContentLargeFile(string inputFile)
+        {
+            string[] fileContent = File.ReadAllLines(inputFile);
+
+            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+
+            string currentDate = "20220623"; //// The date has been hardcoded as we are using a static batch id. This line will be removed in the future.
+            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
         }
     }
 }

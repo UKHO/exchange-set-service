@@ -162,6 +162,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
+        [Test]
+        [Category("SmokeTest")]
+        public async Task WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
+        {
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
+            {
+                var FolderName = $"M0{mediaNumber}X02";
+                DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken, FolderName);
+                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.ExchangeSetProductFile);
+                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
+
+                FileContentHelper.CheckProductFileContentLargeFile(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile));
+            }
+        }
+
         [TearDown]
         public void GlobalTeardown()
         {
