@@ -306,7 +306,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CreateLargeExchangeSetCatalogFile(string batchId, string exchangeSetRootPath, string correlationId)
         {
-
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
@@ -324,9 +323,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var path = directoryInfo.Name;        
             var cat031Bytes = catBuilder.WriteCatalog(path);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
-
             fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
-
             await Task.CompletedTask;
 
             if (fileSystemHelper.CheckFileExists(outputFileName))
