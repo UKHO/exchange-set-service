@@ -20,10 +20,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         private List<string> DownloadedFolderPath;
 
-        ////public bool checkFolder, checkFile;
-
-        ////public int mediaNumber, baseNumber;
-
     ////A hard-coded batch has been used to run the below tests becasue the dependent functionalities are part of the future sprint development
         [OneTimeSetUp]
         public async Task SetupAsync()
