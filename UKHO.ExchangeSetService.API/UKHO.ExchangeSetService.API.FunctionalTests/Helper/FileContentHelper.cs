@@ -306,31 +306,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
             Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
-
-            //Verification of the lines describing folders and country code(s) of the Media.txt here
-            string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
-            Array.Resize(ref checkDirectories, checkDirectories.Length - 1);
-            List<string> countryCodes = new List<string>();
-
-            int i = 2;
-            foreach (string codes in checkDirectories)
-            {
-                string actualfileContent = lines[i];
-                baseFolderNumber = new DirectoryInfo(codes).Name;
-                string count = baseFolderNumber.Substring(1, 1);
-
-                string encRootFolder = Path.Combine(codes, Config.ExchangeSetEncRootFolder);
-                string[] addDirectiory = FssBatchHelper.CheckforDirectories(encRootFolder);
-
-                foreach (string abc in addDirectiory)
-                {
-                    dirName = new DirectoryInfo(abc).Name;
-                    countryCodes.Add(dirName);
-                }
-                Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
-                countryCodes.Clear();
-                i++;
-            }
         }
 
         public static void CheckReadMeTxtFileContentForLargeMediaExchangeSet(string inputFile)
