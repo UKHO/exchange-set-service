@@ -16,7 +16,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private const string FileContent_base = "Base";
         private const string FileContent_dvd = "Media','DVD_SERVICE'";
         public static string dirName, baseFolderNumber;
-        ////static string baseFolderNumber;
         private static TestConfiguration Config = new TestConfiguration();
         private static FssApiClient FssApiClient = new FssApiClient();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
