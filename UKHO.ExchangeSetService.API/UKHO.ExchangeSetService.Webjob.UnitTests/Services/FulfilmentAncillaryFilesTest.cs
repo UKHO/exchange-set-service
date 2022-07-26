@@ -322,7 +322,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1"); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1", "2"); });
         }
 
         [Test]
@@ -332,7 +332,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1");
+            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1", "2");
 
             Assert.AreEqual(true, response);
         }

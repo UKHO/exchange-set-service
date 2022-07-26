@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IMapper mapper;
         private readonly IFileShareService fileShareService;
         private readonly ILogger<FileShareService> logger;
-        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;        
+        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
         private readonly IMonitorHelper monitorHelper;
         private readonly UserIdentifier userIdentifier;
@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.Services
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
-            ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,            
+            ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
             IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
             UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper)
         {
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.mapper = mapper;
             this.fileShareService = fileShareService;
             this.logger = logger;
-            this.exchangeSetStorageProvider = exchangeSetStorageProvider;          
+            this.exchangeSetStorageProvider = exchangeSetStorageProvider;
             this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
             this.monitorHelper = monitorHelper;
             this.userIdentifier = userIdentifier;
@@ -66,9 +66,6 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
-
-            //Temporary code to add bundle info to SCS response
-            salesCatalogueResponse.ResponseBody = CommonHelper.AddBundleInfo(salesCatalogueResponse.ResponseBody);
 
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
@@ -107,7 +104,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             return response;
         }
-             
+
         public ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
         {
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
@@ -272,7 +269,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetResponse, string correlationId)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.FSSCreateBatchRequestStart,
-                EventIds.FSSCreateBatchRequestCompleted, 
+                EventIds.FSSCreateBatchRequestCompleted,
                 "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
@@ -298,7 +295,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     exchangeSetResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
                     exchangeSetResponse.BatchId = createBatchResponse.ResponseBody.BatchId;
                     exchangeSetResponse.HttpStatusCode = createBatchResponse.ResponseCode;
-                    
+
                     return exchangeSetResponse;
                 }, correlationId);
         }
@@ -323,7 +320,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 async () =>
                 {
                     bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId, expiryDate);
-                    
+
                     return result;
                 }, batchId, correlationId);
 
