@@ -49,19 +49,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 FileContentHelper.CheckMediaTxtFileContent(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName), mediaNumber);
                 mediaNumber++;
             }
+            
         }
 
         [Test]
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderIsGenerated()
         {
-            int mediaNumber = 1;
             foreach (string folderPath in DownloadedFolderPath)
             {
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
-                
-                mediaNumber++;
             }
         }
 
@@ -69,13 +67,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderIsGenerated()
         {
-            int mediaNumber = 1;
             foreach (string folderPath in DownloadedFolderPath)
             {
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
-
-                mediaNumber++;
             }
         }
 
@@ -83,7 +78,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
-            int mediaNumber = 1;
             int baseNumber = 1;
             bool checkFolder;
 
@@ -101,8 +95,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     var folderName = $"B{baseNumber}";
                     checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, folderName);
                 } while (checkFolder);
-
-                mediaNumber++;
             }
         }
 
@@ -110,7 +102,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenASerialEncFileIsGenerated()
         {
-            int mediaNumber = 1;
             int baseNumber = 1;
             bool checkFolder;
 
@@ -128,8 +119,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     var folderName = $"B{baseNumber}";
                     checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, folderName);
                 } while (checkFolder);
-
-                mediaNumber++;
             }
         }
 
@@ -137,7 +126,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreGenerated()
         {
-            int mediaNumber = 1;
             int baseNumber = 1;
             bool checkFolder;
 
@@ -166,8 +154,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     var folderName = $"B{baseNumber}";
                     checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, folderName);
                 } while (checkFolder);
-
-                mediaNumber++;
             }
         }
 
