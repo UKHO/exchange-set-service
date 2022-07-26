@@ -20,14 +20,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         private List<string> DownloadedFolderPath;
 
-        public bool checkFolder;
-
-        public int mediaNumber;
-
-        public int baseNumber;
-
-        public bool checkFile;
-
         ////A hard-coded batch has been used to run the below tests becasue the dependent functionalities are part of the future sprint development
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -48,10 +40,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAMediaTxtFileIsGenerated()
         {
-            mediaNumber = 1;
+            int mediaNumber = 1;
             foreach (string folderPath in DownloadedFolderPath)
             {
-                checkFile = FssBatchHelper.CheckforFileExist(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
+                bool checkFile = FssBatchHelper.CheckforFileExist(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
 
                 FileContentHelper.CheckMediaTxtFileContent(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName), mediaNumber);
@@ -63,10 +55,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderIsGenerated()
         {
-            mediaNumber = 1;
+            int mediaNumber = 1;
             foreach (string folderPath in DownloadedFolderPath)
             {
-                checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
+                bool checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
 
                 mediaNumber++;
@@ -77,10 +69,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderIsGenerated()
         {
-            mediaNumber = 1;
+            int mediaNumber = 1;
             foreach (string folderPath in DownloadedFolderPath)
             {
-                checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
+                bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
 
                 mediaNumber++;
@@ -91,14 +83,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
-            mediaNumber = 1;
-            baseNumber = 1;
+            int mediaNumber = 1;
+            int baseNumber = 1;
+            bool checkFolder;
 
             foreach (string folderPath in DownloadedFolderPath)
             {
                 do
                 {
-                    checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
+                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
                     Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
 
                     //Verify README.TXT file content
@@ -117,14 +110,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenASerialEncFileIsGenerated()
         {
-            mediaNumber = 1;
-            baseNumber = 1;
+            int mediaNumber = 1;
+            int baseNumber = 1;
+            bool checkFolder;
 
             foreach (string folderPath in DownloadedFolderPath)
             {
                 do
                 {
-                    checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}"), Config.ExchangeSetSerialEncFile);
+                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}"), Config.ExchangeSetSerialEncFile);
                     Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {Path.Combine(folderPath, $"B{baseNumber}")}");
 
                     //Verify Serial.ENC file content
@@ -143,8 +137,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreGenerated()
         {
-            mediaNumber = 1;
-            baseNumber = 1;
+            int mediaNumber = 1;
+            int baseNumber = 1;
+            bool checkFolder;
 
             foreach (string folderPath in DownloadedFolderPath)
             {
@@ -180,14 +175,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACATALOGFileIsGenerated()
         {
-            mediaNumber = 1;
-            baseNumber = 1;
+            int mediaNumber = 1;
+            int baseNumber = 1;
+            bool checkFolder;
 
             foreach (string folderPath in DownloadedFolderPath)
             {
                 do
                 {
-                    checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
                     Assert.IsTrue(checkFile, $"{Config.ExchangeSetCatalogueFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
 
                     baseNumber++;
@@ -204,7 +200,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public void GlobalTeardown()
         {
             //Clean up downloaded files/folders
-            for (mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
                 var FolderName = $"M0{mediaNumber}X02.zip";
                 FileContentHelper.DeleteDirectory(FolderName);
