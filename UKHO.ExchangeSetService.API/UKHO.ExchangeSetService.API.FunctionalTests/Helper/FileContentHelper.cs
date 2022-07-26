@@ -325,6 +325,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 {
                    dirName = new DirectoryInfo(countryName).Name;
                    countryCodes.Add(dirName);
+                   countryCodes.Sort();
                 }
 
                 Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
