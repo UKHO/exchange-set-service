@@ -312,10 +312,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Array.Resize(ref checkDirectories, checkDirectories.Length - 1);
             List<string> countryCodes = new List<string>();
 
-            int i = 2;
+            int lineNumber = 2;
             foreach (string codes in checkDirectories)
             {
-                string actualfileContent = lines[i];
+                string actualfileContent = lines[lineNumber];
                 baseFolderNumber = new DirectoryInfo(codes).Name;
                 string count = baseFolderNumber.Substring(1, 1);
                 string encRootFolder = Path.Combine(codes, Config.ExchangeSetEncRootFolder);
@@ -330,7 +330,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
                 countryCodes.Clear();
-                i++;
+                lineNumber++;
             }
         }
 
