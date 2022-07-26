@@ -15,7 +15,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private const string FileContent_avcs = "AVCS";
         private const string FileContent_base = "Base";
         private const string FileContent_dvd = "Media','DVD_SERVICE'";
-
+        public static string dirName, baseFolderNumber;
+        ////static string baseFolderNumber;
         private static TestConfiguration Config = new TestConfiguration();
         private static FssApiClient FssApiClient = new FssApiClient();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
@@ -270,30 +271,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static async Task<string> ExchangeSetLargeFile(HttpResponseMessage apiEssResponse, string FssJwtToken, string FolderName)
-        {
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
-
-            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/status"; //here BatchId is hardcoded and will be made dynamic in future
-
-            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
-
-            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
-
-            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl.ToString(), FssJwtToken, FolderName);
-
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
-
-            return downloadFolderPath;
-        }
-
         public static void CheckMediaTxtFileContent(string inputFile, int folderNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
 
-            //Store file content here
+            //Store file content for the 1st line of the Media.txt here
             string[] fileContent = lines[0].Split(" ");
 
             string dataServerAndWeek = fileContent[0];
@@ -312,8 +294,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
             Assert.AreEqual(formatVersionAndExchangeSetNumber, $"M0{folderNumber}X02", $"Expected format {formatVersionAndExchangeSetNumber}");
 
+            //Store file content for the 2nd line of the Media.txt here
             string[] fileContent_1 = lines[1].Split(" ");
-
             string FolderInitial = fileContent_1[0];
             string Avcs = fileContent_1[1];
             string WeekNumber_Year = fileContent_1[2];
@@ -325,6 +307,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
             Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
+
+            //Verification of the lines describing folders and country code(s) of the Media.txt here
+            string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
+            Array.Resize(ref checkDirectories, checkDirectories.Length - 1);
+            List<string> countryCodes = new List<string>();
+
+            int i = 2;
+            foreach (string codes in checkDirectories)
+            {
+                string actualfileContent = lines[i];
+                baseFolderNumber = new DirectoryInfo(codes).Name;
+                string count = baseFolderNumber.Substring(1, 1);
+                    
+                string encRootFolder = Path.Combine(codes, Config.ExchangeSetEncRootFolder);
+                string[] addDirectiory = FssBatchHelper.CheckforDirectories(encRootFolder);
+
+                foreach (string countryName in addDirectiory)
+                {
+                   dirName = new DirectoryInfo(countryName).Name;
+                   countryCodes.Add(dirName);
+                }
+                Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
+                countryCodes.Clear();
+                i++;
+            }
         }
 
         public static void CheckReadMeTxtFileContentForLargeMediaExchangeSet(string inputFile)
@@ -365,6 +372,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
             Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+        }
+
+        public static async Task<List<string>> ExchangeSetLargeFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
+        {
+            List<string> downloadFolderPath = new List<string>();
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
+            {
+                var FolderName = $"M0{mediaNumber}X02";
+                Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+                var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/62713adc-6999-40f6-86b1-ca08ab693d44/status"; //here BatchId is hardcoded and will be made dynamic in future
+
+                var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+                Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
+
+                var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/62713adc-6999-40f6-86b1-ca08ab693d44/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
+
+                var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl.ToString(), FssJwtToken, FolderName);
+
+                var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+                var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
+                downloadFolderPath.Add(downloadFolderPath1);
+            }
+
+            return downloadFolderPath;
         }
     }
 }
