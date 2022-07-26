@@ -315,14 +315,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             int i = 2;
             foreach (string codes in checkDirectories)
             {
-#pragma warning disable S1481 // Unused local variables should be removed
                 string actualfileContent = lines[i];
-#pragma warning restore S1481 // Unused local variables should be removed
                 baseFolderNumber = new DirectoryInfo(codes).Name;
-#pragma warning disable S1481 // Unused local variables should be removed
                 string count = baseFolderNumber.Substring(1, 1);
-#pragma warning restore S1481 // Unused local variables should be removed
-                Console.WriteLine(baseFolderNumber);
                 string encRootFolder = Path.Combine(codes, Config.ExchangeSetEncRootFolder);
                 string[] addDirectiory = FssBatchHelper.CheckforDirectories(encRootFolder);
 
@@ -331,8 +326,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                    dirName = new DirectoryInfo(countryName).Name;
                    countryCodes.Add(dirName);
                 }
-                
-                ////Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
+
+                Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
                 countryCodes.Clear();
                 i++;
             }
