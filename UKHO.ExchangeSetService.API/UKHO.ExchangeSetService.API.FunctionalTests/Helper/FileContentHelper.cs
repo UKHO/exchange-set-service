@@ -361,7 +361,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/62713adc-6999-40f6-86b1-ca08ab693d44/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
 
-                var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl.ToString(), FssJwtToken, FolderName);
+                var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, FolderName);
 
                 var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
                 var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
