@@ -130,7 +130,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> UploadZipFileForLargeMediaExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string mediaZipFileName)
         {
-            return await fileShareService.UploadLargeMediaFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, mediaZipFileName + ".zip");
+            return await fileShareService.UploadLargeMediaFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, mediaZipFileName);
         }
 
         public async Task<bool> CommitLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId)

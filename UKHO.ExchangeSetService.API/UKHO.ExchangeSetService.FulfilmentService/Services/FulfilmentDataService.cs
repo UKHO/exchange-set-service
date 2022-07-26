@@ -452,7 +452,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          return await fulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, mediaZipFileName);
+                          return await fulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, $"{mediaZipFileName}.zip");
                       },
                   batchId, correlationId);
             }

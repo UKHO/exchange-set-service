@@ -276,5 +276,31 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.AreEqual("Large Media Exchange Set Created Successfully", largeExchangeSet);
         }
+
+        [Test]
+        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedIsNotCreated()
+        {
+            string filePath = @"D:\\Downloads";
+            var b1 = A.Fake<IDirectoryInfo>();
+            var b2 = A.Fake<IDirectoryInfo>();
+            A.CallTo(() => b1.Name).Returns("B1");
+            A.CallTo(() => b2.Name).Returns("B2");
+            IDirectoryInfo[] directoryInfos = { b1, b2 };
+
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
+            A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+
+            string largeExchangeSet = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
+
+            Assert.AreEqual("Large Media Exchange Set Is Not Created", largeExchangeSet);
+        }
     }
 }

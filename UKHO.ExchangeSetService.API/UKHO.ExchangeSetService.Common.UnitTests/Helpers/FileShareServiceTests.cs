@@ -40,8 +40,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public string fakeExchangeSetPath = @"D:\UKHO";
         public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
-
         public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
         [SetUp]
         public void Setup()
         {
