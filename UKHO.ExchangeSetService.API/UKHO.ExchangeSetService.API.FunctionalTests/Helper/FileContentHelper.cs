@@ -308,6 +308,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             //Verification of the lines describing folders and country code(s) of the Media.txt here
             string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
+            Array.Sort(checkDirectories);
             Array.Resize(ref checkDirectories, checkDirectories.Length - 1);
             List<string> countryCodes = new List<string>();
 
