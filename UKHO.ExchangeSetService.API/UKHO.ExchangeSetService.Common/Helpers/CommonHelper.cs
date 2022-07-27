@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return hash;
         }
-        
+
         public static double ConvertBytesToMegabytes(long bytes)
         {
             double byteSize = 1024f;

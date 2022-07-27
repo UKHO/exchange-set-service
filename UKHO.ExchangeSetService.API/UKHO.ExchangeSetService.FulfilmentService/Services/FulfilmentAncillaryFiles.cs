@@ -278,7 +278,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isMediaFileCreated;
         }
 
-        public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId, string baseNumber)
+        public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId, string baseNumber, string lastBaseDirectoryNumber)
         {
             bool isSerialEncFileCreated = false;
             if (!string.IsNullOrWhiteSpace(exchangeSetPath))
@@ -287,7 +287,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetPath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
 
-                var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      {2:D2}.00B0{baseNumber}X09\x0b\x0d\x0a";
+                var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      {2:D2}.00B0{baseNumber}X0{lastBaseDirectoryNumber}\x0b\x0d\x0a";
 
                 fileSystemHelper.CreateFileContent(serialFilePath, serialFileContent);
                 await Task.CompletedTask;
