@@ -163,6 +163,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return rootDirectory.GetDirectories();
         }
 
+        public string[] GetDirectories(string path)
+        {
+            return _fileSystem.Directory.GetDirectories(path);
+        }
+
+
         public string[] GetFiles(string path)
         {
             return _fileSystem.Directory.GetFiles(path);

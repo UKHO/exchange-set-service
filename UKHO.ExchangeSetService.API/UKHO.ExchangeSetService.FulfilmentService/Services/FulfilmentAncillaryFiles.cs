@@ -5,15 +5,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
-using UKHO.Torus.Enc.Core.EncCatalogue;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using UKHO.Torus.Enc.Core;
 using UKHO.Torus.Core;
+using UKHO.Torus.Enc.Core;
+using UKHO.Torus.Enc.Core.EncCatalogue;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -260,10 +261,32 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string mediaFilePath = Path.Combine(folderpath, "MEDIA.TXT");
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
+                var basefolders = fileSystemHelper.GetDirectoryInfo(folderpath)
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
 
-                var mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
+                string mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
                 mediaFileContent += Environment.NewLine;
                 mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
+                mediaFileContent += Environment.NewLine;
+                StringBuilder sb = new StringBuilder();
+                foreach (var directory in basefolders)
+                {
+                    var baseFolderName = directory.Name;
+                    var baseDigit = baseFolderName.Remove(0, 1);
+                    string path = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
+                    string[] subdirectoryEntries = fileSystemHelper.GetDirectories(path);
+
+                    List<string> countryCodes = new List<string>();
+                    foreach (string codes in subdirectoryEntries)
+                    {
+                        var dirName = new DirectoryInfo(codes).Name;
+                        countryCodes.Add(dirName);
+                    }
+                    string content = $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS VOLUME{baseDigit}','ENC data for producers {string.Join(", ", countryCodes)}',,";
+                    sb.AppendLine(content);
+
+                }
+                mediaFileContent += sb.ToString();
                 fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
                 await Task.CompletedTask;
 
