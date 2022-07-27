@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         private List<string> DownloadedFolderPath;
 
-    ////A hard-coded batch has been used to run the below tests becasue the dependent functionalities are part of the future sprint development
+        ////A hard-coded batch has been used to run the below tests becasue the dependent functionalities are part of the future sprint development
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
@@ -154,6 +154,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     var folderName = $"B{baseNumber}";
                     checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, folderName);
                 } while (checkFolder);
+            }
+        }
+
+        [Test]
+        [Category("SmokeTest")]
+        public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
+        {
+            foreach (string folderPath in DownloadedFolderPath)
+            {
+                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.ExchangeSetProductFile);
+                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetProductFilePath)}");
+
+                FileContentHelper.CheckProductFileContentLargeFile(Path.Combine(folderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile));
             }
         }
 

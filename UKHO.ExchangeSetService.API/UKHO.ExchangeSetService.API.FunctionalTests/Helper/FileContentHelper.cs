@@ -15,7 +15,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private const string FileContent_avcs = "AVCS";
         private const string FileContent_base = "Base";
         private const string FileContent_dvd = "Media','DVD_SERVICE'";
-        public static string dirName, baseFolderNumber;
         private static TestConfiguration Config = new TestConfiguration();
         private static FssApiClient FssApiClient = new FssApiClient();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
@@ -273,6 +272,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static void CheckMediaTxtFileContent(string inputFile, int folderNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
+
             //Store file content for the 1st line of the Media.txt here
             string[] fileContent = lines[0].Split(" ");
 
@@ -307,6 +307,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
 
             //Verification of the lines describing folders and country code(s) of the Media.txt here
+
+            string baseFolderNumber, dirName;
             string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
             Array.Sort(checkDirectories);
             Array.Resize(ref checkDirectories, checkDirectories.Length - 1);
@@ -336,7 +338,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static void CheckReadMeTxtFileContentForLargeMediaExchangeSet(string inputFile)
         {
-
             string[] lines = File.ReadAllLines(inputFile);
             var fileSecondLineContent = lines[1];
 
@@ -397,6 +398,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
             return downloadFolderPath;
+        }
+
+        public static void CheckProductFileContentLargeFile(string inputFile)
+        {
+            string[] fileContent = File.ReadAllLines(inputFile);
+
+            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+
+            string currentDate = "20220623"; //// The date has been hardcoded as we are using a static batch id. This line will be removed in the future.
+            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
         }
     }
 }

@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return hash;
         }
-        
+
         public static double ConvertBytesToMegabytes(long bytes)
         {
             double byteSize = 1024f;
@@ -97,6 +97,5 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
                 });
         }
-
     }
 }
