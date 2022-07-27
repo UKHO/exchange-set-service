@@ -92,5 +92,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+        public string[] GetDirectories(string path)
+        {
+             throw new System.NotImplementedException();
+        }
+
     }
 }
