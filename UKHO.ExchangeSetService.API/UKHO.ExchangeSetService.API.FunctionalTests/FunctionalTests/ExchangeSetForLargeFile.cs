@@ -158,6 +158,27 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("SmokeTest")]
+        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACATALOGFileIsGenerated()
+        {
+            int baseNumber = 1;
+            bool checkFolder;
+
+            foreach (string folderPath in DownloadedFolderPath)
+            {
+                do
+                {
+                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+                    Assert.IsTrue(checkFile, $"{Config.ExchangeSetCatalogueFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
+
+                    baseNumber++;
+                    var folderName = $"B{baseNumber}";
+                    checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, folderName);
+                } while (checkFolder);
+            }
+        }
+
+        [Test]
+        [Category("SmokeTest")]
         public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)

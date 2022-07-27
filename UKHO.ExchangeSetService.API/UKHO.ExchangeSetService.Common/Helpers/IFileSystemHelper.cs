@@ -25,5 +25,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
         IDirectoryInfo[] GetDirectoryInfo(string path);
         string[] GetDirectories(string path);
+        IDirectoryInfo GetParent(string path);
     }
 }
