@@ -141,7 +141,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var dvdNumbersForCatlogFiles = Enumerable.Range(1, 2);
             Parallel.ForEach(dvdNumbersForCatlogFiles, dvdNumbersForCatlogFile =>
             {
-                ParallelCreateFolderTaskForCatlogFile.Add(LargeMediaExchangesetCatalogFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumbersForCatlogFile.ToString())), message.CorrelationId));
+                ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumbersForCatlogFile.ToString())), message.CorrelationId));
             });
 
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
@@ -421,7 +421,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                   batchId, correlationId);
         }
 
-        public async Task LargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId)
+        private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                        .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
