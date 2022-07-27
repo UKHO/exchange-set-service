@@ -18,6 +18,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public DataHelper DataHelper { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
 
+        private readonly List<string> CleanUpBatchIdList = new List<string>();
+
         private List<string> DownloadedFolderPath;
 
         ////A hard-coded batch has been used to run the below tests becasue the dependent functionalities are part of the future sprint development
@@ -31,13 +33,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
-            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForBigFile(), accessToken: EssJwtToken);
+            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForLargeMedia(), accessToken: EssJwtToken);
             Thread.Sleep(5000); //File creation takes time
-            DownloadedFolderPath = await FileContentHelper.ExchangeSetLargeFile(ApiEssResponse, FssJwtToken);
+            //Get the BatchId
+            var batchId = await ApiEssResponse.GetBatchId();
+            CleanUpBatchIdList.Add(batchId);
+            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFileForLargeMedia(ApiEssResponse, FssJwtToken);
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAMediaTxtFileIsGenerated()
         {
             int mediaNumber = 1;
@@ -45,14 +50,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 bool checkFile = FssBatchHelper.CheckforFileExist(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
-                                
+
                 FileContentHelper.CheckMediaTxtFileContent(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName), mediaNumber);
                 mediaNumber++;
             }
+
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)
@@ -63,7 +69,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)
@@ -74,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
             int baseNumber = 1;
@@ -88,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
 
                     //Verify README.TXT file content
-                    FileContentHelper.CheckReadMeTxtFileContentForLargeMediaExchangeSet(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+                    FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
 
                     baseNumber++;
                     var folderName = $"B{baseNumber}";
@@ -98,7 +104,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenASerialEncFileIsGenerated()
         {
             int baseNumber = 1;
@@ -122,7 +128,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreGenerated()
         {
             int baseNumber = 1;
@@ -157,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)
@@ -170,13 +176,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [OneTimeTearDown]
-        public void GlobalTeardown()
+        public async Task GlobalTeardown()
         {
             //Clean up downloaded files/folders
             for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
                 var FolderName = $"M0{mediaNumber}X02.zip";
                 FileContentHelper.DeleteDirectory(FolderName);
+            }
+
+            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            {
+                //Clean up batches from FSS
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned for clean up batches, instead of the expected 200.");
             }
         }
     }
