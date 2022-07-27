@@ -107,5 +107,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public string GetFileName(string fileFullPath)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

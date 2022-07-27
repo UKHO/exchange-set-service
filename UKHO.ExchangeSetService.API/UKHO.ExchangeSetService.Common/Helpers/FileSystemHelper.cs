@@ -194,5 +194,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return fileDetails;
         }
+
+        //Returns fileName from fullPath
+        public string GetFileName(string fileFullPath)
+        {
+            return Path.GetFileName(fileFullPath);
+        }
     }
 }

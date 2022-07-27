@@ -576,12 +576,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                 if (fileSystemHelper.CheckFileExists(zipName))
                 {
-                    logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set zip:{ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set zip:{ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileSystemHelper.GetFileName(zipName), batchId, correlationId);
                     isCreateZipFileExchangeSetCreated = true;
                 }
                 else
                 {
-                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileSystemHelper.GetFileName(zipName), batchId, correlationId);
                     throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
                 }
             }

@@ -27,5 +27,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         string[] GetDirectories(string path);
         string[] GetFiles(string path);
         List<FileDetail> UploadLargeMediaCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList);
+        string GetFileName(string fileFullPath);
     }
 }
