@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 bool checkFile = FssBatchHelper.CheckforFileExist(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
-
+                                
                 FileContentHelper.CheckMediaTxtFileContent(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName), mediaNumber);
                 mediaNumber++;
             }
@@ -177,6 +177,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
+        [Test]
+        [Category("SmokeTest")]
+        public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
+        {
+            foreach (string folderPath in DownloadedFolderPath)
+            {
+                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.ExchangeSetProductFile);
+                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetProductFilePath)}");
+
+                FileContentHelper.CheckProductFileContentLargeFile(Path.Combine(folderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile));
+            }
+        }
 
         [OneTimeTearDown]
         public void GlobalTeardown()

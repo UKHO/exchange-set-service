@@ -97,6 +97,5 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
                 });
         }
-
     }
 }
