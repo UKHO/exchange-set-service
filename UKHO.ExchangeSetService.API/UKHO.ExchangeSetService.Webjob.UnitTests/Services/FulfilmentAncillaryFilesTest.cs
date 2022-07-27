@@ -354,8 +354,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateLargeExchangeSetCatalogFileRequest_ThenReturnTrueReponse()
         {
-            var b1 = A.Fake<IDirectoryInfo>();
-            IDirectoryInfo directoryInfos = b1;
+            IDirectoryInfo directoryInfos = A.Fake<IDirectoryInfo>();
 
             byte[] byteContent = new byte[100];
             fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
