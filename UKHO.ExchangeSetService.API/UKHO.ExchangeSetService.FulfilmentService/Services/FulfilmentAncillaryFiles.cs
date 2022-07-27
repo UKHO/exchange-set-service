@@ -282,7 +282,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         var dirName = new DirectoryInfo(codes).Name;
                         countryCodes.Add(dirName);
                     }
-                    string content = $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS VOLUME{baseDigit}','ENC data for producers {string.Join(",", countryCodes)}',,";
+                    string content = $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS VOLUME{baseDigit}','ENC data for producers {string.Join(", ", countryCodes)}',,";
                     sb.AppendLine(content);
 
                 }
