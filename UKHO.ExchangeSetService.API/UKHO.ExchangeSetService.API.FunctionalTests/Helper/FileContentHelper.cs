@@ -307,8 +307,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
 
             //Verification of the lines describing folders and country code(s) of the Media.txt here
-
-            string baseFolderNumber, dirName;
             string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
             Array.Sort(checkDirectories);
             Array.Resize(ref checkDirectories, checkDirectories.Length - 1);
@@ -318,14 +316,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             foreach (string codes in checkDirectories)
             {
                 string actualfileContent = lines[lineNumber];
-                baseFolderNumber = new DirectoryInfo(codes).Name;
+                string baseFolderNumber = new DirectoryInfo(codes).Name;
                 string count = baseFolderNumber.Substring(1, 1);
                 string encRootFolder = Path.Combine(codes, Config.ExchangeSetEncRootFolder);
                 string[] addDirectiory = FssBatchHelper.CheckforDirectories(encRootFolder);
 
                 foreach (string countryName in addDirectiory)
                 {
-                   dirName = new DirectoryInfo(countryName).Name;
+                   string dirName = new DirectoryInfo(countryName).Name;
                    countryCodes.Add(dirName);
                    countryCodes.Sort();
                 }
