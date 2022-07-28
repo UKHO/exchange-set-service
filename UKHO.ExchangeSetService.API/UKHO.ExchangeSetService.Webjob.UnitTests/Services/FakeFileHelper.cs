@@ -97,6 +97,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
              throw new System.NotImplementedException();
         }
 
+        public IDirectoryInfo GetParent(string path)
+        {
+            throw new System.NotImplementedException();
+        }
 
         public string[] GetFiles(string path)
         {

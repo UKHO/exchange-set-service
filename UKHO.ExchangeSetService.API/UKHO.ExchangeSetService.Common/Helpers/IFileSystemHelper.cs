@@ -25,6 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
         IDirectoryInfo[] GetDirectoryInfo(string path);
         string[] GetDirectories(string path);
+        IDirectoryInfo GetParent(string path);
         string[] GetFiles(string path);
         List<FileDetail> UploadLargeMediaCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList);
         string GetFileName(string fileFullPath);

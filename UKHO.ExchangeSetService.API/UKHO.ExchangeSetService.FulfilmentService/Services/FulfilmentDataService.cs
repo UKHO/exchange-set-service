@@ -137,8 +137,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId), largeExchangeSetFolderName, dvdNumber.ToString(), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumber.ToString()), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
             });
+
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
+
+            List<Task> ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
+            var dvdNumbersForCatlogFiles = Enumerable.Range(1, 2);
+            Parallel.ForEach(dvdNumbersForCatlogFiles, dvdNumbersForCatlogFile =>
+            {
+                ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, String.Format(largeExchangeSetFolderName, dvdNumbersForCatlogFile.ToString())), message.CorrelationId));
+            });
+
+            await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
+            ParallelCreateFolderTaskForCatlogFile.Clear();
 
             List<Task<bool>> parallelZipUploadTasks = new List<Task<bool>> { };
             Parallel.ForEach(dvdNumbers, dvdNumber =>
@@ -439,6 +450,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                           return await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));
                       },
                   batchId, correlationId);
+        }
+
+        private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId)
+        {
+            var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+
+            List<string> encFolderList = new List<string>();
+            foreach (var directory in baseDirectory)
+            {
+                var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
+                encFolderList.Add(encFolder);
+            }
+            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+
+            Parallel.ForEach(encFolderList, encFolder =>
+            {
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(batchId, encFolder, correlationId));
+            });
+            await Task.WhenAll(ParallelCreateFolderTasks);
+            ParallelCreateFolderTasks.Clear();
         }
 
         private async Task<bool> PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId, string mediaZipFileName)

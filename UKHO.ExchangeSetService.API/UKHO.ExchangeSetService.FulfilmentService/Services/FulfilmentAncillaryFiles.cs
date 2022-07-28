@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.Torus.Core;
 using UKHO.Torus.Enc.Core;
 using UKHO.Torus.Enc.Core.EncCatalogue;
+using System.IO.Abstractions;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -282,7 +283,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         var dirName = new DirectoryInfo(codes).Name;
                         countryCodes.Add(dirName);
                     }
-                    string content = $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS VOLUME{baseDigit}','ENC data for producers {string.Join(", ", countryCodes)}',,";
+                    string content = $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS Volume{baseDigit}','ENC data for producers {string.Join(", ", countryCodes)}',,";
                     sb.AppendLine(content);
 
                 }
@@ -324,6 +325,38 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
             }
             return isSerialEncFileCreated;
+        }
+
+        public async Task<bool> CreateLargeExchangeSetCatalogFile(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            var catBuilder = new Catalog031BuilderFactory().Create();
+            var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
+
+            if (fileSystemHelper.CheckFileExists(readMeFileName))
+            {
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
+                    Implementation = "TXT"
+                });
+            }
+
+            IDirectoryInfo directoryInfo = fileSystemHelper.GetParent(Path.GetDirectoryName(exchangeSetRootPath));
+            var path = directoryInfo.Name;
+            var cat031Bytes = catBuilder.WriteCatalog(path);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
+            await Task.CompletedTask;
+
+            if (fileSystemHelper.CheckFileExists(outputFileName))
+                return true;
+            else
+            {
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
+            }
+
         }
     }
 }

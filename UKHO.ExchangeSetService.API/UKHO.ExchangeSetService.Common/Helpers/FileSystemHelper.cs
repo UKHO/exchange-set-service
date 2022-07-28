@@ -168,6 +168,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return _fileSystem.Directory.GetDirectories(path);
         }
 
+        public IDirectoryInfo GetParent(string path)
+        {
+            return _fileSystem.Directory.GetParent(path);
+        }
 
         public string[] GetFiles(string path)
         {
