@@ -22,7 +22,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         private List<string> DownloadedFolderPath;
 
-        ////A hard-coded batch has been used to run the below tests becasue the dependent functionalities are part of the future sprint development
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
@@ -54,7 +53,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 FileContentHelper.CheckMediaTxtFileContent(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName), mediaNumber);
                 mediaNumber++;
             }
-
         }
 
         [Test]
@@ -85,7 +83,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             int baseNumber = 1;
             bool checkFolder;
-
             foreach (string folderPath in DownloadedFolderPath)
             {
                 do
@@ -109,7 +106,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             int baseNumber = 1;
             bool checkFolder;
-
             foreach (string folderPath in DownloadedFolderPath)
             {
                 do
@@ -133,21 +129,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             int baseNumber = 1;
             bool checkFolder;
-
             foreach (string folderPath in DownloadedFolderPath)
             {
                 do
                 {
                     string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder));
-
                     foreach (var folder in checkDirectories)
                     {
                         string[] checksubDirectories = FssBatchHelper.CheckforDirectories(folder);
-
                         foreach (var updateFolder in checksubDirectories)
                         {
                             string[] checkupdateDirectories = FssBatchHelper.CheckforDirectories(updateFolder);
-
                             foreach (var encFile in checkupdateDirectories)
                             {
                                 int totalFileCount = FileContentHelper.FileCountInDirectories(encFile);
@@ -163,12 +155,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACATALOGFileIsGenerated()
         {
             int baseNumber = 1;
             bool checkFolder;
-
             foreach (string folderPath in DownloadedFolderPath)
             {
                 do
@@ -185,7 +176,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest")]
-        public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
+        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)
             {
