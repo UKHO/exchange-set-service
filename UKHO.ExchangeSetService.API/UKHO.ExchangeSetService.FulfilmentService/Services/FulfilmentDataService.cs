@@ -125,9 +125,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var rootDirectorys = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
                                                   .Where(di => di.Name.StartsWith("M0"));
 
-
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
-
             Parallel.ForEach(rootDirectorys, rootDirectoryFolder =>
             {
                 string dvdNumber = rootDirectoryFolder.ToString().Substring(rootDirectoryFolder.ToString().Length - 4).Remove(1, 3);
