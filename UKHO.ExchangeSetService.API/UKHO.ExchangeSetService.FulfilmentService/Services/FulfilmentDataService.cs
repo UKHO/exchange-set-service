@@ -402,7 +402,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                           var baseDirectorys = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                                                   .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
 
-                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath.Replace("M01", "M02"))
+                          string baseLastDirectoryPath = exchangeSetPath.Replace("M01", "M02");
+                          if(!Directory.Exists(baseLastDirectoryPath))
+                          {
+                              baseLastDirectoryPath = string.Empty;
+                          }
+                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(!string.IsNullOrWhiteSpace(baseLastDirectoryPath) ? baseLastDirectoryPath : exchangeSetPath)
                                                   .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
 
                           string lastBaseDirectoryNumber = baseLastDirectory != null && !string.IsNullOrWhiteSpace(baseLastDirectory.ToString()) ? baseLastDirectory.ToString().Substring(baseLastDirectory.ToString().Length - 1) : "9";
