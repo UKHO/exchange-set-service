@@ -66,3 +66,20 @@ variable "client_credentials_tenant_id" {
 variable "client_credentials_scope" {
   type    = string  
 }
+
+variable "ui_product_name" {
+    type = string
+    default = "Exchange Set Service UI"
+}
+
+variable "b2c_token_issuer" {
+  type  = string
+}
+
+variable "b2c_client_id" {
+  type  = string
+}
+
+variable "cors_origins" {
+  type = list(string)
+}

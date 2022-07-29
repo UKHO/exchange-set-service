@@ -17,4 +17,12 @@ module "exchange_set_service" {
   client_credentials_operation_id   = var.client_credentials_operation_id
   client_credentials_tenant_id      = var.client_credentials_tenant_id
   client_credentials_scope          = var.client_credentials_scope
+  
+  apim_ess_ui_product_name          = var.ui_product_name
+  ess_ui_product_call_limit			= var.ess_ui_product_call_limit
+  ess_ui_product_call_renewal_period= var.ess_ui_product_call_renewal_period
+  ess_ui_product_daily_quota_limit	= var.ess_ui_product_daily_quota_limit
+  ess_b2c_token_issuer              = var.b2c_token_issuer
+  ess_b2c_client_id                 = var.b2c_client_id
+  cors_origins                      = local.cors_origins 
 }
