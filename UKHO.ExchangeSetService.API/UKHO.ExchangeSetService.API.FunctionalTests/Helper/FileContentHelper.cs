@@ -281,7 +281,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string formatVersionAndExchangeSetNumber = fileContent[9];
 
             string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            string year = DateTime.UtcNow.ToString("yy");
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
@@ -341,7 +341,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string formatVersionAndExchangeSetNumber = fileContent[9];
 
             string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            string year = DateTime.UtcNow.ToString("yy");
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
