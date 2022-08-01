@@ -576,12 +576,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                 if (fileSystemHelper.CheckFileExists(zipName))
                 {
-                    logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set zip:{ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    logger.LogInformation(EventIds.CreateZipFileRequestCompleted.ToEventId(), "Exchange set zip:{ExchangeSetFileName} created for BatchId:{BatchId} and  _X-Correlation-ID:{correlationId}", fileSystemHelper.GetFileName(zipName), batchId, correlationId);
                     isCreateZipFileExchangeSetCreated = true;
                 }
                 else
                 {
-                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileShareServiceConfig.Value.ExchangeSetFileName, batchId, correlationId);
+                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileSystemHelper.GetFileName(zipName), batchId, correlationId);
                     throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
                 }
             }
@@ -700,7 +700,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         HttpResponseMessage httpResponse;
 
-                        string mimetype = fileCreateMetaData.FileName == fileShareServiceConfig.Value.ExchangeSetFileName ? "application/zip" : "text/plain";
+                        string mimetype = fileCreateMetaData.FileName.Contains("zip") ? "application/zip" : "text/plain";
 
                         httpResponse = await fileShareServiceClient.AddFileInBatchAsync(HttpMethod.Post, new FileCreateModel(), accessToken, fileShareServiceConfig.Value.BaseUrl, fileCreateMetaData.BatchId, fileCreateMetaData.FileName, fileCreateMetaData.Length, mimetype, correlationId);
                         if (!httpResponse.IsSuccessStatusCode)
@@ -850,5 +850,144 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     return (BatchStatus)Enum.Parse(typeof(BatchStatus), responseBatchStatusModel.Status.ToString());
                 }, batchStatusMetaData.FileName, batchStatusMetaData.BatchId, correlationId);
         }
+
+        #region LargeMediaExchangeSet 
+
+        public async Task<bool> UploadLargeMediaFileToFileShareService(string batchId, string exchangeSetZipPath, string correlationId, string fileName)
+        {
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            bool isWriteBlock = false;
+            DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
+            CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipPath, fileName));
+
+            FileCreateMetaData fileCreateMetaData = new FileCreateMetaData()
+            {
+                AccessToken = accessToken,
+                BatchId = batchId,
+                FileName = customFileInfo.Name,
+                Length = customFileInfo.Length
+            };
+            bool isZipFileCreated = await CreateFile(fileCreateMetaData, accessToken, correlationId);
+            if (isZipFileCreated)
+            {
+                isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
+                if (isWriteBlock)
+                {
+                    DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
+                    monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                }
+            }
+            return isWriteBlock;
+        }
+
+        public async Task<bool> CommitAndGetBatchStatusForLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId)
+        {
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+            List<BatchCommitMetaData> batchCommitMetaDataList = new List<BatchCommitMetaData>();
+
+            //Get zip files full path
+            string[] mediaZipList = fileSystemHelper.GetFiles(exchangeSetZipPath).Where(di => di.Contains("zip")).ToArray();
+
+            foreach (var fileName in mediaZipList)
+            {
+                CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(fileName);
+
+                BatchCommitMetaData batchCommitMetaData = new BatchCommitMetaData()
+                {
+                    BatchId = batchId,
+                    AccessToken = accessToken,
+                    FileName = customFileInfo.Name,
+                    FullFileName = customFileInfo.FullName
+                };
+
+                batchCommitMetaDataList.Add(batchCommitMetaData);
+            }
+
+            DateTime commitTaskStartedAt = DateTime.UtcNow;
+            bool isUploadCommitBatchCompleted = await UploadCommitBatchForLargeMediaExchangeSet(batchCommitMetaDataList, correlationId);
+            BatchStatus batchStatus = BatchStatus.CommitInProgress;
+            if (isUploadCommitBatchCompleted)
+            {
+                var batchStatusMetaData = new BatchStatusMetaData()
+                {
+                    AccessToken = accessToken,
+                    BatchId = batchId
+                };
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                while (batchStatus != BatchStatus.Committed && watch.Elapsed.TotalMinutes <= fileShareServiceConfig.Value.BatchCommitCutOffTimeInMinutes)
+                {
+                    batchStatus = await GetLargeMediaBatchStatus(batchStatusMetaData, correlationId);
+                    if (batchStatus == BatchStatus.Failed)
+                    {
+                        watch.Stop();
+                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
+                        throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
+                    }
+                    await Task.Delay(fileShareServiceConfig.Value.BatchCommitDelayTimeInMilliseconds);
+                }
+                if (batchStatus != BatchStatus.Committed)
+                {
+                    watch.Stop();
+                    logger.LogError(EventIds.BatchCommitTimeout.ToEventId(), "Batch Commit Status timeout for large media exchange set with BatchStatus:{batchStatus} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, batchStatusMetaData.BatchId, correlationId);
+                    throw new FulfilmentException(EventIds.BatchCommitTimeout.ToEventId());
+                }
+                watch.Stop();
+            }
+            else
+            {
+                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
+            }
+            DateTime commitTaskCompletedAt = DateTime.UtcNow;
+            monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null, batchId);
+
+            logger.LogInformation(EventIds.BatchStatus.ToEventId(), "BatchStatus:{batchStatus} for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, batchId, correlationId);
+
+            return batchStatus == BatchStatus.Committed;
+        }
+
+        private Task<bool> UploadCommitBatchForLargeMediaExchangeSet(List<BatchCommitMetaData> batchCommitMetaDataList, string correlationId)
+        {
+            return logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadCommitBatchStart, EventIds.UploadCommitBatchCompleted,
+                "Upload Commit Batch for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    List<FileDetail> fileDetails = fileSystemHelper.UploadLargeMediaCommitBatch(batchCommitMetaDataList);
+                    var batchCommitModel = new BatchCommitModel()
+                    {
+                        FileDetails = fileDetails
+                    };
+
+                    var httpResponse = await fileShareServiceClient.CommitBatchAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, batchCommitMetaDataList[0].BatchId, batchCommitModel, batchCommitMetaDataList[0].AccessToken, correlationId);
+                    if (!httpResponse.IsSuccessStatusCode)
+                    {
+                        logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error in Upload Commit Batch for large media exchange set with uri:{RequestUri} responded with {StatusCode} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchCommitMetaDataList[0].BatchId, correlationId);
+                        throw new FulfilmentException(EventIds.UploadCommitBatchNonOkResponse.ToEventId());
+                    }
+                    return true;
+                }, batchCommitMetaDataList[0].BatchId, correlationId);
+        }
+
+        private Task<BatchStatus> GetLargeMediaBatchStatus(BatchStatusMetaData batchStatusMetaData, string correlationId)
+        {
+            return logger.LogStartEndAndElapsedTimeAsync(EventIds.GetBatchStatusStart, EventIds.GetBatchStatusCompleted,
+                "Get Batch Status for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    var httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
+                    if (!httpResponse.IsSuccessStatusCode)
+                    {
+                        logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error in Get Batch Status for large media exchange set with uri:{RequestUri} responded with {StatusCode} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchStatusMetaData.BatchId, correlationId);
+                        throw new FulfilmentException(EventIds.GetBatchStatusNonOkResponse.ToEventId());
+                    }
+                    string bodyJson = await httpResponse.Content.ReadAsStringAsync();
+                    ResponseBatchStatusModel responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
+                    return (BatchStatus)Enum.Parse(typeof(BatchStatus), responseBatchStatusModel.Status.ToString());
+                }, batchStatusMetaData.BatchId, correlationId);
+        }
+
+        #endregion
     }
 }

@@ -119,7 +119,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
         {
+            DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
+            var largeMediaExchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+
             LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName);
 
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
@@ -147,7 +150,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
             ParallelCreateFolderTaskForCatlogFile.Clear();
 
-            return "Large Exchange Set Created Successfully";
+            List<Task<bool>> parallelZipUploadTasks = new List<Task<bool>> { };
+            Parallel.ForEach(dvdNumbers, dvdNumber =>
+            {
+                var largeMediaExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString()));
+
+                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, largeMediaExchangeSetPath, largeMediaExchangeSetZipFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
+            });
+
+            await Task.WhenAll(parallelZipUploadTasks);
+            bool isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.All(x => x.Result.Equals(true)));
+
+            if (isZipAndUploadSuccessful)
+            {
+                parallelZipUploadTasks.Clear();
+                var isBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(message.BatchId, largeMediaExchangeSetZipFilePath, message.CorrelationId);
+                if (isBatchCommitted)
+                {
+                    logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Large media exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                    monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, DateTime.UtcNow, message.CorrelationId, null, null, null, message.BatchId);
+                    return "Large Media Exchange Set Created Successfully";
+                }
+            }
+
+            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, DateTime.UtcNow, message.CorrelationId, null, null, null, message.BatchId);
+            return "Large Media Exchange Set Is Not Created";
         }
 
         public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(SalesCatalogueServiceResponseQueueMessage message)
@@ -224,6 +251,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             bool isZipFileUploaded = false;
             bool isZipFileCreated = false;
             DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
+
             isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
                        EventIds.CreateZipFileRequestCompleted,
                        "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
@@ -440,6 +468,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
+        }
+
+        private async Task<bool> PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId, string mediaZipFileName)
+        {
+            bool isZipFileUploaded = false;
+            bool isZipFileCreated = false;
+            DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
+
+            isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
+                       EventIds.CreateZipFileRequestCompleted,
+                       "Create large media exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                       async () => await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId),
+                       batchId, correlationId);
+
+            monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, DateTime.UtcNow, correlationId, null, null, null, batchId);
+
+            if (isZipFileCreated)
+            {
+                isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
+                      EventIds.UploadExchangeSetToFssCompleted,
+                      "Upload large media exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                      async () => await fulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, $"{mediaZipFileName}.zip"),
+                      batchId, correlationId);
+            }
+            return isZipFileUploaded;
         }
     }
 }

@@ -343,7 +343,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             IDirectoryInfo directoryInfo = fileSystemHelper.GetParent(Path.GetDirectoryName(exchangeSetRootPath));
-            var path = directoryInfo.Name;        
+            var path = directoryInfo.Name;
             var cat031Bytes = catBuilder.WriteCatalog(path);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
             fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
@@ -358,7 +358,5 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
         }
-
-            
     }
 }
