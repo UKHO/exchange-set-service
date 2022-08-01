@@ -106,8 +106,7 @@ variable "client_credentials_operation_id" {
 }
 
 variable "cors_origin_values" {
-  type = string
-  default = "https://www.google.co.in/"
+  type = string  
 }
 
 locals {
@@ -118,6 +117,6 @@ locals {
   ui_product_name       = local.env_name == "prod" ? var.ui_product_name : "${var.ui_product_name} ${var.env_suffix[local.env_name]}"
   api_name              = local.env_name == "prod" ? var.api_name : "${var.api_name} ${var.env_suffix[local.env_name]}"
   apim_api_path         = local.env_name == "prod" ? local.service_name : "${local.service_name}-${local.env_name}"
-  apim_api_openapi      = file("D:/UKHO/ukhocustomer/ESS/exchangeSetService_OpenApi_definition.yaml")
+  apim_api_openapi      = file("${path.module}/exchangeSetService_OpenApi_definition.yaml")
   cors_origins          = split(";", var.cors_origin_values)
 }
