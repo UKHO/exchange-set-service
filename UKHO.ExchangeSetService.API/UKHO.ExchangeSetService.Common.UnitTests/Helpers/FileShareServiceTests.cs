@@ -195,6 +195,21 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Status = "Committed"
             };
         }
+
+        private ResponseBatchStatusModel GetBatchStatusFailedResponse()
+        {
+            return new ResponseBatchStatusModel()
+            {
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+                Status = "Failed"
+            };
+        }
+
+        private string[] GetZipFileListForBatchCommit()
+        {
+            return new string[] { "Test1.zip, Test2.zip" };
+        }
+
         #endregion UploadZipFileMethods
 
         #region CreateBatch
@@ -1212,7 +1227,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
             fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
-            string[] zipFileList = { "Test1.zip, Test2.zip" };
 
             var responseBatchStatusModel = GetBatchStatusResponse();
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
@@ -1220,7 +1234,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var GetFileInfoDetails = GetFileInfo();
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(zipFileList);
+            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(GetZipFileListForBatchCommit());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
             A.CallTo(() => fakeFileSystemHelper.UploadLargeMediaCommitBatch(A<List<BatchCommitMetaData>>.Ignored)).Returns(GetLargeMediaFileDetails());
             A.CallTo(() => fakeFileShareServiceClient.CommitBatchAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<BatchCommitModel>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -1238,7 +1252,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
             fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
-            string[] zipFileList = { "Test1.zip, Test2.zip" };
             var badCommitBatchResponse = new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.BadRequest,
@@ -1250,11 +1263,35 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var GetFileInfoDetails = GetFileInfo();
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(zipFileList);
+            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(GetZipFileListForBatchCommit());
             A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
             A.CallTo(() => fakeFileSystemHelper.UploadLargeMediaCommitBatch(A<List<BatchCommitMetaData>>.Ignored)).Returns(GetLargeMediaFileDetails());
             A.CallTo(() => fakeFileShareServiceClient.CommitBatchAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<BatchCommitModel>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(badCommitBatchResponse);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                   async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
+        }
+
+        [Test]
+        public void WhenBatchFailedForLargeMediaExchangeSet_ThenReturnFulfilmentException()
+        {
+            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
+            var responseBatchStatusModel = GetBatchStatusFailedResponse();
+            var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            var GetFileInfoDetails = GetFileInfo();
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(GetZipFileListForBatchCommit());
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
+            A.CallTo(() => fakeFileSystemHelper.UploadLargeMediaCommitBatch(A<List<BatchCommitMetaData>>.Ignored)).Returns(GetLargeMediaFileDetails());
+            A.CallTo(() => fakeFileShareServiceClient.CommitBatchAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<BatchCommitModel>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(httpResponse);
+            A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+                .Returns(httpResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                    async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
