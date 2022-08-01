@@ -882,8 +882,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> CommitAndGetBatchStatusForLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId)
         {
-            bool isBatchCommited = false;
-
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
             List<BatchCommitMetaData> batchCommitMetaDataList = new List<BatchCommitMetaData>();
@@ -945,14 +943,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             DateTime commitTaskCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null, batchId);
 
-            if (batchStatus == BatchStatus.Committed)
-            {
-                isBatchCommited = true;
-            }
-
             logger.LogInformation(EventIds.BatchStatus.ToEventId(), "BatchStatus:{batchStatus} for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, batchId, correlationId);
 
-            return isBatchCommited;
+            return batchStatus == BatchStatus.Committed;
         }
 
         private Task<bool> UploadCommitBatchForLargeMediaExchangeSet(List<BatchCommitMetaData> batchCommitMetaDataList, string correlationId)
@@ -967,8 +960,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         FileDetails = fileDetails
                     };
 
-                    HttpResponseMessage httpResponse;
-                    httpResponse = await fileShareServiceClient.CommitBatchAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, batchCommitMetaDataList[0].BatchId, batchCommitModel, batchCommitMetaDataList[0].AccessToken, correlationId);
+                    var httpResponse = await fileShareServiceClient.CommitBatchAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, batchCommitMetaDataList[0].BatchId, batchCommitModel, batchCommitMetaDataList[0].AccessToken, correlationId);
                     if (!httpResponse.IsSuccessStatusCode)
                     {
                         logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error in Upload Commit Batch for large media exchange set with uri:{RequestUri} responded with {StatusCode} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchCommitMetaDataList[0].BatchId, correlationId);
@@ -984,8 +976,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 "Get Batch Status for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    HttpResponseMessage httpResponse;
-                    httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
+                    var httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
                     if (!httpResponse.IsSuccessStatusCode)
                     {
                         logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error in Get Batch Status for large media exchange set with uri:{RequestUri} responded with {StatusCode} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchStatusMetaData.BatchId, correlationId);

@@ -18,7 +18,6 @@ using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
 
-
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
     public class FileShareServiceTests
@@ -181,20 +180,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         private List<FileDetail> GetLargeMediaFileDetails()
         {
-            List<FileDetail> lstFileDetails = new List<FileDetail>()
-            { 
+            return new List<FileDetail>()
+            {
                 new FileDetail() { FileName = "M01X02.zip", Hash = "Testdata" },
-                new FileDetail() { FileName = "M02X02.zip", Hash = "Testdata"} 
+                new FileDetail() { FileName = "M02X02.zip", Hash = "Testdata"}
             };
-            return lstFileDetails;
         }
 
         private ResponseBatchStatusModel GetBatchStatusResponse()
         {
-            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             return new ResponseBatchStatusModel()
             {
-                BatchId = batchId,
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
                 Status = "Committed"
             };
         }
