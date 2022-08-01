@@ -41,3 +41,6 @@ steps:
       TF_VAR_apim_api_backend_url: $(EssApiUrl)
       TF_VAR_client_credentials_tenant_id: $(AzureAdB2CConfiguration.TenantId)
       TF_VAR_client_credentials_scope: "$(AzureAdB2CConfiguration.ClientId)/.default"
+      TF_VAR_b2c_token_issuer: "$(AzureAdB2CConfiguration.ClientId)"
+      TF_VAR_b2c_client_id: "$(AzureAdB2CConfiguration.Instance)"
+      TF_VAR_cors_origin_values: "$(APIM_CORS_ORIGIN_VALUES)"
