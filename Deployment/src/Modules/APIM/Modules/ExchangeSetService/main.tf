@@ -204,7 +204,7 @@ resource "azurerm_api_management_product" "ess_ui_product" {
   api_management_name   = data.azurerm_api_management.apim_instance.name
   product_id            = lower(replace(var.apim_ess_ui_product_name, " ", "-"))
   display_name          = title(var.apim_ess_ui_product_name)
-  description           = "THE DESCRIPTION AN QUOTA LIMITS NEED TO BE CONFIRMED......"
+  description           = "The Exchange Set Service provides APIs to request and download S57 ENC Exchange Sets using a UI."
   subscription_required = false
   approval_required     = false
   published             = true
