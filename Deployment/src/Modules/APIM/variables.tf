@@ -84,12 +84,12 @@ variable "ess_ui_product_call_limit" {
 
 variable "ess_ui_product_call_renewal_period" {
   type    = number  
-  default = 5
+  default = 60
 }
 
 variable "ess_ui_product_daily_quota_limit" {
   type    = number 
-  default = 1000
+  default = 100
 }
 
 variable "client_credentials_tenant_id" {
