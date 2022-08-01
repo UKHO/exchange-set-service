@@ -67,19 +67,31 @@ variable "client_credentials_scope" {
   type    = string  
 }
 
-variable "ui_product_name" {
+variable "apim_ess_ui_product_name" {
     type = string
     default = "Exchange Set Service UI"
 }
 
-variable "b2c_token_issuer" {
+variable "ess_b2c_token_issuer" {
   type  = string
 }
 
-variable "b2c_client_id" {
+variable "ess_b2c_client_id" {
   type  = string
 }
 
 variable "cors_origins" {
   type = list(string)
+}
+
+variable "ess_ui_product_call_limit" {
+    type = number
+}
+
+variable "ess_ui_product_call_renewal_period" {
+    type = number
+}
+
+variable "ess_ui_product_daily_quota_limit" {
+    type = number
 }

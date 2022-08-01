@@ -86,7 +86,7 @@ resource "azurerm_api_management_product_policy" "ess_product_policy" {
 	XML
 }
 
-# Create policy for generating distributor access token
+  # Create policy for generating distributor access token
 resource "azurerm_api_management_api_operation_policy" "client_credentials_token_operation_policy" {
     resource_group_name = data.azurerm_resource_group.rg.name
     api_management_name = data.azurerm_api_management.apim_instance.name
@@ -196,7 +196,7 @@ resource "azurerm_api_management_api_operation_policy" "client_credentials_token
         </inbound>        
     </policies>
     XML
-}                        
+}                      
 
 # Create ESS UI Product
 resource "azurerm_api_management_product" "ess_ui_product" {
@@ -212,15 +212,15 @@ resource "azurerm_api_management_product" "ess_ui_product" {
 
 # ESS product-Group mapping
 resource "azurerm_api_management_product_group" "ess_ui_product_group_mappping" {
-  resource_group_name = var.resource_group_name
+  resource_group_name = data.azurerm_resource_group.rg.name
   api_management_name = data.azurerm_api_management.apim_instance.name
   product_id          = azurerm_api_management_product.ess_ui_product.product_id
   group_name          = azurerm_api_management_group.ess_management_group.name
 }
 
-# Add ESS API to FSS UI Product
+# Add ESS API to ESS UI Product
 resource "azurerm_api_management_product_api" "ess_ui_product_api_mapping" {
-  resource_group_name = var.resource_group_name
+  resource_group_name = data.azurerm_resource_group.rg.name
   api_management_name = data.azurerm_api_management.apim_instance.name
   api_name            = azurerm_api_management_api.ess_api.name
   product_id          = azurerm_api_management_product.ess_ui_product.product_id
@@ -228,7 +228,7 @@ resource "azurerm_api_management_product_api" "ess_ui_product_api_mapping" {
 
 # ESS UI Product poliy
 resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
-  resource_group_name = var.resource_group_name
+  resource_group_name = data.azurerm_resource_group.rg.name
   api_management_name = data.azurerm_api_management.apim_instance.name
   product_id          = azurerm_api_management_product.ess_ui_product.product_id
   depends_on          = [azurerm_api_management_product.ess_ui_product, azurerm_api_management_product_api.ess_ui_product_api_mapping]
@@ -264,10 +264,11 @@ resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
         <!-- Validate b2c token -->
         <validate-jwt header-name="Authorization" failed-validation-error-message="Authorization token is missing or invalid" require-scheme="Bearer" output-token-variable-name="jwt">
             <openid-config url="${var.ess_b2c_token_issuer}" />
-             <audiences>
+            <audiences>
                 <audience>${var.ess_b2c_client_id}</audience>
             </audiences>
         </validate-jwt>
+
         <choose>
             <when condition="@(!((Jwt)context.Variables["jwt"]).Claims.ContainsKey("oid"))">
                 <return-response>
@@ -281,10 +282,15 @@ resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
         </choose>
         <!-- Set oid claim-->
         <set-variable name="oid" value="@(((Jwt)context.Variables["jwt"]).Claims["oid"][0])" />
+
+        <!-- Set rate limit and quota limit -->
+        <rate-limit-by-key calls="${var.ess_ui_product_call_limit}" renewal-period="${var.ess_ui_product_call_renewal_period}" 
+                counter-key="@((string)context.Variables["oid"])" 
+                increment-condition="@(context.Response.StatusCode == 200 || context.Response.StatusCode == 304)" 
+                retry-after-header-name="retry-after" remaining-calls-header-name="remaining-calls" />        
+        <quota-by-key calls="${var.ess_ui_product_daily_quota_limit}" renewal-period="86400" counter-key="@((string)context.Variables["oid"])" 
+                increment-condition="@(context.Response.StatusCode == 200 || context.Response.StatusCode == 304)" />
         
-         <!-- Set rate limit and quota limit -->
-        <rate-limit-by-key calls="${var.ess_ui_product_call_limit}" renewal-period="${var.ess_ui_product_call_renewal_period}" counter-key="@((string)context.Variables["oid"])" increment-condition="@(context.Response.StatusCode == 200 || context.Response.StatusCode == 304)" retry-after-header-name="retry-after" remaining-calls-header-name="remaining-calls" />        
-        <quota-by-key calls="${var.fss_ui_product_daily_quota_limit}" renewal-period="86400" counter-key="@((string)context.Variables["oid"])" increment-condition="@(context.Response.StatusCode == 200 || context.Response.StatusCode == 304)" />
       </inbound> 
 	</policies>
    XML
