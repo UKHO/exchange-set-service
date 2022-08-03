@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
+using UKHO.ExchangeSetService.FulfilmentService.Validation;
 
 namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 {
@@ -37,6 +38,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IMonitorHelper fakeMonitorHelper;
         public IFileSystemHelper fakeFileSystemHelper;
         public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;
+        public IProductDataValidator fakeproductDataValidator;
 
         [SetUp]
         public void Setup()
@@ -74,7 +76,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper,fakeproductDataValidator);
         }
 
         #region GetScsResponseQueueMessage
