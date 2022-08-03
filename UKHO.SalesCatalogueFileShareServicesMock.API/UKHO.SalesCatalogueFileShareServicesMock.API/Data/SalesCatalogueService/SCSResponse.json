@@ -895,5 +895,117 @@
         }
       ]
     }
+  },
+  {
+    "id": "productIdentifier-DE5NOBRK-DE4NO18Q-DE416080-DE260001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 4,
+        "returnedProductCount": 4,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 76909,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B1"
+            }
+          ]
+        },
+        {
+          "editionNumber": 2,
+          "productName": "DE5NOBRK",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-07-09T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 85795,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B2"
+            }
+          ]
+        },
+        {
+          "editionNumber": 9,
+          "productName": "DE416080",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 770543,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B3"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "DE260001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 734003200,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B4"
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

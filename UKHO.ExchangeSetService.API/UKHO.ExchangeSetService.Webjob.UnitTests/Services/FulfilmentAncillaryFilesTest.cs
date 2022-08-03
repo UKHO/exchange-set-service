@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -295,7 +296,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
-
+           
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                   async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1"); });
         }
@@ -303,9 +304,19 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateMediaFileRequest_ThenReturnTrueResponse()
         {
+            string filePath = @"D:\\Downloads";
+            var baseFolder1 = A.Fake<IDirectoryInfo>();
+            var baseFolder2 = A.Fake<IDirectoryInfo>();
+            A.CallTo(() => baseFolder1.Name).Returns("B1");
+            A.CallTo(() => baseFolder2.Name).Returns("B2");
+            IDirectoryInfo[] directoryInfos = { baseFolder1, baseFolder2 };
+            string[] subdirectoryPaths ={ filePath };
+
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
+            A.CallTo(() => fakeFileSystemHelper.GetDirectories(A<string>.Ignored)).Returns(subdirectoryPaths);
 
             var response = await fulfilmentAncillaryFiles.CreateMediaFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1");
 
@@ -322,7 +333,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1"); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1", "2"); });
         }
 
         [Test]
@@ -332,10 +343,43 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1");
+            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1", "2");
 
             Assert.AreEqual(true, response);
         }
+        #endregion
+
+        #region CreateLargeExchangeSetCatalogFile
+        [Test]
+        public async Task WhenValidCreateLargeExchangeSetCatalogFileRequest_ThenReturnTrueReponse()
+        {
+            IDirectoryInfo directoryInfos = A.Fake<IDirectoryInfo>();
+
+            byte[] byteContent = new byte[100];
+            fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
+            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);
+
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
+            A.CallTo(() => fakeFileSystemHelper.GetParent(A<string>.Ignored)).Returns(directoryInfos);
+            var response = await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null);
+
+            Assert.AreEqual(true, response);
+            Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(true, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+            Assert.AreEqual(byteContent, fakeFileHelper.ReadAllBytes(fakeFileName));
+        }
+        [Test]
+        public void WhenInvalidCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
+        {
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null); });
+            Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+        }
+
         #endregion
     }
 }

@@ -15,7 +15,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private const string FileContent_avcs = "AVCS";
         private const string FileContent_base = "Base";
         private const string FileContent_dvd = "Media','DVD_SERVICE'";
-
         private static TestConfiguration Config = new TestConfiguration();
         private static FssApiClient FssApiClient = new FssApiClient();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
@@ -270,50 +269,27 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static async Task<string> ExchangeSetLargeFile(HttpResponseMessage apiEssResponse, string FssJwtToken, string FolderName)
-        {
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
-
-            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/status"; //here BatchId is hardcoded and will be made dynamic in future
-
-            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
-
-            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/621e8d6f-9950-4ba6-bfb4-92415369aaee/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
-
-            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl.ToString(), FssJwtToken, FolderName);
-
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
-
-            return downloadFolderPath;
-        }
-
         public static void CheckMediaTxtFileContent(string inputFile, int folderNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
 
-            //Store file content here
+            //Store file content for the 1st line of the Media.txt here
             string[] fileContent = lines[0].Split(" ");
 
             string dataServerAndWeek = fileContent[0];
             string dateAndCdType = fileContent[3];
             string formatVersionAndExchangeSetNumber = fileContent[9];
 
-            ////string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
-            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
-            ////Below static values are used temporarily as respective functionality will be developed and deployed in future sprints. Once that's implemented the above code will be used
-            string weekNumber = "25";
-            string year = "22";
-            string currentDate = "20220623";
+            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            string year = DateTime.UtcNow.ToString("yy");
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
             Assert.AreEqual(formatVersionAndExchangeSetNumber, $"M0{folderNumber}X02", $"Expected format {formatVersionAndExchangeSetNumber}");
 
+            //Store file content for the 2nd line of the Media.txt here
             string[] fileContent_1 = lines[1].Split(" ");
-
             string FolderInitial = fileContent_1[0];
             string Avcs = fileContent_1[1];
             string WeekNumber_Year = fileContent_1[2];
@@ -325,25 +301,34 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
             Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
+
+            //Verification of the lines describing folders and country code(s) of the Media.txt here
+            string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
+            Array.Sort(checkDirectories);
+            Array.Resize(ref checkDirectories, checkDirectories.Length - 1);
+            List<string> countryCodes = new List<string>();
+
+            int lineNumber = 2;
+            foreach (string codes in checkDirectories)
+            {
+                string actualfileContent = lines[lineNumber];
+                string baseFolderNumber = new DirectoryInfo(codes).Name;
+                string count = baseFolderNumber.Substring(1, 1);
+                string encRootFolder = Path.Combine(codes, Config.ExchangeSetEncRootFolder);
+                string[] addDirectiory = FssBatchHelper.CheckforDirectories(encRootFolder);
+
+                foreach (string countryName in addDirectiory)
+                {
+                   string dirName = new DirectoryInfo(countryName).Name;
+                   countryCodes.Add(dirName);
+                   countryCodes.Sort();
+                }
+
+                Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
+                countryCodes.Clear();
+                lineNumber++;
+            }
         }
-
-        public static void CheckReadMeTxtFileContentForLargeMediaExchangeSet(string inputFile)
-        {
-
-            string[] lines = File.ReadAllLines(inputFile);
-            var fileSecondLineContent = lines[1];
-
-            string[] fileContents = fileSecondLineContent.Split("File date:");
-
-            //Verifying file contents - second line of the readme file
-            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
-
-            var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
-            var expectedUtcDateTime = "2022-06-17 15:00:00";
-
-            Assert.AreEqual(DateTime.Parse(expectedUtcDateTime), DateTime.Parse(utcDateTime), $"Response body returned ExpiryDateTime {utcDateTime}, different than the expected value.");
-        }
-
         public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int baseNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
@@ -355,16 +340,53 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string dateAndCdType = fileContent[3];
             string formatVersionAndExchangeSetNumber = fileContent[9];
 
-            ////string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
-            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
-            string weekNumber = "25";
-            string year = "22";
-            string currentDate = "20220623";
+            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            string year = DateTime.UtcNow.ToString("yy");
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X04"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+        }
+
+        public static async Task<List<string>> CreateExchangeSetFileForLargeMedia(HttpResponseMessage apiEssResponse, string FssJwtToken)
+        {
+            List<string> downloadFolderPath = new List<string>();
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+            var batchId = batchStatusUrl.Split('/')[5];
+
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status"; 
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
+
+            for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
+            {
+                var FolderName = $"M0{mediaNumber}X02";
+                var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{FolderName}.zip";
+
+                var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, FolderName);
+
+                var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+                var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
+                downloadFolderPath.Add(downloadFolderPath1);
+            }
+
+            return downloadFolderPath;
+        }
+
+        public static void CheckProductFileContentLargeFile(string inputFile)
+        {
+            string[] fileContent = File.ReadAllLines(inputFile);
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+
+            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
         }
     }
 }

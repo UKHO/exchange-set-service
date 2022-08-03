@@ -125,7 +125,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
                             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
-                            await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
+                            
+                            //Added to check blob exception
+                            try
+                            {
+                                await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
+                            }
                         }
                         updateNumbers.Add(itemUpdateNumber.Value);
                         internalBatchDetail.IgnoreCache = true;

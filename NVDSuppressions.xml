@@ -249,7 +249,7 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
             Vulnerable versions: 12.10.0 and below
        This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. MSI is pinned to .Net core SDK > 3.1.408 for .NET and Visual Studio Information Disclosure Vulnerability.
        This is a temporary suppression pending a fix being available.
-       Bug to track the fix - https://dev.azure.com/ukhydro/Exchange Set Service/_workitems/edit/52513
+       Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=53813
       ]]>
     </notes>
     <cve>CVE-2022-30187</cve>

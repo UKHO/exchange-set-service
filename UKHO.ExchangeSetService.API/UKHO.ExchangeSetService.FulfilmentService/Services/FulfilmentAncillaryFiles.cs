@@ -5,15 +5,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
-using UKHO.Torus.Enc.Core.EncCatalogue;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using UKHO.Torus.Enc.Core;
 using UKHO.Torus.Core;
+using UKHO.Torus.Enc.Core;
+using UKHO.Torus.Enc.Core.EncCatalogue;
+using System.IO.Abstractions;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -260,10 +262,32 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string mediaFilePath = Path.Combine(folderpath, "MEDIA.TXT");
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
+                var basefolders = fileSystemHelper.GetDirectoryInfo(folderpath)
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
 
-                var mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
+                string mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
                 mediaFileContent += Environment.NewLine;
                 mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
+                mediaFileContent += Environment.NewLine;
+                StringBuilder sb = new StringBuilder();
+                foreach (var directory in basefolders)
+                {
+                    var baseFolderName = directory.Name;
+                    var baseDigit = baseFolderName.Remove(0, 1);
+                    string path = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
+                    string[] subdirectoryEntries = fileSystemHelper.GetDirectories(path);
+
+                    List<string> countryCodes = new List<string>();
+                    foreach (string codes in subdirectoryEntries)
+                    {
+                        var dirName = new DirectoryInfo(codes).Name;
+                        countryCodes.Add(dirName);
+                    }
+                    string content = $"M{baseNumber};{baseFolderName},{DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2},'AVCS Volume{baseDigit}','ENC data for producers {string.Join(", ", countryCodes)}',,";
+                    sb.AppendLine(content);
+
+                }
+                mediaFileContent += sb.ToString();
                 fileSystemHelper.CreateFileContent(mediaFilePath, mediaFileContent);
                 await Task.CompletedTask;
 
@@ -278,7 +302,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isMediaFileCreated;
         }
 
-        public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId, string baseNumber)
+        public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId, string baseNumber, string lastBaseDirectoryNumber)
         {
             bool isSerialEncFileCreated = false;
             if (!string.IsNullOrWhiteSpace(exchangeSetPath))
@@ -287,7 +311,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetPath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
 
-                var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      {2:D2}.00B0{baseNumber}X09\x0b\x0d\x0a";
+                var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      {2:D2}.00B0{baseNumber}X0{lastBaseDirectoryNumber}\x0b\x0d\x0a";
 
                 fileSystemHelper.CreateFileContent(serialFilePath, serialFileContent);
                 await Task.CompletedTask;
@@ -301,6 +325,38 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
             }
             return isSerialEncFileCreated;
+        }
+
+        public async Task<bool> CreateLargeExchangeSetCatalogFile(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            var catBuilder = new Catalog031BuilderFactory().Create();
+            var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
+
+            if (fileSystemHelper.CheckFileExists(readMeFileName))
+            {
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
+                    Implementation = "TXT"
+                });
+            }
+
+            IDirectoryInfo directoryInfo = fileSystemHelper.GetParent(Path.GetDirectoryName(exchangeSetRootPath));
+            var path = directoryInfo.Name;
+            var cat031Bytes = catBuilder.WriteCatalog(path);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
+            await Task.CompletedTask;
+
+            if (fileSystemHelper.CheckFileExists(outputFileName))
+                return true;
+            else
+            {
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
+            }
+
         }
     }
 }
