@@ -263,7 +263,10 @@ resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
 
         <!-- Validate b2c token -->
         <validate-jwt header-name="Authorization" failed-validation-error-message="Authorization token is missing or invalid" require-scheme="Bearer" output-token-variable-name="jwt">
-            <openid-config url="${var.ess_b2c_token_issuer}" />            
+            <openid-config url="${var.ess_b2c_token_issuer}" />
+            <audiences>
+                <audience>${var.ess_b2c_client_id}</audience>
+            </audiences>
         </validate-jwt>
 
         <choose>
