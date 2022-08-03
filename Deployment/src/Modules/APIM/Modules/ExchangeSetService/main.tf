@@ -285,11 +285,9 @@ resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
 
         <!-- Set rate limit and quota limit -->
         <rate-limit-by-key calls="${var.ess_ui_product_call_limit}" renewal-period="${var.ess_ui_product_call_renewal_period}" 
-                counter-key="@((string)context.Variables["oid"])" 
-                increment-condition="@(context.Response.StatusCode == 200 || context.Response.StatusCode == 304)" 
+                counter-key="@((string)context.Variables["oid"])"                 
                 retry-after-header-name="retry-after" remaining-calls-header-name="remaining-calls" />        
-        <quota-by-key calls="${var.ess_ui_product_daily_quota_limit}" renewal-period="86400" counter-key="@((string)context.Variables["oid"])" 
-                increment-condition="@(context.Response.StatusCode == 200 || context.Response.StatusCode == 304)" />
+        <quota-by-key calls="${var.ess_ui_product_daily_quota_limit}" renewal-period="86400" counter-key="@((string)context.Variables["oid"])" />
         
       </inbound> 
 	</policies>
