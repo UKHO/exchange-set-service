@@ -16,11 +16,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Validation
             RuleFor(p =>p)
               .Must(pi => pi != null)
               .WithMessage("products cannot be null or empty.");
-
+            
             RuleForEach(p => p).ChildRules(orders =>
             {
                 orders.RuleForEach(x => x.Bundle).ChildRules(orders =>
                 {
+                    orders.RuleFor(x => x.BundleType)
+                      .Must(p => p.StartsWith("DVD"))
+                      .When(p => string.IsNullOrWhiteSpace(p.BundleType))
+                      .WithMessage("BundleType cannot be null or empty.");
+
                     orders.RuleFor(x => x.Location)
                       .Must(p => p.StartsWith("M1") || p.StartsWith("M2"))
                       .NotEqual("M0")

@@ -365,7 +365,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!result.IsValid)
             {
                 largeExchangeSetDataResponse.ValidationResultFailed = true;
-                logger.LogInformation(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                logger.LogInformation(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 return largeExchangeSetDataResponse;
             }
 
@@ -516,9 +516,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipFileUploaded;
         }
 
-        public Task<ValidationResult> ValidateProductData(List<Products> salesCatalogueProductResponse)
+        public Task<ValidationResult> ValidateProductData(List<Products> products)
         {
-            return productDataValidator.Validate(salesCatalogueProductResponse);
+            return productDataValidator.Validate(products);
         }
     }
 }
