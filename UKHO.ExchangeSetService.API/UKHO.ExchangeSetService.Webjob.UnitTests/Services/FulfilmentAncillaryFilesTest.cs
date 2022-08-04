@@ -355,15 +355,20 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidCreateLargeExchangeSetCatalogFileRequest_ThenReturnTrueReponse()
         {
             IDirectoryInfo directoryInfos = A.Fake<IDirectoryInfo>();
-
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000002", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() },
+            };
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             byte[] byteContent = new byte[100];
+
             fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
             fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
             A.CallTo(() => fakeFileSystemHelper.GetParent(A<string>.Ignored)).Returns(directoryInfos);
-            var response = await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null);
+            var response = await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.AreEqual(true, response);
             Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
@@ -373,10 +378,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000002", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() },
+            };
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);});
             Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
             Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
         }

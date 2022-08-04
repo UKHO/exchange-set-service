@@ -327,7 +327,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isSerialEncFileCreated;
         }
 
-        public async Task<bool> CreateLargeExchangeSetCatalogFile(string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> CreateLargeExchangeSetCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
@@ -342,8 +342,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 });
             }
 
+            if (listFulfilmentData != null && listFulfilmentData.Any())
+            {
+                listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
+
+                List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("text/plain", "ASC"), new Tuple<string, string>("text/plain", "TXT"), new Tuple<string, string>("image/tiff", "TIF") };
+
+                foreach (var listItem in listFulfilmentData)
+                {
+                    CreateLargeExchangeSetCatalogEntry(listItem, orderPreference, catBuilder, salesCatalogueDataResponse, salesCatalogueProductResponse, exchangeSetRootPath, batchId, correlationId);
+                }
+            }
+
             IDirectoryInfo directoryInfo = fileSystemHelper.GetParent(Path.GetDirectoryName(exchangeSetRootPath));
-            var path = directoryInfo.Name;        
+            var path = directoryInfo.Name;
             var cat031Bytes = catBuilder.WriteCatalog(path);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
             fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
@@ -359,6 +372,46 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         }
 
-            
+        private void CreateLargeExchangeSetCatalogEntry(FulfilmentDataResponse listItem, List<Tuple<string, string>> orderPreference, ICatalog031Builder catBuilder, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse, string exchangeSetRootPath, string batchId, string correlationId)
+        {
+            int length = 2;
+            listItem.Files = listItem.Files.OrderByDescending(
+                                item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
+
+            foreach (var item in listItem.Files)
+            {
+                string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), item.Filename);
+                string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
+                string comment = string.Empty;
+                BoundingRectangle boundingRectangle = new BoundingRectangle();
+
+                if (mimeType == "BIN")
+                {
+                    var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+                    if (salescatalogProduct == null)
+                    {
+                        logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId(), "Error in sales catalogue service catalogue end point when product details not found for Product:{ProductName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", listItem.ProductName, batchId, correlationId);
+                        throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId());
+                    }
+
+                    comment = SetCatalogFileComment(listItem, salescatalogProduct, salesCatalogueProductResponse);
+
+                    boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
+                    boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
+                    boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
+                    boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
+                }
+
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileLocation,
+                    FileLongName = "",
+                    Implementation = mimeType,
+                    Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : GetCrcString(Path.Combine(exchangeSetRootPath, fileLocation)),
+                    Comment = comment,
+                    BoundingRectangle = boundingRectangle
+                });
+            }
+        }
     }
 }

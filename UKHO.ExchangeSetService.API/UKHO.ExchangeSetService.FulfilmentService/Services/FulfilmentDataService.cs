@@ -143,7 +143,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             List<Task> ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
             Parallel.ForEach(rootDirectorys, rootDirectoryFolder =>
             {
-                ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
+                ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
             });
 
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
@@ -372,7 +372,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task DownloadLargeMediaReadMeFile(string batchId, string exchangeSetPath, string correlationId)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
 
             List<string> encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
@@ -400,22 +400,23 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       async () =>
                       {
                           var baseDirectorys = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
+                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
 
-                          string baseLastDirectoryPath = exchangeSetPath.Replace("M01", "M02");
-                          if(!Directory.Exists(baseLastDirectoryPath))
+                          string isBaseLastDirectoryPath = exchangeSetPath.Replace("M01", "M02");
+                          string baseLastDirectoryPath = isBaseLastDirectoryPath;
+                          if (!Directory.Exists(isBaseLastDirectoryPath))
                           {
-                              baseLastDirectoryPath = string.Empty;
+                              baseLastDirectoryPath = exchangeSetPath;
                           }
-                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(!string.IsNullOrWhiteSpace(baseLastDirectoryPath) ? baseLastDirectoryPath : exchangeSetPath)
-                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
+                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(baseLastDirectoryPath)
+                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
 
-                          string lastBaseDirectoryNumber = baseLastDirectory != null && !string.IsNullOrWhiteSpace(baseLastDirectory.ToString()) ? baseLastDirectory.ToString().Substring(baseLastDirectory.ToString().Length - 1) : "9";
+                          string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(baseLastDirectoryPath, "B"), "");
 
                           List<Task<bool>> ParallelBaseFolderTasks = new List<Task<bool>> { };
                           Parallel.ForEach(baseDirectorys, baseDirectoryFolder =>
                           {
-                              string baseDirectoryNumber = baseDirectoryFolder.ToString().Substring(baseDirectoryFolder.ToString().Length - 1);
+                              string baseDirectoryNumber = baseDirectoryFolder.ToString().Replace(Path.Combine(exchangeSetPath, "B"), "");
                               ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectoryFolder.ToString(), correlationId, baseDirectoryNumber.ToString(), lastBaseDirectoryNumber));
                           });
                           await Task.WhenAll(ParallelBaseFolderTasks);
@@ -428,10 +429,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                   batchId, correlationId);
         }
 
-        private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId)
+        private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
 
             List<string> encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
@@ -443,7 +444,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             Parallel.ForEach(encFolderList, encFolder =>
             {
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(batchId, encFolder, correlationId));
+                var countryCodes = fileSystemHelper.GetDirectoryInfo(encFolder)
+                                   .Select(di => di.Name[^2..]).ToList();
+
+                var fulfilmentDataBasedonCountryCode = listFulfilmentData.Where(x => countryCodes.Any(z => x.ProductName.StartsWith(z))).ToList();
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(batchId, encFolder, correlationId, fulfilmentDataBasedonCountryCode, salesCatalogueDataResponse, salesCatalogueProductResponse));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
