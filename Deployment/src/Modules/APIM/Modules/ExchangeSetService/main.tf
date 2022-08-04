@@ -86,7 +86,7 @@ resource "azurerm_api_management_product_policy" "ess_product_policy" {
 	XML
 }
 
-# Create policy for generating distributor access token
+  # Create policy for generating distributor access token
 resource "azurerm_api_management_api_operation_policy" "client_credentials_token_operation_policy" {
     resource_group_name = data.azurerm_resource_group.rg.name
     api_management_name = data.azurerm_api_management.apim_instance.name
@@ -196,4 +196,100 @@ resource "azurerm_api_management_api_operation_policy" "client_credentials_token
         </inbound>        
     </policies>
     XML
+}                      
+
+# Create ESS UI Product
+resource "azurerm_api_management_product" "ess_ui_product" {
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  api_management_name   = data.azurerm_api_management.apim_instance.name
+  product_id            = lower(replace(var.apim_ess_ui_product_name, " ", "-"))
+  display_name          = title(var.apim_ess_ui_product_name)
+  description           = "The Exchange Set Service provides APIs to request and download S57 ENC Exchange Sets using a UI."
+  subscription_required = false
+  approval_required     = false
+  published             = true
+}
+
+# ESS product-Group mapping
+resource "azurerm_api_management_product_group" "ess_ui_product_group_mappping" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  product_id          = azurerm_api_management_product.ess_ui_product.product_id
+  group_name          = azurerm_api_management_group.ess_management_group.name
+}
+
+# Add ESS API to ESS UI Product
+resource "azurerm_api_management_product_api" "ess_ui_product_api_mapping" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  api_name            = azurerm_api_management_api.ess_api.name
+  product_id          = azurerm_api_management_product.ess_ui_product.product_id
+}
+
+# ESS UI Product poliy
+resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  product_id          = azurerm_api_management_product.ess_ui_product.product_id
+  depends_on          = [azurerm_api_management_product.ess_ui_product, azurerm_api_management_product_api.ess_ui_product_api_mapping]
+
+  xml_content = <<XML
+	<policies>
+	  <inbound>
+        
+        <!-- Set CORS policy -->
+        <cors allow-credentials="true">
+            <allowed-origins>
+                %{for origin in var.cors_origins~}
+                    <origin>${origin}</origin>
+                %{endfor~}                
+            </allowed-origins>
+            <allowed-methods preflight-result-max-age="300">
+                <method>*</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
+            <expose-headers>
+                <header>*</header>
+            </expose-headers>
+        </cors>
+
+        <set-header name="X-Correlation-ID" exists-action="skip">
+            <value>@(Guid.NewGuid().ToString())</value>
+        </set-header>
+
+        <base />
+
+        <!-- Validate b2c token -->
+        <validate-jwt header-name="Authorization" failed-validation-error-message="Authorization token is missing or invalid" require-scheme="Bearer" output-token-variable-name="jwt">
+            <openid-config url="${var.ess_b2c_token_issuer}" />
+            <audiences>
+                <audience>${var.ess_b2c_client_id}</audience>
+            </audiences>
+        </validate-jwt>
+
+        <choose>
+            <when condition="@(!((Jwt)context.Variables["jwt"]).Claims.ContainsKey("oid"))">
+                <return-response>
+                    <set-status code="403" reason="Forbidden" />
+                    <set-header name="X-Correlation-ID">
+                       <value>@(context.Request.Headers["X-Correlation-ID"][0])</value>
+                    </set-header>
+                    <set-body>"oid" claim missing in token</set-body>
+                </return-response>
+            </when>
+        </choose>
+        <!-- Set oid claim-->
+        <set-variable name="oid" value="@(((Jwt)context.Variables["jwt"]).Claims["oid"][0])" />
+
+        <!-- Set rate limit and quota limit -->
+        <rate-limit-by-key calls="${var.ess_ui_product_call_limit}" renewal-period="${var.ess_ui_product_call_renewal_period}" 
+                counter-key="@((string)context.Variables["oid"])"                 
+                retry-after-header-name="retry-after" remaining-calls-header-name="remaining-calls" />        
+        <quota-by-key calls="${var.ess_ui_product_daily_quota_limit}" renewal-period="86400" counter-key="@((string)context.Variables["oid"])" />
+        
+      </inbound> 
+	</policies>
+   XML
 }
