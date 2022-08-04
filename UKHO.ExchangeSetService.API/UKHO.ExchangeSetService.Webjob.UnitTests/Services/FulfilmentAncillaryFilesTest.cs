@@ -276,7 +276,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(byteContent, fakeFileHelper.ReadAllBytes(fakeFileName));
         }
 
-       
         [Test]
         public void WhenInvalidCreateCatalogFileRequest_ThenReturnFulfilmentException()
         {
@@ -306,11 +305,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidCreateMediaFileRequest_ThenReturnTrueResponse()
         {
             string filePath = @"D:\\Downloads";
-            var b1 = A.Fake<IDirectoryInfo>();
-            var b2 = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => b1.Name).Returns("B1");
-            A.CallTo(() => b2.Name).Returns("B2");
-            IDirectoryInfo[] directoryInfos = { b1, b2 };
+            var baseFolder1 = A.Fake<IDirectoryInfo>();
+            var baseFolder2 = A.Fake<IDirectoryInfo>();
+            A.CallTo(() => baseFolder1.Name).Returns("B1");
+            A.CallTo(() => baseFolder2.Name).Returns("B2");
+            IDirectoryInfo[] directoryInfos = { baseFolder1, baseFolder2 };
             string[] subdirectoryPaths ={ filePath };
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));

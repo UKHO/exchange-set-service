@@ -23,9 +23,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public ILogger<FulfilmentFileShareService> fakeLogger;
         public bool fakeIsFileUploaded = false;
         public bool fakeIsZipFileCreated = false;
+        private bool fakeIsBatchCommitted = false;
         public string fakeExchangeSetRootPath = @"D:\\Downloads\";
         public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        readonly string fakeMediaFolderName = "M01X01.zip";
         public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
         [SetUp]
         public void Setup()
         {
@@ -188,5 +191,45 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeIsZipFileCreated = await fulfilmentFileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, null);
             Assert.AreEqual(false, fakeIsZipFileCreated);
         }
+
+        #region LargeMediaExchangeSet
+
+        [Test]
+        public async Task WhenValidUploadZipFileForLargeMediaExchangeSetToFileShareService_ThenReturnTrue()
+        {
+            fakeIsFileUploaded = true;
+            A.CallTo(() => fakefileShareService.UploadLargeMediaFileToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsFileUploaded);
+            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetRootPath, null, fakeMediaFolderName);
+            Assert.AreEqual(true, fakeIsFileUploaded);
+        }
+
+        [Test]
+        public async Task WhenInvalidUploadZipFileForLargeMediaExchangeSetToFileShareService_ThenReturnFalse()
+        {
+            fakeIsFileUploaded = false;
+            A.CallTo(() => fakefileShareService.UploadLargeMediaFileToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsFileUploaded);
+            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(fakeBatchId, string.Empty, null, fakeMediaFolderName);
+            Assert.AreEqual(false, fakeIsFileUploaded);
+        }
+
+        [Test]
+        public async Task WhenValidCommitLargeMediaExchangeSet_ThenReturnTrue()
+        {
+            fakeIsBatchCommitted = true;
+            A.CallTo(() => fakefileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsBatchCommitted);
+            fakeIsBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetRootPath, null);
+            Assert.AreEqual(true, fakeIsBatchCommitted);
+        }
+
+        [Test]
+        public async Task WhenInvalidCommitLargeMediaExchangeSet_ThenReturnFalse()
+        {
+            fakeIsBatchCommitted = false;
+            A.CallTo(() => fakefileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsBatchCommitted);
+            fakeIsBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetRootPath, null);
+            Assert.AreEqual(false, fakeIsBatchCommitted);
+        }
+
+        #endregion
     }
 }

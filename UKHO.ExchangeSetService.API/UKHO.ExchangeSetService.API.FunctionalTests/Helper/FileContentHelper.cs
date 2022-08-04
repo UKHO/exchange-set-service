@@ -280,13 +280,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string dateAndCdType = fileContent[3];
             string formatVersionAndExchangeSetNumber = fileContent[9];
 
-            ////string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
-            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
-            ////Below static values are used temporarily as respective functionality will be developed and deployed in future sprints. Once that's implemented the above code will be used
-            string weekNumber = "25";
-            string year = "22";
-            string currentDate = "20220623";
+            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            string year = DateTime.UtcNow.ToString("yy");
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
@@ -333,23 +329,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 lineNumber++;
             }
         }
-
-        public static void CheckReadMeTxtFileContentForLargeMediaExchangeSet(string inputFile)
-        {
-            string[] lines = File.ReadAllLines(inputFile);
-            var fileSecondLineContent = lines[1];
-
-            string[] fileContents = fileSecondLineContent.Split("File date:");
-
-            //Verifying file contents - second line of the readme file
-            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
-
-            var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
-            var expectedUtcDateTime = "2022-06-17 15:00:00";
-
-            Assert.AreEqual(DateTime.Parse(expectedUtcDateTime), DateTime.Parse(utcDateTime), $"Response body returned ExpiryDateTime {utcDateTime}, different than the expected value.");
-        }
-
         public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int baseNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
@@ -361,32 +340,34 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string dateAndCdType = fileContent[3];
             string formatVersionAndExchangeSetNumber = fileContent[9];
 
-            ////string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            ////string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
-            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
-            string weekNumber = "25";
-            string year = "22";
-            string currentDate = "20220623";
+            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            string year = DateTime.UtcNow.ToString("yy");
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X04"), $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
-        public static async Task<List<string>> ExchangeSetLargeFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
+        public static async Task<List<string>> CreateExchangeSetFileForLargeMedia(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
             List<string> downloadFolderPath = new List<string>();
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+            var batchId = batchStatusUrl.Split('/')[5];
+
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status"; 
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
+
             for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
                 var FolderName = $"M0{mediaNumber}X02";
-                Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
-
-                var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/62713adc-6999-40f6-86b1-ca08ab693d44/status"; //here BatchId is hardcoded and will be made dynamic in future
-
-                var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-                Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
-
-                var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/62713adc-6999-40f6-86b1-ca08ab693d44/files/{FolderName}.zip"; //here BatchId is hardcoded and will be made dynamic in future
+                var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{FolderName}.zip";
 
                 var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, FolderName);
 
@@ -401,10 +382,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static void CheckProductFileContentLargeFile(string inputFile)
         {
             string[] fileContent = File.ReadAllLines(inputFile);
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            ////string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
-
-            string currentDate = "20220623"; //// The date has been hardcoded as we are using a static batch id. This line will be removed in the future.
             Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
             Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
             Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");

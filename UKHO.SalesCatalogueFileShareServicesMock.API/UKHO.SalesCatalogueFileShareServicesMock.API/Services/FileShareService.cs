@@ -44,24 +44,32 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             string[] filePaths;
             byte[] bytes = null;
             var setZipPath = Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId);
-            if (!string.IsNullOrEmpty(setZipPath) && FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) 
-                && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase))
+            switch (string.IsNullOrEmpty(setZipPath))
             {
-                filePaths = Directory.GetFiles(setZipPath, filesName);
-            }
-            else if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
-            {
-                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
-            }
-            else
-            {
-                filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForReadme, filesName);
+                case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase):
+                case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && (string.Equals("M01X02.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("M02X02.zip", filesName, StringComparison.OrdinalIgnoreCase)):
+                    filePaths = Directory.GetFiles(setZipPath, filesName);
+                    break;
+                default:
+                    {
+                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
+                        }
+                        else
+                        {
+                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForReadme, filesName);
+                        }
+
+                        break;
+                    }
             }
             if (filePaths != null && filePaths.Any())
             {
                 string filePath = filePaths[0];
                 bytes = File.ReadAllBytes(filePath);
             }
+            
             return bytes;
         }
 
