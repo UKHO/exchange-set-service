@@ -44,7 +44,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="System.IO.Abstractions" Version="17.0.21" />
+		<PackageReference Include="System.IO.Abstractions" Version="17.0.24" />
 		<PackageReference Include="System.Net.Security" Version="4.3.2" />
 		<PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
 		<PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
