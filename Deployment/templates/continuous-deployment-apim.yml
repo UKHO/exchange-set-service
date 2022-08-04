@@ -44,3 +44,6 @@ steps:
       TF_VAR_b2c_token_issuer: "$(APIM_B2C_TOKEN_ISSUER)"
       TF_VAR_b2c_client_id: "$(APIM_B2C_CLIENT_ID)"
       TF_VAR_cors_origin_values: "$(APIM_CORS_ORIGIN_VALUES)"
+      TF_VAR_ess_ui_product_call_limit: $(essuiproductcalllimit)
+      TF_VAR_ess_ui_product_call_renewal_period: $(essuiproductcallrenewalperiod)
+      TF_VAR_ess_ui_product_daily_quota_limit: $(essuiproductdailyquotalimit)
