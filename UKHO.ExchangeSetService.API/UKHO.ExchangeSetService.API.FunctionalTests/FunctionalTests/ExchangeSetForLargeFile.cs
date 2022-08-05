@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.IO;
 using System.Threading;
 using System.Collections.Generic;
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -22,6 +23,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         private List<string> DownloadedFolderPath;
 
+        private SalesCatalogueApiClient ScsApiClient { get; set; }
+        private string ScsJwtToken { get; set; }
+
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
@@ -31,6 +35,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
+            ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
+            ScsJwtToken = await authTokenProvider.GetScsToken();
             DataHelper = new DataHelper();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForLargeMedia(), accessToken: EssJwtToken);
             Thread.Sleep(5000); //File creation takes time
@@ -156,7 +162,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest")]
-        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACATALOGFileIsGenerated()
+        public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACATALOGFileIsGenerated()
         {
             int baseNumber = 1;
             bool checkFolder;
@@ -166,6 +172,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 {
                     bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
                     Assert.IsTrue(checkFile, $"{Config.ExchangeSetCatalogueFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
+
+                    //Verify Catalog file content
+                    var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForLargeMedia(), ScsJwtToken);
+                    Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
+                    var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+
+                    FileContentHelper.CheckCatalogueFileContentForLargeMedia(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
 
                     baseNumber++;
                     var folderName = $"B{baseNumber}";
