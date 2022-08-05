@@ -33,7 +33,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
         private readonly IMonitorHelper monitorHelper;
         private readonly IFileSystemHelper fileSystemHelper;
-        private readonly IProductDataValidator productDataValidator;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
@@ -44,8 +43,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
                                     IFulfilmentCallBackService fulfilmentCallBackService,
                                     IMonitorHelper monitorHelper,
-                                    IFileSystemHelper fileSystemHelper,
-                                    IProductDataValidator productDataValidator)
+                                    IFileSystemHelper fileSystemHelper)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -57,7 +55,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentCallBackService = fulfilmentCallBackService;
             this.monitorHelper = monitorHelper;
             this.fileSystemHelper = fileSystemHelper;
-            this.productDataValidator = productDataValidator;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
@@ -130,10 +127,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var largeMediaExchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
 
             LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName);
-            if (response.ValidationResultFailed)
+            if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
             {
-                return "Large Media Exchange Set Is Not Created";
+                throw new ArgumentException("Product response data validation failed", response.ValidationtFailedMessage);
             }
+
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
             var dvdNumbers = Enumerable.Range(1, 2);
 
@@ -338,8 +336,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return salesCatalogueTypeResponse;
         }
 
-
-
         private async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
         {
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
@@ -359,12 +355,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             LargeExchangeSetDataResponse largeExchangeSetDataResponse = new LargeExchangeSetDataResponse();
             var response = await DownloadSalesCatalogueResponse(message);
 
-            ProductDataValidator ev = new ProductDataValidator();
-            ValidationResult result = ev.Validate(response.Products);
+            ProductDataValidator validationRules = new ProductDataValidator();
+            ValidationResult result = validationRules.Validate(response.Products);
 
             if (!result.IsValid)
             {
-                largeExchangeSetDataResponse.ValidationResultFailed = true;
+                largeExchangeSetDataResponse.ValidationtFailedMessage = result.Errors[0].ToString();
                 logger.LogInformation(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 return largeExchangeSetDataResponse;
             }
@@ -516,9 +512,5 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipFileUploaded;
         }
 
-        public Task<ValidationResult> ValidateProductData(List<Products> products)
-        {
-            return productDataValidator.Validate(products);
-        }
     }
 }

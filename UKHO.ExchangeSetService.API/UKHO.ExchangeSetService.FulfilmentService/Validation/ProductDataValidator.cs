@@ -15,10 +15,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Validation
         public ProductDataValidator()
         {
             Int16 maxValue = 100;
-            RuleFor(p =>p)
+            RuleFor(p => p)
               .Must(pi => pi != null)
               .WithMessage("products cannot be null or empty.");
-            
+
             RuleForEach(p => p).ChildRules(orders =>
             {
                 orders.RuleForEach(x => x.Bundle).ChildRules(orders =>
@@ -29,19 +29,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Validation
                       .WithMessage("BundleType cannot be null or empty.");
 
                     orders.RuleFor(x => x.Location)
-                      .Must(p => p.StartsWith("M1") || p.StartsWith("M2"))
-                      .NotEqual("M0")
-                      .When(p => string.IsNullOrWhiteSpace(p.Location))
-                      .WithMessage("Location cannot be null or empty");
-
-                    orders.RuleFor(x => x.Location)
-                    .Must(p => Convert.ToInt16(p.Replace("M1;B", "")) > 0 && Convert.ToInt16(p.Replace("M1;B", "")) < maxValue)
-                    .Must(p => Convert.ToInt16(p.Replace("M2;B", "")) > 0 && Convert.ToInt16(p.Replace("M2;B", "")) < maxValue)
-                    .WithMessage("Base must be in betwenn 1 - 99");
+                      .Must(p => !string.IsNullOrWhiteSpace(p))
+                      .WithMessage("Location cannot be null or empty")
+                      .Must(p => (p.Contains("M1;B") || p.Contains("M2;B")) && Convert.ToInt16(p.Replace("M1;B", "").Replace("M2;B", "")) > 0 && Convert.ToInt16(p.Replace("M1;B", "").Replace("M2;B", "")) < maxValue)
+                      .WithMessage(x => $" Location must starts with M1/M2 and Base must be in between 1 - 99; Product :  {x.BundleType}, Location : {x.Location}");
                 });
             });
-            
         }
+
         Task<ValidationResult> IProductDataValidator.Validate(List<Products> salesCatalogueProductResponse)
         {
             return ValidateAsync(salesCatalogueProductResponse);
