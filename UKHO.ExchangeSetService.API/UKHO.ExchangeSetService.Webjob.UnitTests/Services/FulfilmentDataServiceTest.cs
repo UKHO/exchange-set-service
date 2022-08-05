@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using FluentValidation.Results;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -75,8 +76,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper,fakeproductDataValidator);
+            fakeproductDataValidator = A.Fake<IProductDataValidator>();
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakeproductDataValidator);
         }
 
         #region GetScsResponseQueueMessage
@@ -189,7 +190,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
               .Returns(storageAccountConnectionString);
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
-            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -273,6 +273,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse)).Returns(true);
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
+            A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -292,6 +293,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => b1.Name).Returns("B1");
             A.CallTo(() => b2.Name).Returns("B2");
             IDirectoryInfo[] directoryInfos = { b1, b2 };
+            ////var validationMessage = new ValidationFailure("ProductIdentifiers", "Zip not created.");
+            ////validationMessage.ErrorCode = HttpStatusCode.NotModified.ToString();
 
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
@@ -301,6 +304,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
+            ////A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
+            A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
 

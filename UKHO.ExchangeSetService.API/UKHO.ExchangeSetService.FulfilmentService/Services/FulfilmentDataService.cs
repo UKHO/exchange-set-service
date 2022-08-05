@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -33,6 +32,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
         private readonly IMonitorHelper monitorHelper;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly IProductDataValidator productDataValidator;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
@@ -43,7 +43,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
                                     IFulfilmentCallBackService fulfilmentCallBackService,
                                     IMonitorHelper monitorHelper,
-                                    IFileSystemHelper fileSystemHelper)
+                                    IFileSystemHelper fileSystemHelper,
+                                    IProductDataValidator productDataValidator)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -55,6 +56,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentCallBackService = fulfilmentCallBackService;
             this.monitorHelper = monitorHelper;
             this.fileSystemHelper = fileSystemHelper;
+            this.productDataValidator = productDataValidator;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
@@ -355,12 +357,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             LargeExchangeSetDataResponse largeExchangeSetDataResponse = new LargeExchangeSetDataResponse();
             var response = await DownloadSalesCatalogueResponse(message);
 
-            ProductDataValidator validationRules = new ProductDataValidator();
-            ValidationResult result = validationRules.Validate(response.Products);
+            Task<ValidationResult> result = productDataValidator.Validate(response.Products);
 
-            if (!result.IsValid)
+            if (!result.Result.IsValid)
             {
-                largeExchangeSetDataResponse.ValidationtFailedMessage = result.Errors[0].ToString();
+                largeExchangeSetDataResponse.ValidationtFailedMessage = result.Result.Errors[0].ToString();
                 logger.LogInformation(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 return largeExchangeSetDataResponse;
             }
