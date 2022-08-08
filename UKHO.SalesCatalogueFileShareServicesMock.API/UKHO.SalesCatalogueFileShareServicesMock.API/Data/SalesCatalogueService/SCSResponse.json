@@ -897,55 +897,121 @@
     }
   },
   {
-    "id": "productIdentifier-DE5NOBRK-DE4NO18Q-DE416080-DE260001",
+    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US5CN13M-CA172005-DE521900-NZ300661-KR676D03",
     "responseBody": {
       "productCounts": {
-        "requestedProductCount": 4,
-        "returnedProductCount": 4,
+        "requestedProductCount": 10,
+        "returnedProductCount": 10,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": []
       },
       "products": [
         {
-          "editionNumber": 2,
-          "productName": "DE4NO18Q",
-          "updateNumbers": [
-            0,
-            1
-          ],
-          "dates": [
-            {
-              "issueDate": "2021-03-10T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
-            },
-            {
-              "issueDate": "2021-05-12T00:00:00.0000000Z",
-              "updateNumber": 1
-            }
-          ],
-          "fileSize": 76909,
-          "bundle": [
-            {
-              "bundleType": "DVD",
-              "location": "M1;B1"
-            }
-          ]
-        },
-        {
-          "editionNumber": 2,
-          "productName": "DE5NOBRK",
+          "editionNumber": 12,
+          "productName": "DE521900",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2021-07-09T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
+              "issueDate": "2017-01-13T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
               "updateNumber": 0
             }
           ],
-          "fileSize": 85795,
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 193039,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B8"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "CA172005",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-06-04T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-06-04T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 1039709,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B6"
+            }
+          ]
+        },
+        {
+          "editionNumber": 12,
+          "productName": "US5CN13M",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-04-13T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 1
+          },
+          "fileSize": 68919,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B5"
+            }
+          ]
+        },
+        {
+          "editionNumber": 2,
+          "productName": "NZ300661",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2016-06-02T00:00:00.0000000Z",
+              "updateApplicationDate": "2016-06-02T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 227612,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B7"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "NO3B2020",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-09-11T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-09-11T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 738192,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -954,54 +1020,107 @@
           ]
         },
         {
-          "editionNumber": 9,
-          "productName": "DE416080",
-          "updateNumbers": [
-            0,
-            1,
-            2
-          ],
-          "dates": [
-            {
-              "issueDate": "2019-06-14T00:00:00.0000000Z",
-              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
-              "updateNumber": 0
-            },
-            {
-              "issueDate": "2020-04-22T00:00:00.0000000Z",
-              "updateNumber": 1
-            },
-            {
-              "issueDate": "2020-10-28T00:00:00.0000000Z",
-              "updateNumber": 2
-            }
-          ],
-          "fileSize": 770543,
-          "bundle": [
-            {
-              "bundleType": "DVD",
-              "location": "M2;B3"
-            }
-          ]
-        },
-        {
-          "editionNumber": 1,
-          "productName": "DE260001",
+          "editionNumber": 2,
+          "productName": "RU3P0ZM0",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2009-05-15T00:00:00.0000000Z",
-              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "issueDate": "2017-10-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-10-10T00:00:00.0000000Z",
               "updateNumber": 0
             }
           ],
-          "fileSize": 734003200,
+          "fileSize": 130514,
           "bundle": [
             {
               "bundleType": "DVD",
-              "location": "M2;B4"
+              "location": "M1;B4"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "FR570300",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-02-25T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-02-25T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 314452,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B1"
+            }
+          ]
+        },
+        {
+          "editionNumber": 13,
+          "productName": "SE6IIFE1",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-26T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-26T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 7215,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B1"
+            }
+          ]
+        },
+        {
+          "editionNumber": 9,
+          "productName": "KR676D03",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-12-24T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-12-24T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 124432,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B9"
+            }
+          ]
+        },
+        {
+          "editionNumber": 4,
+          "productName": "GB20486A",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2016-11-11T00:00:00.0000000Z",
+              "updateApplicationDate": "2016-11-11T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 999003200,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
             }
           ]
         }

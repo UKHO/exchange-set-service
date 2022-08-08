@@ -1,0 +1,25 @@
+NEW ZEALAND HYDROGRAPHIC AUTHORITY
+
+NZ300661 - NZ661 - SOUTH ISLAND - EAST COAST - APPROACHES TO OTAGO HARBOUR
+
+INDEX:
+SATELLITE-DERIVED POSITIONS
+NAVIGATIONAL AIDS
+MARINE FARMS
+VOLUNTARY CODE
+
+
+SATELLITE DERIVED POSITIONS
+Positions obtained from satellite navigation systems referred to WGS 84 Datum can be plotted directly onto this chart.  Caution must be exercised in the transfer of geographical positions to other charts not in terms of WGS 84 Datum.
+
+NAVIGATIONAL AIDS
+Certain lights, buoys and beacons in the inner waters and channels are not shown on this chart. For these the larger scale charts must be consulted.
+
+MARINE FARMS
+Marine Farms presenting a hazard to navigation may be encountered in inshore waters.  These farms are generally marked by buoys, beacons and lights.  Mariners are warned that not all farms may be shown on this chart.
+
+VOLUNTARY CODE
+Vessels laden with oil or other harmful liquid substances in bulk are to keep at least 5 nautical miles off the land, any charted danger, or any outlying island(s), until reaching the position where alteration is required to make port.
+
+
+END OF FILE

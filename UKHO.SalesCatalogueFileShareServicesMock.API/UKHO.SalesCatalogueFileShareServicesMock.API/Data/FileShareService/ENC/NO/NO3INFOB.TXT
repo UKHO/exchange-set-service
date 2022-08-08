@@ -1,0 +1,11 @@
+Kartinnhold
+
+Denne ENC er ikke beregnet for navigasjon nær kysten og i indre 
+farvann grunnet målestokk og generalisering. Alle detaljer er ikke vist. 
+ENC i bedre målestokk må benyttes når en nærmer seg grunne områder 
+avgrenset av 20 meters dybdekontur.
+
+Navigasjonshjelpemidler
+
+Fyrbelysning og oppmerkingen i denne ENC er kun ment for navigasjon i 
+åpent farvann.

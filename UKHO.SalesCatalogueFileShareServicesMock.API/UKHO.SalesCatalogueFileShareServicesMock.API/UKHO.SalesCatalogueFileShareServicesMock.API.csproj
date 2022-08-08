@@ -262,5 +262,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\FileShareService\ENC\FR\" />
+  </ItemGroup>
+
 
 </Project>
