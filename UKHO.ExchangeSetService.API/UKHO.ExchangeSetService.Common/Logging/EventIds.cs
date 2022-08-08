@@ -636,7 +636,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805157 - Large exchange set is created with error.
         /// </summary>
-        LargeExchangeSetCreatedWithError = 805157
+        LargeExchangeSetCreatedWithError = 805157,
+         /// <summary>
+         /// 805158 - BundleInfoValidation failed.
+         /// </summary>
+        BundleInfoValidationFailed = 805158
     }
 
     public static class EventIdExtensions

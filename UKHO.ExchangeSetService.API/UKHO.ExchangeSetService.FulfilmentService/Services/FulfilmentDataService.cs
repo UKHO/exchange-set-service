@@ -131,7 +131,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName);
             if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
             {
-                throw new ArgumentException("Product response data validation failed", response.ValidationtFailedMessage);
+                throw new FulfilmentException(EventIds.BundleInfoValidationFailed.ToEventId());
             }
 
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
