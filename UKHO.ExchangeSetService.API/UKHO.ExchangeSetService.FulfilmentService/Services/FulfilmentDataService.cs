@@ -155,7 +155,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             List<Task<bool>> parallelZipUploadTasks = new List<Task<bool>> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
-                string dvdNumber = rootDirectoryFolder.ToString().Substring(rootDirectoryFolder.ToString().Length - 4).Remove(1, 3);
+                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
                 parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), largeMediaExchangeSetFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
             });
 
@@ -399,7 +399,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task DownloadLargeMediaReadMeFile(string batchId, string exchangeSetPath, string correlationId)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && IsNumeric(di.Name[^(di.Name.Count()-1)..]));
 
             List<string> encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
@@ -426,14 +426,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
-                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
-
                           var rootLastDirectoryPath = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                                                   .LastOrDefault(di => di.Name.StartsWith("M0"));
 
+                          var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
+                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && IsNumeric(di.Name[^(di.Name.Count()-1)..]));
+
                           var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath.ToString())
-                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && IsNumeric(di.Name[^(di.Name.Count()-1)..]));
 
                           string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(rootLastDirectoryPath.ToString(), "B"), "");
 
@@ -456,7 +456,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && IsNumeric(di.Name[^(di.Name.Count()-1)..]));
 
             List<string> encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
@@ -501,6 +501,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       batchId, correlationId);
             }
             return isZipFileUploaded;
+        }
+        private static bool IsNumeric(object Expression)
+        {
+            bool isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out _);
+            return isNum;
         }
     }
 }
