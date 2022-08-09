@@ -1225,8 +1225,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenValidCommitAndGetBatchStatusForLargeMediaExchangeSet_ThenReturnTrue()
         {
-            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
-            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
+            fakeFileShareConfig.Value.PosBatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.PosBatchCommitDelayTimeInMilliseconds = 100;
 
             var responseBatchStatusModel = GetBatchStatusResponse();
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
@@ -1250,8 +1250,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenInvalidCommitAndGetBatchStatusForLargeMediaExchangeSet_ThenReturnFulfilmentException()
         {
-            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
-            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
+            fakeFileShareConfig.Value.PosBatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.PosBatchCommitDelayTimeInMilliseconds = 100;
             var badCommitBatchResponse = new HttpResponseMessage()
             {
                 StatusCode = HttpStatusCode.BadRequest,
@@ -1276,8 +1276,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenBatchFailedForLargeMediaExchangeSet_ThenReturnFulfilmentException()
         {
-            fakeFileShareConfig.Value.BatchCommitCutOffTimeInMinutes = 30;
-            fakeFileShareConfig.Value.BatchCommitDelayTimeInMilliseconds = 100;
+            fakeFileShareConfig.Value.PosBatchCommitCutOffTimeInMinutes = 30;
+            fakeFileShareConfig.Value.PosBatchCommitDelayTimeInMilliseconds = 100;
             var responseBatchStatusModel = GetBatchStatusFailedResponse();
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };

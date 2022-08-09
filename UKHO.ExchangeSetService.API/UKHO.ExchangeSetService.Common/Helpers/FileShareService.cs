@@ -916,7 +916,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 };
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                while (batchStatus != BatchStatus.Committed && watch.Elapsed.TotalMinutes <= fileShareServiceConfig.Value.BatchCommitCutOffTimeInMinutes)
+                while (batchStatus != BatchStatus.Committed && watch.Elapsed.TotalMinutes <= fileShareServiceConfig.Value.PosBatchCommitCutOffTimeInMinutes)
                 {
                     batchStatus = await GetLargeMediaBatchStatus(batchStatusMetaData, correlationId);
                     if (batchStatus == BatchStatus.Failed)
@@ -925,7 +925,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
                         throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
                     }
-                    await Task.Delay(fileShareServiceConfig.Value.BatchCommitDelayTimeInMilliseconds);
+                    await Task.Delay(fileShareServiceConfig.Value.PosBatchCommitDelayTimeInMilliseconds);
                 }
                 if (batchStatus != BatchStatus.Committed)
                 {
