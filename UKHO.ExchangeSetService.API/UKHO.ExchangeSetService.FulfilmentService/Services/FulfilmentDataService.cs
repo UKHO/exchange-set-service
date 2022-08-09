@@ -121,22 +121,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
-            var largeMediaExchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+            var largeMediaExchangeSetFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
 
             LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName);
 
-            var rootDirectorys = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
+            var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
                                                   .Where(di => di.Name.StartsWith("M0"));
 
             List<Task> ParallelCreateFolderTasks = new List<Task> { };
-            Parallel.ForEach(rootDirectorys, rootDirectoryFolder =>
+            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
-                string dvdNumber = rootDirectoryFolder.ToString().Substring(rootDirectoryFolder.ToString().Length - 4).Remove(1, 3);
+                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
 
                 ParallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
                 ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, dvdNumber.ToString()));
                 ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
             });
 
@@ -144,7 +144,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             ParallelCreateFolderTasks.Clear();
 
             List<Task> ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
-            Parallel.ForEach(rootDirectorys, rootDirectoryFolder =>
+            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
                 ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
             });
@@ -153,10 +153,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             ParallelCreateFolderTaskForCatlogFile.Clear();
 
             List<Task<bool>> parallelZipUploadTasks = new List<Task<bool>> { };
-            Parallel.ForEach(rootDirectorys, rootDirectoryFolder =>
+            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
                 string dvdNumber = rootDirectoryFolder.ToString().Substring(rootDirectoryFolder.ToString().Length - 4).Remove(1, 3);
-                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), largeMediaExchangeSetZipFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
+                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), largeMediaExchangeSetFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
             });
 
             await Task.WhenAll(parallelZipUploadTasks);
@@ -165,7 +165,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (isZipAndUploadSuccessful)
             {
                 parallelZipUploadTasks.Clear();
-                var isBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(message.BatchId, largeMediaExchangeSetZipFilePath, message.CorrelationId);
+                var isBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(message.BatchId, largeMediaExchangeSetFilePath, message.CorrelationId);
                 if (isBatchCommitted)
                 {
                     logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Large media exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
@@ -417,7 +417,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             ParallelCreateFolderTasks.Clear();
         }
 
-        private async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
+        private async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string rootfolder, string correlationId)
         {
             DateTime createLargeMediaSerialEncFileTaskStartedAt = DateTime.UtcNow;
 
@@ -426,24 +426,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          var baseDirectorys = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
+                          var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
+                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
 
-                          string isBaseLastDirectoryPath = exchangeSetPath.Replace("M01", "M02");
-                          string baseLastDirectoryPath = isBaseLastDirectoryPath;
-                          if (!Directory.Exists(isBaseLastDirectoryPath))
-                          {
-                              baseLastDirectoryPath = exchangeSetPath;
-                          }
-                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(baseLastDirectoryPath)
-                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString().Substring(di.Name.ToString().Length - 1))));
+                          var rootLastDirectoryPath = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
+                                                  .LastOrDefault(di => di.Name.StartsWith("M0"));
 
-                          string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(baseLastDirectoryPath, "B"), "");
+                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath.ToString())
+                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+
+                          string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(rootLastDirectoryPath.ToString(), "B"), "");
 
                           List<Task<bool>> ParallelBaseFolderTasks = new List<Task<bool>> { };
-                          Parallel.ForEach(baseDirectorys, baseDirectoryFolder =>
+                          Parallel.ForEach(baseDirectoryies, baseDirectoryFolder =>
                           {
-                              string baseDirectoryNumber = baseDirectoryFolder.ToString().Replace(Path.Combine(exchangeSetPath, "B"), "");
+                              string baseDirectoryNumber = baseDirectoryFolder.ToString().Replace(Path.Combine(exchangeSetPath, rootfolder, "B"), "");
                               ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectoryFolder.ToString(), correlationId, baseDirectoryNumber.ToString(), lastBaseDirectoryNumber));
                           });
                           await Task.WhenAll(ParallelBaseFolderTasks);
