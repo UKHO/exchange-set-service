@@ -131,6 +131,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName);
             if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
             {
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", message.BatchId, message.CorrelationId, response.ValidationtFailedMessage);
                 throw new FulfilmentException(EventIds.BundleInfoValidationFailed.ToEventId());
             }
 
@@ -362,7 +364,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!result.Result.IsValid)
             {
                 largeExchangeSetDataResponse.ValidationtFailedMessage = result.Result.Errors[0].ToString();
-                logger.LogInformation(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 return largeExchangeSetDataResponse;
             }
 
