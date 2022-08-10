@@ -40,6 +40,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFileSystemHelper fakeFileSystemHelper;
         public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;
         public IProductDataValidator fakeproductDataValidator;
+        public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
         [SetUp]
         public void Setup()
@@ -285,7 +286,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedIsNotCreated()
+        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetIsNotCreated()
         {
             string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
@@ -311,7 +312,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedIsNotCreated()
+        public void WhenInvalidProductResponse_ThenReturnsLargeMediaExchangeSetIsNotCreated()
         {
             string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
@@ -319,8 +320,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => b1.Name).Returns("B1");
             A.CallTo(() => b2.Name).Returns("B2");
             IDirectoryInfo[] directoryInfos = { b1, b2 };
-            var validationMessage = new ValidationFailure("ProductIdentifiers", "Zip not created.");
-            validationMessage.ErrorCode = HttpStatusCode.NotModified.ToString();
+
+            var validationMessage = new ValidationFailure("Products", "Product validation failed")
+            {
+                ErrorCode = HttpStatusCode.BadRequest.ToString()
+            };
 
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
 
@@ -331,13 +335,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
             A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
-            A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
-            ////A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-           //// A.CallTo(() => fakeQueryFssService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            string largeExchangeSet = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
-
-            Assert.AreEqual("Large Media Exchange Set Is Not Created", largeExchangeSet);
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02"); });
         }
     }
 }

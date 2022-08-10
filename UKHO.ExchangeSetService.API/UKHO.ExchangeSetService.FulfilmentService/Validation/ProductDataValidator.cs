@@ -15,28 +15,26 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Validation
     {
         public ProductDataValidator()
         {
-            Int16 maxValue = 100,substringValue = 4;
+            Int16 maxValue = 100, substringValue = 4;
+
             RuleFor(p => p)
-              .Must(pi => pi != null)
-              .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-              .WithMessage("products cannot be null or empty.");
+              .Must(pi => pi != null && pi.Count > 0)
+              .WithMessage("Products cannot be null or empty.")
+              .WithErrorCode(HttpStatusCode.BadRequest.ToString());
 
             RuleForEach(p => p).ChildRules(orders =>
             {
                 orders.RuleForEach(x => x.Bundle).ChildRules(orders =>
                 {
                     orders.RuleFor(x => x.BundleType)
-                      .Must(p => p.Equals("DVD"))
-                      .When(p => string.IsNullOrWhiteSpace(p.BundleType))
-                      .WithMessage("BundleType value cannot not be empty and must be DVD.")
-                      .WithErrorCode(HttpStatusCode.InternalServerError.ToString());
+                      .Must(p => !string.IsNullOrWhiteSpace(p) && p.Equals("DVD"))
+                      .WithMessage("BundleType value cannot not be null or empty and must be DVD.")
+                      .WithErrorCode(HttpStatusCode.BadRequest.ToString());
 
                     orders.RuleFor(x => x.Location)
-                      .Must(p => !string.IsNullOrWhiteSpace(p))
-                      .WithMessage("Location cannot be null or empty")
-                      .Must(p => (p.StartsWith("M1;B") || p.StartsWith("M2;B")) && Convert.ToInt16(p[^(p.Length-substringValue)..]) > 0 && Convert.ToInt16(p[^(p.Length-substringValue)..]) < maxValue)
+                      .Must(p => !string.IsNullOrWhiteSpace(p) && (p.StartsWith("M1;B") || p.StartsWith("M2;B")) && Convert.ToInt16(p[^(p.Length-substringValue)..]) > 0 && Convert.ToInt16(p[^(p.Length-substringValue)..]) < maxValue)
                       .WithMessage(x => $" Location must starts with M1 or M2 and Base must be in between B1 - B99; Product :  {x.BundleType}, Location : {x.Location}")
-                      .WithErrorCode(HttpStatusCode.InternalServerError.ToString());
+                      .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                 });
             });
         }
