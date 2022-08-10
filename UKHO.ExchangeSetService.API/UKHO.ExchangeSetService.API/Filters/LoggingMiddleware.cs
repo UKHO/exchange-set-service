@@ -21,8 +21,8 @@ namespace UKHO.ExchangeSetService.API.Filters
     {
         private const string RedactedValue = "********";
         private static readonly string[] HeadersToRedact = { "userpass", "token" };
-        private const int maxBodyCharSize = 1000;
-        private const int truncatedBodyCharSize = 987;
+        private const int MaxBodyCharSize = 1000;
+        private const int TruncatedBodyCharSize = 987;
 
         public static IApplicationBuilder UseErrorLogging(this IApplicationBuilder appBuilder, ILoggerFactory loggerFactory)
         {
@@ -120,17 +120,14 @@ namespace UKHO.ExchangeSetService.API.Filters
             var bodyAsString = await ReadAndResetStream(responseBody);
             if (!string.IsNullOrEmpty(bodyAsString))
             {
-                foreach (var propertyToRedact in HeadersToRedact)
+                foreach (var propertyToRedact in HeadersToRedact.Where(propertyToRedact => bodyAsString.Contains(propertyToRedact)))
                 {
-                    if (bodyAsString.Contains(propertyToRedact))
-                    {
-                        bodyAsString = RedactBody(propertyToRedact, bodyAsString, logger);
-                    }
+                    bodyAsString = RedactBody(propertyToRedact, bodyAsString, logger);
                 }
 
-                if (bodyAsString.Length > maxBodyCharSize)
+                if (bodyAsString.Length > MaxBodyCharSize)
                 {
-                    bodyAsString = bodyAsString.Remove(truncatedBodyCharSize) + "... Truncated";
+                    bodyAsString = bodyAsString.Remove(TruncatedBodyCharSize) + "... Truncated";
                 }
             }
 
