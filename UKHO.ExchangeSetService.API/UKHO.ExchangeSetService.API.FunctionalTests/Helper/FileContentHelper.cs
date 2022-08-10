@@ -366,16 +366,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                var FolderName = $"M0{mediaNumber}X02";
-                var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{FolderName}.zip";
+                    var FolderName = $"M0{mediaNumber}X02";
+                    var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{FolderName}.zip";
 
-                var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, FolderName);
+                    var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, FolderName);
 
-                var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-                var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
-                downloadFolderPath.Add(downloadFolderPath1);
+                    var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+                    var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
+                    downloadFolderPath.Add(downloadFolderPath1);
             }
-
             return downloadFolderPath;
         }
 
@@ -387,6 +386,57 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
             Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
             Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
+        }
+
+        public static void CheckCatalogueFileContentForLargeMedia(string inputFile, ScsProductResponseModel scsResponse)
+        {
+            List<string> scsCatalogueFilesPath = new List<string>();
+            string catalogueFileContent = File.ReadAllText(inputFile);
+
+            foreach (var item in scsResponse.Products)
+            {
+                string productName = item.ProductName;
+                string editionNumber = item.EditionNumber.ToString();
+                //Get Countrycode
+                string countryCode = productName.Substring(0, 2);
+
+                //Get folder path
+                string editionFolderPath = Path.Combine(Path.GetDirectoryName(inputFile), countryCode, productName);
+
+                ////foreach (var updateNumber in item.UpdateNumbers)
+                ////{
+                    if (Directory.Exists(Path.Combine(editionFolderPath, editionNumber.ToString())))
+                    {
+                        scsCatalogueFilesPath.Add(productName + "\\" + editionNumber.ToString());
+                    }
+                ////}
+            }
+
+            foreach (var catalogueFilePath in scsCatalogueFilesPath)
+            {
+                Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
+            }
+        }
+
+        public static async Task<HttpResponseMessage> CreateErrorFileValidation(HttpResponseMessage apiEssResponse, string FssJwtToken)
+        {
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+            var batchId = batchStatusUrl.Split('/')[5];
+
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
+
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.POSConfig.ErrorFileName}";
+
+            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: FssJwtToken);
+
+            return response;
         }
     }
 }

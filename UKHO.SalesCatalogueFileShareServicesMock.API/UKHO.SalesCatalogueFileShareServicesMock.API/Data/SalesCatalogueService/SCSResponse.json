@@ -1007,5 +1007,218 @@
         }
       ]
     }
+  },
+  {
+    "id": "productIdentifier-DE521900",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 12,
+          "productName": "DE521900",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2017-01-13T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 193039,
+          "bundle": [
+            {
+              "bundleType": "ABC",
+              "location": "M2;B8"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-CA172005",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "CA172005",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-06-04T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-06-04T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 1039709,
+          "bundle": [
+            {
+              "bundleType": "",
+              "location": "M2;B6"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-US5CN13M",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 12,
+          "productName": "US5CN13M",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-04-13T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 1
+          },
+          "fileSize": 68919,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M0;B5"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-NZ300661",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "NZ300661",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2016-06-02T00:00:00.0000000Z",
+              "updateApplicationDate": "2016-06-02T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 227612,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B100"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-NO3B2020",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "NO3B2020",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-09-11T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-09-11T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 738192,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "MA;B2"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-RU3P0ZM0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "RU3P0ZM0",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2017-10-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-10-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 130514,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;BA"
+            }
+          ]
+        }
+      ]
+    }
   }
+
 ]
