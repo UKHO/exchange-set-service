@@ -354,6 +354,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     CreateLargeExchangeSetCatalogEntry(listItem, orderPreference, catBuilder, salesCatalogueDataResponse, salesCatalogueProductResponse, exchangeSetRootPath, batchId, correlationId);
                 }
             }
+            else
+            {
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
+            }
 
             IDirectoryInfo directoryInfo = fileSystemHelper.GetParent(Path.GetDirectoryName(exchangeSetRootPath));
             var path = directoryInfo.Name;
