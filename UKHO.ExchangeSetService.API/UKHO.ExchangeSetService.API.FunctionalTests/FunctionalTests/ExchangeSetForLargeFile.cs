@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using System.Net.Http;
 using System.IO;
-using System.Threading;
+////using System.Threading;
 using System.Collections.Generic;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
@@ -39,7 +39,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsJwtToken = await authTokenProvider.GetScsToken();
             DataHelper = new DataHelper();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForLargeMedia(), accessToken: EssJwtToken);
-            Thread.Sleep(20000); //File creation takes time as we are using 10 products now.
+            ////Thread.Sleep(20000); //File creation takes time as we are using 10 products now.
             //Get the BatchId
             var batchId = await ApiEssResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);
