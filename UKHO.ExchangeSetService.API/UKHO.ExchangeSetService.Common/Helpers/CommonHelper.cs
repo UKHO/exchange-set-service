@@ -97,5 +97,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
                 });
         }
+        public static bool IsNumeric(object Expression)
+        {
+            bool isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out _);
+            return isNum;
+        }
     }
 }

@@ -1,0 +1,12 @@
+S-57 DATASETS ON UNSPECIFIED DATUM
+
+Positions obtained from Global Navigation Satellite Systems, such as
+GPS, are normally referred to WGS84 Datum. The differences between
+satellite-derived positions and positions on this cell cannot be
+accurately determined; the estimated value of the difference for this
+region of the chart is shown in the INFORM attribute. Mariners are
+warned that these differences MAY BE SIGNIFICANT TO
+NAVIGATION and are therefore advised to confirm GPS positions
+shown in the chart display using alternative navigational techniques
+particularly when closing the shore or navigating in the vicinity of
+dangers.

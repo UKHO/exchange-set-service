@@ -346,7 +346,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X04"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
         public static async Task<List<string>> CreateExchangeSetFileForLargeMedia(HttpResponseMessage apiEssResponse, string FssJwtToken)
@@ -387,6 +387,33 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
             Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
             Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
+        }
+
+        public static void CheckCatalogueFileContentForLargeMedia(string inputFile, ScsProductResponseModel scsResponse)
+        {
+            List<string> scsCatalogueFilesPath = new List<string>();
+            string catalogueFileContent = File.ReadAllText(inputFile);
+
+            foreach (var item in scsResponse.Products)
+            {
+                string productName = item.ProductName;
+                string editionNumber = item.EditionNumber.ToString();
+                //Get Countrycode
+                string countryCode = productName.Substring(0, 2);
+
+                //Get folder path
+                string editionFolderPath = Path.Combine(Path.GetDirectoryName(inputFile), countryCode, productName);
+
+                if (Directory.Exists(Path.Combine(editionFolderPath, editionNumber.ToString())))
+                {
+                    scsCatalogueFilesPath.Add(productName + "\\" + editionNumber.ToString());
+                }
+            }
+
+            foreach (var catalogueFilePath in scsCatalogueFilesPath)
+            {
+                Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
+            }
         }
     }
 }
