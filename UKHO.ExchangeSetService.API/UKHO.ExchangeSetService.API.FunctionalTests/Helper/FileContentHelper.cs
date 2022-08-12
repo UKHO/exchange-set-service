@@ -366,10 +366,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                    var FolderName = $"M0{mediaNumber}X02";
-                    var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{FolderName}.zip";
+                    var folderName = $"M0{mediaNumber}X02";
+                    var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{folderName}.zip";
 
-                    var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, FolderName);
+                    var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, folderName);
 
                     var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
                     var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
@@ -403,13 +403,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 //Get folder path
                 string editionFolderPath = Path.Combine(Path.GetDirectoryName(inputFile), countryCode, productName);
 
-                ////foreach (var updateNumber in item.UpdateNumbers)
-                ////{
-                    if (Directory.Exists(Path.Combine(editionFolderPath, editionNumber.ToString())))
-                    {
-                        scsCatalogueFilesPath.Add(productName + "\\" + editionNumber.ToString());
-                    }
-                ////}
+                if (Directory.Exists(Path.Combine(editionFolderPath, editionNumber.ToString())))
+                {
+                   scsCatalogueFilesPath.Add(productName + "\\" + editionNumber.ToString());
+                }
             }
 
             foreach (var catalogueFilePath in scsCatalogueFilesPath)
