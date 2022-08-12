@@ -263,7 +263,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
                 var basefolders = fileSystemHelper.GetDirectoryInfo(folderpath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() == 2 && char.IsDigit(Convert.ToChar(di.Name.ToString()[^1..])));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Count()-1)..]));
 
                 string mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
                 mediaFileContent += Environment.NewLine;
