@@ -359,11 +359,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             LargeExchangeSetDataResponse largeExchangeSetDataResponse = new LargeExchangeSetDataResponse();
             var response = await DownloadSalesCatalogueResponse(message);
 
-            Task<ValidationResult> result = productDataValidator.Validate(response.Products);
+            Task<ValidationResult> validationResult = productDataValidator.Validate(response.Products);
 
-            if (!result.Result.IsValid)
+            if (!validationResult.Result.IsValid)
             {
-                largeExchangeSetDataResponse.ValidationtFailedMessage = result.Result.Errors[0].ToString();
+                largeExchangeSetDataResponse.ValidationtFailedMessage = validationResult.Result.Errors[0].ToString();
                 return largeExchangeSetDataResponse;
             }
 
