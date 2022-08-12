@@ -240,4 +240,18 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
     </notes>
     <cve>CVE-2020-1045</cve>
   </suppress>
+    <suppress>
+    <notes>
+      <![CDATA[
+        file name:  Azure.Storage.Blobs:12.13.0
+        See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
+            Package name: Azure.Storage.Blobs (included as part of the .Net Core runtime)
+            Vulnerable versions: 12.10.0 and below
+       This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. MSI is pinned to .Net core SDK > 3.1.408 for .NET and Visual Studio Information Disclosure Vulnerability.
+       This is a temporary suppression pending a fix being available.
+       Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=53813
+      ]]>
+    </notes>
+    <cve>CVE-2022-30187</cve>
+  </suppress>
 </suppressions>
