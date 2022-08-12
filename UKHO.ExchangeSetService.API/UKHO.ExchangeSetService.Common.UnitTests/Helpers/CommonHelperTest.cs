@@ -138,5 +138,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
 
         }
+
+        [Test]
+        public void CheckValueIsNumeric()
+        {
+            bool isNum = CommonHelper.IsNumeric(1234);
+            Assert.IsTrue(isNum);
+        }
     }
 }
