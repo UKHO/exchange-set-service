@@ -13,7 +13,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string EssJwtToken { get; set; }
         private string FssJwtToken { get; set; }
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        private FssApiClient FssApiClient { get; set; }
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
@@ -24,7 +23,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
-            FssApiClient = new FssApiClient();
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
