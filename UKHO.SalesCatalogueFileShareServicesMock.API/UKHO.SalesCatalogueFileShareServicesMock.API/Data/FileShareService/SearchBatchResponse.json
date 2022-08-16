@@ -1,6 +1,6 @@
 {
-  "count": 35,
-  "total": 35,
+  "count": 54,
+  "total": 54,
   "entries": [
     {
       "batchId": "a07537ff-ffa2-4565-8f0e-96e61e70a9fc",
@@ -27224,6 +27224,2058 @@
           "links": {
             "get": {
               "href": "/batch/856b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "abce34ae-4c44-490e-a791-cb2c0a2a3ddb",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "FR"
+        },
+        {
+          "key": "CellName",
+          "value": "FR570300"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "b1798b03-5df2-458f-90c4-098b78b946cb"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-10-21T11:22:16.587Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "FRM70300.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "132pAhBuKEO8uJ8dNQNztA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/abce34ae-4c44-490e-a791-cb2c0a2a3ddb/files/FRM70300.000"
+            }
+          }
+        },
+        {
+          "filename": "FR570300.000",
+          "fileSize": 232896,
+          "mimeType": "application/s63",
+          "hash": "RGBhSZ/Z4cF397zOcozbIw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "9633BB70"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/abce34ae-4c44-490e-a791-cb2c0a2a3ddb/files/FR570300.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "9a6a97b1-7985-4167-b19d-24fc507b6fee",
+      "status": "Committed",
+      "allFilesZipSize": 30219,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB20486A"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "86db229b-64d6-40d9-98f0-172d6decfc2e"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-07-08T18:31:55.273Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GBDADRNA.TXT",
+          "fileSize": 257,
+          "mimeType": "text/plain",
+          "hash": "BvldVoHY+JauBkZePG+YBQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/9a6a97b1-7985-4167-b19d-24fc507b6fee/files/GBDADRNA.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB621116.TXT",
+          "fileSize": 641,
+          "mimeType": "text/plain",
+          "hash": "rbdUGFiu6T7iT2DsiOnA0A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/9a6a97b1-7985-4167-b19d-24fc507b6fee/files/GB621116.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBUNSDAT.TXT",
+          "fileSize": 645,
+          "mimeType": "text/plain",
+          "hash": "i5NIuXF+FoJ90uucELH5UQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/9a6a97b1-7985-4167-b19d-24fc507b6fee/files/GBUNSDAT.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBJ0486A.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "uuwAgq13Ggsh54fj2AKmDg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/9a6a97b1-7985-4167-b19d-24fc507b6fee/files/GBJ0486A.000"
+            }
+          }
+        },
+        {
+          "filename": "GB20486A.000",
+          "fileSize": 27280,
+          "mimeType": "application/s63",
+          "hash": "KwDqEIuJOAKx898J0udBKw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "390DFD3B"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/9a6a97b1-7985-4167-b19d-24fc507b6fee/files/GB20486A.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "1f0d307d-79ea-4892-9e01-63f8b9d3dcf7",
+      "status": "Committed",
+      "allFilesZipSize": 118152,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "KR"
+        },
+        {
+          "key": "CellName",
+          "value": "KR676D03"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "9"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "c51a3c21-f733-425f-82c1-bc3758ae7dad"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-04-13T15:28:38.113Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "KRN76D03.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "Ow4cc7G2P/7ruFFY0Hoa1Q==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1f0d307d-79ea-4892-9e01-63f8b9d3dcf7/files/KRN76D03.000"
+            }
+          }
+        },
+        {
+          "filename": "KR676D03.000",
+          "fileSize": 117056,
+          "mimeType": "application/s63",
+          "hash": "v/ortnA/vqRMbTXD3YXm/g==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "615D2500"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/1f0d307d-79ea-4892-9e01-63f8b9d3dcf7/files/KR676D03.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "3d49dbb2-d012-4be8-b6b9-f894f8043deb",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "NZ"
+        },
+        {
+          "key": "CellName",
+          "value": "NZ300661"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "44ffa946-2da5-4b1e-bda9-e09be5db0323"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-10-21T11:22:21.087Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "NZCAU009.TXT",
+          "fileSize": 285,
+          "mimeType": "text/plain",
+          "hash": "zZDECj+tysL+J5wBMb0SqA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3d49dbb2-d012-4be8-b6b9-f894f8043deb/files/NZCAU009.TXT"
+            }
+          }
+        },
+        {
+          "filename": "NZK00661.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "dVMSE9XerNKSrJiD58Wqng==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3d49dbb2-d012-4be8-b6b9-f894f8043deb/files/NZK00661.000"
+            }
+          }
+        },
+        {
+          "filename": "NZPUB512.TXT",
+          "fileSize": 1145,
+          "mimeType": "text/plain",
+          "hash": "ODdMbgNizRoCJpMqQFaytA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3d49dbb2-d012-4be8-b6b9-f894f8043deb/files/NZPUB512.TXT"
+            }
+          }
+        },
+        {
+          "filename": "NZ300661.000",
+          "fileSize": 220472,
+          "mimeType": "application/s63",
+          "hash": "fWHgDbYv5TAcCm8JFAjp4w==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "E72E3018"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/3d49dbb2-d012-4be8-b6b9-f894f8043deb/files/NZ300661.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "6c06bfd8-16b2-44c4-8748-013d6c8da6ee",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "SE"
+        },
+        {
+          "key": "CellName",
+          "value": "SE6IIFE1"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "13"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "6cba5863-e5b3-45ea-9e66-1e289bd15e10"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-10-21T11:22:19.28Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "SENIIFE1.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "IZl+jzd4xkU6XJnNbbEYmw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6c06bfd8-16b2-44c4-8748-013d6c8da6ee/files/SENIIFE1.000"
+            }
+          }
+        },
+        {
+          "filename": "SE61TINF.TXT",
+          "fileSize": 1573,
+          "mimeType": "text/plain",
+          "hash": "2DdEBzSzAEjkRXd/e5NO0g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6c06bfd8-16b2-44c4-8748-013d6c8da6ee/files/SE61TINF.TXT"
+            }
+          }
+        },
+        {
+          "filename": "SE6IIFE1.000",
+          "fileSize": 4768,
+          "mimeType": "application/s63",
+          "hash": "5tCZO/KvIlOyDjhuaz479w==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "D779A187"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/6c06bfd8-16b2-44c4-8748-013d6c8da6ee/files/SE6IIFE1.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "abce34ae-4c44-490e-a791-cb2c0a2a3ddb",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "FR"
+        },
+        {
+          "key": "CellName",
+          "value": "FR570300"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "b1798b03-5df2-458f-90c4-098b78b946cb"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-10-21T11:22:16.587Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "FRM70300.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "132pAhBuKEO8uJ8dNQNztA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/abce34ae-4c44-490e-a791-cb2c0a2a3ddb/files/FRM70300.000"
+            }
+          }
+        },
+        {
+          "filename": "FR570300.000",
+          "fileSize": 232896,
+          "mimeType": "application/s63",
+          "hash": "RGBhSZ/Z4cF397zOcozbIw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "9633BB70"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/abce34ae-4c44-490e-a791-cb2c0a2a3ddb/files/FR570300.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "92e6a40c-9674-4cfc-be25-49aa50435c44",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "RU"
+        },
+        {
+          "key": "CellName",
+          "value": "RU3P0ZM0"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "3a2cfb3b-3d29-4665-98de-d150bd06b13d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-10-21T11:22:14Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "RUKP0ZM0.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "9aSRCsX/fvXMCAI3nkOgiQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/92e6a40c-9674-4cfc-be25-49aa50435c44/files/RUKP0ZM0.000"
+            }
+          }
+        },
+        {
+          "filename": "RU3P0ZM0.000",
+          "fileSize": 129640,
+          "mimeType": "application/s63",
+          "hash": "IvW60xNoetrYfp9ltTj99A==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "48F593A1"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/92e6a40c-9674-4cfc-be25-49aa50435c44/files/RU3P0ZM0.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "a8814b5e-9ea3-4327-9023-53293f37c96f",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "NO"
+        },
+        {
+          "key": "CellName",
+          "value": "NO3B2020"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "a8de1a20-057a-4b3a-b6f4-eca21e85d357"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-10-21T11:21:41.243Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "NO3INFOB.TXT",
+          "fileSize": 379,
+          "mimeType": "text/plain",
+          "hash": "ySj7Jz+gi2Fu3rgiPJWZTA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a8814b5e-9ea3-4327-9023-53293f37c96f/files/NO3INFOB.TXT"
+            }
+          }
+        },
+        {
+          "filename": "NO3INFOA.TXT",
+          "fileSize": 409,
+          "mimeType": "text/plain",
+          "hash": "3kbIdMDZiz+jd0gR/R6FMw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a8814b5e-9ea3-4327-9023-53293f37c96f/files/NO3INFOA.TXT"
+            }
+          }
+        },
+        {
+          "filename": "NOKB2020.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "zld4gZU1Yihhfq7XXmOTxw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a8814b5e-9ea3-4327-9023-53293f37c96f/files/NOKB2020.000"
+            }
+          }
+        },
+        {
+          "filename": "NO3B2020.000",
+          "fileSize": 641672,
+          "mimeType": "application/s63",
+          "hash": "u9LyfZ+0lp29xKE2yCmCAg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "5DCD4C09"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/a8814b5e-9ea3-4327-9023-53293f37c96f/files/NO3B2020.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "8945fb51-576d-4127-a2a8-4ecc16d57918",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "US"
+        },
+        {
+          "key": "CellName",
+          "value": "US5CN13M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7588f8b7-88f9-4acb-9e38-78796909e468"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T09:30:10.727Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US5CN13D.TXT",
+          "fileSize": 420,
+          "mimeType": "text/plain",
+          "hash": "UN24nkyrr7okk2z0NSXYNw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8945fb51-576d-4127-a2a8-4ecc16d57918/files/US5CN13D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13C.TXT",
+          "fileSize": 712,
+          "mimeType": "text/plain",
+          "hash": "mzoxEEV/1t9ScYoM5GPPXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8945fb51-576d-4127-a2a8-4ecc16d57918/files/US5CN13C.TXT"
+            }
+          }
+        },
+        {
+          "filename": "USMCN13M.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "uir5kW9GvrywKxaZOx8s4g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8945fb51-576d-4127-a2a8-4ecc16d57918/files/USMCN13M.000"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13A.TXT",
+          "fileSize": 4167,
+          "mimeType": "text/plain",
+          "hash": "zS9DmHydLkdqPuyES82OwA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8945fb51-576d-4127-a2a8-4ecc16d57918/files/US5CN13A.TXT"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13M.000",
+          "fileSize": 60688,
+          "mimeType": "application/s63",
+          "hash": "+DUZyKp/QKFObGHwdIHiwQ==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "251663E1"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/8945fb51-576d-4127-a2a8-4ecc16d57918/files/US5CN13M.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "b5a9caba-4d4d-4733-b176-cf725d7d9461",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "US"
+        },
+        {
+          "key": "CellName",
+          "value": "US5CN13M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7588f8b7-88f9-4acb-9e38-78796909e468"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T09:30:10.723Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US5CN13D.TXT",
+          "fileSize": 420,
+          "mimeType": "text/plain",
+          "hash": "UN24nkyrr7okk2z0NSXYNw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/b5a9caba-4d4d-4733-b176-cf725d7d9461/files/US5CN13D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13C.TXT",
+          "fileSize": 712,
+          "mimeType": "text/plain",
+          "hash": "mzoxEEV/1t9ScYoM5GPPXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/b5a9caba-4d4d-4733-b176-cf725d7d9461/files/US5CN13C.TXT"
+            }
+          }
+        },
+        {
+          "filename": "USMCN13M.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "uir5kW9GvrywKxaZOx8s4g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/b5a9caba-4d4d-4733-b176-cf725d7d9461/files/USMCN13M.000"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13A.TXT",
+          "fileSize": 4167,
+          "mimeType": "text/plain",
+          "hash": "zS9DmHydLkdqPuyES82OwA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/b5a9caba-4d4d-4733-b176-cf725d7d9461/files/US5CN13A.TXT"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13M.000",
+          "fileSize": 60688,
+          "mimeType": "application/s63",
+          "hash": "+DUZyKp/QKFObGHwdIHiwQ==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "251663E1"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/b5a9caba-4d4d-4733-b176-cf725d7d9461/files/US5CN13M.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "4b87f8a0-bbe7-4f87-888e-7ad65a2fba8c",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA172005"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "70eb144a-83b7-45bc-abb1-be8d3323ba14"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T09:05:44.643Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "CAEA2005.TXT",
+          "fileSize": 627,
+          "mimeType": "text/plain",
+          "hash": "0cvNgOd6gWM4458VPkKFuA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/4b87f8a0-bbe7-4f87-888e-7ad65a2fba8c/files/CAEA2005.TXT"
+            }
+          }
+        },
+        {
+          "filename": "CAFA2005.TXT",
+          "fileSize": 728,
+          "mimeType": "text/plain",
+          "hash": "tNGCAkvUl2vjjqi/nOWFng==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/4b87f8a0-bbe7-4f87-888e-7ad65a2fba8c/files/CAFA2005.TXT"
+            }
+          }
+        },
+        {
+          "filename": "CAI72005.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "jbCb2LkLtRyv6u0dqGRj6A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/4b87f8a0-bbe7-4f87-888e-7ad65a2fba8c/files/CAI72005.000"
+            }
+          }
+        },
+        {
+          "filename": "CA172005.000",
+          "fileSize": 1037480,
+          "mimeType": "application/s63",
+          "hash": "LP37JELlnyLzSsgQ2SPxeA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "63D5F06B"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/4b87f8a0-bbe7-4f87-888e-7ad65a2fba8c/files/CA172005.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE521900"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "bfdf3824-a2b2-4b0f-b26c-8ac3878026e0"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:34:32.063Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEFER17E.TXT",
+          "fileSize": 145,
+          "mimeType": "text/plain",
+          "hash": "+YAbE8qQTCjW9D6QnifK+w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DEFER17E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFER17D.TXT",
+          "fileSize": 168,
+          "mimeType": "text/plain",
+          "hash": "v/Q0E8119lMHtZeExHw9Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DEFER17D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01D.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "zDOdb4i4FiQEth7uKWElXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DESLT01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01E.TXT",
+          "fileSize": 192,
+          "mimeType": "text/plain",
+          "hash": "vF8s2fOo6b1EJBJoJggy7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DESLT01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06D.TXT",
+          "fileSize": 286,
+          "mimeType": "text/plain",
+          "hash": "iZntZtM0TsfxiZHJZyHZ/A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DELTG06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06E.TXT",
+          "fileSize": 297,
+          "mimeType": "text/plain",
+          "hash": "IH4dG+zOy5bnWdJe7FVBXA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DELTG06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEM21900.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "wv13k0GoqNYZxIojGU5WaQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DEM21900.000"
+            }
+          }
+        },
+        {
+          "filename": "DE521900.000",
+          "fileSize": 164656,
+          "mimeType": "application/s63",
+          "hash": "oen/EK/ve56W1WyRWoRJHg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "BF2CBACA"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/3fd1aa2c-7259-4356-9cd3-ee9efcf1a63b/files/DE521900.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "e804d061-c65b-496f-bada-14313d967f84",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "US"
+        },
+        {
+          "key": "CellName",
+          "value": "US5CN13M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "32ebdb19-6b0f-42ff-87f4-3b50105dabb6"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-11T13:24:11.193Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US5CN13D.TXT",
+          "fileSize": 420,
+          "mimeType": "text/plain",
+          "hash": "UN24nkyrr7okk2z0NSXYNw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e804d061-c65b-496f-bada-14313d967f84/files/US5CN13D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13C.TXT",
+          "fileSize": 712,
+          "mimeType": "text/plain",
+          "hash": "mzoxEEV/1t9ScYoM5GPPXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e804d061-c65b-496f-bada-14313d967f84/files/US5CN13C.TXT"
+            }
+          }
+        },
+        {
+          "filename": "USMCN13M.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "uir5kW9GvrywKxaZOx8s4g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e804d061-c65b-496f-bada-14313d967f84/files/USMCN13M.000"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13A.TXT",
+          "fileSize": 4167,
+          "mimeType": "text/plain",
+          "hash": "zS9DmHydLkdqPuyES82OwA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e804d061-c65b-496f-bada-14313d967f84/files/US5CN13A.TXT"
+            }
+          }
+        },
+        {
+          "filename": "US5CN13M.000",
+          "fileSize": 60688,
+          "mimeType": "application/s63",
+          "hash": "+DUZyKp/QKFObGHwdIHiwQ==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "251663E1"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/e804d061-c65b-496f-bada-14313d967f84/files/US5CN13M.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "67bb19f9-1b38-4be9-b3e0-f97de868f141",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA172005"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "089a3eec-a19b-4ddf-a062-092e4db88c7a"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-11T13:02:42.31Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "CAEA2005.TXT",
+          "fileSize": 627,
+          "mimeType": "text/plain",
+          "hash": "0cvNgOd6gWM4458VPkKFuA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/67bb19f9-1b38-4be9-b3e0-f97de868f141/files/CAEA2005.TXT"
+            }
+          }
+        },
+        {
+          "filename": "CAFA2005.TXT",
+          "fileSize": 728,
+          "mimeType": "text/plain",
+          "hash": "tNGCAkvUl2vjjqi/nOWFng==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/67bb19f9-1b38-4be9-b3e0-f97de868f141/files/CAFA2005.TXT"
+            }
+          }
+        },
+        {
+          "filename": "CAI72005.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "jbCb2LkLtRyv6u0dqGRj6A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/67bb19f9-1b38-4be9-b3e0-f97de868f141/files/CAI72005.000"
+            }
+          }
+        },
+        {
+          "filename": "CA172005.000",
+          "fileSize": 1037480,
+          "mimeType": "application/s63",
+          "hash": "LP37JELlnyLzSsgQ2SPxeA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "63D5F06B"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/67bb19f9-1b38-4be9-b3e0-f97de868f141/files/CA172005.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "34f29442-c50b-4f7f-b129-fcf3388ee4cf",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE521900"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "e6b98aad-9d25-449d-880d-7e4441cebd5d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T14:36:16.757Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEFER17E.TXT",
+          "fileSize": 145,
+          "mimeType": "text/plain",
+          "hash": "+YAbE8qQTCjW9D6QnifK+w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DEFER17E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFER17D.TXT",
+          "fileSize": 168,
+          "mimeType": "text/plain",
+          "hash": "v/Q0E8119lMHtZeExHw9Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DEFER17D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01D.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "zDOdb4i4FiQEth7uKWElXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DESLT01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01E.TXT",
+          "fileSize": 192,
+          "mimeType": "text/plain",
+          "hash": "vF8s2fOo6b1EJBJoJggy7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DESLT01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06D.TXT",
+          "fileSize": 286,
+          "mimeType": "text/plain",
+          "hash": "iZntZtM0TsfxiZHJZyHZ/A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DELTG06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06E.TXT",
+          "fileSize": 297,
+          "mimeType": "text/plain",
+          "hash": "IH4dG+zOy5bnWdJe7FVBXA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DELTG06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEM21900.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "wv13k0GoqNYZxIojGU5WaQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DEM21900.000"
+            }
+          }
+        },
+        {
+          "filename": "DE521900.000",
+          "fileSize": 164656,
+          "mimeType": "application/s63",
+          "hash": "oen/EK/ve56W1WyRWoRJHg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "BF2CBACA"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/34f29442-c50b-4f7f-b129-fcf3388ee4cf/files/DE521900.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "1e2d1d15-b81e-4a0a-9bec-9dbde45691ba",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE521900"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "e6b98aad-9d25-449d-880d-7e4441cebd5d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T13:38:27.697Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEFER17E.TXT",
+          "fileSize": 145,
+          "mimeType": "text/plain",
+          "hash": "+YAbE8qQTCjW9D6QnifK+w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DEFER17E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFER17D.TXT",
+          "fileSize": 168,
+          "mimeType": "text/plain",
+          "hash": "v/Q0E8119lMHtZeExHw9Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DEFER17D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01D.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "zDOdb4i4FiQEth7uKWElXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DESLT01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01E.TXT",
+          "fileSize": 192,
+          "mimeType": "text/plain",
+          "hash": "vF8s2fOo6b1EJBJoJggy7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DESLT01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06D.TXT",
+          "fileSize": 286,
+          "mimeType": "text/plain",
+          "hash": "iZntZtM0TsfxiZHJZyHZ/A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DELTG06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06E.TXT",
+          "fileSize": 297,
+          "mimeType": "text/plain",
+          "hash": "IH4dG+zOy5bnWdJe7FVBXA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DELTG06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEM21900.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "wv13k0GoqNYZxIojGU5WaQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DEM21900.000"
+            }
+          }
+        },
+        {
+          "filename": "DE521900.000",
+          "fileSize": 164656,
+          "mimeType": "application/s63",
+          "hash": "oen/EK/ve56W1WyRWoRJHg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "BF2CBACA"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/1e2d1d15-b81e-4a0a-9bec-9dbde45691ba/files/DE521900.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "69f2e781-b56e-4887-ac96-6b1b3eb295c9",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE521900"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "0c05b7c5-3837-4eec-995a-e0131963452c"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T12:07:28.907Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEFER17E.TXT",
+          "fileSize": 145,
+          "mimeType": "text/plain",
+          "hash": "+YAbE8qQTCjW9D6QnifK+w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DEFER17E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFER17D.TXT",
+          "fileSize": 168,
+          "mimeType": "text/plain",
+          "hash": "v/Q0E8119lMHtZeExHw9Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DEFER17D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01D.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "zDOdb4i4FiQEth7uKWElXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DESLT01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01E.TXT",
+          "fileSize": 192,
+          "mimeType": "text/plain",
+          "hash": "vF8s2fOo6b1EJBJoJggy7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DESLT01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06D.TXT",
+          "fileSize": 286,
+          "mimeType": "text/plain",
+          "hash": "iZntZtM0TsfxiZHJZyHZ/A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DELTG06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06E.TXT",
+          "fileSize": 297,
+          "mimeType": "text/plain",
+          "hash": "IH4dG+zOy5bnWdJe7FVBXA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DELTG06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEM21900.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "wv13k0GoqNYZxIojGU5WaQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DEM21900.000"
+            }
+          }
+        },
+        {
+          "filename": "DE521900.000",
+          "fileSize": 164656,
+          "mimeType": "application/s63",
+          "hash": "oen/EK/ve56W1WyRWoRJHg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "BF2CBACA"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/69f2e781-b56e-4887-ac96-6b1b3eb295c9/files/DE521900.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "3a034739-b61f-4299-a098-e2f430417ece",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE521900"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "0c05b7c5-3837-4eec-995a-e0131963452c"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T11:11:35.653Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEFER17E.TXT",
+          "fileSize": 145,
+          "mimeType": "text/plain",
+          "hash": "+YAbE8qQTCjW9D6QnifK+w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DEFER17E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFER17D.TXT",
+          "fileSize": 168,
+          "mimeType": "text/plain",
+          "hash": "v/Q0E8119lMHtZeExHw9Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DEFER17D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01D.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "zDOdb4i4FiQEth7uKWElXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DESLT01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01E.TXT",
+          "fileSize": 192,
+          "mimeType": "text/plain",
+          "hash": "vF8s2fOo6b1EJBJoJggy7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DESLT01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06D.TXT",
+          "fileSize": 286,
+          "mimeType": "text/plain",
+          "hash": "iZntZtM0TsfxiZHJZyHZ/A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DELTG06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06E.TXT",
+          "fileSize": 297,
+          "mimeType": "text/plain",
+          "hash": "IH4dG+zOy5bnWdJe7FVBXA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DELTG06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEM21900.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "wv13k0GoqNYZxIojGU5WaQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DEM21900.000"
+            }
+          }
+        },
+        {
+          "filename": "DE521900.000",
+          "fileSize": 164656,
+          "mimeType": "application/s63",
+          "hash": "oen/EK/ve56W1WyRWoRJHg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "BF2CBACA"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/3a034739-b61f-4299-a098-e2f430417ece/files/DE521900.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "c08547a0-b716-492a-b32e-7a9007c2a6a1",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE521900"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "0c05b7c5-3837-4eec-995a-e0131963452c"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T10:57:27.067Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEFER17E.TXT",
+          "fileSize": 145,
+          "mimeType": "text/plain",
+          "hash": "+YAbE8qQTCjW9D6QnifK+w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DEFER17E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFER17D.TXT",
+          "fileSize": 168,
+          "mimeType": "text/plain",
+          "hash": "v/Q0E8119lMHtZeExHw9Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DEFER17D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01D.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "zDOdb4i4FiQEth7uKWElXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DESLT01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01E.TXT",
+          "fileSize": 192,
+          "mimeType": "text/plain",
+          "hash": "vF8s2fOo6b1EJBJoJggy7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DESLT01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06D.TXT",
+          "fileSize": 286,
+          "mimeType": "text/plain",
+          "hash": "iZntZtM0TsfxiZHJZyHZ/A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DELTG06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06E.TXT",
+          "fileSize": 297,
+          "mimeType": "text/plain",
+          "hash": "IH4dG+zOy5bnWdJe7FVBXA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DELTG06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEM21900.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "wv13k0GoqNYZxIojGU5WaQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DEM21900.000"
+            }
+          }
+        },
+        {
+          "filename": "DE521900.000",
+          "fileSize": 164656,
+          "mimeType": "application/s63",
+          "hash": "oen/EK/ve56W1WyRWoRJHg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "BF2CBACA"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/c08547a0-b716-492a-b32e-7a9007c2a6a1/files/DE521900.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "26f8431c-53cc-4632-9b44-593926c52634",
+      "status": "Committed",
+      "allFilesZipSize": null,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE521900"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "12"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:30:50.767Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEFER17E.TXT",
+          "fileSize": 145,
+          "mimeType": "text/plain",
+          "hash": "+YAbE8qQTCjW9D6QnifK+w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DEFER17E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFER17D.TXT",
+          "fileSize": 168,
+          "mimeType": "text/plain",
+          "hash": "v/Q0E8119lMHtZeExHw9Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DEFER17D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01D.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "zDOdb4i4FiQEth7uKWElXw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DESLT01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT01E.TXT",
+          "fileSize": 192,
+          "mimeType": "text/plain",
+          "hash": "vF8s2fOo6b1EJBJoJggy7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DESLT01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06D.TXT",
+          "fileSize": 286,
+          "mimeType": "text/plain",
+          "hash": "iZntZtM0TsfxiZHJZyHZ/A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DELTG06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG06E.TXT",
+          "fileSize": 297,
+          "mimeType": "text/plain",
+          "hash": "IH4dG+zOy5bnWdJe7FVBXA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DELTG06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEM21900.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "wv13k0GoqNYZxIojGU5WaQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DEM21900.000"
+            }
+          }
+        },
+        {
+          "filename": "DE521900.000",
+          "fileSize": 164656,
+          "mimeType": "application/s63",
+          "hash": "oen/EK/ve56W1WyRWoRJHg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "BF2CBACA"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/26f8431c-53cc-4632-9b44-593926c52634/files/DE521900.000"
             }
           }
         }

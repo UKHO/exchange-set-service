@@ -1,0 +1,89 @@
+NOAA ENC®
+
+NATIONAL OCEANIC AND ATMOSPHERIC ADMINISTRATION
+
+US5CN13M - NORTH SHORE OF LONG ISLAND SOUND; HOUSATONIC RIVER AND MILFORD HARBOR
+
+INDEX:	
+AIDS TO NAVIGATION		
+POLLUTION REPORTS
+SUPPLEMENTAL INFORMATION
+CAUTION - TEMPORARY CHANGES
+WARNING - PRUDENT MARINER
+NOTE A
+AUTHORITIES				
+CAUTION - SUBMARINE PIPELINES AND CABLES
+CAUTION - DREDGED AREAS
+RADAR REFLECTORS	
+NOAA WEATHER RADIO BROADCASTS	
+RACING BUOYS
+TIDAL INFORMATION
+ADMINISTRATION AREA
+ADDITIONAL INFORMATION
+
+
+NOTES:
+AIDS TO NAVIGATION 
+Consult U.S. Coast Guard Light List for supplemental information concerning aids to navigation.
+
+
+POLLUTION REPORTS 
+Report all spills of oil and hazardous substances to the National Response Center via 1-800-424-8802 (toll free), or to the nearest U.S. Coast Guard facility if telephone communication is impossible (33 CFR 153).
+
+
+SUPPLEMENTAL INFORMATION 
+Consult U.S. Coast Pilot 2 for important supplemental information.
+
+
+CAUTION - TEMPORARY CHANGES
+Temporary changes or defects in aids to navigation are not indicated. See Local Notice to Mariners. During some winter months or when endangered by ice, certain aids to navigation are replaced by other types or removed. For details see U.S. Coast Guard Light List.
+
+
+WARNING - PRUDENT MARINER
+The prudent mariner will not rely solely on any single aid to navigation, particularly on floating aids. See U.S. Coast Guard Light List and U.S. Coast Pilot for details.
+
+
+NOTE A 
+Navigation regulations are published in Chapter 2, U.S. Coast Pilot 2. Additions or revisions to Chapter 2 are published in the Notice to Mariners. Information concerning the regulations may be obtained at the Office of the Commander, 1st Coast Guard District in Boston, MA or at the Office of the District Engineer, Corps of Engineers in Concord, MA. Refer to charted regulation section numbers. 
+
+
+AUTHORITIES 
+Hydrography and topography by the National Ocean Service, Coast Survey, with additional data from the Corps of Engineers, Geological Survey, and U.S. Coast Guard.
+
+
+CAUTION - SUBMARINE PIPELINES AND CABLES
+Additional uncharted submarine pipelines and submarine cables may exist within the area of this chart. Not all submarine pipelines and submarine cables are required to be buried, and those that were originally buried may have become exposed. Mariners should use extreme caution when operating vessels in depths of water comparable to their draft in areas where pipelines and cables may exist, and when anchoring, dragging, or trawling. Covered wells may be marked by lighted or unlighted buoys.
+
+
+CAUTION - DREDGED AREAS
+Improved channels are subject to shoaling, particularly at the edges.
+
+
+RADAR REFLECTORS 
+Radar reflectors have been placed on many floating aids to navigation. Individual radar reflector identification on these aids has been omitted from this chart.
+
+
+NOAA WEATHER RADIO BROADCASTS
+The NOAA Weather Radio stations listed below provide continuous weather broadcasts. The reception range is typically 37 to 74 kilometers / 20 to 40 nautical miles from the antenna site, but can be as much as 185 kilometers / 100 nautical miles for stations at high elevations.
+Meriden, CT	WXJ-42		162.400 MHz
+New York, NY	KWO-35		162.550 MHz
+Riverhead, NY	WXM-80		162.475 MHz
+
+
+RACING BUOYS 
+Racing buoys within the limits of this chart are not shown hereon. information may be obtained from the U.S. Coast Guard District Offices as racing and other private buoys are not all listed in the U.S. Coast Guard Light List.
+
+
+TIDAL INFORMATION
+For tidal information see the NOS Tide Table publication or go to  https://tidesandcurrents.noaa.gov/
+
+
+ADMINISTRATION AREA
+The entire extent of this ENC cell falls within the limits of an Administration Area. This area covers land, internal waters, and territorial sea. The territorial sea is a maritime zone which the United States exercises sovereignty extending to the airspace as well as to its bed and subsoil. For more information, please refer to the Coast Pilot.
+
+
+ADDITIONAL INFORMATION
+Additional information can be obtained at www.nauticalcharts.noaa.gov
+
+
+END OF FILE

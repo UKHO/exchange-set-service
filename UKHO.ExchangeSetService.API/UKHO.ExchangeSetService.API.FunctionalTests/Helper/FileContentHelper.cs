@@ -346,7 +346,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X04"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
         public static async Task<List<string>> CreateExchangeSetFileForLargeMedia(HttpResponseMessage apiEssResponse, string FssJwtToken)
@@ -405,7 +405,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 if (Directory.Exists(Path.Combine(editionFolderPath, editionNumber.ToString())))
                 {
-                   scsCatalogueFilesPath.Add(productName + "\\" + editionNumber.ToString());
+                    scsCatalogueFilesPath.Add(productName + "\\" + editionNumber.ToString());
                 }
             }
 
@@ -413,27 +413,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
             }
-        }
-
-        public static async Task<HttpResponseMessage> CreateErrorFileValidation(HttpResponseMessage apiEssResponse, string FssJwtToken)
-        {
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
-
-            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
-
-            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
-            var batchId = batchStatusUrl.Split('/')[5];
-
-            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
-
-            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
-
-            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.POSConfig.ErrorFileName}";
-
-            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: FssJwtToken);
-
-            return response;
         }
     }
 }
