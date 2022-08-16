@@ -80,6 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string LargeExchangeSetAdcFolderName { get; set; }
             public string LargeExchangeSetInfoFolderName { get; set; }
             public string DirectoryPath { get; set; }
+            public string ErrorFileName { get; set; }
         }
 
         public TestConfiguration()

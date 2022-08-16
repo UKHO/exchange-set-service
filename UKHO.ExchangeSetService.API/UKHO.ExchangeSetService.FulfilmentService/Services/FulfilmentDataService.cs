@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FluentValidation.Results;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.FulfilmentService.Validation;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -30,6 +32,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
         private readonly IMonitorHelper monitorHelper;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly IProductDataValidator productDataValidator;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
@@ -40,7 +43,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
                                     IFulfilmentCallBackService fulfilmentCallBackService,
                                     IMonitorHelper monitorHelper,
-                                    IFileSystemHelper fileSystemHelper)
+                                    IFileSystemHelper fileSystemHelper,
+                                    IProductDataValidator productDataValidator)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -52,6 +56,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.fulfilmentCallBackService = fulfilmentCallBackService;
             this.monitorHelper = monitorHelper;
             this.fileSystemHelper = fileSystemHelper;
+            this.productDataValidator = productDataValidator;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
@@ -124,6 +129,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var largeMediaExchangeSetFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
 
             LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName);
+            if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
+            {
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", message.BatchId, message.CorrelationId, response.ValidationtFailedMessage);
+                throw new FulfilmentException(EventIds.BundleInfoValidationFailed.ToEventId());
+            }
 
             var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
                                                   .Where(di => di.Name.StartsWith("M0"));
@@ -349,6 +360,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             LargeExchangeSetDataResponse largeExchangeSetDataResponse = new LargeExchangeSetDataResponse();
             var response = await DownloadSalesCatalogueResponse(message);
 
+            Task<ValidationResult> validationResult = productDataValidator.Validate(response.Products);
+
+            if (!validationResult.Result.IsValid)
+            {
+                largeExchangeSetDataResponse.ValidationtFailedMessage = validationResult.Result.Errors[0].ToString();
+                return largeExchangeSetDataResponse;
+            }
+
             if (response.Products != null && response.Products.Any())
             {
                 DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
@@ -502,5 +521,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             return isZipFileUploaded;
         }
+
     }
 }

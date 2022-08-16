@@ -9,5 +9,6 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         public SalesCatalogueProductResponse SalesCatalogueProductResponse { get; set; }
         public SalesCatalogueDataResponse SalesCatalogueDataResponse { get; set; }
         public List<FulfilmentDataResponse> FulfilmentDataResponses { get; set; }
+        public string ValidationtFailedMessage { get; set; } = string.Empty;
     }
 }
