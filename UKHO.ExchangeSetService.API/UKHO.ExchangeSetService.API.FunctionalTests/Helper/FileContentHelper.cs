@@ -319,9 +319,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 foreach (string countryName in addDirectiory)
                 {
-                   string dirName = new DirectoryInfo(countryName).Name;
-                   countryCodes.Add(dirName);
-                   countryCodes.Sort();
+                    string dirName = new DirectoryInfo(countryName).Name;
+                    countryCodes.Add(dirName);
+                    countryCodes.Sort();
                 }
 
                 Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
@@ -359,21 +359,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
             var batchId = batchStatusUrl.Split('/')[5];
 
-            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status"; 
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
             Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
             for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
-                    var folderName = $"M0{mediaNumber}X02";
-                    var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{folderName}.zip";
+                var folderName = $"M0{mediaNumber}X02";
+                var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{folderName}.zip";
 
-                    var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, folderName);
+                var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolderForLargeFiles(downloadFileUrl, FssJwtToken, folderName);
 
-                    var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-                    var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
-                    downloadFolderPath.Add(downloadFolderPath1);
+                var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+                var downloadFolderPath1 = Path.Combine(Path.GetTempPath(), downloadFolder);
+                downloadFolderPath.Add(downloadFolderPath1);
             }
             return downloadFolderPath;
         }
@@ -413,6 +413,27 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
             }
+        }
+
+        public static async Task<HttpResponseMessage> CreateErrorFileValidation(HttpResponseMessage apiEssResponse, string FssJwtToken)
+        {
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
+            var batchId = batchStatusUrl.Split('/')[5];
+
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
+
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.POSConfig.ErrorFileName}";
+
+            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: FssJwtToken);
+
+            return response;
         }
     }
 }
