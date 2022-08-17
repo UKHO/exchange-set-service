@@ -988,6 +988,70 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }, batchStatusMetaData.BatchId, correlationId);
         }
 
+        public async Task<List<BatchFile>> SearchInfoFilePath(string batchId, string correlationId, string uri)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
+
+            List<BatchFile> fileDetails = null;
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+                if (searchBatchResponse.Entries.Count > 0)
+                {
+                    var batchResult = searchBatchResponse.Entries.SelectMany(i => i.Files);
+                    fileDetails = batchResult.Select(x => new BatchFile
+                    {
+                        Filename =  x.Filename,
+                        Links = new Links
+                        {
+                            Get = new Link
+                            {
+                                Href = x.Links.Get.Href
+                            }
+                        }
+                    }).ToList();
+                }
+                else
+                {
+                    logger.LogError(EventIds.ReadMeTextFileNotFound.ToEventId(), "Error in file share service readme.txt not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.ReadMeTextFileNotFound.ToEventId());
+                }
+            }
+            else
+            {
+                logger.LogError(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId(), "Error in file share service while searching ReadMe file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId());
+            }
+            return fileDetails;
+        }
+
+        public async Task<bool> DownloadInfoFiles(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+            foreach (var item in fileDetails)
+            {
+                HttpResponseMessage httpResponse;
+                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item.Links.Get.Href, CancellationToken.None, correlationId);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
+                    fileSystemHelper.CreateFileCopy(Path.Combine(exchangesetPath, item.Filename), new MemoryStream(bytes));
+                }
+                else
+                {
+                    logger.LogError(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId(), "Error in file share service while searching ReadMe file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    throw new FulfilmentException(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId());
+                }
+            }
+            return true;
+        }
+
         #endregion
     }
 }

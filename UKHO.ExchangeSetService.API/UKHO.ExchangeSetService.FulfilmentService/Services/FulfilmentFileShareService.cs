@@ -137,5 +137,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             return await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(batchId, exchangeSetZipPath, correlationId);
         }
+
+        public async Task<List<BatchFile>> SearchInfoFilePath(string batchId, string correlationId)
+        {
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq 'DVD INFO'";
+            return await fileShareService.SearchInfoFilePath(batchId, correlationId, uri);
+        }
+
+        public async Task<bool> DownloadInfoFiles(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
+        {
+            return await fileShareService.DownloadInfoFiles(batchId, correlationId, fileDetails, exchangesetPath);
+        }
     }
 }

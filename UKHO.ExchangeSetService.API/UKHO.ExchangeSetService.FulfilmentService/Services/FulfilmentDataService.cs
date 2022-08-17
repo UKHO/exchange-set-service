@@ -149,6 +149,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
+                ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
             });
 
             await Task.WhenAll(ParallelCreateFolderTasks);
@@ -522,5 +523,32 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipFileUploaded;
         }
 
+        public async Task DownloadInfoFolderFiles(string batchId, string exchangeSetInfoPath, string correlationId)
+        {
+            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
+                  EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
+                  "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () =>
+                  {
+                      return await fulfilmentFileShareService.SearchInfoFilePath(batchId, correlationId);
+                  },
+               batchId, correlationId);
+
+            if (fileDetails != null)
+            {
+                DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
+                   EventIds.DownloadReadMeFileRequestCompleted,
+                   "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                   async () =>
+                   {
+                       return await fulfilmentFileShareService.DownloadInfoFiles(batchId, correlationId, fileDetails, exchangeSetInfoPath);
+                   },
+                batchId, correlationId);
+
+                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+        }
     }
 }
