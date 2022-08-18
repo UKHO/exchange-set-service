@@ -140,13 +140,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<List<BatchFile>> SearchInfoFilePath(string batchId, string correlationId)
         {
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq 'DVD INFO'";
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.ContentInfo}'";
             return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
         }
 
         public async Task<List<BatchFile>> SearchAdcFilePath(string batchId, string correlationId)
         {
-            string uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq 'Catalogue' and $batch(Catalogue Type) eq 'ADC'";
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.Content}' and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.CatalogueType}'";
             return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
         }
 

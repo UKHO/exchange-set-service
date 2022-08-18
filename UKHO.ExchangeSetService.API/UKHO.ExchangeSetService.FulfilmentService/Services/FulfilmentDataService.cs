@@ -150,7 +150,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
                 ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, "ADC"), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.AdcFolderPath), message.CorrelationId));
             });
 
             await Task.WhenAll(ParallelCreateFolderTasks);
@@ -552,10 +552,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task DownloadAdcFolderFiles(string batchId, string exchangeSetInfoPath, string correlationId)
+        public async Task DownloadAdcFolderFiles(string batchId, string exchangeSetAdcPath, string correlationId)
         {
-            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
-                  EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
+            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart,
+                  EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted,
                   "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                   async () =>
                   {
@@ -565,18 +565,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (fileDetails != null)
             {
-                DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
-                   EventIds.DownloadReadMeFileRequestCompleted,
-                   "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                DateTime createAdcFolderFilesTaskStartedAt = DateTime.UtcNow;
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadAdcFolderFilesStart,
+                   EventIds.DownloadAdcFolderFilesCompleted,
+                   "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                    async () =>
                    {
-                       return await fulfilmentFileShareService.DownloadInfoFiles(batchId, correlationId, fileDetails, exchangeSetInfoPath);
+                       return await fulfilmentFileShareService.DownloadInfoFiles(batchId, correlationId, fileDetails, exchangeSetAdcPath);
                    },
                 batchId, correlationId);
 
-                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                DateTime createAdcFolderFilesTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download Adc Folder File Task", createAdcFolderFilesTaskStartedAt, createAdcFolderFilesTaskCompletedAt, correlationId, null, null, null, batchId);
             }
         }
     }

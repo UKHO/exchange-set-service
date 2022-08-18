@@ -230,6 +230,40 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(false, fakeIsBatchCommitted);
         }
 
+        [Test]
+        public async Task WhenValidSearchAdcFolderFileRequest_ThenReturnFilePath()
+        {
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+
+            };
+            A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
+            var result = await fulfilmentFileShareService.SearchAdcFilePath(batchId, null);
+            Assert.IsNotEmpty(result);
+        }
+
+        [Test]
+        public async Task WhenRequestDownloadAdcFolderFile_ThenReturnsTrueIfFileIsDownloaded()
+        {
+            bool isFileDownloaded = true;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+
+            };
+            string filePath = "TestFilePath";
+
+
+
+            A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadInfoFiles(filePath, batchId, batchFileList, null);
+
+
+
+            Assert.AreEqual(true, isFileDownloaded);
+        }
+
         #endregion
     }
 }

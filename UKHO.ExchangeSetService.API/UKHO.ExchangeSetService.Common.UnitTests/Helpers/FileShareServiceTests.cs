@@ -1297,6 +1297,41 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
         }
 
+        [Test]
+        public async Task WhenValidSearchAdcFolderFileRequest_ThenReturnValidFilePath()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string batchId = "a07537ff-ffa2-4565-8f0e-96e61e70a9fc";
+            string correlationId = "2561fa76-ae35-4bdf-996f-75a3389ab1ad";
+            var searchAdcFolderFileName = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
+            string correlationidParam = null;
+
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            var response = await fileShareService.SearchFolderDetails(batchId,correlationId, null);
+            string expectedAdcFolderFilePath = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
+            Assert.IsNotNull(response);
+            Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
+        }
+       
         #endregion
     }
 }
