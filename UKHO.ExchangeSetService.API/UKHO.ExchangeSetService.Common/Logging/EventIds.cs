@@ -637,10 +637,34 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805157 - Large exchange set is created with error.
         /// </summary>
         LargeExchangeSetCreatedWithError = 805157,
-         /// <summary>
-         /// 805158 - BundleInfoValidation failed.
-         /// </summary>
-        BundleInfoValidationFailed = 805158
+        /// <summary>
+        /// 805158 - BundleInfoValidation failed.
+        /// </summary>
+        BundleInfoValidationFailed = 805158,
+        /// <summary>
+        /// 805159 - Request for searching Info and Adc folder files from file share service is completed with ok response..
+        /// </summary>
+        QueryFileShareServiceSearchFolderFileOkResponse = 805159,
+        /// <summary>
+        /// 805160 - Info folder files downloaded with ok response.
+        /// </summary>
+        DownloadInfoFolderFilesOkResponse = 805160,
+        /// <summary>
+        /// 805161 - Request for downloading info folder files started.
+        /// </summary>
+        DownloadInfoFolderRequestStart = 805161,
+        /// <summary>
+        /// 805162 - Request for downloading info folder files completed.
+        /// </summary>
+        DownloadInfoFolderRequestCompleted = 805162,
+        /// <summary>
+        /// 805163 - Request for searching info and adc folder files from file share service is failed due to non ok response.
+        /// </summary>
+        QueryFileShareServiceSearchFolderFileNonOkResponse = 805163,
+        /// <summary>
+        /// 805164 - Info and Adc folder files are not found while searching in file share service.
+        /// </summary>
+        SearchFolderFilesNotFound = 805164,
     }
 
     public static class EventIdExtensions

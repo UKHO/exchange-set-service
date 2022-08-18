@@ -526,9 +526,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task DownloadInfoFolderFiles(string batchId, string exchangeSetInfoPath, string correlationId)
         {
-            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
-                  EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
-                  "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
+                  EventIds.DownloadInfoFolderRequestCompleted,
+                  "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                   async () =>
                   {
                       return await fulfilmentFileShareService.SearchInfoFilePath(batchId, correlationId);
@@ -537,18 +537,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (fileDetails != null)
             {
-                DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
-                   EventIds.DownloadReadMeFileRequestCompleted,
-                   "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                DateTime createInfoFolderFileTaskStartedAt = DateTime.UtcNow;
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
+                   EventIds.DownloadInfoFolderRequestCompleted,
+                   "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                    async () =>
                    {
                        return await fulfilmentFileShareService.DownloadInfoFiles(batchId, correlationId, fileDetails, exchangeSetInfoPath);
                    },
                 batchId, correlationId);
 
-                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                DateTime createInfoFolderFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download Info Folder File Task", createInfoFolderFileTaskStartedAt, createInfoFolderFileTaskCompletedAt, correlationId, null, null, null, batchId);
             }
         }
 

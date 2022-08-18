@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public class FileShareService : IFileShareService
     {
         private readonly IFileShareServiceClient fileShareServiceClient;
-        private readonly IAuthFssTokenProvider authFssTokenProvider;
+        ////private readonly IAuthFssTokenProvider authFssTokenProvider;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FileShareService> logger;
         private readonly IFileShareServiceCache fileShareServiceCache;
@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 IFileSystemHelper fileSystemHelper, IMonitorHelper monitorHelper)
         {
             this.fileShareServiceClient = fileShareServiceClient;
-            this.authFssTokenProvider = authFssTokenProvider;
+           //// this.authFssTokenProvider = authFssTokenProvider;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
             this.fileShareServiceCache = fileShareServiceCache;
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<CreateBatchResponse> CreateBatch(string userOid, string correlationId)
         {
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
             var uri = $"/batch";
 
             CreateBatchRequest createBatchRequest = CreateBatchRequest(userOid);
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
                 List<Products> internalNotFoundProducts = new List<Products>();
-                var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+                var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
                 var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
                 var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
 
@@ -418,7 +418,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadBatchFiles(BatchDetail entry, IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
             return await ProcessBatchFile(entry, uri, downloadPath, payloadJson, accessToken, queueMessage, cancellationTokenSource, cancellationToken);
         }
 
@@ -504,7 +504,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
             string filePath = Path.Combine(exchangeSetRootPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
@@ -536,7 +536,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
             string filePath = string.Empty;
             var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
             HttpResponseMessage httpResponse;
@@ -596,7 +596,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         //Upload either Exchange Set or Error File
         public async Task<bool> UploadFileToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName)
         {
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
             bool isUploadZipFile = false;
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileName));
@@ -855,7 +855,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> UploadLargeMediaFileToFileShareService(string batchId, string exchangeSetZipPath, string correlationId, string fileName)
         {
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
             bool isWriteBlock = false;
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipPath, fileName));
@@ -882,7 +882,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> CommitAndGetBatchStatusForLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId)
         {
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
 
             List<BatchCommitMetaData> batchCommitMetaDataList = new List<BatchCommitMetaData>();
 
@@ -992,7 +992,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
 
@@ -1017,14 +1017,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogError(EventIds.ReadMeTextFileNotFound.ToEventId(), "Error in file share service readme.txt not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                    throw new FulfilmentException(EventIds.ReadMeTextFileNotFound.ToEventId());
+                    logger.LogError(EventIds.SearchFolderFilesNotFound.ToEventId(), "Error in file share service Info and Adc folder files not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.SearchFolderFilesNotFound.ToEventId());
                 }
+               logger.LogInformation(EventIds.QueryFileShareServiceSearchFolderFileOkResponse.ToEventId(), "We are getting correct info folder path for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
             else
             {
-                logger.LogError(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId(), "Error in file share service while searching ReadMe file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
-                throw new FulfilmentException(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId());
+                logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching Info and Adc Folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId());
             }
             return fileDetails;
         }
@@ -1033,7 +1034,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
         {
             string payloadJson = string.Empty;
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI4MDViZTAyNC1hMjA4LTQwZmItYWI2Zi0zOTljMjY0N2QzMzQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYwODA5OTY5LCJuYmYiOjE2NjA4MDk5NjksImV4cCI6MTY2MDgxNTM4MywiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQThLKzBhNWltVU51a254OEhZVU1OTnlOT2NxNXhTSWQ4NUN5UnRUVmViNGNzaHVrc09od2M4NzNVaDRWYmwyYjRYcG5lSXZpNWhic24wT1RWbm1scnNxYzlFZEhpZUlZdTEvSXQ4T3M5dkVTNFNWMTJoMGFUaHUvRDNFVGRRZFNHIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjgwNWJlMDI0LWEyMDgtNDBmYi1hYjZmLTM5OWMyNjQ3ZDMzNCIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hZGQxYzUwMC1hNmQ3LTRkYmQtYjg5MC03ZjhjYjZmN2Q4NjEvIiwiaXBhZGRyIjoiMTUyLjU3LjIyMC4xNTciLCJuYW1lIjoiSGFyc2hkYSBKb3NoaSIsIm9pZCI6IjhlMzg5MWJkLThmZDktNDkzNC04NGI5LWJmODE5M2U3MzdhMCIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQaVRnVzRBSW92dEFxMjg1bkNaSDB6UUNBTXcuIiwicm9sZXMiOlsiQmF0Y2hDcmVhdGUiXSwic2NwIjoiVXNlci5SZWFkIiwic3ViIjoibWNVSDNuYTR2SEVIZnBkN1pqRGFldmk2MFQwOTZ5VEhkNlBRanFQMEt3WSIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiaGFyc2hkYTE1MTI1QG1hc3Rlay5jb20iLCJ1dGkiOiJKTktQd0Y2M1dFQ01TX0haSzl4NEFBIiwidmVyIjoiMS4wIn0.eXFMqze4cSwtB5wW1xFNOOETcidpIOj-d-o9uGZmJius9zH4AurDqf0EeJHkCBbBQPQ-WIQU7eLNihKTBuMGA1efDaTsF9d8cAGhlheYTp-zhJunOyGcSD1QWJ3oFDw5a6aVFPG081RX6elCr9KyRvOl_N1rSf-hs_Q_jF6bbqqwvSF7Y6gk91wEYcN6P8iyf1ElPSmFe1fJAHKWa4xax4Lbh_S9Qt9NM0MveBXNjH9u2HXN4dRUJTLszZ1eHXgz1fuU3eSrAuA5T8IX7GYeEPd5kUhIhEuk4mKhugpH9dqTaSlEfRTIbaqhDBet5bdMtFZX5Ql9jrgkw6TBvHbtzw";
 
             foreach (var item in fileDetails)
             {
@@ -1044,11 +1045,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
                     fileSystemHelper.CreateFileCopy(Path.Combine(exchangesetPath, item.Filename), new MemoryStream(bytes));
+                    logger.LogInformation(EventIds.DownloadInfoFolderFilesOkResponse.ToEventId(), "Successfully downloaded info folder files for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 }
                 else
                 {
-                    logger.LogError(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId(), "Error in file share service while searching ReadMe file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
-                    throw new FulfilmentException(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId());
+                    logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching Info and Adc Folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    throw new FulfilmentException(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId());
                 }
             }
             return true;
