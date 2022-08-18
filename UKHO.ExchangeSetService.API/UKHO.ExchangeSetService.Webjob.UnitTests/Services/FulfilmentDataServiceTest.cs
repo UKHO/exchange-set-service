@@ -70,7 +70,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 Info = "INFO",
                 ProductFileName = "TEST.TXT",
                 CatalogFileName = "CATALOG.031",
-                CommentVersion = "VERSION=1.0"
+                CommentVersion = "VERSION=1.0",
+                ContentInfo =  "DVD INFO",
+                Content = "Catalogue",
+                CatalogueType = "ADC",
+                AdcFolderPath = "ADC"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
             { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
