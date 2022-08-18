@@ -17,5 +17,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         Task<bool> CommitLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId);
         Task<List<BatchFile>> SearchInfoFilePath(string batchId, string correlationId);
         Task<bool> DownloadInfoFiles(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath);
+        Task<List<BatchFile>> SearchAdcFilePath(string batchId, string correlationId);
     }
 }

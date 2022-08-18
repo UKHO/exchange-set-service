@@ -988,7 +988,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }, batchStatusMetaData.BatchId, correlationId);
         }
 
-        public async Task<List<BatchFile>> SearchInfoFilePath(string batchId, string correlationId, string uri)
+        // This function is used to search Info and Adc folder details from FSS for large exchange set
+        public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
@@ -1028,7 +1029,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return fileDetails;
         }
 
-        public async Task<bool> DownloadInfoFiles(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
+        // This function is used to download Info and Adc folder details from FSS for large exchange set
+        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);

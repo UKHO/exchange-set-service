@@ -17,7 +17,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task<bool> UploadFileToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName);
         Task<bool> UploadLargeMediaFileToFileShareService(string batchId, string exchangeSetZipPath, string correlationId, string fileName);
         Task<bool> CommitAndGetBatchStatusForLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId);
-        Task<List<BatchFile>> SearchInfoFilePath(string batchId, string correlationId, string uri);
-        Task<bool> DownloadInfoFiles(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath);
+        Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri);
+        Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath);
     }
 }
