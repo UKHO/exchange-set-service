@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<CreateBatchResponse> CreateBatch(string userOid, string correlationId)
         {
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var uri = $"/batch";
 
             CreateBatchRequest createBatchRequest = CreateBatchRequest(userOid);
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
                 List<Products> internalNotFoundProducts = new List<Products>();
-                var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+                var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
                 var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
                 var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
 
@@ -418,7 +418,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadBatchFiles(BatchDetail entry, IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             string payloadJson = string.Empty;
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             return await ProcessBatchFile(entry, uri, downloadPath, payloadJson, accessToken, queueMessage, cancellationTokenSource, cancellationToken);
         }
 
@@ -504,7 +504,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
             string payloadJson = string.Empty;
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
             string filePath = Path.Combine(exchangeSetRootPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
@@ -536,7 +536,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
             string payloadJson = string.Empty;
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string filePath = string.Empty;
             var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
             HttpResponseMessage httpResponse;
@@ -596,7 +596,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         //Upload either Exchange Set or Error File
         public async Task<bool> UploadFileToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName)
         {
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             bool isUploadZipFile = false;
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileName));
@@ -855,7 +855,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> UploadLargeMediaFileToFileShareService(string batchId, string exchangeSetZipPath, string correlationId, string fileName)
         {
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             bool isWriteBlock = false;
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipPath, fileName));
@@ -882,7 +882,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> CommitAndGetBatchStatusForLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId)
         {
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
             List<BatchCommitMetaData> batchCommitMetaDataList = new List<BatchCommitMetaData>();
 
@@ -992,7 +992,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
         {
             string payloadJson = string.Empty;
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
 
@@ -1017,14 +1017,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogError(EventIds.SearchFolderFilesNotFound.ToEventId(), "Error in file share service folder files not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    logger.LogError(EventIds.SearchFolderFilesNotFound.ToEventId(), "Error in file share service, folder files not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                     throw new FulfilmentException(EventIds.SearchFolderFilesNotFound.ToEventId());
                 }
-               logger.LogInformation(EventIds.QueryFileShareServiceSearchFolderFileOkResponse.ToEventId(), "Successfully searched folder path for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                logger.LogInformation(EventIds.QueryFileShareServiceSearchFolderFileOkResponse.ToEventId(), "Successfully searched files path for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
             else
             {
-                logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching Folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId());
             }
             return fileDetails;
@@ -1034,7 +1034,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
         {
             string payloadJson = string.Empty;
-            var accessToken =await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
             foreach (var item in fileDetails)
             {
@@ -1049,7 +1049,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }
                 else
                 {
-                    logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching Folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                     throw new FulfilmentException(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId());
                 }
             }
