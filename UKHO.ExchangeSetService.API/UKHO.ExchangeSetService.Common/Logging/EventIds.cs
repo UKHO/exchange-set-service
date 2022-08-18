@@ -665,6 +665,22 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805164 - Info and Adc folder files are not found while searching in file share service.
         /// </summary>
         SearchFolderFilesNotFound = 805164,
+        /// <summary>
+        /// 805165 - Request for searching Adc folder files from file share service is started.
+        /// </summary>
+        QueryFileShareServiceAdcFolderFilesRequestStart = 805165,
+        /// <summary>
+        /// 805166 - Request for searching Adc folder files from file share service is completed.
+        /// </summary>
+        QueryFileShareServiceAdcFolderFilesRequestCompleted = 805166,
+        /// <summary>
+        /// 805167 - Request for Download Adc folder files from file share service is started.
+        /// </summary>
+        DownloadAdcFolderFilesStart = 805167,
+        /// <summary>
+        /// 805168 - Request for Download Adc folder files from file share service is completed.
+        /// </summary>
+        DownloadAdcFolderFilesCompleted = 805168,
     }
 
     public static class EventIdExtensions
