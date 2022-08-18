@@ -1304,9 +1304,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string accessTokenParam = null;
             string uriParam = null;
             HttpMethod httpMethodParam = null;
-            string batchId = "a07537ff-ffa2-4565-8f0e-96e61e70a9fc";
+            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
             string correlationId = "2561fa76-ae35-4bdf-996f-75a3389ab1ad";
-            var searchAdcFolderFileName = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
+            var searchAdcFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             string correlationidParam = null;
 
             var searchBatchResponse = GetSearchBatchResponse();
@@ -1327,7 +1327,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             var response = await fileShareService.SearchFolderDetails(batchId,correlationId, null);
-            string expectedAdcFolderFilePath = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
+            string expectedAdcFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             Assert.IsNotNull(response);
             Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
         }
@@ -1335,8 +1335,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenValidDownloadFolderFileRequest_ThenReturnTrue()
         {
-            string batchId = "a07537ff-ffa2-4565-8f0e-96e61e70a9fc";
-            var searchReadMeFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
+            var searchAdcFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
             string postBodyParam = "This should be replace by actual value when param passed to api call";
@@ -1362,14 +1362,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
 
             };
+
             string exchangeSetRootPath = @"C:\\HOME";
 
             var response = await fileShareService.DownloadFolderDetails( batchId,correlationidParam,batchFileList, exchangeSetRootPath);
 
-
-            var expectedReadMeFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            var expectedAdcFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             Assert.AreEqual(true, response);
-            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);
+            Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
         }
 
         #endregion
