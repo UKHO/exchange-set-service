@@ -150,7 +150,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
         }
 
-        public async Task<bool> DownloadInfoFiles(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
+        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
         {
             return await fileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangesetPath);
         }

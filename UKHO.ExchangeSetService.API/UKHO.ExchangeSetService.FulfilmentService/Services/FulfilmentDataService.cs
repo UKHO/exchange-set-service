@@ -543,7 +543,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                    "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                    async () =>
                    {
-                       return await fulfilmentFileShareService.DownloadInfoFiles(batchId, correlationId, fileDetails, exchangeSetInfoPath);
+                       return await fulfilmentFileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetInfoPath);
                    },
                 batchId, correlationId);
 
@@ -571,7 +571,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                    "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                    async () =>
                    {
-                       return await fulfilmentFileShareService.DownloadInfoFiles(batchId, correlationId, fileDetails, exchangeSetAdcPath);
+                       return await fulfilmentFileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetAdcPath);
                    },
                 batchId, correlationId);
 
