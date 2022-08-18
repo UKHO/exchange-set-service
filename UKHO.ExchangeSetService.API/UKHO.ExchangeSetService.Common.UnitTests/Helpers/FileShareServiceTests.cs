@@ -1331,7 +1331,47 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.IsNotNull(response);
             Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
         }
-       
+
+        [Test]
+        public async Task WhenValidDownloadFolderFileRequest_ThenReturnTrue()
+        {
+            string batchId = "a07537ff-ffa2-4565-8f0e-96e61e70a9fc";
+            var searchReadMeFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            string correlationidParam = null;
+            HttpMethod httpMethodParam = null;
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+
+            };
+            string exchangeSetRootPath = @"C:\\HOME";
+
+            var response = await fileShareService.DownloadFolderDetails( batchId,correlationidParam,batchFileList, exchangeSetRootPath);
+
+
+            var expectedReadMeFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            Assert.AreEqual(true, response);
+            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);
+        }
+
         #endregion
     }
 }
