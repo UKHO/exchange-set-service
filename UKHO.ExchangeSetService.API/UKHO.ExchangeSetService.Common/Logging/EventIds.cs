@@ -640,7 +640,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
          /// <summary>
          /// 805158 - BundleInfoValidation failed.
          /// </summary>
-        BundleInfoValidationFailed = 805158
+        BundleInfoValidationFailed = 805158,
+        /// <summary>
+        /// 805159 - Request for creating enc update csv file in exchange set is failed.
+        /// </summary>
+        ENCupdateCSVFileIsNotCreated = 805159,
     }
 
     public static class EventIdExtensions
