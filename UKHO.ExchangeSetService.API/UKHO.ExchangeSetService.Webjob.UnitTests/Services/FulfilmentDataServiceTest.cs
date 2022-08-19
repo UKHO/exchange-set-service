@@ -295,16 +295,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-            List<BatchFile> batchFiles = new List<BatchFile> {
-                                          new BatchFile {
-                                            Filename = "AVCS-User-Guide.pdf",
-                                              Links = new Links {
-                                                Get = new Link {
-                                                  Href = "/batch/63d38bde-5191-4a59-82d5-aa22ca1cc6dc/files/AVCS-User-Guide.pdf",
-                                                }
-                                              }
-                                          }
-                                        };
+            List<BatchFile> batchFiles = GetFiles();
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
             A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -347,16 +338,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-            List<BatchFile> batchFiles = new List<BatchFile> {
-                                          new BatchFile {
-                                            Filename = "AVCS-User-Guide.pdf",
-                                              Links = new Links {
-                                                Get = new Link {
-                                                  Href = "/batch/63d38bde-5191-4a59-82d5-aa22ca1cc6dc/files/AVCS-User-Guide.pdf",
-                                                }
-                                              }
-                                          }
-                                        };
+            List<BatchFile> batchFiles = GetFiles();
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
