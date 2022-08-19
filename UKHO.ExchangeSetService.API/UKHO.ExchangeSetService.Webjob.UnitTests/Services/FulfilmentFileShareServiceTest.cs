@@ -230,6 +230,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(false, fakeIsBatchCommitted);
         }
 
+        #region SearchAdcFolderFile
         [Test]
         public async Task WhenValidSearchAdcFolderFileRequest_ThenReturnFilePath()
         {
@@ -245,7 +246,23 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestDownloadAdcFolderFile_ThenReturnsTrueIfFileIsDownloaded()
+        public async Task WhenInvalidSearchAdcFolderFileRequest_ThenReturnEmptyFileList()
+        { 
+            string batchId = Guid.NewGuid().ToString();
+
+            List<BatchFile> batchFileList = new List<BatchFile>();
+
+            A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
+            var result = await fulfilmentFileShareService.SearchAdcFilePath(batchId, null);
+
+            Assert.IsEmpty(result);
+        }
+
+        #endregion SearchAdcFolderFile
+
+        #region DownloadFolderDetails
+        [Test]
+        public async Task WhenRequestDownloadFolderDetails_ThenReturnsTrueIfFileIsDownloaded()
         {
             bool isFileDownloaded = true;
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
@@ -258,6 +275,23 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.AreEqual(true, isFileDownloaded);
         }
+
+        [Test]
+        public async Task WhenRequestDownloadFolderDetails_ThenReturnsFalseIfFileIsNotDownloaded()
+        {
+            bool isFileDownloaded = false;
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+            };
+
+            A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadFolderDetails(fakeExchangeSetRootPath, batchId, batchFileList, null);
+
+            Assert.AreEqual(false, isFileDownloaded);
+        }
+
+        #endregion DownloadFolderDetails
 
         #endregion
     }

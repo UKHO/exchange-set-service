@@ -1297,6 +1297,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
         }
 
+        #region SearchAdcFolderFile
         [Test]
         public async Task WhenValidSearchAdcFolderFileRequest_ThenReturnValidFilePath()
         {
@@ -1332,6 +1333,52 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
         }
 
+        [Test]
+        public Task WhenSearchAdcFolderFileNotFound_ThenReturnFulfilmentException()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
+            string searchAdcFolderFileName = null;
+            string correlationidParam = null;
+
+            var searchBatchResponse = GetSearchBatchEmptyResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await fileShareService.SearchFolderDetails(batchId, string.Empty, searchAdcFolderFileName); });
+            return Task.CompletedTask;
+        }
+
+        [Test]
+        public void WhenInvalidSearchAdcFolderFileRequest_ThenReturnFulfilmentException()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fileShareService.SearchFolderDetails(string.Empty, string.Empty, string.Empty); });
+        }
+        #endregion SearchAdcFolderFile 
+
+        #region DownloadFolderFiles
         [Test]
         public async Task WhenValidDownloadFolderFileRequest_ThenReturnTrue()
         {
@@ -1371,6 +1418,43 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(true, response);
             Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
         }
+
+        [Test]
+        public void WhenInvalidDownloadAdcFolderFileRequest_ThenReturnFulfilmentException()
+        { 
+            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            string correlationidParam = null;
+            HttpMethod httpMethodParam = null;
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+
+            };
+
+            string exchangeSetRootPath = @"C:\\HOME";
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await fileShareService.DownloadFolderDetails(batchId, correlationidParam, batchFileList, exchangeSetRootPath); });
+        }
+        #endregion DownloadFolderFiles 
 
         #endregion
     }
