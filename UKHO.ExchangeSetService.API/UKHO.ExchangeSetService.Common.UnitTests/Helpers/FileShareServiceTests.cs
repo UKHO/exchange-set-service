@@ -1382,15 +1382,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenValidDownloadFolderFileRequest_ThenReturnTrue()
         {
-            var searchAdcFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            var searchFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             var searchBatchResponse = GetSearchBatchResponse();
-            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
             string uriParam = null;
             string correlationidParam = null;
             HttpMethod httpMethodParam = null;
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
@@ -1411,22 +1411,22 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.DownloadFolderDetails( fakeBatchId,correlationidParam,batchFileList, fakeExchangeSetPath);
 
-            var expectedAdcFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            var expectedFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             Assert.AreEqual(true, response);
-            Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
+            Assert.AreEqual(expectedFolderFilePath, searchFolderFileName);
         }
 
         [Test]
         public void WhenInvalidDownloadAdcFolderFileRequest_ThenReturnFulfilmentException()
         { 
             var searchBatchResponse = GetSearchBatchResponse();
-            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
             string uriParam = null;
             string correlationidParam = null;
             HttpMethod httpMethodParam = null;
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))

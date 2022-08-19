@@ -267,13 +267,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenRequestDownloadFolderDetails_ThenReturnsTrueIfFileIsDownloaded()
         {
             bool isFileDownloaded = true;
-            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var batchFileList = new List<BatchFile>() {
                 new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
             };
 
             A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
-            isFileDownloaded = await fulfilmentFileShareService.DownloadFolderDetails(fakeExchangeSetRootPath, batchId, batchFileList, null);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadFolderDetails(fakeExchangeSetRootPath, fakeBatchId, batchFileList, null);
 
             Assert.AreEqual(true, isFileDownloaded);
         }
@@ -282,13 +281,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenRequestDownloadFolderDetails_ThenReturnsFalseIfFileIsNotDownloaded()
         {
             bool isFileDownloaded = false;
-            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var batchFileList = new List<BatchFile>() {
                 new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
             };
 
             A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
-            isFileDownloaded = await fulfilmentFileShareService.DownloadFolderDetails(fakeExchangeSetRootPath, batchId, batchFileList, null);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadFolderDetails(fakeExchangeSetRootPath, fakeBatchId, batchFileList, null);
 
             Assert.AreEqual(false, isFileDownloaded);
         }
