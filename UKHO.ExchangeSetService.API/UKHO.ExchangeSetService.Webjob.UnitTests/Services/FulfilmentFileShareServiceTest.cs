@@ -230,9 +230,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(false, fakeIsBatchCommitted);
         }
 
-        #region SearchAdcFolderFile
+        #region SearchFolderFile
         [Test]
-        public async Task WhenValidSearchAdcFolderFileRequest_ThenReturnFilePath()
+        public async Task WhenValidSearchFolderFileRequest_ThenReturnFilePath()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var batchFileList = new List<BatchFile>() {
@@ -242,11 +242,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
             var result = await fulfilmentFileShareService.SearchAdcFilePath(batchId, null);
+            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(batchId, null);
             Assert.IsNotEmpty(result);
+            Assert.IsNotEmpty(batchResult);
         }
 
         [Test]
-        public async Task WhenInvalidSearchAdcFolderFileRequest_ThenReturnEmptyFileList()
+        public async Task WhenInvalidSearchFolderFileRequest_ThenReturnEmptyFileList()
         { 
             string batchId = Guid.NewGuid().ToString();
 
@@ -254,11 +256,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
             var result = await fulfilmentFileShareService.SearchAdcFilePath(batchId, null);
-
+            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(batchId, null);
             Assert.IsEmpty(result);
+            Assert.IsEmpty(batchResult);
         }
 
-        #endregion SearchAdcFolderFile
+        #endregion SearchFolderFile
 
         #region DownloadFolderDetails
         [Test]
