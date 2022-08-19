@@ -236,15 +236,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidSearchFolderFileRequest_ThenReturnFilePath()
         {
-            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var batchFileList = new List<BatchFile>() {
                 new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
 
             };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
-            var result = await fulfilmentFileShareService.SearchAdcFilePath(batchId, null);
-            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(batchId, null);
+            var result = await fulfilmentFileShareService.SearchAdcFilePath(fakeBatchId, null);
+            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(fakeBatchId, null);
             Assert.IsNotEmpty(result);
             Assert.IsNotEmpty(batchResult);
         }
@@ -252,13 +251,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenInvalidSearchFolderFileRequest_ThenReturnEmptyFileList()
         { 
-            string batchId = Guid.NewGuid().ToString();
-
             List<BatchFile> batchFileList = new List<BatchFile>() { };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
-            var result = await fulfilmentFileShareService.SearchAdcFilePath(batchId, null);
-            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(batchId, null);
+            var result = await fulfilmentFileShareService.SearchAdcFilePath(fakeBatchId, null);
+            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(fakeBatchId, null);
             Assert.IsEmpty(result);
             Assert.IsEmpty(batchResult);
         }

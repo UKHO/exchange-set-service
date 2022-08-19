@@ -1311,9 +1311,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string correlationidParam = null;
 
             var searchBatchResponse = GetSearchBatchResponse();
-            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
 
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
@@ -1345,9 +1345,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string correlationidParam = null;
 
             var searchBatchResponse = GetSearchBatchEmptyResponse();
-            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
 
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
@@ -1382,7 +1382,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenValidDownloadFolderFileRequest_ThenReturnTrue()
         {
-            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
             var searchAdcFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
@@ -1410,9 +1409,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             };
 
-            string exchangeSetRootPath = @"C:\\HOME";
-
-            var response = await fileShareService.DownloadFolderDetails( batchId,correlationidParam,batchFileList, exchangeSetRootPath);
+            var response = await fileShareService.DownloadFolderDetails( fakeBatchId,correlationidParam,batchFileList, fakeExchangeSetPath);
 
             var expectedAdcFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             Assert.AreEqual(true, response);
@@ -1422,7 +1419,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenInvalidDownloadAdcFolderFileRequest_ThenReturnFulfilmentException()
         { 
-            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
             string postBodyParam = "This should be replace by actual value when param passed to api call";
@@ -1449,10 +1445,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             };
 
-            string exchangeSetRootPath = @"C:\\HOME";
-
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.DownloadFolderDetails(batchId, correlationidParam, batchFileList, exchangeSetRootPath); });
+                 async delegate { await fileShareService.DownloadFolderDetails(fakeBatchId, correlationidParam, batchFileList, fakeExchangeSetPath); });
         }
         #endregion DownloadFolderFiles 
 
