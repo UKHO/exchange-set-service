@@ -65,6 +65,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
         }
 
+
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
             return new SalesCatalogueServiceResponseQueueMessage
@@ -76,6 +77,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
             };
         }
+
 
         [Test]
         public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse()
@@ -230,13 +232,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(false, fakeIsBatchCommitted);
         }
 
+
         #region SearchAdcFolderFile
         [Test]
         public async Task WhenValidSearchAdcFolderFileRequest_ThenReturnFilePath()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var batchFileList = new List<BatchFile>() {
-                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
 
             };
 
@@ -250,7 +253,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         { 
             string batchId = Guid.NewGuid().ToString();
 
-            List<BatchFile> batchFileList = new List<BatchFile>();
+            List<BatchFile> batchFileList = new List<BatchFile>() { };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
             var result = await fulfilmentFileShareService.SearchAdcFilePath(batchId, null);
@@ -267,7 +270,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             bool isFileDownloaded = true;
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var batchFileList = new List<BatchFile>() {
-                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
             };
 
             A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
@@ -282,7 +285,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             bool isFileDownloaded = false;
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var batchFileList = new List<BatchFile>() {
-                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
             };
 
             A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);

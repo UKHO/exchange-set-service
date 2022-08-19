@@ -1297,9 +1297,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
         }
 
-        #region SearchAdcFolderFile
+        #region SearchFolderFiles
         [Test]
-        public async Task WhenValidSearchAdcFolderFileRequest_ThenReturnValidFilePath()
+        public async Task WhenValidSearchFolderFilesRequest_ThenReturnValidFilePath()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
@@ -1307,7 +1307,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             HttpMethod httpMethodParam = null;
             string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
             string correlationId = "2561fa76-ae35-4bdf-996f-75a3389ab1ad";
-            var searchAdcFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            var searchFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             string correlationidParam = null;
 
             var searchBatchResponse = GetSearchBatchResponse();
@@ -1328,20 +1328,20 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             var response = await fileShareService.SearchFolderDetails(batchId,correlationId, null);
-            string expectedAdcFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            string expectedSearchFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             Assert.IsNotNull(response);
-            Assert.AreEqual(expectedAdcFolderFilePath, searchAdcFolderFileName);
+            Assert.AreEqual(expectedSearchFolderFilePath, searchFolderFileName);
         }
 
         [Test]
-        public Task WhenSearchAdcFolderFileNotFound_ThenReturnFulfilmentException()
+        public Task WhenSearchSearchFolderFilesNotFound_ThenReturnFulfilmentException()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string accessTokenParam = null;
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
-            string searchAdcFolderFileName = null;
+            string searchFolderFileName = null;
             string correlationidParam = null;
 
             var searchBatchResponse = GetSearchBatchEmptyResponse();
@@ -1362,12 +1362,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.SearchFolderDetails(batchId, string.Empty, searchAdcFolderFileName); });
+                 async delegate { await fileShareService.SearchFolderDetails(batchId, string.Empty, searchFolderFileName); });
             return Task.CompletedTask;
         }
 
         [Test]
-        public void WhenInvalidSearchAdcFolderFileRequest_ThenReturnFulfilmentException()
+        public void WhenInvalidSearchFolderFilesRequest_ThenReturnFulfilmentException()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
@@ -1376,7 +1376,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                   async delegate { await fileShareService.SearchFolderDetails(string.Empty, string.Empty, string.Empty); });
         }
-        #endregion SearchAdcFolderFile 
+        #endregion SearchFolderFiles 
 
         #region DownloadFolderFiles
         [Test]
@@ -1406,7 +1406,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             var batchFileList = new List<BatchFile>() {
-                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
 
             };
 
@@ -1445,7 +1445,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             var batchFileList = new List<BatchFile>() {
-                new BatchFile{  Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
 
             };
 
