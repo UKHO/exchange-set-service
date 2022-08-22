@@ -279,6 +279,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully()
         {
             string filePath = @"D:\\Downloads";
+            fakeFileShareServiceConfig.Value.Info = "INFO";
+            fakeFileShareServiceConfig.Value.AdcFolderPath = "ADC";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -295,7 +297,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-            List<BatchFile> batchFiles = GetFiles();
+            var batchFiles = GetFiles();
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
             A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -322,6 +324,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetIsNotCreated()
         {
             string filePath = @"D:\\Downloads";
+            fakeFileShareServiceConfig.Value.Info = "INFO";
+            fakeFileShareServiceConfig.Value.AdcFolderPath = "ADC";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();

@@ -236,6 +236,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidSearchFolderFileRequest_ThenReturnFilePath()
         {
+            fakefileShareServiceConfig.Value.ProductType = "ProductType";
+            fakefileShareServiceConfig.Value.BusinessUnit = "ADDS";
+            fakefileShareServiceConfig.Value.Content = "Catalogue";
+            fakefileShareServiceConfig.Value.ContentInfo = "DVD INFO";
+            fakefileShareServiceConfig.Value.CatalogueType = "ADC";
+
             var batchFileList = new List<BatchFile>() {
                 new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
 
@@ -250,8 +256,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         [Test]
         public async Task WhenInvalidSearchFolderFileRequest_ThenReturnEmptyFileList()
-        { 
-            List<BatchFile> batchFileList = new List<BatchFile>() { };
+        {
+            fakefileShareServiceConfig.Value.ProductType = "ProductType";
+            fakefileShareServiceConfig.Value.BusinessUnit = "ADDS";
+            fakefileShareServiceConfig.Value.Content = "Catalogue";
+            fakefileShareServiceConfig.Value.ContentInfo = "DVD INFO";
+            fakefileShareServiceConfig.Value.CatalogueType = "ADC";
+
+            var batchFileList = new List<BatchFile>() { };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
             var result = await fulfilmentFileShareService.SearchAdcFilePath(fakeBatchId, null);
