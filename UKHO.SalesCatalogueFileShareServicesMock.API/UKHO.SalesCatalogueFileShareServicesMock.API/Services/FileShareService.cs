@@ -35,6 +35,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             {
                 fileName = fileShareServiceConfiguration.Value.FssInfoResponseFile;
             }
+            else if (filter.ToUpper().Contains("ADC"))
+            {
+                fileName = fileShareServiceConfiguration.Value.FssAdcResponseFile;
+            }
             else
             {
                 fileName = fileShareServiceConfiguration.Value.ScsResponseFile;
