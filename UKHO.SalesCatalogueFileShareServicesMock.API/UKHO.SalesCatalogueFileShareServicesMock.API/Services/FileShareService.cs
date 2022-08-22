@@ -65,13 +65,18 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                     break;
                 default:
                     {
-                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && File.Exists(Path.Combine(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, filesName[..2], filesName)))
+                        string[] fileDirectorys = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPath, $"*{Path.GetExtension(filesName)}*", SearchOption.AllDirectories).Where(i => i.Split("\\").Last().Equals(filesName)).ToArray();
+                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && (fileDirectorys == null || fileDirectorys.Length == 0))
                         {
                             filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
                         }
+                        else if(fileDirectorys != null && fileDirectorys.Length > 0)
+                        {
+                            filePaths = fileDirectorys;
+                        }
                         else
                         {
-                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPath, $"*{Path.GetExtension(filesName)}*", SearchOption.AllDirectories).Where(i => i.Contains(filesName)).ToArray();
+                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, "*.TXT");
                         }
                         break;
                     }
