@@ -1,0 +1,63 @@
+{
+  "count": 1,
+  "total": 1,
+  "entries": [
+    {
+      "batchId": "22f96e40-63ff-40cb-b423-9baaf04c4458",
+      "status": "Committed",
+      "allFilesZipSize": 1067932,
+      "attributes": [
+        {
+          "key": "Content",
+          "value": "DVD INFO"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-08-05T09:39:45.577Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "End-User-Licence-Agreement-for-ADMIRALTY-digital-data-services.pdf",
+          "fileSize": 96253,
+          "mimeType": "application/pdf",
+          "hash": "hcPL9qhGkXK04bX7lzDdFg==",
+          "attributes": [],
+          "links": { "get": { "href": "/batch/22f96e40-63ff-40cb-b423-9baaf04c4458/files/End-User-Licence-Agreement-for-ADMIRALTY-digital-data-services.pdf" } }
+        },
+        {
+          "filename": "Important Information for AVCS users.pdf",
+          "fileSize": 155722,
+          "mimeType": "application/pdf",
+          "hash": "umt53neIG2Cd/d7VlZJQrw==",
+          "attributes": [],
+          "links": { "get": { "href": "/batch/22f96e40-63ff-40cb-b423-9baaf04c4458/files/Important%20Information%20for%20AVCS%20users.pdf" } }
+        },
+        {
+          "filename": "ENC TandP NM status.pdf",
+          "fileSize": 457669,
+          "mimeType": "application/pdf",
+          "hash": "5uGYrCsRjNUsFyytlyaXug==",
+          "attributes": [],
+          "links": { "get": { "href": "/batch/22f96e40-63ff-40cb-b423-9baaf04c4458/files/ENC%20TandP%20NM%20status.pdf" } }
+        },
+        {
+          "filename": "AVCS-User-Guide.pdf",
+          "fileSize": 648085,
+          "mimeType": "application/pdf",
+          "hash": "4Xi38BZD16xkJkiGBjYvbw==",
+          "attributes": [],
+          "links": { "get": { "href": "/batch/22f96e40-63ff-40cb-b423-9baaf04c4458/files/AVCS-User-Guide.pdf" } }
+        }
+      ]
+    }
+  ],
+  "_Links": {
+    "self": { "href": "/batch?limit=10&start=0&$filter=%24batch%28Product%20Type%29%20eq%20%27AVCS%27%20and%20businessUnit%20eq%20%27ADDS%27%20and%20%24batch%28Content%29%20eq%20%27DVD%20INFO%27" },
+    "first": { "href": "/batch?limit=10&start=0&$filter=%24batch%28Product%20Type%29%20eq%20%27AVCS%27%20and%20businessUnit%20eq%20%27ADDS%27%20and%20%24batch%28Content%29%20eq%20%27DVD%20INFO%27" },
+    "last": { "href": "/batch?limit=10&start=0&$filter=%24batch%28Product%20Type%29%20eq%20%27AVCS%27%20and%20businessUnit%20eq%20%27ADDS%27%20and%20%24batch%28Content%29%20eq%20%27DVD%20INFO%27" }
+  }
+}
