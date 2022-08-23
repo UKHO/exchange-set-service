@@ -415,8 +415,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             TextWriter textWriter = A.Fake<TextWriter>();
             textWriter.Write("Test Stream");
 
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeFileSystemHelper.WriteStream(filePath)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                  async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, fakeBatchId, null); });
@@ -429,8 +429,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             TextWriter textWriter = A.Fake<TextWriter>();
             textWriter.Write("Test Stream");
 
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.WriteStream(filePath)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
             var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, fakeBatchId, null);
 
