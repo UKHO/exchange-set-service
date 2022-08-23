@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Net;
 using System.Threading.Tasks;
@@ -407,19 +408,29 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         #region CreateEncUpdateCsv
 
+        [Test]
         public void WhenInvalidCreateEncUpdateCsvFileRequest_ThenReturnFulfilmentException()
         {
             string filePath = @"D:\\Downloads";
+            TextWriter textWriter = A.Fake<TextWriter>();
+            textWriter.Write("Test Stream");
+
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(filePath)).Returns(textWriter);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                  async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, fakeBatchId, null); });
         }
 
+        [Test]
         public async Task WhenValidCreateEncUpdateCsvFileRequest_ThenReturnTrueResponse()
         {
             string filePath = @"D:\\Downloads";
+            TextWriter textWriter = A.Fake<TextWriter>();
+            textWriter.Write("Test Stream");
+
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(filePath)).Returns(textWriter);
 
             var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, fakeBatchId, null);
 

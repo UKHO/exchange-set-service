@@ -255,11 +255,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 UpdateIssueDate = x.IssueDateLatestUpdate?.ToString("dd/MM/yyyy")
             });
 
-            using var writer = new StreamWriter(file);
-            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-            csv.WriteRecords(productsCsvDetails);
-            csv.WriteField(":ECS");
-            csv.Flush();
+            WriteCsvFile(file, productsCsvDetails);
 
             await Task.CompletedTask;
             var response = fileSystemHelper.CheckFileExists(file);
@@ -269,6 +265,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 throw new FulfilmentException(EventIds.ENCupdateCSVFileIsNotCreated.ToEventId());
             }
             return true;
+        }
+
+        private void WriteCsvFile(string file, IEnumerable<ProductsCsvDetails> productsCsvDetails)
+        {
+            using var writer = fileSystemHelper.WriteStream(file);
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            csv.WriteRecords(productsCsvDetails);
+            csv.WriteField(":ECS");
+            csv.Flush();
         }
 
         private string GetCrcString(string fullFilePath)
