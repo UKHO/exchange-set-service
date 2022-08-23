@@ -225,9 +225,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
-                await Task.CompletedTask;
 
                 var response = fileSystemHelper.CreateFileContent(filePath, content);
+                await Task.CompletedTask;
 
                 if (!response)
                 {
