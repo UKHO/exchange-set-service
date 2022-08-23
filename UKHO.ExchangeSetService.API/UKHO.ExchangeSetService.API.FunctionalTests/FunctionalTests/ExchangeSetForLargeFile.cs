@@ -17,15 +17,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
-
         private readonly List<string> CleanUpBatchIdList = new List<string>();
-
         private List<string> DownloadedFolderPath;
-
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
-
-        
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -37,11 +32,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
-            ////ScsJwtToken = await authTokenProvider.GetScsToken();
-            ScsJwtToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiJmZGFhNDc0Zi00OWE4LTQyNTYtODQ1Zi1kYzJjMTY0NTM1ZWMiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85MTM0Y2E0OC02NjNkLTRhMDUtOTY4YS0zMWE0MmYwYWVkM2UvIiwiaWF0IjoxNjYxMTc1MzMwLCJuYmYiOjE2NjExNzUzMzAsImV4cCI6MTY2MTE4MDk4MiwiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQTUvQnFwYkFLWk9GY3Frb0FDcms0T1JEVU1YNEJMNG5qY3M3S28xcDdrSUkzeXJDdFd3ajkySXpVL1JtM012VGN3RU1LV0NVZVNFQm90eVlmY1RPb1VqbWJtandCa2VjR0tDdHpUSGV0OHQ1SlpNSmVoRUdNLzM5emsvNlF5Ti9rIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6ImZkYWE0NzRmLTQ5YTgtNDI1Ni04NDVmLWRjMmMxNjQ1MzVlYyIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoiTWF5dXJlc2gxMDY2MUBtYXN0ZWsuY29tIiwiaWRwIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvYWRkMWM1MDAtYTZkNy00ZGJkLWI4OTAtN2Y4Y2I2ZjdkODYxLyIsImlwYWRkciI6IjE2My4xMTYuMjA1LjExOCIsIm5hbWUiOiJNYXl1cmVzaCBTYXR5YXdhbiBHYXdkZSIsIm9pZCI6ImIzNWY1OThjLTQ5NTItNGZkZC05OGQ4LTc4MDNhODE4MjBjMSIsInJoIjoiMC5BUUlBU01vMGtUMW1CVXFXaWpHa0x3cnRQazlIcXYyb1NWWkNoRl9jTEJaRk5ld0NBRlUuIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoiaWdRVkE4TC1mbVZmVUY0bFA3c2F0VndlUkhxdDNsVEU4c1hoYmFsQjdLdyIsInRpZCI6IjkxMzRjYTQ4LTY2M2QtNGEwNS05NjhhLTMxYTQyZjBhZWQzZSIsInVuaXF1ZV9uYW1lIjoiTWF5dXJlc2gxMDY2MUBtYXN0ZWsuY29tIiwidXRpIjoiMkFqejFrMG8za2VOUjZVb3F6RTFBQSIsInZlciI6IjEuMCJ9.ZWaVrf1o6lDjb1Dfp6CNUGMwZroXnLMw6NlXSFCj_K4jGNXeh-n4y3Dy22w_iE68VSPEsNMJIkYiTX6ydaj4y22udi46wFzH9Km4F-5yeNFf_IFV5_7p2MdJyZoMJBZLTTYM4bJZvAdgq324da6RHNGpOir3pME2bOs91tv8RdT7BEdYKNs53oIem0BEmOOieulD4RoMNifxrqF8XYAwj5__6pu8HYvHz99OvozLhfjHKPBo3YW1Vo2hZ97PsIl4GVKfSltVr8MGMgKCAmIgvOcrbBc-2yh0NEC6DPrASCh3ReH6cAlVjZW4qOzsLUQGVSvDlfbpNogIVFBTfm5q9g";
+            ScsJwtToken = await authTokenProvider.GetScsToken();
             DataHelper = new DataHelper();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForLargeMedia(), accessToken: EssJwtToken);
-            await Task.Delay(30000);
             //Get the BatchId
             var batchId = await ApiEssResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);
@@ -67,12 +60,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderWithFilesIsGenerated()
         {
-            string[] InfoFolderFiles = { "AVCS-User-Guide.pdf", "ENC TandP NM status.pdf", "End-User-Licence-Agreement-for-ADMIRALTY-digital-data-services.pdf", "Important Information for AVCS users.pdf" };
+            string[] infoFolderFiles = { "AVCS-User-Guide.pdf", "ENC TandP NM status.pdf", "End-User-Licence-Agreement-for-ADMIRALTY-digital-data-services.pdf", "Important Information for AVCS users.pdf" };
             foreach (string folderPath in DownloadedFolderPath)
             {
+                //To verify the INFO folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
-                foreach (string infoFile in InfoFolderFiles)
+
+                //To verify the files under INFO folder exists
+                foreach (string infoFile in infoFolderFiles)
                 {
                     bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName),infoFile);
                     Assert.IsTrue(checkFile, $"{infoFile} does not Exist in the specified folder path.");
@@ -86,9 +82,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             foreach (string folderPath in DownloadedFolderPath)
             {
+                //To verify the ADC folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
                 Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path.");
 
+                //To verify that the files exists under ADC folder
                 int fileCount = Directory.GetFiles(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, Config.POSConfig.LargeExchangeSetAdcFolderName),"*.*",SearchOption.TopDirectoryOnly).Length;
                 Assert.IsTrue(fileCount > 0, $"File count is {fileCount} in the specified folder path.");
             }
