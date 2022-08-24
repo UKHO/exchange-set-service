@@ -1043,8 +1043,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
-                    fileSystemHelper.CreateFileCopy(Path.Combine(exchangeSetPath, item.Filename), new MemoryStream(bytes));
+                    fileSystemHelper.CreateFileCopy(Path.Combine(exchangeSetPath, item.Filename), await httpResponse.Content.ReadAsStreamAsync());
                     logger.LogInformation(EventIds.DownloadInfoFolderFilesOkResponse.ToEventId(), "Successfully downloaded folder files for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 }
                 else
