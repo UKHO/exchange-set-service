@@ -680,7 +680,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805168 - Request for Download Adc folder files from file share service is completed.
         /// </summary>
-        DownloadAdcFolderFilesCompleted = 805168,
+        DownloadAdcFolderFilesCompleted = 805168
     }
 
     public static class EventIdExtensions

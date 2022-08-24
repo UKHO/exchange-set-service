@@ -240,7 +240,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakefileShareServiceConfig.Value.BusinessUnit = "ADDS";
             fakefileShareServiceConfig.Value.Content = "Catalogue";
             fakefileShareServiceConfig.Value.ContentInfo = "DVD INFO";
-            fakefileShareServiceConfig.Value.CatalogueType = "ADC";
+            fakefileShareServiceConfig.Value.Adc = "ADC";
 
             var batchFileList = new List<BatchFile>() {
                 new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
@@ -261,7 +261,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakefileShareServiceConfig.Value.BusinessUnit = "ADDS";
             fakefileShareServiceConfig.Value.Content = "Catalogue";
             fakefileShareServiceConfig.Value.ContentInfo = "DVD INFO";
-            fakefileShareServiceConfig.Value.CatalogueType = "ADC";
+            fakefileShareServiceConfig.Value.Adc = "ADC";
 
             var batchFileList = new List<BatchFile>() { };
 

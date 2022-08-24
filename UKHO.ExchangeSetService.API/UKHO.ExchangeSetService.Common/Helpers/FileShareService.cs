@@ -1031,7 +1031,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         // This function is used to download Info and Adc folder details from FSS for large exchange set
-        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
+        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangeSetPath)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
@@ -1044,7 +1044,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
-                    fileSystemHelper.CreateFileCopy(Path.Combine(exchangesetPath, item.Filename), new MemoryStream(bytes));
+                    fileSystemHelper.CreateFileCopy(Path.Combine(exchangeSetPath, item.Filename), new MemoryStream(bytes));
                     logger.LogInformation(EventIds.DownloadInfoFolderFilesOkResponse.ToEventId(), "Successfully downloaded folder files for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 }
                 else

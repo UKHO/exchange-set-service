@@ -150,7 +150,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
                 ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.AdcFolderPath), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
             });
 
             await Task.WhenAll(ParallelCreateFolderTasks);
@@ -556,7 +556,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart,
                   EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted,
-                  "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                   async () =>
                   {
                       return await fulfilmentFileShareService.SearchAdcFilePath(batchId, correlationId);

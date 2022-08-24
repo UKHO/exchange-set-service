@@ -72,9 +72,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CatalogFileName = "CATALOG.031",
                 CommentVersion = "VERSION=1.0",
                 ContentInfo =  "DVD INFO",
-                Content = "Catalogue",
-                CatalogueType = "ADC",
-                AdcFolderPath = "ADC"
+                Content = "Catalogue",                
+                Adc = "ADC"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
             { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
@@ -280,7 +279,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             string filePath = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.Info = "INFO";
-            fakeFileShareServiceConfig.Value.AdcFolderPath = "ADC";
+            fakeFileShareServiceConfig.Value.Adc = "ADC";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -325,7 +324,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             string filePath = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.Info = "INFO";
-            fakeFileShareServiceConfig.Value.AdcFolderPath = "ADC";
+            fakeFileShareServiceConfig.Value.Adc = "ADC";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();

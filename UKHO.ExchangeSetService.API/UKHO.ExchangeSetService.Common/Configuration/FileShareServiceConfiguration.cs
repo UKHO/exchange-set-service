@@ -35,8 +35,7 @@
         public string ErrorFileName { get; set; }
         public string ContentInfo { get; set; }
         public string Content { get; set; }
-        public string CatalogueType { get; set; }
-        public string AdcFolderPath { get; set; }
+        public string Adc { get; set; }
 
     }
 }

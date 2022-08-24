@@ -146,13 +146,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<List<BatchFile>> SearchAdcFilePath(string batchId, string correlationId)
         {
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.Content}' and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.CatalogueType}'";
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.Content}' and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.Adc}'";
             return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
         }
 
-        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangesetPath)
+        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangeSetPath)
         {
-            return await fileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangesetPath);
+            return await fileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetPath);
         }
     }
 }
