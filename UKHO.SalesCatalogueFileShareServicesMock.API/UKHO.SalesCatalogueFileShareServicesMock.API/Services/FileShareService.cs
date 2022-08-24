@@ -66,7 +66,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 default:
                     {
                         string[] fileDirectorys = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPath, $"*{Path.GetExtension(filesName)}*", SearchOption.AllDirectories).Where(i => i.Split("\\").Last().Equals(filesName)).ToArray();
-                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && (fileDirectorys == null || fileDirectorys.Length == 0))
+                       
+                        bool isEnc = (fileDirectorys == null || fileDirectorys.Length == 0) || (fileDirectorys.Length > 0 &&  fileDirectorys[0].Contains(fileShareServiceConfiguration.Value.FileDirectoryPathForENC));
+                        
+                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && isEnc)
                         {
                             filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
                         }
