@@ -71,8 +71,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ProductFileName = "TEST.TXT",
                 CatalogFileName = "CATALOG.031",
                 CommentVersion = "VERSION=1.0",
-                ContentInfo =  "DVD INFO",
-                Content = "Catalogue",                
+                ContentInfo = "DVD INFO",
+                Content = "Catalogue",
                 Adc = "ADC"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
@@ -278,8 +278,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully()
         {
             string filePath = @"D:\\Downloads";
-            fakeFileShareServiceConfig.Value.Info = "INFO";
-            fakeFileShareServiceConfig.Value.Adc = "ADC";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -323,8 +321,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetIsNotCreated()
         {
             string filePath = @"D:\\Downloads";
-            fakeFileShareServiceConfig.Value.Info = "INFO";
-            fakeFileShareServiceConfig.Value.Adc = "ADC";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();

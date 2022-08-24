@@ -34,7 +34,20 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             fakefileShareService = A.Fake<IFileShareService>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01" });
+            {
+                Limit = 100,
+                Start = 0,
+                ProductLimit = 4,
+                UpdateNumberLimit = 10,
+                EncRoot = "ENC_ROOT",
+                ExchangeSetFileFolder = "V01X01",
+                Info = "INFO",
+                ProductType = "ProductType",
+                BusinessUnit = "ADDS",
+                ContentInfo = "DVD INFO",
+                Content = "Catalogue",
+                Adc = "ADC"
+            });
             fakeLogger = A.Fake<ILogger<FulfilmentFileShareService>>();
 
             fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeLogger);
@@ -109,7 +122,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            Assert.ThrowsAsync<OperationCanceledException>(async()=> await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty));    
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty));
         }
 
         [Test]
@@ -236,12 +249,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidSearchFolderFileRequest_ThenReturnFilePath()
         {
-            fakefileShareServiceConfig.Value.ProductType = "ProductType";
-            fakefileShareServiceConfig.Value.BusinessUnit = "ADDS";
-            fakefileShareServiceConfig.Value.Content = "Catalogue";
-            fakefileShareServiceConfig.Value.ContentInfo = "DVD INFO";
-            fakefileShareServiceConfig.Value.Adc = "ADC";
-
             var batchFileList = new List<BatchFile>() {
                 new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
 
@@ -257,12 +264,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenInvalidSearchFolderFileRequest_ThenReturnEmptyFileList()
         {
-            fakefileShareServiceConfig.Value.ProductType = "ProductType";
-            fakefileShareServiceConfig.Value.BusinessUnit = "ADDS";
-            fakefileShareServiceConfig.Value.Content = "Catalogue";
-            fakefileShareServiceConfig.Value.ContentInfo = "DVD INFO";
-            fakefileShareServiceConfig.Value.Adc = "ADC";
-
             var batchFileList = new List<BatchFile>() { };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
