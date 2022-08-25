@@ -35,6 +35,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsJwtToken = await authTokenProvider.GetScsToken();
             DataHelper = new DataHelper();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForLargeMedia(), accessToken: EssJwtToken);
+            //This will allow to donwload the files
+            await Task.Delay(5000);
             //Get the BatchId
             var batchId = await ApiEssResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);
