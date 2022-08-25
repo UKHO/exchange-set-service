@@ -106,9 +106,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
             {
+                await Task.Delay(5000);
                 stream.CopyTo(outputFileStream);
             }
-            await Task.Delay(5000);
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
