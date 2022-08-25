@@ -154,5 +154,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             return await fileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetPath);
         }
+
     }
 }

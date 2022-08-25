@@ -991,10 +991,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         // This function is used to search Info and Adc folder details from FSS for large exchange set
         public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
         {
-            string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
-            HttpResponseMessage httpResponse;
-            httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
+
+            HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, null, accessToken, uri, CancellationToken.None, correlationId);
 
             List<BatchFile> fileDetails = null;
             if (httpResponse.IsSuccessStatusCode)
@@ -1033,13 +1032,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         // This function is used to download Info and Adc folder details from FSS for large exchange set
         public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangeSetPath)
         {
-            string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
             foreach (var item in fileDetails)
             {
-                HttpResponseMessage httpResponse;
-                httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, item.Links.Get.Href, CancellationToken.None, correlationId);
+                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, null, accessToken, item.Links.Get.Href, CancellationToken.None, correlationId);
 
                 if (httpResponse.IsSuccessStatusCode)
                 {

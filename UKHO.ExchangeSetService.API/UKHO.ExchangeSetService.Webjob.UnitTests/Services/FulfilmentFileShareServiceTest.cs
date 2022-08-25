@@ -257,8 +257,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
             var result = await fulfilmentFileShareService.SearchAdcFilePath(fakeBatchId, null);
             var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(fakeBatchId, null);
-            Assert.IsNotEmpty(result);
-            Assert.IsNotEmpty(batchResult);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(batchFileList, result);
+                Assert.AreEqual(batchFileList, batchResult);
+            }
+            );
         }
 
         [Test]
