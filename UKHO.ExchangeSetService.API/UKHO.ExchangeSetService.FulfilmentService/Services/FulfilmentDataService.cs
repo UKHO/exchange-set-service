@@ -529,7 +529,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
                   EventIds.DownloadInfoFolderRequestCompleted,
                   "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                  async () => await fulfilmentFileShareService.SearchInfoFilePath(batchId, correlationId),
+                  async () =>
+                  {
+                      string uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.ContentInfo}'";
+                      return await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, uri);
+                  },
                   batchId, correlationId);
 
             if (fileDetails != null)
@@ -551,7 +555,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart,
                   EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted,
                   "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                  async () => await fulfilmentFileShareService.SearchAdcFilePath(batchId, correlationId),
+                  async () =>
+                  {
+                      string uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.Content}' and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.Adc}'";
+                      return await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, uri);
+                  },
                   batchId, correlationId);
 
             if (fileDetails != null)

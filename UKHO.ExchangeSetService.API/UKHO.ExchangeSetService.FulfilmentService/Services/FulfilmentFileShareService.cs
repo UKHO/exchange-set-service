@@ -138,15 +138,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(batchId, exchangeSetZipPath, correlationId);
         }
 
-        public async Task<List<BatchFile>> SearchInfoFilePath(string batchId, string correlationId)
+        public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
         {
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.ContentInfo}'";
-            return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
-        }
-
-        public async Task<List<BatchFile>> SearchAdcFilePath(string batchId, string correlationId)
-        {
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.Content}' and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.Adc}'";
             return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
         }
 

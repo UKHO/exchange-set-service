@@ -255,14 +255,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
-            var result = await fulfilmentFileShareService.SearchAdcFilePath(fakeBatchId, null);
-            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(fakeBatchId, null);
-                Assert.Multiple(() =>
-                {
-                    Assert.That(result, Is.EqualTo(batchFileList));
-                    Assert.That(batchResult, Is.EqualTo(batchFileList));
-                }
-            );
+            var batchResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, null);
+            Assert.AreEqual(batchFileList, batchResult);
         }
 
         [Test]
@@ -271,9 +265,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var batchFileList = new List<BatchFile>() { };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
-            var result = await fulfilmentFileShareService.SearchAdcFilePath(fakeBatchId, null);
-            var batchResult = await fulfilmentFileShareService.SearchInfoFilePath(fakeBatchId, null);
-            Assert.IsEmpty(result);
+            var batchResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, null);
             Assert.IsEmpty(batchResult);
         }
 
