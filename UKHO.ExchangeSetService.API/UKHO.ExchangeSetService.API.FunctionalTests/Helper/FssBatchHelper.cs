@@ -96,6 +96,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static async Task<string> ExtractDownloadedFolderForLargeFiles(string downloadFileUrl, string jwtToken, string folderName)
         {
             //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Thread.Sleep()' to avoid intermittent failure in the pipe.
+            await Task.Delay(5000);
             string LargeFolderName = folderName + ".zip";
             string tempFilePath = Path.Combine(Path.GetTempPath(), LargeFolderName);
 
@@ -106,7 +107,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
             {
-                await Task.Delay(5000);
                 stream.CopyTo(outputFileStream);
             }
             string zipPath = tempFilePath;
