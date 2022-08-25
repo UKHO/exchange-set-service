@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.IO;
 using System.Collections.Generic;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -21,6 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private List<string> DownloadedFolderPath;
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
+        public static readonly PeriodicOutputServiceConfiguration posDetails = new TestConfiguration().POSConfig;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -35,8 +37,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsJwtToken = await authTokenProvider.GetScsToken();
             DataHelper = new DataHelper();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForLargeMedia(), accessToken: EssJwtToken);
-            //This will allow to donwload the files
-            await Task.Delay(5000);
             //Get the BatchId
             var batchId = await ApiEssResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);
@@ -62,18 +62,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderWithFilesIsGenerated()
         {
-            string[] infoFolderFiles = { "AVCS-User-Guide.pdf", "ENC TandP NM status.pdf", "End-User-Licence-Agreement-for-ADMIRALTY-digital-data-services.pdf", "Important Information for AVCS users.pdf" };
+            string[] infoFolderFiles = { posDetails.InfoFolderEnctandPnmstatus, posDetails.InfoFolderAvcsUserGuide, posDetails.InfoFolderAddsEul, posDetails.InfoFolderImpInfo};
             foreach (string folderPath in DownloadedFolderPath)
             {
                 //To verify the INFO folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
-                Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
+                Assert.IsTrue(checkFolder, $"{folderPath} not Exist in the specified path");
 
                 //To verify the files under INFO folder exists
                 foreach (string infoFile in infoFolderFiles)
                 {
-                    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName),infoFile);
-                    Assert.IsTrue(checkFile, $"{infoFile} does not Exist in the specified folder path.");
+                    Assert.IsTrue(File.Exists(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, infoFile)));
                 }
             }
         }
@@ -86,7 +85,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 //To verify the ADC folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
-                Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path.");
+                Assert.IsTrue(checkFolder, $"{folderPath} does not exist in the specified path.");
 
                 //To verify that the files exists under ADC folder
                 int fileCount = Directory.GetFiles(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, Config.POSConfig.LargeExchangeSetAdcFolderName),"*.*",SearchOption.TopDirectoryOnly).Length;
