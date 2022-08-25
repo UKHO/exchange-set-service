@@ -255,8 +255,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
-            var batchResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, null);
-            Assert.AreEqual(batchFileList, batchResult);
+            var batchInfoResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Info);
+            var batchAdcResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Adc);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(batchInfoResult, Is.EqualTo(batchFileList));
+                Assert.That(batchAdcResult, Is.EqualTo(batchFileList));
+            });
         }
 
         [Test]
@@ -265,8 +271,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var batchFileList = new List<BatchFile>() { };
 
             A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
-            var batchResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, null);
-            Assert.IsEmpty(batchResult);
+            var batchInfoResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Info);
+            var batchAdcResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Adc);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(batchInfoResult, Is.Empty);
+                Assert.That(batchAdcResult, Is.Empty);
+            });
         }
 
         #endregion SearchFolderFile
