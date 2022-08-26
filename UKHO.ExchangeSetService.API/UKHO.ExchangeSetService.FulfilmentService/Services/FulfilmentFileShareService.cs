@@ -140,14 +140,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string folderName)
         {
-            string uri;
+            string uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+
             if (folderName == fileShareServiceConfig.Value.Info)
             {
-                uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.ContentInfo}'";
+                uri += $" and $batch(Content) eq '{fileShareServiceConfig.Value.ContentInfo}'";
             }
             else
             {
-                uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and $batch(Content) eq '{fileShareServiceConfig.Value.Content}' and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.Adc}'";
+                uri += $" and $batch(Content) eq '{fileShareServiceConfig.Value.Content}'";
+                uri += $" and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.Adc}'";
             }
             return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
         }
