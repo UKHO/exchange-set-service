@@ -3,7 +3,6 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
@@ -44,8 +43,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> ExtractDownloadedFolder(string downloadFileUrl, string jwtToken)
         {
-            //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Thread.Sleep()' to avoid intermittent failure in the pipe.
-            Thread.Sleep(20000);
+            //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
+            await Task.Delay(20000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.ExchangeSetFileName);
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
