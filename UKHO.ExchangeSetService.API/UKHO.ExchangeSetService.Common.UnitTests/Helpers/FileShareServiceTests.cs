@@ -1297,6 +1297,159 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
         }
 
+        #region SearchFolderFiles
+        [Test]
+        public async Task WhenValidSearchFolderFilesRequest_ThenReturnValidFilePath()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
+            string correlationId = "2561fa76-ae35-4bdf-996f-75a3389ab1ad";
+            var searchFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            string correlationidParam = null;
+
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))) };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            var response = await fileShareService.SearchFolderDetails(batchId,correlationId, null);
+            string expectedSearchFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            Assert.IsNotNull(response);
+            Assert.AreEqual(expectedSearchFolderFilePath, searchFolderFileName);
+        }
+
+        [Test]
+        public Task WhenSearchSearchFolderFilesNotFound_ThenReturnFulfilmentException()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string batchId = "a9e518ee-25b0-42ae-96c7-49dafc553c40";
+            string searchFolderFileName = null;
+            string correlationidParam = null;
+
+            var searchBatchResponse = GetSearchBatchEmptyResponse();
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))) };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await fileShareService.SearchFolderDetails(batchId, string.Empty, searchFolderFileName); });
+            return Task.CompletedTask;
+        }
+
+        [Test]
+        public void WhenInvalidSearchFolderFilesRequest_ThenReturnFulfilmentException()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fileShareService.SearchFolderDetails(string.Empty, string.Empty, string.Empty); });
+        }
+        #endregion SearchFolderFiles 
+
+        #region DownloadFolderFiles
+        [Test]
+        public async Task WhenValidDownloadFolderFileRequest_ThenReturnTrue()
+        {
+            var searchFolderFileName = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            string correlationidParam = null;
+            HttpMethod httpMethodParam = null;
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))) };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+
+            };
+
+            var response = await fileShareService.DownloadFolderDetails( fakeBatchId,correlationidParam,batchFileList, fakeExchangeSetPath);
+
+            var expectedFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
+            Assert.AreEqual(true, response);
+            Assert.AreEqual(expectedFolderFilePath, searchFolderFileName);
+        }
+
+        [Test]
+        public void WhenInvalidDownloadAdcFolderFileRequest_ThenReturnFulfilmentException()
+        { 
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string accessTokenParam = null;
+            string uriParam = null;
+            string correlationidParam = null;
+            HttpMethod httpMethodParam = null;
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonResponse))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") } };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationid) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationidParam = correlationid;
+               })
+               .Returns(httpResponse);
+
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+
+            };
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await fileShareService.DownloadFolderDetails(fakeBatchId, correlationidParam, batchFileList, fakeExchangeSetPath); });
+        }
+        #endregion DownloadFolderFiles 
+
         #endregion
     }
 }

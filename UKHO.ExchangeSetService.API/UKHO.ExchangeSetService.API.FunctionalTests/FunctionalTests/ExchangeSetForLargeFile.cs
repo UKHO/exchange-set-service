@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.IO;
 using System.Collections.Generic;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -17,13 +18,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private TestConfiguration Config { get; set; }
         public DataHelper DataHelper { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
-
         private readonly List<string> CleanUpBatchIdList = new List<string>();
-
         private List<string> DownloadedFolderPath;
-
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
+        public static readonly PeriodicOutputServiceConfiguration posDetails = new TestConfiguration().POSConfig;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -61,23 +60,36 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest")]
-        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderIsGenerated()
+        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderWithFilesIsGenerated()
         {
+            string[] infoFolderFiles = { posDetails.InfoFolderEnctandPnmstatus, posDetails.InfoFolderAvcsUserGuide, posDetails.InfoFolderAddsEul, posDetails.InfoFolderImpInfo};
             foreach (string folderPath in DownloadedFolderPath)
             {
+                //To verify the INFO folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
-                Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
+                Assert.IsTrue(checkFolder, $"{folderPath} not Exist in the specified path");
+
+                //To verify the files under INFO folder exists
+                foreach (string infoFile in infoFolderFiles)
+                {
+                    Assert.IsTrue(File.Exists(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, infoFile)));
+                }
             }
         }
 
         [Test]
         [Category("QCOnlyTest")]
-        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderIsGenerated()
+        public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderWithFilesIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)
             {
+                //To verify the ADC folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
-                Assert.IsTrue(checkFolder, $"Folder not Exist in the specified folder path :");
+                Assert.IsTrue(checkFolder, $"{folderPath} does not exist in the specified path.");
+
+                //To verify that the files exists under ADC folder
+                int fileCount = Directory.GetFiles(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, Config.POSConfig.LargeExchangeSetAdcFolderName),"*.*",SearchOption.TopDirectoryOnly).Length;
+                Assert.IsTrue(fileCount > 0, $"File count is {fileCount} in the specified folder path.");
             }
         }
 

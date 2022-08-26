@@ -149,6 +149,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
+                ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
             });
 
             await Task.WhenAll(ParallelCreateFolderTasks);
@@ -520,6 +522,50 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       batchId, correlationId);
             }
             return isZipFileUploaded;
+        }
+
+        public async Task DownloadInfoFolderFiles(string batchId, string exchangeSetInfoPath, string correlationId)
+        {
+            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
+                  EventIds.DownloadInfoFolderRequestCompleted,
+                  "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () => await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, fileShareServiceConfig.Value.Info),
+                  batchId, correlationId);
+
+            if (fileDetails != null)
+            {
+                DateTime createInfoFolderFileTaskStartedAt = DateTime.UtcNow;
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
+                   EventIds.DownloadInfoFolderRequestCompleted,
+                   "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                   async () => await fulfilmentFileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetInfoPath),
+                   batchId, correlationId);
+
+                DateTime createInfoFolderFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download Info Folder File Task", createInfoFolderFileTaskStartedAt, createInfoFolderFileTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+        }
+
+        public async Task DownloadAdcFolderFiles(string batchId, string exchangeSetAdcPath, string correlationId)
+        {
+            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart,
+                  EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted,
+                  "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () => await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, fileShareServiceConfig.Value.Adc),
+                  batchId, correlationId);
+
+            if (fileDetails != null)
+            {
+                DateTime createAdcFolderFilesTaskStartedAt = DateTime.UtcNow;
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadAdcFolderFilesStart,
+                   EventIds.DownloadAdcFolderFilesCompleted,
+                   "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                   async () => await fulfilmentFileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetAdcPath),
+                   batchId, correlationId);
+
+                DateTime createAdcFolderFilesTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download Adc Folder File Task", createAdcFolderFilesTaskStartedAt, createAdcFolderFilesTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
         }
 
     }

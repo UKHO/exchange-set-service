@@ -23,15 +23,28 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             Guid batchId = Guid.NewGuid();
             string batchFolderPath = Path.Combine(homeDirectoryPath, folderName, batchId.ToString());
-            
+
             FileHelper.CheckAndCreateFolder(batchFolderPath);
-            return new BatchResponse() { BatchId= batchId };
+            return new BatchResponse() { BatchId = batchId };
         }
 
         public SearchBatchResponse GetBatches(string filter)
         {
-            var response = FileHelper.ReadJsonFile<SearchBatchResponse>(fileShareServiceConfiguration.Value.FileDirectoryPath + fileShareServiceConfiguration.Value.ScsResponseFile);
-            if (filter.Contains("README.TXT", StringComparison.OrdinalIgnoreCase))
+            string fileName;
+            if (filter.ToUpper().Contains("DVD INFO"))
+            {
+                fileName = fileShareServiceConfiguration.Value.FssInfoResponseFile;
+            }
+            else if (filter.ToUpper().Contains("ADC"))
+            {
+                fileName = fileShareServiceConfiguration.Value.FssAdcResponseFile;
+            }
+            else
+            {
+                fileName = fileShareServiceConfiguration.Value.ScsResponseFile;
+            }
+            var response = FileHelper.ReadJsonFile<SearchBatchResponse>(fileShareServiceConfiguration.Value.FileDirectoryPath + fileName);
+            if (filter.ToUpper().Contains("README.TXT", StringComparison.OrdinalIgnoreCase))
             {
                 response.Entries.RemoveRange(1, response.Entries.Count - 1);
             }
@@ -52,15 +65,22 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                     break;
                 default:
                     {
-                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && !string.Equals("README.TXT", filesName, StringComparison.OrdinalIgnoreCase))
+                        string[] fileDirectorys = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPath, $"*{Path.GetExtension(filesName)}*", SearchOption.AllDirectories).Where(i => i.Split("\\").Last().Equals(filesName)).ToArray();
+                       
+                        bool isEnc = (fileDirectorys == null || fileDirectorys.Length == 0) || (fileDirectorys.Length > 0 &&  fileDirectorys[0].Contains(fileShareServiceConfiguration.Value.FileDirectoryPathForENC));
+                        
+                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && isEnc)
                         {
                             filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
                         }
+                        else if(fileDirectorys != null && fileDirectorys.Length > 0)
+                        {
+                            filePaths = fileDirectorys;
+                        }
                         else
                         {
-                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForReadme, filesName);
+                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, "*.TXT");
                         }
-
                         break;
                     }
             }
@@ -69,7 +89,6 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 string filePath = filePaths[0];
                 bytes = File.ReadAllBytes(filePath);
             }
-            
             return bytes;
         }
 
@@ -117,7 +136,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return batchStatusResponse;
         }
 
-        public bool CleanUp(List<string> batchId,  string homeDirectoryPath)
+        public bool CleanUp(List<string> batchId, string homeDirectoryPath)
         {
             string folderName = fileShareServiceConfiguration.Value.FolderDirectoryName;
             bool deleteFlag = false;

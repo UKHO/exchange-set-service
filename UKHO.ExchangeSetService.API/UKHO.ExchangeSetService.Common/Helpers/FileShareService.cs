@@ -988,6 +988,70 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }, batchStatusMetaData.BatchId, correlationId);
         }
 
+        // This function is used to search Info and Adc folder details from FSS for large exchange set
+        public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
+        {
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+            HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, null, accessToken, uri, CancellationToken.None, correlationId);
+
+            List<BatchFile> fileDetails = null;
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+                if (searchBatchResponse.Entries.Count > 0)
+                {
+                    var batchResult = searchBatchResponse.Entries.SelectMany(i => i.Files);
+                    fileDetails = batchResult.Select(x => new BatchFile
+                    {
+                        Filename =  x.Filename,
+                        Links = new Links
+                        {
+                            Get = new Link
+                            {
+                                Href = x.Links.Get.Href
+                            }
+                        }
+                    }).ToList();
+                }
+                else
+                {
+                    logger.LogError(EventIds.SearchFolderFilesNotFound.ToEventId(), "Error in file share service, folder files not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.SearchFolderFilesNotFound.ToEventId());
+                }
+                logger.LogInformation(EventIds.QueryFileShareServiceSearchFolderFileOkResponse.ToEventId(), "Successfully searched files path for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            }
+            else
+            {
+                logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId());
+            }
+            return fileDetails;
+        }
+
+        // This function is used to download Info and Adc folder details from FSS for large exchange set
+        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangeSetPath)
+        {
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+            foreach (var item in fileDetails)
+            {
+                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, null, accessToken, item.Links.Get.Href, CancellationToken.None, correlationId);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    fileSystemHelper.CreateFileCopy(Path.Combine(exchangeSetPath, item.Filename), await httpResponse.Content.ReadAsStreamAsync());
+                    logger.LogInformation(EventIds.DownloadInfoFolderFilesOkResponse.ToEventId(), "Successfully downloaded folder files for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                }
+                else
+                {
+                    logger.LogError(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId(), "Error in file share service while searching folder files with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                    throw new FulfilmentException(EventIds.QueryFileShareServiceSearchFolderFileNonOkResponse.ToEventId());
+                }
+            }
+            return true;
+        }
+
         #endregion
     }
 }
