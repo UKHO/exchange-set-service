@@ -1001,8 +1001,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
                 if (searchBatchResponse.Entries.Count > 0)
                 {
-                    var batchResult = searchBatchResponse.Entries.SelectMany(i => i.Files);
-                    fileDetails = batchResult.Select(x => new BatchFile
+                    var batchResult = searchBatchResponse.Entries.OrderByDescending(j => j.BatchPublishedDate).FirstOrDefault();
+                    fileDetails = batchResult.Files.Select(x => new BatchFile
                     {
                         Filename =  x.Filename,
                         Links = new Links
