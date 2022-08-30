@@ -989,13 +989,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         // This function is used to search Info and Adc folder details from FSS for large exchange set
-        public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
+        public async Task<IEnumerable<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri)
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
             HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, null, accessToken, uri, CancellationToken.None, correlationId);
 
-            List<BatchFile> fileDetails = null;
+            IEnumerable<BatchFile> fileDetails = null;
             if (httpResponse.IsSuccessStatusCode)
             {
                 SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
@@ -1012,7 +1012,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 Href = x.Links.Get.Href
                             }
                         }
-                    }).ToList();
+                    });
                 }
                 else
                 {
@@ -1030,7 +1030,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         // This function is used to download Info and Adc folder details from FSS for large exchange set
-        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangeSetPath)
+        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, IEnumerable<BatchFile> fileDetails, string exchangeSetPath)
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
