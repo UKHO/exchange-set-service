@@ -34,7 +34,20 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             fakefileShareService = A.Fake<IFileShareService>();
             fakefileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            { Limit = 100, Start = 0, ProductLimit = 4, UpdateNumberLimit = 10, EncRoot = "ENC_ROOT", ExchangeSetFileFolder = "V01X01" });
+            {
+                Limit = 100,
+                Start = 0,
+                ProductLimit = 4,
+                UpdateNumberLimit = 10,
+                EncRoot = "ENC_ROOT",
+                ExchangeSetFileFolder = "V01X01",
+                Info = "INFO",
+                ProductType = "ProductType",
+                BusinessUnit = "ADDS",
+                ContentInfo = "DVD INFO",
+                Content = "Catalogue",
+                Adc = "ADC"
+            });
             fakeLogger = A.Fake<ILogger<FulfilmentFileShareService>>();
 
             fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeLogger);
@@ -65,6 +78,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
         }
 
+
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
             return new SalesCatalogueServiceResponseQueueMessage
@@ -76,6 +90,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
             };
         }
+
 
         [Test]
         public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse()
@@ -107,7 +122,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            Assert.ThrowsAsync<OperationCanceledException>(async()=> await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty));    
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty));
         }
 
         [Test]
@@ -229,6 +244,75 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeIsBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetRootPath, null);
             Assert.AreEqual(false, fakeIsBatchCommitted);
         }
+
+        #region SearchFolderFile
+        [Test]
+        public async Task WhenValidSearchFolderFileRequest_ThenReturnFilePath()
+        {
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+
+            };
+
+            A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
+            var batchInfoResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Info);
+            var batchAdcResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Adc);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(batchInfoResult, Is.EqualTo(batchFileList));
+                Assert.That(batchAdcResult, Is.EqualTo(batchFileList));
+            });
+        }
+
+        [Test]
+        public async Task WhenInvalidSearchFolderFileRequest_ThenReturnEmptyFileList()
+        {
+            var batchFileList = new List<BatchFile>() { };
+
+            A.CallTo(() => fakefileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFileList);
+            var batchInfoResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Info);
+            var batchAdcResult = await fulfilmentFileShareService.SearchFolderDetails(fakeBatchId, null, fakefileShareServiceConfig.Value.Adc);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(batchInfoResult, Is.Empty);
+                Assert.That(batchAdcResult, Is.Empty);
+            });
+        }
+
+        #endregion SearchFolderFile
+
+        #region DownloadFolderDetails
+        [Test]
+        public async Task WhenRequestDownloadFolderDetails_ThenReturnsTrueIfFileIsDownloaded()
+        {
+            bool isFileDownloaded = true;
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+            };
+
+            A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadFolderDetails(fakeExchangeSetRootPath, fakeBatchId, batchFileList, null);
+
+            Assert.AreEqual(true, isFileDownloaded);
+        }
+
+        [Test]
+        public async Task WhenRequestDownloadFolderDetails_ThenReturnsFalseIfFileIsNotDownloaded()
+        {
+            bool isFileDownloaded = false;
+            var batchFileList = new List<BatchFile>() {
+                new BatchFile{  Filename = "TPNMS Diagrams.zip", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } }
+            };
+
+            A.CallTo(() => fakefileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<List<BatchFile>>.Ignored, A<string>.Ignored)).Returns(isFileDownloaded);
+            isFileDownloaded = await fulfilmentFileShareService.DownloadFolderDetails(fakeExchangeSetRootPath, fakeBatchId, batchFileList, null);
+
+            Assert.AreEqual(false, isFileDownloaded);
+        }
+
+        #endregion DownloadFolderDetails
 
         #endregion
     }

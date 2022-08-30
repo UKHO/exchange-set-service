@@ -81,6 +81,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string LargeExchangeSetInfoFolderName { get; set; }
             public string DirectoryPath { get; set; }
             public string ErrorFileName { get; set; }
+            public string InfoFolderAvcsUserGuide { get; set; }
+            public string InfoFolderEnctandPnmstatus { get; set; }
+            public string InfoFolderAddsEul { get; set; }
+            public string InfoFolderImpInfo { get; set; }
         }
 
         public TestConfiguration()

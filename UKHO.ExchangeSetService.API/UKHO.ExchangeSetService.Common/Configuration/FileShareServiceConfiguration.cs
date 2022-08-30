@@ -33,5 +33,9 @@
         public int PosBatchCommitCutOffTimeInMinutes { get; set; }
         public int PosBatchCommitDelayTimeInMilliseconds { get; set; }
         public string ErrorFileName { get; set; }
+        public string ContentInfo { get; set; }
+        public string Content { get; set; }
+        public string Adc { get; set; }
+
     }
 }
