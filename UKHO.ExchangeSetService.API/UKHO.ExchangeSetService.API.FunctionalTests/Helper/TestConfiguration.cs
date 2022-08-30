@@ -85,6 +85,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string InfoFolderEnctandPnmstatus { get; set; }
             public string InfoFolderAddsEul { get; set; }
             public string InfoFolderImpInfo { get; set; }
+            public string EncUpdateList { get; set; }
         }
 
         public TestConfiguration()
