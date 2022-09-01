@@ -680,7 +680,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805168 - Request for Download Adc folder files from file share service is completed.
         /// </summary>
-        DownloadAdcFolderFilesCompleted = 805168
+        DownloadAdcFolderFilesCompleted = 805168,
+        /// <summary>
+        /// 805169 - Download ENC Files from cache container exception
+        /// </summary>
+        DownloadENCFilesFromCacheContainerException = 805169,
+        /// <summary>
+        /// 805170 - Exchange set is created with error while downloading ENC files from cache container
+        /// </summary>
+        ExchangeSetCreatedWithCacheContainerException = 805170
     }
 
     public static class EventIdExtensions
