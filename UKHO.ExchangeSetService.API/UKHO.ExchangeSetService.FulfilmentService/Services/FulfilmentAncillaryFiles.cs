@@ -245,7 +245,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CreateEncUpdateCsv(SalesCatalogueDataResponse salesCatalogueDataResponse, string filePath, string batchId, string correlationId)
         {
-            string file = Path.Combine(filePath, "ENC Update List.csv");
+            string file = Path.Combine(filePath, "ENC Updates List.csv");
             IEnumerable<ProductsCsvDetails> productsCsvDetails = salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName).Select(x => new ProductsCsvDetails
             {
                 ProductName = x.ProductName,
