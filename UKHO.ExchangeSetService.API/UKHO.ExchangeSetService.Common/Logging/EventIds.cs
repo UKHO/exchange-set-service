@@ -686,9 +686,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         DownloadENCFilesFromCacheContainerException = 805169,
         /// <summary>
-        /// 805170 - Exchange set is created with error while downloading ENC files from cache container
+        /// 805170 - Error while downloading ENC files from cache container for specific product but it will get download and cache will update using file share service
         /// </summary>
-        ExchangeSetCreatedWithCacheContainerException = 805170
+        GetBlobDetailsWithCacheContainerException = 805170
     }
 
     public static class EventIdExtensions
