@@ -6,12 +6,12 @@ parameters:
     type: string
 
 steps:
-  - task: FileTransform@1
+  - task: FileTransform@2
     displayName: "File Transform: Ess Config" #Replace exchange set instance value from pipeline 
     inputs:
       folderPath: '$(Pipeline.Workspace)/terraformartifact/src'
-      fileType: 'json'
-      targetFiles: 'appsettings.json'
+      xmlTransformationRules:
+      jsonTargetFiles: 'appsettings.json'
 
   - task: PowerShell@2
     displayName: "terraform devdeploy"
@@ -33,12 +33,12 @@ steps:
       TF_VAR_agent_subnet_name: $(agentSubnetName)
       TF_VAR_agent_subscription_id: $(agentSubscriptionId)
 
-  - task: FileTransform@1
+  - task: FileTransform@2
     displayName: "File Transform: WebAppSettings"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
-      fileType: 'json'
-      targetFiles: '**/appsettings.json'
+      xmlTransformationRules:
+      jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureWebApp@1
     displayName: "Azure App Deploy: ess-$(Environment)-webapp"
@@ -48,12 +48,12 @@ steps:
       appName: "$(WEB_APP_NAME)"
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
 
-  - task: FileTransform@1
+  - task: FileTransform@2
     displayName: "File Transform: WebJob"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
-      fileType: 'json'
-      targetFiles: '**/appsettings.json'
+      xmlTransformationRules:
+      jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2
     displayName: "Azure Fulfilment Webjob Deployment"
