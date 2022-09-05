@@ -245,7 +245,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CreateEncUpdateCsv(SalesCatalogueDataResponse salesCatalogueDataResponse, string filePath, string batchId, string correlationId)
         {
-            string file = Path.Combine(filePath, "ENC Updates List.csv");
+            string file = Path.Combine(filePath, "ENC Update List.csv");
             IEnumerable<ProductsCsvDetails> productsCsvDetails = salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName).Select(x => new ProductsCsvDetails
             {
                 ProductName = x.ProductName,
@@ -257,8 +257,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             WriteCsvFile(file, productsCsvDetails);
 
-            await Task.CompletedTask;
             var response = fileSystemHelper.CheckFileExists(file);
+            await Task.CompletedTask;
+
             if (!response)
             {
                 logger.LogError(EventIds.ENCupdateCSVFileIsNotCreated.ToEventId(), "Error in creating enc update list csv file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
@@ -269,8 +270,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         private void WriteCsvFile(string file, IEnumerable<ProductsCsvDetails> productsCsvDetails)
         {
-            using var writer = fileSystemHelper.WriteStream(file);
-            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            using TextWriter writer = fileSystemHelper.WriteStream(file);
+            using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
             csv.WriteRecords(productsCsvDetails);
             csv.WriteField(":ECS");
             csv.Flush();
