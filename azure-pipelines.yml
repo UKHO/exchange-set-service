@@ -455,12 +455,12 @@ stages:
                     artifactName: 'functionaltests'
                     downloadPath: '$(Build.SourcesDirectory)'
 
-                - task: FileTransform@1
+                - task: FileTransform@2
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    fileType: json
-                    targetFiles: '**/appsettings.json'
+                    xmlTransformationRules:
+                    jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
                   displayName: 'Use .NET Core sdk'
@@ -538,12 +538,12 @@ stages:
                     artifactName: 'functionaltests'
                     downloadPath: '$(Build.SourcesDirectory)'
 
-                - task: FileTransform@1
+                - task: FileTransform@2
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    fileType: json
-                    targetFiles: '**/appsettings.json'
+                    xmlTransformationRules:
+                    jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
                   displayName: 'Use .NET Core sdk'
@@ -625,12 +625,12 @@ stages:
                     artifactName: 'functionaltests'
                     downloadPath: '$(Build.SourcesDirectory)'
 
-                - task: FileTransform@1
+                - task: FileTransform@2
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    fileType: json
-                    targetFiles: '**/appsettings.json'
+                    xmlTransformationRules:
+                    jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
                   displayName: 'Use .NET Core sdk'
