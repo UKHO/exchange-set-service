@@ -71,9 +71,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 List<int?> updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
                 {
-                    updateNumbers.Clear();
-                    int fileCount = 0;
-
                     var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}";
                     var productList = new List<string>();
 
@@ -85,7 +82,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         {
                             var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
 
+                            updateNumbers.Clear();
+                            int fileCount = 0;
                             fileCount = internalBatchDetail.Files.Count();
+
                             if (updateNumbers.Count == fileCount)
                             {
                                 internalSearchBatchResponse.Entries.Add(internalBatchDetail);
@@ -147,15 +147,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
                                 updateNumbers.Add(itemUpdateNumber.Value);
                             }
+                            catch (StorageException storageEx) when (storageEx.Message.Contains("The specified blob does not exist"))
+                            {
+                                logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, storageEx.Message);
+                            }
                             catch (Exception ex)
                             {
-                                if (ex is StorageException && ex.Message.Contains("The specified blob does not exist"))
-                                    logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
-                                else
-                                {
-                                    logger.LogError(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
-                                    throw new FulfilmentException(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId());
-                                }
+                                logger.LogError(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
+                                throw new FulfilmentException(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId());
                             }
                         }
                         internalBatchDetail.IgnoreCache = true;
