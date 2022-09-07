@@ -139,7 +139,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
-            Assert.AreEqual(1, response.Count);
+            Assert.AreEqual(0, response.Count);
         }
 
         [Test]
@@ -251,7 +251,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
-            Assert.AreEqual(1, response.Count);
+            Assert.AreEqual(0, response.Count);
         }
 
         #endregion
