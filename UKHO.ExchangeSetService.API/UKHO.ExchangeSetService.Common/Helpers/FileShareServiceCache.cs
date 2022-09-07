@@ -71,6 +71,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 List<int?> updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
                 {
+                    updateNumbers.Clear();
                     var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}";
                     var productList = new List<string>();
 
@@ -82,9 +83,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         {
                             var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
 
-                            updateNumbers.Clear();
-                            int fileCount = 0;
-                            fileCount = internalBatchDetail.Files.Count();
+                            int fileCount = internalBatchDetail.Files.Count();
 
                             if (updateNumbers.Count == fileCount)
                             {
