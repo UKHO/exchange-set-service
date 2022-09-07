@@ -682,9 +682,17 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         DownloadAdcFolderFilesCompleted = 805168,
         /// <summary>
-        /// 805169 - ENC update csv list not created
+        /// 805169 - Download ENC Files from cache container exception
         /// </summary>
-        ENCupdateCSVFileIsNotCreated = 805169
+        DownloadENCFilesFromCacheContainerException = 805169,
+        /// <summary>
+        /// 805170 - Error while downloading ENC files from cache container for specific product but it will get download and cache will update using file share service
+        /// </summary>
+        GetBlobDetailsWithCacheContainerException = 805170,
+        /// <summary>
+        /// 805171 - ENC update csv file not created
+        /// </summary>
+        ENCupdateCSVFileIsNotCreated = 805171
     }
 
     public static class EventIdExtensions
