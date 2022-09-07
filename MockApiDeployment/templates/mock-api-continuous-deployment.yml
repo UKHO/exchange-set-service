@@ -15,19 +15,19 @@ steps:
       ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
       ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
 
-  - task: FileTransform@1
+  - task: FileTransform@2
     displayName: "File Transform: WebAppSettings"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
-      fileType: 'json'
-      targetFiles: '**/appsettings.json'
+      xmlTransformationRules:
+      jsonTargetFiles: '**/appsettings.json'
 
-  - task: FileTransform@1
+  - task: FileTransform@2
     displayName: "File Transform: WebJob"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
-      fileType: 'json'
-      targetFiles: '**/appsettings.json'
+      xmlTransformationRules:
+      jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2
     displayName: "Mock API deployment"

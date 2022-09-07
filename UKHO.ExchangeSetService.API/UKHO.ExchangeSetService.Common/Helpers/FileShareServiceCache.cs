@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
@@ -66,11 +67,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     UpdateNumbers = new List<int?>(),
                     Bundle = item.Bundle
                 };
+
                 List<int?> updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
                 {
+                    updateNumbers.Clear();
                     var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}";
                     var productList = new List<string>();
+
                     if (!productList.Contains(compareProducts))
                     {
                         var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
@@ -78,7 +82,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
                             var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
-                            internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+
+                            int fileCount = internalBatchDetail.Files.Count();
+
+                            if (updateNumbers.Count == fileCount)
+                            {
+                                internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+                            }
+                            else
+                            {
+                                internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                            }
                             productList.Add(compareProducts);
                         }
                         else
@@ -125,18 +139,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
                             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
-                            
+
                             //Added to check blob exception
                             try
                             {
                                 await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
+                                updateNumbers.Add(itemUpdateNumber.Value);
+                            }
+                            catch (StorageException storageEx) when (storageEx.Message.Contains("The specified blob does not exist"))
+                            {
+                                logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, storageEx.Message);
                             }
                             catch (Exception ex)
                             {
-                                logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
+                                logger.LogError(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
+                                throw new FulfilmentException(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId());
                             }
                         }
-                        updateNumbers.Add(itemUpdateNumber.Value);
                         internalBatchDetail.IgnoreCache = true;
                     }
                     return internalBatchDetail;
