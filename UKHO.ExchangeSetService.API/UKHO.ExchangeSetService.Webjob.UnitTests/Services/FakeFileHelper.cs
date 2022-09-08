@@ -116,5 +116,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+        public TextWriter WriteStream(string filePath)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -138,7 +138,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(batchId, exchangeSetZipPath, correlationId);
         }
 
-        public async Task<List<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string folderName)
+        public async Task<IEnumerable<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string folderName)
         {
             string uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
 
@@ -154,7 +154,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
         }
 
-        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, List<BatchFile> fileDetails, string exchangeSetPath)
+        public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, IEnumerable<BatchFile> fileDetails, string exchangeSetPath)
         {
             return await fileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetPath);
         }

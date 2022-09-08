@@ -688,7 +688,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805170 - Error while downloading ENC files from cache container for specific product but it will get download and cache will update using file share service
         /// </summary>
-        GetBlobDetailsWithCacheContainerException = 805170
+        GetBlobDetailsWithCacheContainerException = 805170,
+        /// <summary>
+        /// 805171 - ENC update csv file not created
+        /// </summary>
+        ENCupdateCSVFileIsNotCreated = 805171
     }
 
     public static class EventIdExtensions
