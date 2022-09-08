@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Net;
 using System.Threading.Tasks;
@@ -296,7 +297,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
-           
+
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                   async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(fakeBatchId, fakeExchangeSetInfoPath, null, "1"); });
         }
@@ -310,7 +311,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => baseFolder1.Name).Returns("B1");
             A.CallTo(() => baseFolder2.Name).Returns("B2");
             IDirectoryInfo[] directoryInfos = { baseFolder1, baseFolder2 };
-            string[] subdirectoryPaths ={ filePath };
+            string[] subdirectoryPaths = { filePath };
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -389,7 +390,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);});
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse); });
             Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
             Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
         }
@@ -401,6 +402,39 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                   async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(fakeBatchId, fakeExchangeSetRootPath, null, null, null, null); });
             Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
             Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+        }
+
+        #endregion
+
+        #region CreateEncUpdateCsv
+
+        [Test]
+        public void WhenInvalidCreateEncUpdateCsvFileRequest_ThenReturnFulfilmentException()
+        {
+            string filePath = @"D:\\Downloads";
+            TextWriter textWriter = A.Fake<TextWriter>();
+            textWriter.Write("Test Stream");
+
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(filePath)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                 async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, fakeBatchId, null); });
+        }
+
+        [Test]
+        public async Task WhenValidCreateEncUpdateCsvFileRequest_ThenReturnTrueResponse()
+        {
+            string filePath = @"D:\\Downloads";
+            TextWriter textWriter = A.Fake<TextWriter>();
+            textWriter.Write("Test Stream");
+
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(filePath)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+
+            var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, fakeBatchId, null);
+
+            Assert.IsTrue(response);
         }
 
         #endregion

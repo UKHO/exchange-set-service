@@ -204,5 +204,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             return Path.GetFileName(fileFullPath);
         }
+
+        public TextWriter WriteStream(string filePath)
+        {
+            return new StreamWriter(filePath);
+        }
     }
 }

@@ -151,6 +151,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse));
                 ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
                 ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.BatchId, message.CorrelationId));
             });
 
             await Task.WhenAll(ParallelCreateFolderTasks);
@@ -526,13 +527,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task DownloadInfoFolderFiles(string batchId, string exchangeSetInfoPath, string correlationId)
         {
-            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
+            IEnumerable<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
                   EventIds.DownloadInfoFolderRequestCompleted,
                   "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                   async () => await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, fileShareServiceConfig.Value.Info),
                   batchId, correlationId);
 
-            if (fileDetails != null)
+            if (fileDetails != null && fileDetails.Any())
             {
                 DateTime createInfoFolderFileTaskStartedAt = DateTime.UtcNow;
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
@@ -548,13 +549,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task DownloadAdcFolderFiles(string batchId, string exchangeSetAdcPath, string correlationId)
         {
-            List<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart,
+            IEnumerable<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart,
                   EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted,
                   "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                   async () => await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, fileShareServiceConfig.Value.Adc),
                   batchId, correlationId);
 
-            if (fileDetails != null)
+            if (fileDetails != null && fileDetails.Any())
             {
                 DateTime createAdcFolderFilesTaskStartedAt = DateTime.UtcNow;
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadAdcFolderFilesStart,

@@ -16,6 +16,8 @@ using UKHO.Torus.Core;
 using UKHO.Torus.Enc.Core;
 using UKHO.Torus.Enc.Core.EncCatalogue;
 using System.IO.Abstractions;
+using System.Globalization;
+using CsvHelper;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -239,6 +241,40 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId(), "Error in sales catalogue service catalogue end point for product.txt responded with {ResponseCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", salesCatalogueDataResponse.ResponseCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId());
             }
+        }
+
+        public async Task<bool> CreateEncUpdateCsv(SalesCatalogueDataResponse salesCatalogueDataResponse, string filePath, string batchId, string correlationId)
+        {
+            string file = Path.Combine(filePath, "ENC Update List.csv");
+            IEnumerable<ProductsCsvDetails> productsCsvDetails = salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName).Select(x => new ProductsCsvDetails
+            {
+                ProductName = x.ProductName,
+                EditionNumber = x.BaseCellEditionNumber,
+                UpdateNumber = x.LatestUpdateNumber,
+                EditionIssueDate = x.BaseCellIssueDate.ToString("dd/MM/yyyy"),
+                UpdateIssueDate = x.IssueDateLatestUpdate?.ToString("dd/MM/yyyy")
+            });
+
+            WriteCsvFile(file, productsCsvDetails);
+
+            var response = fileSystemHelper.CheckFileExists(file);
+            await Task.CompletedTask;
+
+            if (!response)
+            {
+                logger.LogError(EventIds.ENCupdateCSVFileIsNotCreated.ToEventId(), "Error in creating enc update list csv file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                throw new FulfilmentException(EventIds.ENCupdateCSVFileIsNotCreated.ToEventId());
+            }
+            return true;
+        }
+
+        private void WriteCsvFile(string file, IEnumerable<ProductsCsvDetails> productsCsvDetails)
+        {
+            using TextWriter writer = fileSystemHelper.WriteStream(file);
+            using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            csv.WriteRecords(productsCsvDetails);
+            csv.WriteField(":ECS");
+            csv.Flush();
         }
 
         private string GetCrcString(string fullFilePath)
