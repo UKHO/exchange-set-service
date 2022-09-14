@@ -442,7 +442,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var serverValue = httpResponse.Headers.Server.ToString().Split('/').First();
                     fileSystemHelper.CheckAndCreateFolder(downloadPath);
                     string path = Path.Combine(downloadPath, fileName);
-                    if (!fileSystemHelper.CheckFileExists(path))
+                    if (!fileSystemHelper.CheckFileExists(path) || CommonHelper.IsPeriodicOutputService)
                     {
                         await CopyFileToFolder(httpResponse, path, fileName, entry, queueMessage);
                         result = true;
