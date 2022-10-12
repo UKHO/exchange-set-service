@@ -254,4 +254,37 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
     </notes>
     <cve>CVE-2022-30187</cve>
   </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
+	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58194
+	]]></notes>
+	<cve>CVE-2018-8409</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Microsoft.Extensions.Hosting.Abstractions.dll
+	See https://nvd.nist.gov/vuln/detail/CVE-2020-1147 for details on this CVE.
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58192
+	]]></notes>
+	<cve>CVE-2020-1147</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: System.Net.WebSockets.Client:4.0.0
+	For details on these CVEs see:
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0247
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0249
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0256
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58195
+	]]></notes>
+	<cve>CVE-2017-0247</cve>
+	<cve>CVE-2017-0249</cve>
+	<cve>CVE-2017-0256</cve>
+  </suppress>
 </suppressions>
