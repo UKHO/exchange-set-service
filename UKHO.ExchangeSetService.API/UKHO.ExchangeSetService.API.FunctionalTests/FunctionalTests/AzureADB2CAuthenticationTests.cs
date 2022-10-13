@@ -17,8 +17,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string EssB2CCustomizedToken { get; set; }
         public DataHelper DataHelper { get; set; }
         private string FssJwtToken { get; set; }
-        private readonly List<string> CleanUpBatchIdList = new List<string>();
-        private readonly string SinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        private readonly List<string> cleanUpBatchIdList = new List<string>();
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [SetUp]
         public async Task SetupAsync()
@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheDateTimeApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -50,8 +50,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallTheDateTimeApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            string invalidB2cToken = EssB2CToken.Remove(EssB2CToken.Length - 2).Insert(EssB2CToken.Length - 2, "AA");
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: invalidB2cToken);
+            const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: invalidB2CToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheDateTimeApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssB2CCustomizedToken);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssB2CCustomizedToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest")]
         public async Task WhenICallTheDateTimeApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssB2CToken);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssB2CToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
             //verify model structure
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            CleanUpBatchIdList.Add(batchId);
+            cleanUpBatchIdList.Add(batchId);
 
         }
         #endregion
@@ -97,8 +97,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallTheProductIdentifierApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            string invalidB2cToken = EssB2CToken.Remove(EssB2CToken.Length - 2).Insert(EssB2CToken.Length - 2, "AA");
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: invalidB2cToken);
+            const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: invalidB2CToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -124,7 +124,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            CleanUpBatchIdList.Add(batchId);
+            cleanUpBatchIdList.Add(batchId);
         }
         #endregion
 
@@ -133,11 +133,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallTheProductVersionApiWithOutB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
+            List<ProductVersionModel> productVersionData = new List<ProductVersionModel> { DataHelper.GetProductVersionModelData("DE416080", 9, 6) };
 
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
-
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -146,13 +144,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallTheProductVersionApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            string invalidB2cToken = EssB2CToken.Remove(EssB2CToken.Length - 2).Insert(EssB2CToken.Length - 2, "AA");
+            const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
 
-            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
+            List<ProductVersionModel> productVersionData = new List<ProductVersionModel>
+            {
+                DataHelper.GetProductVersionModelData("DE416080", 9, 6)
+            };
 
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 6));
-
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: invalidB2cToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, accessToken: invalidB2CToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -161,11 +160,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest")]
         public async Task WhenICallTheProductVersionApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
+            List<ProductVersionModel> productVersionData = new List<ProductVersionModel>
+            {
+                DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0)
+            };
 
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0));
-
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssB2CCustomizedToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, accessToken: EssB2CCustomizedToken);
 
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
@@ -174,11 +174,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest")]
         public async Task WhenICallTheProductVersionApiWithAValidB2cToken_ThenTheCorrectResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
+            List<ProductVersionModel> productVersionData = new List<ProductVersionModel>
+            {
+                DataHelper.GetProductVersionModelData("DE416080", 9, 1)
+            };
 
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
-
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssB2CToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, accessToken: EssB2CToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
 
             //verify model structure
@@ -186,17 +187,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
-            CleanUpBatchIdList.Add(batchId);
+            cleanUpBatchIdList.Add(batchId);
         }
         #endregion
 
         [OneTimeTearDown]
         public async Task GlobalTeardown()
         {
-            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
             {
                 //Clean up batches from local foldar 
-                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
         }
