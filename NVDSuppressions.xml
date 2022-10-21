@@ -214,4 +214,77 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
     </notes>
     <cve>CVE-2021-43138</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: System.Net.Http:4.3.3
+    See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
+    Package name: System.Net.Http:4.3.3 (included as part of the .Net Core runtime)
+    Vulnerable versions: 4.3.3 and below
+    Secure versions: 4.3.4+
+    This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. ESS is pinned to .Net core SDK > 3.1.419 which is not vulnerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2018-8292</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Http:2.2.2
+    See https://nvd.nist.gov/vuln/detail/CVE-2020-1045 for full details of this CVE.
+    A security feature bypass vulnerability exists in the way Microsoft ASP.NET Core parses encoded cookie names.
+    The ASP.NET Core cookie parser decodes entire cookie strings which could allow a malicious attacker to set a second cookie with the name being percent encoded.
+    Affected software - Any .NET Core 3.1 application running on .NET Core 3.1.7 or lower & any .NET Core 2.1 application running on .NET Core 2.1.21 or lower
+    ESS is pinned to .Net core SDK > 3.1.419 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2020-1045</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        file name:  Azure.Storage.Blobs:12.13.0
+        See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
+            Package name: Azure.Storage.Blobs (included as part of the .Net Core runtime)
+            Vulnerable versions: 12.10.0 and below
+       This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. MSI is pinned to .Net core SDK > 3.1.408 for .NET and Visual Studio Information Disclosure Vulnerability.
+       This is a temporary suppression pending a fix being available.
+       Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=53813
+      ]]>
+    </notes>
+    <cve>CVE-2022-30187</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
+	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58194
+	]]></notes>
+	<cve>CVE-2018-8409</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Microsoft.Extensions.Hosting.Abstractions.dll
+	See https://nvd.nist.gov/vuln/detail/CVE-2020-1147 for details on this CVE.
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58192
+	]]></notes>
+	<cve>CVE-2020-1147</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: System.Net.WebSockets.Client:4.0.0
+	For details on these CVEs see:
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0247
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0249
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0256
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58195
+	]]></notes>
+	<cve>CVE-2017-0247</cve>
+	<cve>CVE-2017-0249</cve>
+	<cve>CVE-2017-0256</cve>
+  </suppress>
 </suppressions>
