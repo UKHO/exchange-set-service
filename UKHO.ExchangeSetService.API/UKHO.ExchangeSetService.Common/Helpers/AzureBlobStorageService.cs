@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.largeExchangeSetInstance = largeExchangeSetInstance;
         }
 
-        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CancellationToken cancellationToken, string expiryDate)
+        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime)
         {
             string uploadFileName = string.Concat(batchId, ".json");
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
@@ -58,14 +58,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await UploadSalesCatalogueServiceResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
-            await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, instanceCountAndType.Item1, storageAccountConnectionString, expiryDate);
+            await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, instanceCountAndType.Item1, storageAccountConnectionString, expiryDate, scsRequestDateTime);
 
             return true;
         }
 
-        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, int instanceNumber, string storageAccountConnectionString, string expiryDate)
+        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, int instanceNumber, string storageAccountConnectionString, string expiryDate, DateTime scsRequestDateTime)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, expiryDate);
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, expiryDate, scsRequestDateTime);
             var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
             await azureMessageQueueHelper.AddMessage(batchId, instanceNumber, storageAccountConnectionString, scsResponseQueueMessageJSON, correlationId);
         }
@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         }
 
-        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, string expiryDate)
+        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, string expiryDate, DateTime scsRequestDateTime)
         {
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
@@ -92,7 +92,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 FileSize = fileSize,
                 CallbackUri = callBackUri == null ? string.Empty : callBackUri,
                 CorrelationId = correlationId,
-                ExchangeSetUrlExpiryDate = expiryDate
+                ExchangeSetUrlExpiryDate = expiryDate,
+                ScsRequestDateTime = scsRequestDateTime
             };
             return scsResponseQueueMessage;
         }

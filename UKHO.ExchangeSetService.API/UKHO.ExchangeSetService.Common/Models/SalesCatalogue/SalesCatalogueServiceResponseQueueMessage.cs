@@ -1,4 +1,6 @@
-﻿namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
+﻿using System;
+
+namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
 {
     public class SalesCatalogueServiceResponseQueueMessage
     {
@@ -8,5 +10,6 @@
         public string CallbackUri { get; set; }
         public string CorrelationId { get; set; }
         public string ExchangeSetUrlExpiryDate { get; set; }
+        public DateTime ScsRequestDateTime { get; set; }
     }
 }

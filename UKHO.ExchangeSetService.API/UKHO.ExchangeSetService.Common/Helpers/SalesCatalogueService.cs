@@ -129,6 +129,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (httpResponse.StatusCode == HttpStatusCode.OK)
                 {
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
+                    response.ScsRequestDateTime = httpResponse!.Headers!.Date!.Value.UtcDateTime;
                 }
                 if (lastModified != null)
                 {
