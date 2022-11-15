@@ -32,6 +32,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         readonly FakeFileHelper fakeFileHelper = new FakeFileHelper();
         public string fakeExchangeSetInfoPath = @"C:\\HOME";
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
+        private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow.AddMinutes(-1);
 
         [SetUp]
         public void Setup()
@@ -230,7 +231,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
         }
 
         [Test]
@@ -242,7 +243,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse);
+            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime);
 
             Assert.AreEqual(true, response);
             Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
