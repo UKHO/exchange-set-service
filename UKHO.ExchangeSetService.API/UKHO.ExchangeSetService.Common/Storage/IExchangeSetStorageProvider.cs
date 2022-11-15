@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.Common.Storage
         /// <param name="callBackUri">batch Id</param>   
         /// <param name="correlationId">batch Id</param>   
         /// <param name="expiryDate">batch Id</param>
-        /// <param name="scsRequestDateTime"></param>
+        /// <param name="scsRequestDateTime">Scs Request DateTime</param>
         /// <returns></returns>
         Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime);
     }

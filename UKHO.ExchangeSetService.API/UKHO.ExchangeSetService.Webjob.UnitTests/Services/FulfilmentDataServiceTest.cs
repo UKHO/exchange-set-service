@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IOptions<PeriodicOutputServiceConfiguration> fakePeriodicOutputServiceConfiguration;
         public IProductDataValidator fakeproductDataValidator;
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
-        private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow.AddMinutes(-1);
+        private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
 
         [SetUp]
         public void Setup()

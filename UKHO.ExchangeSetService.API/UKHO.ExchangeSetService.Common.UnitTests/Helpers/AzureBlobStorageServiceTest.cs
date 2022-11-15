@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IMediumExchangeSetInstance fakeMediumExchangeSetInstance;
         private ILargeExchangeSetInstance fakeLargeExchangeSetInstance;
         public string fakeExpiryDate = "2021-07-23T06:59:13Z";
-        private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow.AddMinutes(-1);
+        private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
 
         [SetUp]
         public void Setup()
