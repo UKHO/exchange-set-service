@@ -287,4 +287,20 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	<cve>CVE-2017-0249</cve>
 	<cve>CVE-2017-0256</cve>
   </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Serilog.Sinks.File:5.0.0
+	For details on these CVEs see:
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-2270
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3479
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3480
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3487
+		This is a temporary suppression pending a fix being available.
+       Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=59829
+	]]></notes>
+	<cve>CVE-2014-2270</cve>
+	<cve>CVE-2014-3479</cve>
+	<cve>CVE-2014-3480</cve>
+	<cve>CVE-2014-3487</cve>
+  </suppress>
 </suppressions>
