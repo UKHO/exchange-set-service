@@ -187,7 +187,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenSCSClientReturns304_ThenPostProductVersionsAsyncReturnsSameStatusAndNullInResponse()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))), Headers = { Date = DateTime.UtcNow } };
             DateTimeOffset lastModified = DateTime.UtcNow;
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -270,7 +270,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenSCSClientReturns304_ThenPostProductIdentifiersAsync304AndLastModifiedDateInResponse()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))), Headers = { Date = DateTime.UtcNow } };
             DateTimeOffset lastModified = DateTime.UtcNow;
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
