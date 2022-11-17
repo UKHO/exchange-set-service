@@ -125,11 +125,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             else
             {
                 response.ResponseCode = httpResponse.StatusCode;
+                response.ScsRequestDateTime = httpResponse!.Headers!.Date!.Value.UtcDateTime;
                 var lastModified = httpResponse.Content.Headers.LastModified;
                 if (httpResponse.StatusCode == HttpStatusCode.OK)
                 {
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
-                    response.ScsRequestDateTime = httpResponse!.Headers!.Date!.Value.UtcDateTime;
                 }
                 if (lastModified != null)
                 {
