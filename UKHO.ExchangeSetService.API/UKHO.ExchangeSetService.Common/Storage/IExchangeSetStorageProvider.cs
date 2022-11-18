@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Storage
@@ -13,8 +14,8 @@ namespace UKHO.ExchangeSetService.Common.Storage
         /// <param name="callBackUri">batch Id</param>   
         /// <param name="correlationId">batch Id</param>   
         /// <param name="expiryDate">batch Id</param>
+        /// <param name="scsRequestDateTime">Scs Request DateTime</param>
         /// <returns></returns>
-        Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate);
-
+        Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime);
     }
 }

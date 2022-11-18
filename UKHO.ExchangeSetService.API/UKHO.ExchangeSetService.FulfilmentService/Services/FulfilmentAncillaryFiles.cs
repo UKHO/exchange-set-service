@@ -191,7 +191,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
         {
             if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -223,7 +223,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         CancelledCellReplacements = String.Join(";", product.CancelledCellReplacements)
                     });
 
-                var content = productsBuilder.WriteProductsList(DateTime.UtcNow);
+                var content = productsBuilder.WriteProductsList(scsRequestDateTime);
                 fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
 
                 var response = fileSystemHelper.CreateFileContent(filePath, content);

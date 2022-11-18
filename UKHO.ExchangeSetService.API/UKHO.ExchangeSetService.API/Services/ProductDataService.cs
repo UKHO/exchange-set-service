@@ -99,7 +99,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId, expiryDate);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime);
             }
 
             return response;
@@ -182,7 +182,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.CorrelationId, expiryDate);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime);
             }
 
             return response;
@@ -228,7 +228,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.CorrelationId, expiryDate);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime);
             }
 
             return response;
@@ -312,14 +312,14 @@ namespace UKHO.ExchangeSetService.API.Services
             return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null;
         }
 
-        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate)
+        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSResponseStoreRequestStart,
                 EventIds.SCSResponseStoreRequestCompleted,
                 "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId, expiryDate);
+                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId, expiryDate, scsRequestDateTime);
 
                     return result;
                 }, batchId, correlationId);

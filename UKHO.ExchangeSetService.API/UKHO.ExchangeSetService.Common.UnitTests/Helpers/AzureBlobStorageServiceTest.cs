@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IMediumExchangeSetInstance fakeMediumExchangeSetInstance;
         private ILargeExchangeSetInstance fakeLargeExchangeSetInstance;
         public string fakeExpiryDate = "2021-07-23T06:59:13Z";
+        private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
 
         [SetUp]
         public void Setup()
@@ -108,7 +110,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate);
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime);
            
             Assert.IsTrue(response);
         }

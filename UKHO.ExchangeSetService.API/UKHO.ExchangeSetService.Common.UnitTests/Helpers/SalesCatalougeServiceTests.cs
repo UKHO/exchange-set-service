@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenSCSClientReturns304_ThenGetProductsFromSpecificDateAsyncReturns304AndLastModifiedDateInResponse()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))), Headers = { Date = DateTime.UtcNow } };
             DateTimeOffset lastModified = DateTime.UtcNow;
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -121,7 +121,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var jsonString = JsonConvert.SerializeObject(scsResponse);
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), Headers = { Date = DateTime.UtcNow } };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
             var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString(), string.Empty);
@@ -147,7 +147,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             //Mock
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), Headers = { Date = DateTime.UtcNow } };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
                 {
@@ -187,7 +187,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenSCSClientReturns304_ThenPostProductVersionsAsyncReturnsSameStatusAndNullInResponse()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))), Headers = { Date = DateTime.UtcNow } };
             DateTimeOffset lastModified = DateTime.UtcNow;
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -204,7 +204,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var jsonString = JsonConvert.SerializeObject(scsResponse);
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), Headers = { Date = DateTime.UtcNow } };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
             var response = await salesCatalogueService.PostProductVersionsAsync(new List<ProductVersionRequest> { new ProductVersionRequest() { EditionNumber = 1, ProductName = "TEST1", UpdateNumber = 0 } }, String.Empty);
@@ -230,7 +230,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             //Mock
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), Headers = { Date = DateTime.UtcNow } };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
                 {
@@ -270,7 +270,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenSCSClientReturns304_ThenPostProductIdentifiersAsync304AndLastModifiedDateInResponse()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.NotModified, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Ignore"))), Headers = { Date = DateTime.UtcNow } };
             DateTimeOffset lastModified = DateTime.UtcNow;
             httpResponse.Content.Headers.LastModified = lastModified;
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -287,7 +287,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var jsonString = JsonConvert.SerializeObject(scsResponse);
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), Headers = { Date = DateTime.UtcNow } };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(httpResponse);
             var response = await salesCatalogueService.PostProductIdentifiersAsync(new List<string> { "TEST1", "TEST2" }, string.Empty);
@@ -313,7 +313,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             //Mock
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
+            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), Headers = { Date = DateTime.UtcNow } };
             A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Invokes((HttpMethod method, string postBody, string accessToken, string uri, string correlationId) =>
                 {

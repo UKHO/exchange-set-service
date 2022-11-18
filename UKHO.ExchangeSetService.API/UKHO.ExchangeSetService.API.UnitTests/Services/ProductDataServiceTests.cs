@@ -126,23 +126,24 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                         RequestedProductsAlreadyUpToDateCount = 8,
                         ReturnedProductCount = 2,
                         RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
-                                new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
-                                new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
-                            }
+                            new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
+                            new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
+                        }
                     },
                     Products = new List<Products> {
-                            new Products {
-                                ProductName = "productName",
-                                EditionNumber = 2,
-                                UpdateNumbers = new List<int?> { 3, 4 },
-                                Cancellation = new Cancellation {
-                                    EditionNumber = 4,
-                                    UpdateNumber = 6
-                                },
-                                FileSize = 400
-                            }
+                        new Products {
+                            ProductName = "productName",
+                            EditionNumber = 2,
+                            UpdateNumbers = new List<int?> { 3, 4 },
+                            Cancellation = new Cancellation {
+                                EditionNumber = 4,
+                                UpdateNumber = 6
+                            },
+                            FileSize = 400
                         }
-                }
+                    }
+                },
+                ScsRequestDateTime = DateTime.UtcNow
             };
         }
         private SalesCatalogueResponse GetSalesCatalogueFileSizeResponse()
@@ -174,7 +175,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                                 FileSize = 500000000
                             }
                         }
-                }
+                },
+                ScsRequestDateTime = DateTime.UtcNow
             };
         }
         #endregion
@@ -348,7 +350,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
