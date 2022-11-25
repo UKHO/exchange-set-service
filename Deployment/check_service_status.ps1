@@ -1,9 +1,10 @@
 Param(
 	[Parameter(mandatory=$true)][string]$healthEndPointUrl,
-    [Parameter(mandatory=$true)][string]$waitTimeInMinute
+    [Parameter(mandatory=$true)][string]$waitTimeInMinute,
+    [Parameter(mandatory=$true)][boolean]$onErrorContinue
 )
 
-$sleepTimeInSecond = 15
+$sleepTimeInSecond = 10
 $isServiceActive = 'false'
 
 $stopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
@@ -43,10 +44,15 @@ If ($HttpResponse -ne $null) {
     $HttpResponse.Close() 
 }
 
+Write-Host "##vso[task.setvariable variable=IS_HEALTHY]$($isServiceActive)"
+
 if ($isServiceActive -eq 'true' ) {
-    Write-Host "Service is up returning from script ..."
+    Write-Host "Service is up returning from script ..."    
 }
 Else { 
     Write-Error "Service was not up in $waitTimeInMinute, error while deployment ..."
-    throw "Error"
+
+    if(!$onErrorContinue) {
+        throw "Error"
+    }
 }

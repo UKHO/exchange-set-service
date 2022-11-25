@@ -56,7 +56,7 @@ module "eventhub" {
   logstashStorageName = lower("${local.service_name}logstash${local.env_name}")
   m_spoke_subnet      = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
-  allowed_ips         = var.allowed_ips
+  allowed_ips         = var.allowed_ips  
   tags                = local.tags
 }
 
@@ -76,6 +76,7 @@ module "webapp_service" {
     "ASPNETCORE_ENVIRONMENT"                               = local.env_name
     "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
+    "WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG"      = "1"
   }
   tags                      = local.tags
   allowed_ips               = var.allowed_ips
@@ -108,7 +109,7 @@ module "fulfilment_webapp" {
 module "fulfilment_storage" {
   source                                = "./Modules/FulfilmentStorage"
   resource_group_name                   = azurerm_resource_group.rg.name
-  allowed_ips                           = var.allowed_ips
+  allowed_ips                           = var.allowed_ips  
   location                              = var.location
   tags                                  = local.tags
   small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
@@ -128,11 +129,11 @@ module "key_vault" {
   env_name            = local.env_name
   tenant_id           = module.user_identity.ess_service_identity_tenant_id
   location            = azurerm_resource_group.rg.location
-  allowed_ips         = var.allowed_ips
+  allowed_ips         = var.allowed_ips  
   subnet_id           = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
   read_access_objects = {
-    "ess_service_identity" = module.user_identity.ess_service_identity_principal_id
+    "ess_service_identity" = module.user_identity.ess_service_identity_principal_id   
   }
   secrets = merge(
       {
@@ -163,7 +164,7 @@ module "fulfilment_keyvaults" {
   env_name                                  = local.env_name
   tenant_id                                 = module.user_identity.ess_service_identity_tenant_id
   location                                  = azurerm_resource_group.rg.location
-  allowed_ips                               = var.allowed_ips
+  allowed_ips                               = var.allowed_ips 
   small_exchange_set_subnets                = data.azurerm_subnet.small_exchange_set_subnet[*].id
   medium_exchange_set_subnets               = data.azurerm_subnet.medium_exchange_set_subnet[*].id
   large_exchange_set_subnets                = data.azurerm_subnet.large_exchange_set_subnet[*].id
@@ -213,7 +214,7 @@ module "azure-dashboard" {
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   resource_group_name                   = azurerm_resource_group.rg.name
-  allowed_ips                           = var.allowed_ips
+  allowed_ips                           = var.allowed_ips  
   location                              = var.location
   tags                                  = local.tags
   small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
