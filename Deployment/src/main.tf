@@ -76,6 +76,7 @@ module "webapp_service" {
     "ASPNETCORE_ENVIRONMENT"                               = local.env_name
     "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
+    "WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG"      = "1"
   }
   tags                      = local.tags
   allowed_ips               = var.allowed_ips
@@ -132,7 +133,7 @@ module "key_vault" {
   subnet_id           = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
   read_access_objects = {
-    "ess_service_identity" = module.user_identity.ess_service_identity_principal_id
+    "ess_service_identity" = module.user_identity.ess_service_identity_principal_id   
   }
   secrets = merge(
       {
