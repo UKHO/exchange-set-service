@@ -58,3 +58,11 @@ output "web_app_resource_group" {
 output "ess_managed_user_identity_client_id"{
     value = module.user_identity.ess_service_client_id
 }
+
+output "web_app_slot_name" {
+  value = module.webapp_service.slot_name
+}
+
+output "web_app_slot_default_site_hostname" {
+  value = module.webapp_service.slot_default_site_hostname
+}

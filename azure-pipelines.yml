@@ -43,92 +43,92 @@ variables:
     value: NautilusBuild
   - group: Covscan-vars
 
-resources:
-  repositories:
-  - repository: covscan
-    type: github
-    name: UKHO/coverityscan-buildtemplates
-    endpoint: UKHO
-    ref: refs/heads/master
+#resources:
+#  repositories:
+#  - repository: covscan
+#    type: github
+#    name: UKHO/coverityscan-buildtemplates
+#    endpoint: UKHO
+#    ref: refs/heads/master
 
 stages:
-  - stage: CoverityScan
-    displayName: "Coverity Scan"
-    pool:
-      name: $(coverityPool)
-    jobs:
-    - job: Coverity
-      workspace:
-        clean: all
-      steps:
-        - checkout: self
-          submodules: recursive
-        - task: UseDotNet@2
-          displayName: 'Use .NET Core sdk'
-          inputs:
-            packageType: sdk
-            version: 3.1.x
-            installationPath: $(Agent.ToolsDirectory)/dotnet
-        - checkout: covscan
-        - template: dotnet-cov.yml@covScan
-          parameters:
-            CovHostUrl: "$(CovHostUrl)"
-            CovUser: "$(CovUser)"
-            CovPwd: "$(CovPwd)"
-            StreamName: "exchange-set-service"
-            BuildCommand: "$(Build.Repository.LocalPath)/exchange-set-service/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API.csproj"
-            StripPath: $(Build.Repository.LocalPath)/exchange-set-service
-            CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
+  #- stage: CoverityScan
+  #  displayName: "Coverity Scan"
+  #  pool:
+  #    name: $(coverityPool)
+  #  jobs:
+  #  - job: Coverity
+  #    workspace:
+  #      clean: all
+  #    steps:
+  #      - checkout: self
+  #        submodules: recursive
+  #      - task: UseDotNet@2
+  #        displayName: 'Use .NET Core sdk'
+  #        inputs:
+  #          packageType: sdk
+  #          version: 3.1.x
+  #          installationPath: $(Agent.ToolsDirectory)/dotnet
+  #      - checkout: covscan
+  #      - template: dotnet-cov.yml@covScan
+  #        parameters:
+  #          CovHostUrl: "$(CovHostUrl)"
+  #          CovUser: "$(CovUser)"
+  #          CovPwd: "$(CovPwd)"
+  #          StreamName: "exchange-set-service"
+  #          BuildCommand: "$(Build.Repository.LocalPath)/exchange-set-service/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API.csproj"
+  #          StripPath: $(Build.Repository.LocalPath)/exchange-set-service
+  #          CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
 
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
     dependsOn: []
     jobs:
-      - job: Dependencychecker
-        workspace:
-          clean: all
-        displayName: "Dependencychecker"
-        steps:
-          - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
-            inputs:
-              packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+      #- job: Dependencychecker
+      #  workspace:
+      #    clean: all
+      #  displayName: "Dependencychecker"
+      #  steps:
+      #    - task: UseDotNet@2
+      #      displayName: 'Use .NET Core 3.1.x sdk'
+      #      inputs:
+      #        packageType: sdk
+      #        useGlobalJson: true
+      #        workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
-          - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore non test projects only"
-            inputs:
-              command: "restore"
-              projects: |
-                **/*.csproj
-                !**/*Tests.csproj
-              feedsToUse: config
-              noCache: true
-              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
+      #    - task: DotNetCoreCLI@2
+      #      displayName: ".Net Core - NuGet restore non test projects only"
+      #      inputs:
+      #        command: "restore"
+      #        projects: |
+      #          **/*.csproj
+      #          !**/*Tests.csproj
+      #        feedsToUse: config
+      #        noCache: true
+      #        nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+      #        workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+      #        packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
 
-          - task: CmdLine@1
-            displayName: "Run OWASP Dependency Checker"
-            inputs:
-              filename: 'dependency-check.bat'
-              arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
+      #    - task: CmdLine@1
+      #      displayName: "Run OWASP Dependency Checker"
+      #      inputs:
+      #        filename: 'dependency-check.bat'
+      #        arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Artifact: OWASP Dependency Checker Report"
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)\DCReport'
-              ArtifactName: "OWASP Dependency Checker Report"
+      #    - task: PublishBuildArtifacts@1
+      #      displayName: "Publish Artifact: OWASP Dependency Checker Report"
+      #      inputs:
+      #        PathtoPublish: '$(Build.ArtifactStagingDirectory)\DCReport'
+      #        ArtifactName: "OWASP Dependency Checker Report"
 
-          - task: PowerShell@1
-            displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
-            inputs:
-              scriptType: inlineScript
-              arguments: '-ReportLocation $(Build.ArtifactStagingDirectory)\DCReport\*'
-              inlineScript: |
-                param($ReportLocation)
-                Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
+      #    - task: PowerShell@1
+      #      displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
+      #      inputs:
+      #        scriptType: inlineScript
+      #        arguments: '-ReportLocation $(Build.ArtifactStagingDirectory)\DCReport\*'
+      #        inlineScript: |
+      #          param($ReportLocation)
+      #          Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
       - job: UnitTestsAndCodeCoverage
         workspace:
