@@ -32,6 +32,7 @@ do
     catch [System.Net.WebException]
     {
         $HttpStatus = $_.Exception.Response.StatusCode
+        Write-Host "Service not yet Up. Response: $HttpResponse re-checking after $sleepTimeInSecond sec ..."
         Write-Host "Service not yet Up.Status: $HttpStatus re-checking after $sleepTimeInSecond sec ..."
     }    
     
