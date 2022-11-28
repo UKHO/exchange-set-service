@@ -25,6 +25,7 @@ do
             break
         }
         Else {
+            Write-Host "Service not yet Up. Response: $HttpResponse re-checking after $sleepTimeInSecond sec ..."
             Write-Host "Service not yet Up. Status code: $HttpStatus re-checking after $sleepTimeInSecond sec ..."
         }
     }
