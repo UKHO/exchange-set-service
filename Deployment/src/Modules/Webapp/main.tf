@@ -76,7 +76,7 @@ resource "azurerm_app_service_slot" "staging" {
 
    identity {
     type = "UserAssigned"
-    identity_ids = [var.user_assigned_slot_identity]
+    identity_ids = [var.user_assigned_identity]
   }
 
   https_only          = azurerm_app_service.webapp_service.https_only
