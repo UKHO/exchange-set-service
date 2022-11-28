@@ -67,6 +67,7 @@ module "webapp_service" {
   location                  = azurerm_resource_group.rg.location
   subnet_id                 = data.azurerm_subnet.main_subnet.id
   user_assigned_identity    = module.user_identity.ess_service_identity_id
+  user_assigned_slot_identity    = module.user_identity.ess_service_slot_identity_id
   app_service_sku           = var.app_service_sku[local.env_name]
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
@@ -134,7 +135,7 @@ module "key_vault" {
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
   read_access_objects = {
     "ess_service_identity" = module.user_identity.ess_service_identity_principal_id,
-    "webapp_slot" = module.webapp_service.slot_principal_id
+    "ess_service_slot_identity" = module.user_identity.ess_service_slot_identity_principal_id
   }
   secrets = merge(
       {
@@ -171,8 +172,8 @@ module "fulfilment_keyvaults" {
   large_exchange_set_subnets                = data.azurerm_subnet.large_exchange_set_subnet[*].id
   agent_subnet                              = data.azurerm_subnet.agent_subnet.id
     read_access_objects = {
-        "ess_service_identity" = module.user_identity.ess_service_identity_principal_id   ,
-        "webapp_slot" = module.webapp_service.slot_principal_id
+        "ess_service_identity" = module.user_identity.ess_service_identity_principal_id,
+        "ess_service_slot_identity" = module.user_identity.ess_service_slot_identity_principal_id
   }
   small_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
