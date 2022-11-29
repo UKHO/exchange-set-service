@@ -34,7 +34,3 @@ variable "app_service_sku" {
 variable "allowed_ips" {
 
 }
-
-variable "user_assigned_slot_identity" {
-  type = string
-}
