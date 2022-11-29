@@ -50,12 +50,12 @@ steps:
       deployToSlotOrASE: true
       slotName: $(WEB_APP_SLOT_NAME)
 
-  - task: PowerShell@2
-    displayName: "Check the status of stagging slot"
-    inputs:
-      targetType: filePath
-      filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl  https://$(WEB_APP_SLOT_HOST_NAME)/health -waitTimeInMinute $(waitTimeInMinute)"
+  #- task: PowerShell@2
+  #  displayName: "Check the status of stagging slot"
+  #  inputs:
+  #    targetType: filePath
+  #    filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
+  #    arguments: "-healthEndPointUrl  https://$(WEB_APP_SLOT_HOST_NAME)/health -waitTimeInMinute $(waitTimeInMinute)"
 
   - task: AzureAppServiceManage@0
     displayName: "Swap with production slot"
