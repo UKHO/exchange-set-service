@@ -26,6 +26,10 @@ variable "allowed_ips" {
 
 }
 
+variable "ip_rules" {
+
+}
+
 variable "tags" {
 
 }

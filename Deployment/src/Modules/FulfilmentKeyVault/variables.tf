@@ -30,6 +30,10 @@ variable "allowed_ips" {
 
 }
 
+variable "ip_rules" {
+
+}
+
 variable "small_exchange_set_subnets" {
 }
 

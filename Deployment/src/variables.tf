@@ -28,6 +28,10 @@ variable "allowed_ips" {
   type = list
 }
 
+variable "ip_rules" {
+  type = list
+}
+
 variable "spoke_rg" {
   type = string
 }

@@ -8,7 +8,7 @@ resource "azurerm_storage_account" "small_exchange_set_storage" {
   allow_blob_public_access  = false
   network_rules {
     default_action             = "Deny"
-    ip_rules                   = var.allowed_ips
+    ip_rules                   = var.ip_rules
     bypass                     = ["Logging", "Metrics", "AzureServices"]
     virtual_network_subnet_ids = concat(var.small_exchange_set_subnets,[var.m_spoke_subnet,var.agent_subnet])
   }
@@ -39,7 +39,7 @@ resource "azurerm_storage_account" "medium_exchange_set_storage" {
   allow_blob_public_access     = false
   network_rules {
     default_action             = "Deny"
-    ip_rules                   = var.allowed_ips
+    ip_rules                   = var.ip_rules
     bypass                     = ["Logging", "Metrics", "AzureServices"]
     virtual_network_subnet_ids = concat(var.medium_exchange_set_subnets,[var.m_spoke_subnet,var.agent_subnet])
   }
@@ -70,7 +70,7 @@ resource "azurerm_storage_account" "large_exchange_set_storage" {
   allow_blob_public_access     = false
   network_rules {
     default_action             = "Deny"
-    ip_rules                   = var.allowed_ips
+    ip_rules                   = var.ip_rules
     bypass                     = ["Logging", "Metrics", "AzureServices"]
     virtual_network_subnet_ids = concat(var.large_exchange_set_subnets,[var.m_spoke_subnet,var.agent_subnet])
   }

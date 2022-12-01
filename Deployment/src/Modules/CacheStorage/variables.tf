@@ -17,6 +17,10 @@ variable "allowed_ips" {
 
 }
 
+variable "ip_rules" {
+
+}
+
 variable "service_name" {
   type = string
 }

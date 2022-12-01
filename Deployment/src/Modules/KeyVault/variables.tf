@@ -34,6 +34,10 @@ variable "allowed_ips" {
 
 }
 
+variable "ip_rules" {
+  type = list
+}
+
 variable "subnet_id" {
   type = string
 }

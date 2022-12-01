@@ -8,7 +8,7 @@ resource "azurerm_storage_account" "ess_cache_storage" {
   allow_blob_public_access  = false
   network_rules {
     default_action             = "Deny"
-    ip_rules                   = var.allowed_ips
+    ip_rules                   = var.ip_rules
     bypass                     = ["Logging", "Metrics", "AzureServices"]
     virtual_network_subnet_ids = flatten([[var.m_spoke_subnet,var.agent_subnet],var.small_exchange_set_subnets,var.medium_exchange_set_subnets,var.large_exchange_set_subnets])
    }
