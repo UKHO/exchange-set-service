@@ -51,12 +51,12 @@ steps:
       deployToSlotOrASE: true
       slotName: $(WEB_APP_SLOT_NAME)
 
-  - task: PowerShell@2
-    displayName: "Check the status of stagging slot"
-    inputs:
-      targetType: filePath
-      filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl  https://$(WEB_APP_SLOT_HOST_NAME)/health -waitTimeInMinute $(waitTimeInMinute)"
+  #- task: PowerShell@2
+  #  displayName: "Check the status of stagging slot"
+  #  inputs:
+  #    targetType: filePath
+  #    filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
+  #    arguments: "-healthEndPointUrl  https://$(WEB_APP_SLOT_HOST_NAME)/health -waitTimeInMinute $(waitTimeInMinute)"
 
   - task: AzureAppServiceManage@0
     displayName: "Swap with production slot"
@@ -73,7 +73,25 @@ steps:
     inputs:
       targetType: filePath
       filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute)"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 1"
+
+  - task: AzureAppServiceManage@0
+    displayName: "Swap with production slot - Rollback"
+    condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
+    inputs:
+      azureSubscription: "${{ parameters.AzureSubscription }}"
+      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      webAppName: $(WEB_APP_NAME)
+      action: "Swap Slots"
+      swapWithProduction: true
+      sourceSlot: $(WEB_APP_SLOT_NAME)  
+
+  - task: PowerShell@2
+    displayName: "Check the status of production slot"
+    inputs:
+      targetType: filePath
+      filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 0"
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"

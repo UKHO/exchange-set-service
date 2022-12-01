@@ -130,50 +130,50 @@ stages:
       #          param($ReportLocation)
       #          Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
-      - job: UnitTestsAndCodeCoverage
-        workspace:
-          clean: all
-        displayName: "Dotnet Test and Publish Code Coverage"
-        steps:
-          - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
-            inputs:
-              packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+      #- job: UnitTestsAndCodeCoverage
+      #  workspace:
+      #    clean: all
+      #  displayName: "Dotnet Test and Publish Code Coverage"
+      #  steps:
+      #    - task: UseDotNet@2
+      #      displayName: 'Use .NET Core 3.1.x sdk'
+      #      inputs:
+      #        packageType: sdk
+      #        useGlobalJson: true
+      #        workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
-          - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore test projects only"
-            inputs:
-              command: "restore"
-              projects: "**/*Tests.csproj"
-              feedsToUse: config
-              noCache: true
-              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
+      #    - task: DotNetCoreCLI@2
+      #      displayName: ".Net Core - NuGet restore test projects only"
+      #      inputs:
+      #        command: "restore"
+      #        projects: "**/*Tests.csproj"
+      #        feedsToUse: config
+      #        noCache: true
+      #        nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+      #        workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+      #        packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packagesForTests'
 
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet test - Perform Unit Tests"
-            inputs:
-              command: "test"
-              projects: "**/*UnitTests.csproj"
-              arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
-              publishTestResults: true
-              testRunTitle: "UnitTests"
+      #    - task: DotNetCoreCLI@2
+      #      displayName: "dotnet test - Perform Unit Tests"
+      #      inputs:
+      #        command: "test"
+      #        projects: "**/*UnitTests.csproj"
+      #        arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+      #        publishTestResults: true
+      #        testRunTitle: "UnitTests"
 
-          - task: PowerShell@2
-            displayName: "Generate code coverage report"
-            inputs:
-              targetType: filePath
-              filePath: '$(Build.SourcesDirectory)\CodeCoverageReport.ps1'
-              arguments: '-source "$(Build.SourcesDirectory)" -reportFolder "$(Build.ArtifactStagingDirectory)"'
+      #    - task: PowerShell@2
+      #      displayName: "Generate code coverage report"
+      #      inputs:
+      #        targetType: filePath
+      #        filePath: '$(Build.SourcesDirectory)\CodeCoverageReport.ps1'
+      #        arguments: '-source "$(Build.SourcesDirectory)" -reportFolder "$(Build.ArtifactStagingDirectory)"'
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Code coverage"
-            inputs:
-              PathtoPublish: "$(Build.ArtifactStagingDirectory)/codecoveragereport"
-              ArtifactName: codecoveragereport
+      #    - task: PublishBuildArtifacts@1
+      #      displayName: "Publish Code coverage"
+      #      inputs:
+      #        PathtoPublish: "$(Build.ArtifactStagingDirectory)/codecoveragereport"
+      #        ArtifactName: codecoveragereport
 
       - job: BuildAndPublishAPI
         workspace:
