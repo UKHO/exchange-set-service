@@ -57,6 +57,7 @@ module "eventhub" {
   m_spoke_subnet      = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
   allowed_ips         = var.allowed_ips
+  ip_rules            = var.ip_rules
   tags                = local.tags
 }
 
@@ -110,6 +111,7 @@ module "fulfilment_storage" {
   source                                = "./Modules/FulfilmentStorage"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips
+  ip_rules                              = var.ip_rules
   location                              = var.location
   tags                                  = local.tags
   small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
@@ -130,6 +132,7 @@ module "key_vault" {
   tenant_id           = module.user_identity.ess_service_identity_tenant_id
   location            = azurerm_resource_group.rg.location
   allowed_ips         = var.allowed_ips
+  ip_rules            = var.ip_rules
   subnet_id           = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
   read_access_objects = {
@@ -165,6 +168,7 @@ module "fulfilment_keyvaults" {
   tenant_id                                 = module.user_identity.ess_service_identity_tenant_id
   location                                  = azurerm_resource_group.rg.location
   allowed_ips                               = var.allowed_ips
+  ip_rules                                  = var.ip_rules
   small_exchange_set_subnets                = data.azurerm_subnet.small_exchange_set_subnet[*].id
   medium_exchange_set_subnets               = data.azurerm_subnet.medium_exchange_set_subnet[*].id
   large_exchange_set_subnets                = data.azurerm_subnet.large_exchange_set_subnet[*].id
@@ -215,6 +219,7 @@ module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips
+  ip_rules                              = var.ip_rules
   location                              = var.location
   tags                                  = local.tags
   small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
