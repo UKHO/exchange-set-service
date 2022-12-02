@@ -52,33 +52,33 @@ resources:
     ref: refs/heads/master
 
 stages:
-  #- stage: CoverityScan
-  #  displayName: "Coverity Scan"
-  #  pool:
-  #    name: $(coverityPool)
-  #  jobs:
-  #  - job: Coverity
-  #    workspace:
-  #      clean: all
-  #    steps:
-  #      - checkout: self
-  #        submodules: recursive
-  #      - task: UseDotNet@2
-  #        displayName: 'Use .NET Core sdk'
-  #        inputs:
-  #          packageType: sdk
-  #          version: 3.1.x
-  #          installationPath: $(Agent.ToolsDirectory)/dotnet
-  #      - checkout: covscan
-  #      - template: dotnet-cov.yml@covScan
-  #        parameters:
-  #          CovHostUrl: "$(CovHostUrl)"
-  #          CovUser: "$(CovUser)"
-  #          CovPwd: "$(CovPwd)"
-  #          StreamName: "exchange-set-service"
-  #          BuildCommand: "$(Build.Repository.LocalPath)/exchange-set-service/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API.csproj"
-  #          StripPath: $(Build.Repository.LocalPath)/exchange-set-service
-  #          CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
+  - stage: CoverityScan
+    displayName: "Coverity Scan"
+    pool:
+      name: $(coverityPool)
+    jobs:
+    - job: Coverity
+      workspace:
+        clean: all
+      steps:
+        - checkout: self
+          submodules: recursive
+        - task: UseDotNet@2
+          displayName: 'Use .NET Core sdk'
+          inputs:
+            packageType: sdk
+            version: 3.1.x
+            installationPath: $(Agent.ToolsDirectory)/dotnet
+        - checkout: covscan
+        - template: dotnet-cov.yml@covScan
+          parameters:
+            CovHostUrl: "$(CovHostUrl)"
+            CovUser: "$(CovUser)"
+            CovPwd: "$(CovPwd)"
+            StreamName: "exchange-set-service"
+            BuildCommand: "$(Build.Repository.LocalPath)/exchange-set-service/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API.csproj"
+            StripPath: $(Build.Repository.LocalPath)/exchange-set-service
+            CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
 
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
