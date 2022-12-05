@@ -24,7 +24,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.11" />
     <!--<PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.1" />-->
     <!--<PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />-->
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="7.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.25.1" />
     <!--<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />-->
     <!--<PackageReference Include="runtime.native.System.Net.Security" Version="4.3.1" />-->
