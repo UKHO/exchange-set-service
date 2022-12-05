@@ -42,6 +42,8 @@ variables:
   - name: coverityPool
     value: NautilusBuild
   - group: Covscan-vars
+  - name: SdkVersion
+    value: "6.0.403"
 
 resources:
   repositories:
@@ -90,10 +92,11 @@ stages:
         displayName: "Dependencychecker"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
+              #useGlobalJson: true
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -136,10 +139,11 @@ stages:
         displayName: "Dotnet Test and Publish Code Coverage"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              #useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -188,10 +192,11 @@ stages:
               arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
 
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              #useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -269,10 +274,11 @@ stages:
         displayName: "Publish Functional Tests And Terraform"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              #useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -349,10 +355,11 @@ stages:
               arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$(UKHOAssemblyProduct) Mock"'
 
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core  $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              #useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
 
           - task: DotNetCoreCLI@2
