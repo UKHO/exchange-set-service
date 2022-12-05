@@ -18,7 +18,7 @@ resource "azurerm_app_service" "webapp_service" {
   tags                = var.tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
