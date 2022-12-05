@@ -66,10 +66,11 @@ stages:
         - checkout: self
           submodules: recursive
         - task: UseDotNet@2
-          displayName: 'Use .NET Core sdk'
+          displayName: 'Use .NET Core  $(SdkVersion) sdk'
           inputs:
             packageType: sdk
-            version: 3.1.x
+            #version: 3.1.x
+            version: $(SdkVersion)
             installationPath: $(Agent.ToolsDirectory)/dotnet
         - checkout: covscan
         - template: dotnet-cov.yml@covScan
@@ -470,10 +471,11 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
+                  displayName: 'Use .NET Core  $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    version: 3.1.x
+                    #version: 3.1.x
+                    version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
@@ -553,10 +555,11 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
+                  displayName: 'Use .NET Core $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    version: 3.1.x
+                    #version: 3.1.x
+                    version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
@@ -640,10 +643,11 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
+                  displayName: 'Use .NET Core $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    version: 3.1.x
+                    #version: 3.1.x
+                    version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
