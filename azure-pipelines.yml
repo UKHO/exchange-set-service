@@ -43,7 +43,7 @@ variables:
     value: NautilusBuild
   - group: Covscan-vars
   - name: SdkVersion
-    value: "6.0.403"
+    value: "6.0.x"
 
 resources:
   repositories:
