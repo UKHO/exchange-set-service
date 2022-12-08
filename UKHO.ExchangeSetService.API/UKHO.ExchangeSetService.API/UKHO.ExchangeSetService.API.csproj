@@ -12,7 +12,6 @@
   <ItemGroup>
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
     <PackageReference Include="Azure.Identity" Version="1.8.0" />
-    <!--<PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.4.0" />-->
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="FluentValidation" Version="11.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.11" />
@@ -20,7 +19,6 @@
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="6.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.11" />
     <!--<PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.1" />-->
-    <!--<PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />-->
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="7.0.0" />
     <!--<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />-->
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
@@ -31,7 +29,6 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
-    <!--<PackageReference Include="System.Net.Security" Version="4.3.2" />-->
     <!--<PackageReference Include="UKHO.Logging.EventHubLogProvider" Version="1.22220.1" />-->
   </ItemGroup>
 
