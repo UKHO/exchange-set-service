@@ -69,7 +69,6 @@ stages:
           displayName: 'Use .NET Core  $(SdkVersion) sdk'
           inputs:
             packageType: sdk
-            #version: 3.1.x
             version: $(SdkVersion)
             installationPath: $(Agent.ToolsDirectory)/dotnet
         - checkout: covscan
@@ -97,7 +96,6 @@ stages:
             inputs:
               packageType: sdk
               version: $(SdkVersion)
-              #useGlobalJson: true
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -143,7 +141,6 @@ stages:
             displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              #useGlobalJson: true
               version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
@@ -196,7 +193,6 @@ stages:
             displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              #useGlobalJson: true
               version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
@@ -278,7 +274,6 @@ stages:
             displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              #useGlobalJson: true
               version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
@@ -359,7 +354,6 @@ stages:
             displayName: 'Use .NET Core  $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              #useGlobalJson: true
               version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
 
@@ -474,7 +468,6 @@ stages:
                   displayName: 'Use .NET Core  $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    #version: 3.1.x
                     version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
@@ -558,7 +551,6 @@ stages:
                   displayName: 'Use .NET Core $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    #version: 3.1.x
                     version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
@@ -646,7 +638,6 @@ stages:
                   displayName: 'Use .NET Core $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    #version: 3.1.x
                     version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
