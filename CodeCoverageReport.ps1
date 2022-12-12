@@ -4,6 +4,7 @@ param (
 )
 
 try {
+    $ErrorActionPreference = 'Continue'
     reportgenerator "-reports:$sourceFolder/**/coverage.cobertura.xml" "-targetdir:$reportFolder\codecoveragereport" "-reporttypes:HtmlInline_AzurePipelines;Cobertura";
     write-host 'CoverageReport Published - '  $reportFolder\codecoveragereport;
 
