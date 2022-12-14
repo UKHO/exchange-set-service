@@ -70,6 +70,7 @@ if (!string.IsNullOrWhiteSpace(kvServiceUri))
 
 #if DEBUG
 builder.Configuration.AddJsonFile("appsettings.local.overrides.json", true, true);
+//Add file based logger for development
 builder.Logging.AddFile(builder.Configuration.GetSection("Logging"));
 #endif
 
@@ -84,8 +85,6 @@ builder.Services.AddControllers(o =>
 {
     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 });
-
-//Configure swagger was here in startup
 
 
 builder.Services.Configure<EventHubLoggingConfiguration>(builder.Configuration.GetSection("EventHubLoggingConfiguration"));
@@ -218,25 +217,14 @@ builder.Services.AddScoped<IEssWebhookService, EssWebhookService>();
 
 
 
-
-
-// Startup has  a configure method here.
-//===========================================
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 ConfigureSwagger();
 
-
-
-
-
 var app = builder.Build();
 
+ConfigureLogging(app);
 
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -249,11 +237,6 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "UKHO Exchange Set Server APIs");
     c.RoutePrefix = "swagger";
 });
-
-//app.UseLogAllRequestsAndResponses(loggerFactory);
-
-app.UseCorrelationIdMiddleware();
-//app.UseErrorLogging(loggerFactory);
 
 
 app.UseHttpsRedirection();
@@ -305,48 +288,49 @@ void ConfigureSwagger()
    
 }
 
-//=====================================
-//void ConfigureLogging(IHttpContextAccessor httpContextAccessor, IOptions<EventHubLoggingConfiguration> eventHubLoggingConfiguration)
-//{
-//    if (!string.IsNullOrWhiteSpace(eventHubLoggingConfiguration?.Value.ConnectionString))
-//    {
-//        void ConfigAdditionalValuesProvider(IDictionary<string, object> additionalValues)
-//        {
-//            if (httpContextAccessor.HttpContext != null)
-//            {
-//                additionalValues["_RemoteIPAddress"] = httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
-//                additionalValues["_User-Agent"] = httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? string.Empty;
-//                additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
-//                additionalValues["_X-Correlation-ID"] =
-//                    httpContextAccessor.HttpContext.Request.Headers?[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault() ?? string.Empty;
 
-//                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-//                    additionalValues["_UserId"] = httpContextAccessor.HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
-//            }
-//        }
+void ConfigureLogging(WebApplication app)
+{
+    var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+    var eventHubLoggingConfiguration = app.Services.GetRequiredService<IOptions<EventHubLoggingConfiguration>>();
+    var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 
-//        builder.Logging.AddEventHub(
-//                                 config =>
-//                                 {
-//                                     config.Environment = eventHubLoggingConfiguration.Value.Environment;
-//                                     config.DefaultMinimumLogLevel =
-//                                         (LogLevel)Enum.Parse(typeof(LogLevel), eventHubLoggingConfiguration.Value.MinimumLoggingLevel, true);
-//                                     config.MinimumLogLevels["UKHO"] =
-//                                         (LogLevel)Enum.Parse(typeof(LogLevel), eventHubLoggingConfiguration.Value.UkhoMinimumLoggingLevel, true);
-//                                     config.EventHubConnectionString = eventHubLoggingConfiguration.Value.ConnectionString;
-//                                     config.EventHubEntityPath = eventHubLoggingConfiguration.Value.EntityPath;
-//                                     config.System = eventHubLoggingConfiguration.Value.System;
-//                                     config.Service = eventHubLoggingConfiguration.Value.Service;
-//                                     config.NodeName = eventHubLoggingConfiguration.Value.NodeName;
-//                                     config.AdditionalValuesProvider = ConfigAdditionalValuesProvider;
-//                                 });
-//    }
-//#if (DEBUG)
-//    //Add file based logger for development
-//    builder.Logging.AddFile(builder.Configuration.GetSection("Logging"));
-//#endif
-//    //app.UseLogAllRequestsAndResponses(loggerFactory);
+    if (!string.IsNullOrWhiteSpace(eventHubLoggingConfiguration?.Value.ConnectionString))
+    {
+        void ConfigAdditionalValuesProvider(IDictionary<string, object> additionalValues)
+        {
+            if (httpContextAccessor.HttpContext != null)
+            {
+                additionalValues["_RemoteIPAddress"] = httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+                additionalValues["_User-Agent"] = httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? string.Empty;
+                additionalValues["_AssemblyVersion"] = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
+                additionalValues["_X-Correlation-ID"] =
+                    httpContextAccessor.HttpContext.Request.Headers?[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault() ?? string.Empty;
 
-//    //app.UseCorrelationIdMiddleware()
-//    //   .UseErrorLogging(loggerFactory);
-//}
+                if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                    additionalValues["_UserId"] = httpContextAccessor.HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
+            }
+        }
+
+        loggerFactory.AddEventHub(
+                                 config =>
+                                 {
+                                     config.Environment = eventHubLoggingConfiguration.Value.Environment;
+                                     config.DefaultMinimumLogLevel =
+                                         (LogLevel)Enum.Parse(typeof(LogLevel), eventHubLoggingConfiguration.Value.MinimumLoggingLevel, true);
+                                     config.MinimumLogLevels["UKHO"] =
+                                         (LogLevel)Enum.Parse(typeof(LogLevel), eventHubLoggingConfiguration.Value.UkhoMinimumLoggingLevel, true);
+                                     config.EventHubConnectionString = eventHubLoggingConfiguration.Value.ConnectionString;
+                                     config.EventHubEntityPath = eventHubLoggingConfiguration.Value.EntityPath;
+                                     config.System = eventHubLoggingConfiguration.Value.System;
+                                     config.Service = eventHubLoggingConfiguration.Value.Service;
+                                     config.NodeName = eventHubLoggingConfiguration.Value.NodeName;
+                                     config.AdditionalValuesProvider = ConfigAdditionalValuesProvider;
+                                 });
+    }
+
+    app.UseLogAllRequestsAndResponses(loggerFactory);
+
+    app.UseCorrelationIdMiddleware()
+       .UseErrorLogging(loggerFactory);
+}
