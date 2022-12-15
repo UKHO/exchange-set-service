@@ -18,18 +18,11 @@
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="6.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.11" />
-    <!--<PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.1" />-->
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="7.0.0" />
-    <!--<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />-->
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <!--<PackageReference Include="SonarAnalyzer.CSharp" Version="8.49.0.57237">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>-->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
-    <!--<PackageReference Include="UKHO.Logging.EventHubLogProvider" Version="1.22220.1" />-->
   </ItemGroup>
 
   <ItemGroup>
