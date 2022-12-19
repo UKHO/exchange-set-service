@@ -55,7 +55,7 @@ resource "azurerm_app_service_slot" "staging" {
   
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
