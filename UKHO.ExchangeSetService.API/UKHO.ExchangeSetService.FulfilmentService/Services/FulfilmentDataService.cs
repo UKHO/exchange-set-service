@@ -68,6 +68,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
+
+            //Get SCS catalogue essData response
+            SalesCatalogueDataResponse salesCatalogueEssDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId);
+
             var response = await DownloadSalesCatalogueResponse(message);
             if (response.Products != null && response.Products.Any())
             {
@@ -108,7 +112,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
-            await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime);
+            await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse);
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetZipFilePath, message.CorrelationId);
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
             if (isZipFileUploaded)
@@ -209,16 +213,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                message.BatchId, message.CorrelationId);
         }
 
-        private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime)
+        private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
-            SalesCatalogueDataResponse salesCatalogueDataResponse = await GetSalesCatalogueDataResponse(batchId, correlationId);
 
-            await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
+            await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime);
             await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
-            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salecatalogueProductResponse);
+            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }
 
         public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
@@ -361,6 +364,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
             LargeExchangeSetDataResponse largeExchangeSetDataResponse = new LargeExchangeSetDataResponse();
+
+            //Get SCS catalogue essData response
+            largeExchangeSetDataResponse.SalesCatalogueDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId);
+
             var response = await DownloadSalesCatalogueResponse(message);
 
             Task<ValidationResult> validationResult = productDataValidator.Validate(response.Products);
@@ -414,7 +421,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 largeExchangeSetDataResponse.FulfilmentDataResponses = listFulfilmentData;
             }
 
-            largeExchangeSetDataResponse.SalesCatalogueDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId);
             return largeExchangeSetDataResponse;
         }
 
