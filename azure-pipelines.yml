@@ -18,7 +18,9 @@ schedules:
     - main
   always: true
 
-pool: NautilusBuild
+pool: 
+    name: NautilusBuild
+    demands: vs_16 -equals 1 #exclude agents 13 and 14 as code coverage report fails
 
 variables:
   - name: BuildConfiguration
@@ -42,6 +44,8 @@ variables:
   - name: coverityPool
     value: NautilusBuild
   - group: Covscan-vars
+  - name: SdkVersion
+    value: "6.0.x"
 
 resources:
   repositories:
@@ -64,10 +68,10 @@ stages:
         - checkout: self
           submodules: recursive
         - task: UseDotNet@2
-          displayName: 'Use .NET Core sdk'
+          displayName: 'Use .NET Core  $(SdkVersion) sdk'
           inputs:
             packageType: sdk
-            version: 3.1.x
+            version: $(SdkVersion)
             installationPath: $(Agent.ToolsDirectory)/dotnet
         - checkout: covscan
         - template: dotnet-cov.yml@covScan
@@ -90,10 +94,10 @@ stages:
         displayName: "Dependencychecker"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -136,10 +140,10 @@ stages:
         displayName: "Dotnet Test and Publish Code Coverage"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -188,10 +192,10 @@ stages:
               arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
 
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -269,10 +273,10 @@ stages:
         displayName: "Publish Functional Tests And Terraform"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
 
           - task: DotNetCoreCLI@2
@@ -349,10 +353,10 @@ stages:
               arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$(UKHOAssemblyProduct) Mock"'
 
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core  $(SdkVersion) sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
 
           - task: DotNetCoreCLI@2
@@ -463,10 +467,10 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
+                  displayName: 'Use .NET Core  $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    version: 3.1.x
+                    version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
@@ -546,10 +550,10 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
+                  displayName: 'Use .NET Core $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    version: 3.1.x
+                    version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
@@ -633,10 +637,10 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
+                  displayName: 'Use .NET Core $(SdkVersion) sdk'
                   inputs:
                     packageType: sdk
-                    version: 3.1.x
+                    version: $(SdkVersion)
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests"
