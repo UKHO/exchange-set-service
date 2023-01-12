@@ -303,4 +303,34 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	<cve>CVE-2014-3480</cve>
 	<cve>CVE-2014-3487</cve>
   </suppress>
+  <suppress>
+	<notes>
+	   <![CDATA[
+     file name: Serilog.Extensions.Logging.File:3.0.0
+     Integer underflow in the file_printf function in the "file" program before 4.20 
+     allows user-assisted attackers to execute arbitrary code via a file that triggers a heap-based buffer overflow.
+     No direct reference to any .NET versions
+     ossindex.sonatype.org reports no known vulnerabilities.
+   ]]>
+	</notes>
+	<cve>CVE-2007-1536</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     file name: System.Runtime.CompilerServices.Unsafe.dll
+     Affects Services module 7.x-3.x before 7.x-3.10 for Drupal
+   ]]>
+	</notes>
+	<cve>CVE-2014-9152</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     file name: System.Threading.Tasks.Dataflow.dll
+     Affects Android  
+   ]]>
+	</notes>
+	<cve>CVE-2022-39349</cve>
+  </suppress>	
 </suppressions>
