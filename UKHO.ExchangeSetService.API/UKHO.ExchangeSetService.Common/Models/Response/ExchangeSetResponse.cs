@@ -23,5 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
 
         [JsonProperty("requestedProductsNotInExchangeSet")]
         public IEnumerable<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
+        [JsonProperty("fssBatchId")]
+        public string BatchId { get; set; }
     }
 }
