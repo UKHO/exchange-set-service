@@ -332,5 +332,14 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
    ]]>
 	</notes>
 	<cve>CVE-2022-39349</cve>
-  </suppress>	
+  </suppress>
+  <suppress>
+	<notes>
+		<![CDATA[
+     file name: System.Private.DataContractSerialization
+     Affects >Net >= 6.0.0, < 6.0.12, currently running 6.0.13  
+   ]]>
+    </notes>
+	<cve>CVE-2023-21538</cve>
+  </suppress>
 </suppressions>
