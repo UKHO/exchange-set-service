@@ -59,7 +59,7 @@ resource "azurerm_storage_account" "logstashStorage" {
   access_tier               = "Hot"
   enable_https_traffic_only = true
   tags                      = var.tags
-  allow_blob_public_access  = false
+  allow_nested_items_to_be_public  = false
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
