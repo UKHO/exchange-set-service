@@ -1,7 +1,7 @@
 Param(
 	[Parameter(mandatory=$true)][string]$healthEndPointUrl,
     [Parameter(mandatory=$true)][string]$waitTimeInMinute,
-    [Parameter(mandatory=$true)][switch]$onErrorContinue
+    [Parameter(mandatory=$true)][string]$onErrorContinue
 )
 
 $sleepTimeInSecond = 10
@@ -52,7 +52,7 @@ if ($isServiceActive -eq 'true' ) {
 Else { 
     Write-Error "Service was not up in $waitTimeInMinute, error while deployment ..."
 
-    if(!$onErrorContinue) {
+    if($isServiceActive -eq 'false') {
         throw "Error"
     }
 }
