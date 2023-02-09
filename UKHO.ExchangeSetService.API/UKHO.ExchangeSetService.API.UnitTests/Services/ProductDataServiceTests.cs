@@ -297,6 +297,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
+            
         }
 
         [Test]
@@ -367,6 +368,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchDetailsUri, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
+            Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
         }
 
         [Test]
@@ -404,6 +406,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
+            Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
         }
 
         [Test]
@@ -596,6 +599,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchDetailsUri, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
+            Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
         }
 
         [Test]
@@ -625,6 +629,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.Null(result.LastModified);
+            Assert.AreEqual(result.BatchId, result.ExchangeSetResponse.BatchId);
+
         }
 
         [Test]
@@ -656,6 +662,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.NotNull(result.LastModified);
+            Assert.AreEqual(result.BatchId, result.ExchangeSetResponse.BatchId);
+
         }
 
         [Test]
@@ -855,6 +863,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchDetailsUri, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
+            Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
         }
 
         [Test]
