@@ -65,7 +65,7 @@ steps:
     inputs:
       targetType: filePath
       filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue $true"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 1"
 
   - task: AzureAppServiceManage@0
     displayName: "Swap with production slot - Rollback"
@@ -84,7 +84,7 @@ steps:
     inputs:
       targetType: filePath
       filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue $false"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 0"
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"

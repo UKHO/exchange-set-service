@@ -1,7 +1,7 @@
 Param(
 	[Parameter(mandatory=$true)][string]$healthEndPointUrl,
     [Parameter(mandatory=$true)][string]$waitTimeInMinute,
-    [Parameter(mandatory=$true)][string]$onErrorContinue
+    [Parameter(mandatory=$true)][boolean]$onErrorContinue
 )
 
 $sleepTimeInSecond = 10
