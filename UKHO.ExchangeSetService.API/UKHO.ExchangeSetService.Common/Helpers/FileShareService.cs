@@ -322,6 +322,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var editionNumber = Convert.ToString(productItem.EditionNumber);
             var updateNumber = item.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
             var bundleInfo = productItem.Bundle.FirstOrDefault()?.Location.Split(";");
+
+            if (bundleInfo is null)
+            {
+                //In the "unlikely" event that bundleInfo is null
+                logger.LogError(EventIds.DownloadENCFilesRequestStart.ToEventId(), "Products.Bundle is null in file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, message.CorrelationId);
+                return Task.FromResult(false);
+            }
+            
             exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleInfo[0].Substring(1, 1), bundleInfo[1]);
 
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadENCFilesRequestStart, EventIds.DownloadENCFilesRequestCompleted,

@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Queues.Models;
+﻿
+using Azure.Storage.Queues.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
