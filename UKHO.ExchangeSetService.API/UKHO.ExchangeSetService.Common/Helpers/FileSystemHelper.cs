@@ -159,7 +159,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public IDirectoryInfo[] GetDirectoryInfo(string path)
         {
-            IDirectoryInfo rootDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(path);
+            IDirectoryInfo rootDirectory = _fileSystem.DirectoryInfo.New(path);
             return rootDirectory.GetDirectories();
         }
 

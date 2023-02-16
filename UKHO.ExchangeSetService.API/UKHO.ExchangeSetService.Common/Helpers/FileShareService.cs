@@ -321,7 +321,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var productName = productItem.ProductName;
             var editionNumber = Convert.ToString(productItem.EditionNumber);
             var updateNumber = item.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
-            var bundleInfo = productItem.Bundle.FirstOrDefault().Location.Split(";");
+            var bundleInfo = productItem.Bundle.FirstOrDefault()?.Location.Split(";");
             exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleInfo[0].Substring(1, 1), bundleInfo[1]);
 
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadENCFilesRequestStart, EventIds.DownloadENCFilesRequestCompleted,
@@ -547,7 +547,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (searchBatchResponse.Entries.Count > 0)
                 {
                     var batchResult = searchBatchResponse.Entries.FirstOrDefault();
-                    filePath = batchResult.Files.FirstOrDefault().Links.Get.Href;
+                    filePath = batchResult.Files.FirstOrDefault()?.Links.Get.Href;
                 }
                 else
                 {
@@ -1002,7 +1002,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (searchBatchResponse.Entries.Count > 0)
                 {
                     var batchResult = searchBatchResponse.Entries.OrderByDescending(j => j.BatchPublishedDate).FirstOrDefault();
-                    fileDetails = batchResult.Files.Select(x => new BatchFile
+                    fileDetails = batchResult?.Files.Select(x => new BatchFile
                     {
                         Filename =  x.Filename,
                         Links = new Links
