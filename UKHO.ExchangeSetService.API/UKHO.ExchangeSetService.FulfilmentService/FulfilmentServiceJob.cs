@@ -1,10 +1,9 @@
 ﻿
+using Azure.Storage.Queues.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Queue;
-using Newtonsoft.Json;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -48,9 +47,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
         }
 
-        public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] CloudQueueMessage message)
+        public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
-            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = JsonConvert.DeserializeObject<SalesCatalogueServiceResponseQueueMessage>(message.AsString);
+            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
             string homeDirectoryPath = configuration["HOME"];
             string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
             string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate, fulfilmentServiceQueueMessage.BatchId);
