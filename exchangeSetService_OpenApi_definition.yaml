@@ -416,6 +416,9 @@ components:
               reason:
                 type: string
                 enum: [productWithdrawn, invalidProduct, noDataAvailableForCancelledProduct]
+        fssBatchId:
+          type: string
+          description: The BatchId is required to retrieve the files from the file share service. 
       example:
         _links:
           exchangeSetBatchStatusUri:
@@ -433,6 +436,7 @@ components:
             { productName: "GB123456", reason: "productWithdrawn" },
             { productName: "GB123789", reason: "invalidProduct" },
           ]
+        fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
 
     Last-Modified:
       type: string
@@ -612,6 +616,7 @@ components:
               { productName: "GB123456", reason: "productWithdrawn" },
               { productName: "GB123789", reason: "invalidProduct" },
             ]
+          fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
 
     ####################################
     #      Security Objects      #

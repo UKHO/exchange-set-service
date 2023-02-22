@@ -241,6 +241,7 @@ namespace UKHO.ExchangeSetService.API
             {
                 var swaggerConfiguration = new SwaggerConfiguration();
                 builder.Configuration.Bind("Swagger", swaggerConfiguration);
+                builder.Services.AddSwaggerGenNewtonsoftSupport();
                 builder.Services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo
