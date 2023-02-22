@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private CreateBatchRequest CreateBatchRequest(string oid)
         {
-            CreateBatchRequest createBatchRequest = new CreateBatchRequest
+            var createBatchRequest = new CreateBatchRequest
             {
                 BusinessUnit = fileShareServiceConfig.Value.BusinessUnit,
                 Attributes = new List<KeyValuePair<string, string>>()
@@ -115,14 +115,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
         {
-            SearchBatchResponse internalSearchBatchResponse = new SearchBatchResponse
+            var internalSearchBatchResponse = new SearchBatchResponse
             {
                 Entries = new List<BatchDetail>()
             };
             List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken) : products;
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
-                List<Products> internalNotFoundProducts = new List<Products>();
+                var internalNotFoundProducts = new List<Products>();
                 var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
                 var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
                 var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             if (internalSearchBatchResponse.Entries.Any() && prodCount != internalSearchBatchResponse.Entries.Count)
             {
-                List<Products> internalProducts = new List<Products>();
+                var internalProducts = new List<Products>();
                 ConvertFssSearchBatchResponseToProductResponse(internalSearchBatchResponse, internalProducts);
                 GetProductDetailsNotFoundInFileShareService(products, internalNotFoundProducts, internalProducts);
             }
@@ -609,7 +609,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileName));
 
-            FileCreateMetaData fileCreateMetaData = new FileCreateMetaData()
+            var fileCreateMetaData = new FileCreateMetaData()
             {
                 AccessToken = accessToken,
                 BatchId = batchId,
@@ -637,7 +637,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<BatchStatus> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
         {
-            BatchCommitMetaData batchCommitMetaData = new BatchCommitMetaData()
+            var batchCommitMetaData = new BatchCommitMetaData()
             {
                 BatchId = batchId,
                 AccessToken = accessToken,
@@ -655,7 +655,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     BatchId = batchId,
                     FileName = customFileInfo.Name
                 };
-                Stopwatch watch = new Stopwatch();
+                var watch = new Stopwatch();
                 watch.Start();
                 while (batchStatus != BatchStatus.Committed && watch.Elapsed.TotalMinutes <= fileShareServiceConfig.Value.BatchCommitCutOffTimeInMinutes)
                 {
@@ -690,7 +690,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> UploadAndWriteBlock(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
         {
             var blockIdList = await UploadBlockFile(batchId, customFileInfo, accessToken, correlationId);
-            WriteBlocksToFileMetaData writeBlocksToFileMetaData = new WriteBlocksToFileMetaData()
+            var writeBlocksToFileMetaData = new WriteBlocksToFileMetaData()
             {
                 BatchId = batchId,
                 FileName = customFileInfo.Name,
@@ -722,7 +722,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<List<string>> UploadBlockFile(string batchId, CustomFileInfo customFileInfo, string accessToken, string correlationId)
         {
-            UploadMessage uploadMessage = new UploadMessage()
+            var uploadMessage = new UploadMessage()
             {
                 UploadSize = customFileInfo.Length,
                 BlockSizeInMultipleOfKBs = fileShareServiceConfig.Value.BlockSizeInMultipleOfKBs
@@ -731,11 +731,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 ? 1024
                 : uploadMessage.BlockSizeInMultipleOfKBs;
             long blockSize = blockSizeInMultipleOfKBs * 1024;
-            List<string> blockIdList = new List<string>();
-            List<Task> ParallelBlockUploadTasks = new List<Task>();
+            var blockIdList = new List<string>();
+            var ParallelBlockUploadTasks = new List<Task>();
             long uploadedBytes = 0;
             int blockNum = 0;
-            using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
             while (uploadedBytes < customFileInfo.Length)
             {
@@ -802,7 +802,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     "Write Blocks to file:{FileName} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
-                        WriteBlockFileModel writeBlockfileModel = new WriteBlockFileModel()
+                        var writeBlockfileModel = new WriteBlockFileModel()
                         {
                             BlockIds = writeBlocksToFileMetaData.BlockIds
                         };
@@ -868,7 +868,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipPath, fileName));
 
-            FileCreateMetaData fileCreateMetaData = new FileCreateMetaData()
+            var fileCreateMetaData = new FileCreateMetaData()
             {
                 AccessToken = accessToken,
                 BatchId = batchId,
@@ -892,7 +892,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
-            List<BatchCommitMetaData> batchCommitMetaDataList = new List<BatchCommitMetaData>();
+            var batchCommitMetaDataList = new List<BatchCommitMetaData>();
 
             //Get zip files full path
             string[] mediaZipList = fileSystemHelper.GetFiles(exchangeSetZipPath).Where(di => di.Contains("zip")).ToArray();
@@ -901,7 +901,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(fileName);
 
-                BatchCommitMetaData batchCommitMetaData = new BatchCommitMetaData()
+                var batchCommitMetaData = new BatchCommitMetaData()
                 {
                     BatchId = batchId,
                     AccessToken = accessToken,
@@ -922,7 +922,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     AccessToken = accessToken,
                     BatchId = batchId
                 };
-                Stopwatch watch = new Stopwatch();
+                var watch = new Stopwatch();
                 watch.Start();
                 while (batchStatus != BatchStatus.Committed && watch.Elapsed.TotalMinutes <= fileShareServiceConfig.Value.PosBatchCommitCutOffTimeInMinutes)
                 {
