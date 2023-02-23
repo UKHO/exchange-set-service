@@ -74,11 +74,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
 
-            using (var ms = new MemoryStream())
-            {
-                LoadStreamWithJson(ms, serializeJsonObject);
-                await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob, ms);
-            }
+            using var ms = new MemoryStream();
+            LoadStreamWithJson(ms, serializeJsonObject);
+            await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob, ms);
 
         }
 
@@ -90,7 +88,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 BatchId = batchId,
                 ScsResponseUri = cloudBlockBlob.Uri.AbsoluteUri,
                 FileSize = fileSize,
-                CallbackUri = callBackUri == null ? string.Empty : callBackUri,
+                CallbackUri = callBackUri ?? string.Empty,
                 CorrelationId = correlationId,
                 ExchangeSetUrlExpiryDate = expiryDate,
                 ScsRequestDateTime = scsRequestDateTime
@@ -100,7 +98,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private void LoadStreamWithJson(Stream ms, object obj)
         {
-            StreamWriter writer = new StreamWriter(ms);
+            var writer = new StreamWriter(ms);
             writer.Write(obj);
             writer.Flush();
             ms.Position = 0;
@@ -146,32 +144,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public (string, string) GetStorageAccountNameAndKeyBasedOnExchangeSetType(ExchangeSetType exchangeSetType)
         {
-            switch (exchangeSetType)
+            return exchangeSetType switch
             {
-                case ExchangeSetType.sxs:
-                    return (storageConfig.Value.SmallExchangeSetAccountName, storageConfig.Value.SmallExchangeSetAccountKey);
-                case ExchangeSetType.mxs:
-                    return (storageConfig.Value.MediumExchangeSetAccountName, storageConfig.Value.MediumExchangeSetAccountKey);
-                case ExchangeSetType.lxs:
-                    return (storageConfig.Value.LargeExchangeSetAccountName, storageConfig.Value.LargeExchangeSetAccountKey);
-                default:
-                    return (string.Empty, string.Empty);
-            }
+                ExchangeSetType.sxs => (storageConfig.Value.SmallExchangeSetAccountName, storageConfig.Value.SmallExchangeSetAccountKey),
+                ExchangeSetType.mxs => (storageConfig.Value.MediumExchangeSetAccountName, storageConfig.Value.MediumExchangeSetAccountKey),
+                ExchangeSetType.lxs => (storageConfig.Value.LargeExchangeSetAccountName, storageConfig.Value.LargeExchangeSetAccountKey),
+                _ => (string.Empty, string.Empty),
+            };
         }
 
         public int GetInstanceCountBasedOnExchangeSetType(ExchangeSetType exchangeSetType)
         {
-            switch (exchangeSetType)
+            return exchangeSetType switch
             {
-                case ExchangeSetType.sxs:
-                    return storageConfig.Value.SmallExchangeSetInstance;
-                case ExchangeSetType.mxs:
-                    return storageConfig.Value.MediumExchangeSetInstance;
-                case ExchangeSetType.lxs:
-                    return storageConfig.Value.LargeExchangeSetInstance;
-                default:
-                    return 1;
-            }
+                ExchangeSetType.sxs => storageConfig.Value.SmallExchangeSetInstance,
+                ExchangeSetType.mxs => storageConfig.Value.MediumExchangeSetInstance,
+                ExchangeSetType.lxs => storageConfig.Value.LargeExchangeSetInstance,
+                _ => 1,
+            };
         }
     }
 }

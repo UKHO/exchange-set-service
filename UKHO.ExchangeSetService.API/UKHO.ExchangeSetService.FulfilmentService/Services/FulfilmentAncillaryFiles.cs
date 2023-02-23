@@ -79,8 +79,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
 
-                List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
-                    new Tuple<string, string>("text/plain", "ASC"), new Tuple<string, string>("text/plain", "TXT"), new Tuple<string, string>("image/tiff", "TIF") };
+                var orderPreference = new List<Tuple<string, string>> { 
+                    new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("text/plain", "ASC"), 
+                    new Tuple<string, string>("text/plain", "TXT"), 
+                    new Tuple<string, string>("image/tiff", "TIF") };
 
                 foreach (var listItem in listFulfilmentData)
                 {
@@ -115,7 +118,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
                 string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
                 string comment = string.Empty;
-                BoundingRectangle boundingRectangle = new BoundingRectangle();
+                var boundingRectangle = new BoundingRectangle();
 
                 if (mimeType == "BIN")
                 {
@@ -152,7 +155,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             int? cancelledUpdateNumber = null;
             var salescatalogProductResponse = salesCatalogueProductResponse.Products.Where(s => s.ProductName == listItem.ProductName).Where(s => s.EditionNumber == listItem.EditionNumber).Select(s => s).FirstOrDefault();
 
-            if (salescatalogProductResponse.Dates != null)
+            if (salescatalogProductResponse?.Dates != null)
             {
                 var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
                 getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
@@ -198,8 +201,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string fileName = fileShareServiceConfig.Value.ProductFileName;
                 string filePath = Path.Combine(exchangeSetInfoPath, fileName);
 
-                var productsBuilder = new ProductListBuilder();
-                productsBuilder.UseDefaultOutputTime = false;
+                var productsBuilder = new ProductListBuilder
+                {
+                    UseDefaultOutputTime = false
+                };
 
                 foreach (var product in salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName))
                     productsBuilder.Add(new ProductListEntry()
@@ -271,7 +276,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private void WriteCsvFile(string file, IEnumerable<ProductsCsvDetails> productsCsvDetails)
         {
             using TextWriter writer = fileSystemHelper.WriteStream(file);
-            using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
             csv.WriteRecords(productsCsvDetails);
             csv.WriteField(":ECS");
             csv.Flush();
@@ -285,7 +290,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         private string GetIssueAndUpdateDate(Dates dateResponse)
         {
-            string UADT = dateResponse.UpdateApplicationDate == null ? null : dateResponse.UpdateApplicationDate.Value.ToString("yyyyMMdd");
+            string UADT = dateResponse.UpdateApplicationDate?.ToString("yyyyMMdd");
             string ISDT = dateResponse.IssueDate.ToString("yyyyMMdd");
             return (UADT != null) ? $"UADT={UADT},ISDT={ISDT};" : $"ISDT={ISDT};";
         }
@@ -299,13 +304,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
                 var basefolders = fileSystemHelper.GetDirectoryInfo(folderpath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Count()-1)..]));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length -1)..]));
 
                 string mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
                 mediaFileContent += Environment.NewLine;
                 mediaFileContent += $"M{baseNumber},'UKHO AVCS Week{weekNumber:D2}_{DateTime.UtcNow:yy} Base Media','DVD_SERVICE'";
                 mediaFileContent += Environment.NewLine;
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 foreach (var directory in basefolders)
                 {
                     var baseFolderName = directory.Name;
@@ -313,7 +318,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     string path = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
                     string[] subdirectoryEntries = fileSystemHelper.GetDirectories(path);
 
-                    List<string> countryCodes = new List<string>();
+                    var countryCodes = new List<string>();
                     foreach (string codes in subdirectoryEntries)
                     {
                         var dirName = new DirectoryInfo(codes).Name;
@@ -382,8 +387,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
 
-                List<Tuple<string, string>> orderPreference = new List<Tuple<string, string>> { new Tuple<string, string>("application/s63", "BIN"),
-                    new Tuple<string, string>("text/plain", "ASC"), new Tuple<string, string>("text/plain", "TXT"), new Tuple<string, string>("image/tiff", "TIF") };
+                var orderPreference = new List<Tuple<string, string>> { 
+                    new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("text/plain", "ASC"), 
+                    new Tuple<string, string>("text/plain", "TXT"), 
+                    new Tuple<string, string>("image/tiff", "TIF") };
 
                 foreach (var listItem in listFulfilmentData)
                 {
@@ -424,7 +432,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), item.Filename);
                 string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
                 string comment = string.Empty;
-                BoundingRectangle boundingRectangle = new BoundingRectangle();
+                var boundingRectangle = new BoundingRectangle();
 
                 if (mimeType == "BIN")
                 {

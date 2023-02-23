@@ -196,8 +196,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              })
               .ConfigureWebJobs(b =>
               {
-                  b.AddAzureStorageCoreServices();
-                  b.AddAzureStorage();
+                  b.AddAzureStorageCoreServices()
+                  .AddAzureStorageQueues()
+                  .AddAzureStorageBlobs();
               });
 
             return hostBuilder;
