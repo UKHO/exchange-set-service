@@ -20,7 +20,7 @@ resource "azurerm_app_service" "small_exchange_set_webapp" {
   tags                = var.tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
@@ -49,7 +49,7 @@ resource "azurerm_app_service_slot" "small_exchange_set_staging" {
   tags                = azurerm_app_service.small_exchange_set_webapp[count.index].tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
@@ -104,7 +104,7 @@ resource "azurerm_app_service" "medium_exchange_set_webapp" {
   tags                = var.tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
@@ -133,7 +133,7 @@ resource "azurerm_app_service_slot" "medium_exchange_set_staging" {
   tags                = azurerm_app_service.medium_exchange_set_webapp[count.index].tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
@@ -188,7 +188,7 @@ resource "azurerm_app_service" "large_exchange_set_webapp" {
   tags                = var.tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
@@ -217,7 +217,7 @@ resource "azurerm_app_service_slot" "large_exchange_set_staging" {
   tags                = azurerm_app_service.large_exchange_set_webapp[count.index].tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"

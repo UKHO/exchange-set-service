@@ -23,7 +23,7 @@ resource "azurerm_app_service" "fulfillment_webapp" {
   app_service_plan_id = azurerm_app_service_plan.app_service_plan.id
   tags                = var.tags
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
@@ -42,7 +42,7 @@ resource "azurerm_app_service" "scs_fss_mock_webapp" {
   tags                = var.tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
@@ -65,7 +65,7 @@ resource "azurerm_app_service" "ess_webapp" {
   tags                = var.tags
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|3.1"
+    windows_fx_version  =   "DOTNETCORE|6.0"
     
     always_on  = true
     ftps_state = "Disabled"
