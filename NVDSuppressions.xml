@@ -336,31 +336,117 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
   <suppress>
 	<notes>
 	  <![CDATA[
-     file name: System.Private.DataContractSerialization 
+     vulnerability: DOS
      Affects >Net >= 6.0.0, < 6.0.12. 
 	 Currently running Net 6.0.13,  sdk 6.0.405
    ]]>
 	</notes>
-	<cve>CVE-2023-21538</cve>
-	<cve>CVE-2022-24464</cve>
-    <cve>CVE-2020-8927</cve>
+	<cve>CVE-2023-21538</cve> 
+	<cve>CVE-2022-24464</cve>  
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: Buffer overflow and spoofing
+     Affects .Net 3.1 .Net 5.0 and <= .Net 6.0.8 
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2020-8927</cve>
 	<cve>CVE-2022-34716</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: Remote code execution
+     Affects .Net 3.1
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
 	<cve>CVE-2020-0605</cve>
 	<cve>CVE-2020-0606</cve>
-	<cve>CVE-2022-41064</cve>
-	<cve>CVE-2022-30184</cve>
-	<cve>CVE-2019-20138</cve>
-	<cve>CVE-2022-34716</cve>
-	<cve>CVE-2022-31147</cve>	  
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: JQuery Validation Plugin, RegX Dos and  X site scripting Jenkins plugin
+     Affects jQuery, Jenkins
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2022-31147</cve>
 	<cve>CVE-2021-43306</cve>
 	<cve>CVE-2021-21252</cve>
-	<cve>CVE-2022-29149</cve>
-    <cve>CVE-2022-3064</cve>
+	<cve>CVE-2018-1000413</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: .NET Framework Information Disclosure
+     Affects .Net 4.x.x
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2022-41064</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: .NET and Visual Studio Information Disclosure Vulnerability 
+     Affects .Net 6.0.0
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2022-30184</cve>
+   </suppress>
+   <suppress>
+	 <notes>
+	   <![CDATA[
+     vulnerability: Weak password hashing 
+     Affects .Http authentication library up to and excluding 2019-12-27 
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2019-20138</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: CPU & Memory hog
+     Affects parsing large YAML version < 2.2.4
+   ]]>
+	</notes>
+	<cve>CVE-2022-3064</cve>
 	<cve>CVE-2021-4235</cve>
-	<cve>CVE-2021-42306</cve> 
-	<cve>CVE-2001-0152</cve> 
-	<cve>CVE-2010-3324</cve>
-	<cve>CVE-2017-11826</cve>  
-	<cve>CVE-2018-1000413</cve> 
-  </suppress>	
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: Password protection, MS10-072 
+     Affects windows 98 & windows Me, Office and Word
+	 MS10-072 fixed in October 2010
+   ]]>
+	</notes>
+	  <cve>CVE-2001-0152</cve>
+	  <cve>CVE-2010-3324</cve>
+	  <cve>CVE-2017-11826</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability:  Information disclosure  
+     Affects Active directory up to 2021-11-02
+   ]]>
+	</notes>
+	<cve>CVE-2021-42306</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability:  Elevation of Privilege   
+     Affects Azure Open Management Infrastructure (OMI) version <= 1.6.9-0 (VMs running Linux)
+   ]]>
+	</notes>
+	<cve>CVE-2022-29149</cve>
+  </suppress>
 </suppressions>

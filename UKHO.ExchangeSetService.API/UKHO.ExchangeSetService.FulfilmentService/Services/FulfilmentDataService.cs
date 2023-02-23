@@ -79,8 +79,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
                 int productGroupCount = response.Products.Count % parallelSearchTaskCount == 0 ? response.Products.Count / parallelSearchTaskCount : (response.Products.Count / parallelSearchTaskCount) + 1;
                 var productsList = CommonHelper.SplitList((response.Products), productGroupCount);
-                List<FulfilmentDataResponse> fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-                object sync = new object();
+                var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
+                var sync = new object();
                 int fileShareServiceSearchQueryCount = 0;
                 var cancellationTokenSource = new CancellationTokenSource();
                 CancellationToken cancellationToken = cancellationTokenSource.Token;
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
-                    int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
+                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
@@ -143,7 +143,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
                                                   .Where(di => di.Name.StartsWith("M0"));
 
-            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+            var ParallelCreateFolderTasks = new List<Task> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
                 string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
@@ -161,7 +161,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
 
-            List<Task> ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
+            var ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
                 ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
@@ -170,7 +170,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
             ParallelCreateFolderTaskForCatlogFile.Clear();
 
-            List<Task<bool>> parallelZipUploadTasks = new List<Task<bool>> { };
+            var parallelZipUploadTasks = new List<Task<bool>> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
                 string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
@@ -363,10 +363,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var batchPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, largeExchangeSetFolderName);
             var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
-            LargeExchangeSetDataResponse largeExchangeSetDataResponse = new LargeExchangeSetDataResponse();
-
-            //Get SCS catalogue essData response
-            largeExchangeSetDataResponse.SalesCatalogueDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId);
+            var largeExchangeSetDataResponse = new LargeExchangeSetDataResponse
+            {
+                //Get SCS catalogue essData response
+                SalesCatalogueDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId)
+            };
 
             var response = await DownloadSalesCatalogueResponse(message);
 
@@ -384,8 +385,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
                 int productGroupCount = response.Products.Count % parallelSearchTaskCount == 0 ? response.Products.Count / parallelSearchTaskCount : (response.Products.Count / parallelSearchTaskCount) + 1;
                 var productsList = CommonHelper.SplitList((response.Products), productGroupCount);
-                List<FulfilmentDataResponse> fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-                object sync = new object();
+                var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
+                var sync = new object();
                 int fileShareServiceSearchQueryCount = 0;
                 var cancellationTokenSource = new CancellationTokenSource();
                 CancellationToken cancellationToken = cancellationTokenSource.Token;
@@ -393,7 +394,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
-                    int queryCount = fulfilmentDataResponse.Count > 0 ? fulfilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount : 0;
+                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
@@ -427,15 +428,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task DownloadLargeMediaReadMeFile(string batchId, string exchangeSetPath, string correlationId)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Count()-1)..]));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
-            List<string> encFolderList = new List<string>();
+            var encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
             {
                 var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
                 encFolderList.Add(encFolder);
             }
-            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+            var ParallelCreateFolderTasks = new List<Task> { };
 
             Parallel.ForEach(encFolderList, encFolder =>
             {
@@ -456,16 +457,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       {
                           var rootLastDirectoryPath = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                                                   .LastOrDefault(di => di.Name.StartsWith("M0"));
-
+                          
                           var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
-                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Count()-1)..]));
+                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length -1)..]));
 
-                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath.ToString())
-                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Count()-1)..]));
+                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath?.ToString())
+                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length -1)..]));
 
                           string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(rootLastDirectoryPath.ToString(), "B"), "");
 
-                          List<Task<bool>> ParallelBaseFolderTasks = new List<Task<bool>> { };
+                          var ParallelBaseFolderTasks = new List<Task<bool>> { };
                           Parallel.ForEach(baseDirectoryies, baseDirectoryFolder =>
                           {
                               string baseDirectoryNumber = baseDirectoryFolder.ToString().Replace(Path.Combine(exchangeSetPath, rootfolder, "B"), "");
@@ -484,15 +485,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Count() <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Count()-1)..]));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length -1)..]));
 
-            List<string> encFolderList = new List<string>();
+            var encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
             {
                 var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
                 encFolderList.Add(encFolder);
             }
-            List<Task> ParallelCreateFolderTasks = new List<Task> { };
+            var ParallelCreateFolderTasks = new List<Task> { };
 
             Parallel.ForEach(encFolderList, encFolder =>
             {

@@ -1,9 +1,9 @@
-﻿using Microsoft.Azure.Storage.Queue;
+﻿
+using Azure.Storage.Queues.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -47,9 +47,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
         }
 
-        public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] CloudQueueMessage message)
+        public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
-            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = JsonConvert.DeserializeObject<SalesCatalogueServiceResponseQueueMessage>(message.AsString);
+            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
             string homeDirectoryPath = configuration["HOME"];
             string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
             string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate, fulfilmentServiceQueueMessage.BatchId);
@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 if (ex.GetType() == typeof(FulfilmentException))
                     exceptionEventId = ((FulfilmentException)ex).EventId;
 
-                FulfilmentException fulfilmentException = new FulfilmentException(exceptionEventId);
+                var fulfilmentException = new FulfilmentException(exceptionEventId);
                 string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
                 await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);

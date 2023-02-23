@@ -110,7 +110,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
             if (fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
             {
-                ExchangeSetServiceResponse exchangeSetResponse = new ExchangeSetServiceResponse
+                var exchangeSetResponse = new ExchangeSetServiceResponse
                 {
                     HttpStatusCode = HttpStatusCode.BadRequest,
                     IsExchangeSetTooLarge = true
@@ -119,7 +119,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             else
             {
-                ExchangeSetServiceResponse exchangeSetResponse = new ExchangeSetServiceResponse
+                var exchangeSetResponse = new ExchangeSetServiceResponse
                 {
                     HttpStatusCode = HttpStatusCode.OK,
                     IsExchangeSetTooLarge = false

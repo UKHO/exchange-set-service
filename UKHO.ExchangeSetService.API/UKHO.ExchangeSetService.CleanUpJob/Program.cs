@@ -5,10 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
-#pragma warning disable S1128 // Unused "using" should be removed
 using Serilog;
 using Serilog.Events;
-#pragma warning disable S1128 // Unused "using" should be removed
 using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -108,7 +106,10 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
                 if (!string.IsNullOrEmpty(instrumentationKey))
                 {
-                    loggingBuilder.AddApplicationInsights(instrumentationKey);
+                    loggingBuilder.AddApplicationInsights(
+                        configureTelemetryConfiguration: (config) => config.ConnectionString = instrumentationKey,
+                        configureApplicationInsightsLoggerOptions: (options) => { }
+                        );
                 }
 
                 #if DEBUG
@@ -150,6 +151,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 (config) =>
                 {
                     config.TelemetryChannel = aiChannel;
+                    config.ConnectionString = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
                 }
             );
 
