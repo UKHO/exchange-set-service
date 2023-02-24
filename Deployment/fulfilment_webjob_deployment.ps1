@@ -54,10 +54,14 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         
         echo "Creating zip package for $webappName in $exchangeSet exchange set done ..."
 
-        echo "Deploying web app $webappName for $exchangeSet exchange set ..."
-        az webapp deployment source config-zip -g $webAppResourceGroup -n $webappName --src "$packagePath/$exchangeSet/$packageName"
+        echo "Deploying web app $webappName for $exchangeSet exchange set to staging slot..."
+        az webapp deployment source config-zip -g $webAppResourceGroup --slot staging -n $webappName --src "$packagePath/$exchangeSet/$packageName"
         
         if ( !$? ) { echo "Error while deploying package" ; throw $_ }
+
+        echo "Swap production slot of web app $webappName for $exchangeSet exchange set to staging slot..."
+
+        az webapp deployment slot swap --name $webappName --resource-group $webAppResourceGroup --slot staging
 
         echo "Deploying web app $webappName for $exchangeSet exchange set done ..."
     
