@@ -58,7 +58,7 @@ resource "azurerm_app_service_slot" "small_exchange_set_staging" {
     }
   }
 
-  app_settings = merge(azurerm_app_service.small_exchange_set_webapp.app_settings, {"WEBJOBS_STOPPED"="1"})
+  app_settings = merge(azurerm_app_service.small_exchange_set_webapp[count.index].app_settings, {"WEBJOBS_STOPPED"="1"})
 
   identity {
     type = "UserAssigned"
@@ -142,7 +142,7 @@ resource "azurerm_app_service_slot" "medium_exchange_set_staging" {
     }
   }
 
-  app_settings = merge(azurerm_app_service.medium_exchange_set_webapp.app_settings, {"WEBJOBS_STOPPED"="1"})
+  app_settings = merge(azurerm_app_service.medium_exchange_set_webapp[count.index].app_settings, {"WEBJOBS_STOPPED"="1"})
 
   identity {
     type = "UserAssigned"
@@ -226,7 +226,7 @@ resource "azurerm_app_service_slot" "large_exchange_set_staging" {
     }
   }
 
-  app_settings = merge(azurerm_app_service.large_exchange_set_webapp.app_settings, {"WEBJOBS_STOPPED"="1"})
+  app_settings = merge(azurerm_app_service.large_exchange_set_webapp[count.index].app_settings, {"WEBJOBS_STOPPED"="1"})
 
   identity {
     type = "UserAssigned"
