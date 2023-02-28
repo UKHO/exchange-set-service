@@ -52,6 +52,9 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         
         if ( !$? ) { echo "Error while zip" ; throw $_ }
         
+        echo "Applying staging slot sticky appsettings - $webappName in $exchangeSet"
+        az webapp config appsettings set --resource-group $webAppResourceGroup --name $webappName --slot staging --slot-settings WEBJOBS_STOPPED=1
+
         echo "Creating zip package for $webappName in $exchangeSet exchange set done ..."
 
         echo "Deploying web app $webappName for $exchangeSet exchange set to staging slot..."
