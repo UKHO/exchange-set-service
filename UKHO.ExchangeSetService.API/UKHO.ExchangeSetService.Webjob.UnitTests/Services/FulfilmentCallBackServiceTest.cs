@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
+using Newtonsoft.Json;
 
 namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 {
@@ -157,6 +158,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                    uriParam = uri;
                    httpMethodParam = method;
                    postBodyParam = postBody;
+                   var callBackResponse = JsonConvert.DeserializeObject<CallBackResponse>(postBody);
+                   Assert.IsNotNull(callBackResponse, "PostBody can not be null");
+                   Assert.AreSame(scsResponseQueueMessage.BatchId, callBackResponse.Data.BatchId);
                });
 
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);

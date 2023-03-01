@@ -140,7 +140,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await callBackClient.CallBackApi(HttpMethod.Post, payloadJson, scsResponseQueueMessage.CallbackUri);
 
             if (!errorStatus)
-                logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
+                logger.LogInformation(EventIds.ExchangeSetCreatedPostCallbackUriCalled.ToEventId(), "Post Callback uri - {CallbackUri} is called with pay load {payloadJson} after exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.CallbackUri, payloadJson, scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
             else
                 logger.LogInformation(EventIds.ExchangeSetCreatedWithErrorPostCallbackUriCalled.ToEventId(), "Post Callback uri is called after exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", scsResponseQueueMessage.BatchId, scsResponseQueueMessage.CorrelationId);
 
@@ -161,7 +161,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
                 ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
                 RequestedProductsAlreadyUpToDateCount = salesCatalogueProductResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Value,
-                RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse)
+                RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse),
+                BatchId = scsResponseQueueMessage.BatchId
             };
         }
 
