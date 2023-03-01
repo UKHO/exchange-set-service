@@ -160,7 +160,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                    postBodyParam = postBody;
                    var callBackResponse = JsonConvert.DeserializeObject<CallBackResponse>(postBody);
                    Assert.IsNotNull(callBackResponse, "PostBody can not be null");
-                   Assert.AreSame(scsResponseQueueMessage.BatchId, callBackResponse.Data.BatchId);
+                   Assert.AreEqual(scsResponseQueueMessage.BatchId, callBackResponse.Data.BatchId);
                });
 
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
