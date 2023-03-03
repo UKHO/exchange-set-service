@@ -46,6 +46,8 @@ variables:
   - group: Covscan-vars
   - name: SdkVersion
     value: "6.0.x"
+  - name: WindowPool
+    value: "NautilusBuild"
 
 resources:
   repositories:
@@ -706,3 +708,11 @@ stages:
                      APIMServiceInstance: $(APIM_SERVICE_NAME)
                      tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+
+      - job: PostDeploymentActions
+        dependsOn:
+        - LiveDeployApp                 
+        pool: $(WindowPool)        
+        displayName: Post Deployment Actions
+        steps:
+          - template: Deployment/templates/retain-pipeline.yml

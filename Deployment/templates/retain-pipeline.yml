@@ -1,0 +1,14 @@
+steps:
+  - task: PowerShell@2
+    condition: and(succeeded(), not(canceled()))
+    displayName: Retain Live Release
+    inputs:
+      targetType: filePath
+      filePath: "$(Build.SourcesDirectory)/Deployment/add-lease.ps1"
+      arguments: "-daysValid 365
+                  -accessToken '$(System.AccessToken)'
+                  -definitionId $(System.DefinitionId)
+                  -ownerId 'User:$(Build.RequestedForId)'
+                  -buildId $(Build.BuildId)
+                  -collectionUri '$(System.CollectionUri)'
+                  -teamProject '$(System.TeamProject)'"     
