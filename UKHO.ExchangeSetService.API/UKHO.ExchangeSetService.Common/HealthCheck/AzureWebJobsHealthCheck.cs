@@ -28,6 +28,10 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 {
                     logger.LogDebug(EventIds.AzureWebJobIsHealthy.ToEventId(), "Azure webjob is healthy");
                 }
+                else if (healthCheckResult.Status == HealthStatus.Degraded)
+                {
+                    logger.LogWarning(EventIds.AzureWebJobIsDegraded.ToEventId(), "Azure webjob is degraded");
+                }
                 else
                 {
                     logger.LogError(EventIds.AzureWebJobIsUnhealthy.ToEventId(), healthCheckResult.Exception, "Azure webjob is unhealthy with error {Message}", healthCheckResult.Exception.Message);
