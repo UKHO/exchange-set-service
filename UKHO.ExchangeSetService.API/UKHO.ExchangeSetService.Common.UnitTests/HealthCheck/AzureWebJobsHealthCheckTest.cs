@@ -45,6 +45,16 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
+        public async Task WhenAzureWebJobStatusIsDegraded_ThenReturnDegraded()
+        {
+            A.CallTo(() => fakeAzureWebJobsHealthCheckService.CheckHealthAsync(A<CancellationToken>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Degraded, "Azure webjob is unhealthy", new Exception("Azure webjob is unhealthy")));
+
+            var response = await azureWebJobsHealthCheck.CheckHealthAsync(new HealthCheckContext());
+            
+            Assert.AreEqual(HealthStatus.Degraded, response.Status);
+        }
+
+        [Test]
         public async Task WhenCheckHealthAsyncThrowException_ThenReturnUnhealthy()
         {
             A.CallTo(() => fakeAzureWebJobsHealthCheckService.CheckHealthAsync(A<CancellationToken>.Ignored)).Throws<Exception>();
