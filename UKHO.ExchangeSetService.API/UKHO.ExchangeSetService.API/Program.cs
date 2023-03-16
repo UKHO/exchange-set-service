@@ -68,9 +68,7 @@ namespace UKHO.ExchangeSetService.API
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
 
-
             builder.Services.Configure<EventHubLoggingConfiguration>(builder.Configuration.GetSection("EventHubLoggingConfiguration"));
-
 
             var essAzureADConfiguration = new AzureADConfiguration();
             builder.Configuration.Bind("ESSAzureADConfiguration", essAzureADConfiguration);
@@ -129,7 +127,6 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
 
-
             builder.Services.AddHeaderPropagation(options =>
             {
                 options.Headers.Add(CorrelationIdMiddleware.XCorrelationIdHeaderKey);
@@ -156,6 +153,9 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.Configure<EssManagedIdentityConfiguration>(builder.Configuration.GetSection("ESSManagedIdentity"));
             builder.Services.Configure<AzureAdB2CConfiguration>(builder.Configuration.GetSection("AzureAdB2CConfiguration"));
             builder.Services.Configure<AzureADConfiguration>(builder.Configuration.GetSection("ESSAzureADConfiguration"));
+            builder.Services.Configure<AioConfiguration>(builder.Configuration.GetSection("AioConfiguration"));
+
+            AioConfiguration.AioCellList = new List<string>(builder.Configuration["AioConfiguration:AioCells"].Split(','));
 
             builder.Services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
             {
