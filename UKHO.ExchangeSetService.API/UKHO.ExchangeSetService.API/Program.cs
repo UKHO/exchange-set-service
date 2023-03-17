@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +14,7 @@ using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -50,11 +50,11 @@ namespace UKHO.ExchangeSetService.API
                     new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
             }
 
-            #if DEBUG
+#if DEBUG
             builder.Configuration.AddJsonFile("appsettings.local.overrides.json", true, true);
             //Add file based logger for development
             builder.Logging.AddFile(builder.Configuration.GetSection("Logging"));
-            #endif
+#endif
 
             // Add services to the container.
             builder.Logging.AddAzureWebAppDiagnostics();
@@ -154,8 +154,6 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.Configure<AzureAdB2CConfiguration>(builder.Configuration.GetSection("AzureAdB2CConfiguration"));
             builder.Services.Configure<AzureADConfiguration>(builder.Configuration.GetSection("ESSAzureADConfiguration"));
             builder.Services.Configure<AioConfiguration>(builder.Configuration.GetSection("AioConfiguration"));
-
-            AioConfiguration.AioCellList = new List<string>(builder.Configuration["AioConfiguration:AioCells"].Split(','));
 
             builder.Services.AddHttpClient<IFileShareServiceClient, FileShareServiceClient>(client =>
             {
