@@ -19,7 +19,6 @@ using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Helpers;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
@@ -98,21 +97,20 @@ namespace UKHO.ExchangeSetService.CleanUpJob
 
         private static void ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
         {
+            var buildServiceProvider = serviceCollection.BuildServiceProvider();
             //Add logging
             serviceCollection.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
 
+                //Add Application Insights if needed (if key exists in settings)
                 string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
                 if (!string.IsNullOrEmpty(instrumentationKey))
-                {
-                    loggingBuilder.AddApplicationInsights(
-                        configureTelemetryConfiguration: (config) => config.ConnectionString = instrumentationKey,
-                        configureApplicationInsightsLoggerOptions: (options) => { }
-                        );
+                {   
+                    loggingBuilder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
                 }
 
-                #if DEBUG
+#if DEBUG
                 loggingBuilder.AddSerilog(new LoggerConfiguration()
                                 .WriteTo.File("Logs/UKHO.ExchangeSetService.CleanUpLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
                                 .MinimumLevel.Information()
@@ -146,14 +144,8 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                     });
                 }
             });
-            
-            serviceCollection.Configure<TelemetryConfiguration>(
-                (config) =>
-                {
-                    config.TelemetryChannel = aiChannel;
-                    config.ConnectionString = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
-                }
-            );
+
+            serviceCollection.AddApplicationInsightsTelemetry();
 
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             serviceCollection.Configure<CleanUpConfiguration>(configuration.GetSection("CleanUpConfiguration"));
