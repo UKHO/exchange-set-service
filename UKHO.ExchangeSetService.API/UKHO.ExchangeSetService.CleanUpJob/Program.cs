@@ -1,25 +1,24 @@
 ﻿using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
-using Microsoft.Extensions.Logging;
-using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Helpers;
-using UKHO.ExchangeSetService.CleanUpJob.Services;
-using UKHO.ExchangeSetService.Common.Storage;
-using UKHO.Logging.EventHubLogProvider;
-using System.Reflection;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Helpers;
-using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
+using UKHO.ExchangeSetService.CleanUpJob.Services;
+using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Storage;
+using UKHO.Logging.EventHubLogProvider;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
@@ -106,10 +105,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
                 if (!string.IsNullOrEmpty(instrumentationKey))
                 {
-                    loggingBuilder.AddApplicationInsights(
-                        configureTelemetryConfiguration: (config) => config.ConnectionString = instrumentationKey,
-                        configureApplicationInsightsLoggerOptions: (options) => { }
-                        );
+                    loggingBuilder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
                 }
 
                 #if DEBUG
@@ -146,14 +142,8 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                     });
                 }
             });
-            
-            serviceCollection.Configure<TelemetryConfiguration>(
-                (config) =>
-                {
-                    config.TelemetryChannel = aiChannel;
-                    config.ConnectionString = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
-                }
-            );
+
+            serviceCollection.AddApplicationInsightsTelemetry();
 
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             serviceCollection.Configure<CleanUpConfiguration>(configuration.GetSection("CleanUpConfiguration"));
