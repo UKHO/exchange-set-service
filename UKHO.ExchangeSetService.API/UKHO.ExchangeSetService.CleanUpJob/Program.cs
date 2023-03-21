@@ -142,9 +142,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                     });
                 }
             });
-
-            serviceCollection.AddApplicationInsightsTelemetry();
-
+            
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             serviceCollection.Configure<CleanUpConfiguration>(configuration.GetSection("CleanUpConfiguration"));
 
