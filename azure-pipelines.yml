@@ -250,7 +250,7 @@ stages:
               command: "publish"
               publishWebProjects: false
               projects: "**/*UKHO.ExchangeSetService.CleanUpJob.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\triggered\ESSCleanUpWebJob'
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\continuous\ESSCleanUpWebJob'
               zipAfterPublish: false
               modifyOutputPath: false
 

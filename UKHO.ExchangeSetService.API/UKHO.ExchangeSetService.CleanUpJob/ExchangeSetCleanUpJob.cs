@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -12,6 +13,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
     [ExcludeFromCodeCoverage]
     public class ExchangeSetCleanUpJob
     {
+        private const string testTime = "0 */15 13-14 * * *";
         private readonly IExchangeSetCleanUpService exchangeSetCleanUpService;
         private readonly ILogger<ExchangeSetCleanUpJob> logger;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
@@ -30,6 +32,12 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
             logger.LogInformation(EventIds.ESSCleanUpJobRequestCompleted.ToEventId(), "Exchange set service clean up web job completed at " + DateTime.Now + " for storage account name {StorageAccountName}.", storageConfig.Value.StorageAccountName);
+        }
+
+        public async Task ProcessCleanUpTimerEvent([TimerTrigger(testTime)] TimerInfo timeInfo)
+        {
+            logger.LogInformation(EventIds.LogRequest.ToEventId(), "Testing ESS Cleanup " + DateTime.Now + " for storage account name {StorageAccountName}.", storageConfig.Value.StorageAccountName);
+            await ProcessCleanUp();
         }
     }
 }
