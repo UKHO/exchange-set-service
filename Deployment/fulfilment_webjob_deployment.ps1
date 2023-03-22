@@ -35,7 +35,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         
         if ( !$? ) { echo "Error while updating json file for fulfilment" ; throw $_ }
         
-        $appSettingFileForCleanUp = "$packagePath/$exchangeSet/App_Data/jobs/triggered/ESSCleanUpWebJob/appsettings.json"
+        $appSettingFileForCleanUp = "$packagePath/$exchangeSet/App_Data/jobs/continuous/ESSCleanUpWebJob/appsettings.json"
         $appSettingForCleanUp = Get-Content $appSettingFileForCleanUp |ConvertFrom-Json
 
         if ( !$? ) { echo "Error while Reading json file for CleanUp" ; throw $_ }

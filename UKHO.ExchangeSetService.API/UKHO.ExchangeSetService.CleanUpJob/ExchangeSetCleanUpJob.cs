@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
     [ExcludeFromCodeCoverage]
     public class ExchangeSetCleanUpJob
     {
-        private const string testTime = "0 */15 17-18 * * *";
+        private const string testTime = "0 */15 17-19 * * *";
         private readonly IExchangeSetCleanUpService exchangeSetCleanUpService;
         private readonly ILogger<ExchangeSetCleanUpJob> logger;
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
