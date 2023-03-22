@@ -6,7 +6,7 @@ steps:
       targetType: filePath
       filePath: "$(Build.SourcesDirectory)/Deployment/add-lease.ps1"
       arguments: "-daysValid 365
-                  -accessToken '$(System.AccessToken)'
+                  -accessToken 'Bearer $(System.AccessToken)'
                   -definitionId $(System.DefinitionId)
                   -ownerId 'User:$(Build.RequestedForId)'
                   -buildId $(Build.BuildId)
