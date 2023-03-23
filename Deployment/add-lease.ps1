@@ -10,7 +10,7 @@ Param(
 
 try{
     $contentType = "application/json";
-    $headers = @{ Authorization = 'Bearer $accessToken' };
+    $headers = @{ Authorization = $accessToken };
     $rawRequest = @{ daysValid = $daysValid; definitionId = $definitionId; ownerId = $ownerId; protectPipeline = $false; runId = $buildId };
     $request = ConvertTo-Json @($rawRequest);
     $uri = "$collectionUri$teamProject/_apis/build/retention/leases?api-version=7.0";
@@ -23,6 +23,7 @@ try{
     Write-Host "Pipeline will be retained for $daysValid days"
 }
 catch{
+   Write-Host "##vso[task.LogIssue type=warning;]Pipeline retaintion failed."
    Write-Host $_
    Write-Host "##vso[task.complete result=SucceededWithIssues;]"
 }
