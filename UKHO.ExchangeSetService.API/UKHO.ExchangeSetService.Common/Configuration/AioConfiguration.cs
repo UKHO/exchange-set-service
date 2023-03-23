@@ -2,7 +2,7 @@
 {
     public class AioConfiguration
     {
-        public bool AioEnabled { get; set; }
+        public bool AioEnabled { get; set; } = true;
         public string AioCells { get; set; }
     }
 }

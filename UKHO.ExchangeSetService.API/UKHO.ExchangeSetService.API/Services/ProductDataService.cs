@@ -31,12 +31,13 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly ISalesCatalogueService salesCatalogueService;
         private readonly IMapper mapper;
         private readonly IFileShareService fileShareService;
-        private readonly ILogger<FileShareService> logger;
+        private readonly ILogger<ProductDataService> logger;
         private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
         private readonly IMonitorHelper monitorHelper;
         private readonly UserIdentifier userIdentifier;
         private readonly IAzureAdB2CHelper azureAdB2CHelper;
+        private readonly IOptions<AioConfiguration> aioConfiguration;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -44,9 +45,9 @@ namespace UKHO.ExchangeSetService.API.Services
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
-            ILogger<FileShareService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
+            ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
             IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
-            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper)
+            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration)
         {
             this.productIdentifierValidator = productIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
@@ -60,6 +61,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.monitorHelper = monitorHelper;
             this.userIdentifier = userIdentifier;
             this.azureAdB2CHelper = azureAdB2CHelper;
+            this.aioConfiguration = aioConfiguration;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -276,6 +278,15 @@ namespace UKHO.ExchangeSetService.API.Services
 
                     var createBatchResponse =
                         await fileShareService.CreateBatch(userIdentifier.UserIdentity, correlationId);
+
+                    if (aioConfiguration.Value.AioEnabled)
+                    {
+                        logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(),"ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", createBatchResponse.ResponseBody.BatchId, correlationId);
+                    }
+                    else
+                    {
+                        logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(),"ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", createBatchResponse.ResponseBody.BatchId, correlationId);
+                    }
 
                     if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
                     {

@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
-using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
@@ -32,13 +33,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private ProductDataService service;
         private ISalesCatalogueService fakeSalesCatalogueService;
         private IFileShareService fakeFileShareService;
-        private ILogger<FileShareService> logger;
+        private ILogger<ProductDataService> logger;
         private IMapper fakeMapper;
         private IExchangeSetStorageProvider fakeExchangeSetStorageProvider;
-        private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfig;      
+        private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfig;
         private IMonitorHelper fakeMonitorHelper;
         private UserIdentifier fakeUserIdentifier;
         private IAzureAdB2CHelper fakeAzureAdB2CHelper;
+        private IOptions<AioConfiguration> fakeAioConfiguration;
 
         [SetUp]
         public void Setup()
@@ -49,19 +51,20 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
             fakeMapper = A.Fake<IMapper>();
             fakeFileShareService = A.Fake<IFileShareService>();
-            logger = A.Fake<ILogger<FileShareService>>();
+            logger = A.Fake<ILogger<ProductDataService>>();
             fakeExchangeSetStorageProvider = A.Fake<ExchangeSetStorageProvider>();
-            fakeEssFulfilmentStorageConfig = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();         
+            fakeEssFulfilmentStorageConfig = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
             fakeUserIdentifier = A.Fake<UserIdentifier>();
             fakeAzureAdB2CHelper = A.Fake<IAzureAdB2CHelper>();
-            fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;     
+            fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
+            fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureAdB2CHelper);
+            , fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureAdB2CHelper, fakeAioConfiguration);
         }
-        
+
         #region GetExchangeSetResponse
 
         private ExchangeSetResponse GetExchangeSetResponse()
@@ -297,7 +300,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
-            
+
         }
 
         [Test]
@@ -353,6 +356,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).Returns(true);
 
+            fakeAioConfiguration.Value.AioEnabled = true;
+
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
                 {
@@ -369,6 +374,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -395,6 +405,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
+            fakeAioConfiguration.Value.AioEnabled = false;
+
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
                 {
@@ -407,6 +419,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponse.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
+
+           A.CallTo(logger).Where(call => call.Method.Name == "Log"
+           && call.GetArgument<LogLevel>(0) == LogLevel.Information
+           && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -587,6 +604,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
+            fakeAioConfiguration.Value.AioEnabled = true;
+
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
                 ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
@@ -600,6 +619,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
+
+           A.CallTo(logger).Where(call => call.Method.Name == "Log"
+           && call.GetArgument<LogLevel>(0) == LogLevel.Information
+           && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -653,6 +677,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
+            fakeAioConfiguration.Value.AioEnabled = true;
+
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
                 ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
@@ -664,6 +690,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.NotNull(result.LastModified);
             Assert.AreEqual(result.BatchId, result.ExchangeSetResponse.BatchId);
 
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -850,11 +880,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
-            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);       
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
             A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<RequestedProductsNotReturned>.Ignored))
                 .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
+
+            fakeAioConfiguration.Value.AioEnabled = false;
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
@@ -864,6 +896,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -878,7 +915,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
-                .Returns(salesCatalogueResponse);    
+                .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
