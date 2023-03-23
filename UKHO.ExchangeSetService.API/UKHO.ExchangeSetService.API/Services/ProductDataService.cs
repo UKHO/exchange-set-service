@@ -279,7 +279,9 @@ namespace UKHO.ExchangeSetService.API.Services
                     var createBatchResponse =
                         await fileShareService.CreateBatch(userIdentifier.UserIdentity, correlationId);
 
-                    if (aioConfiguration.Value.AioEnabled)
+                    bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue ? aioConfiguration.Value.AioEnabled.Value : false;
+
+                    if (isAioEnabled)
                     {
                         logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(),"ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", createBatchResponse.ResponseBody.BatchId, correlationId);
                     }
