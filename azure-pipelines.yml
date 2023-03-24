@@ -95,6 +95,11 @@ stages:
           clean: all
         displayName: "Dependencychecker"
         steps:
+          - task: CmdLine@2
+            displayName: 'Clear NuGet Caches'
+            inputs:
+              script: "dotnet nuget locals all --clear"
+          
           - task: UseDotNet@2
             displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:

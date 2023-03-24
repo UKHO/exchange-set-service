@@ -249,7 +249,7 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
             Vulnerable versions: 12.10.0 and below
        This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. MSI is pinned to .Net core SDK > 3.1.408 for .NET and Visual Studio Information Disclosure Vulnerability.
        This is a temporary suppression pending a fix being available.
-       Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=53813
+	   We have since upgraded this package. This is a false positive.
       ]]>
     </notes>
     <cve>CVE-2022-30187</cve>
@@ -260,7 +260,7 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
 	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
 	This is a temporary suppression pending a fix being available.
-	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58194
+	This package is no longer present in the solution dependency tree.
 	]]></notes>
 	<cve>CVE-2018-8409</cve>
   </suppress>
@@ -445,6 +445,7 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	  <![CDATA[
      vulnerability:  Elevation of Privilege   
      Affects Azure Open Management Infrastructure (OMI) version <= 1.6.9-0 (VMs running Linux)
+
    ]]>
 	</notes>
 	<cve>CVE-2022-29149</cve>
@@ -454,9 +455,16 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 			<![CDATA[
    file name: System.Runtime.Serialization.Json:4.0.2, System.Runtime.Serialization.Json:4.3.0,
    System.Text.Json:4.6.0, System.Text.Json:4.7.2, System.Text.Json:7.0.0
-   Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=71085
+   These packages are dendencies of nuget packages. All packages at latest version, must update dependent packages when newer versions are available.
    ]]>
 		</notes>
 		<cve>CVE-2022-45688</cve>
 	</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: System.Security.Cryptography.X509Certificates:4.1.0
+   This part of .NetCoreApp. Either waiting on fix through .net sdk to fix, or update to .net core 8 when available.
+   ]]></notes>
+   <cve>CVE-2017-11770</cve>
+</suppress>
 </suppressions>
