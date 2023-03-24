@@ -4,7 +4,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
 {
     public enum EventIds
     {
-        /*Event id range for ESS - 805000 to 805172 */
+        /*Event id range for ESS - 805000 to 805122 */
         /// <summary>
         /// 805000 - Request for sales catalogue service products sincedatetime endpoint is started.
         /// </summary>
@@ -692,11 +692,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805171 - ENC update csv file not created
         /// </summary>
-        ENCupdateCSVFileIsNotCreated = 805171,
-        /// <summary>
-        /// 805172 - Azure web job for exchange set service is degraded.
-        /// </summary>
-        AzureWebJobIsDegraded = 805172
+        ENCupdateCSVFileIsNotCreated = 805171
     }
 
     public static class EventIdExtensions
