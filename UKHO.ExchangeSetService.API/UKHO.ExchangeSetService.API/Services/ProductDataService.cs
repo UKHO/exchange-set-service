@@ -275,11 +275,10 @@ namespace UKHO.ExchangeSetService.API.Services
                 "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-
                     var createBatchResponse =
                         await fileShareService.CreateBatch(userIdentifier.UserIdentity, correlationId);
 
-                    bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue ? aioConfiguration.Value.AioEnabled.Value : false;
+                    bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
                     if (isAioEnabled)
                     {

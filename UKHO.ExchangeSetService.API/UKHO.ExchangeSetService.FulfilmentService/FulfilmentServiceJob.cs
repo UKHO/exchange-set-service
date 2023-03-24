@@ -60,7 +60,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
             try
             {
-
                 bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
                 if (isAioEnabled)

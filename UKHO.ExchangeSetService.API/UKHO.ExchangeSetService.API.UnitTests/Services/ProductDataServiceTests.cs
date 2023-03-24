@@ -654,7 +654,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
             Assert.Null(result.LastModified);
             Assert.AreEqual(result.BatchId, result.ExchangeSetResponse.BatchId);
-
         }
 
         [Test]
@@ -924,7 +923,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.IsNull(result.ExchangeSetResponse);
             Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpStatusCode);
         }
-
         #endregion ProductDataSinceDateTime       
     }
 }
