@@ -101,19 +101,19 @@ namespace UKHO.ExchangeSetService.API.Services
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
 
+            if (isAioEnabled)//when toggle on then add additional aio cell details
+            {
+                response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
+                response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+            }
+
             if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
             {
                 return response;
             }
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
-
-            if (!isAioEnabled && aioCells.Any())//when toggle on then add additional aio cell details
-            {
-                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
-                exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
-                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
-            }
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);            
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -192,6 +192,14 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Product Version Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, request.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, true);
+
+            if (isAioEnabled)//when toggle on then add additional aio cell details
+            {
+                response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
+                response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+            }
+
             if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
             {
                 return response;
@@ -212,13 +220,6 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId);
-
-            if (!isAioEnabled && aioCells.Any())//when toggle on then add additional aio cell details
-            {
-                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
-                exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
-                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
-            }
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -260,21 +261,22 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
+
+            if (isAioEnabled)//when toggle on then add additional aio cell details
+            {
+                response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
+                response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+            }
+
             if (response.HttpStatusCode != HttpStatusCode.OK)
             {
                 return response;
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
-
-            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
-
-            if (!isAioEnabled && aioCells.Any())//when toggle on then add additional aio cell details
-            {
-                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
-                exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
-                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
-            }
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -389,7 +391,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             IEnumerable<string> aioCells = products.ProductIdentifier.Intersect(configAioCells).ToList();
 
-            if (!isAioEnabled && products!= null)//when toggle off then remove aio cells from scs request payload
+            if (!isAioEnabled)//when toggle off then remove aio cells from scs request payload
             {
                 products.ProductIdentifier = products.ProductIdentifier.Except(configAioCells).ToArray();
             }
@@ -403,7 +405,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             IEnumerable<string> aioCells = products.ProductVersions.Select(x => x.ProductName).Intersect(configAioCells).ToList();
 
-            if (!isAioEnabled && products!= null)//when toggle off then remove aio cells from scs request payload
+            if (!isAioEnabled)//when toggle off then remove aio cells from scs request payload
             {
                 products.ProductVersions = products.ProductVersions.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList();
             }
