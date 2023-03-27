@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
-    public class ExchangeSetResponse 
+    public class ExchangeSetResponse
     {
         [JsonProperty("_links")]
         public Links Links { get; set; }
@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         public DateTime? ExchangeSetUrlExpiryDateTime { get; set; }
 
         [JsonProperty("requestedProductCount")]
-        public int RequestedProductCount { get; set; }  
+        public int RequestedProductCount { get; set; }
 
         [JsonProperty("exchangeSetCellCount")]
         public int ExchangeSetCellCount { get; set; }

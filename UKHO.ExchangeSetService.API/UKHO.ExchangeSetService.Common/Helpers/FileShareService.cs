@@ -108,6 +108,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{createBatchResponse.ResponseBody.BatchId}";
                 createBatchResponse.ResponseBody.BatchExpiryDateTime = batchExpiryDateTime;
                 createBatchResponse.ResponseBody.ExchangeSetFileUri = $"{createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}";
+                createBatchResponse.ResponseBody.AioExchangeSetFileUri = $"{createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/{fileShareServiceConfig.Value.AioExchangeSetFileName}";
             }
 
             return createBatchResponse;
