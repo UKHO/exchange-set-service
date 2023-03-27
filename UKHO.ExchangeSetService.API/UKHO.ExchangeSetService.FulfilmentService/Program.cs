@@ -133,6 +133,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
                  services.Configure<SalesCatalogueConfiguration>(ConfigurationBuilder.GetSection("SalesCatalogue"));
+                 services.Configure<AioConfiguration>(ConfigurationBuilder.GetSection("AioConfiguration"));
 
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
                  services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
