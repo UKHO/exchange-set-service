@@ -362,8 +362,13 @@ namespace UKHO.ExchangeSetService.API.Services
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
                         ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri },
-                        AioExchangeSetFileUri = isAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
                     };
+
+                    if (isAioEnabled)//when toggle on then add additional aio cell details
+                    {
+                        exchangeSetServiceResponse.ExchangeSetResponse.Links.AioExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri };
+                    }
+
                     exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
                     exchangeSetServiceResponse.BatchId = createBatchResponse.ResponseBody.BatchId;
                     exchangeSetServiceResponse.ExchangeSetResponse.BatchId = exchangeSetServiceResponse.BatchId;
