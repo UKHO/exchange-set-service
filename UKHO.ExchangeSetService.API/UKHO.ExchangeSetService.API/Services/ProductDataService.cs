@@ -8,8 +8,10 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
@@ -17,8 +19,6 @@ using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
-using UKHO.ExchangeSetService.API.Configuration;
-using UKHO.ExchangeSetService.Common.Extensions;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
@@ -37,6 +37,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IMonitorHelper monitorHelper;
         private readonly UserIdentifier userIdentifier;
         private readonly IAzureAdB2CHelper azureAdB2CHelper;
+        public readonly bool isAioEnabled = true;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -65,7 +66,21 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest);
+
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
+
+            if (!isAioEnabled && aioCells.Any())//when toggle off then add aio cells as invalidProduct
+            {
+                IEnumerable<RequestedProductsNotReturned> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotReturned()
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                });
+
+                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.AddRange(requestedProductsNotReturneds);
+            }
 
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
@@ -92,6 +107,14 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
+
+            if (!isAioEnabled && aioCells.Any())//when toggle on then add additional aio cell details
+            {
+                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
+                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+            }
+
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
 
@@ -101,7 +124,6 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime);
             }
-
             return response;
         }
 
@@ -136,7 +158,22 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request);
+
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
+
+            if (!isAioEnabled && aioCells.Any())//when toggle off then add aio cells as invalidProduct
+            {
+                IEnumerable<RequestedProductsNotReturned> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotReturned
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                });
+
+                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.AddRange(requestedProductsNotReturneds);
+            }
+
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -175,6 +212,14 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId);
+
+            if (!isAioEnabled && aioCells.Any())//when toggle on then add additional aio cell details
+            {
+                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
+                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+            }
+
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
 
@@ -221,6 +266,16 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
+
+            if (!isAioEnabled && aioCells.Any())//when toggle on then add additional aio cell details
+            {
+                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
+                exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+            }
+
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
 
@@ -290,7 +345,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     {
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
-                        ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri }
+                        ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri },
+                        AioExchangeSetFileUri = isAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
                     };
                     exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
                     exchangeSetServiceResponse.BatchId = createBatchResponse.ResponseBody.BatchId;
@@ -325,6 +381,43 @@ namespace UKHO.ExchangeSetService.API.Services
                     return result;
                 }, batchId, correlationId);
 
+        }
+
+        private IEnumerable<string> FilterAioCellsByProductIdentifiers(ProductIdentifierRequest products)
+        {
+            List<string> configAioCells = new("GB800001,US2ARCGD".Split(','));
+
+            IEnumerable<string> aioCells = products.ProductIdentifier.Intersect(configAioCells).ToList();
+
+            if (!isAioEnabled && products!= null)//when toggle off then remove aio cells from scs request payload
+            {
+                products.ProductIdentifier = products.ProductIdentifier.Except(configAioCells).ToArray();
+            }
+
+            return aioCells;
+        }
+
+        private IEnumerable<string> FilterAioCellsByProductVersions(ProductDataProductVersionsRequest products)
+        {
+            List<string> configAioCells = new("GB800001,US2ARCGD".Split(','));
+
+            IEnumerable<string> aioCells = products.ProductVersions.Select(x => x.ProductName).Intersect(configAioCells).ToList();
+
+            if (!isAioEnabled && products!= null)//when toggle off then remove aio cells from scs request payload
+            {
+                products.ProductVersions = products.ProductVersions.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList();
+            }
+
+            return aioCells;
+        }
+
+        private static IEnumerable<string> FilterAioCellsByProductData(SalesCatalogueProductResponse products)
+        {
+            List<string> configAioCells = new("GB800001,US2ARCGD".Split(','));
+
+            IEnumerable<string> aioCells = products.Products.Select(p => p.ProductName).Intersect(configAioCells);
+
+            return aioCells;
         }
     }
 }
