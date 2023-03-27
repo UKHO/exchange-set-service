@@ -29,12 +29,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private readonly IAzureBlobStorageService azureBlobStorageService;
         private readonly IFulfilmentCallBackService fulfilmentCallBackService;
         private readonly IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration;
+        private readonly IOptions<AioConfiguration> aioConfiguration;
 
         public FulfilmentServiceJob(IConfiguration configuration,
                                     IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                     IFileShareService fileShareService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                     IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
-                                    IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
+                                    IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IOptions<AioConfiguration> aioConfiguration)
         {
             this.configuration = configuration;
             this.fulFilmentDataService = fulFilmentDataService;
@@ -45,6 +46,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentCallBackService = fulfilmentCallBackService;
             this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
+            this.aioConfiguration = aioConfiguration;
         }
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
@@ -56,9 +58,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             double fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(fulfilmentServiceQueueMessage.FileSize);
 
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
-
             try
             {
+                bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
+
+                if (isAioEnabled)
+                {
+                    logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                }
+                else
+                {
+                    logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "ESS Webjob : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                }
+
                 if (CommonHelper.IsPeriodicOutputService)
                 {
                     await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateLargeExchangeSetRequestStart,
