@@ -176,6 +176,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 });
 
                 salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.AddRange(requestedProductsNotReturneds);
+                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount += aioCells.Count();
             }
 
             long fileSize = 0;
