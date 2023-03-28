@@ -101,6 +101,82 @@
     }
   },
   {
+    "id": "productIdentifier-GB800001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-GB800001-DE260001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 140018
+        },
+        {
+          "editionNumber": 2,
+          "productName": "DE260001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 85795
+        }
+      ]
+    }
+  },
+  {
     "id": "productIdentifier-DE290001",
     "responseBody": {
       "productCounts": {
@@ -373,6 +449,38 @@
     }
   },
   {
+    "id": "productVersion-GB800001-9-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "GB800001",
+          "updateNumbers": [
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2023-03-25T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 140018
+        }
+      ]
+    }
+  },
+  {
     "id": "productVersion-DE416080-9-1",
     "responseBody": {
       "productCounts": {
@@ -437,6 +545,52 @@
             },
             {
               "issueDate": "2020-07-06T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 9228
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-GB800001-9-0-US2WC06M-10-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "GB800001",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 140018
+        },
+        {
+          "editionNumber": 10,
+          "productName": "US2WC06M",
+          "updateNumbers": [
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2023-03-18T00:00:00.0000000Z",
               "updateNumber": 2
             }
           ],
@@ -1121,6 +1275,258 @@
             {
               "bundleType": "DVD",
               "location": "M1;B3"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US5CN13M-CA172005-DE521900-NZ300661-KR676D03-GB800001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 11,
+        "returnedProductCount": 11,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 12,
+          "productName": "DE521900",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2017-01-13T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 193039,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B8"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "CA172005",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-06-04T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-06-04T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 1039709,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B6"
+            }
+          ]
+        },
+        {
+          "editionNumber": 12,
+          "productName": "US5CN13M",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-04-13T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 1
+          },
+          "fileSize": 68919,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B5"
+            }
+          ]
+        },
+        {
+          "editionNumber": 2,
+          "productName": "NZ300661",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2016-06-02T00:00:00.0000000Z",
+              "updateApplicationDate": "2016-06-02T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 227612,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B7"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "NO3B2020",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-09-11T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-09-11T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 738192,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B2"
+            }
+          ]
+        },
+        {
+          "editionNumber": 2,
+          "productName": "RU3P0ZM0",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2017-10-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-10-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 130514,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B4"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "FR570300",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-02-25T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-02-25T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 314452,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B1"
+            }
+          ]
+        },
+        {
+          "editionNumber": 13,
+          "productName": "SE6IIFE1",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-26T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-26T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 7215,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B1"
+            }
+          ]
+        },
+        {
+          "editionNumber": 9,
+          "productName": "KR676D03",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-12-24T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-12-24T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 124432,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B9"
+            }
+          ]
+        },
+        {
+          "editionNumber": 4,
+          "productName": "GB20486A",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2016-11-11T00:00:00.0000000Z",
+              "updateApplicationDate": "2016-11-11T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 999003200,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
+          ]
+        },
+        {
+          "editionNumber": 9,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B4"
             }
           ]
         }
