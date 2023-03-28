@@ -167,7 +167,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
 
-            if (!isAioEnabled && aioCells.Any())//when toggle off then add aio cells as invalidProduct
+            if (!isAioEnabled && aioCells.Any() && salesCatalogueResponse.ResponseBody != null)//when toggle off then add aio cells as invalidProduct
             {
                 IEnumerable<RequestedProductsNotReturned> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotReturned
                 {
@@ -212,8 +212,15 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
+                IEnumerable<RequestedProductsNotInExchangeSet> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                });
+
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
-                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>();
+                response.ExchangeSetResponse.RequestedProductCount += !isAioEnabled && aioCells.Any() ? aioCells.Count() : 0;
+                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = !isAioEnabled && aioCells.Any() ? requestedProductsNotReturneds : new List<RequestedProductsNotInExchangeSet>();
                 salesCatalogueResponse.ResponseBody = new SalesCatalogueProductResponse
                 {
                     Products = new List<Products>(),
@@ -265,9 +272,8 @@ namespace UKHO.ExchangeSetService.API.Services
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
-            var response = SetExchangeSetResponse(salesCatalogueResponse, false);
-
             IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
+            var response = SetExchangeSetResponse(salesCatalogueResponse, false);
             bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             if (isAioEnabled)//when toggle on then add additional aio cell details
@@ -275,6 +281,14 @@ namespace UKHO.ExchangeSetService.API.Services
                 response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+            }
+            if (!isAioEnabled && aioCells.Any())
+            {
+                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = aioCells.Select(x => new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                });
             }
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -423,7 +437,7 @@ namespace UKHO.ExchangeSetService.API.Services
             IEnumerable<string> aioCells = products.ProductVersions.Select(x => x.ProductName).Intersect(configAioCells).ToList();
             bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
-            if (!isAioEnabled)//when toggle off then remove aio cells from scs request payload
+            if (!isAioEnabled)//when toggle off then remove aio cells from scs request
             {
                 products.ProductVersions = products.ProductVersions.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList();
             }
@@ -435,6 +449,13 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             IEnumerable<string> configAioCells = !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',')) : new List<string>();
             IEnumerable<string> aioCells = products != null ? products.Products.Select(p => p.ProductName).Intersect(configAioCells) : new List<string>();
+            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
+
+            if (!isAioEnabled)//when toggle off then remove aio cells from scs response
+            {
+                products.Products = products != null ? products.Products.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList() : new List<Products>();
+                products.ProductCounts.ReturnedProductCount = products != null ? products.ProductCounts.ReturnedProductCount - aioCells.Count() : products.ProductCounts.ReturnedProductCount;
+            }
 
             return aioCells;
         }
