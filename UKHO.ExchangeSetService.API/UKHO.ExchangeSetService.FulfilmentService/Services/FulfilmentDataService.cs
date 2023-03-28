@@ -116,13 +116,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse);
-            
+
             bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
-            if (isAioEnabled)     
+            if (isAioEnabled)
             {
                 var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
-                await CreateAioAncillaryFiles(message.BatchId, aioExchangeSetPath, message.CorrelationId);            
+                await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
             }
 
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetZipFilePath, message.CorrelationId);
@@ -178,7 +178,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (isAioEnabled)
             {
                 var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
-                await CreateAioAncillaryFiles(message.BatchId, aioExchangeSetPath, message.CorrelationId);
+                await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
             }
 
             var ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
@@ -477,12 +477,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       {
                           var rootLastDirectoryPath = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                                                   .LastOrDefault(di => di.Name.StartsWith("M0"));
-                          
+
                           var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
-                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length -1)..]));
+                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
                           var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath?.ToString())
-                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length -1)..]));
+                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
                           string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(rootLastDirectoryPath.ToString(), "B"), "");
 
@@ -505,7 +505,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length -1)..]));
+                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
             var encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
@@ -596,7 +596,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        private async Task CreateAioAncillaryFiles(string batchId, string aioExchangeSetPath, string correlationId)
+        private async Task CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId)
         {
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
         }

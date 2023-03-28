@@ -6,10 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
@@ -27,6 +29,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
         public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
         public string fakeExchangeSetPath = string.Empty;
+        public string fakeAioExchangeSetPath = string.Empty;
         public string fakeExchangeSetRootPath = @"F:\\HOME";
         public string fakeFileName = "test.txt";
         readonly FakeFileHelper fakeFileHelper = new FakeFileHelper();
@@ -54,6 +57,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ReadMeFileName = "ReadMe.txt",
                 CatalogFileName = "CATALOG.031",
                 SerialFileName = "TEST.ENC",
+                SerialAioFileName = "TEST.AIO",
                 ProductFileName = "PRODUCT.TXT",
                 CommentVersion = "VERSION=1.0"
             });
@@ -439,5 +443,40 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         #endregion
+
+        #region AIO
+
+        [Test]
+        public void WhenInvalidCreateSerialAioFileRequest_ThenReturnFulfilmentException()
+        {
+            fakeAioExchangeSetPath = @"C:\\HOME";
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFile(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeAioExchangeSetPath, null); });
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.SerialAioFileIsNotCreated.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating serial.aio file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path").MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public async Task WhenValidCreateSerialAioFileRequest_ThenReturnTrueResponse()
+        {
+            fakeAioExchangeSetPath = @"C:\\HOME";
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CreateFile(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+
+            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeAioExchangeSetPath, null);
+
+            Assert.AreEqual(true, response);
+        }
+
+        #endregion
+
     }
 }

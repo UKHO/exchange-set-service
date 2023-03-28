@@ -216,8 +216,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 var newFile = _fileSystem.File.Create(filePath);
                 newFile.Close();
-            }
-           
+            }    
         }
     }
 }
