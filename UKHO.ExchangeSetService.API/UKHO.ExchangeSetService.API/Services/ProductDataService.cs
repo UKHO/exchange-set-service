@@ -82,6 +82,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 });
 
                 salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.AddRange(requestedProductsNotReturneds);
+                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount += aioCells.Count();
             }
 
             long fileSize = 0;
@@ -362,6 +363,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
                         ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri },
+                        //when toggle on then add additional aio cell details
                         AioExchangeSetFileUri = isAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
                     };
 
