@@ -419,9 +419,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private IEnumerable<string> FilterAioCellsByProductIdentifiers(ProductIdentifierRequest products)
         {
-            IEnumerable<string> configAioCells = !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',')) : new List<string>();
+            (IEnumerable<string>, bool) confiValues = GetConfigValues();
+
+            bool isAioEnabled = confiValues.Item2;
+            IEnumerable<string> configAioCells = confiValues.Item1;
             IEnumerable<string> aioCells = products.ProductIdentifier.Intersect(configAioCells).ToList();
-            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             if (!isAioEnabled)//when toggle off then remove aio cells from scs request payload
             {
@@ -433,9 +435,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private IEnumerable<string> FilterAioCellsByProductVersions(ProductDataProductVersionsRequest products)
         {
-            IEnumerable<string> configAioCells = !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',')) : new List<string>();
+            (IEnumerable<string>, bool) confiValues = GetConfigValues();
+
+            bool isAioEnabled = confiValues.Item2;
+            IEnumerable<string> configAioCells = confiValues.Item1;
             IEnumerable<string> aioCells = products.ProductVersions.Select(x => x.ProductName).Intersect(configAioCells).ToList();
-            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             if (!isAioEnabled)//when toggle off then remove aio cells from scs request
             {
@@ -447,9 +451,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private IEnumerable<string> FilterAioCellsByProductData(SalesCatalogueProductResponse products)
         {
-            IEnumerable<string> configAioCells = !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',')) : new List<string>();
+            (IEnumerable<string>, bool) confiValues = GetConfigValues();
+
+            bool isAioEnabled = confiValues.Item2;
+            IEnumerable<string> configAioCells = confiValues.Item1;
             IEnumerable<string> aioCells = products != null ? products.Products.Select(p => p.ProductName).Intersect(configAioCells) : new List<string>();
-            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             if (!isAioEnabled)//when toggle off then remove aio cells from scs response
             {
@@ -458,6 +464,14 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             return aioCells;
+        }
+
+        private (IEnumerable<string>, bool) GetConfigValues()
+        {
+            IEnumerable<string> configAioCells = !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',').Select(s => s.Trim())) : new List<string>();
+            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
+
+            return (configAioCells, isAioEnabled);
         }
     }
 }
