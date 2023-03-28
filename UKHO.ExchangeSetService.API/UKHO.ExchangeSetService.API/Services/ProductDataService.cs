@@ -67,24 +67,10 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
-            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest);
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
-
-            if (!isAioEnabled && aioCells.Any())//when toggle off then add aio cells as invalidProduct
-            {
-                IEnumerable<RequestedProductsNotReturned> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotReturned()
-                {
-                    ProductName = x,
-                    Reason = "invalidProduct"
-                });
-
-                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.AddRange(requestedProductsNotReturneds);
-                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount += aioCells.Count();
-            }
-
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -103,12 +89,30 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Product Identifier Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productIdentifierRequest.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
+            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
-            if (isAioEnabled)//when toggle on then add additional aio cell details
+            if (isAioEnabled) //when toggle on then add additional aio cell details
             {
                 response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+
+                if (aioCells.Any())
+                {
+                    response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.RequestedProductCount - aioCells.Count();
+                    response.ExchangeSetResponse.ExchangeSetCellCount -= response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount;
+                    int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Select(i => aioCells.Any(y => y.Equals(i.ProductName))).Count();
+                    response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count() - invalidAioCells;
+                }
+            }
+            else //when toggle off then add aio cells as invalidProduct
+            {
+                response.ExchangeSetResponse.RequestedProductCount += aioCells.Count();
+                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.AddRange(aioCells.Select(x => new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                }));
             }
 
             if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
@@ -161,24 +165,10 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
-            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request);
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
-
-            if (!isAioEnabled && aioCells.Any() && salesCatalogueResponse.ResponseBody != null)//when toggle off then add aio cells as invalidProduct
-            {
-                IEnumerable<RequestedProductsNotReturned> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotReturned
-                {
-                    ProductName = x,
-                    Reason = "invalidProduct"
-                });
-
-                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.AddRange(requestedProductsNotReturneds);
-                salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount += aioCells.Count();
-            }
-
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -197,12 +187,30 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Product Version Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, request.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, true);
+            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
-            if (isAioEnabled)//when toggle on then add additional aio cell details
+            if (isAioEnabled) //when toggle on then add additional aio cell details
             {
                 response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+
+                if (aioCells.Any())
+                {
+                    response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.RequestedProductCount - aioCells.Count();
+                    response.ExchangeSetResponse.ExchangeSetCellCount -= response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount;
+                    int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Select(i => aioCells.Any(y => y.Equals(i.ProductName))).Count();
+                    response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count() - invalidAioCells;
+                }
+            }
+            else if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK) //when toggle off and status is modified then add aio cells as invalidProduct
+            {
+                response.ExchangeSetResponse.RequestedProductCount += aioCells.Count();
+                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.AddRange(aioCells.Select(x => new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                }));
             }
 
             if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
@@ -212,15 +220,15 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
-                IEnumerable<RequestedProductsNotInExchangeSet> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotInExchangeSet
+                List<RequestedProductsNotInExchangeSet> requestedProductsNotReturneds = aioCells.Select(x => new RequestedProductsNotInExchangeSet
                 {
                     ProductName = x,
                     Reason = "invalidProduct"
-                });
+                }).ToList();
 
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
-                response.ExchangeSetResponse.RequestedProductCount += !isAioEnabled && aioCells.Any() ? aioCells.Count() : 0;
-                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = !isAioEnabled && aioCells.Any() ? requestedProductsNotReturneds : new List<RequestedProductsNotInExchangeSet>();
+                response.ExchangeSetResponse.RequestedProductCount += !isAioEnabled ? aioCells.Count() : 0;
+                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = !isAioEnabled ? requestedProductsNotReturneds : new List<RequestedProductsNotInExchangeSet>();
                 salesCatalogueResponse.ResponseBody = new SalesCatalogueProductResponse
                 {
                     Products = new List<Products>(),
@@ -282,13 +290,13 @@ namespace UKHO.ExchangeSetService.API.Services
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
             }
-            if (!isAioEnabled && aioCells.Any())
+            else
             {
-                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = aioCells.Select(x => new RequestedProductsNotInExchangeSet
+                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.AddRange(aioCells.Select(x => new RequestedProductsNotInExchangeSet
                 {
                     ProductName = x,
                     Reason = "invalidProduct"
-                });
+                }));
             }
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -394,7 +402,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private ExchangeSetResponse MapExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse)
         {
             var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
-            model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned);
+            model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned).ToList();
             return model;
         }
 

@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         public int? RequestedAioProductsAlreadyUpToDateCount { get; set; } = null;
 
         [JsonProperty("requestedProductsNotInExchangeSet")]
-        public IEnumerable<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
+        public List<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
         [JsonProperty("fssBatchId")]
         public string BatchId { get; set; }
     }
