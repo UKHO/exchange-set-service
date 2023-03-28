@@ -30,5 +30,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         List<FileDetail> UploadLargeMediaCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList);
         string GetFileName(string fileFullPath);
         TextWriter WriteStream(string filePath);
+        void CreateFile(string filePath);
     }
 }

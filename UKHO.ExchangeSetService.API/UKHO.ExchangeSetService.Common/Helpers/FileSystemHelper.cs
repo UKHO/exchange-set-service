@@ -209,5 +209,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             return new StreamWriter(filePath);
         }
+
+        public void CreateFile(string filePath)
+        {
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                var newFile = _fileSystem.File.Create(filePath);
+                newFile.Close();
+            }
+           
+        }
     }
 }

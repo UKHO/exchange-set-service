@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CsvHelper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -15,9 +18,6 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.Torus.Core;
 using UKHO.Torus.Enc.Core;
 using UKHO.Torus.Enc.Core.EncCatalogue;
-using System.IO.Abstractions;
-using System.Globalization;
-using CsvHelper;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
@@ -79,10 +79,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
 
-                var orderPreference = new List<Tuple<string, string>> { 
+                var orderPreference = new List<Tuple<string, string>> {
                     new Tuple<string, string>("application/s63", "BIN"),
-                    new Tuple<string, string>("text/plain", "ASC"), 
-                    new Tuple<string, string>("text/plain", "TXT"), 
+                    new Tuple<string, string>("text/plain", "ASC"),
+                    new Tuple<string, string>("text/plain", "TXT"),
                     new Tuple<string, string>("image/tiff", "TIF") };
 
                 foreach (var listItem in listFulfilmentData)
@@ -387,10 +387,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
 
-                var orderPreference = new List<Tuple<string, string>> { 
+                var orderPreference = new List<Tuple<string, string>> {
                     new Tuple<string, string>("application/s63", "BIN"),
-                    new Tuple<string, string>("text/plain", "ASC"), 
-                    new Tuple<string, string>("text/plain", "TXT"), 
+                    new Tuple<string, string>("text/plain", "ASC"),
+                    new Tuple<string, string>("text/plain", "TXT"),
                     new Tuple<string, string>("image/tiff", "TIF") };
 
                 foreach (var listItem in listFulfilmentData)
@@ -461,6 +461,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     BoundingRectangle = boundingRectangle
                 });
             }
+        }
+
+        public async Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
+        {
+            bool checkSerialAioFileCreated = false;
+            if (!string.IsNullOrWhiteSpace(aioExchangeSetPath))
+            {
+                string serialFilePath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.SerialAioFileName);
+                fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
+
+                fileSystemHelper.CreateFile(serialFilePath);
+
+                await Task.CompletedTask;
+
+                if (fileSystemHelper.CheckFileExists(serialFilePath))
+                    checkSerialAioFileCreated = true;
+                else
+                {
+                    logger.LogError(EventIds.SerialAioFileIsNotCreated.ToEventId(), "Error in creating serial.aio file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.SerialAioFileIsNotCreated.ToEventId());
+                }
+            }
+            return checkSerialAioFileCreated;
         }
     }
 }

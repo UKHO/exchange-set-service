@@ -33,6 +33,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IMonitorHelper monitorHelper;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IProductDataValidator productDataValidator;
+        private readonly IOptions<AioConfiguration> aioConfiguration;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
@@ -44,7 +45,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                     IFulfilmentCallBackService fulfilmentCallBackService,
                                     IMonitorHelper monitorHelper,
                                     IFileSystemHelper fileSystemHelper,
-                                    IProductDataValidator productDataValidator)
+                                    IProductDataValidator productDataValidator,
+                                    IOptions<AioConfiguration> aioConfiguration)
         {
             this.azureBlobStorageService = azureBlobStorageService;
             this.fulfilmentFileShareService = fulfilmentFileShareService;
@@ -57,6 +59,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.monitorHelper = monitorHelper;
             this.fileSystemHelper = fileSystemHelper;
             this.productDataValidator = productDataValidator;
+            this.aioConfiguration = aioConfiguration;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
@@ -113,6 +116,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse);
+            
+            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
+
+            if (isAioEnabled)     
+            {
+                var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
+                await CreateAioAncillaryFiles(message.BatchId, aioExchangeSetPath, message.CorrelationId);            
+            }
+
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetZipFilePath, message.CorrelationId);
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
             if (isZipFileUploaded)
@@ -160,6 +172,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
+
+            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
+
+            if (isAioEnabled)
+            {
+                var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
+                await CreateAioAncillaryFiles(message.BatchId, aioExchangeSetPath, message.CorrelationId);
+            }
 
             var ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
@@ -576,5 +596,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
+        private async Task CreateAioAncillaryFiles(string batchId, string aioExchangeSetPath, string correlationId)
+        {
+            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+        }
+        private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
+        {
+            await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
+                      EventIds.CreateSerialAioFileRequestCompleted,
+                      "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                      async () =>
+                      {
+                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+                      },
+                  batchId, correlationId);
+        }
     }
 }
