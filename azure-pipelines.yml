@@ -95,19 +95,6 @@ stages:
           clean: all
         displayName: "Dependencychecker"
         steps:
-          - task: DotNetCoreCLI@2
-            displayName: 'Clear NuGet Caches'
-            inputs:
-              command: "nuget locals http-cache --clear"
-              projects: |
-                **/*.csproj
-                !**/*Tests.csproj
-              feedsToUse: config
-              noCache: true
-              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
-
           - task: UseDotNet@2
             displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:
@@ -126,7 +113,7 @@ stages:
               noCache: true
               nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-              packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
+            #  packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
 
           - task: CmdLine@1
             displayName: "Run OWASP Dependency Checker"
