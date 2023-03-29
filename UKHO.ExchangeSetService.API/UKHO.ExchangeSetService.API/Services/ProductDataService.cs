@@ -89,6 +89,12 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Product Identifier Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productIdentifierRequest.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
+
+            if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
+            {
+                return response;
+            }
+
             bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             if (isAioEnabled) //when toggle on then add additional aio cell details
@@ -113,11 +119,6 @@ namespace UKHO.ExchangeSetService.API.Services
                     ProductName = x,
                     Reason = "invalidProduct"
                 }));
-            }
-
-            if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
-            {
-                return response;
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
@@ -187,6 +188,12 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Product Version Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, request.CorrelationId, null, null, fileSize, null);
 
             var response = SetExchangeSetResponse(salesCatalogueResponse, true);
+
+            if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
+            {
+                return response;
+            }
+
             bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             if (isAioEnabled) //when toggle on then add additional aio cell details
@@ -211,11 +218,6 @@ namespace UKHO.ExchangeSetService.API.Services
                     ProductName = x,
                     Reason = "invalidProduct"
                 }));
-            }
-
-            if (response.HttpStatusCode != HttpStatusCode.OK && response.HttpStatusCode != HttpStatusCode.NotModified)
-            {
-                return response;
             }
 
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
@@ -282,6 +284,12 @@ namespace UKHO.ExchangeSetService.API.Services
 
             IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
+
+            if (response.HttpStatusCode != HttpStatusCode.OK)
+            {
+                return response;
+            }
+
             bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
 
             if (isAioEnabled)//when toggle on then add additional aio cell details
@@ -300,11 +308,6 @@ namespace UKHO.ExchangeSetService.API.Services
                     ProductName = x,
                     Reason = "invalidProduct"
                 }));
-            }
-
-            if (response.HttpStatusCode != HttpStatusCode.OK)
-            {
-                return response;
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
@@ -468,10 +471,10 @@ namespace UKHO.ExchangeSetService.API.Services
             IEnumerable<string> configAioCells = confiValues.Item1;
             IEnumerable<string> aioCells = products != null ? products.Products.Select(p => p.ProductName).Intersect(configAioCells) : new List<string>();
 
-            if (!isAioEnabled)//when toggle off then remove aio cells from scs response
+            if (!isAioEnabled && products != null)//when toggle off then remove aio cells from scs response
             {
-                products.Products = products != null ? products.Products.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList() : new List<Products>();
-                products.ProductCounts.ReturnedProductCount = products != null ? products.ProductCounts.ReturnedProductCount - aioCells.Count() : products.ProductCounts.ReturnedProductCount;
+                products.Products = products.Products.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList();
+                products.ProductCounts.ReturnedProductCount = products.ProductCounts.ReturnedProductCount - aioCells.Count();
             }
 
             return aioCells;

@@ -69,6 +69,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
         private ExchangeSetResponse GetExchangeSetResponse()
         {
+            bool isAioEnabled = fakeAioConfiguration.Value.AioEnabled.HasValue && fakeAioConfiguration.Value.AioEnabled.Value;
+
             LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
@@ -81,11 +83,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
             };
+            LinkSetFileUri AiolinkSetFileUri = new LinkSetFileUri()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip",
+            };
             Common.Models.Response.Links links = new Common.Models.Response.Links()
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
-                ExchangeSetFileUri = linkSetFileUri
+                ExchangeSetFileUri = linkSetFileUri,
+                AioExchangeSetFileUri = isAioEnabled ? AiolinkSetFileUri : null
             };
             List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
             {
@@ -107,8 +114,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 RequestedProductCount = 22,
                 ExchangeSetCellCount = 15,
                 RequestedProductsAlreadyUpToDateCount = 5,
-                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet
+                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet,
+                RequestedAioProductCount = isAioEnabled ? 1 : null,
+                AioExchangeSetCellCount = isAioEnabled ? 1 : null,
+                RequestedAioProductsAlreadyUpToDateCount = isAioEnabled ? 0 : null
             };
+
+            if (!isAioEnabled)
+            {
+                exchangeSetResponse.RequestedProductsNotInExchangeSet.Add(new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = "US2ARCG1Dsss",
+                    Reason = "invalidProduct"
+                });
+            }
+
             return exchangeSetResponse;
         }
 
@@ -224,6 +244,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     BatchStatusUri = $"http://fss.ukho.gov.uk/batch/{batchId}/status",
                     ExchangeSetBatchDetailsUri = $"http://fss.ukho.gov.uk/batch/{batchId}",
                     ExchangeSetFileUri = $"http://fss.ukho.gov.uk/batch/{batchId}/files/exchangeset123.zip",
+                    AioExchangeSetFileUri = $"http://fss.ukho.gov.uk/batch/{batchId}/files/aio123.zip",
                     BatchExpiryDateTime = "2021-02-17T16:19:32.269Z"
                 },
                 ResponseCode = HttpStatusCode.Created
@@ -372,7 +393,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetBatchDetailsUri, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri);
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
-            Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);       
+            Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
         }
 
         [Test]
@@ -486,7 +507,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550", "US2ARCGD" };
+            fakeAioConfiguration.Value.AioEnabled = false;
+            fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
@@ -509,8 +532,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).Returns(true);
 
-            fakeAioConfiguration.Value.AioEnabled = false;
-
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
                 {
@@ -527,6 +548,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
+            //Aio cell details
+            CollectionAssert.AreEqual(exchangeSetResponse.RequestedProductsNotInExchangeSet, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -539,7 +562,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
-            string[] productIdentifiers = new string[] { "GB123467", "GB160060", "AU334550" };
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550", "US2ARCGD" };
+            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
@@ -562,8 +587,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).Returns(true);
 
-            fakeAioConfiguration.Value.AioEnabled = true;
-
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
                 {
@@ -580,6 +603,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponse.Links.ExchangeSetFileUri, result.ExchangeSetResponse.Links.ExchangeSetFileUri);
             Assert.AreEqual(exchangeSetResponse.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponse.BatchId, result.BatchId);
+            //Aio cell details
+            Assert.AreEqual(exchangeSetResponse.AioExchangeSetCellCount, result.ExchangeSetResponse.AioExchangeSetCellCount);
+            Assert.AreEqual(exchangeSetResponse.RequestedAioProductCount, result.ExchangeSetResponse.RequestedAioProductCount);
+            Assert.AreEqual(exchangeSetResponse.Links.AioExchangeSetFileUri, result.ExchangeSetResponse.Links.AioExchangeSetFileUri);
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
