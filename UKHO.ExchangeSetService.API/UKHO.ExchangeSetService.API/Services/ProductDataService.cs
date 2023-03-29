@@ -93,17 +93,17 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (isAioEnabled) //when toggle on then add additional aio cell details
             {
-                response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
-                response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
-                response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+                //temporary code start
+                int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => aioCells.Any(y => y.Equals(x.ProductName))).Count();
+                int invalidCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => !aioCells.Any(y => y.Equals(x.ProductName))).Count();
 
-                if (aioCells.Any())
-                {
-                    response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.RequestedProductCount - aioCells.Count();
-                    response.ExchangeSetResponse.ExchangeSetCellCount -= response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount;
-                    int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Select(i => aioCells.Any(y => y.Equals(i.ProductName))).Count();
-                    response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count() - invalidAioCells;
-                }
+                response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.RequestedProductCount - aioCells.Count();
+                response.ExchangeSetResponse.ExchangeSetCellCount -= response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount;
+                response.ExchangeSetResponse.ExchangeSetCellCount -= invalidCells;
+                response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Any() ? aioCells.Count() - invalidAioCells : 0;
+                response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+                //temporary code end
             }
             else //when toggle off then add aio cells as invalidProduct
             {
@@ -191,17 +191,17 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (isAioEnabled) //when toggle on then add additional aio cell details
             {
-                response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
-                response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
-                response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+                //temporary code starts
+                int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => aioCells.Any(y => y.Equals(x.ProductName))).Count();
+                int invalidCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => !aioCells.Any(y => y.Equals(x.ProductName))).Count();
 
-                if (aioCells.Any())
-                {
-                    response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.RequestedProductCount - aioCells.Count();
-                    response.ExchangeSetResponse.ExchangeSetCellCount -= response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount;
-                    int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Select(i => aioCells.Any(y => y.Equals(i.ProductName))).Count();
-                    response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count() - invalidAioCells;
-                }
+                response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.RequestedProductCount - aioCells.Count();
+                response.ExchangeSetResponse.ExchangeSetCellCount -= response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount;
+                response.ExchangeSetResponse.ExchangeSetCellCount -= invalidCells;
+                response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Any() ? aioCells.Count() - invalidAioCells : 0;
+                response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+                //temporary code end
             }
             else if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK) //when toggle off and status is modified then add aio cells as invalidProduct
             {
@@ -286,9 +286,12 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (isAioEnabled)//when toggle on then add additional aio cell details
             {
+                //temporary code starts
                 response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.ExchangeSetCellCount - aioCells.Count();
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+                //temporary code end
             }
             else
             {
