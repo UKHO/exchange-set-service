@@ -98,7 +98,7 @@ stages:
           - task: CmdLine@2
             displayName: 'Clear NuGet Caches'
             inputs:
-              script: "dotnet nuget locals http-cache --clear"
+              script: "dotnet nuget locals all --clear"
           
           - task: UseDotNet@2
             displayName: 'Use .NET Core $(SdkVersion) sdk'
