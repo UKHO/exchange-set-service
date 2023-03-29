@@ -101,82 +101,6 @@
     }
   },
   {
-    "id": "productIdentifier-GB800001",
-    "responseBody": {
-      "productCounts": {
-        "requestedProductCount": 1,
-        "returnedProductCount": 1,
-        "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
-      },
-      "products": [
-        {
-          "editionNumber": 1,
-          "productName": "GB800001",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 140018
-        }
-      ]
-    }
-  },
-  {
-    "id": "productIdentifier-GB800001-DE260001",
-    "responseBody": {
-      "productCounts": {
-        "requestedProductCount": 2,
-        "returnedProductCount": 2,
-        "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
-      },
-      "products": [
-        {
-          "editionNumber": 9,
-          "productName": "GB800001",
-          "updateNumbers": [
-            0,
-            1
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
-            },
-            {
-              "issueDate": "2021-05-12T00:00:00.0000000Z",
-              "updateNumber": 1
-            }
-          ],
-          "fileSize": 140018
-        },
-        {
-          "editionNumber": 2,
-          "productName": "DE260001",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 85795
-        }
-      ]
-    }
-  },
-  {
     "id": "productIdentifier-DE290001",
     "responseBody": {
       "productCounts": {
@@ -449,38 +373,6 @@
     }
   },
   {
-    "id": "productVersion-GB800001-9-0",
-    "responseBody": {
-      "productCounts": {
-        "requestedProductCount": 1,
-        "returnedProductCount": 1,
-        "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
-      },
-      "products": [
-        {
-          "editionNumber": 9,
-          "productName": "GB800001",
-          "updateNumbers": [
-            1,
-            2
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 1
-            },
-            {
-              "issueDate": "2023-03-25T00:00:00.0000000Z",
-              "updateNumber": 2
-            }
-          ],
-          "fileSize": 140018
-        }
-      ]
-    }
-  },
-  {
     "id": "productVersion-DE416080-9-1",
     "responseBody": {
       "productCounts": {
@@ -545,52 +437,6 @@
             },
             {
               "issueDate": "2020-07-06T00:00:00.0000000Z",
-              "updateNumber": 2
-            }
-          ],
-          "fileSize": 9228
-        }
-      ]
-    }
-  },
-  {
-    "id": "productVersion-GB800001-9-0-US2WC06M-10-0",
-    "responseBody": {
-      "productCounts": {
-        "requestedProductCount": 2,
-        "returnedProductCount": 2,
-        "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
-      },
-      "products": [
-        {
-          "editionNumber": 9,
-          "productName": "GB800001",
-          "updateNumbers": [
-            1
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 1
-            }
-          ],
-          "fileSize": 140018
-        },
-        {
-          "editionNumber": 10,
-          "productName": "US2WC06M",
-          "updateNumbers": [
-            1,
-            2
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 1
-            },
-            {
-              "issueDate": "2023-03-18T00:00:00.0000000Z",
               "updateNumber": 2
             }
           ],
@@ -1980,6 +1826,168 @@
         }
       ]
     }
+  },
+  {
+    "id": "productIdentifier-GB800001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B6"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-GB800001-DE260001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 140018,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B6"
+            }
+          ]
+        },
+        {
+          "editionNumber": 1,
+          "productName": "DE260001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 139144
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-GB800001-1-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2023-03-25T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 140018
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-GB800001-1-0-US2WC06M-10-11",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018
+        },
+        {
+          "editionNumber": 10,
+          "productName": "US2WC06M",
+          "updateNumbers": [
+            11
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2023-03-18T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 9228
+        }
+      ]
+    }
   }
-
 ]
