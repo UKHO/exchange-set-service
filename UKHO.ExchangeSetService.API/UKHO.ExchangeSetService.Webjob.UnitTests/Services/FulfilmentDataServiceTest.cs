@@ -43,6 +43,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IProductDataValidator fakeproductDataValidator;
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
         private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
+        private IOptions<AioConfiguration> fakeAioConfiguration;
 
         [SetUp]
         public void Setup()
@@ -83,7 +84,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             fakeproductDataValidator = A.Fake<IProductDataValidator>();
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakeproductDataValidator);
+            fakeAioConfiguration = Options.Create(new AioConfiguration() { AioEnabled = false, AioCells = "GB800001" });
+
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakeproductDataValidator, fakeAioConfiguration);
         }
 
         public List<BatchFile> GetFiles()
