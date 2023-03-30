@@ -435,5 +435,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             return response;
         }
+
+        public static async Task<string> DownloadAndExtractAioZip(string FssJwtToken, string batchId)
+        {
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
+
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedAioFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            return downloadFolderPath;
+        }
     }
 }
