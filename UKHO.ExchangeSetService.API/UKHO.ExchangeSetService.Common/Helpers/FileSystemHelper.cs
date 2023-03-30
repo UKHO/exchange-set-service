@@ -214,8 +214,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             if (!string.IsNullOrEmpty(filePath))
             {
-                var newFile = _fileSystem.File.Create(filePath);
-                newFile.Close();
+                var file = _fileSystem.File.Create(filePath);
+                file.Close();
             }    
         }
     }

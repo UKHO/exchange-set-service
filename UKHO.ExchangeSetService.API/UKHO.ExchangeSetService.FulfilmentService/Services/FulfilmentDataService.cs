@@ -600,6 +600,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
         }
+
         private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
         {
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
