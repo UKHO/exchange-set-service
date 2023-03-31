@@ -1916,6 +1916,7 @@
               "bundleType": "DVD",
               "location": "M2;B8"
             }
+          ]
         }
       ]
     }
@@ -1948,7 +1949,7 @@
     }
   },
   {
-    "id": "productVersion-GB800001-31-0-US2WC06M-10-1",
+    "id": "productVersion-GB800001-31-0-DE4NO18Q-2-1",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 2,
@@ -1961,34 +1962,43 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 140018
-        },
-        {
-          "editionNumber": 10,
-          "productName": "US2WC06M",
-          "updateNumbers": [
             1
           ],
           "dates": [
             {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
               "updateNumber": 1
             }
           ],
-          "fileSize": 9228,
+          "fileSize": 140018,
           "bundle": [
             {
               "bundleType": "DVD",
               "location": "M1;B3"
             }
+          ]
+        },
+        {
+          "editionNumber": 2,
+          "productName": "DE4NO18Q",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 2290,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B8"
+            }
+          ]
         }
       ]
     }

@@ -69169,9 +69169,9 @@
       "productName": "KR676D03"
     },
     {
-      "baseCellEditionNumber": 9,
-      "baseCellIssueDate": "2023-03-10T00:00:00.0000000Z",
-      "baseCellLocation": "M2;B6",
+      "baseCellEditionNumber": 31,
+      "baseCellIssueDate": "2022-03-31T00:00:00.0000000Z",
+      "baseCellLocation": "M1;B3",
       "baseCellUpdateNumber": null,
       "cancelledCellReplacements": [],
       "cancelledEditionNumber": null,
@@ -69184,10 +69184,10 @@
       "encryption": true,
       "fileSize": 140018,
       "id": "GB800001",
-      "issueDateLatestUpdate": "2023-03-18T00:00:00.0000000Z",
+      "issueDateLatestUpdate": "2022-11-24T00:00:00.0000000Z",
       "issueDatePreviousUpdate": null,
       "lastUpdateNumberPreviousEdition": null,
-      "latestUpdateNumber": 9,
+      "latestUpdateNumber": 34,
       "productName": "GB800001"
     }
   ]
