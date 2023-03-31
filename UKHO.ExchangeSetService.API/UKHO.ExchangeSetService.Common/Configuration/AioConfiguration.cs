@@ -2,16 +2,16 @@
 {
     public class AioConfiguration
     {
-        public bool? IsAioEnabled { get; set; }
-        public bool AioEnabled
+        public bool? AioEnabled { get; set; }
+        public bool IsAioEnabled
         {
             get
             {
-                return (bool)(!IsAioEnabled.HasValue ? false : IsAioEnabled);
+                return (bool)(!AioEnabled.HasValue ? false : AioEnabled);
             }
             set
             {
-                IsAioEnabled = value;
+                AioEnabled = value;
             }
         }
         public string AioCells { get; set; }

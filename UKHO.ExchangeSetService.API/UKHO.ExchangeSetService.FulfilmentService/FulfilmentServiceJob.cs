@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
             try
             {
-                if (aioConfiguration.Value.AioEnabled)
+                if (aioConfiguration.Value.IsAioEnabled)
                 {
                     logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
                 }
