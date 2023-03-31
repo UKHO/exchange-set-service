@@ -1356,7 +1356,7 @@
           ]
         },
         {
-          "editionNumber": 9,
+          "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
             0
@@ -1372,7 +1372,7 @@
           "bundle": [
             {
               "bundleType": "DVD",
-              "location": "M1;B4"
+              "location": "M1;B3"
             }
           ]
         }
@@ -1838,7 +1838,7 @@
       },
       "products": [
         {
-          "editionNumber": 1,
+          "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
             0
@@ -1854,7 +1854,7 @@
           "bundle": [
             {
               "bundleType": "DVD",
-              "location": "M2;B6"
+              "location": "M1;B3"
             }
           ]
         }
@@ -1872,19 +1872,20 @@
       },
       "products": [
         {
-          "editionNumber": 1,
+          "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
+            0,
+            1
           ],
           "dates": [
             {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
+              "issueDate": "2022-03-31T00:00:00.0000000Z",
+              "updateApplicationDate": "2022-03-31T00:00:00.0000000Z",
               "updateNumber": 0
             },
             {
-              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "issueDate": "2022-04-07T00:00:00.0000000Z",
               "updateNumber": 1
             }
           ],
@@ -1892,7 +1893,7 @@
           "bundle": [
             {
               "bundleType": "DVD",
-              "location": "M2;B6"
+              "location": "M1;B3"
             }
           ]
         },
@@ -1904,18 +1905,23 @@
           ],
           "dates": [
             {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2009-05-15T00:00:00Z",
+              "issueDate": "2009-05-15T00:00:00Z"
             }
           ],
-          "fileSize": 139144
+          "fileSize": 139144,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B8"
+            }
         }
       ]
     }
   },
   {
-    "id": "productVersion-GB800001-1-0",
+    "id": "productVersion-GB800001-31-0",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 1,
@@ -1925,7 +1931,7 @@
       },
       "products": [
         {
-          "editionNumber": 1,
+          "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
             0
@@ -1933,11 +1939,7 @@
           "dates": [
             {
               "issueDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 1
-            },
-            {
-              "issueDate": "2023-03-25T00:00:00.0000000Z",
-              "updateNumber": 2
+              "updateNumber": 0
             }
           ],
           "fileSize": 140018
@@ -1946,7 +1948,7 @@
     }
   },
   {
-    "id": "productVersion-GB800001-1-0-US2WC06M-10-11",
+    "id": "productVersion-GB800001-31-0-US2WC06M-10-1",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 2,
@@ -1956,7 +1958,7 @@
       },
       "products": [
         {
-          "editionNumber": 1,
+          "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
             0
@@ -1981,7 +1983,12 @@
               "updateNumber": 1
             }
           ],
-          "fileSize": 9228
+          "fileSize": 9228,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
         }
       ]
     }
