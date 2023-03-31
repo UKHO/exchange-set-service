@@ -1875,18 +1875,13 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "issueDate": "2022-03-31T00:00:00.0000000Z",
               "updateApplicationDate": "2022-03-31T00:00:00.0000000Z",
               "updateNumber": 0
-            },
-            {
-              "issueDate": "2022-04-07T00:00:00.0000000Z",
-              "updateNumber": 1
             }
           ],
           "fileSize": 140018,
@@ -1939,7 +1934,8 @@
           ],
           "dates": [
             {
-              "issueDate": "2023-03-10T00:00:00.0000000Z",
+              "issueDate": "2022-03-31T00:00:00.0000000Z",
+              "updateApplicationDate": "2022-03-31T00:00:00.0000000Z",
               "updateNumber": 0
             }
           ],
