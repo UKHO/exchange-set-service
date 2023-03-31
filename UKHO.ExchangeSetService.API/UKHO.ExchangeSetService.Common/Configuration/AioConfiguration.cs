@@ -2,7 +2,18 @@
 {
     public class AioConfiguration
     {
-        public bool? AioEnabled { get; set; }
+        public bool? IsAioEnabled { get; set; }
+        public bool AioEnabled
+        {
+            get
+            {
+                return (bool)(!IsAioEnabled.HasValue ? false : IsAioEnabled);
+            }
+            set
+            {
+                IsAioEnabled = value;
+            }
+        }
         public string AioCells { get; set; }
     }
 }
