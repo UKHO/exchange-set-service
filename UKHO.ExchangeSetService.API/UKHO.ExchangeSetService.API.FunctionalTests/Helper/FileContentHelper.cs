@@ -435,5 +435,37 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             return response;
         }
+
+        public static async Task<string> DownloadAndExtractAioZip(string FssJwtToken, string batchId)
+        {
+            var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
+
+            var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
+
+            var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
+
+            var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedAioFolder(downloadFileUrl.ToString(), FssJwtToken);
+
+            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+
+            return downloadFolderPath;
+        }
+
+        public static void CheckAioReadMeTxtFileContent(string inputFile)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+            var fileSecondLineContent = lines[1];
+
+            string[] fileContents = fileSecondLineContent.Split("File date: ");
+
+            //Verifying file contents - second line of the readme file
+            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
+
+            var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 13);
+
+            Assert.AreEqual("2023-02-24 15:00:00", utcDateTime, $"The expected date 2023-02-24 15:00:00 isn't matching with the {utcDateTime}");
+        }
     }
 }
