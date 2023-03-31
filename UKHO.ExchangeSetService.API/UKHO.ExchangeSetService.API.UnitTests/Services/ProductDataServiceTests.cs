@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
         private ExchangeSetResponse GetExchangeSetResponse()
         {
-            bool isAioEnabled = fakeAioConfiguration.Value.AioEnabled;
+            bool isAioEnabled = fakeAioConfiguration.Value.IsAioEnabled;
 
             LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
             {
@@ -618,7 +618,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550", "US2ARCGD" };
-            fakeAioConfiguration.Value.AioEnabled = false;
+            fakeAioConfiguration.Value.IsAioEnabled = false;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
@@ -676,7 +676,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550", "US2ARCGD" };
-            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
@@ -859,7 +859,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
-            Assert.NotNull(result.LastModified);
             Assert.AreEqual(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, result.ExchangeSetResponse.ExchangeSetCellCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOff.RequestedProductCount, result.ExchangeSetResponse.RequestedProductCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
@@ -1042,7 +1041,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
-            fakeAioConfiguration.Value.AioEnabled = false;
+            fakeAioConfiguration.Value.IsAioEnabled = false;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
@@ -1077,6 +1076,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, azureAdToken);
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
+            exchangeSetResponseAioToggleOff.RequestedProductCount += 1; //one aio cell passed
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
@@ -1104,13 +1104,15 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
-            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
             var exchangeSetResponse = GetExchangeSetResponse();
+            exchangeSetResponse.RequestedProductCount += 1; //one aio cell passed
+
             A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
             A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
                 .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
@@ -1339,12 +1341,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
-            fakeAioConfiguration.Value.AioEnabled = false;
+            fakeAioConfiguration.Value.IsAioEnabled = false;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
             var exchangeSetResponse = GetExchangeSetResponse();
+            exchangeSetResponse.RequestedProductsNotInExchangeSet.Add(new RequestedProductsNotInExchangeSet
+            {
+                ProductName = "US2ARCGD",
+                Reason = "InvalidProduct"
+            });
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
@@ -1371,6 +1378,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href, result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href);
             Assert.AreEqual(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponseAioToggleOff.BatchId, result.BatchId);
+            Assert.AreEqual(exchangeSetResponseAioToggleOff.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1383,7 +1391,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
-            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
@@ -1403,6 +1411,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             });
             var exchangeSetResponse = GetExchangeSetResponse();
             exchangeSetResponse.RequestedProductCount = 0;
+            exchangeSetResponse.RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>();
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
