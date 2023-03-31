@@ -1973,16 +1973,12 @@
           "editionNumber": 10,
           "productName": "US2WC06M",
           "updateNumbers": [
-            11
+            1
           ],
           "dates": [
             {
               "issueDate": "2023-03-10T00:00:00.0000000Z",
               "updateNumber": 1
-            },
-            {
-              "issueDate": "2023-03-18T00:00:00.0000000Z",
-              "updateNumber": 2
             }
           ],
           "fileSize": 9228
