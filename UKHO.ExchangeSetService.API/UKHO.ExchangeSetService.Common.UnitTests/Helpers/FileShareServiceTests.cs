@@ -286,9 +286,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.CreateBatch(userOID, correlationIdParam);
 
             //Test
-            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
             Assert.AreEqual(HttpMethod.Post, httpMethodParam);
-            Assert.AreEqual(actualAccessToken, accessTokenParam);
+            Assert.AreEqual(accessTokenParam, actualAccessToken);
         }
 
         #endregion CreateBatch
