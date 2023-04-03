@@ -75,22 +75,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             var response = await DownloadSalesCatalogueResponse(message);
 
-            List<string> aioCells = new(aioConfiguration.AioCells.Split(','));
+            List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
             var essItems = response.Products
                 .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
                 .ToList();
 
-            bool isAioEnabled = aioConfiguration.AioEnabled.HasValue && aioConfiguration.AioEnabled.Value;
-            if (isAioEnabled)
-            {
-                var aioItems = response.Products
+            var aioItems = response.Products
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
-                await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+            bool isAioEnabled = aioConfiguration.AioEnabled.HasValue && aioConfiguration.AioEnabled.Value;
+            if (isAioEnabled)
+            {
+                if (essItems != null && essItems.Any() || response.Products.Count == 0)
+                    await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
 
-                if (aioItems != null && aioItems.Any())
+                if ((aioItems != null && aioItems.Count > 0) || (response.Products.Count == aioItems.Count && aioItems.Count > 0))
                     await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
+
+                //Temporary code to avoid exception for only AIO batch
+                if (aioItems.Count > 0 && response.Products.Count == aioItems.Count)
+                    return "Exchange Set Created Successfully";
             }
             else
             {
@@ -115,69 +120,40 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
             var largeMediaExchangeSetFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+            bool isZipAndUploadSuccessful = false;
 
-            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName);
-            if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
+            var response = new LargeExchangeSetDataResponse
             {
-                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", message.BatchId, message.CorrelationId, response.ValidationtFailedMessage);
-                throw new FulfilmentException(EventIds.BundleInfoValidationFailed.ToEventId());
-            }
+                //Get SCS catalogue essData response
+                SalesCatalogueDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId),
+                SalesCatalogueProductResponse = await DownloadSalesCatalogueResponse(message)
+            };
 
-            var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
-                                                  .Where(di => di.Name.StartsWith("M0"));
+            List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
+            var essItems = response.SalesCatalogueProductResponse.Products
+                .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
+                .ToList();
 
-            var ParallelCreateFolderTasks = new List<Task> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
-            {
-                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
-
-                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, dvdNumber.ToString()));
-                ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse, message.ScsRequestDateTime));
-                ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.BatchId, message.CorrelationId));
-            });
-
-            await Task.WhenAll(ParallelCreateFolderTasks);
-            ParallelCreateFolderTasks.Clear();
-
-            var ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
-            {
-                ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
-            });
-
-            await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
-            ParallelCreateFolderTaskForCatlogFile.Clear();
+            var aioItems = response.SalesCatalogueProductResponse.Products
+                    .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
+                    .ToList();
 
             bool isAioEnabled = aioConfiguration.AioEnabled.HasValue && aioConfiguration.AioEnabled.Value;
             if (isAioEnabled)
             {
-                List<string> aioCells = new(aioConfiguration.AioCells.Split(','));
-                var aioItems = response.SalesCatalogueProductResponse.Products
-                    .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
-                    .ToList();
+                if (essItems.Count > 0)
+                    isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
 
-                await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
+                if (aioItems.Count > 0)
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
             }
-
-            var parallelZipUploadTasks = new List<Task<bool>> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
+            else
             {
-                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
-                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), largeMediaExchangeSetFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
-            });
-
-            await Task.WhenAll(parallelZipUploadTasks);
-            bool isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.All(x => x.Result.Equals(true)));
+                isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
+            }
 
             if (isZipAndUploadSuccessful)
             {
-                parallelZipUploadTasks.Clear();
                 var isBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(message.BatchId, largeMediaExchangeSetFilePath, message.CorrelationId);
                 if (isBatchCommitted)
                 {
@@ -353,26 +329,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
 
         //Search and download ENC files for large media exchange set
-        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName)
+        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName, LargeExchangeSetDataResponse largeExchangeSetDataResponse)
         {
             var batchPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, largeExchangeSetFolderName);
             var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
-            var largeExchangeSetDataResponse = new LargeExchangeSetDataResponse
-            {
-                //Get SCS catalogue essData response
-                SalesCatalogueDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId)
-            };
 
-            var response = await DownloadSalesCatalogueResponse(message);
+            List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
 
-            List<string> aioCells = new(aioConfiguration.AioCells.Split(','));
-
-            var essItems = response.Products
+            var essItems = largeExchangeSetDataResponse.SalesCatalogueProductResponse.Products
                 .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
                 .ToList();
 
-            Task<ValidationResult> validationResult = productDataValidator.Validate(response.Products);
+            Task<ValidationResult> validationResult = productDataValidator.Validate(essItems);
 
             if (!validationResult.Result.IsValid)
             {
@@ -419,7 +388,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
 
-                largeExchangeSetDataResponse.SalesCatalogueProductResponse = response;
+                ////largeExchangeSetDataResponse.SalesCatalogueProductResponse = response;
                 largeExchangeSetDataResponse.FulfilmentDataResponses = listFulfilmentData;
             }
 
@@ -674,6 +643,60 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse);
+        }
+
+        private async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)
+        {
+            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName, largeExchangeSetDataResponse);
+            if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
+            {
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", message.BatchId, message.CorrelationId, response.ValidationtFailedMessage);
+                throw new FulfilmentException(EventIds.BundleInfoValidationFailed.ToEventId());
+            }
+
+            var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
+                                                  .Where(di => di.Name.StartsWith("M0"));
+
+            var ParallelCreateFolderTasks = new List<Task> { };
+            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
+            {
+                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
+
+                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, dvdNumber.ToString()));
+                ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse, message.ScsRequestDateTime));
+                ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.BatchId, message.CorrelationId));
+            });
+
+            await Task.WhenAll(ParallelCreateFolderTasks);
+            ParallelCreateFolderTasks.Clear();
+
+            var ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
+            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
+            {
+                ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
+            });
+
+            await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
+            ParallelCreateFolderTaskForCatlogFile.Clear();
+
+            var parallelZipUploadTasks = new List<Task<bool>> { };
+            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
+            {
+                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
+                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), largeMediaExchangeSetFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
+            });
+
+            await Task.WhenAll(parallelZipUploadTasks);
+            bool isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.All(x => x.Result.Equals(true)));
+            parallelZipUploadTasks.Clear();
+
+            return isZipAndUploadSuccessful;
         }
     }
 }
