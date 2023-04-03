@@ -84,8 +84,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
-            bool isAioEnabled = aioConfiguration.AioEnabled.HasValue && aioConfiguration.AioEnabled.Value;
-            if (isAioEnabled)
+            if (aioConfiguration.IsAioEnabled)
             {
                 if (essItems != null && essItems.Any() || response.Products.Count == 0)
                     await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
@@ -138,8 +137,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
-            bool isAioEnabled = aioConfiguration.AioEnabled.HasValue && aioConfiguration.AioEnabled.Value;
-            if (isAioEnabled)
+            if (aioConfiguration.IsAioEnabled)
             {
                 if (essItems.Count > 0)
                     isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
