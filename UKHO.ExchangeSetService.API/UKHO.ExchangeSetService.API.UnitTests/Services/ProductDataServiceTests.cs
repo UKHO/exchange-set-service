@@ -667,6 +667,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
@@ -680,6 +685,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseBody.Products.Add(new Products
+            {
+                ProductName = "US2ARCGD",
+                EditionNumber = 2,
+                UpdateNumbers = new List<int?> { 3, 4 },
+                Cancellation = new Cancellation
+                {
+                    EditionNumber = 4,
+                    UpdateNumber = 6
+                },
+                FileSize = 400
+            });
             var azureAdToken = GetAzureADToken();
 
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
@@ -725,6 +742,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductCount, result.ExchangeSetResponse.RequestedAioProductCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1094,6 +1116,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
@@ -1157,6 +1184,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductCount, result.ExchangeSetResponse.RequestedAioProductCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1346,12 +1378,19 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
-            var exchangeSetResponse = GetExchangeSetResponse();
-            exchangeSetResponse.RequestedProductsNotInExchangeSet.Add(new RequestedProductsNotInExchangeSet
+            salesCatalogueResponse.ResponseBody.Products.Add(new Products
             {
                 ProductName = "US2ARCGD",
-                Reason = "InvalidProduct"
+                EditionNumber = 2,
+                UpdateNumbers = new List<int?> { 3, 4 },
+                Cancellation = new Cancellation
+                {
+                    EditionNumber = 4,
+                    UpdateNumber = 6
+                },
+                FileSize = 400
             });
+            var exchangeSetResponse = GetExchangeSetResponse();
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
@@ -1379,6 +1418,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponseAioToggleOff.BatchId, result.BatchId);
             Assert.AreEqual(exchangeSetResponseAioToggleOff.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1445,6 +1489,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductCount, result.ExchangeSetResponse.RequestedAioProductCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information

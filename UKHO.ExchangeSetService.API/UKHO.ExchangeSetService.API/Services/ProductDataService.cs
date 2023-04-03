@@ -106,6 +106,8 @@ namespace UKHO.ExchangeSetService.API.Services
                 response.ExchangeSetResponse.ExchangeSetCellCount -= invalidCells;
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Any() ? aioCells.Count() - invalidAioCells : 0;
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+
+                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), response.BatchId, productIdentifierRequest.CorrelationId);
                 //temporary code end
             }
             else //when toggle off then add aio cells as invalidProduct
@@ -116,6 +118,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     ProductName = x,
                     Reason = "invalidProduct"
                 }));
+
+                logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), response.BatchId, productIdentifierRequest.CorrelationId);
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
@@ -203,6 +207,8 @@ namespace UKHO.ExchangeSetService.API.Services
                 response.ExchangeSetResponse.ExchangeSetCellCount -= invalidCells;
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Any() ? aioCells.Count() - invalidAioCells : 0;
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+
+                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), response.BatchId, request.CorrelationId);
                 //temporary code end
             }
             else if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK) //when toggle off and status is modified then add aio cells as invalidProduct
@@ -213,6 +219,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     ProductName = x,
                     Reason = "invalidProduct"
                 }));
+
+                logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), response.BatchId, request.CorrelationId);
             }
 
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
@@ -292,6 +300,8 @@ namespace UKHO.ExchangeSetService.API.Services
                 response.ExchangeSetResponse.ExchangeSetCellCount = response.ExchangeSetResponse.ExchangeSetCellCount - aioCells.Count();
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
+
+                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), response.BatchId, productDataSinceDateTimeRequest.CorrelationId);
                 //temporary code end
             }
             else
@@ -301,6 +311,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     ProductName = x,
                     Reason = "invalidProduct"
                 }));
+
+                logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), response.BatchId, productDataSinceDateTimeRequest.CorrelationId);
             }
 
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
