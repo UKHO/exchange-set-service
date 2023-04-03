@@ -20,6 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FssJwtToken = await authTokenProvider.GetFssToken();
         }
 
+        //Product Backlog Item 71610: Create empty SERIAL.AIO file and add to AIO exchange set
         [Test]
         [Category("SmokeTest")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
