@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -26,6 +27,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public SalesCatalogue ScsAuthConfig = new SalesCatalogue();
         public CacheConfiguration ClearCacheConfig = new CacheConfiguration();
         public PeriodicOutputServiceConfiguration POSConfig = new PeriodicOutputServiceConfiguration();
+        public AioConfiguration AIOConfig = new AioConfiguration();
 
         public class EssAuthorizationTokenConfiguration
         {
@@ -41,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public class SalesCatalogue
         {
-            public string BaseUrl { get; set; }            
+            public string BaseUrl { get; set; }
             public string ResourceId { get; set; }
             public bool IsRunningOnLocalMachine { get; set; }
         }
@@ -49,28 +51,28 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public class CacheConfiguration
         {
             public string CacheStorageConnectionString { get; set; }
-            public string FssSearchCacheTableName { get; set; }        
+            public string FssSearchCacheTableName { get; set; }
         }
 
         public class FileShareService
         {
-            public string BaseUrl { get; set; }      
+            public string BaseUrl { get; set; }
             public string ResourceId { get; set; }
             public bool IsRunningOnLocalMachine { get; set; }
             public int BatchCommitWaitTime { get; set; }
         }
         public class AzureAdB2CConfiguration
         {
-           
-            public string ClientId { get; set; }           
-            public string Scope { get; set; }           
-            public string TenantId { get; set; }            
+
+            public string ClientId { get; set; }
+            public string Scope { get; set; }
+            public string TenantId { get; set; }
             public string MicrosoftOnlineLoginUrl { get; set; }
             public string ClientSecret { get; set; }
             // Test Client id is used to test unauthorized scenario for FSS API
             public bool IsRunningOnLocalMachine { get; set; }
-            public string LocalTestToken { get; set; } 
-        }       
+            public string LocalTestToken { get; set; }
+        }
 
         public class PeriodicOutputServiceConfiguration
         {
@@ -86,6 +88,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string InfoFolderAddsEul { get; set; }
             public string InfoFolderImpInfo { get; set; }
             public string EncUpdateList { get; set; }
+        }
+
+        public class AioConfiguration
+        {
+            public string AioExchangeSetFileName { get; set; }
+            public List<string> AioExchangeSetBatchIds { get; set; }
+            public string ExchangeSetSerialAioFile { get; set; }
+            public string AioEncTempPath { get; set; }
         }
 
         public TestConfiguration()
@@ -107,11 +117,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ExchangeSetEncRootFolder = ConfigurationRoot.GetSection("ExchangeSetEncRootFolder").Value;
             ExchangeSetCatalogueFile = ConfigurationRoot.GetSection("ExchangeSetCatalogueFile").Value;
             ConfigurationRoot.Bind("EssAuthorizationConfiguration", EssAuthorizationConfig);
-            ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);          
+            ConfigurationRoot.Bind("AzureAdB2CTestConfiguration", AzureAdB2CConfig);
             ConfigurationRoot.Bind("FileShareService", FssConfig);
             ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
             ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
             ConfigurationRoot.Bind("PeriodicOutputServiceConfiguration", POSConfig);
+            ConfigurationRoot.Bind("AioConfiguration", AIOConfig);
         }
     }
 }
