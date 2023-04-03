@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [TestCase("DE416080", 10, 6, TestName = "EditionNumber Unavailable")]
         [TestCase("DE416080", 9, 10, TestName = "UpdateNumber Unavailable")]
-        [Category("SmokeTest")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheApiWithAProductVersionNotAvailable_ThenASuccessStatusIsReturned(string productname, int editionnumber, int updatenumber)
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -206,7 +206,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheApiWithAnEmptyProductVersion_ThenABadRequestStatusIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -225,7 +225,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("DE416080", 9, null, "productVersions[0].updateNumber", "updateNumber cannot be less than zero or null.", TestName = "When update number is null.")]
         [TestCase("DE416080", -1, 1, "productVersions[0].editionNumber", "editionNumber cannot be less than zero or null.", TestName = "When edition number is less than zero.")]
         [TestCase("DE416080", 4, -1, "productVersions[0].updateNumber", "updateNumber cannot be less than zero or null.", TestName = "When update number is less than zero.")]
-        [Category("SmokeTest")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheApiWithNullProductVersion_ThenABadRequestStatusIsReturned(string productName, int? editionNumber, int? updateNumber, string sourceMessage, string descriptionMessage)
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -245,7 +245,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
         [TestCase("https://", TestName = "Callback URL with only https request")]
         [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
-        [Category("SmokeTest")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheApiWithAValidProductVersionWithInvalidCallbackURI_ThenABadRequestStatusIsReturned(string callBackUrl)
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
