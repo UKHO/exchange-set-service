@@ -1,5 +1,470 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Threading.Tasks.Extensions.dll
+   Suppressing this CVE Because it relates to a mobile "Tasks" application (Astrid Tasks) version before 9.7.3. ESS is not a mobile application.
+   ]]>
+    </notes>
+    <cve>CVE-2020-22475</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: GetDocument.Insider.dll
+   Suppressing this CVE as it is a .NetCore runtime issue affecting .NetCore runtimes below .NET Core 3.1.4 or lower. The ESS Runs in an AppService which will have the fixes already applied, and the global.json has been addeded to require .NetCore 3.1.408 or greater.
+   More details can be found here: https://github.com/dotnet/announcements/issues/156
+   ]]>    </notes>
+    <cve>CVE-2020-1108</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: GetDocument.Insider.dll
+  CVE References ASP.Net versions 1.0-1.1. ESS is built on ASP.Net Core 3.1+, not classic ASP.Net.
+See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus.com/bid/14217 for more details.
+   ]]>    </notes>
+    <cve>CVE-2005-2224</cve>
+  </suppress>
 
+  <suppress>
+    <notes><![CDATA[
+   file name: GetDocument.Insider.dll
+  Vunerability applies to AfterLogic MailBee WebMail Pro 4.1 for ASP.NET which is not used by the ESS
+   ]]>    </notes>
+    <cve>CVE-2008-0333</cve>
+  </suppress>
+
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Serilog.Sinks.File:4.1.0
+      8117-softmagic.c in file before 5.21 does not properly limit recursion, which allows remote attackers to cause a denial of service (CPU consumption or crash) via unspecified vectors.
+      9652-The mconvert function in softmagic.c in file before 5.21, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not properly handle a certain string-length field during a copy of a truncated version of a Pascal string, which might allow remote attackers to cause a denial of service (out-of-bounds memory access and application crash) via a crafted file.
+    This is a false positive. These two CVEs references a C library softmagic.c which is not used by ESS
+    ]]>
+    </notes>
+    <cve>CVE-2014-8117</cve>
+    <cve>CVE-2014-9652</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+     file name: Serilog.Sinks.File:4.1.0
+      readelf.c in file before 5.22, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not consider that pread calls sometimes read only a subset of the available data, which allows remote attackers to cause a denial of service (uninitialized memory access) or possibly have unspecified other impact via a crafted ELF file.
+     This is a false positive in readelf.c as ESS is not using this, or PHP.
+    ]]>
+    </notes>
+    <cve>CVE-2014-9653</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Serilog.Extensions.Logging.File:2.0.0
+      cdf_read_property_info in cdf.c in file through 5.37 does not restrict the number of CDF_VECTOR elements, which allows a heap-based buffer overflow (4-byte out-of-bounds write)
+    This is a false positive in cdf.c which is not used by ESS
+    ]]>
+    </notes>
+    <cve>CVE-2019-18218</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    An information disclosure vulnerability exists in .NET Framework and .NET Core which allows bypassing Cross-origin Resource Sharing (CORS) configurations, aka ".NET Framework Information Disclosure Vulnerability."
+    This applies to version of System.Net.Http as deployed as part of .Net core below 2.1.7 or 2.2.1. ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2019-0545</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/97 for MS details on this CVE.
+    This CVE only applies to .NetCore versions below 2.1.8 and 2.2.2. ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2019-0657</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
+        Package name: System.Text.RegularExpressions.dll (included as part of the .Net Core runtime)
+      	Vulnerable versions: 4.3.0 and below
+        Secure versions: 4.3.1+
+    This CVE applies to .Net Core versions below 2.2.107 (runtime 2.2.5). ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2019-0820</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+      file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+        See https://github.com/dotnet/announcements/issues/112 for full MS Details on the CVE
+          A denial of service vulnerability exists when .NET Framework or .NET Core improperly handle web requests, aka '.Net Framework and .Net Core Denial of Service Vulnerability'. This CVE ID is unique from CVE-2019-0820, CVE-2019-0981.
+          Vunerability applies to System.Private.Uri version	4.3.0 and 4.3.1. System.Private.Uri is part of the .NetCore runtime, and fixed with version System.Private.Uri version 4.3.2.
+        ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2019-0980</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/113 for full MS Details on the CVE
+    Vunerability applies to System.Private.Uri version	4.3.0 and 4.3.1. System.Private.Uri is part of the .NetCore runtime, and fixed with version System.Private.Uri version 4.3.2.
+    The issue is fixed:         
+        2.1.11 or SDK 2.1.507 for Visual Studio 2017 or SDK 2.1.604 for Visual Studio 2019
+        2.2.5 or SDK 2.2.107 for Visual Studio 2017 or SDK 2.2.204 for Visual Studio 2019
+    ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2019-0981</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/121 for full MS Details on CVE.
+    A denial of service vulnerability exists when .NET Core improperly handles web requests. An attacker who successfully exploited this vulnerability could cause a denial of service against a .NET Core web application. The vulnerability can be exploited remotely, without authentication.
+    This CVE applies to any .NET Core based application running on .NET Core 2.1.0-2.1.12, or .NET Core 2.2.0-2.2.6. ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2019-1301</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/175 for full MS Details on CVE.
+    .NET Core and Visual Studio Denial of Service Vulnerability. 
+    This CVE applies to any .NET Core 3.1 but patch is provided at 3.1.405, ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2021-1721</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/176 for full MS Details on CVE.
+    A remote code execution vulnerability exists when parsing certain types of graphics files.
+    This vulnerability only exists on systems running on MacOS or Linux.
+    This CVE applies to any .NET Core 3.1 but patch is provided at 3.1.405, ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2021-24112</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/194 for full MS Details on CVE.
+    A denial of service vulnerability exists in .NET 5.0, .NET Core 3.1 and .NET Core 2.1 where .NET (Core) server applications providing WebSocket endpoints could be tricked into endlessly looping while trying to read a single WebSocket frame.
+    This CVE applies to any .NET Core 3.1 but patch is provided at 3.1.412, ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2021-26423</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/178 for full MS Details on CVE.
+    A remote code execution vulnerability exists in .NET 5 and .NET Core due to how text encoding is performed.This vulnerability is for System.Text.Encodings.Web and fixed on 5.0.1 and we are using 5.0.1
+    This CVE applies to any .NET Core 3.1 but patch is provided at 3.1.407, ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2021-26701</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/196 for full MS Details on CVE.
+    An information disclosure vulnerability exists in .NET 5.0, .NET Core 3.1 and .NET Core 2.1 when dumps created by the tool to collect crash dumps and dumps on demand are created with global read permissions on Linux and macOS.
+    This CVE applies to any .NET Core 3.1 but patch is provided at 3.1.412, ESS is pinned to .Net core SDK > 3.1.408 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2021-34485</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: System.Net.WebSockets.Client.dll
+    See https://nvd.nist.gov/vuln/detail/CVE-2021-33880 for full Details on CVE.
+    The aaugustin websockets library before 9.1 for Python has an Observable Timing Discrepancy on servers when HTTP Basic Authentication is enabled with basic_auth_protocol_factory(credentials=...). An attacker may be able to guess a password via a timing attack.
+    This CVE applies to python and this is a false positive cve for our application which is C# based.
+    ]]>
+    </notes>
+    <cve>CVE-2021-33880</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+      file name: Serilog.Sinks.Async.dll
+      A vulnerability exists in Async through 3.2.1 (fixed in 3.2.2) , which could let a malicious user obtain privileges via the mapValues() method.
+      This is a false positive as the vulnerability exists in a NPM Javascript package named 'Async' and not the nuget .NET package named 'Serilog.Sinks.Async'.
+    ]]>
+    </notes>
+    <cve>CVE-2021-43138</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: System.Net.Http:4.3.3
+    See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
+    Package name: System.Net.Http:4.3.3 (included as part of the .Net Core runtime)
+    Vulnerable versions: 4.3.3 and below
+    Secure versions: 4.3.4+
+    This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. ESS is pinned to .Net core SDK > 3.1.419 which is not vulnerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2018-8292</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Http:2.2.2
+    See https://nvd.nist.gov/vuln/detail/CVE-2020-1045 for full details of this CVE.
+    A security feature bypass vulnerability exists in the way Microsoft ASP.NET Core parses encoded cookie names.
+    The ASP.NET Core cookie parser decodes entire cookie strings which could allow a malicious attacker to set a second cookie with the name being percent encoded.
+    Affected software - Any .NET Core 3.1 application running on .NET Core 3.1.7 or lower & any .NET Core 2.1 application running on .NET Core 2.1.21 or lower
+    ESS is pinned to .Net core SDK > 3.1.419 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
+    ]]>
+    </notes>
+    <cve>CVE-2020-1045</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        file name:  Azure.Storage.Blobs:12.13.0
+        See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
+            Package name: Azure.Storage.Blobs (included as part of the .Net Core runtime)
+            Vulnerable versions: 12.10.0 and below
+       This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. MSI is pinned to .Net core SDK > 3.1.408 for .NET and Visual Studio Information Disclosure Vulnerability.
+       This is a temporary suppression pending a fix being available.
+	   We have since upgraded this package. This is a false positive.
+      ]]>
+    </notes>
+    <cve>CVE-2022-30187</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
+	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
+	This is a temporary suppression pending a fix being available.
+	This package is no longer present in the solution dependency tree.
+	]]></notes>
+	<cve>CVE-2018-8409</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Microsoft.Extensions.Hosting.Abstractions.dll
+	See https://nvd.nist.gov/vuln/detail/CVE-2020-1147 for details on this CVE.
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58192
+	]]></notes>
+	<cve>CVE-2020-1147</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: System.Net.WebSockets.Client:4.0.0
+	For details on these CVEs see:
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0247
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0249
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0256
+	This is a temporary suppression pending a fix being available.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58195
+	]]></notes>
+	<cve>CVE-2017-0247</cve>
+	<cve>CVE-2017-0249</cve>
+	<cve>CVE-2017-0256</cve>
+  </suppress>
+  <suppress>
+	<notes><![CDATA[
+	file name: Serilog.Sinks.File:5.0.0
+	For details on these CVEs see:
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-2270
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3479
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3480
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3487
+		This is a temporary suppression pending a fix being available.
+       Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=59829
+	]]></notes>
+	<cve>CVE-2014-2270</cve>
+	<cve>CVE-2014-3479</cve>
+	<cve>CVE-2014-3480</cve>
+	<cve>CVE-2014-3487</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	   <![CDATA[
+     file name: Serilog.Extensions.Logging.File:3.0.0
+     Integer underflow in the file_printf function in the "file" program before 4.20 
+     allows user-assisted attackers to execute arbitrary code via a file that triggers a heap-based buffer overflow.
+     No direct reference to any .NET versions
+     ossindex.sonatype.org reports no known vulnerabilities.
+   ]]>
+	</notes>
+	<cve>CVE-2007-1536</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     file name: System.Runtime.CompilerServices.Unsafe.dll
+     Affects Services module 7.x-3.x before 7.x-3.10 for Drupal
+   ]]>
+	</notes>
+	<cve>CVE-2014-9152</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     file name: System.Threading.Tasks.Dataflow.dll
+     Affects Android  
+   ]]>
+	</notes>
+	<cve>CVE-2022-39349</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: DOS
+     Affects >Net >= 6.0.0, < 6.0.12. 
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2023-21538</cve> 
+	<cve>CVE-2022-24464</cve>  
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: Buffer overflow and spoofing
+     Affects .Net 3.1 .Net 5.0 and <= .Net 6.0.8 
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2020-8927</cve>
+	<cve>CVE-2022-34716</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: Remote code execution
+     Affects .Net 3.1
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2020-0605</cve>
+	<cve>CVE-2020-0606</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: JQuery Validation Plugin, RegX Dos and  X site scripting Jenkins plugin
+     Affects jQuery, Jenkins
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2022-31147</cve>
+	<cve>CVE-2021-43306</cve>
+	<cve>CVE-2021-21252</cve>
+	<cve>CVE-2018-1000413</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: .NET Framework Information Disclosure
+     Affects .Net 4.x.x
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2022-41064</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: .NET and Visual Studio Information Disclosure Vulnerability 
+     Affects .Net 6.0.0
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2022-30184</cve>
+   </suppress>
+   <suppress>
+	 <notes>
+	   <![CDATA[
+     vulnerability: Weak password hashing 
+     Affects .Http authentication library up to and excluding 2019-12-27 
+	 Currently running Net 6.0.13,  sdk 6.0.405
+   ]]>
+	</notes>
+	<cve>CVE-2019-20138</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: CPU & Memory hog
+     Affects parsing large YAML version < 2.2.4
+   ]]>
+	</notes>
+	<cve>CVE-2022-3064</cve>
+	<cve>CVE-2021-4235</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability: Password protection, MS10-072 
+     Affects windows 98 & windows Me, Office and Word
+	 MS10-072 fixed in October 2010
+   ]]>
+	</notes>
+	  <cve>CVE-2001-0152</cve>
+	  <cve>CVE-2010-3324</cve>
+	  <cve>CVE-2017-11826</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability:  Information disclosure  
+     Affects Active directory up to 2021-11-02
+   ]]>
+	</notes>
+	<cve>CVE-2021-42306</cve>
+  </suppress>
+  <suppress>
+	<notes>
+	  <![CDATA[
+     vulnerability:  Elevation of Privilege   
+     Affects Azure Open Management Infrastructure (OMI) version <= 1.6.9-0 (VMs running Linux)
+
+   ]]>
+	</notes>
+	<cve>CVE-2022-29149</cve>
+  </suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: System.Runtime.Serialization.Json:4.0.2, System.Runtime.Serialization.Json:4.3.0,
+   System.Text.Json:4.6.0, System.Text.Json:4.7.2, System.Text.Json:7.0.0
+   These packages are dendencies of nuget packages. All packages at latest version, must update dependent packages when newer versions are available.
+   ]]>
+		</notes>
+		<cve>CVE-2022-45688</cve>
+	</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: System.Security.Cryptography.X509Certificates:4.1.0
+   This part of .NetCoreApp. Either waiting on fix through .net sdk to fix, or update to .net core 8 when available.
+   ]]></notes>
+   <cve>CVE-2017-11770</cve>
+</suppress>
 </suppressions>
