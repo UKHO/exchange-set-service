@@ -69167,6 +69167,28 @@
       "lastUpdateNumberPreviousEdition": null,
       "latestUpdateNumber": 3,
       "productName": "KR676D03"
+    },
+    {
+      "baseCellEditionNumber": 31,
+      "baseCellIssueDate": "2022-03-31T00:00:00.0000000Z",
+      "baseCellLocation": "M1;B3",
+      "baseCellUpdateNumber": null,
+      "cancelledCellReplacements": [],
+      "cancelledEditionNumber": null,
+      "cellLimitEasternmostLatitude": 126.65,
+      "cellLimitNorthernmostLatitude": 37.5,
+      "cellLimitSouthernmostLatitude": 37.45,
+      "cellLimitWesternmostLatitude": 126.6,
+      "compression": true,
+      "dataCoverageCoordinates": [],
+      "encryption": true,
+      "fileSize": 140018,
+      "id": "GB800001",
+      "issueDateLatestUpdate": "2022-11-24T00:00:00.0000000Z",
+      "issueDatePreviousUpdate": null,
+      "lastUpdateNumberPreviousEdition": null,
+      "latestUpdateNumber": 34,
+      "productName": "GB800001"
     }
   ]
-  }
+}
