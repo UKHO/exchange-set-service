@@ -75,7 +75,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CommentVersion = "VERSION=1.0",
                 ContentInfo = "DVD INFO",
                 Content = "Catalogue",
-                Adc = "ADC"
+                Adc = "ADC",
+                AioExchangeSetFileName = "AIO.zip",
+                AioExchangeSetFileFolder = "AIO"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
             { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
@@ -380,12 +382,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         #region AIO
+
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsAioExchangeSetCreatedSuccessfully()
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-
+ 
             var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" } }
             };
@@ -409,6 +412,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
@@ -421,7 +425,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             string filePath = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.AioExchangeSetFileFolder = "AIO";
-
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -429,7 +432,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => b1.Name).Returns("B1");
             A.CallTo(() => b2.Name).Returns("B2");
             A.CallTo(() => m1.Name).Returns("M01X02");
-            
 
             IDirectoryInfo[] directoryInfos = { b1, b2, m1 };
 
@@ -438,7 +440,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
 
             fakeAioConfiguration.Value.AioEnabled = true;
-
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
@@ -456,6 +457,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, batchFiles, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CommitLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -464,7 +466,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.AreEqual("Large Media Exchange Set Created Successfully", largeExchangeSet);
         }
-        #endregion
 
+        #endregion
     }
 }

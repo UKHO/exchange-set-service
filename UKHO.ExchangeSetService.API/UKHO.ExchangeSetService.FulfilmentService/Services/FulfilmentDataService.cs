@@ -597,6 +597,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
 
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+        }
+
+        private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
+        {
+            await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
+                      EventIds.CreateSerialAioFileRequestCompleted,
+                      "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                      async () =>
+                      {
+                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+                      },
+                  batchId, correlationId);
         }
     }
 }
