@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
