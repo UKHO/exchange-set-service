@@ -26,6 +26,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using Microsoft.ApplicationInsights.Extensibility;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
+using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -131,10 +132,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
+                 services.Configure<AioConfiguration>(ConfigurationBuilder.GetSection("AioConfiguration"));
                  services.Configure<QueuesOptions>(ConfigurationBuilder.GetSection("QueuesOptions"));
                  services.Configure<SalesCatalogueConfiguration>(ConfigurationBuilder.GetSection("SalesCatalogue"));
-                 services.Configure<AioConfiguration>(ConfigurationBuilder.GetSection("AioConfiguration"));
-
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
                  services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();

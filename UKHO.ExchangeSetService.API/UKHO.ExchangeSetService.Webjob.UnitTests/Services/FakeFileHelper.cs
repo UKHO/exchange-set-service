@@ -120,5 +120,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public void CreateFile(string filePath)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -702,9 +702,21 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         AIOToggleIsOn = 805173,
         /// <summary>
-        /// 805173 - AIO toggle is OFF.
+        /// 805174 - AIO toggle is OFF.
         /// </summary>
-        AIOToggleIsOff = 805174
+        AIOToggleIsOff = 805174,
+        /// <summary>
+        /// 805175 - Request for creating serial.aio file in exchange set is started.
+        /// </summary>
+        CreateSerialAioFileRequestStart = 805175,
+        /// <summary>
+        /// 805176 - Request for creating serial.aio file in exchange set is completed.
+        /// </summary>
+        CreateSerialAioFileRequestCompleted = 805176,
+        /// <summary>
+        /// 805177 - Request for creating serial.aio file in exchange set is failed.
+        /// </summary>
+        SerialAioFileIsNotCreated = 805177
     }
 
     public static class EventIdExtensions

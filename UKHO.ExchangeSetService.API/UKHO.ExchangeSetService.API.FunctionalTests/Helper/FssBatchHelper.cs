@@ -123,5 +123,29 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             return (Directory.GetDirectories(filePath));
         }
+
+        public static async Task<string> ExtractDownloadedAioFolder(string downloadFileUrl, string jwtToken)
+        {
+            //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
+            await Task.Delay(20000);
+            string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.AIOConfig.AioExchangeSetFileName);
+
+            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
+            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
+
+            Stream stream = await response.Content.ReadAsStreamAsync();
+
+            using (FileStream outputFileStream = new FileStream(tempFilePath, FileMode.Create))
+            {
+                stream.CopyTo(outputFileStream);
+            }
+
+            string zipPath = tempFilePath;
+            string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
+
+            ZipFile.ExtractToDirectory(zipPath, extractPath);
+
+            return extractPath;
+        }
     }
 }
