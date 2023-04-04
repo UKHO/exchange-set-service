@@ -21,6 +21,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
         public int RequestedProductsAlreadyUpToDateCount { get; set; }
 
         public IEnumerable<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
+
+        [JsonProperty("requestedAioProductCount")]
+        public int RequestedAioProductCount { get; set; }
+
+        [JsonProperty("aioExchangeSetCellCount")]
+        public int AioExchangeSetCellCount { get; set; }
+
+        [JsonProperty("requestedAioProductsAlreadyUpToDateCount")]
+        public int RequestedAioProductsAlreadyUpToDateCount { get; set; }
     }
 
     public class Links
@@ -28,6 +37,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
 
         public LinkSetBatchStatusUri ExchangeSetBatchStatusUri { get; set; }
         public LinkSetFileUri ExchangeSetFileUri { get; set; }
+        public LinkSetAioFileUri AioExchangeSetFileUri { get; set; }
+
     }
 
     public class LinkSetBatchStatusUri
@@ -49,5 +60,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
         [JsonProperty("reason")]
         public string Reason { get; set; }
 
+    }
+
+    public class LinkSetAioFileUri
+    {
+        [JsonProperty("href")]
+        public string Href { get; set; }
     }
 }
