@@ -260,7 +260,7 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
 	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
 	This is a temporary suppression pending a fix being available.
-	This package is no longer present in the solution dependency tree.
+	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58194
 	]]></notes>
 	<cve>CVE-2018-8409</cve>
   </suppress>
@@ -455,7 +455,7 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 			<![CDATA[
    file name: System.Runtime.Serialization.Json:4.0.2, System.Runtime.Serialization.Json:4.3.0,
    System.Text.Json:4.6.0, System.Text.Json:4.7.2, System.Text.Json:7.0.0
-   These packages are dendencies of nuget packages. All packages at latest version, must update dependent packages when newer versions are available.
+   These packages are dependencies of nuget packages. All packages at latest version, must update dependent packages when newer versions are available.
    ]]>
 		</notes>
 		<cve>CVE-2022-45688</cve>

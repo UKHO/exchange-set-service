@@ -35,8 +35,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="bin\Debug\net6.0\" />
-  </ItemGroup>
-
 </Project>
