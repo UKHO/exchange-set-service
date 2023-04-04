@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -26,6 +27,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public SalesCatalogue ScsAuthConfig = new SalesCatalogue();
         public CacheConfiguration ClearCacheConfig = new CacheConfiguration();
         public PeriodicOutputServiceConfiguration POSConfig = new PeriodicOutputServiceConfiguration();
+        public AioConfiguration AIOConfig = new AioConfiguration();
 
         public class EssAuthorizationTokenConfiguration
         {
@@ -88,6 +90,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string EncUpdateList { get; set; }
         }
 
+        public class AioConfiguration
+        {
+            public string AioExchangeSetFileName { get; set; }
+            public List<string> AioExchangeSetBatchIds { get; set; }
+            public string ExchangeSetSerialAioFile { get; set; }
+        }
+
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
@@ -112,6 +121,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("SalesCatalogue", ScsAuthConfig);
             ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
             ConfigurationRoot.Bind("PeriodicOutputServiceConfiguration", POSConfig);
+            ConfigurationRoot.Bind("AioConfiguration", AIOConfig);
         }
     }
 }
