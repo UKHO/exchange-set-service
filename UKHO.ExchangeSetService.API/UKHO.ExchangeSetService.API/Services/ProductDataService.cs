@@ -441,7 +441,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!aioConfiguration.Value.IsAioEnabled)//when toggle off then remove aio cells from scs request payload
             {
-                products.ProductIdentifier = products.ProductIdentifier.Except(configAioCells).ToArray();
+                products.ProductIdentifier = products.ProductIdentifier.Where(x => !configAioCells.Any(y => y.Equals(x))).ToArray();
             }
             return aioCells;
         }
