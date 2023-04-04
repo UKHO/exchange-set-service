@@ -66,7 +66,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
-
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
 
@@ -99,6 +98,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             else
             {
                 await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+            }
+
+            if (aioConfiguration.IsAioEnabled)
+            {
+                var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
+                await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
             }
 
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetZipFilePath, message.CorrelationId);
@@ -385,8 +390,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     downloadedENCFileCount += item.Files.Count();
                 }
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
-
-                ////largeExchangeSetDataResponse.SalesCatalogueProductResponse = response;
                 largeExchangeSetDataResponse.FulfilmentDataResponses = listFulfilmentData;
             }
 
@@ -591,6 +594,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
+
+            await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
         }
 
         #endregion
@@ -695,6 +700,26 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             parallelZipUploadTasks.Clear();
 
             return isZipAndUploadSuccessful;
+        }
+
+        private async Task CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId)
+        {
+            var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+
+            await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+        }
+
+        private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
+        {
+            await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
+                      EventIds.CreateSerialAioFileRequestCompleted,
+                      "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                      async () =>
+                      {
+                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+                      },
+                  batchId, correlationId);
         }
     }
 }

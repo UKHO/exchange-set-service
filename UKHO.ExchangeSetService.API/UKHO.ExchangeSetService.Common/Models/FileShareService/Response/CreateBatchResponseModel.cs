@@ -12,5 +12,7 @@ namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Response
         public string BatchExpiryDateTime { get; set; }
 
         public string ExchangeSetFileUri { get; set; }
+
+        public string AioExchangeSetFileUri { get; set; }
     }
 }

@@ -3,7 +3,7 @@
     public class AioConfiguration
     {
         public bool? AioEnabled { get; set; }
-
+        public string AioCells { get; set; }
         public bool IsAioEnabled
         {
             get
@@ -15,7 +15,5 @@
                 AioEnabled = value;
             }
         }
-
-        public string AioCells { get; set; }
     }
 }
