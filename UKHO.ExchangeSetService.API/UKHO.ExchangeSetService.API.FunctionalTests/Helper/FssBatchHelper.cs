@@ -146,9 +146,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             return extractPath;
-
         }
-
-
     }
 }

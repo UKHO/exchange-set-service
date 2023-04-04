@@ -452,5 +452,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             return downloadFolderPath;
         }
+
+        public static void CheckAioReadMeTxtFileContent(string inputFile)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+            var fileSecondLineContent = lines[1];
+
+            string[] fileContents = fileSecondLineContent.Split("File date: ");
+
+            //Verifying file contents - second line of the readme file
+            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
+
+            var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 13);
+
+            Assert.AreEqual("2023-02-24 15:00:00", utcDateTime, $"The expected date 2023-02-24 15:00:00 isn't matching with the {utcDateTime}");
+        }
     }
 }
