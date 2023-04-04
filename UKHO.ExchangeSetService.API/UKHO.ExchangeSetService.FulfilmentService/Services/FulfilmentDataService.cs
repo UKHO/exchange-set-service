@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly IMonitorHelper monitorHelper;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IProductDataValidator productDataValidator;
-        private readonly IOptions<AioConfiguration> aioConfiguration;
+        private readonly AioConfiguration aioConfiguration;
 
         public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
                                     IFulfilmentFileShareService fulfilmentFileShareService,
@@ -59,14 +59,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             this.monitorHelper = monitorHelper;
             this.fileSystemHelper = fileSystemHelper;
             this.productDataValidator = productDataValidator;
-            this.aioConfiguration = aioConfiguration;
+            this.aioConfiguration = aioConfiguration.Value;
         }
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
-
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
@@ -115,11 +114,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
+
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse);
 
-            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
-
-            if (isAioEnabled)
+            if (aioConfiguration.IsAioEnabled)
             {
                 var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
                 await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
@@ -173,9 +171,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
 
-            bool isAioEnabled = aioConfiguration.Value.AioEnabled.HasValue && aioConfiguration.Value.AioEnabled.Value;
-
-            if (isAioEnabled)
+            if (aioConfiguration.IsAioEnabled)
             {
                 var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
                 await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
@@ -598,6 +594,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         private async Task CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId)
         {
+            var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+
+            await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
         }
 

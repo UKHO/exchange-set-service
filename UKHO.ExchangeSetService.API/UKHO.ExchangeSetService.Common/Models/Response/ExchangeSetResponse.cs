@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
-    public class ExchangeSetResponse 
+    public class ExchangeSetResponse
     {
         [JsonProperty("_links")]
         public Links Links { get; set; }
@@ -21,8 +21,17 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         [JsonProperty("requestedProductsAlreadyUpToDateCount")]
         public int RequestedProductsAlreadyUpToDateCount { get; set; }
 
+        [JsonProperty("requestedAioProductCount", NullValueHandling = NullValueHandling.Ignore)]
+        public int? RequestedAioProductCount { get; set; } = null;
+
+        [JsonProperty("aioExchangeSetCellCount", NullValueHandling = NullValueHandling.Ignore)]
+        public int? AioExchangeSetCellCount { get; set; } = null;
+
+        [JsonProperty("RequestedAioProductsAlreadyUpToDateCount", NullValueHandling = NullValueHandling.Ignore)]
+        public int? RequestedAioProductsAlreadyUpToDateCount { get; set; } = null;
+
         [JsonProperty("requestedProductsNotInExchangeSet")]
-        public IEnumerable<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
+        public List<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
         [JsonProperty("fssBatchId")]
         public string BatchId { get; set; }
     }
