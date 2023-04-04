@@ -696,7 +696,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805172 - Azure web job for exchange set service is degraded.
         /// </summary>
-        AzureWebJobIsDegraded = 805172
+        AzureWebJobIsDegraded = 805172,
+        /// <summary>
+        /// 805173 - AIO toggle is ON.
+        /// </summary>
+        AIOToggleIsOn = 805173,
+        /// <summary>
+        /// 805173 - AIO toggle is OFF.
+        /// </summary>
+        AIOToggleIsOff = 805174
     }
 
     public static class EventIdExtensions

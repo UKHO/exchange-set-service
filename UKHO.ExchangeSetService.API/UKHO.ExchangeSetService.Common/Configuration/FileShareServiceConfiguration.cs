@@ -36,6 +36,7 @@
         public string ContentInfo { get; set; }
         public string Content { get; set; }
         public string Adc { get; set; }
-
+        public string AioExchangeSetFileName { get; set; }
+        public string AioExchangeSetFileFolder { get; set; }
     }
 }
