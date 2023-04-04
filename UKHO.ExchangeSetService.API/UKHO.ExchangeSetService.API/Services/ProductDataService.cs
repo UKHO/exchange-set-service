@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IMonitorHelper monitorHelper;
         private readonly UserIdentifier userIdentifier;
         private readonly IAzureAdB2CHelper azureAdB2CHelper;
-        private readonly IOptions<AioConfiguration> aioConfiguration;
+        private readonly AioConfiguration aioConfiguration;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.monitorHelper = monitorHelper;
             this.userIdentifier = userIdentifier;
             this.azureAdB2CHelper = azureAdB2CHelper;
-            this.aioConfiguration = aioConfiguration;
+            this.aioConfiguration = aioConfiguration.Value;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 return response;
             }
-            if (aioConfiguration.Value.IsAioEnabled) //when toggle on then add additional aio cell details
+            if (aioConfiguration.IsAioEnabled) //when toggle on then add additional aio cell details
             {
                 //temporary code start
                 int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => aioCells.Any(y => y.Equals(x.ProductName))).Count();
@@ -136,7 +136,7 @@ namespace UKHO.ExchangeSetService.API.Services
             return response;
         }
 
-        public ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
+        private ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
         {
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
             if (fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
@@ -195,7 +195,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
 
-            if (aioConfiguration.Value.IsAioEnabled) //when toggle on then add additional aio cell details
+            if (aioConfiguration.IsAioEnabled) //when toggle on then add additional aio cell details
             {
                 //temporary code starts
                 int invalidAioCells = response.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => aioCells.Any(y => y.Equals(x.ProductName))).Count();
@@ -232,8 +232,8 @@ namespace UKHO.ExchangeSetService.API.Services
                 }).ToList();
 
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
-                response.ExchangeSetResponse.RequestedProductCount += !aioConfiguration.Value.IsAioEnabled ? aioCells.Count() : 0;
-                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = !aioConfiguration.Value.IsAioEnabled ? requestedProductsNotReturneds : new List<RequestedProductsNotInExchangeSet>();
+                response.ExchangeSetResponse.RequestedProductCount += !aioConfiguration.IsAioEnabled ? aioCells.Count() : 0;
+                response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = !aioConfiguration.IsAioEnabled ? requestedProductsNotReturneds : new List<RequestedProductsNotInExchangeSet>();
                 salesCatalogueResponse.ResponseBody = new SalesCatalogueProductResponse
                 {
                     Products = new List<Products>(),
@@ -293,7 +293,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return response;
             }
 
-            if (aioConfiguration.Value.IsAioEnabled)//when toggle on then add additional aio cell details
+            if (aioConfiguration.IsAioEnabled)//when toggle on then add additional aio cell details
             {
                 //temporary code starts
                 response.ExchangeSetResponse.RequestedAioProductCount = aioCells.Count();
@@ -372,7 +372,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     var createBatchResponse =
                         await fileShareService.CreateBatch(userIdentifier.UserIdentity, correlationId);
 
-                    if (aioConfiguration.Value.IsAioEnabled)
+                    if (aioConfiguration.IsAioEnabled)
                     {
                         logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", createBatchResponse.ResponseBody.BatchId, correlationId);
                     }
@@ -396,7 +396,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
                         ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri },
                         //when toggle on then add additional aio cell details
-                        AioExchangeSetFileUri = aioConfiguration.Value.IsAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
+                        AioExchangeSetFileUri = aioConfiguration.IsAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
                     };
 
                     exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
@@ -439,7 +439,7 @@ namespace UKHO.ExchangeSetService.API.Services
             IEnumerable<string> configAioCells = GetAioCells();
             IEnumerable<string> aioCells = products.ProductIdentifier.Intersect(configAioCells).ToList();
 
-            if (!aioConfiguration.Value.IsAioEnabled)//when toggle off then remove aio cells from scs request payload
+            if (!aioConfiguration.IsAioEnabled)//when toggle off then remove aio cells from scs request payload
             {
                 products.ProductIdentifier = products.ProductIdentifier.Where(x => !configAioCells.Any(y => y.Equals(x))).ToArray();
             }
@@ -451,7 +451,7 @@ namespace UKHO.ExchangeSetService.API.Services
             IEnumerable<string> configAioCells = GetAioCells();
             IEnumerable<string> aioCells = products.ProductVersions.Select(x => x.ProductName).Intersect(configAioCells).ToList();
 
-            if (!aioConfiguration.Value.IsAioEnabled)//when toggle off then remove aio cells from scs request
+            if (!aioConfiguration.IsAioEnabled)//when toggle off then remove aio cells from scs request
             {
                 products.ProductVersions = products.ProductVersions.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList();
             }
@@ -463,7 +463,7 @@ namespace UKHO.ExchangeSetService.API.Services
             IEnumerable<string> configAioCells = GetAioCells();
             IEnumerable<string> aioCells = products != null ? products.Products.Select(p => p.ProductName).Intersect(configAioCells) : new List<string>();
 
-            if (!aioConfiguration.Value.IsAioEnabled && products != null)//when toggle off then remove aio cells from scs response
+            if (!aioConfiguration.IsAioEnabled && products != null)//when toggle off then remove aio cells from scs response
             {
                 products.Products = products.Products.Where(x => !configAioCells.Any(y => y.Equals(x.ProductName))).ToList();
                 products.ProductCounts.ReturnedProductCount = products.ProductCounts.ReturnedProductCount - aioCells.Count();
@@ -473,7 +473,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private IEnumerable<string> GetAioCells()
         {
-            return !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',').Select(s => s.Trim())) : new List<string>();
+            return !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',').Select(s => s.Trim())) : new List<string>();
         }
     }
 }
