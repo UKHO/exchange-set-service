@@ -285,26 +285,33 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
-                if (CommonHelper.IsPeriodicOutputService)
+                await DownloadEncFilesFromFssBatch(item, productItem, message, cancellationTokenSource, exchangeSetRootPath, aioCells, cancellationToken);
+            }
+        }
+
+        private async Task DownloadEncFilesFromFssBatch(BatchDetail item, Products productItem, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, string exchangeSetRootPath, List<string> aioCells, CancellationToken cancellationToken)
+        {
+            if (CommonHelper.IsPeriodicOutputService)
+            {
+                if (aioConfiguration.IsAioEnabled)
                 {
-                    if (aioConfiguration.IsAioEnabled)
-                    {
-                        if (!aioCells.Contains(productItem.ProductName))
-                        {
-                            await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
-                        }
-                        else
-                        {
-                            await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
-                        }
-                    }
-                    else
+                    if (!aioCells.Contains(productItem.ProductName))
                     {
                         await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
                     }
+                    else
+                    {
+                        await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                    }
                 }
                 else
-                    await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                {
+                    await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                }
+            }
+            else
+            {
+                await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
             }
         }
 
