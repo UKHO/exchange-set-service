@@ -31,6 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IMonitorHelper fakeMonitorHelper;
         private IFileShareServiceCache fakeFileShareServiceCache;
         private IOptions<CacheConfiguration> fakeCacheConfiguration;
+        private IOptions<AioConfiguration> fakeAioConfiguration;
 
         public string fakeFilePath = "C:\\HOME\\test.txt";
         public string fakeLargeMediaZipFilePath = "D:\\HOME\\M01X01.zip";
@@ -44,17 +45,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [SetUp]
         public void Setup()
         {
-            this.fakeLogger = A.Fake<ILogger<FileShareService>>();
-            this.fakeAuthFssTokenProvider = A.Fake<IAuthFssTokenProvider>();
-            this.fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration()
+            fakeLogger = A.Fake<ILogger<FileShareService>>();
+            fakeAuthFssTokenProvider = A.Fake<IAuthFssTokenProvider>();
+            fakeFileShareConfig = Options.Create(new FileShareServiceConfiguration()
             { BaseUrl = "http://tempuri.org", PublicBaseUrl = "http://filetempuri.org", CellName = "DE260001", EditionNumber = "1", Limit = 10, Start = 0, ProductCode = "AVCS", ProductLimit = 4, UpdateNumber = "0", UpdateNumberLimit = 10 });
-            this.fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
-            this.fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            this.fakeFileShareServiceCache = A.Fake<IFileShareServiceCache>();
-            this.fakeMonitorHelper = A.Fake<IMonitorHelper>();
-            this.fakeCacheConfiguration = Options.Create(new CacheConfiguration { CacheStorageAccountKey = "key", CacheStorageAccountName = "cache", FssSearchCacheTableName = "AnyName", IsFssCacheEnabled = true });
+            fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
+            fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
+            fakeFileShareServiceCache = A.Fake<IFileShareServiceCache>();
+            fakeMonitorHelper = A.Fake<IMonitorHelper>();
+            fakeCacheConfiguration = Options.Create(new CacheConfiguration { CacheStorageAccountKey = "key", CacheStorageAccountName = "cache", FssSearchCacheTableName = "AnyName", IsFssCacheEnabled = true });
+            fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
 
-            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeCacheConfiguration, fakeFileSystemHelper, fakeMonitorHelper);
+            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeCacheConfiguration, fakeFileSystemHelper, fakeMonitorHelper, fakeAioConfiguration);
         }
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
@@ -97,6 +99,40 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             return new List<Products> {
                             new Products {
                                 ProductName = "DE416050",
+                                EditionNumber = 0,
+                                UpdateNumbers = new List<int?> {0},
+                                FileSize = 400,
+                                Bundle = new List<Bundle>
+                            {
+                                new Bundle
+                                {
+                                    BundleType = "DVD",
+                                    Location = "M1;B1"
+                                }
+                            }
+                            }
+                        };
+        }
+
+        private List<Products> GetAioProductdetails()
+        {
+            return new List<Products> {
+                            new Products {
+                                ProductName = "DE416050",
+                                EditionNumber = 0,
+                                UpdateNumbers = new List<int?> {0},
+                                FileSize = 400,
+                                Bundle = new List<Bundle>
+                            {
+                                new Bundle
+                                {
+                                    BundleType = "DVD",
+                                    Location = "M1;B1"
+                                }
+                            }
+                            },
+                            new Products {
+                                ProductName = "GB800001",
                                 EditionNumber = 0,
                                 UpdateNumbers = new List<int?> {0},
                                 FileSize = 400,
@@ -1327,7 +1363,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.SearchFolderDetails(batchId,correlationId, null);
+            var response = await fileShareService.SearchFolderDetails(batchId, correlationId, null);
             string expectedSearchFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             Assert.IsNotNull(response);
             Assert.AreEqual(expectedSearchFolderFilePath, searchFolderFileName);
@@ -1409,7 +1445,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             };
 
-            var response = await fileShareService.DownloadFolderDetails( fakeBatchId,correlationidParam,batchFileList, fakeExchangeSetPath);
+            var response = await fileShareService.DownloadFolderDetails(fakeBatchId, correlationidParam, batchFileList, fakeExchangeSetPath);
 
             var expectedFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
             Assert.AreEqual(true, response);
@@ -1418,7 +1454,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         [Test]
         public void WhenInvalidDownloadAdcFolderFileRequest_ThenReturnFulfilmentException()
-        { 
+        {
             var searchBatchResponse = GetSearchBatchResponse();
             var jsonResponse = JsonConvert.SerializeObject(searchBatchResponse);
             string postBodyParam = "This should be replace by actual value when param passed to api call";
@@ -1451,5 +1487,111 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #endregion DownloadFolderFiles 
 
         #endregion
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProductAndAioToggleDisabled()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored,
+                A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored,
+                A<CancellationToken>.Ignored)).Returns(GetAioProductdetails());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            CommonHelper.IsPeriodicOutputService = true;
+            fakeAioConfiguration.Value.AioEnabled = false;
+            fakeAioConfiguration.Value.AioCells = "GB800001";
+
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
+            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+        }
+
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProductAndAioToggleEnabled()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            searchBatchResponse.Entries.Add(new BatchDetail
+            {
+                BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "GB" } ,
+                                                           new Attribute { Key= "CellName", Value= "GB800001" },
+                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+            });
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored,
+                A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored,
+                A<CancellationToken>.Ignored)).Returns(GetAioProductdetails());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            CommonHelper.IsPeriodicOutputService = true;
+            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.AioCells = "GB800001";
+
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
+            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+        }
     }
 }

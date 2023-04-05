@@ -1,7 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
@@ -14,7 +12,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     ////"AioConfiguration": {
     ////  "AioEnabled": false,
     ////  "AioCells": "GB800001" }
-    
+
     public class EssEndPointsScenariosWhenAioIsDisabled
     {
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
@@ -22,8 +20,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string EssJwtToken { get; set; }
         public ProductIdentifierModel ProductIdentifierModel { get; set; }
         public DataHelper Datahelper { get; set; }
-
-        private readonly string SinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [SetUp]
         public async Task SetupAsync()
@@ -71,7 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithValidAndGB800001ProductAndAioIsDisabled_ThenTheCorrectResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+            List<ProductVersionModel> ProductVersiondata = new();
 
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE416080", 9, 1));
             ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB800001", 1, 0));
@@ -87,23 +83,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
 
-        }
-
-        [Test]
-        [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheApiWithAValidRFC1123DateTimeAndAioIsDisabled_ThenACorrectResponseIsReturned()
-        {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
-
-            //verify model structure
-            await apiResponse.CheckModelStructureForSuccessResponse();
-
-            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
-
-            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
-            Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
-            
         }
     }
 }

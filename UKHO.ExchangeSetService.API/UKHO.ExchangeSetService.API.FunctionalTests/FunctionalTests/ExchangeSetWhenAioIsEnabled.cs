@@ -54,5 +54,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 FileContentHelper.DeleteDirectory(Config.AIOConfig.AioExchangeSetFileName);
             }
         }
+
+        //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
+        [Test]
+        [Category("SmokeTest")]
+        public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
+        {
+            foreach (string batchId in Config.AIOConfig.AioExchangeSetBatchIds)
+            {
+                DownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(FssJwtToken, batchId);
+
+                int count = Directory.GetFiles(Path.Combine(DownloadedFolderPath, Config.AIOConfig.AioEncTempPath)).Length;
+                Assert.IsTrue(count > 0, $"Downloaded Enc files count is 0, Instead of expected count should be greater than 0");
+
+                FileContentHelper.DeleteDirectory(Config.AIOConfig.AioExchangeSetFileName);
+            }
+        }
     }
 }
