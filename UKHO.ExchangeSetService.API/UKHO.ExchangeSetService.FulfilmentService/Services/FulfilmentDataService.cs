@@ -100,12 +100,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
             }
 
-            if (aioConfiguration.IsAioEnabled)
-            {
-                var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
-                await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
-            }
-
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetPath, exchangeSetZipFilePath, message.CorrelationId);
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
             if (isZipFileUploaded)
@@ -708,6 +702,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+            await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId);
         }
 
         private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
@@ -721,5 +716,30 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       },
                   batchId, correlationId);
         }
+
+        //Added this method temporarily. We will use existing method implementation Ref. CreateCatalogFile() while adding contents to this file.
+        private async Task<bool> CreateCatalogFileForAio(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            bool isFileCreated = false;
+
+            if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
+            {
+                DateTime createCatalogFileForAioTaskStartedAt = DateTime.UtcNow;
+                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileForAioRequestStart,
+                        EventIds.CreateCatalogFileForAioRequestCompleted,
+                        "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                        async () =>
+                        {
+                            return await fulfilmentAncillaryFiles.CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId);
+                        },
+                        batchId, correlationId);
+
+                DateTime createCatalogFileForAioTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileForAioTaskStartedAt, createCatalogFileForAioTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+
+            return isFileCreated;
+        }
+
     }
 }
