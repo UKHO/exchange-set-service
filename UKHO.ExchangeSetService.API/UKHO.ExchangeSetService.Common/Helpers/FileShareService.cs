@@ -33,6 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly IMonitorHelper monitorHelper;
+        private readonly AioConfiguration aioConfiguration;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
@@ -41,7 +42,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 ILogger<FileShareService> logger,
                                 IFileShareServiceCache fileShareServiceCache,
                                 IOptions<CacheConfiguration> fssCacheConfiguration,
-                                IFileSystemHelper fileSystemHelper, IMonitorHelper monitorHelper)
+                                IFileSystemHelper fileSystemHelper, IMonitorHelper monitorHelper,
+                                IOptions<AioConfiguration> aioConfiguration)
         {
             this.fileShareServiceClient = fileShareServiceClient;
             this.authFssTokenProvider = authFssTokenProvider;
@@ -51,6 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
             this.monitorHelper = monitorHelper;
+            this.aioConfiguration = aioConfiguration.Value;
         }
 
         public async Task<CreateBatchResponse> CreateBatch(string userOid, string correlationId)
@@ -108,6 +111,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{createBatchResponse.ResponseBody.BatchId}";
                 createBatchResponse.ResponseBody.BatchExpiryDateTime = batchExpiryDateTime;
                 createBatchResponse.ResponseBody.ExchangeSetFileUri = $"{createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}";
+                createBatchResponse.ResponseBody.AioExchangeSetFileUri = $"{createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/{fileShareServiceConfig.Value.AioExchangeSetFileName}";
             }
 
             return createBatchResponse;
@@ -264,6 +268,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task CheckProductOrCancellationData(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string updateNumber, string compareProducts, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
         {
+            List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
+
             if (cancellationToken.IsCancellationRequested)
             {
                 logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files and no data found while querying with CancellationToken:{cancellationTokenSource.Token} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
@@ -279,10 +285,33 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 internalSearchBatchResponse.Entries.Add(item);
                 productList.Add(compareProducts);
-                if (CommonHelper.IsPeriodicOutputService)
-                    await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                await DownloadEncFilesFromFssBatch(item, productItem, message, cancellationTokenSource, exchangeSetRootPath, aioCells, cancellationToken);
+            }
+        }
+
+        private async Task DownloadEncFilesFromFssBatch(BatchDetail item, Products productItem, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, string exchangeSetRootPath, List<string> aioCells, CancellationToken cancellationToken)
+        {
+            if (CommonHelper.IsPeriodicOutputService)
+            {
+                if (aioConfiguration.IsAioEnabled)
+                {
+                    if (!aioCells.Contains(productItem.ProductName))
+                    {
+                        await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                    }
+                    else
+                    {
+                        await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                    }
+                }
                 else
-                    await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                {
+                    await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                }
+            }
+            else
+            {
+                await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
             }
         }
 
@@ -329,7 +358,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 logger.LogError(EventIds.DownloadENCFilesRequestStart.ToEventId(), "Products.Bundle is null in file share service download request for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and _X-Correlation-ID:{CorrelationId}", productName, editionNumber, message.CorrelationId);
                 return Task.FromResult(false);
             }
-            
+
             exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleInfo[0].Substring(1, 1), bundleInfo[1]);
 
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadENCFilesRequestStart, EventIds.DownloadENCFilesRequestCompleted,
@@ -1012,7 +1041,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var batchResult = searchBatchResponse.Entries.OrderByDescending(j => j.BatchPublishedDate).FirstOrDefault();
                     fileDetails = batchResult?.Files.Select(x => new BatchFile
                     {
-                        Filename =  x.Filename,
+                        Filename = x.Filename,
                         Links = new Links
                         {
                             Get = new Link
