@@ -471,6 +471,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateSerialAioFileRequest_ThenReturnFulfilmentException()
         {
+            bool checkAioSerialFileCreated= false;
             fakeAioExchangeSetPath = @"C:\\HOME";
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
@@ -483,12 +484,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating serial.aio file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path").MustHaveHappenedOnceExactly();
 
             Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(false, checkAioSerialFileCreated);
         }
 
         [Test]
         public async Task WhenValidCreateSerialAioFileRequest_ThenReturnTrueResponse()
         {
+            bool checkAioSerialFileCreated = true;
             fakeAioExchangeSetPath = @"C:\\HOME";
+            fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetInfoPath);
+
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFile(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
@@ -496,6 +501,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeAioExchangeSetPath, null);
 
             Assert.AreEqual(true, response);
+            Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(true, checkAioSerialFileCreated);
         }
 
         #endregion
