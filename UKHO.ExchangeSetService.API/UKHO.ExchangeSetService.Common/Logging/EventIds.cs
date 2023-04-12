@@ -720,11 +720,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805178 - Request for creating products.txt file in aio exchange set is started.
         /// </summary>
-        CreateProductFileRequestForAioStart = 805068,
+        CreateProductFileRequestForAioStart = 805178,
         /// <summary>
         /// 805179 - Request for creating products.txt file in aio exchange set is completed.
         /// </summary>
-        CreateProductFileRequestForAioCompleted = 805069
+        CreateProductFileRequestForAioCompleted = 805179
     }
 
     public static class EventIdExtensions

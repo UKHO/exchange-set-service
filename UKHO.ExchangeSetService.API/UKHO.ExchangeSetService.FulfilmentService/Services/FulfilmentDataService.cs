@@ -727,7 +727,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
                 isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestForAioStart,
                         EventIds.CreateProductFileRequestForAioCompleted,
-                        "Create product Aio Exchange set file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                        "Create aio exchange set product file request for and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () =>
                         {
                             return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
