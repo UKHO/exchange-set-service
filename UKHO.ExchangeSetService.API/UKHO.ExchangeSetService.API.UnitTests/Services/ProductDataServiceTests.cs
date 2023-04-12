@@ -71,23 +71,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             bool isAioEnabled = fakeAioConfiguration.Value.IsAioEnabled;
 
-            LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            LinkSetBatchStatusUri linkSetBatchStatusUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
             };
-            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new LinkSetBatchDetailsUri()
+            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             };
-            LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
+            LinkSetFileUri linkSetFileUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
             };
-            LinkSetFileUri AiolinkSetFileUri = new LinkSetFileUri()
+            LinkSetFileUri AiolinkSetFileUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip",
             };
-            Common.Models.Response.Links links = new Common.Models.Response.Links()
+            Common.Models.Response.Links links = new()
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
@@ -103,7 +103,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 },
                 new RequestedProductsNotInExchangeSet()
                 {
-                    ProductName = "GB123789",
+                    ProductName = "GB160060",
                     Reason = "invalidProduct"
                 }
             };
@@ -127,35 +127,36 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             return exchangeSetResponse;
         }
 
-        private ExchangeSetResponse GetExchangeSetResponseAioToggleOff()
+        private static ExchangeSetResponse GetExchangeSetResponseAioToggleOff()
         {
-            LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            LinkSetBatchStatusUri linkSetBatchStatusUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
             };
-            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new LinkSetBatchDetailsUri()
+            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             };
-            LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
+            LinkSetFileUri linkSetFileUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
             };
-            Common.Models.Response.Links links = new Common.Models.Response.Links()
+            Common.Models.Response.Links links = new()
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
                 ExchangeSetFileUri = linkSetFileUri,
             };
             List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new()
-            {   new RequestedProductsNotInExchangeSet()
+            {
+                new RequestedProductsNotInExchangeSet()
                 {
                     ProductName = "GB123456",
                     Reason = "productWithdrawn"
                 },
                 new RequestedProductsNotInExchangeSet()
                 {
-                    ProductName = "GB123789",
+                    ProductName = "GB160060",
                     Reason = "invalidProduct"
                 },
                 new RequestedProductsNotInExchangeSet()
@@ -178,25 +179,30 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             return exchangeSetResponse;
         }
 
-        private ExchangeSetResponse GetExchangeSetResponseAioToggleON()
+        private static ExchangeSetResponse GetExchangeSetResponseAioToggleON()
         {
-            LinkSetBatchStatusUri linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            LinkSetBatchStatusUri linkSetBatchStatusUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
             };
-            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new LinkSetBatchDetailsUri()
+            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             };
-            LinkSetFileUri linkSetFileUri = new LinkSetFileUri()
+            LinkSetFileUri linkSetFileUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
             };
-            Common.Models.Response.Links links = new Common.Models.Response.Links()
+            LinkSetFileUri AiolinkSetFileUri = new()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip",
+            };
+            Common.Models.Response.Links links = new()
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
                 ExchangeSetFileUri = linkSetFileUri,
+                AioExchangeSetFileUri =  AiolinkSetFileUri
             };
             List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new()
             {   new RequestedProductsNotInExchangeSet()
@@ -206,7 +212,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 },
                 new RequestedProductsNotInExchangeSet()
                 {
-                    ProductName = "GB123789",
+                    ProductName = "GB160060",
                     Reason = "invalidProduct"
                 }
             };
@@ -216,7 +222,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
                 RequestedProductsAlreadyUpToDateCount = 0,
                 RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet,
-                RequestedProductCount = 4,
+                RequestedProductCount = 3,
                 ExchangeSetCellCount = 1,
                 BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
                 RequestedAioProductCount = 1,
@@ -245,12 +251,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                         ReturnedProductCount = 2,
                         RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
                             new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
-                            new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
+                            new RequestedProductsNotReturned { ProductName = "GB160060", Reason = "invalidProduct" }
                         }
                     },
                     Products = new List<Products> {
                         new Products {
-                            ProductName = "productName",
+                            ProductName = "AU334550",
                             EditionNumber = 2,
                             UpdateNumbers = new List<int?> { 3, 4 },
                             Cancellation = new Cancellation {
@@ -264,7 +270,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ScsRequestDateTime = DateTime.UtcNow
             };
         }
-        private SalesCatalogueResponse GetSalesCatalogueFileSizeResponse()
+        private static SalesCatalogueResponse GetSalesCatalogueFileSizeResponse()
         {
             return new SalesCatalogueResponse
             {
@@ -416,7 +422,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.BadRequest, result.HttpStatusCode);
-
         }
 
         [Test]
@@ -495,7 +500,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -541,7 +556,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -613,6 +638,58 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
+        public async Task WhenBatchNotCreatedProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkWithoutStoringData()
+        {
+            A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            var azureAdToken = GetAzureADToken();
+
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
+
+            var exchangeSetResponse = GetExchangeSetResponse();
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+
+            var CreateBatchResponseModel = CreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.NotModified;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
+
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
+
+            await service.CreateProductDataByProductIdentifiers(
+                new ProductIdentifierRequest()
+                {
+                    ProductIdentifier = productIdentifiers,
+                    CallbackUri = callbackUri
+                }, azureAdToken);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).MustNotHaveHappened();
+        }
+
+        [Test]
         public async Task WhenValidProductIdentifierRequest_And_AIOToggleIsOff_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
@@ -671,8 +748,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -706,7 +788,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var exchangeSetResponse = GetExchangeSetResponse();
             exchangeSetResponse.RequestedProductCount += 1; //one aio cell passed
-
             A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
             A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
                 .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
@@ -742,6 +823,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductCount, result.ExchangeSetResponse.RequestedAioProductCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
+            Assert.AreEqual(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href);
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -750,8 +832,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         #endregion
@@ -861,8 +948,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).Returns(true);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -888,8 +978,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -905,9 +1005,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).Returns(true); A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -926,6 +1028,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
             exchangeSetResponseAioToggleOff.ExchangeSetCellCount = 0; //RequestedProductsAlreadyUpToDateCount
             exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
+            exchangeSetResponseAioToggleOff.RequestedProductCount = 0;
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
@@ -938,8 +1041,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -958,9 +1066,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).Returns(true); A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -979,6 +1089,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
             exchangeSetResponseAioToggleOff.ExchangeSetCellCount = 0; //RequestedProductsAlreadyUpToDateCount
             exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
+            exchangeSetResponseAioToggleOff.RequestedProductCount = 0;
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
@@ -991,8 +1102,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -1057,6 +1173,63 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
+        public async Task WhenBtachNotCreatedProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkWithoutStoringData()
+        {
+            A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            var azureAdToken = GetAzureADToken();
+
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var exchangeSetResponse = GetExchangeSetResponse();
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
+
+            var CreateBatchResponseModel = CreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.NotModified;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
+
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
+
+            await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
+            {
+                ProductVersions = new List<ProductVersionRequest>() {
+                    new ProductVersionRequest {
+                            ProductName = "GB123456", EditionNumber = 6, UpdateNumber = 3
+                    },new ProductVersionRequest {
+                            ProductName = "GB160060", EditionNumber = 2, UpdateNumber = 4
+                    },new ProductVersionRequest {
+                            ProductName = "AU334550", EditionNumber = 8, UpdateNumber = 1
+                    }
+                },
+                CallbackUri = ""
+            }, azureAdToken);
+
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).MustNotHaveHappened();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
         public async Task WhenValidProductVersionRequest_And_AIOToggleIsOff_ThenCreateProductDataByProductVersionsReturnsOkrequest()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
@@ -1115,13 +1288,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -1130,6 +1308,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseBody.Products.Add(new Products
+            {
+                ProductName = "US2ARCGD",
+                EditionNumber = 2,
+                UpdateNumbers = new List<int?> { 3, 4 },
+                Cancellation = new Cancellation
+                {
+                    EditionNumber = 4,
+                    UpdateNumber = 6
+                },
+                FileSize = 400
+            });
             var azureAdToken = GetAzureADToken();
             fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
@@ -1184,16 +1374,22 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductCount, result.ExchangeSetResponse.RequestedAioProductCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
+            Assert.AreEqual(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         #endregion
@@ -1342,8 +1538,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -1366,6 +1572,48 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             Assert.IsNull(result.ExchangeSetResponse);
             Assert.AreEqual(HttpStatusCode.InternalServerError, result.HttpStatusCode);
+        }
+
+        [Test]
+        public async Task WhenBatchNotCreatedProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnsOkWithoutStoringData()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            salesCatalogueResponse.LastModified = DateTime.UtcNow;
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var CreateBatchResponseModel = CreateBatchResponse();
+            CreateBatchResponseModel.ResponseCode = HttpStatusCode.NotModified;
+            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
+
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
+
+            await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
+
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime)).MustNotHaveHappened();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -1405,7 +1653,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
-            exchangeSetResponseAioToggleOff.RequestedProductCount = 3;
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
@@ -1421,13 +1668,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -1489,16 +1741,22 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductCount, result.ExchangeSetResponse.RequestedAioProductCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count);
+            Assert.AreEqual(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ESS API : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         #endregion ProductDataSinceDateTime       

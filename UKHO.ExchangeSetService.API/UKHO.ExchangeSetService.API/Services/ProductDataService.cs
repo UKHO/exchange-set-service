@@ -401,6 +401,7 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             if (aioConfiguration.IsAioEnabled) //when toggle on then add additional aio cell details
             {
+                //filter valid and invalid aio/enc cells for calculations
                 IEnumerable<string> invalidAioCells = exchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => aioCells.Any(y => y.Equals(x.ProductName))).Select(x => x.ProductName);
                 IEnumerable<string> invalidEncCells = exchangeSetResponse.RequestedProductsNotInExchangeSet.Where(x => !aioCells.Any(y => y.Equals(x.ProductName))).Select(x => x.ProductName);
 
@@ -412,9 +413,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
                 exchangeSetResponse.RequestedProductCount -= aioCells.Count();
                 exchangeSetResponse.ExchangeSetCellCount = validEncCells.Count();
+
                 var requestedEncCells = requestedProducts.Where(x => !aioCells.Any(y => y.Equals(x))).Select(x => x);
                 exchangeSetResponse.RequestedProductsAlreadyUpToDateCount = requestedEncCells.Where(x => !totalEncCells.Any(y => y.Equals(x))).Count();//when requested enc cells are not found in response valid and invalid enc cells then cells are already uptodate
 
+                //additional aio details
                 exchangeSetResponse.RequestedAioProductCount = aioCells.Count();
                 exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count();
                 exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = aioCells.Where(x => !totalAioCells.Any(y => y.Equals(x))).Count();//when requested aio cells are not found in response valid and invalid aio cells then cells are already uptodate
