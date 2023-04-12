@@ -36,6 +36,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public string fakeExchangeSetInfoPath = @"C:\\HOME";
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
         private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
+       
 
         [SetUp]
         public void Setup()
@@ -476,6 +477,42 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(true, response);
         }
 
+        [Test]
+        public async Task WhenValidCreateCatalogFileForAioRequest_ThenReturnTrueReponse()
+        {
+            byte[] byteContent = new byte[100];
+
+            fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
+            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);
+
+            A.CallTo(() => fakeFileSystemHelper.CreateFile(A<string>.Ignored));
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
+
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, null);
+
+            Assert.AreEqual(true, response);
+            Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(true, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+            Assert.AreEqual(byteContent, fakeFileHelper.ReadAllBytes(fakeFileName));
+        }
+
+        [Test]
+        public void WhenInvalidCreateCatalogFileForAioRequest_ThenReturnFulfilmentException()
+        {
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, null); });
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.CatalogFileForAioIsNotCreated.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating catalog.031 file for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+        }
         #endregion
 
     }
