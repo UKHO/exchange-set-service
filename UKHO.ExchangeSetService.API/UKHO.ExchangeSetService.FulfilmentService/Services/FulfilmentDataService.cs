@@ -143,13 +143,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
+            var tasks = new List<Task> { };
+
             if (aioConfiguration.IsAioEnabled)
             {
                 if (essItems.Count > 0)
                     isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
 
                 if (aioItems.Count > 0)
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
+                {
+                    tasks.Add(CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems));
+
+                    await Task.WhenAll(tasks);
+                    isExchangeSetFolderCreated = await Task.FromResult(tasks.All(x => x.IsCompletedSuccessfully.Equals(true)));
+                }
             }
             else
             {
@@ -623,6 +630,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
+
+            await Task.CompletedTask;
         }
 
         #endregion
