@@ -116,12 +116,23 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
         public TextWriter WriteStream(string filePath)
         {
             throw new System.NotImplementedException();
         }
 
         public void CreateFile(string filePath)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IDirectoryInfo[] GetSubDirectories(string folderPath)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IFileInfo[] GetZipFiles(string folderPath)
         {
             throw new System.NotImplementedException();
         }

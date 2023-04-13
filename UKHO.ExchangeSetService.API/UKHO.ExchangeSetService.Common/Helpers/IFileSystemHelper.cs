@@ -31,5 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         string GetFileName(string fileFullPath);
         TextWriter WriteStream(string filePath);
         void CreateFile(string filePath);
+        IDirectoryInfo[] GetSubDirectories(string folderPath);
+        IFileInfo[] GetZipFiles(string folderPath);
     }
 }

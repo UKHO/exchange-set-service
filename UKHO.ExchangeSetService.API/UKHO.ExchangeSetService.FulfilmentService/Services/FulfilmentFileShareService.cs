@@ -123,9 +123,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             return await fileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);
         }
-        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId)
+        public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string zipFileName)
         {
-            return await fileShareService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, fileShareServiceConfig.Value.ExchangeSetFileName);
+            return await fileShareService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, zipFileName);
         }
 
         public async Task<bool> UploadZipFileForLargeMediaExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string mediaZipFileName)
@@ -159,5 +159,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await fileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetPath);
         }
 
+        public async Task<bool> CommitExchangeSet(string batchId, string correlationId, string exchangeSetZipPath)
+        {
+            return await fileShareService.CommitBatchToFss(batchId, correlationId, exchangeSetZipPath, null);
+        }
     }
 }

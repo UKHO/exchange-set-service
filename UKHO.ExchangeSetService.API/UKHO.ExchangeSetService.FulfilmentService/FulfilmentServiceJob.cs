@@ -82,6 +82,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 }
                 else
                 {
+                    throw new ArithmeticException("test");
+#pragma warning disable CS0162 // Unreachable code detected
                     await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
                         EventIds.CreateExchangeSetRequestCompleted,
                         "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
@@ -90,6 +92,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate);
                         },
                     fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+#pragma warning restore CS0162 // Unreachable code detected
                 }
             }
             catch (Exception ex)
@@ -111,6 +114,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public async Task CreateAndUploadErrorFileToFileShareService(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage, EventId eventId, string errorMessage, string batchFolderPath)
         {
+            var isErrorFileCommitted = false;
             fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
 
             var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
@@ -121,6 +125,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 var isUploaded = await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
 
                 if (isUploaded)
+                {
+                    isErrorFileCommitted = await fileShareService.CommitBatchToFss(fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+                }
+
+                if (isErrorFileCommitted)
                 {
                     logger.LogError(EventIds.ErrorTxtIsUploaded.ToEventId(), "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", eventId.Id, eventId.Name, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
                     logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);

@@ -176,7 +176,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             fakeIsFileUploaded = true;
             A.CallTo(() => fakefileShareService.UploadFileToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsFileUploaded);
-            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetRootPath, null);
+            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetRootPath, null, fakefileShareServiceConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(true, fakeIsFileUploaded);
         }
 
@@ -185,7 +185,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             fakeIsFileUploaded = false;
             A.CallTo(() => fakefileShareService.UploadFileToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeIsFileUploaded);
-            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, string.Empty, null);
+            fakeIsFileUploaded = await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(fakeBatchId, fakeExchangeSetRootPath, null, fakefileShareServiceConfig.Value.ExchangeSetFileName);
             Assert.AreEqual(false, fakeIsFileUploaded);
         }
 

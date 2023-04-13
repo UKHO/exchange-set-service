@@ -218,5 +218,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 file.Close();
             }    
         }
+
+        public IDirectoryInfo[] GetSubDirectories(string folderPath)
+        {
+            IDirectoryInfo di = _fileSystem.DirectoryInfo.New(folderPath);
+            IDirectoryInfo[] dir = di.GetDirectories();
+            return dir;
+        }
+
+        public IFileInfo[] GetZipFiles(string folderPath)
+        {
+            IDirectoryInfo di = _fileSystem.DirectoryInfo.New(folderPath);
+            return di.GetFiles("*.zip");
+        }
     }
 }
