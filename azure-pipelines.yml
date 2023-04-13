@@ -94,7 +94,7 @@ stages:
         workspace:
           clean: all
         displayName: "Dependencychecker"
-        steps:
+        steps:          
           - task: UseDotNet@2
             displayName: 'Use .NET Core $(SdkVersion) sdk'
             inputs:

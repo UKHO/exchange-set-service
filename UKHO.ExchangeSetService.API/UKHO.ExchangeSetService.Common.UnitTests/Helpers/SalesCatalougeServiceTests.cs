@@ -246,11 +246,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await salesCatalogueService.PostProductVersionsAsync(requestBody, string.Empty);
 
             //Test
-            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
             Assert.AreEqual(HttpMethod.Post, httpMethodParam);
-            Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productVersions", uriParam);
+            Assert.AreEqual(uriParam, $"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productVersions");
             Assert.AreEqual(JsonConvert.SerializeObject(requestBody), postBodyParam);
-            Assert.AreEqual(actualAccessToken, accessTokenParam);
+            Assert.AreEqual(accessTokenParam, actualAccessToken);
         }
         #endregion PostProductVersionsAsync
 
@@ -329,11 +329,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await salesCatalogueService.PostProductIdentifiersAsync(requestBody, string.Empty);
 
             //Test
-            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
             Assert.AreEqual(HttpMethod.Post, httpMethodParam);
             Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productIdentifiers", uriParam);
             Assert.AreEqual(JsonConvert.SerializeObject(requestBody), postBodyParam);
-            Assert.AreEqual(actualAccessToken, accessTokenParam);
+            Assert.AreEqual(accessTokenParam, actualAccessToken);
         }
         #endregion PostProductIdentifiersAsync
 
@@ -399,7 +399,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
 
             //Test
-            Assert.AreEqual(response.ResponseCode, HttpStatusCode.OK);
+            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
             Assert.AreEqual(HttpMethod.Get, httpMethodParam);
             Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/catalogue/{fakeSaleCatalogueConfig.Value.CatalogueType}", uriParam);
             Assert.AreEqual(actualAccessToken, accessTokenParam);
