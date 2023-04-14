@@ -711,7 +711,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return isBatchCommitted;
         }
 
-        public async Task<BatchStatus> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, List<BatchCommitMetaData> batchCommitMetaDataList)
+        private async Task<BatchStatus> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, List<BatchCommitMetaData> batchCommitMetaDataList)
         {
             DateTime commitTaskStartedAt = DateTime.UtcNow;
             bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaDataList, correlationId);

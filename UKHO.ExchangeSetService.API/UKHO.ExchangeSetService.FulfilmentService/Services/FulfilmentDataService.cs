@@ -234,8 +234,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             bool isZipFileCreated = false;
             bool isZipFileUploaded = false;
-            ////DirectoryInfo di = new(exchangeSetZipFilePath);
-            ////DirectoryInfo[] dir = di.GetDirectories();
+
             IDirectoryInfo[] dir = fileSystemHelper.GetSubDirectories(exchangeSetZipFilePath);
             DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
 
@@ -261,7 +260,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (isZipFileCreated)
             {
-                ////FileInfo[] fileInfos = di.GetFiles("*.zip");
                 IFileInfo[] fileInfos = fileSystemHelper.GetZipFiles(exchangeSetZipFilePath);
 
                 foreach (var file in fileInfos)

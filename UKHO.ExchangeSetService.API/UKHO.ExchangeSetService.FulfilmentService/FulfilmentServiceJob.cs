@@ -82,8 +82,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 }
                 else
                 {
-                    throw new ArithmeticException("test");
-#pragma warning disable CS0162 // Unreachable code detected
                     await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
                         EventIds.CreateExchangeSetRequestCompleted,
                         "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
@@ -92,7 +90,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate);
                         },
                     fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-#pragma warning restore CS0162 // Unreachable code detected
                 }
             }
             catch (Exception ex)

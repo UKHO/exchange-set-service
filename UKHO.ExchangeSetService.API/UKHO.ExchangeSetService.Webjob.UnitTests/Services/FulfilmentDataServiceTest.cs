@@ -77,7 +77,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 Content = "Catalogue",
                 Adc = "ADC",
                 AioExchangeSetFileFolder = "AIO",
-                AioExchangeSetFileName = "AIO.zip"
+                AioExchangeSetFileName = "AIO.zip",
+                ExchangeSetFileName = "V01X01.zip"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
             { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
@@ -217,6 +218,24 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
+        private IDirectoryInfo GetSubDirectories()
+        {
+            IDirectoryInfo fakeDirectoryInfo = A.Fake<IDirectoryInfo>();
+            A.CallTo(() => fakeDirectoryInfo.Name).Returns(fakeFileShareServiceConfig.Value.ExchangeSetFileFolder);
+            A.CallTo(() => fakeDirectoryInfo.FullName).Returns(fakeFileShareServiceConfig.Value.ExchangeSetFileFolder);
+            A.CallTo(() => fakeDirectoryInfo.GetDirectories()).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
+            return fakeDirectoryInfo;
+        }
+
+        private IFileInfo[] GetZipFiles()
+        {
+            IFileInfo fakeFileInfo = A.Fake<IFileInfo>();
+            A.CallTo(() => fakeFileInfo.Name).Returns(fakeFileShareServiceConfig.Value.ExchangeSetFileName);
+
+            IFileInfo[] fileInfos = new IFileInfo[] { fakeFileInfo };
+            return fileInfos;
+        }
+
         [Test]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsExchangeSetCreatedSuccessfully()
         {
@@ -241,10 +260,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.CommitExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(true);
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
+            IDirectoryInfo fakeDirectoryInfo = GetSubDirectories();
+            A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
+            IFileInfo[] fileInfos = GetZipFiles();
+            A.CallTo(() => fakeFileSystemHelper.GetZipFiles(A<string>.Ignored)).Returns(fileInfos);
 
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
@@ -429,6 +453,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.CommitExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(true);
@@ -437,6 +462,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
                 A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            IDirectoryInfo fakeDirectoryInfo = GetSubDirectories();
+            A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
+            IFileInfo[] fileInfos = GetZipFiles();
+            A.CallTo(() => fakeFileSystemHelper.GetZipFiles(A<string>.Ignored)).Returns(fileInfos);
 
             string result = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 

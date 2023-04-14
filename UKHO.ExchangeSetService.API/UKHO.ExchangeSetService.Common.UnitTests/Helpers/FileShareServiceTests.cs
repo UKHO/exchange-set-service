@@ -39,6 +39,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public string fakeZipFilepath = "D:\\UKHO\\V01X01";
         public string fakeExchangeSetPath = @"D:\UKHO";
         public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
+        public string fakeCorrelationId = Guid.NewGuid().ToString();
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
         public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -959,25 +960,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public void WhenInvalidCommitBatchAsyncRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
+            fakeFileShareConfig.Value.ErrorFileName = "error.txt";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
             fakeFileShareConfig.Value.BaseUrl = null;
-            byte[] byteData = new byte[1024];
             var fileDetail = GetFileDetails();
             var responseBatchStatusModel = GetBatchStatusResponse();
             responseBatchStatusModel.Status = "";
-            var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
-            var GetFileInfoDetails = GetFileInfo();
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
-            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
+            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(new string[] { "V01X01.zip" });
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfo());
             A.CallTo(() => fakeFileSystemHelper.UploadCommitBatch(A<BatchCommitMetaData>.Ignored)).Returns(fileDetail);
-            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
-            .Returns(httpResponse);
-            A.CallTo(() => fakeFileShareServiceClient.WriteBlockInFileAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<WriteBlockFileModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-            .Returns(httpResponse);
             A.CallTo(() => fakeFileShareServiceClient.CommitBatchAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<BatchCommitModel>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(new HttpResponseMessage()
             {
@@ -990,30 +984,26 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
+                async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath, null); });
         }
 
         [Test]
         public void WhenInvalidGetBatchStatusAsyncRequest_ThenReturnFulfilmentException()
         {
             fakeFileShareConfig.Value.ExchangeSetFileName = "V01X01.zip";
+            fakeFileShareConfig.Value.ErrorFileName = "error.txt";
             fakeFileShareConfig.Value.BlockSizeInMultipleOfKBs = 256;
             fakeFileShareConfig.Value.ParallelUploadThreadCount = 0;
             fakeFileShareConfig.Value.BaseUrl = null;
-            byte[] byteData = new byte[1024];
             var responseBatchStatusModel = GetBatchStatusResponse();
             responseBatchStatusModel.Status = "";
             var jsonString = JsonConvert.SerializeObject(responseBatchStatusModel);
-            var GetFileInfoDetails = GetFileInfo();
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.Created, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfoDetails);
-            A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
-            A.CallTo(() => fakeFileShareServiceClient.AddFileInBatchAsync(A<HttpMethod>.Ignored, A<FileCreateModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<long>.Ignored, A<string>.Ignored, A<string>.Ignored))
-            .Returns(httpResponse);
-            A.CallTo(() => fakeFileShareServiceClient.WriteBlockInFileAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<WriteBlockFileModel>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
-            .Returns(httpResponse);
+            A.CallTo(() => fakeFileSystemHelper.GetFiles(A<string>.Ignored)).Returns(new string[] { "V01X01.zip" });
+            A.CallTo(() => fakeFileSystemHelper.GetFileInfo(A<string>.Ignored)).Returns(GetFileInfo());
+            A.CallTo(() => fakeFileSystemHelper.UploadCommitBatch(A<BatchCommitMetaData>.Ignored)).Returns(GetFileDetails());
             A.CallTo(() => fakeFileShareServiceClient.CommitBatchAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<BatchCommitModel>.Ignored, A<string>.Ignored, A<string>.Ignored))
             .Returns(httpResponse);
             A.CallTo(() => fakeFileShareServiceClient.GetBatchStatusAsync(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -1028,7 +1018,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
+                   async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath, null); });
         }
 
         [Test]
