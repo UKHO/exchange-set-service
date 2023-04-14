@@ -115,7 +115,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
-            var largeMediaExchangeSetFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+            var exchangeSetFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+            bool isExchangeSetFolderCreated = false;
             bool isZipAndUploadSuccessful = false;
 
             var response = new LargeExchangeSetDataResponse
@@ -134,22 +135,53 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
+            var tasks = new List<Task> { };
+
             if (aioConfiguration.IsAioEnabled)
             {
                 if (essItems.Count > 0)
-                    isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
+                    isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
 
                 if (aioItems.Count > 0)
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
+                {
+                    tasks.Add(CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems));
+
+                    await Task.WhenAll(tasks);
+                    isExchangeSetFolderCreated = await Task.FromResult(tasks.All(x => x.IsCompletedSuccessfully.Equals(true)));
+                }
             }
             else
             {
-                isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
+                isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
             }
+
+            if (isExchangeSetFolderCreated)
+            {
+                var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId));
+
+                var parallelZipUploadTasks = new List<Task<bool>> { };
+                Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
+                {
+                    if (rootDirectoryFolder.Name.StartsWith("M0"))  //Large Media Exchange Set
+                    {
+                        string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
+                        parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), exchangeSetFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
+                    }
+                    else // AIO
+                    {
+                        parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), exchangeSetFilePath, message.CorrelationId, fileShareServiceConfig.Value.AioExchangeSetFileFolder));
+                    }
+                });
+
+                await Task.WhenAll(parallelZipUploadTasks);
+                isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.All(x => x.Result.Equals(true)));
+                parallelZipUploadTasks.Clear();
+            }
+
 
             if (isZipAndUploadSuccessful)
             {
-                var isBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(message.BatchId, largeMediaExchangeSetFilePath, message.CorrelationId);
+                var isBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(message.BatchId, exchangeSetFilePath, message.CorrelationId);
                 if (isBatchCommitted)
                 {
                     logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Large media exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
@@ -490,6 +522,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
+
+            await Task.CompletedTask;
         }
 
         private async Task<bool> PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId, string mediaZipFileName)
@@ -610,6 +644,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
+
+            await Task.CompletedTask;
         }
 
         #endregion
@@ -700,20 +736,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             });
 
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
+            bool isExchangeSetFolderCreated = await Task.FromResult(ParallelCreateFolderTaskForCatlogFile.All(x => x.IsCompletedSuccessfully.Equals(true)));
             ParallelCreateFolderTaskForCatlogFile.Clear();
 
-            var parallelZipUploadTasks = new List<Task<bool>> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
-            {
-                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
-                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), largeMediaExchangeSetFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
-            });
-
-            await Task.WhenAll(parallelZipUploadTasks);
-            bool isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.All(x => x.Result.Equals(true)));
-            parallelZipUploadTasks.Clear();
-
-            return isZipAndUploadSuccessful;
+            return isExchangeSetFolderCreated;
         }
 
         private async Task CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId)
