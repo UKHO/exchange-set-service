@@ -143,24 +143,38 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
-            var tasks = new List<Task> { };
-
             if (aioConfiguration.IsAioEnabled)
             {
                 if (essItems.Count > 0)
                     isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
 
+                if (!isExchangeSetFolderCreated)
+                {
+                    logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                    throw new FulfilmentException(EventIds.LargeExchangeSetCreatedWithError.ToEventId());
+                }
+
                 if (aioItems.Count > 0)
                 {
-                    tasks.Add(CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems));
+                    isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
 
-                    await Task.WhenAll(tasks);
-                    isExchangeSetFolderCreated = await Task.FromResult(tasks.All(x => x.IsCompletedSuccessfully.Equals(true)));
+                    if (!isExchangeSetFolderCreated)
+                    {
+                        logger.LogError(EventIds.AIOExchangeSetCreatedWithError.ToEventId(), "AIO exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                        throw new FulfilmentException(EventIds.AIOExchangeSetCreatedWithError.ToEventId());
+                    }
                 }
+
             }
             else
             {
                 isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
+
+                if (!isExchangeSetFolderCreated)
+                {
+                    logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                    throw new FulfilmentException(EventIds.LargeExchangeSetCreatedWithError.ToEventId());
+                }
             }
 
             if (isExchangeSetFolderCreated)
@@ -230,8 +244,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }
 
-        public async Task DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
         {
+            bool isDownloadReadMeFileSuccess = false;
             string readMeFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
                   EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
                   "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
@@ -244,7 +259,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!string.IsNullOrWhiteSpace(readMeFilePath))
             {
                 DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
+                isDownloadReadMeFileSuccess = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
                    EventIds.DownloadReadMeFileRequestCompleted,
                    "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                    async () =>
@@ -256,6 +271,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
                 monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
             }
+
+            return isDownloadReadMeFileSuccess;
         }
 
         public async Task CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
@@ -485,7 +502,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                   batchId, correlationId);
         }
 
-        private async Task CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        private async Task<bool> CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
                        .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
@@ -496,7 +513,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
                 encFolderList.Add(encFolder);
             }
-            var ParallelCreateFolderTasks = new List<Task> { };
+            var ParallelCreateFolderTasks = new List<Task<bool>> { };
 
             Parallel.ForEach(encFolderList, encFolder =>
             {
@@ -507,9 +524,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(batchId, encFolder, correlationId, fulfilmentDataBasedonCountryCode, salesCatalogueDataResponse, salesCatalogueProductResponse));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
+            var isCreateFolderTasksSuccessful = await Task.FromResult(ParallelCreateFolderTasks.All(x => x.Result.Equals(true)));
             ParallelCreateFolderTasks.Clear();
 
-            await Task.CompletedTask;
+            return isCreateFolderTasksSuccessful;
         }
 
         private async Task<bool> PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId, string mediaZipFileName)
@@ -583,7 +601,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         #region AIO Exchanges Set
 
-        private async Task CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems)
+        private async Task<bool> CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems)
         {
             var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
             var aioExchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -629,9 +647,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
 
-            await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
+            return await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
 
-            await Task.CompletedTask;
         }
 
         #endregion
@@ -715,30 +732,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
 
-            var ParallelCreateFolderTaskForCatlogFile = new List<Task> { };
+            var ParallelCreateFolderTaskForCatlogFile = new List<Task<bool>> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
                 ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
             });
 
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
-            bool isExchangeSetFolderCreated = await Task.FromResult(ParallelCreateFolderTaskForCatlogFile.All(x => x.IsCompletedSuccessfully.Equals(true)));
+            bool isExchangeSetFolderCreated = await Task.FromResult(ParallelCreateFolderTaskForCatlogFile.All(x => x.Result.Equals(true)));
             ParallelCreateFolderTaskForCatlogFile.Clear();
 
             return isExchangeSetFolderCreated;
         }
 
-        private async Task CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId)
+        private async Task<bool> CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId)
         {
             var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
 
-            await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
-            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+            return
+                await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId) &&
+                await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
         }
 
-        private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
+        private async Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
         {
-            await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
+            bool isSerialAioCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
                       EventIds.CreateSerialAioFileRequestCompleted,
                       "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
@@ -746,6 +764,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                           return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
                       },
                   batchId, correlationId);
+
+            return isSerialAioCreated;
         }
     }
 }

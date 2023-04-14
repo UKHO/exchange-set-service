@@ -716,7 +716,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805177 - Request for creating serial.aio file in exchange set is failed.
         /// </summary>
-        SerialAioFileIsNotCreated = 805177
+        SerialAioFileIsNotCreated = 805177,
+        /// <summary>
+        /// 805178 - Request for creating AIO exchange set failed.
+        /// </summary>
+        AIOExchangeSetCreatedWithError = 805178,
     }
 
     public static class EventIdExtensions
