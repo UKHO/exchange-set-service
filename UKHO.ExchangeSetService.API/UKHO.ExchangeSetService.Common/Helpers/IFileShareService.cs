@@ -19,6 +19,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task<bool> CommitAndGetBatchStatusForLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId);
         Task<IEnumerable<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string uri);
         Task<bool> DownloadFolderDetails(string batchId, string correlationId, IEnumerable<BatchFile> fileDetails, string exchangeSetPath);
-        Task<bool> CommitBatchToFss(string batchId, string correlationId, string exchangeSetZipPath, string fileName);
+        Task<bool> CommitBatchToFss(string batchId, string correlationId, string exchangeSetZipPath, string fileName = "zip");
     }
 }

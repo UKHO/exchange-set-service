@@ -35,6 +35,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IMonitorHelper monitorHelper;
         private readonly AioConfiguration aioConfiguration;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
+        private const string ZIPFILE = "zip";
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthFssTokenProvider authFssTokenProvider,
@@ -660,17 +661,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         //Commit and check batch status of ENC / AIO / Error.txt batch to FSS
-        public async Task<bool> CommitBatchToFss(string batchId, string correlationId, string exchangeSetZipPath, string fileName)
+        public async Task<bool> CommitBatchToFss(string batchId, string correlationId, string exchangeSetZipPath, string fileName = ZIPFILE)
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
 
             bool isBatchCommitted = false;
             var batchCommitMetaDataList = new List<BatchCommitMetaData>();
 
-            if (fileName != fileShareServiceConfig.Value.ErrorFileName)
+            if (fileName == ZIPFILE)
             {
                 //Get zip files full path
-                string[] exchangeSetZipList = fileSystemHelper.GetFiles(exchangeSetZipPath).Where(di => di.Contains("zip")).ToArray();
+                string[] exchangeSetZipList = fileSystemHelper.GetFiles(exchangeSetZipPath).Where(di => di.Contains(ZIPFILE)).ToArray();
 
                 foreach (var zipFileName in exchangeSetZipList)
                 {

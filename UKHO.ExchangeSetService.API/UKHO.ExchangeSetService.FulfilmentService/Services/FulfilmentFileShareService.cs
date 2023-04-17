@@ -161,7 +161,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<bool> CommitExchangeSet(string batchId, string correlationId, string exchangeSetZipPath)
         {
-            return await fileShareService.CommitBatchToFss(batchId, correlationId, exchangeSetZipPath, null);
+            return await fileShareService.CommitBatchToFss(batchId, correlationId, exchangeSetZipPath);
         }
     }
 }

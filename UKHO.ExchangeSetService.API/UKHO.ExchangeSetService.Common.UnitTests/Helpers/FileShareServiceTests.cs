@@ -984,7 +984,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath, null); });
+                async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath); });
         }
 
         [Test]
@@ -1018,7 +1018,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath, null); });
+                   async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath); });
         }
 
         [Test]
