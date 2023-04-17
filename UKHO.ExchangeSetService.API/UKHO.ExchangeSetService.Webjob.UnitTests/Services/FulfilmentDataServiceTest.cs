@@ -90,8 +90,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeproductDataValidator = A.Fake<IProductDataValidator>();
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
 
-
-
             fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakeproductDataValidator, fakeAioConfiguration);
         }
 
