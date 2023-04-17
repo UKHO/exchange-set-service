@@ -442,7 +442,7 @@ namespace UKHO.ExchangeSetService.API.Services
             if (aioConfiguration.IsAioEnabled)//when toggle on then add additional aio cell details
             {
                 exchangeSetResponse.ExchangeSetCellCount -= aioCells.Count();
-                exchangeSetResponse.RequestedAioProductCount = aioCells.Count();
+                exchangeSetResponse.RequestedAioProductCount = 0;
                 exchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
                 exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
 

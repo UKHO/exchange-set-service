@@ -1725,6 +1725,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             exchangeSetResponseAioToggleOn.RequestedProductCount = 0;
             exchangeSetResponseAioToggleOn.ExchangeSetCellCount = 0;
             exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>();
+            exchangeSetResponseAioToggleOn.RequestedAioProductCount = 0;
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
