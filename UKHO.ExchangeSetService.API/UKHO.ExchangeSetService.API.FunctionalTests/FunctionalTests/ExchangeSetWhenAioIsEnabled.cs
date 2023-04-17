@@ -12,7 +12,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private TestConfiguration Config { get; set; }
         private string DownloadedFolderPath { get; set; }
 
-
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
@@ -83,6 +82,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
                 Assert.IsTrue(checkFile, $"{Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+
+                FileContentHelper.DeleteDirectory(Config.AIOConfig.AioExchangeSetFileName);
+            }
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenIDownloadAioZipExchangeSet_ThenCatalog031IsAvailable()
+        {
+            foreach (string batchId in Config.AIOConfig.AioExchangeSetBatchIds)
+            {
+                DownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(FssJwtToken, batchId);
+
+                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
 
                 FileContentHelper.DeleteDirectory(Config.AIOConfig.AioExchangeSetFileName);
             }

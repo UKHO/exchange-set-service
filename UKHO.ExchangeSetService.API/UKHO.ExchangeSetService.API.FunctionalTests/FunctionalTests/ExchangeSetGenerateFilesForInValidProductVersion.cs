@@ -47,6 +47,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             CleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
         }
+
         [Ignore("This FT's issue has been fixed in PBI 74619, so we will remove this ignore tag in that branch.")]
         [Test]
         [Category("QCOnlyTest")]
