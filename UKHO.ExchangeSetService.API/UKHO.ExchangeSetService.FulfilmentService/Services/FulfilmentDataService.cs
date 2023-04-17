@@ -725,8 +725,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
             {
                 DateTime createCatalogFileForAioTaskStartedAt = DateTime.UtcNow;
-                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileForAioRequestStart,
-                        EventIds.CreateCatalogFileForAioRequestCompleted,
+                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
+                        EventIds.CreateCatalogFileRequestCompleted,
                         "Create catalog file request for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () =>
                         {

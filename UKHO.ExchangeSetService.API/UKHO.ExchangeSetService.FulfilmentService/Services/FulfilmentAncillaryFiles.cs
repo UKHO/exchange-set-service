@@ -514,8 +514,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 return true;
             else
             {
-                logger.LogError(EventIds.CatalogFileForAioIsNotCreated.ToEventId(), "Error in creating catalog.031 file for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                throw new FulfilmentException(EventIds.CatalogFileForAioIsNotCreated.ToEventId());
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
             }
         }
 
