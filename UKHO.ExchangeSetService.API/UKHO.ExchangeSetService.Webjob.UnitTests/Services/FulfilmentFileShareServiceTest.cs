@@ -25,9 +25,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public bool fakeIsZipFileCreated = false;
         private bool fakeIsBatchCommitted = false;
         public string fakeExchangeSetRootPath = @"D:\\Downloads\";
-        public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        readonly string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
         readonly string fakeMediaFolderName = "M01X01.zip";
         public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private readonly string fakeExchangeSetZipPath = @"D:\Home\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        private readonly string fakeCorrelationId = Guid.NewGuid().ToString();
 
         [SetUp]
         public void Setup()
@@ -245,6 +247,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(false, fakeIsBatchCommitted);
         }
 
+        #endregion
+
         #region SearchFolderFile
         [Test]
         public async Task WhenValidSearchFolderFileRequest_ThenReturnFilePath()
@@ -314,6 +318,24 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         #endregion DownloadFolderDetails
 
-        #endregion
+        [Test]
+        public async Task WhenRequestCommitExchangeSet_ThenReturnsTrueIfBatchCommitted()
+        {
+            A.CallTo(() => fakefileShareService.CommitBatchToFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+
+            bool isFileCommitted = await fulfilmentFileShareService.CommitExchangeSet(fakeBatchId, fakeCorrelationId, fakeExchangeSetZipPath);
+
+            Assert.IsTrue(isFileCommitted);
+        }
+
+        [Test]
+        public async Task WhenRequestCommitExchangeSet_ThenReturnsFalseIfBatchNotCommitted()
+        {
+            A.CallTo(() => fakefileShareService.CommitBatchToFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+
+            bool isFileCommitted = await fulfilmentFileShareService.CommitExchangeSet(fakeBatchId, fakeCorrelationId, fakeExchangeSetZipPath);
+
+            Assert.IsFalse(isFileCommitted);
+        }
     }
 }
