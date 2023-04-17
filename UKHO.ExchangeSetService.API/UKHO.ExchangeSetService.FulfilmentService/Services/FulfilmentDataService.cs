@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
 
                 if ((aioItems != null && aioItems.Count > 0) || (response.Products.Count == aioItems.Count && aioItems.Count > 0))
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponse);
 
                 //Temporary code to avoid exception for only AIO batch
                 if (aioItems.Count > 0 && response.Products.Count == aioItems.Count)
@@ -142,7 +142,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
 
                 if (aioItems.Count > 0)
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems);
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, response.SalesCatalogueDataResponse);
             }
             else
             {
@@ -543,7 +543,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         #region AIO Exchanges Set
 
-        private async Task CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems)
+        private async Task CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
         {
             var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
             var aioExchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -589,7 +589,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
 
-            await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId);
+            await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId, salesCatalogueEssDataResponse, message.ScsRequestDateTime);
         }
 
         #endregion
@@ -696,12 +696,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isZipAndUploadSuccessful;
         }
 
-        private async Task CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId)
+        private async Task CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
         {
             var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetInfoPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.Info);
 
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+            await CreateProductFileForAio(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
             await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId);
         }
 
@@ -741,5 +743,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isFileCreated;
         }
 
+        private async Task<bool> CreateProductFileForAio(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
+        {
+            bool isProductFileCreated = false;
+
+            if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
+            {
+                DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
+                isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestForAioStart,
+                        EventIds.CreateProductFileRequestForAioCompleted,
+                        "Create aio exchange set product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                        async () =>
+                        {
+                            return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
+                        },
+                        batchId, correlationId);
+
+                DateTime createProductFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+
+            return isProductFileCreated;
+        }
     }
 }

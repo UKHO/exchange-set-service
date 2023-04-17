@@ -36,6 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             }
         }
 
+        //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
         [Test]
         [Category("SmokeTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
