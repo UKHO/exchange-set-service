@@ -469,7 +469,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             if (!string.IsNullOrWhiteSpace(aioExchangeSetPath))
             {
                 string serialFilePath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.SerialAioFileName);
-                
+
                 fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
                 fileSystemHelper.CreateFile(serialFilePath);
                 await Task.CompletedTask;
@@ -484,5 +484,40 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             return checkSerialAioFileCreated;
         }
+
+        //Added this method temporarily. We will use existing method implementation Ref. CreateCatalogFile() while adding contents to this file.
+        public async Task<bool> CreateCatalogFileForAio(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            var catBuilder = new Catalog031BuilderFactory().Create();
+            var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
+
+            if (fileSystemHelper.CheckFileExists(readMeFileName))
+            {
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
+                    Implementation = "TXT"
+                });
+            }
+
+            var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.AioExchangeSetFileFolder);
+
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            fileSystemHelper.CreateFile(outputFileName);
+
+            fileSystemHelper.CreateFileContentWithBytes(outputFileName, cat031Bytes);
+
+            await Task.CompletedTask;
+
+            if (fileSystemHelper.CheckFileExists(outputFileName))
+                return true;
+            else
+            {
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
+            }
+        }
+
     }
 }
