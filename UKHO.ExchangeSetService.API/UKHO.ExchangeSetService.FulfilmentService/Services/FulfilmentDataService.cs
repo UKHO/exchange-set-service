@@ -85,11 +85,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (aioConfiguration.IsAioEnabled)
             {
-                if (essItems != null && essItems.Any() || response.Products.Count == 0)
-                    await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
 
+                if (essItems != null && essItems.Any() || response.Products.Count == 0)
+                {
+                    salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
+                                                                 .Where(x => !aioItems.Any(y => y.ProductName.Equals(x.ProductName))).ToList();
+                    await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                }
                 if ((aioItems != null && aioItems.Count > 0) || (response.Products.Count == aioItems.Count && aioItems.Count > 0))
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponse);
+                {
+                    salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
+                                                         .Where(x => aioItems.Any(y => y.ProductName.Equals(x.ProductName))).ToList();
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio);
+                }
+
 
                 //Temporary code to avoid exception for only AIO batch
                 if (aioItems.Count > 0 && response.Products.Count == aioItems.Count)
@@ -138,11 +148,25 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (aioConfiguration.IsAioEnabled)
             {
-                if (essItems.Count > 0)
-                    isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
+                var largeExchangeSetDataResponseForAio = new LargeExchangeSetDataResponse()
+                {
+                    SalesCatalogueDataResponse = (SalesCatalogueDataResponse)response.SalesCatalogueDataResponse.Clone(),
+                    SalesCatalogueProductResponse = response.SalesCatalogueProductResponse
+                };
 
+                if (essItems.Count > 0)
+                {
+                    response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
+                                                                       .Where(x => !aioItems.Any(y => y.ProductName == x.ProductName)).ToList();
+                    isZipAndUploadSuccessful = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, largeMediaExchangeSetFilePath);
+                }
                 if (aioItems.Count > 0)
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, response.SalesCatalogueDataResponse);
+                {
+                    largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
+                                                                                         .Where(x => aioItems.Any(y => y.ProductName == x.ProductName)).ToList();
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse);
+                }
+
             }
             else
             {
