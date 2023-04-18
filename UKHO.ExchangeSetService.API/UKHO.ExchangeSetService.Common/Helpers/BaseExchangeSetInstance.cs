@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
+    [ExcludeFromCodeCoverage]
     public abstract class BaseExchangeSetInstance
     {
         private int instanceNumber = 0;

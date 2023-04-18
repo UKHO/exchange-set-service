@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace UKHO.ExchangeSetService.Common.Models.FileShareService.Request
 {
+    [ExcludeFromCodeCoverage]
     public class CreateBatchRequest
     {
         public string BusinessUnit { get; set; }
