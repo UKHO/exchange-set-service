@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (aioConfiguration.IsAioEnabled)
             {
-                SalesCatalogueDataResponse catalogueDataResponse = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
+                SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
 
                 if (essItems != null && essItems.Any() || response.Products.Count == 0)
                 {
@@ -95,9 +95,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 if ((aioItems != null && aioItems.Count > 0) || (response.Products.Count == aioItems.Count && aioItems.Count > 0))
                 {
-                    catalogueDataResponse.ResponseBody = catalogueDataResponse.ResponseBody
+                    salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
                                                          .Where(x => aioItems.Any(y => y.ProductName.Equals(x.ProductName))).ToList();
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, catalogueDataResponse);
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio);
                 }
 
 
@@ -148,7 +148,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (aioConfiguration.IsAioEnabled)
             {
-                var largeExchangeSetDataResponse = new LargeExchangeSetDataResponse()
+                var largeExchangeSetDataResponseForAio = new LargeExchangeSetDataResponse()
                 {
                     SalesCatalogueDataResponse = (SalesCatalogueDataResponse)response.SalesCatalogueDataResponse.Clone(),
                     SalesCatalogueProductResponse = response.SalesCatalogueProductResponse
@@ -162,9 +162,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 if (aioItems.Count > 0)
                 {
-                    largeExchangeSetDataResponse.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponse.SalesCatalogueDataResponse.ResponseBody
+                    largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
                                                                                          .Where(x => aioItems.Any(y => y.ProductName == x.ProductName)).ToList();
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponse.SalesCatalogueDataResponse);
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse);
                 }
 
             }
