@@ -83,6 +83,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
                 Assert.IsTrue(checkFile, $"{Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
 
+                //Product Backlog Item 72019: Add content to PRODUCTS.TXT file
+                FileContentHelper.CheckAioProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile));
+
                 FileContentHelper.DeleteDirectory(Config.AIOConfig.AioExchangeSetFileName);
             }
         }
