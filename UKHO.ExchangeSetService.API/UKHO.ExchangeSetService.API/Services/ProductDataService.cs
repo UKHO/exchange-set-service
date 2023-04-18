@@ -191,7 +191,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             else if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK) //Set Aio details on exchange set response
             {
-                IEnumerable<string> lstRequestedProducts = request.ProductVersions.Select(x => x.ProductName).ToList();
+                IEnumerable<string> lstRequestedProducts = request.ProductVersions.Select(x => x.ProductName);
                 SetExchangeSetAioDetails(response.ExchangeSetResponse, lstRequestedProducts, salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, request.CorrelationId);
             }
 
