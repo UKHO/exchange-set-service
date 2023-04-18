@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace UKHO.ExchangeSetService.Common.Configuration
 {
     [Serializable]
+    [ExcludeFromCodeCoverage]
     public class FulfilmentException : Exception
     {
         private static readonly string message = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. " +
