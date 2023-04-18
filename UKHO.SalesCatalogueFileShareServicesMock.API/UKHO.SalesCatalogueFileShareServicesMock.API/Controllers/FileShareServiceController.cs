@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
@@ -95,6 +96,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             if (!string.IsNullOrEmpty(fileName) )
             {
+                var setZipPath = Path.Combine(configuration["HOME"], fileShareServiceConfiguration.Value.FolderDirectoryName, batchId, fileName);
+                if (!System.IO.File.Exists(setZipPath))
+                {
+                    return NotFound();
+                }
                 bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
             }
          
