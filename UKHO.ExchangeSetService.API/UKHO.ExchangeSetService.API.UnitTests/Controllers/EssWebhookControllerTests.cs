@@ -15,6 +15,8 @@ using Attribute = UKHO.ExchangeSetService.Common.Models.Request.Attribute;
 using System.Net;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
+using UKHO.ExchangeSetService.Common.Logging;
+using System.Linq;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
@@ -41,12 +43,29 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public void WhenValidHeaderRequestedInNewFilesPublishedOptions_ThenReturnsOkResponse()
         {
-            fakeWebHookController.ControllerContext.HttpContext = new DefaultHttpContext();
-            fakeHttpContextAccessor.HttpContext.Request.Headers.Add("WebHook-Request-Origin", "test.example.com");
+            var responseHeaders = A.Fake<IHeaderDictionary>();
+            var httpContext = A.Fake<HttpContext>();
+
+            A.CallTo(() => httpContext.Response.Headers).Returns(responseHeaders);
+            A.CallTo(() => fakeHttpContextAccessor.HttpContext).Returns(httpContext);
+            A.CallTo(() => httpContext.Request.Headers["WebHook-Request-Origin"]).Returns(new[] { "test.com" });
 
             var result = (OkObjectResult)fakeWebHookController.NewFilesPublishedOptions();
 
             Assert.AreEqual(200, result.StatusCode);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.NewFilesPublishedWebhookOptionsCallStarted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Started processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.NewFilesPublishedWebhookOptionsCallCompleted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Completed processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => responseHeaders.Add("WebHook-Allowed-Rate", "*")).MustHaveHappened();
+            A.CallTo(() => responseHeaders.Add("WebHook-Allowed-Origin", "test.com")).MustHaveHappened();
         }
 
         [Test]
@@ -65,6 +84,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
             Assert.AreEqual(200, result.StatusCode);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event started for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+            
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSB2CUserValidationEvent.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Event was triggered with invalid Azure AD token from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+           
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event completed as Azure AD Authentication failed with OK response and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -89,6 +123,26 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
            
             Assert.AreEqual(200, result.StatusCode);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event started for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadValidationEvent.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Required attributes missing in event data from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event completed for ProductName:{productName} as required data was missing in payload with OK response and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -107,6 +161,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
             Assert.AreEqual(200, result.StatusCode);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event started for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event completed for ProductName:{productName} with OK response and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
         }
 
         private EnterpriseEventCacheDataRequest GetCacheRequestData()
