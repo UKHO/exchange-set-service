@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace UKHO.ExchangeSetService.API.Validation
         Task<ValidationResult> Validate(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest);
     }
 
+    [ExcludeFromCodeCoverage]
     public class EnterpriseEventCacheDataRequestValidator : AbstractValidator<EnterpriseEventCacheDataRequest>, IEnterpriseEventCacheDataRequestValidator
     {
         public EnterpriseEventCacheDataRequestValidator()

@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     ////"AioConfiguration": {
     ////  "AioEnabled": true,
     ////  "AioCells": "GB800001" }
-    
+
     public class EssEndPointsScenariosWhenAioIsEnabled
     {
         private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
@@ -51,11 +51,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
-            Assert.AreEqual(4, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 4.");
+            Assert.AreEqual(3, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 3.");
 
             //Verify requested product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
-            
+
             // Verify ExchangeSetCellCount
             Assert.AreEqual(3, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 3.");
 
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Verify requested AIO product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedAioProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedAioProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
-            
+
             // Verify AIO ExchangeSetCellCount
             Assert.AreEqual(1, apiResponseData.AioExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.AioExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 1.");
 
@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
 
             ProductIdentifierModel.ProductIdentifier.Clear();
-            
+
         }
 
         [Test]
@@ -95,6 +95,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Check RequestedProductsNotInExchangeSet is empty
             Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
+
+            ProductVersiondata.Clear();
         }
 
         [Test]
@@ -127,7 +129,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
-            Assert.AreEqual(5, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 4.");
+            Assert.AreEqual(4, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 4.");
 
             //Verify requested product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
@@ -152,5 +154,224 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ProductIdentifierModel.ProductIdentifier.Clear();
         }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallTheProductVersionApiWithValidAndGB800001AndInvalidProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("CA479226", 4, 6));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("US2ARCGD", 1, 5));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB800001", 4, 6));
+
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureForAioSuccessResponse();
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            //Check RequestedProductsNotInExchangeSet is not empty
+            Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
+
+            Assert.AreEqual("US2ARCGD", apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'US2ARCGD'");
+            Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
+
+            ProductVersiondata.Clear();
+
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+
+        public async Task WhenICallTheProductIdentifiersApiWithValidEncAndNoAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
+        {
+            ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080" };
+
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureForAioSuccessResponse();
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+            //Verify requested product count
+            Assert.AreEqual(3, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 3.");
+
+            //Verify requested product AlreadyUpToDate count
+            Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
+
+            // Verify ExchangeSetCellCount
+            Assert.AreEqual(3, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 3.");
+
+            //Verify requested AIO product count
+            Assert.AreEqual(0, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 1.");
+
+            //Verify requested AIO product AlreadyUpToDate count
+            Assert.AreEqual(0, apiResponseData.RequestedAioProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedAioProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
+
+            // Verify AIO ExchangeSetCellCount
+            Assert.AreEqual(0, apiResponseData.AioExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.AioExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 1.");
+
+            //Check RequestedProductsNotInExchangeSet is empty
+            Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
+
+            ProductIdentifierModel.ProductIdentifier.Clear();
+
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallTheProductVersionApiWithValidEncAndNoAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE416080", 9, 1));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("CA479226", 4, 6));
+
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureForAioSuccessResponse();
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            //Check RequestedProductsNotInExchangeSet is empty
+            Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
+
+            ProductVersiondata.Clear();
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallTheProductIdentifiersApiWithOnlyAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
+        {
+            ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB800001" };
+
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureForAioSuccessResponse();
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+            //Verify requested product count
+            Assert.AreEqual(0, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 0.");
+
+            //Verify requested product AlreadyUpToDate count
+            Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
+
+            // Verify ExchangeSetCellCount
+            Assert.AreEqual(0, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 0.");
+
+            //Verify requested AIO product count
+            Assert.AreEqual(1, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 1.");
+
+            //Verify requested AIO product AlreadyUpToDate count
+            Assert.AreEqual(0, apiResponseData.RequestedAioProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedAioProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
+
+            // Verify AIO ExchangeSetCellCount
+            Assert.AreEqual(1, apiResponseData.AioExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.AioExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 1.");
+
+            //Check RequestedProductsNotInExchangeSet is empty
+            Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
+
+            ProductIdentifierModel.ProductIdentifier.Clear();
+
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallTheProductVersionApiOnlyAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB800001", 1, 0));
+
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureForAioSuccessResponse();
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            //Check RequestedProductsNotInExchangeSet is empty
+            Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
+
+            ProductVersiondata.Clear();
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallTheProductIdentifiersApiWithValidEncAndDuplicateAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
+        {
+            ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE416080", "GB800001", "GB800001" };
+
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureForAioSuccessResponse();
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+            //Verify requested product count
+            Assert.AreEqual(2, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 0.");
+
+            //Verify requested product AlreadyUpToDate count
+            Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 2.");
+
+            // Verify ExchangeSetCellCount
+            Assert.AreEqual(1, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 1.");
+
+            //Verify requested AIO product count
+            Assert.AreEqual(1, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 1.");
+
+            //Verify requested AIO product AlreadyUpToDate count
+            Assert.AreEqual(0, apiResponseData.RequestedAioProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedAioProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
+
+            // Verify AIO ExchangeSetCellCount
+            Assert.AreEqual(1, apiResponseData.AioExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.AioExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 1.");
+
+            //Check RequestedProductsNotInExchangeSet is not empty
+            Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
+
+            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
+            Assert.AreEqual("duplicateProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'duplicateProduct'");
+
+            ProductIdentifierModel.ProductIdentifier.Clear();
+
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallTheProductVersionApiWithValidEncAndDuplicateAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
+        {
+            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
+
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE416080", 9, 1));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB800001", 1, 0));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB800001", 1, 0));
+
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+
+            //verify model structure
+            await apiResponse.CheckModelStructureForAioSuccessResponse();
+
+            var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            //Check RequestedProductsNotInExchangeSet is not empty
+            Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
+
+            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
+            Assert.AreEqual("duplicateProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'duplicateProduct'");
+
+            ProductVersiondata.Clear();
+        }
+
     }
 }

@@ -467,5 +467,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Assert.AreEqual("2023-02-24 15:00:00", utcDateTime, $"The expected date 2023-02-24 15:00:00 isn't matching with the {utcDateTime}");
         }
+
+        public static void CheckAioProductFileContent(string inputProductTxtFile)
+        {
+            string[] lines = File.ReadAllLines(inputProductTxtFile);
+
+            string[] fileContents = lines[0].Split(":DATE ");
+
+            var utcDateTime = fileContents[1];
+
+            Assert.AreEqual("20230302 09:00:00", utcDateTime, $"The expected date 20230302 09:00:00 isn't matching with the {utcDateTime}");
+            Assert.True(lines[1].Contains("VERSION"), $"Product Txt File returned {lines[1]}, which does not contain expected VERSION.");
+            Assert.True(lines[3].Contains("ENC"), $"Product Txt File returned {lines[3]}, which does not contain expected ENC.");
+        }
     }
 }
