@@ -1,5 +1,8 @@
-﻿namespace UKHO.ExchangeSetService.Common.HealthCheck
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
+    [ExcludeFromCodeCoverage]
     public class WebJobDetails
     {
         public string UserPassword { get; set; }

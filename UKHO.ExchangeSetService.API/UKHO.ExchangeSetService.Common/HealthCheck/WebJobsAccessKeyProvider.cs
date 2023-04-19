@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
+    [ExcludeFromCodeCoverage]
     public class WebJobsAccessKeyProvider : IWebJobsAccessKeyProvider
     {
         private readonly IDictionary<string, string> WebJobsAccessKey;

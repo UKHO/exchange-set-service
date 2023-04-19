@@ -1,5 +1,9 @@
-﻿namespace UKHO.ExchangeSetService.Common.Configuration
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace UKHO.ExchangeSetService.Common.Configuration
 {
+    [ExcludeFromCodeCoverage]
     public class AioConfiguration
     {
         public bool? AioEnabled { get; set; }
@@ -8,7 +12,7 @@
         {
             get
             {
-                return (bool)(AioEnabled.HasValue ? AioEnabled : false);
+                return Convert.ToBoolean(AioEnabled.HasValue ? AioEnabled : false);
             }
             set
             {
