@@ -94,16 +94,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
                 return StatusCode(StatusCodes.Status307TemporaryRedirect);
             }
-            if (!string.IsNullOrEmpty(fileName) )
+            if (!string.IsNullOrEmpty(fileName))
             {
-                var setZipPath = Path.Combine(configuration["HOME"], fileShareServiceConfiguration.Value.FolderDirectoryName, batchId, fileName);
-                if (!System.IO.File.Exists(setZipPath))
-                {
-                    return NotFound();
-                }
                 bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
             }
-         
+
             return File(bytes, "application/octet-stream", fileName);
         }
 
