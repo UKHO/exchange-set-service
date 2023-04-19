@@ -43,7 +43,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiersForLargeMedia()
         {
-           return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US5CN13M", "CA172005", "DE521900", "NZ300661", "KR676D03" };
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US5CN13M", "CA172005", "DE521900", "NZ300661", "KR676D03" };
+        }
+
+        public List<string> GetProductIdentifiersForLargeMediaAndAio()
+        {
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US5CN13M", "CA172005", "DE521900", "NZ300661", "KR676D03", "GB800001" };
+        }
+
+        public List<string> GetProductIdentifiersForEncAndAio()
+        {
+            return new List<string>() { "GB800001", "DE260001" };
+        }
+
+        public List<string> GetProductIdentifiersForAioOnly()
+        {
+            return new List<string>() { "GB800001" };
         }
     }
 }

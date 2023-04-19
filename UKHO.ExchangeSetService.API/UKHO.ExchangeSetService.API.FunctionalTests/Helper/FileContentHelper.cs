@@ -329,6 +329,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 lineNumber++;
             }
         }
+
         public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int baseNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
@@ -436,49 +437,41 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return response;
         }
 
-        public static async Task<string> DownloadAndExtractAioZip(string FssJwtToken, string batchId)
+        public static async Task<string> DownloadAndExtractAioZip(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
+
+            ////List<string> downloadFolderPath = new List<string>();
+            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            var batchStatusUrl = apiResponseData.Links.AioExchangeSetFileUri.Href;
+            var batchId = batchStatusUrl.Split('/')[5];
+
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
+            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
             var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedAioFolder(downloadFileUrl.ToString(), FssJwtToken);
 
             var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+            return Path.Combine(Path.GetTempPath(), downloadFolder);
 
-            return downloadFolderPath;
         }
 
-        public static void CheckAioReadMeTxtFileContent(string inputFile)
+        public static void CheckAioProductFileContent(string inputFile, dynamic scsResponse)
         {
-            string[] lines = File.ReadAllLines(inputFile);
-            var fileSecondLineContent = lines[1];
+            string[] fileContent = File.ReadAllLines(inputFile);
 
-            string[] fileContents = fileSecondLineContent.Split("File date: ");
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            //Verifying file contents - second line of the readme file
-            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
-
-            var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 13);
-
-            Assert.AreEqual("2023-02-24 15:00:00", utcDateTime, $"The expected date 2023-02-24 15:00:00 isn't matching with the {utcDateTime}");
-        }
-
-        public static void CheckAioProductFileContent(string inputProductTxtFile)
-        {
-            string[] lines = File.ReadAllLines(inputProductTxtFile);
-
-            string[] fileContents = lines[0].Split(":DATE ");
-
-            var utcDateTime = fileContents[1];
-
-            Assert.AreEqual("20230302 09:00:00", utcDateTime, $"The expected date 20230302 09:00:00 isn't matching with the {utcDateTime}");
-            Assert.True(lines[1].Contains("VERSION"), $"Product Txt File returned {lines[1]}, which does not contain expected VERSION.");
-            Assert.True(lines[3].Contains("ENC"), $"Product Txt File returned {lines[3]}, which does not contain expected ENC.");
+            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
+            Assert.True(fileContent[4].Contains("GB800001"), $"Product File returned {fileContent[4]}, which does not contain expected GB800001.");
         }
     }
 }
