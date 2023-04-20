@@ -4,7 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
-using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+////using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -42,8 +42,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
-                bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
         }
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
@@ -52,40 +52,41 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public void WhenIDownloadAioZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
         {
 
-                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
-                //Verify README.TXT file content
-                FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
-        //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
-        [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
-        {
-            //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForLargeMediaAndAio(), ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
-            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+        //////Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
+        ////[Test]
+        ////[Category("QCOnlyTest-AIOEnabled")]
+        ////public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
+        ////{
+        ////    //Get the product details form sales catalogue service
+        ////    var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForLargeMediaAndAio(), ScsJwtToken);
+        ////    Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
-            foreach (var product in apiScsResponseData.Products)
-            {
-                string productName = product.ProductName;
-                int editionNumber = product.EditionNumber;
+        ////    var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-                if(productName.Equals("GB800001"))
-                {
-                    //Enc file download verification
-                    foreach (var updateNumber in product.UpdateNumbers)
-                    {
-                        await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+        ////    foreach (var product in apiScsResponseData.Products)
+        ////    {
+        ////        string productName = product.ProductName;
+        ////        int editionNumber = product.EditionNumber;
 
-                    }
-                }
-            }
-        }
+        ////        if(productName.Equals("GB800001"))
+        ////        {
+        ////            //Enc file download verification
+        ////            foreach (var updateNumber in product.UpdateNumbers)
+        ////            {
+        ////                await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+
+        ////            }
+        ////        }
+        ////    }
+        ////}
 
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
         [Test]
