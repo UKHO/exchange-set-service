@@ -505,8 +505,7 @@ stages:
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
-                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
-                  condition: always()
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
                   inputs:
                     azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
                     scriptType: 'pscore'
@@ -639,7 +638,6 @@ stages:
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
-                  condition: always()
                   inputs:
                     azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
                     scriptType: 'pscore'
@@ -775,8 +773,7 @@ stages:
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
-                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
-                  condition: always()
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
                   inputs:
                     azureSubscription: "Exchange-Set-Service-QA-A-008-02"
                     scriptType: 'pscore'
