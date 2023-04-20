@@ -60,7 +60,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             switch (string.IsNullOrEmpty(setZipPath))
             {
                 case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && (string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("AIO.zip", filesName, StringComparison.OrdinalIgnoreCase)): 
-                case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && (string.Equals("M01X02.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("M02X02.zip", filesName, StringComparison.OrdinalIgnoreCase)):
+                case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && (string.Equals("M01X02.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("M02X02.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("AIO.zip", filesName, StringComparison.OrdinalIgnoreCase)):
                     filePaths = Directory.GetFiles(setZipPath, filesName);
                     break;
                 default:
