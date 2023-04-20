@@ -303,6 +303,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             bool isZipFileCreated = false;
             bool isZipFileUploaded = false;
+            bool isBatchCommitted = false;
 
             IDirectoryInfo[] dir = fileSystemHelper.GetSubDirectories(exchangeSetZipFilePath);
             DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
@@ -346,10 +347,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (isZipFileUploaded)
             {
-                return await fulfilmentFileShareService.CommitExchangeSet(batchId, correlationId, exchangeSetZipFilePath);
+                isBatchCommitted = await fulfilmentFileShareService.CommitExchangeSet(batchId, correlationId, exchangeSetZipFilePath);
             }
 
-            return isZipFileUploaded;
+            return isBatchCommitted;
         }
 
         public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
