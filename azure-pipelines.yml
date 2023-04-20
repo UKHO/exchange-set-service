@@ -86,6 +86,32 @@ stages:
             StripPath: $(Build.Repository.LocalPath)/exchange-set-service
             CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
 
+  - stage: Stryker_Mutator
+    displayName: "Stryker Mutator"
+    dependsOn: []
+    jobs:
+    - job: Stryker
+      workspace:
+        clean: all
+      steps:
+        - task: DotNetCoreCLI@2
+          displayName: "Install Stryker"
+          inputs:
+            command: custom
+            custom: tool
+            arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools
+        - task: Powershell@2
+          displayName: "Run Stryker"
+          inputs:
+            workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+            targetType: 'inline'
+            pwsh: true
+            script: $(Agent.BuildDirectory)/tools/dotnet-stryker
+        - task: PublishMutationReport@0
+          displayName: 'Publish Strkyer Mutator Report'
+          inputs:
+            reportPattern: '**/mutation-report.html'
+
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
     dependsOn: []
@@ -681,6 +707,14 @@ stages:
                     artifactName: 'functionaltests'
                     downloadPath: '$(Build.SourcesDirectory)'
 
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Terraform Artifact"
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'terraformartifact'
+                    downloadPath: '$(Build.SourcesDirectory)'
+
                 - task: FileTransform@2
                   displayName: "File Transform: functionaltests"
                   inputs:
@@ -694,17 +728,59 @@ stages:
                     packageType: sdk
                     version: $(SdkVersion)
 
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
+                  condition: always()
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+
                 - task: DotNetCoreCLI@2
-                  displayName: "Run Functional tests"
+                  displayName: "Run Functional tests AIOEnabled"
                   inputs:
                     command: "test"
                     projects: |
                       **/*FunctionalTest*.dll
                       !**/*TestAdapter.dll
                       !**/obj/**
-                    arguments: '--filter Category=SmokeTest'
+                    arguments: '--filter Category=SmokeTest-AIOEnabled'
                     testRunTitle: "QA-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
+                  condition: always()
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIODisabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=SmokeTest-AIODisabled'
+                    testRunTitle: "QA-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration"
+                  condition: always()
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests

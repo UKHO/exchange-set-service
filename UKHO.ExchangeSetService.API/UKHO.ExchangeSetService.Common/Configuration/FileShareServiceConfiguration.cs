@@ -1,5 +1,8 @@
-﻿namespace UKHO.ExchangeSetService.Common.Configuration
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace UKHO.ExchangeSetService.Common.Configuration
 {
+    [ExcludeFromCodeCoverage]
     public class FileShareServiceConfiguration
     {
         public string BaseUrl { get; set; }
