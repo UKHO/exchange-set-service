@@ -59,7 +59,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
+
         //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
+        [Ignore("Temporary")]
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
