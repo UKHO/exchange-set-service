@@ -95,7 +95,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string AioExchangeSetFileName { get; set; }
             public List<string> AioExchangeSetBatchIds { get; set; }
             public string ExchangeSetSerialAioFile { get; set; }
-            public string AioEncTempPath { get; set; }
         }
 
         public TestConfiguration()
