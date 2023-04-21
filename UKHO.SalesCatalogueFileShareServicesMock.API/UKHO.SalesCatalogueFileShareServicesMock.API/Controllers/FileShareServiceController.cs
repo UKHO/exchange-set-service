@@ -96,6 +96,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             if (!string.IsNullOrEmpty(fileName))
             {
+                if (fileName.Contains(".zip"))
+                {
+                    var setZipPath = Path.Combine(configuration["HOME"], fileShareServiceConfiguration.Value.FolderDirectoryName, batchId, fileName);
+                    if (!System.IO.File.Exists(setZipPath))
+                    {
+                        return NotFound();
+                    }
+                }
                 bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
             }
 
