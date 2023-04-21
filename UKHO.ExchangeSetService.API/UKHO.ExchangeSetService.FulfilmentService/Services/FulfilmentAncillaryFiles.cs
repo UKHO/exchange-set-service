@@ -463,7 +463,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
+        public async Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
             bool checkSerialAioFileCreated = false;
             if (!string.IsNullOrWhiteSpace(aioExchangeSetPath))
@@ -471,7 +471,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string serialFilePath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.SerialAioFileName);
 
                 fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
-                fileSystemHelper.CreateFile(serialFilePath);
+
+                string cdType = GetCdType(salesCatalogueDataResponse.ResponseBody, aioExchangeSetPath);////Get cdType BASE/UPDATE
+                int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
+
+                var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}{cdType}      {2:D2}.00\x0b\x0d\x0a";
+
+                fileSystemHelper.CreateFileContent(serialFilePath, serialFileContent);
                 await Task.CompletedTask;
 
                 if (fileSystemHelper.CheckFileExists(serialFilePath))
@@ -519,5 +525,25 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
+        /// <summary>
+        /// return cdType, BASE when base '0' folder and product with '.000' extension found in Aio Exchangeset
+        /// </summary>
+        /// <param name="salesCatalogueDataProductResponses"></param>
+        /// <param name="aioExchangeSetPath"></param>
+        /// <returns></returns>
+        private string GetCdType(List<SalesCatalogueDataProductResponse> salesCatalogueDataProductResponses, string aioExchangeSetPath)
+        {
+            string cdType = "UPDATE";
+            foreach (var response in salesCatalogueDataProductResponses)
+            {
+                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2], response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0", response.ProductName + ".000");
+                if (fileSystemHelper.CheckFileExists(path))
+                {
+                    cdType = "BASE";
+                    break;
+                }
+            }
+            return cdType;
+        }
     }
 }

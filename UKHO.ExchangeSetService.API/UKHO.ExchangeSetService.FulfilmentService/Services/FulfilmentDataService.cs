@@ -726,19 +726,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetInfoPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.Info);
 
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
-            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse);
             await CreateProductFileForAio(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
             await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId);
         }
 
-        private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
+        private async Task CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
                       EventIds.CreateSerialAioFileRequestCompleted,
                       "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId);
+                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse);
                       },
                   batchId, correlationId);
         }
