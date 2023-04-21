@@ -61,7 +61,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
-        [Ignore("Temporary")]
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
