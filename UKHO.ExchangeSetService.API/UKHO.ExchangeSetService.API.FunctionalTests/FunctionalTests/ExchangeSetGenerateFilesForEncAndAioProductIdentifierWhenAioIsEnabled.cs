@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -21,6 +22,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private SalesCatalogueApiClient ScsApiClient { get; set; }
         private string ScsJwtToken { get; set; }
 
+        private FssApiClient FssApiClient { get; set; }
+        private readonly List<string> LargeExchangeSetFolderName = new List<string>();
+        private string batchId;
+
         //Product Backlog Item 76440: ESS : Creation of AIO.zip and uploading to FSS with ENC Exchange Set
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -32,8 +37,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FssJwtToken = await authTokenProvider.GetFssToken();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
+            FssApiClient = new FssApiClient();
             DataHelper = new DataHelper();
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForEncAndAio(), accessToken: EssJwtToken);
+            //Get the BatchId
+            batchId = await ApiEssResponse.GetBatchId();
             DownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(ApiEssResponse, FssJwtToken);
         }
 
@@ -112,6 +120,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
                 bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
                 Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallEssWithAioProductAndAioIsEnabled_ThenLargeMediaZipsShouldNotBeAvailable()
+        {
+            LargeExchangeSetFolderName.Add(Config.POSConfig.LargeExchangeSetFolderName1 + ".zip");
+            LargeExchangeSetFolderName.Add(Config.POSConfig.LargeExchangeSetFolderName2 + ".zip");
+
+            foreach (string folderName in LargeExchangeSetFolderName)
+            {
+                string downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{folderName}";
+
+                var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: FssJwtToken);
+                Assert.AreEqual(404, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
+            }
         }
 
         [OneTimeTearDown]
