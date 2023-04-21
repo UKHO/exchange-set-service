@@ -25,6 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
+            await Task.Delay(30000);
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();

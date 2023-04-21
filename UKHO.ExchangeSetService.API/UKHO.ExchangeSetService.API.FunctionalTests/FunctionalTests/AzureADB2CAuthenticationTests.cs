@@ -23,6 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [SetUp]
         public async Task SetupAsync()
         {
+            await Task.Delay(30000);
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             FssApiClient = new FssApiClient();
