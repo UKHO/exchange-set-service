@@ -472,7 +472,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
 
-                string cdType = GetCdType(salesCatalogueDataResponse.ResponseBody, aioExchangeSetPath);////Get cdType BASE/UPDATE
+                string cdType = GetCdType(salesCatalogueDataResponse.ResponseBody, aioExchangeSetPath); //Get cdType BASE/UPDATE
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
 
                 var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}{cdType}      {2:D2}.00\x0b\x0d\x0a";
@@ -536,7 +536,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             string cdType = "UPDATE";
             foreach (var response in salesCatalogueDataProductResponses)
             {
-                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2], response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0", response.ProductName + ".000");
+                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2], 
+                                           response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0",
+                                           response.ProductName + ".000");
                 if (fileSystemHelper.CheckFileExists(path))
                 {
                     cdType = "BASE";
