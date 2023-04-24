@@ -1930,7 +1930,7 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
+            1
           ],
           "dates": [
             {
@@ -1945,7 +1945,7 @@
     }
   },
   {
-    "id": "productVersion-GB800001-31-0-DE4NO18Q-2-1",
+    "id": "productVersion-GB800001-31-0-DE4NO18Q-2-0",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 2,
@@ -1985,7 +1985,7 @@
             {
               "issueDate": "2021-03-10T00:00:00.0000000Z",
               "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 1
             }
           ],
           "fileSize": 2290,
