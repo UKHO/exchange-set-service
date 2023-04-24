@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Compression;
+using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
@@ -93,14 +94,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             if (stream != null)
             {
+                var extendedAsciiEncoding = Encoding.GetEncoding("iso-8859-1");
                 CreateFileCopy(filePath, stream);
-                using StreamReader reader = new StreamReader(stream);
-                string secondLineText = string.Empty;
-                secondLineText = GetLine(filePath);
-                string text = File.ReadAllText(filePath);
+                var text = File.ReadAllText(filePath, extendedAsciiEncoding);
+                var secondLineText = GetLine(filePath);
                 text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
                 if (!string.IsNullOrWhiteSpace(text))
-                    File.WriteAllText(filePath, text);
+                    File.WriteAllText(filePath, text, extendedAsciiEncoding);
                 return true;
             }
             return false;
