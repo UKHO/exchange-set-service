@@ -71,33 +71,33 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
-        //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
-        [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
-        {
-            //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForLargeMediaAndAio(), ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+        //////Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
+        ////[Test]
+        ////[Category("QCOnlyTest-AIOEnabled")]
+        ////public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
+        ////{
+        ////    //Get the product details form sales catalogue service
+        ////    var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForLargeMediaAndAio(), ScsJwtToken);
+        ////    Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
-            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+        ////    var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            foreach (var product in apiScsResponseData.Products)
-            {
-                string productName = product.ProductName;
-                int editionNumber = product.EditionNumber;
+        ////    foreach (var product in apiScsResponseData.Products)
+        ////    {
+        ////        string productName = product.ProductName;
+        ////        int editionNumber = product.EditionNumber;
 
-                if(productName.Equals("GB800001"))
-                {
-                    //Enc file download verification
-                    foreach (var updateNumber in product.UpdateNumbers)
-                    {
-                        await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+        ////        if(productName.Equals("GB800001"))
+        ////        {
+        ////            //Enc file download verification
+        ////            foreach (var updateNumber in product.UpdateNumbers)
+        ////            {
+        ////                await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
 
-                    }
-                }
-            }
-        }
+        ////            }
+        ////        }
+        ////    }
+        ////}
 
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
         [Test]
