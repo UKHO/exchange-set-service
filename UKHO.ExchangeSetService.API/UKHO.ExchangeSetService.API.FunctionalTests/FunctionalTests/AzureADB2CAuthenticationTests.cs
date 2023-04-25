@@ -23,7 +23,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [SetUp]
         public async Task SetupAsync()
         {
-            await Task.Delay(30000);
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             FssApiClient = new FssApiClient();
@@ -33,6 +32,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FssJwtToken = await authTokenProvider.GetFssToken();
             EssB2CCustomizedToken = b2cAuthTokenProvider.GenerateCustomToken();
             DataHelper = new DataHelper();
+            await Task.Delay(30000);
         }
 
         #region Set DateTime Api

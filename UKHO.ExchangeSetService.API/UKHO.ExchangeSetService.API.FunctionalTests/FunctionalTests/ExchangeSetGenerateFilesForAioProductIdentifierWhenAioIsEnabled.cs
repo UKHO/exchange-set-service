@@ -29,7 +29,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            await Task.Delay(30000);
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
@@ -39,6 +38,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsJwtToken = await authTokenProvider.GetScsToken();
             FssApiClient = new FssApiClient();
             DataHelper = new DataHelper();
+            await Task.Delay(30000);
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForAioOnly(), accessToken: EssJwtToken);
             //Get the BatchId
             batchId = await ApiEssResponse.GetBatchId();
