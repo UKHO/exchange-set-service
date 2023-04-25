@@ -1,7 +1,6 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -12,30 +11,38 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     [ExcludeFromCodeCoverage]
     public class AzureBlobStorageClient : IAzureBlobStorageClient
     {
-        public async Task<CloudBlockBlob> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
+        public async Task<BlockBlobClient> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
         {
-            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
+            ///CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString) RHZ
+            var cloudStorageAccount = new BlobServiceClient(storageAccountConnectionString);
+
+            ///CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient()
+            ///CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName)
+            BlobContainerClient cloudBlobContainer = cloudStorageAccount.GetBlobContainerClient(containerName);
+
             await cloudBlobContainer.CreateIfNotExistsAsync();
-            CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
+
+            ///CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName)
+            BlockBlobClient cloudBlockBlob = cloudBlobContainer.GetBlockBlobClient(fileName); 
+            
             return cloudBlockBlob;
         }
 
-        public CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString)
+        public BlockBlobClient GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString)
         {
-            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            return new CloudBlockBlob(new Uri(uri), cloudStorageAccount.Credentials);
+            ///CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString)
+            var cloudStorageAccount = new BlobServiceClient(storageAccountConnectionString);
+            return new BlockBlobClient(new Uri(uri), cloudStorageAccount.Credential);
         }
 
-        public async Task UploadFromStreamAsync(CloudBlockBlob cloudBlockBlob,MemoryStream ms)
+        public async Task UploadFromStreamAsync(BlockBlobClient cloudBlockBlob,MemoryStream ms)
         {
-            await cloudBlockBlob.UploadFromStreamAsync(ms);
+            await cloudBlockBlob.UploadAsync(ms);
         }
 
-        public async Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob)
+        public async Task<string> DownloadTextAsync(BlockBlobClient cloudBlockBlob)
         {
-             return await cloudBlockBlob.DownloadTextAsync();
+             return await cloudBlockBlob.DownloadTextAsync();  //RHZ
         }
 
         public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)

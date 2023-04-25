@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Azure;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -138,7 +139,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
-                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
+                            BlockBlobClient cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
 
                             //Added to check blob exception
                             try
@@ -146,7 +147,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
                                 updateNumbers.Add(itemUpdateNumber.Value);
                             }
-                            catch (StorageException storageEx) when (storageEx.Message.Contains("The specified blob does not exist"))
+                            catch (RequestFailedException storageEx) when (storageEx.ErrorCode == BlobErrorCode.BlobNotFound)
                             {
                                 logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, storageEx.Message);
                             }
@@ -165,11 +166,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
-            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
+            BlockBlobClient cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
+            cloudBlockBlob.SetHttpHeaders(new BlobHttpHeaders { ContentType = CONTENT_TYPE });
             if (!await cloudBlockBlob.ExistsAsync())
             {
-                await cloudBlockBlob.UploadFromStreamAsync(stream);
+                await cloudBlockBlob.UploadAsync(stream);
             }
         }
 
