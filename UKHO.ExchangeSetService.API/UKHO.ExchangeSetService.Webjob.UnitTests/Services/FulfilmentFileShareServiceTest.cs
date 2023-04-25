@@ -80,7 +80,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
         }
 
-
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
             return new SalesCatalogueServiceResponseQueueMessage
@@ -136,6 +135,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var result = await fulfilmentFileShareService.SearchReadMeFilePath(batchId, null);
             Assert.IsNotEmpty(result);
         }
+
         [Test]
         public async Task WhenInvalidSearchReadMeFileRequest_ThenReturnEmptyFilePath()
         {

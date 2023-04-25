@@ -1,5 +1,4 @@
-﻿
-using Azure.Storage.Queues.Models;
+﻿using Azure.Storage.Queues.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,9 +13,9 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
+
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
-
     [ExcludeFromCodeCoverage]
     public class FulfilmentServiceJob
     {
@@ -111,7 +110,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public async Task CreateAndUploadErrorFileToFileShareService(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage, EventId eventId, string errorMessage, string batchFolderPath)
         {
-            var isErrorFileCommitted = false;
             fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
 
             var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
@@ -119,6 +117,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
             if (fileSystemHelper.CheckFileExists(errorFileFullPath))
             {
+                var isErrorFileCommitted = false;
                 var isUploaded = await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
 
                 if (isUploaded)
