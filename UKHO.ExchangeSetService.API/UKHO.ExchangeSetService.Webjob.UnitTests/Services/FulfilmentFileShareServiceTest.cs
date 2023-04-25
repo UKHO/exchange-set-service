@@ -25,8 +25,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public bool fakeIsZipFileCreated = false;
         private bool fakeIsBatchCommitted = false;
         public string fakeExchangeSetRootPath = @"D:\\Downloads\";
-        readonly string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-        readonly string fakeMediaFolderName = "M01X01.zip";
+        private readonly string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        private readonly string fakeMediaFolderName = "M01X01.zip";
         public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly string fakeExchangeSetZipPath = @"D:\Home\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
         private readonly string fakeCorrelationId = Guid.NewGuid().ToString();
