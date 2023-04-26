@@ -724,7 +724,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805179 - Request for creating products.txt file in aio exchange set is completed.
         /// </summary>
-        CreateProductFileRequestForAioCompleted = 805179
+        CreateProductFileRequestForAioCompleted = 805179,
+        /// <summary>
+        /// 805178 - Request for creating AIO exchange set failed.
+        /// </summary>
+        AIOExchangeSetCreatedWithError = 805180
     }
 
     public static class EventIdExtensions

@@ -35,6 +35,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IMonitorHelper monitorHelper;
         private readonly AioConfiguration aioConfiguration;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
+        private const string ZIPFILE = "zip";
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthFssTokenProvider authFssTokenProvider,
@@ -651,38 +652,77 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 bool isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
                 if (isWriteBlock)
                 {
+                    isUploadZipFile = true;
                     DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
                     monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
-                    BatchStatus batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, customFileInfo);
-                    if (batchStatus == BatchStatus.Committed)
-                    {
-                        isUploadZipFile = true;
-                    }
-                    logger.LogInformation(EventIds.BatchStatus.ToEventId(), "BatchStatus:{batchStatus} for file:{fileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, fileName, batchId, correlationId);
                 }
             }
             return isUploadZipFile;
         }
 
-        public async Task<BatchStatus> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, CustomFileInfo customFileInfo)
+        //Commit and check batch status of ENC / AIO / Error.txt batch to FSS
+        public async Task<bool> CommitBatchToFss(string batchId, string correlationId, string exchangeSetZipPath, string fileName = ZIPFILE)
         {
-            var batchCommitMetaData = new BatchCommitMetaData()
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+            bool isBatchCommitted = false;
+            var batchCommitMetaDataList = new List<BatchCommitMetaData>();
+
+            if (fileName == ZIPFILE)
             {
-                BatchId = batchId,
-                AccessToken = accessToken,
-                FileName = customFileInfo.Name,
-                FullFileName = customFileInfo.FullName
-            };
+                //Get zip files full path
+                string[] exchangeSetZipList = fileSystemHelper.GetFiles(exchangeSetZipPath).Where(di => di.Contains(ZIPFILE)).ToArray();
+
+                foreach (var zipFileName in exchangeSetZipList)
+                {
+                    CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(zipFileName);
+
+                    var batchCommitMetaData = new BatchCommitMetaData()
+                    {
+                        BatchId = batchId,
+                        AccessToken = accessToken,
+                        FileName = customFileInfo.Name,
+                        FullFileName = customFileInfo.FullName
+                    };
+
+                    batchCommitMetaDataList.Add(batchCommitMetaData);
+                }
+            }
+            else
+            {
+                CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipPath, fileName));
+
+                var batchCommitMetaData = new BatchCommitMetaData()
+                {
+                    BatchId = batchId,
+                    AccessToken = accessToken,
+                    FileName = customFileInfo.Name,
+                    FullFileName = customFileInfo.FullName
+                };
+
+                batchCommitMetaDataList.Add(batchCommitMetaData);
+            }
+
+            BatchStatus batchStatus = await CommitAndGetBatchStatus(batchId, correlationId, accessToken, batchCommitMetaDataList);
+            if (batchStatus == BatchStatus.Committed)
+            {
+                isBatchCommitted = true;
+            }
+            logger.LogInformation(EventIds.BatchStatus.ToEventId(), "BatchStatus:{batchStatus} for file:{fileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, GetFileNameOfCommittedBatch(batchCommitMetaDataList), batchId, correlationId);
+            return isBatchCommitted;
+        }
+
+        private async Task<BatchStatus> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, List<BatchCommitMetaData> batchCommitMetaDataList)
+        {
             DateTime commitTaskStartedAt = DateTime.UtcNow;
-            bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaData, correlationId);
+            bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaDataList, correlationId);
             BatchStatus batchStatus = BatchStatus.CommitInProgress;
             if (isUploadCommitBatchCompleted)
             {
                 var batchStatusMetaData = new BatchStatusMetaData()
                 {
                     AccessToken = accessToken,
-                    BatchId = batchId,
-                    FileName = customFileInfo.Name
+                    BatchId = batchId
                 };
                 var watch = new Stopwatch();
                 watch.Start();
@@ -692,7 +732,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     if (batchStatus == BatchStatus.Failed)
                     {
                         watch.Stop();
-                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
+                        logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatusMetaData.BatchId, correlationId);
                         throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
 
                     }
@@ -701,14 +741,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (batchStatus != BatchStatus.Committed)
                 {
                     watch.Stop();
-                    logger.LogError(EventIds.BatchCommitTimeout.ToEventId(), "Batch Commit Status timeout with BatchStatus:{batchStatus} for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, customFileInfo.Name, batchStatusMetaData.BatchId, correlationId);
+                    logger.LogError(EventIds.BatchCommitTimeout.ToEventId(), "Batch Commit Status timeout with BatchStatus:{batchStatus} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, batchStatusMetaData.BatchId, correlationId);
                     throw new FulfilmentException(EventIds.BatchCommitTimeout.ToEventId());
                 }
                 watch.Stop();
             }
             else
             {
-                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for file:{Name} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", customFileInfo.Name, batchId, correlationId);
+                logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
             }
             DateTime commitTaskCompletedAt = DateTime.UtcNow;
@@ -846,46 +886,53 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     }, writeBlocksToFileMetaData.FileName, writeBlocksToFileMetaData.BatchId, correlationId);
         }
 
-        public Task<bool> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData, string correlationId)
+        public Task<bool> UploadCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList, string correlationId)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadCommitBatchStart, EventIds.UploadCommitBatchCompleted,
                 "Upload Commit Batch for FileName:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    List<FileDetail> fileDetails = fileSystemHelper.UploadCommitBatch(batchCommitMetaData);
+                    List<FileDetail> fileDetails = fileSystemHelper.UploadLargeMediaCommitBatch(batchCommitMetaDataList);
                     var batchCommitModel = new BatchCommitModel()
                     {
                         FileDetails = fileDetails
                     };
 
                     HttpResponseMessage httpResponse;
-                    httpResponse = await fileShareServiceClient.CommitBatchAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, batchCommitMetaData.BatchId, batchCommitModel, batchCommitMetaData.AccessToken, correlationId);
+                    httpResponse = await fileShareServiceClient.CommitBatchAsync(HttpMethod.Put, fileShareServiceConfig.Value.BaseUrl, batchCommitMetaDataList[0].BatchId, batchCommitModel, batchCommitMetaDataList[0].AccessToken, correlationId);
                     if (!httpResponse.IsSuccessStatusCode)
                     {
-                        logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error in Upload Commit Batch with uri:{RequestUri} responded with {StatusCode} for FileName:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchCommitMetaData.FileName, batchCommitMetaData.BatchId, correlationId);
+                        logger.LogError(EventIds.UploadCommitBatchNonOkResponse.ToEventId(), "Error in Upload Commit Batch with uri:{RequestUri} responded with {StatusCode} for FileName:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, GetFileNameOfCommittedBatch(batchCommitMetaDataList), batchCommitMetaDataList[0].BatchId, correlationId);
                         throw new FulfilmentException(EventIds.UploadCommitBatchNonOkResponse.ToEventId());
                     }
                     return true;
-                }, batchCommitMetaData.FileName, batchCommitMetaData.BatchId, correlationId);
+                }, GetFileNameOfCommittedBatch(batchCommitMetaDataList),
+                batchCommitMetaDataList[0].BatchId, correlationId);
+        }
+
+        private static string GetFileNameOfCommittedBatch(List<BatchCommitMetaData> batchCommitMetaDataList)
+        {
+            return batchCommitMetaDataList.ElementAtOrDefault(1) == null ? batchCommitMetaDataList[0].FileName :
+                            batchCommitMetaDataList[0].FileName + " and " + batchCommitMetaDataList[1].FileName;
         }
 
         public Task<BatchStatus> GetBatchStatus(BatchStatusMetaData batchStatusMetaData, string correlationId)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.GetBatchStatusStart, EventIds.GetBatchStatusCompleted,
-                "Get Batch Status for FileName:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                "Get Batch Status for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
                     HttpResponseMessage httpResponse;
                     httpResponse = await fileShareServiceClient.GetBatchStatusAsync(HttpMethod.Get, fileShareServiceConfig.Value.BaseUrl, batchStatusMetaData.BatchId, batchStatusMetaData.AccessToken);
                     if (!httpResponse.IsSuccessStatusCode)
                     {
-                        logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error in Get Batch Status with uri:{RequestUri} responded with {StatusCode} for FileName:{FileName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchStatusMetaData.FileName, batchStatusMetaData.BatchId, correlationId);
+                        logger.LogError(EventIds.GetBatchStatusNonOkResponse.ToEventId(), "Error in Get Batch Status with uri:{RequestUri} responded with {StatusCode} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchStatusMetaData.BatchId, correlationId);
                         throw new FulfilmentException(EventIds.GetBatchStatusNonOkResponse.ToEventId());
                     }
                     string bodyJson = await httpResponse.Content.ReadAsStringAsync();
                     ResponseBatchStatusModel responseBatchStatusModel = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(bodyJson);
                     return (BatchStatus)Enum.Parse(typeof(BatchStatus), responseBatchStatusModel.Status.ToString());
-                }, batchStatusMetaData.FileName, batchStatusMetaData.BatchId, correlationId);
+                }, batchStatusMetaData.BatchId, correlationId);
         }
 
         #region LargeMediaExchangeSet 

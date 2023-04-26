@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
@@ -93,11 +94,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
                 return StatusCode(StatusCodes.Status307TemporaryRedirect);
             }
-            if (!string.IsNullOrEmpty(fileName) )
+            if (!string.IsNullOrEmpty(fileName))
             {
                 bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
             }
-         
+
             return File(bytes, "application/octet-stream", fileName);
         }
 

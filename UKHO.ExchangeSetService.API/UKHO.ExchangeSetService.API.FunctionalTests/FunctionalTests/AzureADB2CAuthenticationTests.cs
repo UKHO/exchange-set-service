@@ -32,6 +32,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FssJwtToken = await authTokenProvider.GetFssToken();
             EssB2CCustomizedToken = b2cAuthTokenProvider.GenerateCustomToken();
             DataHelper = new DataHelper();
+            await Task.Delay(30000);
         }
 
         #region Set DateTime Api
@@ -67,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssB2CToken);
@@ -113,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifiersApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssB2CToken);
@@ -171,7 +172,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithAValidB2cToken_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new List<ProductVersionModel>

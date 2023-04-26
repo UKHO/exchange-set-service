@@ -15,7 +15,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CreateZipFile(string rootPath, string zipFileName);
         CustomFileInfo GetFileInfo(string filePath);
         byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData);
-        List<FileDetail> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData);
         void CreateFileContentWithBytes(string outputFileName, byte[] content);
         bool CheckFileExists(string filePath);
         byte[] ReadAllBytes(string filePath);
@@ -31,5 +30,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         string GetFileName(string fileFullPath);
         TextWriter WriteStream(string filePath);
         void CreateFile(string filePath);
+        IDirectoryInfo[] GetSubDirectories(string folderPath);
+        IFileInfo[] GetZipFiles(string folderPath);
     }
 }

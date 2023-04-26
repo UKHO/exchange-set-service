@@ -29340,6 +29340,66 @@
           }
         }
       ]
+    },
+    {
+      "batchId": "db4be5f8-7791-4b4f-aebf-01b55c3d6975",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "31"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:24:38.737Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB800001.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "UI+tf5JA2vkQg3jshJ59uw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/db4be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.000"
+            }
+          }
+        },
+        {
+          "filename": "GB800001.001",
+          "fileSize": 8208,
+          "mimeType": "application/s63",
+          "hash": "x3BKBRQUy2NBCnWxI8ywUw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "56346F59"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/db4be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.001"
+            }
+          }
+        }
+      ]
     }
   ],
   "_Links": {

@@ -72,21 +72,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return byteData;
         }
 
-        public List<FileDetail> UploadCommitBatch(BatchCommitMetaData batchCommitMetaData)
-        {
-            FileInfo fileInfo = new FileInfo(batchCommitMetaData.FullFileName);
-            using var fs = fileInfo.OpenRead();
-            var fileMd5Hash = CommonHelper.CalculateMD5(fs);
-            List<FileDetail> fileDetails = new List<FileDetail>();
-            FileDetail fileDetail = new FileDetail()
-            {
-                FileName = fileInfo.Name,
-                Hash = Convert.ToBase64String(fileMd5Hash)
-            };
-            fileDetails.Add(fileDetail);
-            return fileDetails;
-        }
-
         public void CreateFileContentWithBytes(string outputFileName, byte[] content)
         {
             using (var output = File.OpenWrite(outputFileName))
@@ -217,6 +202,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var file = _fileSystem.File.Create(filePath);
                 file.Close();
             }    
+        }
+
+        public IDirectoryInfo[] GetSubDirectories(string folderPath)
+        {
+            IDirectoryInfo di = _fileSystem.DirectoryInfo.New(folderPath);
+            IDirectoryInfo[] dir = di.GetDirectories();
+            return dir;
+        }
+
+        public IFileInfo[] GetZipFiles(string folderPath)
+        {
+            IDirectoryInfo di = _fileSystem.DirectoryInfo.New(folderPath);
+            return di.GetFiles("*.zip");
         }
     }
 }
