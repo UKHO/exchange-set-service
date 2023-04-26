@@ -305,7 +305,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 A.CallTo(() => fakeDirectoryInfo.FullName).Returns(fakeFileShareServiceConfig.Value.ExchangeSetFileFolder);
                 A.CallTo(() => fakeDirectoryInfo.GetDirectories()).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
             }
-            else if (exchangeSetType == "AIO")
+            else if (exchangeSetType == AioExchangeSet)
             {
                 A.CallTo(() => fakeDirectoryInfo.Name).Returns(fakeFileShareServiceConfig.Value.AioExchangeSetFileFolder);
                 A.CallTo(() => fakeDirectoryInfo.FullName).Returns(fakeFileShareServiceConfig.Value.AioExchangeSetFileFolder);
@@ -352,7 +352,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(true);
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
-            IDirectoryInfo fakeDirectoryInfo = GetSubDirectories("V01X01");
+            IDirectoryInfo fakeDirectoryInfo = GetSubDirectories(EncExchangeSet);
             A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
             IFileInfo[] fileInfos = GetZipFiles();
             A.CallTo(() => fakeFileSystemHelper.GetZipFiles(A<string>.Ignored)).Returns(fileInfos);
