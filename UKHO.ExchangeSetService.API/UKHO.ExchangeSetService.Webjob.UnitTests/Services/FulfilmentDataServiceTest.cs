@@ -360,6 +360,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string salesCatalogueResponseFile = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
             Assert.AreEqual("Exchange Set Created Successfully", salesCatalogueResponseFile);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateProductFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -577,7 +587,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CommitExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<DateTime>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
@@ -589,7 +599,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
             IFileInfo[] fileInfos = GetZipFiles();
             A.CallTo(() => fakeFileSystemHelper.GetZipFiles(A<string>.Ignored)).Returns(fileInfos);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFileForAio(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
             string result = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
@@ -600,8 +609,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create catalog file request for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.CreateSerialAioFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileForAioRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
             Assert.AreEqual("Exchange Set Created Successfully", result);
         }
@@ -638,7 +652,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
             A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFileForAio(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
             string result = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
 
@@ -690,21 +703,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
                 A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFileForAio(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<DateTime>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
 
             string result = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
-
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateProductFileRequestForAioStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create aio exchange set product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create catalog file request for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
             Assert.AreEqual("Large Media Exchange Set Created Successfully", result);
         }
@@ -862,7 +865,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
                 A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFileForAio(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
             IDirectoryInfo fakeDirectoryInfo = GetSubDirectories(AioExchangeSet);
             A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
