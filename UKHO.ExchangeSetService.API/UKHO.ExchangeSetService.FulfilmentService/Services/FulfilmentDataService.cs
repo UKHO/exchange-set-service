@@ -98,7 +98,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
                                                          .Where(x => aioItems.Any(y => y.ProductName.Equals(x.ProductName))).ToList();
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio);
+                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
                 }
             }
             else
@@ -169,7 +169,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
                                                                                         .Where(x => aioItems.Any(y => y.ProductName == x.ProductName)).ToList();
-                    isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse);
+                    isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
 
                     if (!isExchangeSetFolderCreated)
                     {
@@ -636,7 +636,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         #region AIO Exchanges Set
 
-        private async Task<bool> CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
+        private async Task<bool> CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems, SalesCatalogueDataResponse salesCatalogueEssDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
             var aioExchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -682,7 +682,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
 
-            return await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId, salesCatalogueEssDataResponse, message.ScsRequestDateTime);
+            return await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId, salesCatalogueEssDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, listFulfilmentAioData);
         }
 
         #endregion
@@ -779,7 +779,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isExchangeSetFolderCreated;
         }
 
-        private async Task<bool> CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
+        private async Task<bool> CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, SalesCatalogueProductResponse salesCatalogueProductResponse, List<FulfilmentDataResponse> listFulfilmentAioData)
         {
             var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var exchangeSetInfoPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.Info);
@@ -788,7 +788,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId) &&
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId) &&
             await CreateProductFileForAio(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime) &&
-            await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId);
+            await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId, listFulfilmentAioData, salesCatalogueDataResponse, salesCatalogueProductResponse);
         }
 
         private async Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId)
@@ -803,30 +803,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                   batchId, correlationId);
 
             return isSerialAioCreated;
-        }
-
-        //Added this method temporarily. We will use existing method implementation Ref. CreateCatalogFile() while adding contents to this file.
-        private async Task<bool> CreateCatalogFileForAio(string batchId, string exchangeSetRootPath, string correlationId)
-        {
-            bool isFileCreated = false;
-
-            if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
-            {
-                DateTime createCatalogFileForAioTaskStartedAt = DateTime.UtcNow;
-                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
-                        EventIds.CreateCatalogFileRequestCompleted,
-                        "Create catalog file request for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulfilmentAncillaryFiles.CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId);
-                        },
-                        batchId, correlationId);
-
-                DateTime createCatalogFileForAioTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileForAioTaskStartedAt, createCatalogFileForAioTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isFileCreated;
         }
 
         private async Task<bool> CreateProductFileForAio(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
@@ -850,6 +826,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             return isProductFileCreated;
+        }
+
+        public async Task<bool> CreateCatalogFileForAio(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        {
+            bool isFileCreated = false;
+
+            if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
+            {
+                DateTime createCatalogFileForAioTaskStartedAt = DateTime.UtcNow;
+                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileForAioRequestStart,
+                        EventIds.CreateCatalogFileForAioRequestCompleted,
+                        "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                        async () =>
+                        {
+                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
+                        },
+                        batchId, correlationId);
+
+                DateTime createCatalogFileForAioTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileForAioTaskStartedAt, createCatalogFileForAioTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+
+            return isFileCreated;
         }
     }
 }
