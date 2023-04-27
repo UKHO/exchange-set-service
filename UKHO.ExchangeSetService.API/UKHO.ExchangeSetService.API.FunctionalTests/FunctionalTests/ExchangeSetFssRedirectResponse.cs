@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithProductIdentifiers_ThenARedirectResponseIsReturned()        {
            
             string fssDownLoadUrl = $"{Config.FssConfig.BaseUrl}/batch/e478ee2e-8602-44f6-b6fd-08075357c9f1/files/DE260001.000";
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithProductIdentifiers_ThenNoRedirectResponseIsReturned()
         {
             string fssDownLoadUrl = $"{Config.FssConfig.BaseUrl}/batch/6c5e2434-5a4b-4b4a-b865-49586a9767c6/files/DEJ60001.000";
