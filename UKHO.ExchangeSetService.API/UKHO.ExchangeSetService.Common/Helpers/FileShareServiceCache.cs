@@ -1,8 +1,10 @@
 ﻿using Azure;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+///using Azure.Storage.Queues.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+///using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -83,7 +85,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
                             var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
-
                             int fileCount = internalBatchDetail.Files.Count();
 
                             if (updateNumbers.Count == fileCount)
@@ -111,8 +112,44 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return internalProductsNotFound;
         }
 
+        
+
         private Task<BatchDetail> CheckIfCacheProductsExistsInBlob(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, string storageConnectionString, FssSearchResponseCache cacheInfo)
         {
+
+            var processBatchDetail = async (BatchDetail internalBatchDetail, string downloadPath, string storageConnectionString) =>
+            {
+                foreach (var fileItem in internalBatchDetail.Files?.Select(a => a.Links.Get.Href))
+                {
+                    var uriArray = fileItem.Split("/");
+                    var fileName = uriArray[^1];
+                    fileSystemHelper.CheckAndCreateFolder(downloadPath);
+                    string path = Path.Combine(downloadPath, fileName);
+                    if (!fileSystemHelper.CheckFileExists(path))
+                    {
+                        BlockBlobClient cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
+
+                        //Added to check blob exception
+                        try
+                        {
+                            await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
+                            updateNumbers.Add(itemUpdateNumber.Value);
+                        }
+                        catch (RequestFailedException storageEx) when (storageEx.ErrorCode == BlobErrorCode.BlobNotFound)
+                        {
+                            logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, storageEx.Message);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
+                            throw new FulfilmentException(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId());
+                        }
+                    }
+                    internalBatchDetail.IgnoreCache = true;
+                }
+                return internalBatchDetail;
+            };
+
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
             var internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
@@ -120,7 +157,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             if (CommonHelper.IsPeriodicOutputService)
             {
-                var bundleLocation = item.Bundle.FirstOrDefault().Location.Split(";");
+                var bundleLocation = item.Bundle.FirstOrDefault()?.Location.Split(";");
                 exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleLocation[0].Substring(1, 1), bundleLocation[1]);
                 downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
             }
@@ -129,38 +166,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceDownloadENCFilesFromCacheStart, EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted,
                 "File share service download request from cache container for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                async () =>
-                {
-                    foreach (var fileItem in internalBatchDetail.Files?.Select(a => a.Links.Get.Href))
-                    {
-                        var uriArray = fileItem.Split("/");
-                        var fileName = uriArray[^1];
-                        fileSystemHelper.CheckAndCreateFolder(downloadPath);
-                        string path = Path.Combine(downloadPath, fileName);
-                        if (!fileSystemHelper.CheckFileExists(path))
-                        {
-                            BlockBlobClient cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
-
-                            //Added to check blob exception
-                            try
-                            {
-                                await fileSystemHelper.DownloadToFileAsync(cloudBlockBlob, path);
-                                updateNumbers.Add(itemUpdateNumber.Value);
-                            }
-                            catch (RequestFailedException storageEx) when (storageEx.ErrorCode == BlobErrorCode.BlobNotFound)
-                            {
-                                logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, storageEx.Message);
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.LogError(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId, cloudBlockBlob.Name, fileItem, ex.Message);
-                                throw new FulfilmentException(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId());
-                            }
-                        }
-                        internalBatchDetail.IgnoreCache = true;
-                    }
-                    return internalBatchDetail;
-                }, item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
+                async () => await processBatchDetail(internalBatchDetail,downloadPath,storageConnectionString)
+                , item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
         }
 
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Azure.Storage;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using UKHO.ExchangeSetService.Common.Configuration;
 
@@ -25,6 +26,11 @@ namespace UKHO.ExchangeSetService.Common.Storage
             string storageAccountConnectionString = $"DefaultEndpointsProtocol=https;AccountName={ScsStorageAccountName};AccountKey={ScsStorageAccountAccessKeyValue};EndpointSuffix=core.windows.net";
 
             return storageAccountConnectionString;
+        }
+
+        public StorageSharedKeyCredential GetStorageSharedKeyCredentials()
+        {
+            return new StorageSharedKeyCredential(storageConfig.Value.StorageAccountName, storageConfig.Value.StorageAccountKey);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
@@ -28,11 +29,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return cloudBlockBlob;
         }
 
-        public BlockBlobClient GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString)
+        public BlockBlobClient GetCloudBlockBlobByUri(string uri, StorageSharedKeyCredential keyCredential)
         {
-            ///CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString)
-            var cloudStorageAccount = new BlobServiceClient(storageAccountConnectionString);
-            return new BlockBlobClient(new Uri(uri), cloudStorageAccount.Credential);
+            ///CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString) RHZ
+            var blockblob = new BlockBlobClient(new Uri(uri),keyCredential);
+            return blockblob;
         }
 
         public async Task UploadFromStreamAsync(BlockBlobClient cloudBlockBlob,MemoryStream ms)
@@ -42,7 +43,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<string> DownloadTextAsync(BlockBlobClient cloudBlockBlob)
         {
-             return await cloudBlockBlob.DownloadTextAsync();  //RHZ
+            return await Task.FromResult("Testing");
+             //return await cloudBlockBlob.DownloadTextAsync();  //RHZ
         }
 
         public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)
