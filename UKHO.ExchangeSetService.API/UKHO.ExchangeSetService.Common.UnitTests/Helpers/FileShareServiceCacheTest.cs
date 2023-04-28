@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -164,10 +165,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var stream = new MemoryStream(Encoding.UTF8.GetBytes("test stream"));
             const string fileName = "file name";
             const string batchId = "batch id";
+            var mockUri = new Uri("http://tempuri.org/blob");
+            var mockCreds = new StorageSharedKeyCredential("test", "test");
+
             var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
 
-            var cloudBlob = A.Fake<BlockBlobClient>(o => o.WithArgumentsForConstructor(() => new BlockBlobClient(new Uri("http://tempuri.org/blob"),A<BlobClientOptions>.Ignored)));
-            ///var cloudBlob = A.Fake<BlockBlobClient>();
+            var cloudBlob = A.Fake<BlockBlobClient>();
+            A.CallTo(() => cloudBlob).Invokes(() => new BlockBlobClient(mockUri, mockCreds)).Returns(cloudBlob);
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId)).Returns(cloudBlob);
             ///A.CallTo(() => cloudBlob.ExistsAsync(A<CancellationToken>.Ignored)).Returns<bool>(ValueTask.FromResult( false)); 

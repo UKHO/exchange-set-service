@@ -122,10 +122,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotFound_ThenReturnKeyNotFoundException()
         {
-            //This test may be redundant as StorageAccountConnectionString not used Rhz
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
             string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
+            A.CallTo(() => fakeScsStorageService.GetStorageSharedKeyCredentials())
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()

@@ -60,6 +60,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
             Assert.AreEqual(expectedErrorMessage, ex.Message);
         }
 
+        [Test]
+        public void WhenInvalidStorageConfigIsProvided_ThenAKeynotfoundIsReturned()
+        {
+            fakeStorageConfig.Value.StorageAccountKey = "Test";
+            fakeStorageConfig.Value.StorageAccountName = "";
+            _ = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageSharedKeyCredentials());
+            fakeStorageConfig.Value.StorageAccountKey = "";
+            fakeStorageConfig.Value.StorageAccountName = "Test";
+            _ = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageSharedKeyCredentials());
+        }
+
+        [Test]
+        public void WhenValidStorageConfigIsInplace_ThenStorageKeyCredentialsReturned()
+        {
+            fakeStorageConfig.Value.StorageAccountKey = "Test";
+            var response = salesCatalogueStorageService.GetStorageSharedKeyCredentials();
+            Assert.NotNull(response);
+        }
+
         #endregion
     }
 }

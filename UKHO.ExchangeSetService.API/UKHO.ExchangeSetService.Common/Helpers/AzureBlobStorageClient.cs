@@ -31,7 +31,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public BlockBlobClient GetCloudBlockBlobByUri(string uri, StorageSharedKeyCredential keyCredential)
         {
-            ///CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString) RHZ
             var blockblob = new BlockBlobClient(new Uri(uri),keyCredential);
             return blockblob;
         }
