@@ -4,7 +4,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
 {
     public enum EventIds
     {
-        /*Event id range for ESS - 805000 to 805172 */
+        /*Event id range for ESS - 805000 to 805122 */
         /// <summary>
         /// 805000 - Request for sales catalogue service products sincedatetime endpoint is started.
         /// </summary>
