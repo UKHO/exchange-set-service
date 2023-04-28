@@ -29371,18 +29371,6 @@
       "expiryDate": null,
       "files": [
         {
-          "filename": "GB800001.000",
-          "fileSize": 874,
-          "mimeType": "text/plain",
-          "hash": "UI+tf5JA2vkQg3jshJ59uw==",
-          "attributes": [],
-          "links": {
-            "get": {
-              "href": "/batch/db4be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.000"
-            }
-          }
-        },
-        {
           "filename": "GB800001.001",
           "fileSize": 8208,
           "mimeType": "application/s63",

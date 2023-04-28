@@ -54,8 +54,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
-                bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+
+            //Product Backlog Item 71612: Add content to SERIAL.AIO file
+            //Verify Serial.AIO file content
+            FileContentHelper.CheckSerialAioFileContentForAioUpdate(Path.Combine(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile));
         }
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
@@ -64,11 +68,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public void WhenIDownloadAioZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
         {
 
-                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
-                //Verify README.TXT file content
-                FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
         //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
@@ -77,7 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
         {
             //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForEncAndAio(), ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
@@ -104,8 +108,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
-                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
 
             //Product Backlog Item 72019: Add content to PRODUCTS.TXT file
             //Verify Product.txt file content
@@ -122,8 +126,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenCatalog031IsAvailable()
         {
-                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
         }
 
         [Test]

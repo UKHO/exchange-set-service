@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -93,7 +92,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public class AioConfiguration
         {
             public string AioExchangeSetFileName { get; set; }
-            public List<string> AioExchangeSetBatchIds { get; set; }
             public string ExchangeSetSerialAioFile { get; set; }
         }
 
