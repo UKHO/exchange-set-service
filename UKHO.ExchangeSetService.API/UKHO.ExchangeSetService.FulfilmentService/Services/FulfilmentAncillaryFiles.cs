@@ -526,15 +526,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
 
         /// <summary>
-        /// return cdType, BASE when base '0' folder and product with '.000' extension found in Aio Exchangeset
+        /// BASE when base '0' folder and product with '.000' extension found in Aio Exchangeset else UPDATE
         /// </summary>
         /// <param name="salesCatalogueDataProductResponses"></param>
         /// <param name="aioExchangeSetPath"></param>
-        /// <returns></returns>
-        private string GetCdType(List<SalesCatalogueDataProductResponse> salesCatalogueDataProductResponses, string aioExchangeSetPath)
+        /// <returns> Returns CdType BASE/UPDATE </returns>
+        private string GetCdType(List<SalesCatalogueDataProductResponse> salesCatalogueDataAioProductResponse, string aioExchangeSetPath)
         {
             string cdType = "UPDATE";
-            foreach (var response in salesCatalogueDataProductResponses)
+            foreach (var response in salesCatalogueDataAioProductResponse)
             {
                 string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2], 
                                            response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0",
