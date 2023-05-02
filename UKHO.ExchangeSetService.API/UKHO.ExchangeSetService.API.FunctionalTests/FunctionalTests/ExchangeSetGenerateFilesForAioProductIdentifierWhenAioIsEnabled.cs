@@ -50,8 +50,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
-                bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+
+            //Product Backlog Item 71612: Add content to SERIAL.AIO file
+            //Verify Serial.AIO file content
+            FileContentHelper.CheckSerialAioFileContentForAioBase(Path.Combine(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile));
         }
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
@@ -60,11 +64,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public void WhenIDownloadAioZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
         {
 
-                bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
-                //Verify README.TXT file content
-                FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
         //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
@@ -83,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 string productName = product.ProductName;
                 int editionNumber = product.EditionNumber;
 
-                if(productName.Equals("GB800001"))
+                if (productName.Equals("GB800001"))
                 {
                     //Enc file download verification
                     foreach (var updateNumber in product.UpdateNumbers)
@@ -126,10 +130,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIOEnabled")]
         public async Task WhenICallEssWithAioProductAndAioIsEnabled_ThenLargeMediaZipsShouldNotBeAvailable()
         {
-            LargeExchangeSetFolderName.Add(Config.POSConfig.LargeExchangeSetFolderName1+".zip");
+            LargeExchangeSetFolderName.Add(Config.POSConfig.LargeExchangeSetFolderName1 + ".zip");
             LargeExchangeSetFolderName.Add(Config.POSConfig.LargeExchangeSetFolderName2 + ".zip");
 
-            foreach(string folderName in LargeExchangeSetFolderName)
+            foreach (string folderName in LargeExchangeSetFolderName)
             {
                 string downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{folderName}";
 
@@ -142,10 +146,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIOEnabled")]
         public async Task WhenICallEssWithAioProductAndAioIsEnabled_ThenV01X01ZipShouldNotBeAvailable()
         {
-                string downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.ExchangeSetFileName}";
+            string downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.ExchangeSetFileName}";
 
-                var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: FssJwtToken);
-                Assert.AreEqual(404, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
+            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: FssJwtToken);
+            Assert.AreEqual(404, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
         }
 
 

@@ -473,5 +473,45 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
             Assert.True(fileContent[4].Contains("GB800001"), $"Product File returned {fileContent[4]}, which does not contain expected GB800001.");
         }
+
+        public static void CheckSerialAioFileContentForAioBase(string inputFile)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+
+            //Store file content here
+            string[] fileContent = lines[0].Split(" ");
+
+            string dataServerAndWeek = fileContent[0];
+            string dateAndCdType = fileContent[3];
+            string formatVersionAndExchangeSetNumber = fileContent[9];
+
+            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+
+            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+        }
+
+        public static void CheckSerialAioFileContentForAioUpdate(string inputFile)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+
+            //Store file content here
+            string[] fileContent = lines[0].Split(" ");
+
+            string dataServerAndWeek = fileContent[0];
+            string dateAndCdType = fileContent[3];
+            string formatVersionAndExchangeSetNumber = fileContent[9];
+
+            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+
+            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.AreEqual(dateAndCdType, $"{currentDate}UPDATE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+        }
     }
 }

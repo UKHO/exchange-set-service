@@ -28,6 +28,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public IFileSystemHelper fakeFileSystemHelper;
         public FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
         public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        private readonly string _fakeCorrelationId = "48f53a95-0bd2-4c0c-a6ba-afded2bdffac";
         public string fakeExchangeSetPath = string.Empty;
         public string fakeAioExchangeSetPath = string.Empty;
         public string fakeExchangeSetRootPath = @"F:\\HOME";
@@ -471,38 +472,64 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateSerialAioFileRequest_ThenReturnFulfilmentException()
         {
-            bool checkAioSerialFileCreated= false;
-            fakeAioExchangeSetPath = @"C:\\HOME";
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
+            bool checkAioSerialFileCreated = false;
+
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true).Once().Then.Returns(checkAioSerialFileCreated);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeAioExchangeSetPath, null); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeExchangeSetRootPath, _fakeCorrelationId, GetSalesCatalogueDataResponse());});
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.SerialAioFileIsNotCreated.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating serial.aio file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path").MustHaveHappenedOnceExactly();
 
-            Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
-            Assert.AreEqual(false, checkAioSerialFileCreated);
+            Assert.IsFalse(checkAioSerialFileCreated);
+
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public async Task WhenValidCreateSerialAioFileRequest_ThenReturnTrueResponse()
         {
             bool checkAioSerialFileCreated = true;
-            fakeAioExchangeSetPath = @"C:\\HOME";
-            fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetInfoPath);
+                        
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(checkAioSerialFileCreated).Twice();
 
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
-            A.CallTo(() => fakeFileSystemHelper.CreateFile(A<string>.Ignored));
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
+            checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeExchangeSetRootPath, _fakeCorrelationId, GetSalesCatalogueDataResponse());
 
-            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeAioExchangeSetPath, null);
+            Assert.IsTrue(checkAioSerialFileCreated);
 
-            Assert.AreEqual(true, response);
-            Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
-            Assert.AreEqual(true, checkAioSerialFileCreated);
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public async Task WhenValidCreateSerialAioFileRequest_CdTypeUpdate_ThenReturnTrueResponse()
+        {
+            bool checkAioSerialFileCreated = true;
+                        
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false).Once().Then.Returns(checkAioSerialFileCreated);
+
+            checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, fakeExchangeSetRootPath, _fakeCorrelationId, GetSalesCatalogueDataResponse());
+
+            Assert.IsTrue(checkAioSerialFileCreated);
+
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public async Task WhenEmptyExchangeSetPathCreateSerialAioFileRequest_ThenReturnFalseResponse()
+        {
+            bool checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(fakeBatchId, string.Empty, _fakeCorrelationId, GetSalesCatalogueDataResponse());
+
+            Assert.IsFalse(checkAioSerialFileCreated);
+            Assert.IsFalse(fakeFileHelper.CheckAndCreateFolderIsCalled);
+
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
         }
 
         [Test]
@@ -517,11 +544,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, null);
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, _fakeCorrelationId);
 
-            Assert.AreEqual(true, response);
-            Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);
-            Assert.AreEqual(true, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+            Assert.IsTrue(response);
+            Assert.IsTrue(fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.IsTrue(fakeFileHelper.CreateFileContentWithBytesIsCalled);
             Assert.AreEqual(byteContent, fakeFileHelper.ReadAllBytes(fakeFileName));
         }
 
@@ -531,17 +558,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, null); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, _fakeCorrelationId); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.CatalogFileIsNotCreated.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating catalog.031 file for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            Assert.AreEqual(false, fakeFileHelper.CheckAndCreateFolderIsCalled);
-            Assert.AreEqual(false, fakeFileHelper.CreateFileContentWithBytesIsCalled);
+            Assert.IsFalse(fakeFileHelper.CheckAndCreateFolderIsCalled);
+            Assert.IsFalse(fakeFileHelper.CreateFileContentWithBytesIsCalled);
         }
         #endregion
-
     }
 }
