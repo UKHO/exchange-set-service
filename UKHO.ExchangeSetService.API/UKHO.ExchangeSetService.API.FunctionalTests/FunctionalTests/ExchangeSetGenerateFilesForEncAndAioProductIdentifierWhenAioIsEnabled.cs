@@ -52,6 +52,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+
+            //Product Backlog Item 71612: Add content to SERIAL.AIO file
+            //Verify Serial.AIO file content
+            FileContentHelper.CheckSerialAioFileContentForAioBase(Path.Combine(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile));
         }
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set

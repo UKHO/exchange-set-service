@@ -1,64 +1,61 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
+    [ExcludeFromCodeCoverage]
     public class AzureWebJobsHealthCheckClient : IAzureWebJobsHealthCheckClient
     {
-        private readonly IAzureWebJobsHealthCheckHttpClient azureWebJobsHealthCheckHttpClient;
-
-        public AzureWebJobsHealthCheckClient(IAzureWebJobsHealthCheckHttpClient azureWebJobsHealthCheckHttpClient)
+        static HttpClient httpClient = new HttpClient();
+        private readonly IWebHostEnvironment webHostEnvironment;
+        
+        public AzureWebJobsHealthCheckClient(IWebHostEnvironment webHostEnvironment)
         {
-            this.azureWebJobsHealthCheckHttpClient = azureWebJobsHealthCheckHttpClient; 
+            this.webHostEnvironment = webHostEnvironment;
         }
-
         public async Task<HealthCheckResult> CheckAllWebJobsHealth(List<WebJobDetails> webJobs)
         {
             try
             {
-                var jobsHealthCheckResults = new ConcurrentBag<(WebJobDetails webJobDetails, HealthCheckResult healthCheckResult)>();
-
-                await Parallel.ForEachAsync(webJobs, async (job, token) =>
+                string webJobDetail, webJobStatus = string.Empty;
+                foreach (var webJob in webJobs)
                 {
-                    jobsHealthCheckResults.Add(new (job, await azureWebJobsHealthCheckHttpClient.CheckHealth(job)));
-                });
-                
-                return GetHealthStatus(jobsHealthCheckResults);
+                    using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJob.WebJobUri);
+                    httpClient.DefaultRequestHeaders.Accept.Clear();
+                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", webJob.UserPassword);
+                    var response = await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, CancellationToken.None);
+
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var webJobDetails = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+                        webJobStatus = webJobDetails["status"];
+                        if (webJobStatus != "Running")
+                        {
+                            webJobDetail = $"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.ExchangeSetType}-{webJob.Instance} status is {webJobStatus}";
+                            return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(webJobDetail));
+                        }
+                    }
+                    else
+                    {
+                        return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception($"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.ExchangeSetType}-{webJob.Instance} status code is {response.StatusCode}"));
+                    }
+                }
+                return HealthCheckResult.Healthy("Azure webjob is healthy");
             }
             catch (Exception ex)
             {
                 return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(ex.Message));
             }
-        }
-
-        private HealthCheckResult GetHealthStatus(ConcurrentBag<(WebJobDetails webJobDetails, HealthCheckResult healthCheckResult)> healthCheckResults)
-        {
-            if (healthCheckResults.All(h => h.healthCheckResult.Status == HealthStatus.Healthy))
-                return healthCheckResults.First().healthCheckResult;
-
-            var unhealthyResults = healthCheckResults
-                .Where(h => h.healthCheckResult.Status != HealthStatus.Healthy)
-                .OrderBy(a => a.webJobDetails.ExchangeSetType)
-                .ThenBy(a => a.webJobDetails.Instance)
-                .ToList();
-
-            var description = string.Join(", ", unhealthyResults
-                .Select(h => h.healthCheckResult.Description));
-
-            var message = string.Join(", ", unhealthyResults
-                .Select(h => h.healthCheckResult.Exception?.Message));
-
-            var allUnhealthyInstancesOfSameType = healthCheckResults
-                .GroupBy(w => w.Item1.ExchangeSetType)
-                .Where(a => a.All(x => x.Item2.Status == HealthStatus.Unhealthy));
-
-            return allUnhealthyInstancesOfSameType.Any()
-                 ? HealthCheckResult.Unhealthy(description, new Exception(message))
-                  : HealthCheckResult.Degraded(description, new Exception(message));
         }
     }
 }
