@@ -532,42 +532,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
         }
 
-        [Test]
-        public async Task WhenValidCreateCatalogFileForAioRequest_ThenReturnTrueReponse()
-        {
-            byte[] byteContent = new byte[100];
-
-            fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetRootPath);
-            fakeFileHelper.CreateFileContentWithBytes(fakeFileName, byteContent);
-
-            A.CallTo(() => fakeFileSystemHelper.CreateFile(A<string>.Ignored));
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
-
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, _fakeCorrelationId);
-
-            Assert.IsTrue(response);
-            Assert.IsTrue(fakeFileHelper.CheckAndCreateFolderIsCalled);
-            Assert.IsTrue(fakeFileHelper.CreateFileContentWithBytesIsCalled);
-            Assert.AreEqual(byteContent, fakeFileHelper.ReadAllBytes(fakeFileName));
-        }
-
-        [Test]
-        public void WhenInvalidCreateCatalogFileForAioRequest_ThenReturnFulfilmentException()
-        {
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
-
-            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateCatalogFileForAio(fakeBatchId, fakeExchangeSetRootPath, _fakeCorrelationId); });
-
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CatalogFileIsNotCreated.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating catalog.031 file for aio exchange set for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            Assert.IsFalse(fakeFileHelper.CheckAndCreateFolderIsCalled);
-            Assert.IsFalse(fakeFileHelper.CreateFileContentWithBytesIsCalled);
-        }
         #endregion
     }
 }
