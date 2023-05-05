@@ -15,7 +15,9 @@ namespace UKHO.ExchangeSetService.Common.Storage
         /// <param name="correlationId">batch Id</param>   
         /// <param name="expiryDate">batch Id</param>
         /// <param name="scsRequestDateTime">Scs Request DateTime</param>
+        /// <param name="isEmptyEncExchangeSet">"create empty enc exchange set"</param>
+        /// <param name="isEmptyAioExchangeSet">"create empty aio exchange set"</param>
         /// <returns></returns>
-        Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime);
+        Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet);
     }
 }
