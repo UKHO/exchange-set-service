@@ -9,19 +9,19 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    class ExchangeSetGenerateFilesForLargeMediaAndAioProductIdentifierWhenAioIsEnabled
+    class ExchangeSetGenerateFilesForLargeMediaAndAioProductIdentifierWhenAioIsEnabled : ObjectStorage
     {
-        private string EssJwtToken { get; set; }
-        private string FssJwtToken { get; set; }
-        private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        private TestConfiguration Config { get; set; }
-        public DataHelper DataHelper { get; set; }
-        private HttpResponseMessage ApiEssResponse { get; set; }
-        private string DownloadedFolderPath;
-        private SalesCatalogueApiClient ScsApiClient { get; set; }
-        private string ScsJwtToken { get; set; }
+        ////private string EssJwtToken { get; set; }
+        ////private string FssJwtToken { get; set; }
+        ////private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
+        ////private TestConfiguration Config { get; set; }
+        ////public DataHelper DataHelper { get; set; }
+        ////private HttpResponseMessage ApiEssResponse { get; set; }
+        ////private string DownloadedFolderPath;
+        ////private SalesCatalogueApiClient ScsApiClient { get; set; }
+        ////private string ScsJwtToken { get; set; }
 
-        //Product Backlog Item 76443: ESS : Creation of AIO.zip and uploading to FSS with Large Media Exchange Set
+        ////Product Backlog Item 76443: ESS : Creation of AIO.zip and uploading to FSS with Large Media Exchange Set
         [OneTimeSetUp]
         public async Task SetupAsync()
         {

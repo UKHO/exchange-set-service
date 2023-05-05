@@ -15,13 +15,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     ////  "AioEnabled": true,
     ////  "AioCells": "GB800001" }
 
-    public class EssEndPointsScenariosWhenAioIsEnabled
+    public class EssEndPointsScenariosWhenAioIsEnabled : ObjectStorage
     {
-        private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        private TestConfiguration Config { get; set; }
-        private string EssJwtToken { get; set; }
-        public ProductIdentifierModel ProductIdentifierModel { get; set; }
-        public DataHelper Datahelper { get; set; }
+        ////private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
+        ////private TestConfiguration Config { get; set; }
+        ////private string EssJwtToken { get; set; }
+        ////public ProductIdentifierModel ProductIdentifierModel { get; set; }
+        ////public DataHelper Datahelper { get; set; }
 
         private readonly string SinceDateTime = DateTime.Now.AddDays(-12).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
