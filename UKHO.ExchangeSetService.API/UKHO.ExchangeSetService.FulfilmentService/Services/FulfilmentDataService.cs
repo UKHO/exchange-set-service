@@ -88,16 +88,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
 
-                if (essItems != null && essItems.Any() || response.Products.Count == 0)
+                if (essItems != null && essItems.Any() || message.IsEmptyEncExchangeSet)
                 {
                     salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
-                                                                 .Where(x => !aioItems.Any(y => y.ProductName.Equals(x.ProductName))).ToList();
+                                                                 .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
                     await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
                 }
-                if ((aioItems != null && aioItems.Count > 0) || (response.Products.Count == aioItems.Count && aioItems.Count > 0))
+                if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
                 {
                     salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
-                                                         .Where(x => aioItems.Any(y => y.ProductName.Equals(x.ProductName))).ToList();
+                                                         .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
                     await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
                 }
             }
@@ -152,10 +152,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     SalesCatalogueProductResponse = response.SalesCatalogueProductResponse
                 };
 
-                if (essItems.Count > 0)
+                if (essItems.Count > 0 || message.IsEmptyEncExchangeSet)
                 {
                     response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
-                                                                       .Where(x => !aioItems.Any(y => y.ProductName == x.ProductName)).ToList();
+                                                                       .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
                     isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
 
                     if (!isExchangeSetFolderCreated)
@@ -165,10 +165,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     }
                 }
 
-                if (aioItems.Count > 0)
+                if (aioItems.Count > 0 || message.IsEmptyEncExchangeSet)
                 {
                     largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
-                                                                                        .Where(x => aioItems.Any(y => y.ProductName == x.ProductName)).ToList();
+                                                                                        .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
                     isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
 
                     if (!isExchangeSetFolderCreated)
