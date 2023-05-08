@@ -60,5 +60,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             return new List<string>() { "GB800001" };
         }
+        public List<string> GetProductIdentifiersForLargeMediaAndAioNotPresent()
+        {
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US5CN13M", "CA172005", "DE521900", "NZ300661", "KR676D03", "GZ800112" };
+        }
+
     }
 }
