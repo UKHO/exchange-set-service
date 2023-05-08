@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
@@ -11,16 +10,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     [TestFixture]
     class ExchangeSetGenerateFilesForLargeMediaAndAioProductIdentifierWhenAioIsEnabled : ObjectStorage
     {
-        ////private string EssJwtToken { get; set; }
-        ////private string FssJwtToken { get; set; }
-        ////private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        ////private TestConfiguration Config { get; set; }
-        ////public DataHelper DataHelper { get; set; }
-        ////private HttpResponseMessage ApiEssResponse { get; set; }
-        ////private string DownloadedFolderPath;
-        ////private SalesCatalogueApiClient ScsApiClient { get; set; }
-        ////private string ScsJwtToken { get; set; }
-
         ////Product Backlog Item 76443: ESS : Creation of AIO.zip and uploading to FSS with Large Media Exchange Set
         [OneTimeSetUp]
         public async Task SetupAsync()

@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
@@ -12,21 +11,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     [TestFixture]
     class ExchangeSetGenerateFilesForAioProductVersionWhenAioIsEnabled: ObjectStorage
     {
-        ////private string EssJwtToken { get; set; }
-        ////private string FssJwtToken { get; set; }
-        ////private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        ////private TestConfiguration Config { get; set; }
-        ////public DataHelper DataHelper { get; set; }
-        ////private HttpResponseMessage ApiEssResponse { get; set; }
-        ////private string DownloadedFolderPath;
-        ////private SalesCatalogueApiClient ScsApiClient { get; set; }
-        ////private string ScsJwtToken { get; set; }
-        ////private FssApiClient FssApiClient { get; set; }
-        ////private List<ProductVersionModel> ProductVersionData { get; set; }
-        ////private readonly List<string> LargeExchangeSetFolderName = new List<string>();
-        ////private string batchId;
-
-
         //Product Backlog Item 76440: ESS : Creation of AIO.zip and uploading to FSS with ENC Exchange Set
         [OneTimeSetUp]
         public async Task SetupAsync()
