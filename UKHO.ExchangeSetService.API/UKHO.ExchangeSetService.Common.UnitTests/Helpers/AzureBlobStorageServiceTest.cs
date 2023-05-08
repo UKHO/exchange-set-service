@@ -27,6 +27,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private ILargeExchangeSetInstance fakeLargeExchangeSetInstance;
         public string fakeExpiryDate = "2021-07-23T06:59:13Z";
         private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
+        private readonly bool fakeIsEmptyEncExchangeSet = false;
+        private static bool fakeIsEmptyAioExchangeSet = false;
 
         [SetUp]
         public void Setup()
@@ -59,8 +61,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeMediumExchangeSetInstance = A.Fake<IMediumExchangeSetInstance>();
             fakeLargeExchangeSetInstance = A.Fake<ILargeExchangeSetInstance>();
 
-            azureBlobStorageService = new AzureBlobStorageService(fakeScsStorageService, fakeStorageConfig, 
-                fakeAzureMessageQueueHelper, fakeLogger, fakeAzureBlobStorageClient, fakeSmallExchangeSetInstance, 
+            azureBlobStorageService = new AzureBlobStorageService(fakeScsStorageService, fakeStorageConfig,
+                fakeAzureMessageQueueHelper, fakeLogger, fakeAzureBlobStorageClient, fakeSmallExchangeSetInstance,
                 fakeMediumExchangeSetInstance, fakeLargeExchangeSetInstance);
         }
 
@@ -110,8 +112,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime);
-           
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet);
+
             Assert.IsTrue(response);
         }
         #endregion

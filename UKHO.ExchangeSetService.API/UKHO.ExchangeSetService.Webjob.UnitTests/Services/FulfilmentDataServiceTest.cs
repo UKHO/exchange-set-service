@@ -123,7 +123,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 FileSize = 4000,
                 ScsResponseUri = "https://test/ess-test/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272.json",
                 CallbackUri = "https://test-callbackuri.com",
-                CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
+                CorrelationId = "727c5230-2c25-4244-9580-13d90004584a",
+                IsEmptyEncExchangeSet = false,
+                IsEmptyAioExchangeSet = false
             };
         }
         #endregion
