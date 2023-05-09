@@ -367,7 +367,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductVersiondata.Clear();
         }
 
-        [Ignore("Temporary")]
         [Test]
         [Category("SmokeTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidEncProductAndAioCellWhichIsNotAvailableAndAioIsEnabled_ThenACorrectResponseIsReturned()
@@ -408,7 +407,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ProductIdentifierModel.ProductIdentifier.Clear();
         }
 
-        [Ignore("Temporary")]
         [Test]
         [Category("SmokeTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidEncAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
@@ -464,7 +462,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
-            Assert.AreEqual(10, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 3.");
+            Assert.AreEqual(10, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 10.");
 
             //Verify requested product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
@@ -500,7 +498,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
-            Assert.AreEqual(10, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 3.");
+            Assert.AreEqual(10, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 10.");
 
             //Verify requested product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
@@ -520,6 +518,5 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
         }
-
     }
 }
