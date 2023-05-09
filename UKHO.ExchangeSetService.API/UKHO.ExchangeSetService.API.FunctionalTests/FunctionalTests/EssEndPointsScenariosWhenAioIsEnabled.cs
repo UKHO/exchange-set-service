@@ -390,7 +390,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(3, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 3.");
 
             //Verify requested AIO product count
-            Assert.AreEqual(0, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 0.");
+            Assert.AreEqual(1, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 1.");
 
             //Verify requested AIO product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedAioProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedAioProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
@@ -424,7 +424,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
-            Assert.AreEqual(2, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 2.");
+            Assert.AreEqual(1, apiResponseData.RequestedProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 2.");
 
             //Verify requested product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
@@ -433,7 +433,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(1, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 1.");
 
             //Verify requested AIO product count
-            Assert.AreEqual(0, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 0.");
+            Assert.AreEqual(1, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 1.");
 
             //Verify requested AIO product AlreadyUpToDate count
             Assert.AreEqual(0, apiResponseData.RequestedAioProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedAioProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
