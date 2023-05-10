@@ -1,0 +1,124 @@
+﻿using Newtonsoft.Json;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using System.Net.Http;
+
+namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
+{
+    [TestFixture]
+    class ExchangeSetGeneratesEmptyZipForV01X01ProductVersionWhenAioIsEnabled
+    {
+        private string EssJwtToken { get; set; }
+        private string FssJwtToken { get; set; }
+        private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
+        private FssApiClient FssApiClient { get; set; }
+        private TestConfiguration Config { get; set; }
+        public DataHelper DataHelper { get; set; }
+        private SalesCatalogueApiClient ScsApiClient { get; set; }
+        private string ScsJwtToken { get; set; }
+        private string DownloadedFolderPath { get; set; }
+        private List<ProductVersionModel> ProductVersionData { get; set; }
+        private HttpResponseMessage ApiEssResponse { get; set; }
+        private string batchId;
+
+        [OneTimeSetUp]
+        public async Task SetupAsync()
+        {
+            Config = new TestConfiguration();
+            ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
+            FssApiClient = new FssApiClient();
+            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
+            EssJwtToken = await authTokenProvider.GetEssToken();
+            FssJwtToken = await authTokenProvider.GetFssToken();
+            DataHelper = new DataHelper();
+            ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
+            ScsJwtToken = await authTokenProvider.GetScsToken();
+            ProductVersionData = new List<ProductVersionModel>();
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 2));
+            ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
+            //Get the BatchId
+            batchId = await ApiEssResponse.GetBatchId();
+            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
+
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenAProductTxtFileIsGenerated()
+        {
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
+
+            //Verify Product.txt file content
+            var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
+            dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
+
+            FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public void WhenICallExchangeSetApiWithAValidProductVersion_ThenAReadMeTxtFileIsGenerated()
+        {
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+
+            //Verify README.TXT file content
+            FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public void WhenICallExchangeSetApiWithAValidProductVersion_ThenACatalogueFileIsGenerated()
+        {
+            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public void WhenICallExchangeSetApiWithAValidProductVersion_ThenASerialEncFileIsGenerated()
+        {
+            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
+            Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+
+            //Verify Serial.Enc file content
+            FileContentHelper.CheckSerialEncFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetSerialEncFile));
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenEncFilesShouldNotBeDownloaded()
+        {
+            //Get the product details form sales catalogue service
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
+            Assert.AreEqual(304, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 304.");
+
+            Assert.IsFalse(Directory.Exists(Path.Combine(DownloadedFolderPath, "ENC_ROOT\\DE")));
+        }
+
+        [Test]
+        [Category("SmokeTest-AIOEnabled")]
+        public async Task WhenICallEssWithAioProductAndAioIsEnabled_ThenAioZipShouldNotBeAvailable()
+        {
+            string downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
+
+            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: FssJwtToken);
+            Assert.AreEqual(404, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
+        }
+
+        [OneTimeTearDown]
+        public void GlobalTeardown()
+        {
+            //Clean up downloaded files/folders   
+            FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
+        }
+    }
+}
