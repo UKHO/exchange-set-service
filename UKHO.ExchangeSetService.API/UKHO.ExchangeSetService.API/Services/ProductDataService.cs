@@ -262,11 +262,6 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                if (aioConfiguration.IsAioEnabled)
-                {
-                    CheckEmptyExchangeSet(exchangeSetServiceResponse);
-                }
-
                 await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
             }
 
@@ -472,8 +467,10 @@ namespace UKHO.ExchangeSetService.API.Services
             }
         }
 
-        //boolean variables will updated with AioEnabled = true
-        //applicable to productVersions/sinceDateTime endpoints to create empty exchange set
+        /*  boolean variables will updated with AioEnabled = true
+            applicable to productVersions endpoints to create empty exchange set
+            productIdentifier - not applicable 
+            sinceDateTime - ESS API will return 304 and will not create empty exchange set   */
         private void CheckEmptyExchangeSet(ExchangeSetServiceResponse exchangeSetServiceResponse)
         {
             isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0;

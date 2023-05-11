@@ -152,7 +152,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     SalesCatalogueProductResponse = response.SalesCatalogueProductResponse
                 };
 
-                if (essItems.Count > 0 || message.IsEmptyEncExchangeSet)
+                if (essItems.Count > 0)
                 {
                     response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
                                                                        .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
@@ -165,7 +165,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     }
                 }
 
-                if (aioItems.Count > 0 || message.IsEmptyEncExchangeSet)
+                if (aioItems.Count > 0)
                 {
                     largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
                                                                                         .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
