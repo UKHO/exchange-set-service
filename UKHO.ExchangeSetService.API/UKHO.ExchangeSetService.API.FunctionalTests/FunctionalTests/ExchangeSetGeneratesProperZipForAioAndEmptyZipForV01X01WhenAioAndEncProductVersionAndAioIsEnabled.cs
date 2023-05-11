@@ -10,21 +10,9 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    class ExchangeSetGeneratesProperZipForAioAndEmptyZipForV01X01WhenAioAndEncProductVersionAndAioIsEnabled
+    class ExchangeSetGeneratesProperZipForAioAndEmptyZipForV01X01WhenAioAndEncProductVersionAndAioIsEnabled : ObjectStorage
     {
-        private string EssJwtToken { get; set; }
-        private string FssJwtToken { get; set; }
-        private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        private TestConfiguration Config { get; set; }
-        public DataHelper DataHelper { get; set; }
-        private HttpResponseMessage ApiEssResponse { get; set; }
-        private string AioDownloadedFolderPath;
-        private string EncDownloadedFolderPath;
-        private SalesCatalogueApiClient ScsApiClient { get; set; }
-        private string ScsJwtToken { get; set; }
-        private FssApiClient FssApiClient { get; set; }
-        private List<ProductVersionModel> ProductVersionData { get; set; }
-
+        
         //Product Backlog Item 77585: ESS : Empty AIO Exchange Set Creation
         [OneTimeSetUp]
         public async Task SetupAsync()
