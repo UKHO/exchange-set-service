@@ -10,20 +10,8 @@ using System.Net.Http;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    class ExchangeSetGeneratesEmptyZipForV01X01ProductVersionWhenAioIsEnabled
+    class ExchangeSetGeneratesEmptyZipForV01X01ProductVersionWhenAioIsEnabled : ObjectStorage
     {
-        private string EssJwtToken { get; set; }
-        private string FssJwtToken { get; set; }
-        private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        private FssApiClient FssApiClient { get; set; }
-        private TestConfiguration Config { get; set; }
-        public DataHelper DataHelper { get; set; }
-        private SalesCatalogueApiClient ScsApiClient { get; set; }
-        private string ScsJwtToken { get; set; }
-        private string DownloadedFolderPath { get; set; }
-        private List<ProductVersionModel> ProductVersionData { get; set; }
-        private HttpResponseMessage ApiEssResponse { get; set; }
-        private string batchId;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
