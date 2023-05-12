@@ -27,6 +27,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly ISalesCatalogueStorageService azureStorageService;
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
+        private readonly AioConfiguration aioConfiguration;
         private const string CONTENT_TYPE = "application/json";
         private const int StringLength = 2;
 
@@ -35,7 +36,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             ILogger<FileShareServiceCache> logger,
             ISalesCatalogueStorageService azureStorageService,
             IOptions<CacheConfiguration> fssCacheConfiguration,
-            IFileSystemHelper fileSystemHelper)
+            IFileSystemHelper fileSystemHelper,
+            IOptions<AioConfiguration> aioConfiguration)
         {
             this.azureBlobStorageClient = azureBlobStorageClient;
             this.azureTableStorageClient = azureTableStorageClient;
@@ -43,6 +45,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.azureStorageService = azureStorageService;
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
+            this.aioConfiguration = aioConfiguration.Value;
         }
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
@@ -121,7 +124,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 var bundleLocation = item.Bundle.FirstOrDefault().Location.Split(";");
                 exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleLocation[0].Substring(1, 1), bundleLocation[1]);
-                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
+                if (aioConfiguration.IsAioEnabled)
+                {
+                    List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
+
+                    if (!aioCells.Contains(item.ProductName))
+                        downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
+                    else
+                        downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+                }
+                else
+                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
             }
             else
                 downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
