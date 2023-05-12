@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                         };
         }
 
-        private List<Products> GetProductdetailsAio()
+        private List<Products> GetProductdetailsForEncAndAioProduct()
         {
             return new List<Products> {
                             new Products {
@@ -148,7 +148,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
         }
 
-        private FssSearchResponseCache GetResponseCacheAio()
+        private FssSearchResponseCache GetResponseCacheForAioProduct()
         {
             return new FssSearchResponseCache()
             {
@@ -302,7 +302,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSet1()
+        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSetWhenAioToggleIsOn()
         {
             string exchangeSetRootPath = @"C:\\HOME";
 
@@ -310,12 +310,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache()).Once().Then.Returns(GetResponseCacheAio());
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache()).Once().Then.Returns(GetResponseCacheForAioProduct());
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
             CommonHelper.IsPeriodicOutputService = true;
 
-            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetailsAio(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
+            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetailsForEncAndAioProduct(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
             Assert.AreEqual(0, response.Count);
         }
