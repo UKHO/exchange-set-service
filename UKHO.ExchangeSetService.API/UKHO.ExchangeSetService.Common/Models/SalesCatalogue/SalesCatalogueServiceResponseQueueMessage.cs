@@ -11,5 +11,7 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public string CorrelationId { get; set; }
         public string ExchangeSetUrlExpiryDate { get; set; }
         public DateTime ScsRequestDateTime { get; set; }
+        public bool IsEmptyEncExchangeSet { get; set; }
+        public bool IsEmptyAioExchangeSet { get; set; }
     }
 }
