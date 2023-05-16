@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
@@ -19,7 +17,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task SetupAsync()
         {
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 1));
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB800001", 31, 34));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB800001", 31, 58));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: objStorage.EssJwtToken);
             EncDownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, objStorage.FssJwtToken);
             AioDownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(ApiEssResponse, objStorage.FssJwtToken);

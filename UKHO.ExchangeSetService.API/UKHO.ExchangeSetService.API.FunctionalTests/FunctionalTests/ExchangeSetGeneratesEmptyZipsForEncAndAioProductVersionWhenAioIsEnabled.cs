@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task SetupAsync()
         {
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416080", 9, 2));
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB800001", 31, 34));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB800001", 31, 58));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: objStorage.EssJwtToken);
             EncDownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, objStorage.FssJwtToken);
             AioDownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(ApiEssResponse, objStorage.FssJwtToken);
