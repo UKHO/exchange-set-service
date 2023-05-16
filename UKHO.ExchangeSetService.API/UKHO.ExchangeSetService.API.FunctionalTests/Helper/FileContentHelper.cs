@@ -440,7 +440,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static async Task<string> DownloadAndExtractAioZip(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
 
-            ////List<string> downloadFolderPath = new List<string>();
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();

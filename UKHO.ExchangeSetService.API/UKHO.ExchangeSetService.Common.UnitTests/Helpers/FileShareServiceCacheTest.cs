@@ -30,6 +30,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IOptions<CacheConfiguration> fakeCacheConfiguration;
         private IFileSystemHelper fakeFileSystemHelper;
         private IFileShareServiceCache fileShareServiceCache;
+        private IOptions<AioConfiguration> fakeAioConfiguration;
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
         [SetUp]
@@ -45,8 +46,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeCacheConfiguration.Value.CacheStorageAccountName = "testessstorage";
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
             fakeCacheConfiguration.Value.IsFssCacheEnabled = true;
+            fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
 
-            fileShareServiceCache = new FileShareServiceCache(fakeAzureBlobStorageClient, fakeAzureTableStorageClient, fakeLogger, fakeAzureStorageService, fakeCacheConfiguration, fakeFileSystemHelper);
+            fileShareServiceCache = new FileShareServiceCache(fakeAzureBlobStorageClient, fakeAzureTableStorageClient, fakeLogger, fakeAzureStorageService, fakeCacheConfiguration, fakeFileSystemHelper, fakeAioConfiguration);
         }
 
         private (string, string) GetStorageAccountConnectionStringAndContainerName()
@@ -65,6 +67,26 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                                 UpdateNumbers = new List<int?> {0},
                                 FileSize = 400,
                                 Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
+                            }
+                        };
+        }
+
+        private List<Products> GetProductdetailsForEncAndAioProduct()
+        {
+            return new List<Products> {
+                            new Products {
+                                ProductName = "DE416050",
+                                EditionNumber = 2,
+                                UpdateNumbers = new List<int?> {0},
+                                FileSize = 400,
+                                Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
+                            },
+                            new Products {
+                                ProductName = "GB800001",
+                                EditionNumber = 1,
+                                UpdateNumbers = new List<int?> {0},
+                                FileSize = 400,
+                                Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B3" } }
                             }
                         };
         }
@@ -123,6 +145,31 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 PartitionKey = "DE416050",
                 RowKey = "2|0",
                 Response = JsonConvert.SerializeObject(GetBatchDetail())
+            };
+        }
+
+        private FssSearchResponseCache GetResponseCacheForAioProduct()
+        {
+            return new FssSearchResponseCache()
+            {
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+                PartitionKey = "GB800001",
+                RowKey = "1|0",
+                Response = JsonConvert.SerializeObject(GetBatchDetailAio())
+            };
+        }
+
+        private BatchDetail GetBatchDetailAio()
+        {
+            return new BatchDetail
+            {
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+                Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "/batch/26067645-643e-4a56-xy5f-19977b4ae876/files/Test.TXT" } } } },
+                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
+                                                           new Attribute { Key= "CellName", Value= "DE416050" },
+                                                           new Attribute { Key= "EditionNumber", Value= "2" } ,
+                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
+                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
             };
         }
 
@@ -250,6 +297,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             CommonHelper.IsPeriodicOutputService = true;
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
+
+            Assert.AreEqual(0, response.Count);
+        }
+
+        [Test]
+        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSetWhenAioToggleIsOn()
+        {
+            string exchangeSetRootPath = @"C:\\HOME";
+
+            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.AioCells = "GB800001";
+
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache()).Once().Then.Returns(GetResponseCacheForAioProduct());
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
+            CommonHelper.IsPeriodicOutputService = true;
+
+            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetailsForEncAndAioProduct(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
             Assert.AreEqual(0, response.Count);
         }

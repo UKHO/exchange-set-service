@@ -38,6 +38,8 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly UserIdentifier userIdentifier;
         private readonly IAzureAdB2CHelper azureAdB2CHelper;
         private readonly AioConfiguration aioConfiguration;
+        private bool isEmptyEncExchangeSet = false;
+        private bool isEmptyAioExchangeSet = false;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
@@ -107,7 +109,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
             }
             return response;
         }
@@ -204,7 +206,12 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime);
+                if (aioConfiguration.IsAioEnabled)
+                {
+                    CheckEmptyExchangeSet(exchangeSetServiceResponse);
+                }
+
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
             }
 
             return response;
@@ -255,7 +262,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
             }
 
             return response;
@@ -341,14 +348,14 @@ namespace UKHO.ExchangeSetService.API.Services
             return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null;
         }
 
-        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime)
+        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSResponseStoreRequestStart,
                 EventIds.SCSResponseStoreRequestCompleted,
                 "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId, expiryDate, scsRequestDateTime);
+                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
 
                     return result;
                 }, batchId, correlationId);
@@ -458,6 +465,16 @@ namespace UKHO.ExchangeSetService.API.Services
 
                 logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), batchId, correlationId);
             }
+        }
+
+        /*  boolean variables will updated with AioEnabled = true
+            applicable to productVersions endpoints to create empty exchange set
+            productIdentifier - not applicable 
+            sinceDateTime - ESS API will return 304 and will not create empty exchange set   */
+        private void CheckEmptyExchangeSet(ExchangeSetServiceResponse exchangeSetServiceResponse)
+        {
+            isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0;
+            isEmptyAioExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount > 0;
         }
     }
 }
