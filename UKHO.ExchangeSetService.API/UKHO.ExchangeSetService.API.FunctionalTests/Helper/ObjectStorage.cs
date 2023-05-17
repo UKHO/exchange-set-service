@@ -14,10 +14,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string FssJwtToken { get; set; }
         public DataHelper DataHelper = new();
         protected HttpResponseMessage ApiEssResponse { get; set; }
+       
         protected SalesCatalogueApiClient ScsApiClient { get; set; }
         public string ScsJwtToken { get; set; }
         protected FssApiClient FssApiClient { get; set; }
         protected List<ProductVersionModel> ProductVersionData { get; set; }
+
         protected readonly List<string> LargeExchangeSetFolderName = new List<string>();
         protected string batchId;
         protected string DownloadedFolderPath;

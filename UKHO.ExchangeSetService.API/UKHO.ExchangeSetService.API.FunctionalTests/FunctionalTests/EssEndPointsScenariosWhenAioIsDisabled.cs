@@ -13,14 +13,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     ////  "AioEnabled": false,
     ////  "AioCells": "GB800001" }
 
-    public class EssEndPointsScenariosWhenAioIsDisabled
+    public class EssEndPointsScenariosWhenAioIsDisabled: ObjectStorage
     {
-        private ExchangeSetApiClient ExchangeSetApiClient { get; set; }
-        private TestConfiguration Config { get; set; }
-        private string EssJwtToken { get; set; }
-        public ProductIdentifierModel ProductIdentifierModel { get; set; }
-        public DataHelper Datahelper { get; set; }
-
         [SetUp]
         public async Task SetupAsync()
         {

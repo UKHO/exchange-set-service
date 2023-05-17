@@ -516,7 +516,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIOEnabled"
@@ -537,7 +537,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIODisabled"
@@ -559,7 +559,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
   - stage: QCdeploy
     dependsOn:
@@ -648,7 +648,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled "true" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIOEnabled"
@@ -669,7 +669,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled "false" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIODisabled"
@@ -691,7 +691,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
     dependsOn:
@@ -784,7 +784,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIOEnabled"
@@ -805,7 +805,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIODisabled"
@@ -827,7 +827,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests
