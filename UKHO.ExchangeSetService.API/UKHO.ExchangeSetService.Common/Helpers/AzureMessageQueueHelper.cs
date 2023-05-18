@@ -36,11 +36,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<HealthCheckResult> CheckMessageQueueHealth(string storageAccountConnectionString, string queueName)
         {
-            ///CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString); RHZ
-            ///CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-            ///CloudQueue queue = queueClient.GetQueueReference(queueName);
-            ///var queueMessageExists = await queue.ExistsAsync();
-            
             var queueClient = new QueueClient(storageAccountConnectionString, queueName);
            
             if (await queueClient.ExistsAsync())

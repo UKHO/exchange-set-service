@@ -127,7 +127,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 EventIds.DownloadSalesCatalogueResponseDataCompleted,
                 "Sales catalogue response download from blob for scsResponseUri:{scsResponseUri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", 
                 async ()=> {
-                    ///string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(); Rhz
                     var keyCredential = scsStorageService.GetStorageSharedKeyCredentials();
                     BlockBlobClient cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, keyCredential);
 

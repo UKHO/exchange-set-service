@@ -175,9 +175,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             BlockBlobClient cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
             cloudBlockBlob.SetHttpHeaders(new BlobHttpHeaders { ContentType = CONTENT_TYPE });
-            if (!await cloudBlockBlob.ExistsAsync())
+            if (!await azureBlobStorageClient.ExistsAsync(cloudBlockBlob))
             {
                 await cloudBlockBlob.UploadAsync(stream);
+                azureBlobStorageClient.CheckUploadCalled();
             }
         }
 

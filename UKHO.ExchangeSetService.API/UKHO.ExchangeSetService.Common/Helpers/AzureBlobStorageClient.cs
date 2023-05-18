@@ -14,19 +14,33 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         public async Task<BlockBlobClient> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
         {
-            ///CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString) RHZ
             var cloudStorageAccount = new BlobServiceClient(storageAccountConnectionString);
 
-            ///CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient()
-            ///CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName)
             BlobContainerClient cloudBlobContainer = cloudStorageAccount.GetBlobContainerClient(containerName);
 
             await cloudBlobContainer.CreateIfNotExistsAsync();
 
-            ///CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName)
             BlockBlobClient cloudBlockBlob = cloudBlobContainer.GetBlockBlobClient(fileName); 
             
             return cloudBlockBlob;
+        }
+
+        /// <summary>
+        /// This wrapper method used to facilitate FakeItEasy not working with some Storage V12 methods.
+        /// </summary>
+        /// <param name="bbc"></param>
+        /// <returns></returns>
+        public async Task<bool> ExistsAsync(BlockBlobClient bbc)
+        {
+            return await bbc.ExistsAsync();
+        }
+
+        /// <summary>
+        /// This dummy method used to facilitate FakeItEasy not working with some Storage V12 methods
+        /// </summary>
+        public void CheckUploadCalled()
+        {
+            ///does nothing;
         }
 
         public BlockBlobClient GetCloudBlockBlobByUri(string uri, StorageSharedKeyCredential keyCredential)
