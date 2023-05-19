@@ -82,6 +82,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
                         var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+
+                        if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
+                        {
+                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+
+                            if (cloudBlockBlob != null)
+                            {
+                                cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
+                            }
+                        }
+
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
                             var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
