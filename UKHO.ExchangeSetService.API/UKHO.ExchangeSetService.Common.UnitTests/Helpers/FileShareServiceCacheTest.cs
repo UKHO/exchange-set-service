@@ -167,13 +167,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
 
             var cloudBlob = A.Fake<BlockBlobClient>();
-
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId)).Returns(cloudBlob);
             A.CallTo(() => fakeAzureBlobStorageClient.ExistsAsync(cloudBlob)).Returns(false);  
             await fileShareServiceCache.CopyFileToBlob(stream, fileName, batchId);
-            ///A.CallTo(() => cloudBlob.UploadAsync(stream,A<BlobUploadOptions>.Ignored,A<CancellationToken>.Ignored )).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeAzureBlobStorageClient.CheckUploadCalled()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => cloudBlob.UploadAsync(stream, A<BlobUploadOptions>.Ignored, A<CancellationToken>.Ignored)).WithAnyArguments().MustHaveHappenedOnceExactly();
+            
 
 
         }
@@ -191,8 +190,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId)).Returns(cloudBlob);
             A.CallTo(() => fakeAzureBlobStorageClient.ExistsAsync(cloudBlob)).Returns(true);
             await fileShareServiceCache.CopyFileToBlob(stream, fileName, batchId);
-            ///A.CallTo(() => cloudBlob.UploadAsync(stream, A<BlobUploadOptions>.Ignored, A<CancellationToken>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => fakeAzureBlobStorageClient.CheckUploadCalled()).MustNotHaveHappened();
+            A.CallTo(() => cloudBlob.UploadAsync(stream, A<BlobUploadOptions>.Ignored, A<CancellationToken>.Ignored)).MustNotHaveHappened();
         }
 
         [Test]

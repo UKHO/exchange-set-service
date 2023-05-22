@@ -15,6 +15,5 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName);
         Task DeleteCacheContainer(string storageAccountConnectionString, string containerName);
         Task<bool> ExistsAsync(BlockBlobClient bbc);
-        void CheckUploadCalled();
     }
 }

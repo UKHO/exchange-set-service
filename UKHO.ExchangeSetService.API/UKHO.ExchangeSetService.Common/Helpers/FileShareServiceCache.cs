@@ -175,10 +175,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             BlockBlobClient cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
             cloudBlockBlob.SetHttpHeaders(new BlobHttpHeaders { ContentType = CONTENT_TYPE });
-            if (!await azureBlobStorageClient.ExistsAsync(cloudBlockBlob))
+            if (!await azureBlobStorageClient.ExistsAsync(cloudBlockBlob)) 
             {
-                await cloudBlockBlob.UploadAsync(stream);
-                azureBlobStorageClient.CheckUploadCalled();
+                var ct = new CancellationTokenSource();
+                //Rhz The null and Token have to be added because the test does not allow optional parameters
+                //    If we use Ignore in the test the MustHaveHappenedOnceExactly method expects
+                //    the call to be made with the same number of parameters.
+                await cloudBlockBlob.UploadAsync(stream,null,ct.Token); 
             }
         }
 

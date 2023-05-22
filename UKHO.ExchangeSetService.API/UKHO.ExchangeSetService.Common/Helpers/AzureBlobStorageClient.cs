@@ -26,21 +26,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         /// <summary>
-        /// This wrapper method used to facilitate FakeItEasy not working with some Storage V12 methods.
+        /// This wrapper method used to facilitate FakeItEasy not working with Storage V12 methods that have optional parameters.
         /// </summary>
         /// <param name="bbc"></param>
         /// <returns></returns>
         public async Task<bool> ExistsAsync(BlockBlobClient bbc)
         {
             return await bbc.ExistsAsync();
-        }
-
-        /// <summary>
-        /// This dummy method used to facilitate FakeItEasy not working with some Storage V12 methods
-        /// </summary>
-        public void CheckUploadCalled()
-        {
-            ///does nothing;
         }
 
         public BlockBlobClient GetCloudBlockBlobByUri(string uri, StorageSharedKeyCredential keyCredential)
@@ -57,7 +49,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<string> DownloadTextAsync(BlockBlobClient cloudBlockBlob)
         {
             return await Task.FromResult("Testing");
-             //return await cloudBlockBlob.DownloadTextAsync();  //RHZ
+             //return await cloudBlockBlob.DownloadTextAsync();  //RHZ DownloadTextAsync does not exist in SDK 12
         }
 
         public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)
