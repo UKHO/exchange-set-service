@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -30,6 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly AioConfiguration aioConfiguration;
         private const string CONTENT_TYPE = "application/json";
         private const int StringLength = 2;
+        private const int responseFileSizeLimitInKb = 60;
 
         public FileShareServiceCache(IAzureBlobStorageClient azureBlobStorageClient,
             IAzureTableStorageClient azureTableStorageClient,
@@ -212,12 +214,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache)
         {
-            //Temporary code to exclude storing of AIO cell in cahce table due to storage exception
-            if (!fssSearchResponseCache.Response.Contains("GB800001"))
+            int responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
+
+            //If content size is more that responseFileSizeLimitInKb
+            //then store content into json file to avoid azure table storage exception for column limit
+            if (responseSizeInKb > responseFileSizeLimitInKb)
             {
-                var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-                await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+                // convert string to stream
+                byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
+                MemoryStream stream = new(byteArray);
+
+                await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId);
+                fssSearchResponseCache.Response = string.Empty;
             }
+
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
         }
     }
 }
