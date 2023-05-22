@@ -48,8 +48,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<string> DownloadTextAsync(BlockBlobClient cloudBlockBlob)
         {
-            return await Task.FromResult("Testing");
              //return await cloudBlockBlob.DownloadTextAsync();  //RHZ DownloadTextAsync does not exist in SDK 12
+            using var ms = new MemoryStream();
+            await cloudBlockBlob.DownloadToAsync(ms);
+            string text = System.Text.Encoding.UTF8.GetString( ms.ToArray());
+            return text;
         }
 
         public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)
