@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB800001", 31, 58));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB800001", 31, 59));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: objStorage.EssJwtToken);
             //////Get the BatchId
             batchId = await ApiEssResponse.GetBatchId();
