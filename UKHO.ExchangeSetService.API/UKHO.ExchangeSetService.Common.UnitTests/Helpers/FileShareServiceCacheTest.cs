@@ -289,7 +289,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
 
-            string blobResponse = JsonConvert.SerializeObject(GetBatchDetail(),Formatting.None);
+            string blobResponse = JsonConvert.SerializeObject(GetBatchDetail(), Formatting.None);
             A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<CloudBlockBlob>.Ignored)).Returns(blobResponse);
             CommonHelper.IsPeriodicOutputService = false;
 
@@ -311,6 +311,24 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                  async delegate { await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None); });
+        }
+
+        [Test]
+        public async Task WhenInsertOrMergeFssCacheDetailForLargeResponseSize_ThenUploadSucessful()
+        {
+            FssSearchResponseCache fssSearchResponseCache = GetResponseCacheForAioProduct();
+            fssSearchResponseCache.Response = new string('a', 62464);
+
+            var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
+            var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cloudBlob);
+            A.CallTo(() => cloudBlob.ExistsAsync()).Returns(false);
+            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+
+            await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
+
+            A.CallTo(() => cloudBlob.UploadFromStreamAsync(A<Stream>.Ignored)).MustHaveHappenedOnceExactly();
         }
 
         #region LargeMediaExchangeSet
