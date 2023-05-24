@@ -93,6 +93,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             public string AioExchangeSetFileName { get; set; }
             public string ExchangeSetSerialAioFile { get; set; }
+            public string AioCellName { get; set; }
+            public int AioEditionNumber { get; set; }
+            public int AioUpdateNumber { get; set; }
+            public string EncCellName { get; set; }
+            public int EncEditionNumber { get; set; }
+            public int EncUpdateNumber { get; set; }
         }
 
         public TestConfiguration()
