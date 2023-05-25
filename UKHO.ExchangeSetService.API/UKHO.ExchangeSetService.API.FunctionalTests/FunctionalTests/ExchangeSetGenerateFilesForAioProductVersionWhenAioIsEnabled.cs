@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FssApiClient = new FssApiClient();
             DataHelper = new DataHelper();
             ProductVersionData = new List<ProductVersionModel>();
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("GB800001", 31, 0));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData(Config.AIOConfig.AioCellName, Config.AIOConfig.AioEditionNumber, 0));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             //Get the BatchId
             batchId = await ApiEssResponse.GetBatchId();
@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 string productName = product.ProductName;
                 int editionNumber = product.EditionNumber;
 
-                if (productName.Equals("GB800001"))
+                if (productName.Equals(Config.AIOConfig.AioCellName))
                 {
                     //Enc file download verification
                     foreach (var updateNumber in product.UpdateNumbers)
