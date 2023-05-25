@@ -63,8 +63,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check RequestedProductsNotInExchangeSet is empty
             Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
 
-            ProductIdentifierModel.ProductIdentifier.Clear();
-
         }
 
         [Test]
@@ -141,7 +139,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual("ABCDEFGH", apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'ABCDEFGH'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
 
-            ProductIdentifierModel.ProductIdentifier.Clear();
         }
 
         [Test]
@@ -205,8 +202,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check RequestedProductsNotInExchangeSet is empty
             Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
 
-            ProductIdentifierModel.ProductIdentifier.Clear();
-
         }
 
         [Test]
@@ -262,9 +257,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Check RequestedProductsNotInExchangeSet is empty
             Assert.IsEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Not Empty for RequestedProductsNotInExchangeSet, instead of Empty");
-
-            ProductIdentifierModel.ProductIdentifier.Clear();
-
         }
 
         [Test]
@@ -323,8 +315,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             Assert.AreEqual(Config.AIOConfig.AioCellName, apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
             Assert.AreEqual("duplicateProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'duplicateProduct'");
-
-            ProductIdentifierModel.ProductIdentifier.Clear();
 
         }
 
@@ -389,8 +379,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             Assert.AreEqual(Config.AIOConfig.InvalidAioCellName, apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GZ800112'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
-
-            ProductIdentifierModel.ProductIdentifier.Clear();
+            
         }
 
         [Test]
