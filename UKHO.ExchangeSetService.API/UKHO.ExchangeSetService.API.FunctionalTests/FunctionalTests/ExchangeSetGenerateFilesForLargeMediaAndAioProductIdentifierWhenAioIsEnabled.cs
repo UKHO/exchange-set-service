@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 string productName = product.ProductName;
                 int editionNumber = product.EditionNumber;
 
-                if (productName.Equals("GB800001"))
+                if (productName.Equals(Config.AIOConfig.AioCellName))
                 {
                     //Enc file download verification
                     foreach (var updateNumber in product.UpdateNumbers)

@@ -99,6 +99,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string EncCellName { get; set; }
             public int EncEditionNumber { get; set; }
             public int EncUpdateNumber { get; set; }
+            public string InvalidEncCellName { get; set; }
+            public string InvalidAioCellName { get; set; }
         }
 
         public TestConfiguration()

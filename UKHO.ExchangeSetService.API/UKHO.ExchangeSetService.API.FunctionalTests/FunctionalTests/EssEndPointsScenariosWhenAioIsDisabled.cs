@@ -31,9 +31,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidAndGB800001ProductAndAioIsDisabled_ThenACorrectResponseIsReturned()
         {
-            ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080", "GB800001" };
-
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetAioProductIdentifierData(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //verify model structure
@@ -52,7 +50,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
             
-            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
+            Assert.AreEqual(Config.AIOConfig.AioCellName, apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
 
         }
@@ -63,8 +61,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new();
 
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("DE416080", 9, 1));
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB800001", 1, 0));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(Config.AIOConfig.EncCellName, Config.AIOConfig.EncEditionNumber, Config.AIOConfig.EncUpdateNumber-1));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(Config.AIOConfig.AioCellName, Config.AIOConfig.AioEditionNumber, Config.AIOConfig.AioEditionNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
@@ -74,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
-            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
+            Assert.AreEqual(Config.AIOConfig.AioCellName, apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
 
         }
@@ -83,9 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifiersApiWithOnlyGB800001ProductAndAioIsDisabled_ThenACorrectResponseIsReturned()
         {
-            ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB800001" };
-
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifiersForAioOnly(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //verify model structure
@@ -104,7 +100,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
 
-            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
+            Assert.AreEqual(Config.AIOConfig.AioCellName, apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
 
         }
@@ -115,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             List<ProductVersionModel> ProductVersiondata = new();
 
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData("GB800001", 1, 0));
+            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(Config.AIOConfig.AioCellName, Config.AIOConfig.AioEditionNumber, Config.AIOConfig.AioUpdateNumber));
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
@@ -125,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
-            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
+            Assert.AreEqual(Config.AIOConfig.AioCellName, apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
 
         }
@@ -153,7 +149,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
 
-            Assert.AreEqual("GB800001", apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
+            Assert.AreEqual(Config.AIOConfig.AioCellName, apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName, $"Exchange set returned Product Name {apiResponseData.RequestedProductsNotInExchangeSet.LastOrDefault().ProductName}, instead of expected Product Name 'GB800001'");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
 
         }
