@@ -148,6 +148,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
         }
 
+        private FssSearchResponseCache GetEmptyResponseCache()
+        {
+            return new FssSearchResponseCache()
+            {
+                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+                PartitionKey = "DE416050",
+                RowKey = "2|0",
+                Response = string.Empty
+            };
+        }
+
         private FssSearchResponseCache GetResponseCacheForAioProduct()
         {
             return new FssSearchResponseCache()
@@ -269,6 +280,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
+        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnNonCachedProductFromBlob()
+        {
+            const string exchangeSetRootPath = @"C:\\HOME";
+
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetEmptyResponseCache());
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
+
+            string blobResponse = JsonConvert.SerializeObject(GetBatchDetail(), Formatting.None);
+            A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<CloudBlockBlob>.Ignored)).Returns(blobResponse);
+            CommonHelper.IsPeriodicOutputService = false;
+
+            var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
+
+            Assert.AreEqual(0, nonCachedProduct.Count);
+        }
+
+        [Test]
         public void WhenGetNonCachedProductDataForFssIsCalled_ThenReturnStorageException()
         {
             const string exchangeSetRootPath = @"C:\\HOME";
@@ -281,6 +311,24 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                  async delegate { await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None); });
+        }
+
+        [Test]
+        public async Task WhenInsertOrMergeFssCacheDetailForLargeResponseSize_ThenUploadSucessful()
+        {
+            FssSearchResponseCache fssSearchResponseCache = GetResponseCacheForAioProduct();
+            fssSearchResponseCache.Response = new string('a', 62464);
+
+            var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
+            var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cloudBlob);
+            A.CallTo(() => cloudBlob.ExistsAsync()).Returns(false);
+            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+
+            await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
+
+            A.CallTo(() => cloudBlob.UploadFromStreamAsync(A<Stream>.Ignored)).MustHaveHappenedOnceExactly();
         }
 
         #region LargeMediaExchangeSet
