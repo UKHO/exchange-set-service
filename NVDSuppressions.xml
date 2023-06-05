@@ -259,8 +259,8 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
 	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
 	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
-	This is a temporary suppression pending a fix being available.
-	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58194
+	Affects .NET Core 2.1 - now on .NET 6 so false positive.
+	See https://msrc.microsoft.com/update-guide/en-us/vulnerability/CVE-2018-8409
 	]]></notes>
 	<cve>CVE-2018-8409</cve>
   </suppress>
