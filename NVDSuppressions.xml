@@ -2,70 +2,12 @@
 
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
   <suppress>
-    <notes>
-      <![CDATA[
-   file name: System.Threading.Tasks.Extensions.dll
-   Suppressing this CVE Because it relates to a mobile "Tasks" application (Astrid Tasks) version before 9.7.3. ESS is not a mobile application.
-   ]]>
-    </notes>
-    <cve>CVE-2020-22475</cve>
-  </suppress>
-  <suppress>
     <notes><![CDATA[
    file name: GetDocument.Insider.dll
    Suppressing this CVE as it is a .NetCore runtime issue affecting .NetCore runtimes below .NET Core 3.1.4 or lower. The ESS Runs in an AppService which will have the fixes already applied, and the global.json has been addeded to require .NetCore 3.1.408 or greater.
    More details can be found here: https://github.com/dotnet/announcements/issues/156
    ]]>    </notes>
     <cve>CVE-2020-1108</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
-   file name: GetDocument.Insider.dll
-  CVE References ASP.Net versions 1.0-1.1. ESS is built on ASP.Net Core 3.1+, not classic ASP.Net.
-See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus.com/bid/14217 for more details.
-   ]]>    </notes>
-    <cve>CVE-2005-2224</cve>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[
-   file name: GetDocument.Insider.dll
-  Vunerability applies to AfterLogic MailBee WebMail Pro 4.1 for ASP.NET which is not used by the ESS
-   ]]>    </notes>
-    <cve>CVE-2008-0333</cve>
-  </suppress>
-
-  <suppress>
-    <notes>
-      <![CDATA[
-    file name: Serilog.Sinks.File:4.1.0
-      8117-softmagic.c in file before 5.21 does not properly limit recursion, which allows remote attackers to cause a denial of service (CPU consumption or crash) via unspecified vectors.
-      9652-The mconvert function in softmagic.c in file before 5.21, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not properly handle a certain string-length field during a copy of a truncated version of a Pascal string, which might allow remote attackers to cause a denial of service (out-of-bounds memory access and application crash) via a crafted file.
-    This is a false positive. These two CVEs references a C library softmagic.c which is not used by ESS
-    ]]>
-    </notes>
-    <cve>CVE-2014-8117</cve>
-    <cve>CVE-2014-9652</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-     file name: Serilog.Sinks.File:4.1.0
-      readelf.c in file before 5.22, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not consider that pread calls sometimes read only a subset of the available data, which allows remote attackers to cause a denial of service (uninitialized memory access) or possibly have unspecified other impact via a crafted ELF file.
-     This is a false positive in readelf.c as ESS is not using this, or PHP.
-    ]]>
-    </notes>
-    <cve>CVE-2014-9653</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-    file name: Serilog.Extensions.Logging.File:2.0.0
-      cdf_read_property_info in cdf.c in file through 5.37 does not restrict the number of CDF_VECTOR elements, which allows a heap-based buffer overflow (4-byte out-of-bounds write)
-    This is a false positive in cdf.c which is not used by ESS
-    ]]>
-    </notes>
-    <cve>CVE-2019-18218</cve>
   </suppress>
   <suppress>
     <notes>
@@ -196,49 +138,12 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
   <suppress>
     <notes>
       <![CDATA[
-    file name: System.Net.WebSockets.Client.dll
-    See https://nvd.nist.gov/vuln/detail/CVE-2021-33880 for full Details on CVE.
-    The aaugustin websockets library before 9.1 for Python has an Observable Timing Discrepancy on servers when HTTP Basic Authentication is enabled with basic_auth_protocol_factory(credentials=...). An attacker may be able to guess a password via a timing attack.
-    This CVE applies to python and this is a false positive cve for our application which is C# based.
-    ]]>
-    </notes>
-    <cve>CVE-2021-33880</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
       file name: Serilog.Sinks.Async.dll
       A vulnerability exists in Async through 3.2.1 (fixed in 3.2.2) , which could let a malicious user obtain privileges via the mapValues() method.
       This is a false positive as the vulnerability exists in a NPM Javascript package named 'Async' and not the nuget .NET package named 'Serilog.Sinks.Async'.
     ]]>
     </notes>
     <cve>CVE-2021-43138</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-    file name: System.Net.Http:4.3.3
-    See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
-    Package name: System.Net.Http:4.3.3 (included as part of the .Net Core runtime)
-    Vulnerable versions: 4.3.3 and below
-    Secure versions: 4.3.4+
-    This CVE applies to .NET Core 2.1, .NET Core 1.0, .NET Core 1.1, PowerShell Core 6.0. ESS is pinned to .Net core SDK > 3.1.419 which is not vulnerable, and deployed to Azure App Service which will have the security patch applied.
-    ]]>
-    </notes>
-    <cve>CVE-2018-8292</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-    file name: Microsoft.AspNetCore.Http:2.2.2
-    See https://nvd.nist.gov/vuln/detail/CVE-2020-1045 for full details of this CVE.
-    A security feature bypass vulnerability exists in the way Microsoft ASP.NET Core parses encoded cookie names.
-    The ASP.NET Core cookie parser decodes entire cookie strings which could allow a malicious attacker to set a second cookie with the name being percent encoded.
-    Affected software - Any .NET Core 3.1 application running on .NET Core 3.1.7 or lower & any .NET Core 2.1 application running on .NET Core 2.1.21 or lower
-    ESS is pinned to .Net core SDK > 3.1.419 which is not vunerable, and deployed to Azure App Service which will have the security patch applied.
-    ]]>
-    </notes>
-    <cve>CVE-2020-1045</cve>
   </suppress>
   <suppress>
     <notes>
@@ -259,8 +164,8 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
 	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
 	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
-	This is a temporary suppression pending a fix being available.
-	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58194
+	Affects .NET Core 2.1 - now on .NET 6 so false positive.
+	See https://msrc.microsoft.com/update-guide/en-us/vulnerability/CVE-2018-8409
 	]]></notes>
 	<cve>CVE-2018-8409</cve>
   </suppress>
@@ -288,52 +193,6 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	<cve>CVE-2017-0256</cve>
   </suppress>
   <suppress>
-	<notes><![CDATA[
-	file name: Serilog.Sinks.File:5.0.0
-	For details on these CVEs see:
-		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-2270
-		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3479
-		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3480
-		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3487
-		This is a temporary suppression pending a fix being available.
-       Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=59829
-	]]></notes>
-	<cve>CVE-2014-2270</cve>
-	<cve>CVE-2014-3479</cve>
-	<cve>CVE-2014-3480</cve>
-	<cve>CVE-2014-3487</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	   <![CDATA[
-     file name: Serilog.Extensions.Logging.File:3.0.0
-     Integer underflow in the file_printf function in the "file" program before 4.20 
-     allows user-assisted attackers to execute arbitrary code via a file that triggers a heap-based buffer overflow.
-     No direct reference to any .NET versions
-     ossindex.sonatype.org reports no known vulnerabilities.
-   ]]>
-	</notes>
-	<cve>CVE-2007-1536</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	  <![CDATA[
-     file name: System.Runtime.CompilerServices.Unsafe.dll
-     Affects Services module 7.x-3.x before 7.x-3.10 for Drupal
-   ]]>
-	</notes>
-	<cve>CVE-2014-9152</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	  <![CDATA[
-     file name: System.Threading.Tasks.Dataflow.dll
-     Affects Android  
-   ]]>
-	</notes>
-	<cve>CVE-2022-39349</cve>
-  </suppress>
-  <suppress>
 	<notes>
 	  <![CDATA[
      vulnerability: DOS
@@ -358,30 +217,6 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
   <suppress>
 	<notes>
 	  <![CDATA[
-     vulnerability: Remote code execution
-     Affects .Net 3.1
-	 Currently running Net 6.0.13,  sdk 6.0.405
-   ]]>
-	</notes>
-	<cve>CVE-2020-0605</cve>
-	<cve>CVE-2020-0606</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	  <![CDATA[
-     vulnerability: JQuery Validation Plugin, RegX Dos and  X site scripting Jenkins plugin
-     Affects jQuery, Jenkins
-	 Currently running Net 6.0.13,  sdk 6.0.405
-   ]]>
-	</notes>
-	<cve>CVE-2022-31147</cve>
-	<cve>CVE-2021-43306</cve>
-	<cve>CVE-2021-21252</cve>
-	<cve>CVE-2018-1000413</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	  <![CDATA[
      vulnerability: .NET Framework Information Disclosure
      Affects .Net 4.x.x
 	 Currently running Net 6.0.13,  sdk 6.0.405
@@ -399,26 +234,6 @@ See https://nvd.nist.gov/vuln/detail/CVE-2005-2224 and https://www.securityfocus
 	</notes>
 	<cve>CVE-2022-30184</cve>
    </suppress>
-   <suppress>
-	 <notes>
-	   <![CDATA[
-     vulnerability: Weak password hashing 
-     Affects .Http authentication library up to and excluding 2019-12-27 
-	 Currently running Net 6.0.13,  sdk 6.0.405
-   ]]>
-	</notes>
-	<cve>CVE-2019-20138</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	  <![CDATA[
-     vulnerability: CPU & Memory hog
-     Affects parsing large YAML version < 2.2.4
-   ]]>
-	</notes>
-	<cve>CVE-2022-3064</cve>
-	<cve>CVE-2021-4235</cve>
-  </suppress>
   <suppress>
 	<notes>
 	  <![CDATA[
