@@ -184,7 +184,7 @@
 		</notes>
 		<cve>CVE-2020-1147</cve>
 	</suppress>
-	<suppress>
+	<!--<suppress>
 		<notes>
 			<![CDATA[
    file name: runtime.native.System.Net.Security:4.3.0
@@ -194,7 +194,7 @@
 		<cve>CVE-2017-0247</cve>
 		<cve>CVE-2017-0249</cve>
 		<cve>CVE-2017-0256</cve>
-	</suppress>
+	</suppress>-->
 	<suppress>
 		<notes>
 			<![CDATA[
