@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -113,7 +112,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 "Sales catalogue response download from blob for scsResponseUri:{scsResponseUri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", 
                 async ()=> {
                     var keyCredential = scsStorageService.GetStorageSharedKeyCredentials();
-                    var blobClient = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, keyCredential);
+                    var blobClient = azureBlobStorageClient.GetBlobClientByUri(scsResponseUri, keyCredential);
 
                     var responseFile = await azureBlobStorageClient.DownloadTextAsync(blobClient);
                     var salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);

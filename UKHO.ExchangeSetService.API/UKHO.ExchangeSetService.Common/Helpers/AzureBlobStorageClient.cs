@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return blobContainerClient.GetBlobClient(fileName);
         }
 
-        public BlobClient GetCloudBlockBlobByUri(string uri, StorageSharedKeyCredential keyCredential)
+        public BlobClient GetBlobClientByUri(string uri, StorageSharedKeyCredential keyCredential)
         {
             return new BlobClient(new Uri(uri), keyCredential);
         }

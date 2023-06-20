@@ -38,8 +38,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
             salesCatalogueStorageService = new SalesCatalogueStorageService(fakeStorageConfig);
         }
 
-        #region GetStorageAccountConnectionString
-
         [Test]
         public void WhenValidGetStorageAccountConnectionStringRequest_ThenReturnValidResponse()
         {
@@ -53,13 +51,30 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
-            string expectedErrorMessage = "Storage account accesskey not found";
+            const string expectedErrorMessage = "Storage account accesskey not found";
 
             var ex = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageAccountConnectionString(null, null));
 
-            Assert.AreEqual(expectedErrorMessage, ex.Message);
+            Assert.AreEqual(expectedErrorMessage, ex?.Message);
         }
 
-        #endregion
+        [Test]
+        public void WhenInvalidStorageConfigIsProvided_ThenAKeyNotFoundIsReturned()
+        {
+            fakeStorageConfig.Value.StorageAccountKey = "Test";
+            fakeStorageConfig.Value.StorageAccountName = "";
+            _ = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageSharedKeyCredentials());
+            fakeStorageConfig.Value.StorageAccountKey = "";
+            fakeStorageConfig.Value.StorageAccountName = "Test";
+            _ = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageSharedKeyCredentials());
+        }
+
+        [Test]
+        public void WhenValidStorageConfigIsInPlace_ThenStorageKeyCredentialsReturned()
+        {
+            fakeStorageConfig.Value.StorageAccountKey = "Test";
+            var response = salesCatalogueStorageService.GetStorageSharedKeyCredentials();
+            Assert.NotNull(response);
+        }
     }
 }
