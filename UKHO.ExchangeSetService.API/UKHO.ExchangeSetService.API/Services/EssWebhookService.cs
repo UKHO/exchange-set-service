@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -64,7 +65,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         BatchId = cacheInfo.BatchId,
                         PartitionKey = cacheInfo.PartitionKey,
                         RowKey = cacheInfo.RowKey,
-                        ETag = "*"
+                        ETag = ETag.All
                     };
 
                     logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromTableStarted.ToEventId(), "Deletion started for Search and Download cache data from table:{cacheConfiguration.Value.FssSearchCacheTableName} for ProductName:{cellName} and BatchId:{cacheInfo.BatchId} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, cellName, cacheTableData.BatchId, correlationId);

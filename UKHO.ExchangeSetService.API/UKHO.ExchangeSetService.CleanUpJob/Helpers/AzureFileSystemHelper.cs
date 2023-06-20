@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -80,10 +79,10 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
         public async Task DeleteHistoricScsResponseFile(DirectoryInfo subDirectory, string storageAccountConnectionString, string containerName)
         {
             var batchId = subDirectory.Name;
-            string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
+            var scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
 
-            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetBlobClient(scsResponseFileName, storageAccountConnectionString, containerName);
-            var response = await cloudBlockBlob.DeleteIfExistsAsync();
+            var blobClient = await azureBlobStorageClient.GetBlobClient(scsResponseFileName, storageAccountConnectionString, containerName);
+            var response = await blobClient.DeleteIfExistsAsync();
 
             if (response)
             {

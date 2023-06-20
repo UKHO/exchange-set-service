@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString, string containerName)
         {
             var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
-            await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
+            await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey, entity.ETag);
         }
 
         private static async Task<TableClient> GetAzureTable(string tableName, string storageAccountConnectionString)
