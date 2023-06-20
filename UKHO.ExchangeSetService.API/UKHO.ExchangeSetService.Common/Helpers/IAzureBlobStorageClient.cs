@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.WindowsAzure.Storage.Blob;
+﻿using Azure.Storage.Blobs;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -7,7 +7,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IAzureBlobStorageClient
     {
-        Task<CloudBlockBlob> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName);
+        Task<BlobClient> GetBlobClient(string fileName, string storageAccountConnectionString, string containerName);
         CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString);
         Task UploadFromStreamAsync(CloudBlockBlob cloudBlockBlob, MemoryStream ms);
         Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob);

@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Azure.Data.Tables;
 using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.Common.Helpers

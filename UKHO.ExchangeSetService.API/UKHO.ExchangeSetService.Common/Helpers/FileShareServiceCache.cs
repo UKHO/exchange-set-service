@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
                         {
-                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
 
                             if (cloudBlockBlob != null)
                             {
@@ -156,7 +156,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
-                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, internalBatchDetail.BatchId);
+                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, internalBatchDetail.BatchId);
 
                             //Added to check blob exception
                             try
@@ -204,17 +204,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
-            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
-            if (!await cloudBlockBlob.ExistsAsync())
+            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, batchId);
+            blobClient.SetHttpHeaders(new BlobHttpHeaders { ContentType = CONTENT_TYPE });
+
+            if (!await blobClient.ExistsAsync())
             {
-                await cloudBlockBlob.UploadFromStreamAsync(stream);
+                await blobClient.UploadAsync(stream);
             }
         }
 
         public async Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache)
         {
-            int responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
+            var responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
 
             //If content size is more that responseFileSizeLimitInKb
             //then store content into json file to avoid azure table storage exception for column limit

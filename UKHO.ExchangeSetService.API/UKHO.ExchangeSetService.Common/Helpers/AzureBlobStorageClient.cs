@@ -1,7 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -12,14 +10,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     [ExcludeFromCodeCoverage]
     public class AzureBlobStorageClient : IAzureBlobStorageClient
     {
-        public async Task<CloudBlockBlob> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
+        public async Task<BlobClient> GetBlobClient(string fileName, string storageAccountConnectionString, string containerName)
         {
-            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
-            await cloudBlobContainer.CreateIfNotExistsAsync();
-            CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
-            return cloudBlockBlob;
+            var blobServiceClient = new BlobServiceClient(storageAccountConnectionString);
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            await blobContainerClient.CreateIfNotExistsAsync();
+            return blobContainerClient.GetBlobClient(fileName);
         }
 
         public CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString)

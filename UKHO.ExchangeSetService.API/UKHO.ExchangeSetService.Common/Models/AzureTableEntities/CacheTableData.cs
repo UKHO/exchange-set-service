@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Azure.Data.Tables;
 
 namespace UKHO.ExchangeSetService.Common.Models.AzureTableEntities
 {

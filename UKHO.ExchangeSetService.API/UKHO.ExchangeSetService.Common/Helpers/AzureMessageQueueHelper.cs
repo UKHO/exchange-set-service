@@ -1,9 +1,7 @@
 ﻿using Azure.Storage.Queues;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Queue;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;

@@ -1,5 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
