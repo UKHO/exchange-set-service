@@ -259,7 +259,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenInsertOrMergeFssCacheDetail_ThenReturnTrue()
         {
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<ITableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored));
             await fileShareServiceCache.InsertOrMergeFssCacheDetail(GetResponseCache());
 
             Assert.IsNotNull(true);
@@ -273,7 +273,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
             A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException(BlobErrorCode.BlobNotFound.ToString()));
+            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException(0, "Test error", BlobErrorCode.BlobNotFound.ToString(), null));
             CommonHelper.IsPeriodicOutputService = false;
 
             var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
@@ -308,7 +308,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
             A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException("Test error"));
+            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException(0, "Test error", BlobErrorCode.BlobBeingRehydrated.ToString(), null));
             CommonHelper.IsPeriodicOutputService = false;
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
@@ -326,7 +326,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
             A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(blobClient);
             A.CallTo(() => blobClient.ExistsAsync(default)).Returns(Response.FromValue(false, default));
-            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<ITableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored));
 
             await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
 
