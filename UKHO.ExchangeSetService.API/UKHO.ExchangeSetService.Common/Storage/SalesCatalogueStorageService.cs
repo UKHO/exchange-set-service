@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Azure.Storage;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using UKHO.ExchangeSetService.Common.Configuration;
 
@@ -9,7 +11,7 @@ namespace UKHO.ExchangeSetService.Common.Storage
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         public SalesCatalogueStorageService(IOptions<EssFulfilmentStorageConfiguration> storageConfig)
         {
-            this.storageConfig = storageConfig;
+            this.storageConfig = storageConfig ?? throw new ArgumentNullException(nameof(storageConfig));
         }
 
         public string GetStorageAccountConnectionString(string storageAccountName = null, string storageAccountKey = null)
@@ -25,6 +27,18 @@ namespace UKHO.ExchangeSetService.Common.Storage
             string storageAccountConnectionString = $"DefaultEndpointsProtocol=https;AccountName={ScsStorageAccountName};AccountKey={ScsStorageAccountAccessKeyValue};EndpointSuffix=core.windows.net";
 
             return storageAccountConnectionString;
+        }
+
+        public StorageSharedKeyCredential GetStorageSharedKeyCredentials()
+        {
+            var config = storageConfig.Value;
+
+            if (config == null || string.IsNullOrWhiteSpace(config.StorageAccountName) || string.IsNullOrWhiteSpace(config.StorageAccountKey))
+            {
+                throw new KeyNotFoundException("Storage account credentials missing from config");
+            }
+
+            return new StorageSharedKeyCredential(config.StorageAccountName, config.StorageAccountKey);
         }
     }
 }

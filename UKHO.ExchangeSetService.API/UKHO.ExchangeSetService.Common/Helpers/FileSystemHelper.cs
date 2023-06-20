@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure.Storage.Blobs;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -136,9 +137,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return ms.ToArray();
         }
 
-        public async Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
+        public async Task DownloadToFileAsync(BlobClient blobClient, string path)
         {
-            await cloudBlockBlob.DownloadToFileAsync(path, FileMode.Create);
+            // If path already exists it will be overwritten (equivalent to FileMode.Create).
+            await blobClient.DownloadToAsync(path);
         }
 
         public IDirectoryInfo[] GetDirectoryInfo(string path)

@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -44,49 +46,47 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
         {
-            string uploadFileName = string.Concat(batchId, ".json");
-            long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
+            var uploadFileName = string.Concat(batchId, ".json");
+            var fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
             var instanceCountAndType = GetInstanceCountBasedOnFileSize(fileSizeInMB);
             var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.Item2);
 
-            string storageAccountConnectionString =
-                  scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
-            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
-            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
+            var storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
+            var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
+            await blobClient.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
 
-            await UploadSalesCatalogueServiceResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
+            await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
-            await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, instanceCountAndType.Item1, storageAccountConnectionString, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
+            await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, blobClient, instanceCountAndType.Item1, storageAccountConnectionString, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
 
             return true;
         }
 
-        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, int instanceNumber, string storageAccountConnectionString, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
+        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, BlobClient blobClient, int instanceNumber, string storageAccountConnectionString, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
+            var scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, blobClient, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
             var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
             await azureMessageQueueHelper.AddMessage(batchId, instanceNumber, storageAccountConnectionString, scsResponseQueueMessageJSON, correlationId);
         }
 
-        public async Task UploadSalesCatalogueServiceResponseToBlobAsync(CloudBlockBlob cloudBlockBlob, SalesCatalogueProductResponse salesCatalogueResponse)
+        public async Task UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
 
             using var ms = new MemoryStream();
             LoadStreamWithJson(ms, serializeJsonObject);
-            await azureBlobStorageClient.UploadFromStreamAsync(cloudBlockBlob, ms);
-
+            await azureBlobStorageClient.UploadFromStreamAsync(blobClient, ms);
         }
 
-        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
+        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, BlobClient blobClient, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
         {
-            long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
+            var fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
             {
                 BatchId = batchId,
-                ScsResponseUri = cloudBlockBlob.Uri.AbsoluteUri,
+                ScsResponseUri = blobClient.Uri.AbsoluteUri,
                 FileSize = fileSize,
                 CallbackUri = callBackUri ?? string.Empty,
                 CorrelationId = correlationId,
@@ -112,11 +112,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 EventIds.DownloadSalesCatalogueResponseDataCompleted,
                 "Sales catalogue response download from blob for scsResponseUri:{scsResponseUri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", 
                 async ()=> {
-                    string storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString();
-                    CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, storageAccountConnectionString);
+                    var keyCredential = scsStorageService.GetStorageSharedKeyCredentials();
+                    var blobClient = azureBlobStorageClient.GetCloudBlockBlobByUri(scsResponseUri, keyCredential);
 
-                    var responseFile = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
-                    SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
+                    var responseFile = await azureBlobStorageClient.DownloadTextAsync(blobClient);
+                    var salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
                   
                     return salesCatalogueProductResponse;
                 },

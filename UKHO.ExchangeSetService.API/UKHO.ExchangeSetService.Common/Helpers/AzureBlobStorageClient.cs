@@ -1,8 +1,10 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -18,36 +20,36 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return blobContainerClient.GetBlobClient(fileName);
         }
 
-        public CloudBlockBlob GetCloudBlockBlobByUri(string uri, string storageAccountConnectionString)
+        public BlobClient GetCloudBlockBlobByUri(string uri, StorageSharedKeyCredential keyCredential)
         {
-            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            return new CloudBlockBlob(new Uri(uri), cloudStorageAccount.Credentials);
+            return new BlobClient(new Uri(uri), keyCredential);
         }
 
-        public async Task UploadFromStreamAsync(CloudBlockBlob cloudBlockBlob,MemoryStream ms)
+        public async Task UploadFromStreamAsync(BlobClient blobClient, MemoryStream ms)
         {
-            await cloudBlockBlob.UploadFromStreamAsync(ms);
+            await blobClient.UploadAsync(ms);
         }
 
-        public async Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob)
+        public async Task<string> DownloadTextAsync(BlobClient blobClient)
         {
-             return await cloudBlockBlob.DownloadTextAsync();
+            using var ms = new MemoryStream();
+            await blobClient.DownloadToAsync(ms);
+            return Encoding.UTF8.GetString(ms.ToArray());
         }
 
         public async Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName)
         {
-            BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
-            var blobContainerExists = await container.ExistsAsync();
-            if(blobContainerExists)
-                return HealthCheckResult.Healthy("Azure blob storage is healthy");
-            else
-                return HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", new Exception("Azure blob storage connection failed or not available"));
+            var blobContainerClient = new BlobContainerClient(storageAccountConnectionString, containerName);
+            var blobContainerExists = await blobContainerClient.ExistsAsync();
+            return blobContainerExists
+                ? HealthCheckResult.Healthy("Azure blob storage is healthy")
+                : HealthCheckResult.Unhealthy("Azure blob storage is unhealthy", new Exception("Azure blob storage connection failed or not available"));
         }
 
         public async Task DeleteCacheContainer(string storageAccountConnectionString, string containerName)
         {
-            BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
-            await container.DeleteIfExistsAsync();
+            var blobContainerClient = new BlobContainerClient(storageAccountConnectionString, containerName);
+            await blobContainerClient.DeleteIfExistsAsync();
         }
     }
 }
