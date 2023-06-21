@@ -184,17 +184,6 @@
 		</notes>
 		<cve>CVE-2020-1147</cve>
 	</suppress>
-	<!--<suppress>
-		<notes>
-			<![CDATA[
-   file name: runtime.native.System.Net.Security:4.3.0
-   ]]>
-		</notes>
-		<packageUrl regex="true">^pkg:nuget/runtime\.native\.System\.Net\.Security@.*$</packageUrl>
-		<cve>CVE-2017-0247</cve>
-		<cve>CVE-2017-0249</cve>
-		<cve>CVE-2017-0256</cve>
-	</suppress>-->
 	<suppress>
 		<notes>
 			<![CDATA[
@@ -205,17 +194,6 @@
 		</notes>
 		<cve>CVE-2023-21538</cve>
 		<cve>CVE-2022-24464</cve>
-	</suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
-     vulnerability: Buffer overflow and spoofing
-     Affects .Net 3.1 .Net 5.0 and <= .Net 6.0.8 
-	 Currently running Net 6.0.13,  sdk 6.0.405
-   ]]>
-		</notes>
-		<cve>CVE-2020-8927</cve>
-		<cve>CVE-2022-34716</cve>
 	</suppress>
 	<suppress>
 		<notes>
