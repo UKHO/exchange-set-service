@@ -237,18 +237,6 @@
   <suppress>
 	<notes>
 	  <![CDATA[
-     vulnerability: Password protection, MS10-072 
-     Affects windows 98 & windows Me, Office and Word
-	 MS10-072 fixed in October 2010
-   ]]>
-	</notes>
-	  <cve>CVE-2001-0152</cve>
-	  <cve>CVE-2010-3324</cve>
-	  <cve>CVE-2017-11826</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	  <![CDATA[
      vulnerability:  Information disclosure  
      Affects Active directory up to 2021-11-02
    ]]>
@@ -260,7 +248,6 @@
 	  <![CDATA[
      vulnerability:  Elevation of Privilege   
      Affects Azure Open Management Infrastructure (OMI) version <= 1.6.9-0 (VMs running Linux)
-
    ]]>
 	</notes>
 	<cve>CVE-2022-29149</cve>
@@ -281,5 +268,15 @@
    This part of .NetCoreApp. Either waiting on fix through .net sdk to fix, or update to .net core 8 when available.
    ]]></notes>
    <cve>CVE-2017-11770</cve>
-</suppress>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Microsoft.NETCore.Platforms:3.1.0
+   False positive - only affects .Net Framework.
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Platforms@.*$</packageUrl>
+		<vulnerabilityName>CVE-2023-29326</vulnerabilityName>
+	</suppress>
 </suppressions>

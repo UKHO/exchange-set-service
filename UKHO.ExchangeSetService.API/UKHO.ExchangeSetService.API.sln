@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD9A854E-AAEF-428B-AD51-3499A4A84EE6}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		..\NVDSuppressions.xml = ..\NVDSuppressions.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1FE54AB1-9543-480E-8A3D-2FA1E2A340CE}"
@@ -28,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.Web
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.CleanUpJob", "UKHO.ExchangeSetService.CleanUpJob\UKHO.ExchangeSetService.CleanUpJob.csproj", "{650B81DD-16F9-4E73-99DA-6F14A1912E80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests", "UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests\UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.csproj", "{270C6A69-D3AD-4E1E-BC66-EB3F34692307}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests", "UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests\UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.csproj", "{270C6A69-D3AD-4E1E-BC66-EB3F34692307}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
