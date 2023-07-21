@@ -598,7 +598,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                logger.LogError(EventIds.DownloadIhoCrtFileNonOkResponse.ToEventId(), "Error in file share service while downloading IHO.crt file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
+                logger.LogError(EventIds.DownloadIhoCrtFileNonOkResponse.ToEventId(), "Error in file share service while downloading IHO.crt file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpIhoCrtFileResponse.StatusCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.DownloadIhoCrtFileNonOkResponse.ToEventId());
             }
         }
@@ -631,7 +631,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                logger.LogError(EventIds.DownloadIhoPubFileNonOkResponse.ToEventId(), "Error in file share service while downloading IHO.pub file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
+                logger.LogError(EventIds.DownloadIhoPubFileNonOkResponse.ToEventId(), "Error in file share service while downloading IHO.pub file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpIhoPubFileResponse.StatusCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.DownloadIhoPubFileNonOkResponse.ToEventId());
             }
         }

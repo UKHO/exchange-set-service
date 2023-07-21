@@ -136,5 +136,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public bool DownloadFile(string filePath, Stream stream, string lineToWrite)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

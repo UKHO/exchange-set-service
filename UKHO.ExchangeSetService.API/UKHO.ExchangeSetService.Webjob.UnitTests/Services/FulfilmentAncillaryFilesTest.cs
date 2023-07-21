@@ -56,6 +56,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 EncRoot = "ENC_ROOT",
                 ExchangeSetFileFolder = "V01X01",
                 ReadMeFileName = "ReadMe.txt",
+                IhoCrtFileName = "IHO.crt",
+                IhoPubFileName = "IHO.pub",
                 CatalogFileName = "CATALOG.031",
                 SerialFileName = "TEST.ENC",
                 SerialAioFileName = "TEST.AIO",
