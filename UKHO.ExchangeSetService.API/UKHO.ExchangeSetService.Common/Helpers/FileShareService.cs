@@ -593,7 +593,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         logger.LogInformation(EventIds.DownloadIhoCrtFile307RedirectResponse.ToEventId(), "File share service download IHO.crt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
                     }
-                    return fileSystemHelper.DownloadFile(filePath, stream, lineToWrite);
+                    return fileSystemHelper.DownloadIhoCrtFile(filePath, stream, lineToWrite);
                 }
             }
             else
