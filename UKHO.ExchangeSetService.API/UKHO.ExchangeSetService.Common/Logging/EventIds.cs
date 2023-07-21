@@ -736,7 +736,71 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805182 - Request for creating catalog.031 file in aio exchange set is completed
         /// </summary>
-        CreateCatalogFileForAioRequestCompleted = 805182
+        CreateCatalogFileForAioRequestCompleted = 805182,
+        /// <summary>
+        /// 805183 - Request for searching IHO.CRT from file share service is started.
+        /// </summary>
+        QueryFileShareServiceIhoCrtFileRequestStart = 805183,
+        /// <summary>
+        /// 805184 - Request for searching IHO.CRT from file share service is completed.
+        /// </summary>
+        QueryFileShareServiceIhoCrtFileRequestCompleted = 805184,
+        /// <summary>
+        /// 805185 - Request for searching IHO.PUB from file share service is started.
+        /// </summary>
+        QueryFileShareServiceIhoPubFileRequestStart = 805185,
+        /// <summary>
+        /// 805186 - Request for searching IHO.PUB from file share service is completed.
+        /// </summary>
+        QueryFileShareServiceIhoPubFileRequestCompleted = 805186,
+        /// <summary>
+        /// 805187 - Request for downloading IHO.CRT from file share service is started.
+        /// </summary>
+        DownloadIhoCrtFileRequestStart = 805187,
+        /// <summary>
+        /// 805188 - Request for downloading IHO.CRT from file share service is completed.
+        /// </summary>
+        DownloadIhoCrtFileRequestCompleted = 805188,
+        /// <summary>
+        /// 805189 - Request for downloading IHO.PUB from file share service is started.
+        /// </summary>
+        DownloadIhoPubFileRequestStart = 805189,
+        /// <summary>
+        /// 805190 - Request for downloading IHO.PUB from file share service is completed.
+        /// </summary>
+        DownloadIhoPubFileRequestCompleted = 805190,
+        /// <summary>
+        /// 805191 - IHO.crt file is not found while searching in file share service.
+        /// </summary>
+        IhoCrtFileNotFound = 805191,
+        /// <summary>
+        /// 805192 - IHO.pub file is not found while searching in file share service.
+        /// </summary>
+        IhoPubFileNotFound = 805192,
+        /// <summary>
+        /// 805193 - Request for searching IHO.crt from file share service is failed due to non ok response.
+        /// </summary>
+        QueryFileShareServiceIhoCrtFileNonOkResponse = 805193,
+        /// <summary>
+        /// 805194 - Request for searching IHO.pub from file share service is failed due to non ok response.
+        /// </summary>
+        QueryFileShareServiceIhoPubFileNonOkResponse = 805194,
+        /// <summary>
+        /// 805195 - Request for downloading IHO.crt from file share service is failed due to non ok response.
+        /// </summary>
+        DownloadIhoCrtFileNonOkResponse = 805195,
+        /// <summary>
+        /// 805196 - Request for downloading IHO.pub from file share service is failed due to non ok response.
+        /// </summary>
+        DownloadIhoPubFileNonOkResponse = 805196,
+        /// <summary>
+        /// 805197 - Completed download of 307 response IHO.crt file from the file share service.
+        /// </summary>
+        DownloadIhoCrtFile307RedirectResponse = 805197,
+        /// <summary>
+        /// 805198 - Completed download of 307 response IHO.pub file from the file share service.
+        /// </summary>
+        DownloadIhoPubFile307RedirectResponse = 805198,
     }
 
     public static class EventIdExtensions

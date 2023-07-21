@@ -287,6 +287,68 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isDownloadReadMeFileSuccess;
         }
 
+        public async Task<bool> DownloadIhoCrtFile(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            bool isDownloadIhoCrtFileSuccess = false;
+            string ihoCrtFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceIhoCrtFileRequestStart,
+                EventIds.QueryFileShareServiceIhoCrtFileRequestCompleted,
+                "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    return await fulfilmentFileShareService.SearchIhoCrtFilePath(batchId, correlationId);
+                },
+                batchId, correlationId);
+
+            if (!string.IsNullOrWhiteSpace(ihoCrtFilePath))
+            {
+                DateTime createIhoCrtFileTaskStartedAt = DateTime.UtcNow;
+                isDownloadIhoCrtFileSuccess = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadIhoCrtFileRequestStart,
+                    EventIds.DownloadIhoCrtFileRequestCompleted,
+                    "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () =>
+                    {
+                        return await fulfilmentFileShareService.DownloadIhoCrtFile(ihoCrtFilePath, batchId, exchangeSetRootPath, correlationId);
+                    },
+                    batchId, correlationId);
+
+                DateTime createIhoCrtFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download IHO.crt File Task", createIhoCrtFileTaskStartedAt, createIhoCrtFileTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+
+            return isDownloadIhoCrtFileSuccess;
+        }
+
+        public async Task<bool> DownloadIhoPubFile(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            bool isDownloadIhoPubFileSuccess = false;
+            string ihoPubFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceIhoPubFileRequestStart,
+                EventIds.QueryFileShareServiceIhoPubFileRequestCompleted,
+                "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    return await fulfilmentFileShareService.SearchIhoPubFilePath(batchId, correlationId);
+                },
+                batchId, correlationId);
+
+            if (!string.IsNullOrWhiteSpace(ihoPubFilePath))
+            {
+                DateTime createIhoPubFileTaskStartedAt = DateTime.UtcNow;
+                isDownloadIhoPubFileSuccess = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadIhoPubFileRequestStart,
+                    EventIds.DownloadIhoPubFileRequestCompleted,
+                    "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () =>
+                    {
+                        return await fulfilmentFileShareService.DownloadIhoPubFile(ihoPubFilePath, batchId, exchangeSetRootPath, correlationId);
+                    },
+                    batchId, correlationId);
+
+                DateTime createIhoPubFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download Iho Pub File Task", createIhoPubFileTaskStartedAt, createIhoPubFileTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+
+            return isDownloadIhoPubFileSuccess;
+        }
+
         public async Task CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
         {
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
@@ -786,6 +848,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             return
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId) &&
+            await DownloadIhoCrtFile(batchId, exchangeSetRootPath, correlationId) &&
+            await DownloadIhoPubFile(batchId, exchangeSetRootPath, correlationId) &&
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse) &&
             await CreateProductFileForAio(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime) &&
             await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId, listFulfilmentAioData, salesCatalogueDataResponse, salesCatalogueProductResponse);
