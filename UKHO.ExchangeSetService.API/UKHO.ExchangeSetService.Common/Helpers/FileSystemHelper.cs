@@ -106,6 +106,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return false;
         }
 
+        public bool DownloadFile(string filePath, Stream stream, string lineToWrite)
+        {
+            if (stream != null)
+            {
+                CreateFileCopy(filePath, stream);
+                var text = File.ReadAllText(filePath);
+                var secondLineText = GetLine(filePath);
+                text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
+                if (!string.IsNullOrWhiteSpace(text))
+                    File.WriteAllText(filePath, text);
+                return true;
+            }
+            return false;
+        }
+
         public void CreateFileCopy(string filePath, Stream stream)
         {
             if (stream != null)

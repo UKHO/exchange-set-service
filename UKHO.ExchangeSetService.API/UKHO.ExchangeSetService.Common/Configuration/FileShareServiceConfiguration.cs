@@ -13,6 +13,8 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         public string ExchangeSetFileFolder { get; set; }
         public string EncRoot { get; set; }
         public string ReadMeFileName { get; set; }
+        public string IhoCrtFileName { get; set; }
+        public string IhoPubFileName { get; set; }
         public string Info { get; set; }
         public string ProductFileName { get; set; }
         public string BaseCellExtension { get; set; }

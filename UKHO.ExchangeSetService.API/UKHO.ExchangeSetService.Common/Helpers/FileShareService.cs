@@ -571,6 +571,71 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
+        public async Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string fileName = fileShareServiceConfig.Value.IhoCrtFileName;
+            string filePath = Path.Combine(exchangeSetRootPath, fileName);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
+            HttpResponseMessage httpIhoCrtFileResponse;
+            httpIhoCrtFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, ihoCrtFilePath, CancellationToken.None, correlationId);
+
+            var requestUri = new Uri(httpIhoCrtFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
+
+            if (httpIhoCrtFileResponse.IsSuccessStatusCode)
+            {
+                var serverValue = httpIhoCrtFileResponse.Headers.Server.ToString().Split('/').First();
+                using (Stream stream = await httpIhoCrtFileResponse.Content.ReadAsStreamAsync())
+                {
+                    if (serverValue == ServerHeaderValue)
+                    {
+                        logger.LogInformation(EventIds.DownloadIhoCrtFile307RedirectResponse.ToEventId(), "File share service download IHO.crt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
+                    }
+                    return fileSystemHelper.DownloadFile(filePath, stream, lineToWrite);
+                }
+            }
+            else
+            {
+                logger.LogError(EventIds.DownloadIhoCrtFileNonOkResponse.ToEventId(), "Error in file share service while downloading IHO.crt file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.DownloadIhoCrtFileNonOkResponse.ToEventId());
+            }
+        }
+
+
+        public async Task<bool> DownloadIhoPubFile(string ihoPubFilePath, string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string fileName = fileShareServiceConfig.Value.IhoPubFileName;
+            string filePath = Path.Combine(exchangeSetRootPath, fileName);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
+            HttpResponseMessage httpIhoPubFileResponse;
+            httpIhoPubFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, ihoPubFilePath, CancellationToken.None, correlationId);
+
+            var requestUri = new Uri(httpIhoPubFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
+
+            if (httpIhoPubFileResponse.IsSuccessStatusCode)
+            {
+                var serverValue = httpIhoPubFileResponse.Headers.Server.ToString().Split('/').First();
+                using (Stream stream = await httpIhoPubFileResponse.Content.ReadAsStreamAsync())
+                {
+                    if (serverValue == ServerHeaderValue)
+                    {
+                        logger.LogInformation(EventIds.DownloadIhoPubFile307RedirectResponse.ToEventId(), "File share service download IHO.pub redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
+                    }
+                    return fileSystemHelper.DownloadFile(filePath, stream, lineToWrite);
+                }
+            }
+            else
+            {
+                logger.LogError(EventIds.DownloadIhoPubFileNonOkResponse.ToEventId(), "Error in file share service while downloading IHO.pub file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.DownloadIhoPubFileNonOkResponse.ToEventId());
+            }
+        }
+
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
             string payloadJson = string.Empty;
@@ -597,6 +662,68 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 logger.LogError(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId(), "Error in file share service while searching ReadMe file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.QueryFileShareServiceReadMeFileNonOkResponse.ToEventId());
+            }
+
+            return filePath;
+        }
+
+        public async Task<string> SearchIhoCrtFilePath(string batchId, string correlationId)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string filePath = string.Empty;
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.IhoCrtFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+                if (searchBatchResponse.Entries.Count > 0)
+                {
+                    var batchResult = searchBatchResponse.Entries.FirstOrDefault();
+                    filePath = batchResult.Files.FirstOrDefault()?.Links.Get.Href;
+                }
+                else
+                {
+                    logger.LogError(EventIds.IhoCrtFileNotFound.ToEventId(), "Error in file share service IHO.crt not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.IhoCrtFileNotFound.ToEventId());
+                }
+            }
+            else
+            {
+                logger.LogError(EventIds.QueryFileShareServiceIhoCrtFileNonOkResponse.ToEventId(), "Error in file share service while searching IHO.crt file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.QueryFileShareServiceIhoCrtFileNonOkResponse.ToEventId());
+            }
+
+            return filePath;
+        }
+
+        public async Task<string> SearchIhoPubFilePath(string batchId, string correlationId)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string filePath = string.Empty;
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.IhoPubFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            HttpResponseMessage httpResponse;
+            httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                SearchBatchResponse searchBatchResponse = await SearchBatchResponse(httpResponse);
+                if (searchBatchResponse.Entries.Count > 0)
+                {
+                    var batchResult = searchBatchResponse.Entries.FirstOrDefault();
+                    filePath = batchResult.Files.FirstOrDefault()?.Links.Get.Href;
+                }
+                else
+                {
+                    logger.LogError(EventIds.IhoPubFileNotFound.ToEventId(), "Error in file share service IHO.pub not found for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.IhoPubFileNotFound.ToEventId());
+                }
+            }
+            else
+            {
+                logger.LogError(EventIds.QueryFileShareServiceIhoPubFileNonOkResponse.ToEventId(), "Error in file share service while searching IHO.pub file with uri {RequestUri} responded with {StatusCode} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.QueryFileShareServiceIhoPubFileNonOkResponse.ToEventId());
             }
 
             return filePath;

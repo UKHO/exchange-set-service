@@ -18,5 +18,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         Task<IEnumerable<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string folderName);
         Task<bool> DownloadFolderDetails(string batchId, string correlationId, IEnumerable<BatchFile> fileDetails, string exchangeSetPath);
         Task<bool> CommitExchangeSet(string batchId, string correlationId, string exchangeSetZipPath);
+
+        Task<string> SearchIhoPubFilePath(string batchId, string correlationId);
+        Task<string> SearchIhoCrtFilePath(string batchId, string correlationId);
+        Task<bool> DownloadIhoPubFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
+        Task<bool> DownloadIhoCrtFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
     }
 }
