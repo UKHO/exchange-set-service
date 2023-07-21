@@ -141,5 +141,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public bool DownloadIhoCrtFile(string filePath, Stream stream, string lineToWrite)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
