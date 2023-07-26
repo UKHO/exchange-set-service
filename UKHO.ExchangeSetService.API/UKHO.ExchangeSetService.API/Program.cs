@@ -214,12 +214,12 @@ namespace UKHO.ExchangeSetService.API
             });
 
             app.UseHttpsRedirection();
-            //app.UseHsts(x => x.MaxAge(365).IncludeSubdomains());
-            //app.UseReferrerPolicy(x => x.NoReferrer());
-            //app.UseCsp(x => x.DefaultSources(y => y.Self()));
-            //app.UsePermissionsPolicyHeader();
-            //app.UseXfo(x => x.SameOrigin());
-            //app.UseXContentTypeOptions();
+            app.UseHsts(x => x.MaxAge(365).IncludeSubdomains());
+            app.UseReferrerPolicy(x => x.NoReferrer());
+            app.UseCsp(x => x.DefaultSources(y => y.Self()));
+            app.UsePermissionsPolicyHeader();
+            app.UseXfo(x => x.SameOrigin());
+            app.UseXContentTypeOptions();
             app.UseHeaderPropagation();
             app.UseAuthentication();
             app.UseAuthorization();
