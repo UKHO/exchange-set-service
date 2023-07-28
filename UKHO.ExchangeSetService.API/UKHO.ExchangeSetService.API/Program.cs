@@ -195,15 +195,11 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IEnterpriseEventCacheDataRequestValidator, EnterpriseEventCacheDataRequestValidator>();
             builder.Services.AddScoped<IEssWebhookService, EssWebhookService>();
 
-
-
             builder.Services.AddEndpointsApiExplorer();
             ConfigureSwagger();
 
             var app = builder.Build();
-
             ConfigureLogging(app);
-
 
             if (app.Environment.IsDevelopment())
             {
@@ -211,28 +207,25 @@ namespace UKHO.ExchangeSetService.API
             }
 
             app.UseSwagger();
-
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "UKHO Exchange Set Server APIs");
                 c.RoutePrefix = "swagger";
             });
 
-
             app.UseHttpsRedirection();
-
+            app.UseHsts(x => x.MaxAge(365).IncludeSubdomains());
+            app.UseReferrerPolicy(x => x.NoReferrer());
+            app.UseCsp(x => x.DefaultSources(y => y.Self()));
+            app.UsePermissionsPolicyHeader();
+            app.UseXfo(x => x.SameOrigin());
+            app.UseXContentTypeOptions();
             app.UseHeaderPropagation();
-
             app.UseAuthentication();
-
             app.UseAuthorization();
-
             app.MapHealthChecks("/health");
-
             app.MapControllers();
-
             app.Run();
-
 
             //=====================================
             void ConfigureSwagger()
@@ -265,10 +258,7 @@ namespace UKHO.ExchangeSetService.API
                     });
                     c.OperationFilter<UKHO.ExchangeSetService.API.Filters.SecurityRequirementsOperationFilter>();
                 });
-
-
             }
-
 
             void ConfigureLogging(WebApplication app)
             {
@@ -315,7 +305,6 @@ namespace UKHO.ExchangeSetService.API
                 app.UseCorrelationIdMiddleware()
                    .UseErrorLogging(loggerFactory);
             }
-
         }
     }
 }
