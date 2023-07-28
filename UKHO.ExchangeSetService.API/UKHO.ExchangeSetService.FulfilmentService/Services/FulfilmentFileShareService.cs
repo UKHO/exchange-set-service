@@ -115,10 +115,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);
         }
+
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
             return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
         }
+
+        public async Task<string> SearchIhoPubFilePath(string batchId, string correlationId)
+        {
+            return await fileShareService.SearchIhoPubFilePath(batchId, correlationId);
+        }
+
+        public async Task<string> SearchIhoCrtFilePath(string batchId, string correlationId)
+        {
+            return await fileShareService.SearchIhoCrtFilePath(batchId, correlationId);
+        }
+        public async Task<bool> DownloadIhoPubFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            return await fileShareService.DownloadIhoPubFile(filePath, batchId, exchangeSetRootPath, correlationId);
+        }
+
+        public async Task<bool> DownloadIhoCrtFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            return await fileShareService.DownloadIhoCrtFile(filePath, batchId, exchangeSetRootPath, correlationId);
+        }
+
         public async Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
             return await fileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);

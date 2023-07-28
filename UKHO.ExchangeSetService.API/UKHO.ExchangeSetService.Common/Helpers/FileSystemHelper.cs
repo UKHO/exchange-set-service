@@ -106,6 +106,41 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return false;
         }
 
+        public bool DownloadIhoCrtFile(string filePath, Stream stream, string lineToWrite)
+        {
+            if (stream != null)
+            {
+                var encodingProvider = CodePagesEncodingProvider.Instance;
+                Encoding.RegisterProvider(encodingProvider);
+
+                var windows1252Encoding = encodingProvider.GetEncoding(1252) ?? Encoding.Default;
+
+                CreateFileCopy(filePath, stream);
+                var text = File.ReadAllText(filePath, windows1252Encoding);
+                var secondLineText = GetLine(filePath);
+                text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
+                if (!string.IsNullOrWhiteSpace(text))
+                    File.WriteAllText(filePath, text, windows1252Encoding);
+                return true;
+            }
+            return false;
+        }
+
+        public bool DownloadFile(string filePath, Stream stream, string lineToWrite)
+        {
+            if (stream != null)
+            {
+                CreateFileCopy(filePath, stream);
+                var text = File.ReadAllText(filePath);
+                var secondLineText = GetLine(filePath);
+                text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
+                if (!string.IsNullOrWhiteSpace(text))
+                    File.WriteAllText(filePath, text);
+                return true;
+            }
+            return false;
+        }
+
         public void CreateFileCopy(string filePath, Stream stream)
         {
             if (stream != null)

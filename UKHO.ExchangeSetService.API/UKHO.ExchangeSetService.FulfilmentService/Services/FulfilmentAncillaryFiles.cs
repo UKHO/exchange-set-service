@@ -64,6 +64,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
+            var ihoCrtFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.IhoCrtFileName);
+            var ihoPubFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.IhoPubFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
 
             if (fileSystemHelper.CheckFileExists(readMeFileName))
@@ -72,6 +74,24 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
                     Implementation = "TXT"
+                });
+            }
+
+            if (fileSystemHelper.CheckFileExists(ihoCrtFileName))
+            {
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.IhoCrtFileName,
+                    Implementation = "CRT"
+                });
+            }
+
+            if (fileSystemHelper.CheckFileExists(ihoPubFileName))
+            {
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.IhoPubFileName,
+                    Implementation = "PUB"
                 });
             }
 
