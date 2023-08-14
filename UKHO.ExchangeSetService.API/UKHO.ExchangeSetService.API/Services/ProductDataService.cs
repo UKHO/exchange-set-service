@@ -100,11 +100,11 @@ namespace UKHO.ExchangeSetService.API.Services
             //Set Aio details on exchange set response
             SetExchangeSetAioDetails(response.ExchangeSetResponse, productIdentifierRequest.ProductIdentifier.ToList(), salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, productIdentifierRequest.CorrelationId);
 
-            var aioCellsCount = aioCells.Count();
+            var aioCellsExist = aioCells.Any();
 
-            var encCellsExist = productIdentifierRequest.ProductIdentifier.ToList().Count > aioCellsCount;
+            var encCellsExist = productIdentifierRequest.ProductIdentifier.Any();
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId, encCellsExist, aioCellsCount > 0 );
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId, encCellsExist, aioCellsExist);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -201,11 +201,11 @@ namespace UKHO.ExchangeSetService.API.Services
                 SetExchangeSetAioDetails(response.ExchangeSetResponse, lstRequestedProducts, salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, request.CorrelationId);
             }
 
-            var aioCellsCount = aioCells.Count();
+            var aioCellsExist = aioCells.Any();
 
-            var encCellsExist = request.ProductVersions.Select(x => x.ProductName).ToList().Count > aioCellsCount;
+            var encCellsExist = request.ProductVersions.Select(x => x.ProductName).Any();
             
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId, encCellsExist, aioCellsCount > 0);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId, encCellsExist, aioCellsExist);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -261,11 +261,11 @@ namespace UKHO.ExchangeSetService.API.Services
             //Set Aio details on exchange set response
             SetExchangeSetAioDetailsSinceDateTime(response.ExchangeSetResponse, aioCells, response.BatchId, productDataSinceDateTimeRequest.CorrelationId);
 
-            var aioCellsCount = aioCells.Count();
+            var aioCellsExist = aioCells.Any();
 
-            var encCellsExist = salesCatalogueResponse.ResponseBody?.Products.Select(p => p.ProductName).ToList().Count > aioCellsCount;
+            var encCellsExist = salesCatalogueResponse.ResponseBody?.Products.Select(p => p.ProductName).Any() ?? false;
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId, encCellsExist, aioCellsCount > 0);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId, encCellsExist, aioCellsExist);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
