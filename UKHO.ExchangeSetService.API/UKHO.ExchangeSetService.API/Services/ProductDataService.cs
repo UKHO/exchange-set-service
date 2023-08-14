@@ -70,11 +70,14 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            var aioCellsCount = GetAioCells().Count();
+            // filter cells method might update the number of items in the list so get total count before calling it
+            var allCellsCount = productIdentifierRequest.ProductIdentifier.ToList().Count;
 
-            var encCellsExist = productIdentifierRequest.ProductIdentifier.ToList().Count > aioCellsCount;
+            IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest).ToList();
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest);
+            var aioCellsCount = aioCells.Count();
+
+            var encCellsExist = allCellsCount > aioCells.Count();
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             long fileSize = 0;
@@ -150,11 +153,14 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            var aioCellsCount = GetAioCells().Count();
+            // filter cells method might update the number of items in the list so get total count before calling it
+            var allCellsCount = request.ProductVersions.Select(x => x.ProductName).ToList().Count;
 
-            var encCellsExist = request.ProductVersions.Select(x => x.ProductName).ToList().Count > aioCellsCount;
-            
-            IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request);
+            IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request).ToList();
+
+            var aioCellsCount = aioCells.Count();
+
+            var encCellsExist = allCellsCount > aioCells.Count();
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
             long fileSize = 0;
@@ -251,11 +257,15 @@ namespace UKHO.ExchangeSetService.API.Services
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
-            var aioCellsCount = GetAioCells().Count();
+            // filter cells method might update the number of items in the list so get total count before calling it
+            var allCellsCount = salesCatalogueResponse.ResponseBody?.Products.Select(p => p.ProductName).ToList().Count;
 
-            var encCellsExist = salesCatalogueResponse.ResponseBody?.Products.Select(p => p.ProductName).ToList().Count > aioCellsCount;
+            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody).ToList();
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
+            var aioCellsCount = aioCells.Count();
+
+            var encCellsExist = allCellsCount > aioCells.Count();
+
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
