@@ -70,7 +70,11 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest).ToList();
+            var aioCellsCount = GetAioCells().Count();
+
+            var encCellsExist = productIdentifierRequest.ProductIdentifier.ToList().Count > aioCellsCount;
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest);
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             long fileSize = 0;
@@ -99,12 +103,8 @@ namespace UKHO.ExchangeSetService.API.Services
 
             //Set Aio details on exchange set response
             SetExchangeSetAioDetails(response.ExchangeSetResponse, productIdentifierRequest.ProductIdentifier.ToList(), salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, productIdentifierRequest.CorrelationId);
-
-            var aioCellsExist = aioCells.Any();
-
-            var encCellsExist = productIdentifierRequest.ProductIdentifier.Any();
-
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId, encCellsExist, aioCellsExist);
+            
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId, encCellsExist, aioCellsCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -150,7 +150,11 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request).ToList();
+            var aioCellsCount = GetAioCells().Count();
+
+            var encCellsExist = request.ProductVersions.Select(x => x.ProductName).ToList().Count > aioCellsCount;
+            
+            IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request);
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
             long fileSize = 0;
@@ -201,11 +205,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 SetExchangeSetAioDetails(response.ExchangeSetResponse, lstRequestedProducts, salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, request.CorrelationId);
             }
 
-            var aioCellsExist = aioCells.Any();
-
-            var encCellsExist = request.ProductVersions.Select(x => x.ProductName).Any();
-            
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId, encCellsExist, aioCellsExist);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId, encCellsExist, aioCellsCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -251,7 +251,11 @@ namespace UKHO.ExchangeSetService.API.Services
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody).ToList();
+            var aioCellsCount = GetAioCells().Count();
+
+            var encCellsExist = salesCatalogueResponse.ResponseBody?.Products.Select(p => p.ProductName).ToList().Count > aioCellsCount;
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -260,12 +264,8 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             //Set Aio details on exchange set response
             SetExchangeSetAioDetailsSinceDateTime(response.ExchangeSetResponse, aioCells, response.BatchId, productDataSinceDateTimeRequest.CorrelationId);
-
-            var aioCellsExist = aioCells.Any();
-
-            var encCellsExist = salesCatalogueResponse.ResponseBody?.Products.Select(p => p.ProductName).Any() ?? false;
-
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId, encCellsExist, aioCellsExist);
+            
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId, encCellsExist, aioCellsCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
