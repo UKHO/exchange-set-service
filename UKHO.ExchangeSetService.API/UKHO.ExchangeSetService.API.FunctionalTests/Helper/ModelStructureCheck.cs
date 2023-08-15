@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             Config = new TestConfiguration();
         }
-        public static async Task CheckModelStructureForSuccessResponse(this HttpResponseMessage apiResponse)
+        public static async Task CheckModelStructureForSuccessResponse(this HttpResponseMessage apiResponse, bool shouldEncFileUriExist = true)
         {
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -22,9 +22,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsNotNull(apiResponseData.Links.ExchangeSetBatchStatusUri.Href, $"Response body returns null, instead of expected link {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}.");
             Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetBatchStatusUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, Its not valid uri");
 
-            //Check ExchangeSetFileUri is Not null and it is a valid Uri
-            Assert.IsNotNull(apiResponseData.Links.ExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
-            Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiResponseData.Links.ExchangeSetFileUri.Href}, Its not valid uri");
+            if (shouldEncFileUriExist)
+            {
+                //Check ExchangeSetFileUri is Not null and it is a valid Uri
+                Assert.IsNotNull(apiResponseData.Links.ExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
+                Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiResponseData.Links.ExchangeSetFileUri.Href}, Its not valid uri");
+            }
+            else
+            {
+                Assert.IsNull(apiResponseData.Links.ExchangeSetFileUri, "Exchange Set File uri should be null");
+            }
 
             //Check ExchangeSetUrlExpiryDateTime is not null
             Assert.IsNotNull(apiResponseData.ExchangeSetUrlExpiryDateTime, $"Response body returns null, Instead of valid datetime {apiResponseData.ExchangeSetUrlExpiryDateTime}.");
@@ -126,7 +133,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static async Task CheckModelStructureForAioSuccessResponse(this HttpResponseMessage apiResponse)
+        public static async Task CheckModelStructureForAioSuccessResponse(this HttpResponseMessage apiResponse, bool shouldEncFileUriExist = true, bool shouldAioFileUriExist = true)
         {
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -134,9 +141,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsNotNull(apiResponseData.Links.ExchangeSetBatchStatusUri.Href, $"Response body returns null, instead of expected link {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}.");
             Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetBatchStatusUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, Its not valid uri");
 
-            //Check ExchangeSetFileUri is Not null and it is a valid Uri
-            Assert.IsNotNull(apiResponseData.Links.ExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
-            Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiResponseData.Links.ExchangeSetFileUri.Href}, Its not valid uri");
+            if (shouldEncFileUriExist)
+            {
+                //Check ExchangeSetFileUri is Not null and it is a valid Uri
+                Assert.IsNotNull(apiResponseData.Links.ExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
+                Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiResponseData.Links.ExchangeSetFileUri.Href}, Its not valid uri");
+            }
+            else
+            {
+                Assert.IsNull(apiResponseData.Links.ExchangeSetFileUri, "Exchange Set File uri should be null");
+            }
 
             //Check ExchangeSetUrlExpiryDateTime is not null
             Assert.IsNotNull(apiResponseData.ExchangeSetUrlExpiryDateTime, $"Response body returns null, Instead of valid datetime {apiResponseData.ExchangeSetUrlExpiryDateTime}.");
@@ -153,9 +167,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsTrue(apiResponseData.RequestedProductsAlreadyUpToDateCount.GetType().Equals(typeof(int)), "Responsebody returns other datatype, instead of expected Int");
             Assert.IsTrue(apiResponseData.RequestedProductsAlreadyUpToDateCount >= 0, "Response body returns RequestedProductsAlreadyUpToDateCount less than zero, instead of expected count should not be less than zero.");
 
-            //Check AIOExchangeSetFileUri is Not null and it is a valid Uri
-            Assert.IsNotNull(apiResponseData.Links.AioExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
-            Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.AioExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiResponseData.Links.AioExchangeSetFileUri.Href}, Its not valid uri");
+
+            if (shouldAioFileUriExist)
+            {
+                //Check AIOExchangeSetFileUri is Not null and it is a valid Uri
+                Assert.IsNotNull(apiResponseData.Links.AioExchangeSetFileUri.Href, "Response body returns null instead of valid links.");
+                Assert.IsTrue(Uri.IsWellFormedUriString(apiResponseData.Links.AioExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), $"Exchange set returned file URI {apiResponseData.Links.AioExchangeSetFileUri.Href}, Its not valid uri");
+            }
+            else
+            {
+                Assert.IsNull(apiResponseData.Links.AioExchangeSetFileUri, "Exchange Set File uri should be null");
+            }
+
 
             //Check data type of AIORequestedProductCount and value should not be less than zero
             Assert.IsTrue(apiResponseData.RequestedAioProductCount.GetType().Equals(typeof(int)), "Responsebody returns other datatype, instead of expected Int");
