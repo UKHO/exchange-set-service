@@ -70,7 +70,14 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest);
+            // filter cells method might update the number of items in the list so get total count before calling it
+            var allCellsCount = productIdentifierRequest.ProductIdentifier.ToList().Count;
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest).ToList();
+
+            var aioCellsCount = aioCells.Count();
+
+            var encCellsExist = allCellsCount > aioCells.Count();
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             long fileSize = 0;
@@ -99,8 +106,8 @@ namespace UKHO.ExchangeSetService.API.Services
 
             //Set Aio details on exchange set response
             SetExchangeSetAioDetails(response.ExchangeSetResponse, productIdentifierRequest.ProductIdentifier.ToList(), salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, productIdentifierRequest.CorrelationId);
-
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
+            
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId, encCellsExist, aioCellsCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -146,7 +153,14 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request);
+            // filter cells method might update the number of items in the list so get total count before calling it
+            var allCellsCount = request.ProductVersions.Select(x => x.ProductName).ToList().Count;
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request).ToList();
+
+            var aioCellsCount = aioCells.Count();
+
+            var encCellsExist = allCellsCount > aioCells.Count();
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
             long fileSize = 0;
@@ -197,7 +211,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 SetExchangeSetAioDetails(response.ExchangeSetResponse, lstRequestedProducts, salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, request.CorrelationId);
             }
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId, encCellsExist, aioCellsCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -243,7 +257,15 @@ namespace UKHO.ExchangeSetService.API.Services
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
-            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody);
+            // filter cells method might update the number of items in the list so get total count before calling it
+            var allCellsCount = salesCatalogueResponse.ResponseBody?.Products.Count;
+
+            IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody).ToList();
+
+            var aioCellsCount = aioCells.Count();
+
+            var encCellsExist = allCellsCount > aioCells.Count();
+
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -252,8 +274,8 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             //Set Aio details on exchange set response
             SetExchangeSetAioDetailsSinceDateTime(response.ExchangeSetResponse, aioCells, response.BatchId, productDataSinceDateTimeRequest.CorrelationId);
-
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
+            
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId, encCellsExist, aioCellsCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -300,7 +322,8 @@ namespace UKHO.ExchangeSetService.API.Services
             return response;
         }
 
-        private Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetServiceResponse, string correlationId)
+        private Task<ExchangeSetServiceResponse> SetExchangeSetResponseLinks(ExchangeSetServiceResponse exchangeSetServiceResponse, string correlationId,
+            bool encCellsExist, bool aioCellsExist)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.FSSCreateBatchRequestStart,
                 EventIds.FSSCreateBatchRequestCompleted,
@@ -322,9 +345,12 @@ namespace UKHO.ExchangeSetService.API.Services
                     {
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
-                        ExchangeSetFileUri = new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri },
+                        //when toggle off then always set file Uri
+                        ExchangeSetFileUri = encCellsExist || !aioConfiguration.IsAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri } : null,
                         //when toggle on then add additional aio cell details
-                        AioExchangeSetFileUri = aioConfiguration.IsAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
+                        AioExchangeSetFileUri = aioConfiguration.IsAioEnabled ?
+                            aioCellsExist ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
+                            : null
                     };
 
                     exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
@@ -398,7 +424,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             return aioCells;
         }
-
+      
         private IEnumerable<string> GetAioCells()
         {
             return !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',').Select(s => s.Trim())) : new List<string>();

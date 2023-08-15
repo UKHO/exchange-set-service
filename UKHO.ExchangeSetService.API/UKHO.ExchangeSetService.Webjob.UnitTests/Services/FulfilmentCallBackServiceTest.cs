@@ -31,6 +31,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public HttpMethod httpMethodParam;
         public SalesCatalogueProductResponse salesCatalogueProductResponse;
         public SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage;
+        public IOptions<AioConfiguration> fakeAioConfiguration;
 
         [SetUp]
         public void Setup()
@@ -45,8 +46,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeCallBackClient = A.Fake<ICallBackClient>();
             fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration(){ });
             fakeLogger = A.Fake<ILogger<FulfilmentCallBackService>>();
+            fakeAioConfiguration = Options.Create(new AioConfiguration() { });
 
-            fulfilmentCallBackService = new FulfilmentCallBackService(fakeEssCallBackConfiguration, fakeCallBackClient, fakeFileShareServiceConfig, fakeLogger);
+            fulfilmentCallBackService = new FulfilmentCallBackService(fakeEssCallBackConfiguration, fakeCallBackClient, fakeFileShareServiceConfig, fakeLogger, fakeAioConfiguration);
         }
 
         #region GetCallBackResponse
