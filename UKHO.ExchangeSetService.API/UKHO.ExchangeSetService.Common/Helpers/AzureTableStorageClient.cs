@@ -7,7 +7,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     [ExcludeFromCodeCoverage]
     public class AzureTableStorageClient : IAzureTableStorageClient
     {
-        public async Task<ITableEntity> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement : class, ITableEntity
+        public async Task<TElement> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement : class, ITableEntity
         {
             var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
             var operation = await tableClient.GetEntityAsync<TElement>(partitionKey, rowKey);
