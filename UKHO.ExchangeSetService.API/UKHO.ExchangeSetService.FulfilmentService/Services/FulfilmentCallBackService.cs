@@ -131,6 +131,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public bool ValidateCallbackRequestPayload(CallBackResponse callBackResponse)
         {
+            var payLoad = JsonConvert.SerializeObject(callBackResponse, Formatting.Indented);
+            logger.LogInformation(EventIds.ValidateCallbackRequestPayloadStart.ToEventId(), 
+
+                "Callback payload validation started for BatchId:{BatchId}, Payload: {Payload}", callBackResponse.Data.BatchId, payLoad);
+
             return (callBackResponse.Data.RequestedProductCount >= 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
         }
 
@@ -211,6 +216,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}"
                 };
             }
+
+
+            exchangeSetResponse.Links = links;
 
             return exchangeSetResponse;
         }
