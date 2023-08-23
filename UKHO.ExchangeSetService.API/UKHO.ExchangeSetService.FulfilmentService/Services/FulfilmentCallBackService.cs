@@ -136,7 +136,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 "Callback payload validation started for BatchId:{BatchId}, Payload: {Payload}", callBackResponse.Data.BatchId, payLoad);
 
-            return (callBackResponse.Data.RequestedProductCount >= 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
+            return (
+                       callBackResponse.Data.RequestedProductCount >= 0 
+                       || callBackResponse.Data.RequestedAioProductCount >= 0
+                   )
+                   && (
+                       !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) 
+                       || !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.AioExchangeSetFileUri.Href)
+                   )
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href) 
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) 
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Id));
         }
 
         public bool ValidateCallbackErrorRequestPayload(CallBackResponse callBackResponse)
@@ -197,7 +207,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 exchangeSetResponse.AioExchangeSetCellCount = aioCellsCountInSalesCatalogue;
 
-                if (aioCellsCountInSalesCatalogue > 0)
+                if (aioCellsCountInSalesCatalogue > 0 || scsResponseQueueMessage.IsEmptyAioExchangeSet)
                 {
                     links.AioExchangeSetFileUri = new LinkSetFileUri
                     {
@@ -208,7 +218,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             }
 
-            if (salesCatalogueProductResponse.Products.Count > aioCellsCountInSalesCatalogue || !aioConfiguration.IsAioEnabled)
+            if (salesCatalogueProductResponse.Products.Count > aioCellsCountInSalesCatalogue || !aioConfiguration.IsAioEnabled || scsResponseQueueMessage.IsEmptyEncExchangeSet)
             {
                 links.ExchangeSetFileUri = new LinkSetFileUri
                 {
