@@ -140,12 +140,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                        callBackResponse.Data.RequestedProductCount >= 0 
                        || callBackResponse.Data.RequestedAioProductCount >= 0
                    )
-                   && (
-                       !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri?.Href) 
-                       || !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.AioExchangeSetFileUri?.Href)
-                   )
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href)
                    && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href) 
-                   && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) 
+                   && (
+                        !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri?.Href)
+                        || !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.AioExchangeSetFileUri?.Href)
+                       )
                    && !string.IsNullOrWhiteSpace(callBackResponse.Id);
         }
 
