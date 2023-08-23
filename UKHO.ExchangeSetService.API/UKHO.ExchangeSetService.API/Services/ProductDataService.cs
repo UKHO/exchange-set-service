@@ -258,7 +258,7 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
             // filter cells method might update the number of items in the list so get total count before calling it
-            var allCellsCount = salesCatalogueResponse.ResponseBody?.Products.Select(p => p.ProductName).ToList().Count;
+            var allCellsCount = salesCatalogueResponse.ResponseBody?.Products.Count;
 
             IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody).ToList();
 
@@ -345,7 +345,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     {
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
-                        ExchangeSetFileUri = encCellsExist ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri } : null,
+                        //when toggle off then always set file Uri
+                        ExchangeSetFileUri = encCellsExist || !aioConfiguration.IsAioEnabled ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri } : null,
                         //when toggle on then add additional aio cell details
                         AioExchangeSetFileUri = aioConfiguration.IsAioEnabled ?
                             aioCellsExist ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null

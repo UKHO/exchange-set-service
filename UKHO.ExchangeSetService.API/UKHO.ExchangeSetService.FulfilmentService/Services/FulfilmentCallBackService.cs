@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -21,16 +22,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly ICallBackClient callBackClient;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FulfilmentCallBackService> logger;
+        private readonly AioConfiguration aioConfiguration;
 
         public FulfilmentCallBackService(IOptions<EssCallBackConfiguration> essCallBackConfiguration,
                                          ICallBackClient callBackClient,
                                          IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                         ILogger<FulfilmentCallBackService> logger)
+                                         ILogger<FulfilmentCallBackService> logger,
+                                         IOptions<AioConfiguration> aioConfiguration)
         {
             this.essCallBackConfiguration = essCallBackConfiguration;
             this.callBackClient = callBackClient;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
+            this.aioConfiguration = aioConfiguration.Value;
         }
 
         public async Task<bool> SendCallBackResponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
@@ -149,14 +153,25 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public ExchangeSetResponse SetExchangeSetResponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
         {
-            return new ExchangeSetResponse()
+            var configAioCells = GetAioCells();
+
+            var links = new Links()
             {
-                Links = new Links()
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri
                 {
-                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status" },
-                    ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
-                    ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}" }
+                    Href =
+                        $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status"
                 },
+                ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri
+                    { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
+                
+            };
+
+            var aioCellsCountInSalesCatalogue = salesCatalogueProductResponse.Products
+                .Count(x => configAioCells.Any(y => y.Equals(x.ProductName)));
+                
+            var exchangeSetResponse = new ExchangeSetResponse()
+            {
                 ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
                 RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
                 ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
@@ -164,6 +179,45 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse),
                 BatchId = scsResponseQueueMessage.BatchId
             };
+
+            if (aioConfiguration.IsAioEnabled)
+            {
+                exchangeSetResponse.RequestedAioProductCount = exchangeSetResponse.RequestedProductCount >= aioCellsCountInSalesCatalogue
+                    ? aioCellsCountInSalesCatalogue : 0;
+
+                exchangeSetResponse.RequestedProductCount = exchangeSetResponse.RequestedProductCount >= aioCellsCountInSalesCatalogue
+                ? exchangeSetResponse.RequestedProductCount - aioCellsCountInSalesCatalogue : exchangeSetResponse.RequestedProductCount;
+                
+                exchangeSetResponse.ExchangeSetCellCount -= aioCellsCountInSalesCatalogue;
+
+                exchangeSetResponse.AioExchangeSetCellCount = aioCellsCountInSalesCatalogue;
+
+                if (aioCellsCountInSalesCatalogue > 0)
+                {
+                    links.AioExchangeSetFileUri = new LinkSetFileUri
+                    {
+                        Href =
+                            $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.AioExchangeSetFileName}"
+                    };
+                }
+
+            }
+
+            if (salesCatalogueProductResponse.Products.Count > aioCellsCountInSalesCatalogue || !aioConfiguration.IsAioEnabled)
+            {
+                links.ExchangeSetFileUri = new LinkSetFileUri
+                {
+                    Href =
+                        $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}"
+                };
+            }
+
+            return exchangeSetResponse;
+        }
+        
+        private IEnumerable<string> GetAioCells()
+        {
+            return !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',').Select(s => s.Trim())) : new List<string>();
         }
 
         public CallBackResponse SetCallBackResponse(ExchangeSetResponse exchangeSetResponse)
