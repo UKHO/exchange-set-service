@@ -146,7 +146,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                    )
                    && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href) 
                    && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) 
-                   && !string.IsNullOrWhiteSpace(callBackResponse.Id));
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Id);
         }
 
         public bool ValidateCallbackErrorRequestPayload(CallBackResponse callBackResponse)
