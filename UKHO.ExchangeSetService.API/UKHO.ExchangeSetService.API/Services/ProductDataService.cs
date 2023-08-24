@@ -70,15 +70,8 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            // filter cells method might update the number of items in the list so get total count before calling it
-            var allCellsCount = productIdentifierRequest.ProductIdentifier.ToList().Count;
-
             IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest).ToList();
-
-            var aioCellsCount = aioCells.Count();
-
-            var encCellsExist = allCellsCount > aioCells.Count();
-
+            
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
@@ -107,7 +100,7 @@ namespace UKHO.ExchangeSetService.API.Services
             //Set Aio details on exchange set response
             SetExchangeSetAioDetails(response.ExchangeSetResponse, productIdentifierRequest.ProductIdentifier.ToList(), salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, productIdentifierRequest.CorrelationId);
             
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId, encCellsExist, aioCellsCount > 0);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId, response.ExchangeSetResponse.ExchangeSetCellCount > 0, response.ExchangeSetResponse.AioExchangeSetCellCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -153,14 +146,7 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
-            // filter cells method might update the number of items in the list so get total count before calling it
-            var allCellsCount = request.ProductVersions.Select(x => x.ProductName).ToList().Count;
-
             IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request).ToList();
-
-            var aioCellsCount = aioCells.Count();
-
-            var encCellsExist = allCellsCount > aioCells.Count();
 
             var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
             long fileSize = 0;
@@ -211,7 +197,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 SetExchangeSetAioDetails(response.ExchangeSetResponse, lstRequestedProducts, salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, request.CorrelationId);
             }
 
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId, encCellsExist, aioCellsCount > 0);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, request.CorrelationId, response.ExchangeSetResponse.ExchangeSetCellCount > 0, response.ExchangeSetResponse.AioExchangeSetCellCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
@@ -261,11 +247,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var allCellsCount = salesCatalogueResponse.ResponseBody?.Products.Count;
 
             IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody).ToList();
-
-            var aioCellsCount = aioCells.Count();
-
-            var encCellsExist = allCellsCount > aioCells.Count();
-
+            
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -275,7 +257,7 @@ namespace UKHO.ExchangeSetService.API.Services
             //Set Aio details on exchange set response
             SetExchangeSetAioDetailsSinceDateTime(response.ExchangeSetResponse, aioCells, response.BatchId, productDataSinceDateTimeRequest.CorrelationId);
             
-            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId, encCellsExist, aioCellsCount > 0);
+            var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId, response.ExchangeSetResponse.ExchangeSetCellCount > 0, response.ExchangeSetResponse.AioExchangeSetCellCount > 0);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
                 return exchangeSetServiceResponse;
