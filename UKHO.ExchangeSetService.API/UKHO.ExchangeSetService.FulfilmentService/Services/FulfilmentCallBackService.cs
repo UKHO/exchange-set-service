@@ -182,9 +182,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 
             };
 
-            var aioCellsCountInSalesCatalogue = salesCatalogueProductResponse.Products
-                .Count(x => configAioCells.Any(y => y.Equals(x.ProductName)));
-                
+            var validAioCells = salesCatalogueProductResponse.Products
+                .Where(x => configAioCells.Any(y => y.Equals(x.ProductName)))
+                .Select(x => x.ProductName)
+                .ToList();
+
+            var validEncCells = salesCatalogueProductResponse.Products
+                .Where(x => !configAioCells.Any(y => y.Equals(x.ProductName)))
+                .Select(x => x.ProductName).ToList();
+
             var exchangeSetResponse = new ExchangeSetResponse()
             {
                 ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
@@ -197,17 +203,33 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (aioConfiguration.IsAioEnabled)
             {
-                exchangeSetResponse.RequestedAioProductCount = exchangeSetResponse.RequestedProductCount >= aioCellsCountInSalesCatalogue
-                    ? aioCellsCountInSalesCatalogue : 0;
+                //filter valid and invalid aio/enc cells for calculations
+                var invalidAioCells = exchangeSetResponse.RequestedProductsNotInExchangeSet
+                    .Where(x => configAioCells.Any(y => y.Equals(x.ProductName)))
+                    .Select(x => x.ProductName).ToList();
 
-                exchangeSetResponse.RequestedProductCount = exchangeSetResponse.RequestedProductCount >= aioCellsCountInSalesCatalogue
-                ? exchangeSetResponse.RequestedProductCount - aioCellsCountInSalesCatalogue : exchangeSetResponse.RequestedProductCount;
+                var invalidEncCells = exchangeSetResponse.RequestedProductsNotInExchangeSet
+                    .Where(x => !invalidAioCells.Any(y => y.Equals(x.ProductName)))
+                    .Select(x => x.ProductName).ToList();
                 
-                exchangeSetResponse.ExchangeSetCellCount -= aioCellsCountInSalesCatalogue;
 
-                exchangeSetResponse.AioExchangeSetCellCount = aioCellsCountInSalesCatalogue;
+                var totalAioCells = invalidAioCells.Concat(validAioCells).ToList();
+                var totalEncCells = invalidEncCells.Concat(validEncCells).ToList();
 
-                if (aioCellsCountInSalesCatalogue > 0 || scsResponseQueueMessage.IsEmptyAioExchangeSet)
+                exchangeSetResponse.RequestedAioProductCount = scsResponseQueueMessage.RequestedAioProductCount;
+                exchangeSetResponse.RequestedProductCount = scsResponseQueueMessage.RequestedProductCount;
+                exchangeSetResponse.ExchangeSetCellCount -= validAioCells.Count;
+                exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count;
+
+                exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedAioProductCount > 0
+                            ? scsResponseQueueMessage.RequestedAioProductCount - totalAioCells.Count : 0;
+
+                exchangeSetResponse.RequestedProductsAlreadyUpToDateCount =
+                    scsResponseQueueMessage.RequestedProductCount > 0
+                        ? exchangeSetResponse.RequestedProductCount - totalEncCells.Count
+                        : 0;
+                
+                if (validAioCells.Count > 0 || scsResponseQueueMessage.IsEmptyAioExchangeSet)
                 {
                     links.AioExchangeSetFileUri = new LinkSetFileUri
                     {
@@ -215,10 +237,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.AioExchangeSetFileName}"
                     };
                 }
-
+            }
+            else
+            {
+                exchangeSetResponse.RequestedProductsNotInExchangeSet.AddRange(validAioCells.Select(x => new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                }));
             }
 
-            if (salesCatalogueProductResponse.Products.Count > aioCellsCountInSalesCatalogue || !aioConfiguration.IsAioEnabled || scsResponseQueueMessage.IsEmptyEncExchangeSet)
+            if (validEncCells.Count > 0 || !aioConfiguration.IsAioEnabled || scsResponseQueueMessage.IsEmptyEncExchangeSet)
             {
                 links.ExchangeSetFileUri = new LinkSetFileUri
                 {
@@ -226,7 +255,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}"
                 };
             }
-
 
             exchangeSetResponse.Links = links;
 
