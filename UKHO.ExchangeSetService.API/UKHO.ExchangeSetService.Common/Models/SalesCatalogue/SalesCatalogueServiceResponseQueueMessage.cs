@@ -15,5 +15,9 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public bool IsEmptyAioExchangeSet { get; set; }
         public int RequestedProductCount { get; set; }
         public int RequestedAioProductCount { get; set; }
+
+        public int RequestedProductsAlreadyUpToDateCount { get; set; }
+
+        public int RequestedAioProductsAlreadyUpToDateCount { get; set; }
     }
 }

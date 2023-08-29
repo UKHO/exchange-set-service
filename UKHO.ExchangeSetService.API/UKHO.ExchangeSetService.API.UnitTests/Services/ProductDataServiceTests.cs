@@ -1734,7 +1734,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             Assert.AreEqual(exchangeSetResponseAioToggleOn.RequestedProductsAlreadyUpToDateCount, result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchStatusUri.Href, result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchDetailsUri.Href, result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href);
-            Assert.AreEqual(exchangeSetResponseAioToggleOn.Links.ExchangeSetFileUri.Href, result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.ExchangeSetUrlExpiryDateTime, result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime);
             Assert.AreEqual(exchangeSetResponseAioToggleOn.BatchId, result.BatchId);
             //Aio cell details

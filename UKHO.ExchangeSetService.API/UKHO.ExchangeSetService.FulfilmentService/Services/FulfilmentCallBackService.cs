@@ -203,31 +203,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             if (aioConfiguration.IsAioEnabled)
             {
-                //filter valid and invalid aio/enc cells for calculations
-                var invalidAioCells = exchangeSetResponse.RequestedProductsNotInExchangeSet
-                    .Where(x => configAioCells.Any(y => y.Equals(x.ProductName)))
-                    .Select(x => x.ProductName).ToList();
-
-                var invalidEncCells = exchangeSetResponse.RequestedProductsNotInExchangeSet
-                    .Where(x => !invalidAioCells.Any(y => y.Equals(x.ProductName)))
-                    .Select(x => x.ProductName).ToList();
-                
-
-                var totalAioCells = invalidAioCells.Concat(validAioCells).ToList();
-                var totalEncCells = invalidEncCells.Concat(validEncCells).ToList();
-
                 exchangeSetResponse.RequestedAioProductCount = scsResponseQueueMessage.RequestedAioProductCount;
                 exchangeSetResponse.RequestedProductCount = scsResponseQueueMessage.RequestedProductCount;
                 exchangeSetResponse.ExchangeSetCellCount -= validAioCells.Count;
                 exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count;
 
-                exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedAioProductCount > 0
-                            ? scsResponseQueueMessage.RequestedAioProductCount - totalAioCells.Count : 0;
-
-                exchangeSetResponse.RequestedProductsAlreadyUpToDateCount =
-                    scsResponseQueueMessage.RequestedProductCount > 0
-                        ? exchangeSetResponse.RequestedProductCount - totalEncCells.Count
-                        : 0;
+                exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedAioProductsAlreadyUpToDateCount;
+                exchangeSetResponse.RequestedProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedProductsAlreadyUpToDateCount;
                 
                 if (validAioCells.Count > 0 || scsResponseQueueMessage.IsEmptyAioExchangeSet)
                 {
