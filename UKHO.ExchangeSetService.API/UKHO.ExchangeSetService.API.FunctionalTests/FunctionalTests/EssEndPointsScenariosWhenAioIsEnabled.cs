@@ -354,7 +354,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //verify model structure
-            await apiResponse.CheckModelStructureForAioSuccessResponse();
+            await apiResponse.CheckModelStructureForAioSuccessResponse(shouldAioFileUriExist: false);
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
@@ -434,7 +434,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //verify model structure
-            await apiResponse.CheckModelStructureForAioSuccessResponse();
+            await apiResponse.CheckModelStructureForAioSuccessResponse(shouldAioFileUriExist:false);
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
