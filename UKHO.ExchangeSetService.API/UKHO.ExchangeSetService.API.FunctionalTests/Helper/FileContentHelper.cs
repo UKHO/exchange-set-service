@@ -444,8 +444,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
-            var batchStatusUrl = apiResponseData.Links.AioExchangeSetFileUri.Href;
-            var batchId = batchStatusUrl.Split('/')[5];
+            var batchId = apiResponseData.BatchId;
 
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
