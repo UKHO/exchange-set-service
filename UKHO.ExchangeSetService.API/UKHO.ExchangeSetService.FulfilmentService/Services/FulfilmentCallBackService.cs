@@ -173,13 +173,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var links = new Links()
             {
                 ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri
-                {
-                    Href =
-                        $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status"
-                },
+                { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status" },
                 ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri
-                    { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
-                
+                    { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}" }
             };
 
             var validAioCells = salesCatalogueProductResponse.Products
@@ -207,7 +203,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 exchangeSetResponse.RequestedProductCount = scsResponseQueueMessage.RequestedProductCount;
                 exchangeSetResponse.ExchangeSetCellCount -= validAioCells.Count;
                 exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count;
-
                 exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedAioProductsAlreadyUpToDateCount;
                 exchangeSetResponse.RequestedProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedProductsAlreadyUpToDateCount;
                 

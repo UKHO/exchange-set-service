@@ -353,20 +353,20 @@ stages:
               PathtoPublish: '$(Build.SourcesDirectory)\Deployment'
               ArtifactName: terraformartifact
           
-          #- task: ArchiveFiles@2
-          #  displayName: "Zip Load Tests"
-          #  inputs:
-          #    rootFolderOrFile: '$(Build.SourcesDirectory)/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.LoadTests'
-          #    includeRootFolder: false
-          #    archiveType: 'zip'
-          #    archiveFile: '$(Build.ArtifactStagingDirectory)/loadtests/loadtests.zip'
-          #    replaceExistingArchive: true
+          - task: ArchiveFiles@2
+            displayName: "Zip Load Tests"
+            inputs:
+              rootFolderOrFile: '$(Build.SourcesDirectory)/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.LoadTests'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/loadtests/loadtests.zip'
+              replaceExistingArchive: true
 
-          #- task: PublishBuildArtifacts@1
-          #  displayName: "Publish Load Tests"
-          #  inputs:
-          #    PathtoPublish: '$(Build.ArtifactStagingDirectory)/loadtests/'
-          #    ArtifactName: LoadTests
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Load Tests"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/loadtests/'
+              ArtifactName: LoadTests
 
       - job: BuildAndPublishMockAPIAndTerraform
         workspace:
