@@ -284,8 +284,26 @@
    ]]></notes>
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
 		<cpe>cpe:/a:asp-project:asp-project</cpe>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.AspNetCore.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
 		<cpe>cpe:/a:elastic:apm_agent</cpe>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.AspNetCore.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
 		<cve>CVE-2021-37941</cve>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.AspNetCore.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
 	<suppress>
@@ -294,7 +312,19 @@
    ]]></notes>
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
 		<cpe>cpe:/a:elastic:apm_agent</cpe>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.Extensions.Logging.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
 		<cve>CVE-2021-37941</cve>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.Extensions.Logging.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
 	<suppress>
@@ -303,7 +333,19 @@
    ]]></notes>
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
 		<cpe>cpe:/a:elastic:apm_agent</cpe>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
 		<cve>CVE-2021-37941</cve>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
 </suppressions>
