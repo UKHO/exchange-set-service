@@ -348,4 +348,25 @@
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.Extensions.Hosting.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
+		<cpe>cpe:/a:elastic:apm_agent</cpe>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.Extensions.Hosting.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
+		<cve>CVE-2021-37941</cve>
+	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.Extensions.Hosting.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
+		<cve>CVE-2019-7617</cve>
+	</suppress>
 </suppressions>
