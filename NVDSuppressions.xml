@@ -281,6 +281,7 @@
 	<suppress>
 		<notes><![CDATA[
    file name: Elastic.Apm.AspNetCore.dll
+   False positive - impacts Java or Python
    ]]></notes>
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
 		<cpe>cpe:/a:asp-project:asp-project</cpe>
@@ -289,66 +290,36 @@
 		<cve>CVE-2019-7617</cve>
 	</suppress>
 	<suppress>
-		<notes><![CDATA[
+		<notes>
+			<![CDATA[
    file name: Elastic.Apm.Extensions.Logging.dll
+   False positive - impacts Java or Python
    ]]></notes>
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
 		<cpe>cpe:/a:elastic:apm_agent</cpe>
-	</suppress>
-	<suppress>
-		<notes><![CDATA[
-   file name: Elastic.Apm.Extensions.Logging.dll
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
 		<cve>CVE-2021-37941</cve>
-	</suppress>
-	<suppress>
-		<notes><![CDATA[
-   file name: Elastic.Apm.Extensions.Logging.dll
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
 	<suppress>
-		<notes><![CDATA[
+		<notes>
+			<![CDATA[
    file name: Elastic.Apm.dll
+   False positive - impacts Java or Python
    ]]></notes>
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
 		<cpe>cpe:/a:elastic:apm_agent</cpe>
-	</suppress>
-	<suppress>
-		<notes><![CDATA[
-   file name: Elastic.Apm.dll
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
 		<cve>CVE-2021-37941</cve>
-	</suppress>
-	<suppress>
-		<notes><![CDATA[
-   file name: Elastic.Apm.dll
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
 	<suppress>
-		<notes><![CDATA[
+		<notes>
+			<![CDATA[
    file name: Elastic.Apm.Extensions.Hosting.dll
+   False positive - impacts Java or Python
    ]]></notes>
 		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
 		<cpe>cpe:/a:elastic:apm_agent</cpe>
-	</suppress>
-	<suppress>
-		<notes><![CDATA[
-   file name: Elastic.Apm.Extensions.Hosting.dll
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
 		<cve>CVE-2021-37941</cve>
-	</suppress>
-	<suppress>
-		<notes><![CDATA[
-   file name: Elastic.Apm.Extensions.Hosting.dll
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
 </suppressions>
