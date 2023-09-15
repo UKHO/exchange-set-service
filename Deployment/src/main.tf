@@ -104,7 +104,7 @@ module "fulfilment_webapp" {
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
     "ELASTIC_APM_SERVER_URL"                               = var.elastic_apm_server_url
     "ELASTIC_APM_ENVIRONMENT"                              = local.env_name
-    "ELASTIC_APM_SERVICE_NAME"                             = "Fulfilment-${local.env_name}"
+    "ELASTIC_APM_SERVICE_NAME"                             = "ESS Fulfilment Service-${local.env_name}"
     "ELASTIC_APM_API_KEY"                                  = var.elastic_apm_api_key
   }
   tags = local.tags
