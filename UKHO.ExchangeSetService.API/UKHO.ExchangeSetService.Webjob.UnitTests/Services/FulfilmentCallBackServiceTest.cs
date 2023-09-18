@@ -457,7 +457,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
                 if (isAioReturned)
                 {
-                    a.Products.Add(new Products { ProductName = aioCells.First() });
+                    a.Products.Add(new Products { ProductName = aioCells[0]});
                     a.ProductCounts.RequestedProductCount += 1;
                     a.ProductCounts.ReturnedProductCount += 1;
                     a.ProductCounts.RequestedProductsAlreadyUpToDateCount += 1;
@@ -494,7 +494,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
                 if (isAioReturned)
                 {
-                    a.Products.Add(new Products { ProductName = aioCells.First() });
+                    a.Products.Add(new Products { ProductName = aioCells[0] });
                     a.ProductCounts.RequestedProductCount += 1;
                     a.ProductCounts.ReturnedProductCount += 1;
                     a.ProductCounts.RequestedProductsAlreadyUpToDateCount += 1;
