@@ -42,18 +42,24 @@ namespace UKHO.ExchangeSetService.API
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Configuration.AddEnvironmentVariables();
+            string essManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"];
+            DefaultAzureCredentialOptions defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId };
             string kvServiceUri = builder.Configuration["KeyVaultSettings:ServiceUri"];
 
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
                 builder.Configuration.AddAzureKeyVault(new Uri(kvServiceUri),
-                    new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
+                    new DefaultAzureCredential(defaultAzureCredentialOptions));
             }
 
 #if DEBUG
             builder.Configuration.AddJsonFile("appsettings.local.overrides.json", true, true);
             //Add file based logger for development
             builder.Logging.AddFile(builder.Configuration.GetSection("Logging"));
+            if (bool.TryParse(builder.Configuration["ESSAzureADConfiguration:Local"], out bool result) && result)
+            {
+                defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeInteractiveBrowserCredential = false };
+            }
 #endif
 
             // Add services to the container.
@@ -182,6 +188,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddSingleton<IWebJobsAccessKeyProvider>(s => new WebJobsAccessKeyProvider(builder.Configuration));
             builder.Services.AddScoped<UserIdentifier>();
             builder.Services.AddScoped<IFileSystem, FileSystem>();
+            builder.Services.AddSingleton(defaultAzureCredentialOptions);
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
@@ -256,7 +263,7 @@ namespace UKHO.ExchangeSetService.API
                         Scheme = "bearer",
                         BearerFormat = "JWT"
                     });
-                    c.OperationFilter<UKHO.ExchangeSetService.API.Filters.SecurityRequirementsOperationFilter>();
+                    c.OperationFilter<Filters.SecurityRequirementsOperationFilter>();
                 });
             }
 

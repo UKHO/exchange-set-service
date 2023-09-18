@@ -18,14 +18,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         private readonly IOptions<EssManagedIdentityConfiguration> essManagedIdentityConfiguration;
         private readonly ILogger<AuthTokenProvider> logger;
-        private static readonly Object _lock = new Object();
+        private static readonly Object _lock = new ();
         private readonly IDistributedCache _cache;
+        private readonly DefaultAzureCredentialOptions _azureCredentialOptions;
 
-        public AuthTokenProvider(IOptions<EssManagedIdentityConfiguration> essManagedIdentityConfiguration, IDistributedCache _cache, ILogger<AuthTokenProvider> logger)
+        public AuthTokenProvider(IOptions<EssManagedIdentityConfiguration> essManagedIdentityConfiguration, IDistributedCache _cache, ILogger<AuthTokenProvider> logger, DefaultAzureCredentialOptions defaultAzureCredentialOptions)
         {
             this.essManagedIdentityConfiguration = essManagedIdentityConfiguration;
             this._cache = _cache;
             this.logger = logger;
+            this._azureCredentialOptions = defaultAzureCredentialOptions;
         }
 
 
@@ -46,7 +48,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task<AccessTokenItem> GetNewAuthToken(string resource)
         {
-            var tokenCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityConfiguration.Value.ClientId });
+            var tokenCredential = new DefaultAzureCredential(_azureCredentialOptions);
             var accessToken = await tokenCredential.GetTokenAsync(
                 new TokenRequestContext(scopes: new string[] { resource + "/.default" }) { }
             );
