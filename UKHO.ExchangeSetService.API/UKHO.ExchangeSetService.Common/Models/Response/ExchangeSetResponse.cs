@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         [JsonProperty("aioExchangeSetCellCount", NullValueHandling = NullValueHandling.Ignore)]
         public int? AioExchangeSetCellCount { get; set; } = null;
 
-        [JsonProperty("RequestedAioProductsAlreadyUpToDateCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("requestedAioProductsAlreadyUpToDateCount", NullValueHandling = NullValueHandling.Ignore)]
         public int? RequestedAioProductsAlreadyUpToDateCount { get; set; } = null;
 
         [JsonProperty("requestedProductsNotInExchangeSet")]
