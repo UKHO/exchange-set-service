@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
 
             var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
-            Assert.True(DateTime.ParseExact(utcDateTime,
+            Assert.True(DateTime.ParseExact(utcDateTime.Trim(),
                     "yyyy-MM-dd HH:mm:ss",
                     CultureInfo.InvariantCulture) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second, DateTimeKind.Utc), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
         }
