@@ -50,8 +50,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         }
         private static HostBuilder BuildHostConfiguration()
         {
-
             HostBuilder hostBuilder = new HostBuilder();
+            DefaultAzureCredentialOptions defaultAzureCredentialOptions = null;
             hostBuilder.ConfigureAppConfiguration((hostContext, builder) =>
             {
                 builder.AddJsonFile("appsettings.json");
@@ -70,10 +70,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                                                         new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
                     builder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
                 }
-
+                string essManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"];
+                defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId };
 #if DEBUG
                 //Add development overrides configuration
                 builder.AddJsonFile("appsettings.local.overrides.json", true, true);
+                if (bool.TryParse(tempConfig["ESSAzureADConfiguration:Local"], out bool result) && result)
+                {
+                    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeInteractiveBrowserCredential = false };
+                }
 #endif
 
                 //Add environment variables
@@ -145,6 +150,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
                  services.AddScoped<IProductDataValidator, ProductDataValidator>();
+                 services.AddSingleton(defaultAzureCredentialOptions);
+
 
                  var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
