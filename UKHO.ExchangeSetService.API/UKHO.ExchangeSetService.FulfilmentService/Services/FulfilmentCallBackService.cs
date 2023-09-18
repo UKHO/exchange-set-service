@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -21,16 +22,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private readonly ICallBackClient callBackClient;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly ILogger<FulfilmentCallBackService> logger;
+        private readonly AioConfiguration aioConfiguration;
 
         public FulfilmentCallBackService(IOptions<EssCallBackConfiguration> essCallBackConfiguration,
                                          ICallBackClient callBackClient,
                                          IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                         ILogger<FulfilmentCallBackService> logger)
+                                         ILogger<FulfilmentCallBackService> logger,
+                                         IOptions<AioConfiguration> aioConfiguration)
         {
             this.essCallBackConfiguration = essCallBackConfiguration;
             this.callBackClient = callBackClient;
             this.fileShareServiceConfig = fileShareServiceConfig;
             this.logger = logger;
+            this.aioConfiguration = aioConfiguration.Value;
         }
 
         public async Task<bool> SendCallBackResponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
@@ -127,12 +131,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public bool ValidateCallbackRequestPayload(CallBackResponse callBackResponse)
         {
-            return (callBackResponse.Data.RequestedProductCount >= 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Id));
+            var payLoad = JsonConvert.SerializeObject(callBackResponse, Formatting.Indented);
+            logger.LogInformation(EventIds.ValidateCallbackRequestPayloadStart.ToEventId(),
+
+                "Callback payload validation started for BatchId:{BatchId}, Payload: {Payload}", callBackResponse.Data.BatchId, payLoad);
+
+            return (callBackResponse.Data.RequestedProductCount >= 0 || callBackResponse.Data.RequestedAioProductCount is >= 0 )
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href)
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href)
+                   && (!string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri?.Href)
+                       || !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.AioExchangeSetFileUri?.Href))
+                   && !string.IsNullOrWhiteSpace(callBackResponse.Id);
         }
 
         public bool ValidateCallbackErrorRequestPayload(CallBackResponse callBackResponse)
         {
-            return (callBackResponse.Data.RequestedProductCount >= 0 && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href) && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href) && Links.Equals(callBackResponse.Data.Links.ExchangeSetFileUri, null) && !string.IsNullOrWhiteSpace(callBackResponse.Id) && int.Equals(callBackResponse.Data.ExchangeSetCellCount, 0));
+            var result =  (callBackResponse.Data.RequestedProductCount >= 0 || callBackResponse.Data.RequestedAioProductCount is >= 0)
+                    && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href)
+                    && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href)
+                    && Links.Equals(callBackResponse.Data.Links.ExchangeSetFileUri, null)
+                    && Links.Equals(callBackResponse.Data.Links.AioExchangeSetFileUri, null)
+                    && !string.IsNullOrWhiteSpace(callBackResponse.Id)
+                    && int.Equals(callBackResponse.Data.ExchangeSetCellCount, 0)
+                    && int.Equals(callBackResponse.Data.AioExchangeSetCellCount ?? 0, 0);
+
+            return result;
         }
 
         public async Task<bool> SendResponseToCallBackApi(bool errorStatus, string payloadJson, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
@@ -149,14 +172,23 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public ExchangeSetResponse SetExchangeSetResponse(SalesCatalogueProductResponse salesCatalogueProductResponse, SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage)
         {
-            return new ExchangeSetResponse()
+            var configAioCells = GetAioCells();
+
+            var links = new Links()
             {
-                Links = new Links()
-                {
-                    ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status" },
-                    ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}" },
-                    ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}" }
-                },
+                ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri
+                { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/status" },
+                ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri
+                { Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}" }
+            };
+
+            var validAioCells = salesCatalogueProductResponse.Products
+                .Where(x => configAioCells.Any(y => y.Equals(x.ProductName)))
+                .Select(x => x.ProductName)
+                .ToList();
+
+            var exchangeSetResponse = new ExchangeSetResponse()
+            {
                 ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(scsResponseQueueMessage.ExchangeSetUrlExpiryDate).ToUniversalTime(),
                 RequestedProductCount = salesCatalogueProductResponse.ProductCounts.RequestedProductCount.Value,
                 ExchangeSetCellCount = salesCatalogueProductResponse.ProductCounts.ReturnedProductCount.Value,
@@ -164,6 +196,52 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse),
                 BatchId = scsResponseQueueMessage.BatchId
             };
+            
+            if (aioConfiguration.IsAioEnabled)
+            {
+                exchangeSetResponse.RequestedAioProductCount = scsResponseQueueMessage.RequestedAioProductCount;
+                exchangeSetResponse.RequestedProductCount = scsResponseQueueMessage.RequestedProductCount;
+                exchangeSetResponse.ExchangeSetCellCount -= validAioCells.Count;
+                exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count;
+                exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedAioProductsAlreadyUpToDateCount;
+                exchangeSetResponse.RequestedProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedProductsAlreadyUpToDateCount;
+            }
+            else
+            {
+                exchangeSetResponse.RequestedProductsNotInExchangeSet.AddRange(validAioCells.Select(x => new RequestedProductsNotInExchangeSet
+                {
+                    ProductName = x,
+                    Reason = "invalidProduct"
+                }));
+            }
+            
+            var hasExchangeSetFileUri = !aioConfiguration.IsAioEnabled
+                                        || exchangeSetResponse.ExchangeSetCellCount > 0
+                                        || exchangeSetResponse.RequestedProductsNotInExchangeSet.Any()
+                                        || scsResponseQueueMessage.IsEmptyEncExchangeSet;
+
+            var hasAioExchangeSetFileUri = aioConfiguration.IsAioEnabled
+                                           && (exchangeSetResponse.AioExchangeSetCellCount > 0 || scsResponseQueueMessage.IsEmptyAioExchangeSet);
+
+            links.ExchangeSetFileUri = hasExchangeSetFileUri ? new LinkSetFileUri
+            {
+                Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.ExchangeSetFileName}"
+            } : null;
+
+            links.AioExchangeSetFileUri = hasAioExchangeSetFileUri ? new LinkSetFileUri
+            {
+                Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.AioExchangeSetFileName}"
+                    
+            } : null;
+
+            exchangeSetResponse.Links = links;
+
+            return exchangeSetResponse;
+        }
+
+        private IEnumerable<string> GetAioCells()
+        {
+            return !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',').Select(s => s.Trim())) : new List<string>();
         }
 
         public CallBackResponse SetCallBackResponse(ExchangeSetResponse exchangeSetResponse)
