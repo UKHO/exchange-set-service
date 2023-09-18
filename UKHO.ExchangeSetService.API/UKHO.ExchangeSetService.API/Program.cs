@@ -56,10 +56,10 @@ namespace UKHO.ExchangeSetService.API
             builder.Configuration.AddJsonFile("appsettings.local.overrides.json", true, true);
             //Add file based logger for development
             builder.Logging.AddFile(builder.Configuration.GetSection("Logging"));
-            if (bool.TryParse(builder.Configuration["ESSAzureADConfiguration:Local"], out bool result) && result)
-            {
-                defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeInteractiveBrowserCredential = false };
-            }
+            //if (bool.TryParse(builder.Configuration["ESSAzureADConfiguration:Local"], out bool result) && result)
+            //{
+            //    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeInteractiveBrowserCredential = false };
+            //}
 #endif
 
             // Add services to the container.
