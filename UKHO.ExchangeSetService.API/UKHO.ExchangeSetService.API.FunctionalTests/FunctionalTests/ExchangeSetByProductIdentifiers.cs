@@ -175,8 +175,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "requestBody"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Either body is null or malformed."));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Source == "requestBody"));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Description == "Either body is null or malformed."));
         }
 
         [Test]
@@ -189,8 +189,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "productIdentifier"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "productIdentifiers cannot be null or empty."));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Source == "productIdentifier"));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Description == "productIdentifiers cannot be null or empty."));
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
@@ -205,8 +205,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "callbackUri"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Invalid callbackUri format."));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Source == "callbackUri"));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Description == "Invalid callbackUri format."));
         }
 
         [OneTimeTearDown]

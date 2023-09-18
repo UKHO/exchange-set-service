@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
@@ -35,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
         [Test]
@@ -45,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
         [Test]
@@ -55,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime cannot be a future date."));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == "Provided sinceDateTime cannot be a future date."));
         } 
 
         [Test]
@@ -65,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.CallbackUri);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == "Invalid callbackUri format."));
         }
 
         [Test]
@@ -85,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
             string errorMessage = "Provided sinceDateTime must be within last " + configuration.GetValue<string>("MaximumNumerOfDaysValidForSinceDateTimeEndpoint") + " days.";
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == errorMessage));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == errorMessage));
         }
 
         [Test]

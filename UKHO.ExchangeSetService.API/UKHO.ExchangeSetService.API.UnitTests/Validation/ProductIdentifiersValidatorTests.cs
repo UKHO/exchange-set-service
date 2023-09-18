@@ -1,6 +1,5 @@
 ﻿using FluentValidation.TestHelper;
 using NUnit.Framework;
-using System.Linq;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
@@ -23,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var model = new ProductIdentifierRequest { CallbackUri = "demo uri" };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.CallbackUri);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == "Invalid callbackUri format."));
         }
 
         [Test]
@@ -52,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
@@ -67,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+            Assert.IsTrue(result.Errors.Exists(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
 

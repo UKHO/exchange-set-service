@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var dates = salescatalogProductResponse.Dates.Where(s => s.UpdateNumber == listItem.UpdateNumber).Select(s => s).FirstOrDefault();
                 getIssueAndUpdateDate = GetIssueAndUpdateDate(dates);
             }
-            if (salescatalogProductResponse.Cancellation != null)
+            if (salescatalogProductResponse?.Cancellation != null)
             {
                 cancelledUpdateNumber = salescatalogProductResponse.Cancellation.UpdateNumber;
             }
@@ -324,7 +324,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 fileSystemHelper.CheckAndCreateFolder(folderpath);
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
                 var basefolders = fileSystemHelper.GetDirectoryInfo(folderpath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
+                       .Where(di => di.Name.StartsWith('B') && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
                 string mediaFileContent = $"GBWK{weekNumber:D2}_{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}BASE      M0{baseNumber}X02";
                 mediaFileContent += Environment.NewLine;

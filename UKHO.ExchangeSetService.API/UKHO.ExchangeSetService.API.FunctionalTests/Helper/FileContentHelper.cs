@@ -85,7 +85,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
 
-            Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
+            Assert.True(DateTime.ParseExact(utcDateTime,
+                    "yyyyMMddHHmmssfff",
+                    CultureInfo.InvariantCulture) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second, DateTimeKind.Utc), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
         }
 
         public static async Task CheckDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, string accessToken)
@@ -118,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
+                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Exists(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
                 }
             }
         }
@@ -161,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                 foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseBatchDetailsModel.Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
+                    Assert.IsTrue(responseBatchDetailsModel.Files.Exists(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
                 }
             }
             else
@@ -297,10 +299,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string dvd_service = fileContent_1[4];
 
             Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned '{FolderInitial}'.");
-            Assert.AreEqual(Avcs, FileContent_avcs, $"Incorrect file content is returned 'M{Avcs}'.");
+            Assert.AreEqual(FileContent_avcs, Avcs, $"Incorrect file content is returned 'M{Avcs}'.");
             Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
-            Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
+            Assert.AreEqual(FileContent_base, baseContent, $"Incorrect file content is returned 'M{baseContent}'.");
+            Assert.AreEqual(FileContent_dvd, dvd_service, $"Incorrect file content is returned 'M{dvd_service}'.");
 
             //Verification of the lines describing folders and country code(s) of the Media.txt here
             string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));

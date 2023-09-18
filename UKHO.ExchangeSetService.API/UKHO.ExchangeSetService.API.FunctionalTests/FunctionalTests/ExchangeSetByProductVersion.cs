@@ -215,8 +215,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "requestBody"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Either body is null or malformed."));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Source == "requestBody"));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Description == "Either body is null or malformed."));
         }
 
         [TestCase(null, 9, 6, "productVersions[0].productName", "productName cannot be blank or null.", TestName = "When product name is null.")]
@@ -236,8 +236,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == sourceMessage));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == descriptionMessage));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Source == sourceMessage));
+            Assert.IsTrue(errorMessage.Errors.Exists(e => e.Description == descriptionMessage));
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]

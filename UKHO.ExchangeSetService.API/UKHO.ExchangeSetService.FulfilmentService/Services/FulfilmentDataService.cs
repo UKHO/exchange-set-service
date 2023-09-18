@@ -77,27 +77,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
             var essItems = response.Products
-                .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
+                .Where(product => aioCells.TrueForAll(aioCell => product.ProductName != aioCell))
                 .ToList();
 
             var aioItems = response.Products
-                    .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
+                    .Where(product => aioCells.Exists(aioCell => product.ProductName == aioCell))
                     .ToList();
 
             if (aioConfiguration.IsAioEnabled)
             {
                 SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
 
-                if (essItems != null && essItems.Any() || message.IsEmptyEncExchangeSet)
+                if (essItems.Any() || message.IsEmptyEncExchangeSet)
                 {
                     salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
-                                                                 .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
+                                                                 .Where(x => !aioCells.Exists(productName => productName.Equals(x.ProductName))).ToList();
                     await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
                 }
-                if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
+                if (aioItems.Any() || message.IsEmptyAioExchangeSet)
                 {
                     salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
-                                                         .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
+                                                         .Where(x => aioCells.Exists(productName => productName.Equals(x.ProductName))).ToList();
                     await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
                 }
             }
@@ -137,11 +137,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
             var essItems = response.SalesCatalogueProductResponse.Products
-                .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
+                .Where(product => aioCells.TrueForAll(aioCell => product.ProductName != aioCell))
                 .ToList();
 
             var aioItems = response.SalesCatalogueProductResponse.Products
-                    .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
+                    .Where(product => aioCells.Exists(aioCell => product.ProductName == aioCell))
                     .ToList();
 
             if (aioConfiguration.IsAioEnabled)
@@ -155,7 +155,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (essItems.Count > 0)
                 {
                     response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
-                                                                       .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
+                                                                       .Where(x => !aioCells.Exists(productName => productName == x.ProductName)).ToList();
                     isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
 
                     if (!isExchangeSetFolderCreated)
@@ -168,7 +168,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (aioItems.Count > 0)
                 {
                     largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
-                                                                                        .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
+                                                                                        .Where(x => aioCells.Exists(productName => productName == x.ProductName)).ToList();
                     isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
 
                     if (!isExchangeSetFolderCreated)
@@ -208,7 +208,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 });
 
                 await Task.WhenAll(parallelZipUploadTasks);
-                isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.All(x => x.Result.Equals(true)));
+                isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.TrueForAll(x => x.Result.Equals(true)));
                 parallelZipUploadTasks.Clear();
             }
 
@@ -487,7 +487,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
 
             var essItems = largeExchangeSetDataResponse.SalesCatalogueProductResponse.Products
-                .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
+                .Where(product => aioCells.TrueForAll(aioCell => product.ProductName != aioCell))
                 .ToList();
 
             Task<ValidationResult> validationResult = productDataValidator.Validate(essItems);
@@ -498,7 +498,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 return largeExchangeSetDataResponse;
             }
 
-            if (essItems != null && essItems.Any())
+            if (essItems.Any())
             {
                 DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
                 int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
@@ -513,7 +513,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
-                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
+                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse[0].FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
@@ -545,7 +545,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task DownloadLargeMediaReadMeFile(string batchId, string exchangeSetPath, string correlationId)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
+                       .Where(di => di.Name.StartsWith('B') && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
             var encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
@@ -576,12 +576,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                                                   .LastOrDefault(di => di.Name.StartsWith("M0"));
 
                           var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
-                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
+                                                  .Where(di => di.Name.StartsWith('B') && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
                           var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath?.ToString())
-                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
+                                                  .LastOrDefault(di => di.Name.StartsWith('B') && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
-                          string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(rootLastDirectoryPath.ToString(), "B"), "");
+                          string lastBaseDirectoryNumber = baseLastDirectory?.ToString().Replace(Path.Combine(rootLastDirectoryPath?.ToString(), "B"), "");
 
                           var ParallelBaseFolderTasks = new List<Task<bool>> { };
                           Parallel.ForEach(baseDirectoryies, baseDirectoryFolder =>
@@ -594,7 +594,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                           DateTime createLargeMediaSerialEncFileTaskCompletedAt = DateTime.UtcNow;
                           monitorHelper.MonitorRequest("Create Large Media Serial Enc File Task", createLargeMediaSerialEncFileTaskStartedAt, createLargeMediaSerialEncFileTaskCompletedAt, correlationId, null, null, null, batchId);
 
-                          return await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));
+                          return await Task.FromResult(ParallelBaseFolderTasks.TrueForAll(x => x.Result.Equals(true)));
                       },
                   batchId, correlationId);
         }
@@ -602,7 +602,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private async Task<bool> CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
+                       .Where(di => di.Name.StartsWith('B') && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
             var encFolderList = new List<string>();
             foreach (var directory in baseDirectory)
@@ -617,11 +617,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var countryCodes = fileSystemHelper.GetDirectoryInfo(encFolder)
                                    .Select(di => di.Name[^2..]).ToList();
 
-                var fulfilmentDataBasedonCountryCode = listFulfilmentData.Where(x => countryCodes.Any(z => x.ProductName.StartsWith(z))).ToList();
+                var fulfilmentDataBasedonCountryCode = listFulfilmentData.Where(x => countryCodes.Exists(z => x.ProductName.StartsWith(z))).ToList();
                 ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(batchId, encFolder, correlationId, fulfilmentDataBasedonCountryCode, salesCatalogueDataResponse, salesCatalogueProductResponse));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
-            var isCreateFolderTasksSuccessful = await Task.FromResult(ParallelCreateFolderTasks.All(x => x.Result.Equals(true)));
+            var isCreateFolderTasksSuccessful = await Task.FromResult(ParallelCreateFolderTasks.TrueForAll(x => x.Result.Equals(true)));
             ParallelCreateFolderTasks.Clear();
 
             return isCreateFolderTasksSuccessful;
@@ -719,7 +719,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, aioExchangeSetRootPath, cancellationTokenSource, cancellationToken);
-                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
+                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse[0].FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
@@ -769,7 +769,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
-                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
+                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse[0].FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
                         fileShareServiceSearchQueryCount += queryCount;
@@ -835,7 +835,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             });
 
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
-            bool isExchangeSetFolderCreated = await Task.FromResult(ParallelCreateFolderTaskForCatlogFile.All(x => x.Result.Equals(true)));
+            bool isExchangeSetFolderCreated = await Task.FromResult(ParallelCreateFolderTaskForCatlogFile.TrueForAll(x => x.Result.Equals(true)));
             ParallelCreateFolderTaskForCatlogFile.Clear();
 
             return isExchangeSetFolderCreated;

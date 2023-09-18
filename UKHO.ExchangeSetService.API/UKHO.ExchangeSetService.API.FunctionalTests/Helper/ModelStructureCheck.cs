@@ -115,7 +115,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Verify expiry datetime
             var expiryDateTime = DateTime.UtcNow.AddDays(1).AddMinutes(1);
 
-            Assert.True(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second), $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
+            Assert.True(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second, DateTimeKind.Utc), $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
         }
 
         public static async Task<string> GetBatchId(this HttpResponseMessage apiResponse)
