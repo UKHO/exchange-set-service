@@ -30,6 +30,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
 
         [JsonProperty("requestedAioProductsAlreadyUpToDateCount")]
         public int RequestedAioProductsAlreadyUpToDateCount { get; set; }
+
+        [JsonProperty("fssBatchId")]
+        public string BatchId { get; set; }
     }
 
     public class Links

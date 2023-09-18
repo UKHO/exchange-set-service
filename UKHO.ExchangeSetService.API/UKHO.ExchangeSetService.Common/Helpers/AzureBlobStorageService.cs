@@ -10,6 +10,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 
@@ -42,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.largeExchangeSetInstance = largeExchangeSetInstance;
         }
 
-        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
+        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
             string uploadFileName = string.Concat(batchId, ".json");
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
@@ -58,14 +59,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await UploadSalesCatalogueServiceResponseToBlobAsync(cloudBlockBlob, salesCatalogueResponse);
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
-            await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, instanceCountAndType.Item1, storageAccountConnectionString, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
+            await AddQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, instanceCountAndType.Item1, storageAccountConnectionString, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse);
 
             return true;
         }
 
-        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, int instanceNumber, string storageAccountConnectionString, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
+        public async Task AddQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, int instanceNumber, string storageAccountConnectionString, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet);
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetSalesCatalogueServiceResponseQueueMessage(batchId, salesCatalogueResponse, callBackUri, correlationId, cloudBlockBlob, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse);
             var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(scsResponseQueueMessage);
             await azureMessageQueueHelper.AddMessage(batchId, instanceNumber, storageAccountConnectionString, scsResponseQueueMessageJSON, correlationId);
         }
@@ -80,7 +81,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         }
 
-        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
+        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, CloudBlockBlob cloudBlockBlob, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
@@ -93,7 +94,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 ExchangeSetUrlExpiryDate = expiryDate,
                 ScsRequestDateTime = scsRequestDateTime,
                 IsEmptyEncExchangeSet= isEmptyEncExchangeSet,
-                IsEmptyAioExchangeSet= isEmptyAioExchangeSet
+                IsEmptyAioExchangeSet= isEmptyAioExchangeSet,
+                RequestedProductCount = exchangeSetResponse?.RequestedProductCount ?? 0,
+                RequestedAioProductCount = exchangeSetResponse?.RequestedAioProductCount ?? 0,
+                RequestedProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedProductsAlreadyUpToDateCount ?? 0,
+                RequestedAioProductsAlreadyUpToDateCount= exchangeSetResponse?.RequestedAioProductsAlreadyUpToDateCount ?? 0
             };
             return scsResponseQueueMessage;
         }

@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 
@@ -105,6 +106,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
+            var exchangeSetResponse = new ExchangeSetResponse
+            {
+                RequestedAioProductCount = 0,
+                RequestedProductCount = 0
+            };
+
             CancellationToken cancellationToken = CancellationToken.None;
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
@@ -112,7 +119,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet);
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
             Assert.IsTrue(response);
         }

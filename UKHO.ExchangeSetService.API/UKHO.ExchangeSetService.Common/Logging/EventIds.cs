@@ -801,6 +801,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805198 - Completed download of 307 response IHO.pub file from the file share service.
         /// </summary>
         DownloadIhoPubFile307RedirectResponse = 805198,
+
+        /// <summary>
+        /// 805199 - Validate callback request payload start
+        /// </summary>
+        ValidateCallbackRequestPayloadStart = 805199
     }
 
     public static class EventIdExtensions
