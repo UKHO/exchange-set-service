@@ -109,6 +109,10 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
+                if (aioConfiguration.IsAioEnabled)
+                {
+                    CheckEmptyExchangeSet(exchangeSetServiceResponse);
+                }
                 await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
             }
             return response;
@@ -176,12 +180,12 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.NotModified)
             {
                 response.ExchangeSetResponse.RequestedProductCount = response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = request.ProductVersions.Count;
-                response.ExchangeSetResponse.RequestedProductCount = 0;
+                response.ExchangeSetResponse.RequestedProductCount -= aioCells.Count();
                 response.ExchangeSetResponse.RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>();
                 response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount = aioConfiguration.IsAioEnabled ? response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount - aioCells.Count() : response.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount + aioCells.Count();
                 response.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = aioConfiguration.IsAioEnabled ? aioCells.Count() : null;
                 response.ExchangeSetResponse.AioExchangeSetCellCount = aioConfiguration.IsAioEnabled ? 0 : null;
-                response.ExchangeSetResponse.RequestedAioProductCount = aioConfiguration.IsAioEnabled ? 0 : null;
+                response.ExchangeSetResponse.RequestedAioProductCount = aioConfiguration.IsAioEnabled ? aioCells.Count() : null;
                 salesCatalogueResponse.ResponseBody = new SalesCatalogueProductResponse
                 {
                     Products = new List<Products>(),
@@ -327,8 +331,10 @@ namespace UKHO.ExchangeSetService.API.Services
                                                      .RequestedProductsNotInExchangeSet.Any();
 
                     var hasAioExchangeSetFileUri = aioConfiguration.IsAioEnabled
-                                                   && exchangeSetServiceResponse.ExchangeSetResponse
-                                                       .AioExchangeSetCellCount > 0;
+                                                   && (exchangeSetServiceResponse.ExchangeSetResponse
+                                                       .AioExchangeSetCellCount > 0
+                                                   || exchangeSetServiceResponse.ExchangeSetResponse
+                                                        .RequestedAioProductsAlreadyUpToDateCount > 0);
 
                     exchangeSetServiceResponse.ExchangeSetResponse.Links = new Links()
                     {
@@ -336,8 +342,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
                         ExchangeSetFileUri = hasExchangeSetFileUri ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri } : null,
                         AioExchangeSetFileUri = hasAioExchangeSetFileUri ?
-                             new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
-                            
+                             new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null                            
                     };
 
                     exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
@@ -480,14 +485,14 @@ namespace UKHO.ExchangeSetService.API.Services
             }
         }
 
-        /*  boolean variables will updated with AioEnabled = true
-            applicable to productVersions endpoints to create empty exchange set
-            productIdentifier - not applicable 
-            sinceDateTime - ESS API will return 304 and will not create empty exchange set   */
         private void CheckEmptyExchangeSet(ExchangeSetServiceResponse exchangeSetServiceResponse)
         {
-            isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0;
+            //ProductVersion - 304 if AIO cell requested with latest edition and Update number then create AIO empty exchange set PBI #77585.
             isEmptyAioExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount > 0;
+
+            //crate standard empty exchange set when invalid enc or aio cell requested PBI #93502.
+            isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0 // when enc cell already uptodate
+                                    || exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Any();// when invalid enc and aio cell requested
         }
     }
 }
