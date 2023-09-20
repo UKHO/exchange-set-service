@@ -10,7 +10,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Response
         [JsonProperty("exchangeSetBatchDetailsUri")]
         public LinkSetBatchDetailsUri ExchangeSetBatchDetailsUri { get; set; }
 
-        [JsonProperty("exchangeSetFileUri")]
+        [JsonProperty("exchangeSetFileUri", NullValueHandling = NullValueHandling.Ignore)]
         public LinkSetFileUri ExchangeSetFileUri { get; set; }
 
         [JsonProperty("aioExchangeSetFileUri", NullValueHandling = NullValueHandling.Ignore)]
