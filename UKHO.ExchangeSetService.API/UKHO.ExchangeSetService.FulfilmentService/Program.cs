@@ -49,7 +49,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
             HostBuilder hostBuilder = BuildHostConfiguration();
             IHost host = hostBuilder.Build();
-
             string transactionName = $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
             Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest,  () =>

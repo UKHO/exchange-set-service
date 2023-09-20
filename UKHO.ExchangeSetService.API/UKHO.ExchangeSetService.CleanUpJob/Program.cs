@@ -56,7 +56,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 try
                 {
                     var cleanUpJob = serviceProvider.GetService<ExchangeSetCleanUpJob>();
-
                     string transactionName = $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-cleanup-transaction";
 
                     await Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, async () =>
