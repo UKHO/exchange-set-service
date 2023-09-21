@@ -98,7 +98,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseDataProductTXT);
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public void GlobalTeardown()
         {
             ////Clean up downloaded files/ folders
