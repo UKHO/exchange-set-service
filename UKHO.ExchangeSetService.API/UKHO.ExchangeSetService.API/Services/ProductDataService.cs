@@ -328,7 +328,9 @@ namespace UKHO.ExchangeSetService.API.Services
                                                  || exchangeSetServiceResponse.ExchangeSetResponse
                                                      .ExchangeSetCellCount > 0
                                                  || exchangeSetServiceResponse.ExchangeSetResponse
-                                                     .RequestedProductsNotInExchangeSet.Any();
+                                                     .RequestedProductsNotInExchangeSet.Any()
+                                                 || exchangeSetServiceResponse.ExchangeSetResponse
+                                                     .RequestedProductsAlreadyUpToDateCount > 0;
 
                     var hasAioExchangeSetFileUri = aioConfiguration.IsAioEnabled
                                                    && (exchangeSetServiceResponse.ExchangeSetResponse
@@ -487,12 +489,12 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private void CheckEmptyExchangeSet(ExchangeSetServiceResponse exchangeSetServiceResponse)
         {
-            //ProductVersion - 304 if AIO cell requested with latest edition and Update number then create AIO empty exchange set PBI #77585.
+            //ProductVersion - 304 if AIO cell requested with latest edition and Update number then create empty AIO exchange set PBI #77585.
             isEmptyAioExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.AioExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount > 0;
 
-            //crate standard empty exchange set when invalid enc or aio cell requested PBI #93502.
-            isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0 // when enc cell already uptodate
-                                    || exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Any();// when invalid enc and aio cell requested
+            //create standard empty exchange set when invalid enc or aio cell requested PBI #93502.
+            isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0 // when enc cell already up to date
+                                    || exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Any();// when invalid enc or aio cell requested
         }
     }
 }
