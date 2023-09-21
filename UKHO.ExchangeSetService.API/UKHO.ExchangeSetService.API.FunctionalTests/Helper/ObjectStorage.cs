@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         protected ProductIdentifierModel ProductIdentifierModel { get; set; }
         protected DataHelper Datahelper { get; set; }
         public string FssJwtToken { get; set; }
-        public DataHelper DataHelper = new();
+        public static DataHelper DataHelper = new();
         protected HttpResponseMessage ApiEssResponse { get; set; }
        
         protected SalesCatalogueApiClient ScsApiClient { get; set; }

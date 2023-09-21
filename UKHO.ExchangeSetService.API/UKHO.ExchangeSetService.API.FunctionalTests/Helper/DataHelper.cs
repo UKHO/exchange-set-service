@@ -88,5 +88,35 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080", "GZ800112" };
 
         }
+
+        public List<string> GetProductIdentifiersForInvalidProduct()
+        {
+            return new List<string>() { "AB1234GH" };
+        }
+
+        public List<string> GetProductIdentifiersForInvalidEncAndInValidAio()
+        {
+            return new List<string>() { "AB1234GH", "GZ800112" };
+        }
+
+        public List<string> GetProductIdentifiersForInvalidAioCells()
+        {
+            return new List<string>() { "GZ800112" };
+        }
+
+        public List<string> GetProductIdentifiersForInvalidProductAndValidAio()
+        {
+            return new List<string>() { "AB1234GH", "GB800001" };
+        }
+
+        public List<string> GetProductIdentifiersForInvalidEncAndValidAndInvalidAioCell()
+        {
+            return new List<string>() { "AB1234GH", "GZ800112", "GB800001", };
+        }
+
+        public List<string> GetProductIdentifiersForValidAndInvalidAioCell()
+        {
+            return new List<string>() { "GB800001", "GZ800112" };
+        }
     }
 }
