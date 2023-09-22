@@ -1028,7 +1028,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
             exchangeSetResponseAioToggleOff.ExchangeSetCellCount = 0; //RequestedProductsAlreadyUpToDateCount
             exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
-            exchangeSetResponseAioToggleOff.RequestedProductCount = 0;
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
@@ -1089,7 +1088,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
             exchangeSetResponseAioToggleOff.ExchangeSetCellCount = 0; //RequestedProductsAlreadyUpToDateCount
             exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
-            exchangeSetResponseAioToggleOff.RequestedProductCount = 0;
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
             Assert.AreEqual(HttpStatusCode.Created, result.HttpStatusCode);
