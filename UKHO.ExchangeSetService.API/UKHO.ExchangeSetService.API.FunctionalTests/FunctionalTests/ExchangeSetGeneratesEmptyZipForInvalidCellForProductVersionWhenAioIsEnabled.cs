@@ -26,7 +26,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIOEnabled")]
         public async Task VerifyEmptyEncExchangeSetForProductVersion()
         {
-
             //// ENC_ROOT >>> ReadmeTxtFile
             bool checkFileReadme = FssBatchHelper.CheckforFileExist(Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFileReadme, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");
@@ -70,7 +69,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task VerifyEmptyAioExchangeSetForProductVersion()
         {
-
             //// ENC_ROOT >>> ReadmeTxtFile
             bool checkFileReadme = FssBatchHelper.CheckforFileExist(Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFileReadme, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");

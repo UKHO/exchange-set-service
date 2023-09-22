@@ -22,13 +22,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public List<string> GetProductIdentifierData()
         {
             return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080" };
-
         }
 
         public List<string> GetOnlyProductIdentifierData()
         {
             return new List<string>() { "DE260001" };
-
         }
 
         public List<string> GetProductIdentifiers()
@@ -60,6 +58,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             return new List<string>() { "GB800001" };
         }
+
         public List<string> GetProductIdentifiersForLargeMediaAndAioNotPresent()
         {
             return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US5CN13M", "CA172005", "DE521900", "NZ300661", "KR676D03", "GZ800112" };
@@ -74,19 +73,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public List<string> GetAioProductIdentifierAndInvalidData()
         {
             return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080", "GB800001", "ABCDEFGH" };
-
         }
 
         public List<string> GetDuplicateAioProductIdentifierData()
         {
             return new List<string>() { "DE416080", "GB800001", "GB800001" };
-
         }
 
         public List<string> GetAdditionalAioProductIdentifierData()
         {
             return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080", "GZ800112" };
-
         }
 
         public List<string> GetProductIdentifiersForInvalidProduct()
