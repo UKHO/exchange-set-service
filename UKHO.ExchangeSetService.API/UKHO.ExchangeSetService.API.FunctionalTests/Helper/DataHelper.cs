@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiersForLargeMedia()
         {
-           return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US5CN13M", "CA172005", "DE521900", "NZ300661", "KR676D03" };
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US5CN13M", "CA172005", "DE521900", "NZ300661", "KR676D03" };
         }
 
         public List<string> GetProductIdentifiersForLargeMediaAndAio()

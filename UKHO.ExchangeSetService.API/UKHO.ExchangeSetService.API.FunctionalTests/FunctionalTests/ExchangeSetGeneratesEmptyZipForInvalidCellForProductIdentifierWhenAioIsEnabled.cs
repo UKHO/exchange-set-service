@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIOEnabled")]
         public async Task VerifyEmptyExchangeSetForProductIdentifier(List<string> product)
         {
-            
+
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(product, accessToken: objStorage.EssJwtToken);
             Assert.AreEqual(200, (int)ApiEssResponse.StatusCode, $"Incorrect status code is returned {ApiEssResponse.StatusCode}, instead of the expected status 200.");
 
@@ -84,7 +84,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //// No ENC Available
             Assert.IsFalse(Directory.Exists(Path.Combine(DownloadedFolderPath, "ENC_ROOT\\AB")));
-
 
             //// INFO >> PRODUCT.TXT
             bool checkFileProductTxt = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
