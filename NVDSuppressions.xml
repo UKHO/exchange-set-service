@@ -278,4 +278,48 @@
 		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Platforms@.*$</packageUrl>
 		<vulnerabilityName>CVE-2023-29326</vulnerabilityName>
 	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: Elastic.Apm.AspNetCore.dll
+   False positive - impacts Java or Python
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
+		<cpe>cpe:/a:asp-project:asp-project</cpe>
+		<cpe>cpe:/a:elastic:apm_agent</cpe>
+		<cve>CVE-2021-37941</cve>
+		<cve>CVE-2019-7617</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Elastic.Apm.Extensions.Logging.dll
+   False positive - impacts Java or Python
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
+		<cpe>cpe:/a:elastic:apm_agent</cpe>
+		<cve>CVE-2021-37941</cve>
+		<cve>CVE-2019-7617</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Elastic.Apm.dll
+   False positive - impacts Java or Python
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
+		<cpe>cpe:/a:elastic:apm_agent</cpe>
+		<cve>CVE-2021-37941</cve>
+		<cve>CVE-2019-7617</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Elastic.Apm.Extensions.Hosting.dll
+   False positive - impacts Java or Python
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
+		<cpe>cpe:/a:elastic:apm_agent</cpe>
+		<cve>CVE-2021-37941</cve>
+		<cve>CVE-2019-7617</cve>
+	</suppress>
 </suppressions>
