@@ -27,9 +27,14 @@ paths:
       description: |
         Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.   
 
+        Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
+        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
+        
         ## Business Rules:
 
         Only ENCs that are releasable at the date of the request will be returned.
+
+        If valid ENCs are requested then ENC exchange set with baseline data including requested ENCs will be returned. If valid AIO is requested then AIO exchange set with baseline releasable data including requested AIO will be returned.
 
         For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
 
@@ -37,13 +42,7 @@ paths:
 
         If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
 
-        If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e. the user is not informed it does not exist). If none of the requested ENCs exist, then status code 400 ('Bad Request') response will be returned.
-
-        If valid AIO is requested then aio exchange set file url will be returned.
-
-        If valid ENC is requested then exchange set file url will be returned.
-
-        If AIO and ENC do not exist then exchange set file url will be returned.
+        If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
@@ -86,24 +85,7 @@ paths:
 
       callbacks:
         fulfilmentResponse:
-          '{$request.query.callbackUri}':
-            post:
-              summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
-              description: |
-                Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
-
-                ## Data:
-
-                The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
-
-              requestBody:
-                content:
-                  application/json:
-                    schema:
-                      $ref: "#/components/schemas/cloudEvent"
-              responses:
-                "200":
-                  description: The service will ignore all response from the callback.
+          $ref: "#/components/callbacks/fulfilmentResponse"
 
   /productData/productVersions:
     post:
@@ -111,19 +93,20 @@ paths:
       description: |
         Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
 
+        Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
+        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
+        
         ## Business Rules:
 
-        If there is no update to the version that is requested, then nothing will be returned for the ENC.
+        If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
 
         If none of the ENCs requested have an update, then a 'Not modified' response will be returned. If none of the ENCs requested exist, then status code 400 ('Bad Request') response will be returned.
 
         The rules around cancellation, replacements, additional coverage and re-issues apply as defined in the previous section.
 
-        If valid AIO is requested then aio exchange set file url will be returned.
+        If none of the ENCs requested have an update, then ENC exchange set with releasable baseline data will be returned.
 
-        If valid ENC is requested then exchange set file url will be returned.
-
-        If AIO and ENC do not exist then exchange set file url will be returned.
+        If none of the AIO requested have an update, then AIO exchange set with releasable baseline data will be returned.
 
       operationId: postProductVersions
 
@@ -171,13 +154,16 @@ paths:
 
       callbacks:
         fulfilmentResponse:
-          $ref: "#/components/callbacks/fulfilmentResponse1"
+          $ref: "#/components/callbacks/fulfilmentResponse"
 
   /productData:
     post:
       summary: Provide all the releasable data after a datetime.
       description: |
         Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.
+
+        Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
+        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
 
       operationId: getProducts
 
@@ -229,7 +215,7 @@ paths:
 
       callbacks:
         fulfilmentResponse:
-          $ref: "#/components/callbacks/fulfilmentResponse1"
+          $ref: "#/components/callbacks/fulfilmentResponse"
 
   /auth/client_credentials:
     post:
@@ -679,7 +665,7 @@ components:
     ######################
 
   callbacks:
-    fulfilmentResponse1:
+    fulfilmentResponse:
       '{$request.query.callbackUri}':
         post:
           summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
