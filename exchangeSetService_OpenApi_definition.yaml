@@ -27,9 +27,6 @@ paths:
       description: |
         Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.   
 
-        Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
-        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
-        
         ## Business Rules:
 
         Only ENCs that are releasable at the date of the request will be returned.
@@ -93,9 +90,6 @@ paths:
       description: |
         Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
 
-        Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
-        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
-        
         ## Business Rules:
 
         If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
@@ -161,10 +155,7 @@ paths:
       summary: Provide all the releasable data after a datetime.
       description: |
         Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.
-
-        Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
-        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
-
+        
       operationId: getProducts
 
       parameters:
@@ -303,7 +294,10 @@ components:
       in: query
       name: callbackUri
       required: false
-      description: An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.
+      description: |
+        An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. 
+        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. 
+        If not specified, then no call back notification will be sent.
       schema:
         type: string
 

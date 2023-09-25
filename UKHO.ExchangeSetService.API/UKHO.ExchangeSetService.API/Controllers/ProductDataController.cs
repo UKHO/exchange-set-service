@@ -34,8 +34,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         /// <summary>
         /// Provide all the latest releasable baseline data for a specified set of ENCs.
-        /// Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
-        /// The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
         /// </summary>
         /// <remarks>
         /// Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.
@@ -52,10 +50,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// 
         /// If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
         ///
-        /// Call
         /// </remarks>
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
-        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -124,8 +121,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         /// <summary>
         /// Given a set of ENC versions (e.g. Edition x Update y) provide any later releasable files.
-        /// Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
-        /// The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
         /// </summary>
         /// <remarks>
         /// Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
@@ -141,7 +136,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// 
         /// </remarks>
         /// <param name="productVersionsRequest">The JSON body containing product versions.</param>
-        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates for any of the productVersions, then status code 200 ('OK') will be returned with an empty Exchange Set (containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -210,14 +205,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         /// <summary>
         /// Provide all the releasable data after a datetime.
-        /// Once the Exchange Set has been committed on File Share Service, a notification that this is now ready to download will be sent to the callbackURI (if specified).
-        /// The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
         /// </summary>
         /// <remarks>Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.</remarks>
         /// <param name="sinceDateTime" example="Wed, 21 Oct 2015 07:28:00 GMT" >The date and time from which changes are requested. Any changes since the date will be returned. The value should be the value in the `Date` header returned by the last request to this operation. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
         /// <br/><para><i>Example</i> : Wed, 21 Oct 2015 07:28:00 GMT</para>
         /// </param>
-        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</response>
         /// <response code="304">Not modified.</response>
         /// <response code="400">Bad Request.</response>
