@@ -39,17 +39,20 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.
         /// ## Business Rules:
         /// Only ENCs that are releasable at the date of the request will be returned.
-        /// 
+        ///
+        /// If valid ENCs are requested then ENC exchange set with baseline data including requested ENCs will be returned. If valid AIO is requested then AIO exchange set with baseline releasable data including requested AIO will be returned.
+        ///  
         /// For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
         /// 
         /// If an ENC has a re-issue, then the latest batch on the FSS will be used. 
         /// 
         /// If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
         /// 
-        /// If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e. the user is not informed it does not exist). If none of the requested ENCs exist, then status code 400 ('Bad Request') response will be returned.
+        /// If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
+        ///
         /// </remarks>
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
-        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -122,14 +125,18 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <remarks>
         /// Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
         /// ## Business Rules:
-        /// If there is no update to the version that is requested, then nothing will be returned for the ENC.
         /// 
-        /// If none of the ENCs requested have an update, then a 'Not modified' response will be returned. If none of the ENCs requested exist, then status code 400 ('Bad Request') response will be returned.
+        /// If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
         /// 
         /// The rules around cancellation, replacements, additional coverage and re-issues apply as defined in the previous section.
+        ///
+        /// If none of the ENCs requested have an update, then ENC exchange set with releasable baseline data will be returned.
+        ///
+        /// If none of the AIO requested have an update, then AIO exchange set with releasable baseline data will be returned.
+        /// 
         /// </remarks>
         /// <param name="productVersionsRequest">The JSON body containing product versions.</param>
-        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates for any of the productVersions, then status code 200 ('OK') will be returned with an empty Exchange Set (containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -203,7 +210,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <param name="sinceDateTime" example="Wed, 21 Oct 2015 07:28:00 GMT" >The date and time from which changes are requested. Any changes since the date will be returned. The value should be the value in the `Date` header returned by the last request to this operation. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
         /// <br/><para><i>Example</i> : Wed, 21 Oct 2015 07:28:00 GMT</para>
         /// </param>
-        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.</param>
+        /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</response>
         /// <response code="304">Not modified.</response>
         /// <response code="400">Bad Request.</response>
