@@ -40,9 +40,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
-
+            hostBuilder.UseEnvironment("development");
             IHost host = hostBuilder.Build();
-
             using (host)
             {
                 host.Run();
@@ -75,9 +74,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 #if DEBUG
                 //Add development overrides configuration
                 builder.AddJsonFile("appsettings.local.overrides.json", true, true);
-                if (bool.TryParse(tempConfig["ESSAzureADConfiguration:Local"], out bool result) && result)
+                if (bool.TryParse(tempConfig["Local"], out bool result) && result)
                 {
-                    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeInteractiveBrowserCredential = false };
+                    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeAzurePowerShellCredential = true, ExcludeEnvironmentCredential = true, ExcludeVisualStudioCredential = false, ExcludeVisualStudioCodeCredential = false, ExcludeInteractiveBrowserCredential = false };
                 }
 #endif
 
@@ -133,7 +132,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              })
              .ConfigureServices((hostContext, services) =>
              {
+#pragma warning disable S1481
                  var buildServiceProvider = services.BuildServiceProvider();
+#pragma warning restore S1481
 
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
@@ -195,11 +196,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.AddDistributedMemoryCache();
 
+#if !DEBUG
                  // Add App Insights Telemetry Filter
                  var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
                  var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
                  telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next));
                  telemetryProcessorChainBuilder.Build();
+#endif
 
              })
               .ConfigureWebJobs(b =>

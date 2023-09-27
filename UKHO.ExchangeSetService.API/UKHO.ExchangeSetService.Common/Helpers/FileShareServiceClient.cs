@@ -24,7 +24,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             HttpContent content = null;
 
             if (requestBody != null)
+            {
                 content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+            }
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             { Content = content };
