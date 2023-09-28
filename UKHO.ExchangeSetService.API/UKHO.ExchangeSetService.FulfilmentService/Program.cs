@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 builder.AddJsonFile("appsettings.local.overrides.json", true, true);
                 if (bool.TryParse(tempConfig["Local"], out bool result) && result)
                 {
-                    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeAzurePowerShellCredential = true, ExcludeEnvironmentCredential = true, ExcludeVisualStudioCredential = false, ExcludeVisualStudioCodeCredential = false, ExcludeInteractiveBrowserCredential = true };
+                    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeAzurePowerShellCredential = true, ExcludeEnvironmentCredential = true, ExcludeVisualStudioCredential = false, ExcludeVisualStudioCodeCredential = true, ExcludeInteractiveBrowserCredential = true };
                 }
 #endif
 

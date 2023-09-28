@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Logging.AddFile(builder.Configuration.GetSection("Logging"));
             if (bool.TryParse(builder.Configuration["Local"], out bool result) && result)
             {
-                defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeAzurePowerShellCredential = true, ExcludeEnvironmentCredential = true, ExcludeVisualStudioCredential = false, ExcludeVisualStudioCodeCredential = true, ExcludeInteractiveBrowserCredential = false };
+                defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeAzurePowerShellCredential = true, ExcludeEnvironmentCredential = true, ExcludeVisualStudioCredential = false, ExcludeVisualStudioCodeCredential = true, ExcludeInteractiveBrowserCredential = true };
             }
 #endif
 
