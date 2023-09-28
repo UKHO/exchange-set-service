@@ -40,7 +40,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         public static void Main(string[] args)
         {
             HostBuilder hostBuilder = BuildHostConfiguration();
-            hostBuilder.UseEnvironment("development");
             IHost host = hostBuilder.Build();
             using (host)
             {
@@ -76,7 +75,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 builder.AddJsonFile("appsettings.local.overrides.json", true, true);
                 if (bool.TryParse(tempConfig["Local"], out bool result) && result)
                 {
-                    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeAzurePowerShellCredential = true, ExcludeEnvironmentCredential = true, ExcludeVisualStudioCredential = false, ExcludeVisualStudioCodeCredential = false, ExcludeInteractiveBrowserCredential = false };
+                    defaultAzureCredentialOptions = new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityClientId, ExcludeAzureCliCredential = true, ExcludeAzurePowerShellCredential = true, ExcludeEnvironmentCredential = true, ExcludeVisualStudioCredential = false, ExcludeVisualStudioCodeCredential = false, ExcludeInteractiveBrowserCredential = true };
                 }
 #endif
 

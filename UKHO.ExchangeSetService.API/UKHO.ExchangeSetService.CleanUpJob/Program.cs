@@ -117,7 +117,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 #endif
 
                 loggingBuilder.AddConsole();
-                //loggingBuilder.AddDebug();
+                loggingBuilder.AddDebug();
 
                 EventHubLoggingConfiguration eventhubConfig = configuration.GetSection("EventHubLoggingConfiguration").Get<EventHubLoggingConfiguration>();
 
@@ -152,7 +152,6 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             serviceCollection.AddScoped<IExchangeSetCleanUpService, ExchangeSetCleanUpService>();
             serviceCollection.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
             serviceCollection.AddScoped<IAzureFileSystemHelper, AzureFileSystemHelper>();
-
         }
     }
 }

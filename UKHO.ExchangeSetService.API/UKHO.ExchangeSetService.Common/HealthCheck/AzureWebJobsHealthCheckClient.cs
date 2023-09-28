@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
     [ExcludeFromCodeCoverage]
     public class AzureWebJobsHealthCheckClient : IAzureWebJobsHealthCheckClient
     {
-        static HttpClient httpClient = new HttpClient();
+        static HttpClient httpClient = new ();
         private readonly IWebHostEnvironment webHostEnvironment;
         
         public AzureWebJobsHealthCheckClient(IWebHostEnvironment webHostEnvironment)
