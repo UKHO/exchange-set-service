@@ -14,7 +14,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("http://*:61780");
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }
