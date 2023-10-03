@@ -73,11 +73,3 @@ variable "agent_subnet_name" {
 variable "agent_subscription_id" {
   type = string
 }
-
-variable "elastic_apm_server_url" {
-
-}
-
-variable "elastic_apm_api_key" {
-
-}

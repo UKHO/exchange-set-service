@@ -1,8 +1,4 @@
-﻿using Elastic.Apm.Azure.Storage;
-using Elastic.Apm.DiagnosticSource;
-using Elastic.Apm;
-using Elastic.Apm.Api;
-using Microsoft.Azure.WebJobs.Host;
+﻿using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,23 +39,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public static void Main(string[] args)
         {
-            // Elastic APM
-            Agent.Subscribe(new HttpDiagnosticsSubscriber());
-            Agent.Subscribe(new AzureBlobStorageDiagnosticsSubscriber());
-
             HostBuilder hostBuilder = BuildHostConfiguration();
             IHost host = hostBuilder.Build();
-            string transactionName = $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
-            Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest,  () =>
+            using (host)
             {
-                //application code that is captured as a transaction
-                using (host)
-                {
-                    host.Run();
-                }
+                host.Run();
+            }
 
-            });
         }
         private static HostBuilder BuildHostConfiguration()
         {
