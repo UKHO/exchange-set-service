@@ -2,6 +2,9 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Elastic.Apm;
+using Elastic.Apm.Api;
+using Elastic.Apm.Azure.Storage;
+using Elastic.Apm.DiagnosticSource;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +38,10 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             {
                 var delayTime = 5000;
 
+                // Elastic APM
+                Agent.Subscribe(new HttpDiagnosticsSubscriber());
+                Agent.Subscribe(new AzureBlobStorageDiagnosticsSubscriber());
+
                 //Build configuration
                 var configuration = BuildConfiguration();
 
@@ -49,7 +56,13 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                 try
                 {
                     var cleanUpJob = serviceProvider.GetService<ExchangeSetCleanUpJob>();
-                    await cleanUpJob.ProcessCleanUp();
+                    string transactionName = $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-cleanup-transaction";
+
+                    await Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, async () =>
+                    {
+                        //application code that is captured as a transaction
+                        await cleanUpJob.ProcessCleanUp();
+                    });
 
                 }
                 finally
@@ -62,6 +75,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}{Environment.NewLine}Stack trace: {ex.StackTrace}");
+                Agent.Tracer.CurrentTransaction.CaptureException(ex);
                 throw;
             }
         }

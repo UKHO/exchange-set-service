@@ -27,6 +27,10 @@ using Microsoft.ApplicationInsights.Extensibility;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
 using System.Collections.Generic;
+using Elastic.Apm.Azure.Storage;
+using Elastic.Apm.DiagnosticSource;
+using Elastic.Apm;
+using Elastic.Apm.Api;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -39,13 +43,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public static void Main(string[] args)
         {
+            // Elastic APM
+            Agent.Subscribe(new HttpDiagnosticsSubscriber());
+            Agent.Subscribe(new AzureBlobStorageDiagnosticsSubscriber());
+
             HostBuilder hostBuilder = BuildHostConfiguration();
             IHost host = hostBuilder.Build();
+            string transactionName = $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
-            using (host)
+            Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, () =>
             {
-                host.Run();
-            }
+                using (host)
+                {
+                    host.Run();
+                }
+            });
 
         }
         private static HostBuilder BuildHostConfiguration()
