@@ -459,10 +459,6 @@ stages:
             value: $(AutoTestClientSecret_NoAuth)
           - name: "AzureAdB2CTestConfiguration.ClientSecret"
             value: $(AUTOTEST-ESS-SECRET)
-          - name: "ElasticAPMServerURL"
-            value: $(ElasticAPM.ServerURL)
-          - name: "ElasticAPMApiKey"
-            value: $(ElasticAPM.ApiKey)
 
         strategy:
           runOnce:
