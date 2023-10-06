@@ -1,10 +1,10 @@
 ﻿using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using Elastic.Apm.Azure.Storage;
-using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm;
 using Elastic.Apm.Api;
+using Elastic.Apm.Azure.Storage;
+using Elastic.Apm.DiagnosticSource;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

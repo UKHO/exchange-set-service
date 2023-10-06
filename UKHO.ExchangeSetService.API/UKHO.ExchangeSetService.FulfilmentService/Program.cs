@@ -1,8 +1,4 @@
-﻿using Elastic.Apm.Azure.Storage;
-using Elastic.Apm.DiagnosticSource;
-using Elastic.Apm;
-using Elastic.Apm.Api;
-using Microsoft.Azure.WebJobs.Host;
+﻿using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,6 +27,10 @@ using Microsoft.ApplicationInsights.Extensibility;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
 using System.Collections.Generic;
+using Elastic.Apm.Azure.Storage;
+using Elastic.Apm.DiagnosticSource;
+using Elastic.Apm;
+using Elastic.Apm.Api;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -51,15 +51,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             IHost host = hostBuilder.Build();
             string transactionName = $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
-            Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest,  () =>
+            Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, () =>
             {
-                //application code that is captured as a transaction
                 using (host)
                 {
                     host.Run();
                 }
-
             });
+
         }
         private static HostBuilder BuildHostConfiguration()
         {
