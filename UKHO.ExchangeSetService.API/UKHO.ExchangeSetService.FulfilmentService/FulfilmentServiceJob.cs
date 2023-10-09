@@ -50,61 +50,79 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
-            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
+
+            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage =
+                message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
             string homeDirectoryPath = configuration["HOME"];
             string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
-            string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate, fulfilmentServiceQueueMessage.BatchId);
+            string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate,
+                fulfilmentServiceQueueMessage.BatchId);
             double fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(fulfilmentServiceQueueMessage.FileSize);
 
-            CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
+            CommonHelper.IsPeriodicOutputService =
+                fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
             try
             {
-                if (aioConfiguration.Value.IsAioEnabled)
+                try
                 {
-                    logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                }
-                else
-                {
-                    logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "ESS Webjob : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                }
+                    if (aioConfiguration.Value.IsAioEnabled)
+                    {
+                        logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(),
+                            "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}",
+                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    }
+                    else
+                    {
+                        logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(),
+                            "ESS Webjob : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}",
+                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    }
 
-                if (CommonHelper.IsPeriodicOutputService)
-                {
-                    await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateLargeExchangeSetRequestStart,
-                        EventIds.CreateLargeExchangeSetRequestCompleted,
-                        "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulFilmentDataService.CreateLargeExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate, periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
-                        },
-                    fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    if (CommonHelper.IsPeriodicOutputService)
+                    {
+                        await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateLargeExchangeSetRequestStart,
+                            EventIds.CreateLargeExchangeSetRequestCompleted,
+                            "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                            async () =>
+                            {
+                                return await fulFilmentDataService.CreateLargeExchangeSet(fulfilmentServiceQueueMessage,
+                                    currentUtcDate,
+                                    periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
+                            },
+                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    }
+                    else
+                    {
+                        await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
+                            EventIds.CreateExchangeSetRequestCompleted,
+                            "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                            async () =>
+                            {
+                                return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage,
+                                    currentUtcDate);
+                            },
+                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    }
                 }
-                else
+                catch (FulfilmentException ex)
                 {
-                    await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
-                        EventIds.CreateExchangeSetRequestCompleted,
-                        "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate);
-                        },
-                    fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    EventId exceptionEventId = ex.EventId;
+                    var fulfillmentException = new FulfilmentException(exceptionEventId);
+                    string errorMessage = string.Format(fulfillmentException.Message, exceptionEventId.Id,
+                        fulfilmentServiceQueueMessage.CorrelationId);
+
+                    await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId,
+                        errorMessage, batchFolderPath);
                 }
             }
             catch (Exception ex)
             {
                 EventId exceptionEventId = EventIds.SystemException.ToEventId();
 
-                if (ex.GetType() == typeof(FulfilmentException))
-                    exceptionEventId = ((FulfilmentException)ex).EventId;
-
-                var fulfilmentException = new FulfilmentException(exceptionEventId);
-                string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
-
-                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
-
-                if (ex.GetType() != typeof(FulfilmentException))
-                    logger.LogError(exceptionEventId, ex, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
+                logger.LogError(exceptionEventId, ex,
+                    "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}",
+                    fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId,
+                    ex.Message);
             }
         }
 
