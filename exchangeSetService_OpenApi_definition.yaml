@@ -31,13 +31,15 @@ paths:
 
         Only ENCs that are releasable at the date of the request will be returned.
 
+        If valid ENCs are requested then ENC exchange set with baseline data including requested ENCs will be returned. If valid AIO is requested then AIO exchange set with baseline releasable data including requested AIO will be returned.
+
         For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
 
         If an ENC has a re-issue, then the latest batch on the FSS will be used. 
 
         If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
 
-        If a requested ENC does not exist (it is not a valid ENC) then nothing for that ENC will be returned (i.e. the user is not informed it does not exist). If none of the requested ENCs exist, then status code 400 ('Bad Request') response will be returned.
+        If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
@@ -90,11 +92,15 @@ paths:
 
         ## Business Rules:
 
-        If there is no update to the version that is requested, then nothing will be returned for the ENC.
+        If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
 
         If none of the ENCs requested have an update, then a 'Not modified' response will be returned. If none of the ENCs requested exist, then status code 400 ('Bad Request') response will be returned.
 
         The rules around cancellation, replacements, additional coverage and re-issues apply as defined in the previous section.
+
+        If none of the ENCs requested have an update, then ENC exchange set with releasable baseline data will be returned.
+
+        If none of the AIO requested have an update, then AIO exchange set with releasable baseline data will be returned.
 
       operationId: postProductVersions
 
@@ -149,7 +155,7 @@ paths:
       summary: Provide all the releasable data after a datetime.
       description: |
         Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.
-
+        
       operationId: getProducts
 
       parameters:
@@ -288,7 +294,10 @@ components:
       in: query
       name: callbackUri
       required: false
-      description: An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. If not specified, then no call back notification will be sent.
+      description: |
+        An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. 
+        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. 
+        If not specified, then no call back notification will be sent.
       schema:
         type: string
 
@@ -377,14 +386,15 @@ components:
           type: object
           required:
             - "exchangeSetBatchStatusUri"
-            - "exchangeSetBatchDetailsUri"
-            - "exchangeSetFileUri"
+            - "exchangeSetBatchDetailsUri"            
           properties:
             exchangeSetBatchStatusUri:
               $ref: "#/components/schemas/link"
             exchangeSetBatchDetailsUri:
               $ref: "#/components/schemas/link"
             exchangeSetFileUri:
+              $ref: "#/components/schemas/link"
+            aioExchangeSetFileUri:
               $ref: "#/components/schemas/link"
         exchangeSetUrlExpiryDateTime:
           type: string
@@ -397,6 +407,12 @@ components:
           type: integer
           description: Number of products that have data included in the produced Exchange Set.
         requestedProductsAlreadyUpToDateCount:
+          type: integer
+        requestedAioProductCount:
+          type: integer
+        aioExchangeSetCellCount:
+          type: integer
+        requestedAioProductsAlreadyUpToDateCount:
           type: integer
         requestedProductsNotInExchangeSet:
           type: array
@@ -427,10 +443,15 @@ components:
             href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
           exchangeSetFileUri:
             href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+          aioExchangeSetFileUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip"
         exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
         requestedProductCount: 22
         exchangeSetCellCount: 15
         requestedProductsAlreadyUpToDateCount: 5
+        requestedAioProductCount: 2
+        aioExchangeSetCellCount: 1
+        requestedAioProductsAlreadyUpToDateCount: 1
         requestedProductsNotInExchangeSet:
           [
             { productName: "GB123456", reason: "productWithdrawn" },
@@ -605,12 +626,17 @@ components:
               href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             exchangeSetFileUri:
               href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+            aioExchangeSetFileUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip"
             errorFileUri:
               href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/error.txt"
           exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
           requestedProductCount: 22
           exchangeSetCellCount: 15
           requestedProductsAlreadyUpToDateCount: 5
+          requestedAioProductCount: 2
+          aioExchangeSetCellCount: 1
+          requestedAioProductsAlreadyUpToDateCount: 1
           requestedProductsNotInExchangeSet:
             [
               { productName: "GB123456", reason: "productWithdrawn" },

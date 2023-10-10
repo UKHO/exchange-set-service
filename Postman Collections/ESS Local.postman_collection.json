@@ -1,0 +1,382 @@
+{
+	"info": {
+		"_postman_id": "d3e6e35d-f708-4882-a31e-cb9263b3a52b",
+		"name": "ESS Local",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25442370"
+	},
+	"item": [
+		{
+			"name": "Dev ProductIdentifiers",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-ms-date",
+						"value": "21 September 2023 09:21:04 GMT",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n\"DE4NO18Q\",\r\n\"DE5NOBRK\",\r\n\"DE416080\"\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:25449/productData/productIdentifiers",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "25449",
+					"path": [
+						"productData",
+						"productIdentifiers"
+					],
+					"query": [
+						{
+							"key": "callbackUri",
+							"value": "https://callbackwebapp.azurewebsites.net/postErrorCallBack",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dev ProductIdentifiers LargeMedia AIO",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n\"FR570300\",\r\n\"SE6IIFE1\",\r\n\"NO3B2020\",\r\n\"GB20486A\",\r\n\"RU3P0ZM0\",\r\n\"US5CN13M\",\r\n\"CA172005\",\r\n\"DE521900\",\r\n\"NZ300661\",\r\n\"KR676D03\",\r\n\"GZ800112\",\r\n\"GB800001\"\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:25449/productData/productIdentifiers",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "25449",
+					"path": [
+						"productData",
+						"productIdentifiers"
+					],
+					"query": [
+						{
+							"key": "callbackUri",
+							"value": "https://callbackwebapp.azurewebsites.net/postErrorCallBack",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dev SinceDateTime",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Correlation-ID",
+						"value": "0980ebbd-02a4-4c9d-814b-6c605e0ce999",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://127.0.0.1:25449/productData?sinceDateTime=Fri, 29 Sep 2023 09:00:00 GMT",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "25449",
+					"path": [
+						"productData"
+					],
+					"query": [
+						{
+							"key": "callbackUri",
+							"value": "https://callbackwebapp.azurewebsites.net/postCallBack",
+							"disabled": true
+						},
+						{
+							"key": "sinceDateTime",
+							"value": "Fri, 29 Sep 2023 09:00:00 GMT"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dev SinceDateTime Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Correlation-ID",
+						"value": "0980ebbd-02a4-4c9d-814b-6c605e0ce999",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://exchangeset-dev.admiralty.co.uk/productData?sinceDateTime=Thu, 13 Apr 2023 12:11:00 GMT",
+					"protocol": "https",
+					"host": [
+						"exchangeset-dev",
+						"admiralty",
+						"co",
+						"uk"
+					],
+					"path": [
+						"productData"
+					],
+					"query": [
+						{
+							"key": "callbackUri",
+							"value": "https://callbackwebapp.azurewebsites.net/postCallBack",
+							"disabled": true
+						},
+						{
+							"key": "sinceDateTime",
+							"value": "Thu, 13 Apr 2023 12:11:00 GMT"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dev productVersions",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n{\r\n\"productName\": \"DE516510\",\r\n\"editionNumber\": 2,\r\n\"updateNumber\": 1\r\n}\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:25449/productData/productVersions",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "25449",
+					"path": [
+						"productData",
+						"productVersions"
+					],
+					"query": [
+						{
+							"key": "callbackUri",
+							"value": "https://callbackwebapp.azurewebsites.net/postErrorCallBack",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dev productVersions Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n//     {\r\n//     \"productName\": \"US2ARCGD\",\r\n//     \"editionNumber\": 1,\r\n//     \"updateNumber\": 0\r\n//   },\r\n  {\r\n    \"productName\": \"GB800001\",\r\n    \"editionNumber\": 31,\r\n    \"updateNumber\": 34\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://exchangeset-dev.admiralty.co.uk/productData/productVersions",
+					"protocol": "https",
+					"host": [
+						"exchangeset-dev",
+						"admiralty",
+						"co",
+						"uk"
+					],
+					"path": [
+						"productData",
+						"productVersions"
+					],
+					"query": [
+						{
+							"key": "callbackUri",
+							"value": "https://callbackwebapp.azurewebsites.net/postErrorCallBack",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dev productVersions Copy 2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n//     {\r\n//     \"productName\": \"US2ARCGD\",\r\n//     \"editionNumber\": 1,\r\n//     \"updateNumber\": 0\r\n//   },\r\n    {\r\n    \"productName\": \"CA479226\",\r\n    \"editionNumber\": 4,\r\n    \"updateNumber\": 6\r\n  },\r\n  {\r\n    \"productName\": \"GB800001\",\r\n    \"editionNumber\": 31,\r\n    \"updateNumber\": 33\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://exchangeset-dev.admiralty.co.uk/productData/productVersions",
+					"protocol": "https",
+					"host": [
+						"exchangeset-dev",
+						"admiralty",
+						"co",
+						"uk"
+					],
+					"path": [
+						"productData",
+						"productVersions"
+					],
+					"query": [
+						{
+							"key": "callbackUri",
+							"value": "https://callbackwebapp.azurewebsites.net/postErrorCallBack",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://exchangeset-dev.admiralty.co.uk/health",
+					"protocol": "https",
+					"host": [
+						"exchangeset-dev",
+						"admiralty",
+						"co",
+						"uk"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "tokenName",
+				"value": "ESS Dev",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "80a6c68b-59aa-49a4-939a-7968ff79d676/.default",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "80a6c68b-59aa-49a4-939a-7968ff79d676",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://login.microsoftonline.com/9134ca48-663d-4a05-968a-31a42f0aed3e/oauth2/v2.0/authorize",
+				"type": "string"
+			},
+			{
+				"key": "challengeAlgorithm",
+				"value": "S256",
+				"type": "string"
+			},
+			{
+				"key": "useBrowser",
+				"value": true,
+				"type": "boolean"
+			},
+			{
+				"key": "redirect_uri",
+				"value": "https://oauth.pstmn.io/v1/callback",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "implicit",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
