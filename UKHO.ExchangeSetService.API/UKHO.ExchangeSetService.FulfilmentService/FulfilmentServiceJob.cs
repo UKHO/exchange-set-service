@@ -50,14 +50,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
-
-            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage =
+            SalesCatalogueServiceResponseQueueMessage fulfillmentServiceQueueMessage =
                 message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
             string homeDirectoryPath = configuration["HOME"];
             string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
             string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate,
-                fulfilmentServiceQueueMessage.BatchId);
-            double fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(fulfilmentServiceQueueMessage.FileSize);
+                fulfillmentServiceQueueMessage.BatchId);
+            double fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(fulfillmentServiceQueueMessage.FileSize);
 
             CommonHelper.IsPeriodicOutputService =
                 fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
@@ -69,13 +68,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     {
                         logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(),
                             "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}",
-                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                            fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
                     }
                     else
                     {
                         logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(),
                             "ESS Webjob : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}",
-                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                            fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
                     }
 
                     if (CommonHelper.IsPeriodicOutputService)
@@ -85,11 +84,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateLargeExchangeSet(fulfilmentServiceQueueMessage,
+                                return await fulFilmentDataService.CreateLargeExchangeSet(fulfillmentServiceQueueMessage,
                                     currentUtcDate,
                                     periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
                             },
-                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                            fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
                     }
                     else
                     {
@@ -98,10 +97,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage,
+                                return await fulFilmentDataService.CreateExchangeSet(fulfillmentServiceQueueMessage,
                                     currentUtcDate);
                             },
-                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                            fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
                     }
                 }
                 catch (FulfilmentException ex)
@@ -109,9 +108,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     EventId exceptionEventId = ex.EventId;
                     var fulfillmentException = new FulfilmentException(exceptionEventId);
                     string errorMessage = string.Format(fulfillmentException.Message, exceptionEventId.Id,
-                        fulfilmentServiceQueueMessage.CorrelationId);
+                        fulfillmentServiceQueueMessage.CorrelationId);
 
-                    await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId,
+                    await CreateAndUploadErrorFileToFileShareService(fulfillmentServiceQueueMessage, exceptionEventId,
                         errorMessage, batchFolderPath);
                 }
             }
@@ -121,12 +120,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                 logger.LogError(exceptionEventId, ex,
                     "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}",
-                    fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId,
+                    fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId,
                     ex.Message);
             }
         }
 
-        public async Task CreateAndUploadErrorFileToFileShareService(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage, EventId eventId, string errorMessage, string batchFolderPath)
+        public async Task CreateAndUploadErrorFileToFileShareService(SalesCatalogueServiceResponseQueueMessage fulfillmentServiceQueueMessage, EventId eventId, string errorMessage, string batchFolderPath)
         {
             fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
 
@@ -136,27 +135,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             if (fileSystemHelper.CheckFileExists(errorFileFullPath))
             {
                 var isErrorFileCommitted = false;
-                var isUploaded = await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
+                var isUploaded = await fileShareService.UploadFileToFileShareService(fulfillmentServiceQueueMessage.BatchId, batchFolderPath, fulfillmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
 
                 if (isUploaded)
                 {
-                    isErrorFileCommitted = await fileShareService.CommitBatchToFss(fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+                    isErrorFileCommitted = await fileShareService.CommitBatchToFss(fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId, batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
                 }
 
                 if (isErrorFileCommitted)
                 {
-                    logger.LogError(EventIds.ErrorTxtIsUploaded.ToEventId(), "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", eventId.Id, eventId.Name, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                    logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    logger.LogError(EventIds.ErrorTxtIsUploaded.ToEventId(), "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", eventId.Id, eventId.Name, fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
+                    logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
                 }
                 else
-                    logger.LogError(EventIds.ErrorTxtNotUploaded.ToEventId(), "Error while uploading error.txt file to file share service for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    logger.LogError(EventIds.ErrorTxtNotUploaded.ToEventId(), "Error while uploading error.txt file to file share service for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
             }
             else
             {
-                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfillmentServiceQueueMessage.BatchId, fulfillmentServiceQueueMessage.CorrelationId);
             }
 
-            await SendErrorCallBackResponse(fulfilmentServiceQueueMessage);
+            await SendErrorCallBackResponse(fulfillmentServiceQueueMessage);
         }
 
         public async Task SendErrorCallBackResponse(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage)
