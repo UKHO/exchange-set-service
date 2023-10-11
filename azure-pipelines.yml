@@ -865,7 +865,7 @@ stages:
           - name: "ESSAzureADConfiguration.TenantId"
             value: $(TenantId)
         strategy:
-        runOnce:
+         runOnce:
           deploy:
             steps:
               - template: Deployment/templates/continuous-deployment.yml
