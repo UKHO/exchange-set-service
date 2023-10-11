@@ -981,7 +981,7 @@ stages:
 
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests
-        dependsOn: QADeployApp
+        dependsOn: vNextIATDeploy
         pool: $(DeploymentPool)
         variables:
           - group: "ADDS-E2E"
@@ -1133,7 +1133,7 @@ stages:
 
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests
-        dependsOn: QADeployApp
+        dependsOn: vNextE2EDeploy
         pool: $(DeploymentPool)
         variables:
           - group: "ADDS-E2E"
