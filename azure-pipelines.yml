@@ -895,7 +895,6 @@ stages:
     dependsOn:
     - Devdeploy
     displayName: vNextIATeploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: vNextIATDeploy
         displayName: VnEXT iat - deploy terraform and dotnet App
@@ -1046,7 +1045,6 @@ stages:
     dependsOn:
     - vNextIATDeploy
     displayName: vNextE2EDeploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: vNextE2EDeploy
         displayName: vNextE2E - deploy terraform and dotnet App
