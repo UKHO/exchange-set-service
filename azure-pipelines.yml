@@ -844,6 +844,53 @@ stages:
               filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
               arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
 
+  - stage: Livedeploy
+    dependsOn:
+    - QAdeploy
+    displayName: Livedeploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    jobs:
+      - deployment: LiveDeployApp
+        displayName: Live - deploy terraform and dotnet App
+        environment: "Ess-Live"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        variables:
+          - group: "ESS-Deployment-Variables-LIVE"
+          - group: "ESS-Live-Variables"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+        strategy:
+        runOnce:
+          deploy:
+            steps:
+              - template: Deployment/templates/continuous-deployment.yml
+                parameters:
+                  ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                  AzureSubscription: "Exchange-Set-Service-Live-A-008-02"
+
+              - template: Deployment/templates/continuous-deployment-apim.yml
+                parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "UKHO-APIM-Live"
+                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                    APIMServiceInstance: $(APIM_SERVICE_NAME)
+                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+
+      - job: PostDeploymentActions
+        dependsOn:
+        - LiveDeployApp                 
+        pool: $(WindowPool)        
+        displayName: Post Deployment Actions
+        steps:
+          - template: Deployment/templates/retain-pipeline.yml
+
   - stage: vNextIATDeploy
     dependsOn:
     - Devdeploy
@@ -1147,49 +1194,4 @@ stages:
               filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
               arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
 
-  - stage: Livedeploy
-    dependsOn:
-    - QAdeploy
-    displayName: Livedeploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
-    jobs:
-      - deployment: LiveDeployApp
-        displayName: Live - deploy terraform and dotnet App
-        environment: "Ess-Live"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-LIVE"
-          - group: "ESS-Live-Variables"
-          - name: "ESSAzureADConfiguration.ClientId"
-            value: $(ESSClientId)
-          - name: "ESSAzureADConfiguration.TenantId"
-            value: $(TenantId)
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Exchange-Set-Service-Live-A-008-02"
 
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "UKHO-APIM-Live"
-                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
-
-      - job: PostDeploymentActions
-        dependsOn:
-        - LiveDeployApp                 
-        pool: $(WindowPool)        
-        displayName: Post Deployment Actions
-        steps:
-          - template: Deployment/templates/retain-pipeline.yml
