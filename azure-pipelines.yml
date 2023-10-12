@@ -892,8 +892,8 @@ stages:
           - template: Deployment/templates/retain-pipeline.yml
 
   - stage: vNextIATDeploy
-    dependsOn:
-    - Devdeploy
+    dependsOn: []
+    # - Devdeploy
     displayName: vNextIATeploy (inc terraform, webapp deploy)
     jobs:
       - deployment: vNextIATDeploy
@@ -1042,8 +1042,8 @@ stages:
               arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
 
   - stage: vNextE2EDeploy
-    dependsOn:
-    - vNextIATDeploy
+    dependsOn: []
+    # - vNextIATDeploy
     displayName: vNextE2EDeploy (inc terraform, webapp deploy)
     jobs:
       - deployment: vNextE2EDeploy
@@ -1054,8 +1054,8 @@ stages:
         workspace:
           clean: all
         variables:
-          - group: "ESS-Deployment-Variables-QA"
-          - group: "ESS-QA-Variables"
+          - group: "ESS-Deployment-Variables-vNextE2E"
+          - group: "ESS-vNextE2E-Variables"
           - name: "ESSAzureADConfiguration.ClientId"
             value: $(ESSClientId)
           - name: "ESSAzureADConfiguration.TenantId"
