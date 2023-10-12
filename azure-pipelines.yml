@@ -1082,7 +1082,7 @@ stages:
                 - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                    AzureSubscription: "Exchange Set Service vNext E2E - A.011.08"
 
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
