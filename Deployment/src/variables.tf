@@ -51,6 +51,10 @@ variable "app_service_sku" {
 	    tier = "PremiumV3"
 	    size = "P1v3"
         }
+    "ess-vnexte2e"     = {
+	    tier = "PremiumV3"
+	    size = "P1v3"
+        }
     "prod"   = {
 	    tier = "PremiumV3"
 	    size = "P1v3"
