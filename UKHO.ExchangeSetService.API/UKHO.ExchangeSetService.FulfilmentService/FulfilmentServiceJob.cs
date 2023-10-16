@@ -7,6 +7,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
+using Elastic.Apm;
+using Elastic.Apm.Api;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -68,28 +70,37 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "ESS Webjob : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
                 }
 
-                if (CommonHelper.IsPeriodicOutputService)
+                string transactionName =
+                    $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
+
+                await Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, async () =>
                 {
-                    await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateLargeExchangeSetRequestStart,
-                        EventIds.CreateLargeExchangeSetRequestCompleted,
-                        "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulFilmentDataService.CreateLargeExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate, periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
-                        },
-                    fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                }
-                else
-                {
-                    await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
-                        EventIds.CreateExchangeSetRequestCompleted,
-                        "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate);
-                        },
-                    fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                }
+                    if (CommonHelper.IsPeriodicOutputService)
+                    {
+                        await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateLargeExchangeSetRequestStart,
+                            EventIds.CreateLargeExchangeSetRequestCompleted,
+                            "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                            async () =>
+                            {
+                                return await fulFilmentDataService.CreateLargeExchangeSet(fulfilmentServiceQueueMessage,
+                                    currentUtcDate,
+                                    periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
+                            },
+                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    }
+                    else
+                    {
+                        await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateExchangeSetRequestStart,
+                            EventIds.CreateExchangeSetRequestCompleted,
+                            "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                            async () =>
+                            {
+                                return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage,
+                                    currentUtcDate);
+                            },
+                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -105,6 +116,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                 if (ex.GetType() != typeof(FulfilmentException))
                     logger.LogError(exceptionEventId, ex, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
+
+                Agent.Tracer.CurrentTransaction?.CaptureException(ex);
+            }
+            finally
+            {
+                Agent.Tracer.CurrentTransaction?.End();
             }
         }
 
