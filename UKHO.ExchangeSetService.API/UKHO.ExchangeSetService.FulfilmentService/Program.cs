@@ -26,11 +26,9 @@ using UKHO.ExchangeSetService.Common.Logging;
 using Microsoft.ApplicationInsights.Extensibility;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
-using System.Collections.Generic;
 using Elastic.Apm.Azure.Storage;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm;
-using Elastic.Apm.Api;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
