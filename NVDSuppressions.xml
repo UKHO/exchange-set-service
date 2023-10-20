@@ -322,6 +322,7 @@
 		<cve>CVE-2021-37941</cve>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
+  
 	<suppress>
 		<notes>
 			<![CDATA[
@@ -331,4 +332,12 @@
 		<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
 		<cve>CVE-2023-36414</cve>
 	</suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Identity.Client.dll
+   ]]>
+    </notes>
+    <cve>CVE-2019-20138</cve>
+  </suppress>
 </suppressions>
