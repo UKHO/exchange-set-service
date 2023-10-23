@@ -1,24 +1,24 @@
-﻿using FakeItEasy;
+﻿using Azure.Data.Tables;
+using FakeItEasy;
+using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Storage;
-using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using Attribute = UKHO.ExchangeSetService.Common.Models.Request.Attribute;
-using UKHO.ExchangeSetService.API.Validation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Cosmos.Table;
-using FluentValidation.Results;
-using System.Linq;
-using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.ValidateEventGridCacheDataRequest(new EnterpriseEventCacheDataRequest()
             { Attributes = new List<Attribute>() { new Attribute() { Key = null } } });
 
-            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<ITableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
             Assert.IsFalse(result.IsValid);            
@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             
             await service.DeleteSearchAndDownloadCacheData(GetInvalidCacheRequestData(), FakeCorrelationId);
 
-            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<ITableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
@@ -93,7 +93,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(), FakeCorrelationId);
 
-            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<ITableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
@@ -120,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(), FakeCorrelationId);
 
-            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<ITableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"

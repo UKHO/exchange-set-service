@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob;
+﻿using Azure.Storage.Blobs;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             return byteContent;
         }
 
-        public Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path)
+        public Task DownloadToFileAsync(BlobClient blobClient, string path)
         {
             throw new System.NotImplementedException();
         }

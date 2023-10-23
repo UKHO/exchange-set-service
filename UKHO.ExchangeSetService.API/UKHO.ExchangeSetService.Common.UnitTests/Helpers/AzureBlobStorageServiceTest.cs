@@ -1,17 +1,18 @@
 ﻿using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
+using Azure.Storage;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -100,11 +101,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue()
         {
-            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string containerName = "testContainer";
-            string callBackUri = "https://essTest/myCallback?secret=test&po=1234";
-            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
-            string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
+            const string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            const string containerName = "testContainer";
+            const string callBackUri = "https://essTest/myCallback?secret=test&po=1234";
+            const string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
+            const string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
             var exchangeSetResponse = new ExchangeSetResponse
             {
@@ -116,7 +117,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
             var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
@@ -130,9 +131,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotFound_ThenReturnKeyNotFoundException()
         {
-            string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
-            string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
+            const string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
+            const string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            A.CallTo(() => fakeScsStorageService.GetStorageSharedKeyCredentials())
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
@@ -143,15 +144,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenCallDownloadSalesCatalogueResponse_ThenReturnsSalesCatalogueProductResponse()
         {
-            string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
-            string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
+            const string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
+            const string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            const string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString("StorageAccountName", "StorageAccountKey")).Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlobByUri(A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClientByUri(A<string>.Ignored, A<StorageSharedKeyCredential>.Ignored)).Returns(new BlobClient(new System.Uri("http://tempuri.org/blob")));
 
-            A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<CloudBlockBlob>.Ignored)).Returns("{\"Products\":[{\"productName\":\"DE5NOBRK\",\"editionNumber\":1,\"updateNumbers\":[0,1],\"fileSize\":200}],\"ProductCounts\":{\"RequestedProductCount\":1,\"ReturnedProductCount\":1,\"RequestedProductsAlreadyUpToDateCount\":0,\"RequestedProductsNotReturned\":[]}}");
+            A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<BlobClient>.Ignored)).Returns("{\"Products\":[{\"productName\":\"DE5NOBRK\",\"editionNumber\":1,\"updateNumbers\":[0,1],\"fileSize\":200}],\"ProductCounts\":{\"RequestedProductCount\":1,\"ReturnedProductCount\":1,\"RequestedProductsAlreadyUpToDateCount\":0,\"RequestedProductsNotReturned\":[]}}");
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
             var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null);
 
