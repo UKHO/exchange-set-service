@@ -1,18 +1,18 @@
-﻿using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Storage;
 using Azure.Storage.Blobs;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
-using Azure.Storage;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -29,8 +29,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private ILargeExchangeSetInstance fakeLargeExchangeSetInstance;
         public string fakeExpiryDate = "2021-07-23T06:59:13Z";
         private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
-        private readonly bool fakeIsEmptyEncExchangeSet = false;
-        private static bool fakeIsEmptyAioExchangeSet = false;
+        private const bool fakeIsEmptyEncExchangeSet = false;
+        private const bool fakeIsEmptyAioExchangeSet = false;
 
         [SetUp]
         public void Setup()
@@ -106,20 +106,20 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             const string callBackUri = "https://essTest/myCallback?secret=test&po=1234";
             const string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
             const string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
+            var salesCatalogueProductResponse = GetSalesCatalogueServiceResponse();
             var exchangeSetResponse = new ExchangeSetResponse
             {
                 RequestedAioProductCount = 0,
                 RequestedProductCount = 0
             };
+            var cancellationToken = CancellationToken.None;
+            var mockBlobClient = A.Fake<BlobClient>();
 
-            CancellationToken cancellationToken = CancellationToken.None;
-
+            A.CallTo(() => mockBlobClient.Uri).Returns(new Uri("http://tempuri.org/blob"));
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new System.Uri("http://tempuri.org/blob")));
-
+            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(mockBlobClient);
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
+
             var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
             Assert.IsTrue(response);

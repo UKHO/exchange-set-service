@@ -80,10 +80,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await azureBlobStorageClient.UploadFromStreamAsync(blobClient, ms);
         }
 
-        private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, BlobClient blobClient, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
+        private static SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string correlationId, BlobClient blobClient, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
             var fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
-            var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
+            var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage
             {
                 BatchId = batchId,
                 ScsResponseUri = blobClient.Uri.AbsoluteUri,
