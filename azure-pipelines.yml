@@ -58,34 +58,6 @@ resources:
     ref: refs/heads/master
 
 stages:
-  - stage: CoverityScan
-    displayName: "Coverity Scan"
-    pool:
-      name: $(coverityPool)
-    jobs:
-    - job: Coverity
-      workspace:
-        clean: all
-      steps:
-        - checkout: self
-          submodules: recursive
-        - task: UseDotNet@2
-          displayName: 'Use .NET Core  $(SdkVersion) sdk'
-          inputs:
-            packageType: sdk
-            version: $(SdkVersion)
-            installationPath: $(Agent.ToolsDirectory)/dotnet
-        - checkout: covscan
-        - template: dotnet-cov.yml@covScan
-          parameters:
-            CovHostUrl: "$(CovHostUrl)"
-            CovUser: "$(CovUser)"
-            CovPwd: "$(CovPwd)"
-            StreamName: "exchange-set-service"
-            BuildCommand: "$(Build.Repository.LocalPath)/exchange-set-service/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API.csproj"
-            StripPath: $(Build.Repository.LocalPath)/exchange-set-service
-            CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
-
   - stage: Stryker_Mutator
     displayName: "Stryker Mutator"
     dependsOn: []
