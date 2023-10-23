@@ -19,7 +19,7 @@ locals {
     SERVICE_OWNER    = "Robin Chapman"
     RESPONSIBLE_TEAM = "Abzu"
     CALLOUT_TEAM     = "On-Call_N/A"
-    COST_CENTRE      = "A.008.02"
+    COST_CENTRE      = "A.011.08"
   }
   config_data = jsondecode(file("${path.module}/appsettings.json"))
 }
@@ -79,9 +79,7 @@ variable "agent_subscription_id" {
 }
 
 variable "elastic_apm_server_url" {
-
 }
 
 variable "elastic_apm_api_key" {
-
 }

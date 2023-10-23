@@ -1111,7 +1111,7 @@ stages:
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
                   condition: always()
                   inputs:
-                    azureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                    azureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
@@ -1132,7 +1132,7 @@ stages:
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
                   inputs:
-                    azureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                    azureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
@@ -1154,7 +1154,7 @@ stages:
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
                   condition: always()
                   inputs:
-                    azureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                    azureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
