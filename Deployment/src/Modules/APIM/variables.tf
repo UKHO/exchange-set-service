@@ -58,7 +58,7 @@ variable "env_suffix" {
   default = {
     "dev"     = "Dev"
     "qa"      = "QA"
-    "vne2e"   = "E2E"
+    "vne2e"   = "vne2e"
   }
 }
 
