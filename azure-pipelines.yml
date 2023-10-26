@@ -1025,15 +1025,15 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-  - stage: vNextE2EDeploy
+  - stage: vnexte2eDeploy
     dependsOn: 
       - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     # - vNextIATDeploy
-    displayName: vNextE2EDeploy (inc terraform, webapp deploy)
+    displayName: vnexte2eDeploy (inc terraform, webapp deploy)
     jobs:
-      - deployment: vNextE2EDeploy
-        displayName: vNextE2E - deploy terraform and dotnet App
-        environment: "Ess-vNextE2E"
+      - deployment: E2EDeploy
+        displayName: vnexte2e - deploy terraform and dotnet App
+        environment: "Ess-vnexte2e"
         pool: $(DeploymentPool)
         container: ${{variables.Container}}
         workspace:
