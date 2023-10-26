@@ -184,7 +184,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<UserIdentifier>();
             builder.Services.AddScoped<IFileSystem, FileSystem>();
 
-            builder.Services.AddHealthChecks()
+            builder.Services.AddHealthChecks();
                 //.AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 //.AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
                 //.AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck")
