@@ -185,7 +185,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IFileSystem, FileSystem>();
 
             builder.Services.AddHealthChecks()
-                .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
+                //.AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 //.AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
                 //.AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck")
                 .AddCheck<AzureBlobStorageHealthCheck>("AzureBlobStorageHealthCheck");
