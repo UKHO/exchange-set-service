@@ -188,7 +188,7 @@ namespace UKHO.ExchangeSetService.API
                 //.AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 //.AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
                 //.AddCheck<EventHubLoggingHealthCheck>("EventHubLoggingHealthCheck")
-                .AddCheck<AzureBlobStorageHealthCheck>("AzureBlobStorageHealthCheck");
+                //.AddCheck<AzureBlobStorageHealthCheck>("AzureBlobStorageHealthCheck");
                 //.AddCheck<AzureMessageQueueHealthCheck>("AzureMessageQueueHealthCheck")
                 //.AddCheck<AzureWebJobsHealthCheck>("AzureWebJobsHealthCheck");
             builder.Services.AddDistributedMemoryCache();
