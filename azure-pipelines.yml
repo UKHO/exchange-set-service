@@ -1043,7 +1043,8 @@ stages:
           
   - stage: vnexte2eDeploy
     dependsOn: 
-      - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+      - Devdeploy
+      
     # - vNextIATDeploy
     displayName: vnexte2eDeploy (inc terraform, webapp deploy)
     jobs:
