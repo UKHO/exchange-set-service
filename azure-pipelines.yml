@@ -1088,7 +1088,7 @@ stages:
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "Fleet Manager Dev/Test"
+                     AzureSubscription: "UKHO-APIM-Dev"
                      TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                      APIMServiceInstance: $(APIM_SERVICE_NAME)
