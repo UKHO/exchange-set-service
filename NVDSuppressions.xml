@@ -327,5 +327,12 @@
    file name: Azure.Identity:1.8.2
    ]]></notes>
    <cve>CVE-2023-36414</cve>
+   <cve>CVE-2023-36415</cve>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: GetDocument.Insider.dll
+   ]]></notes>
+   <cve>CVE-2023-44487</cve>
 </suppress>
 </suppressions>
