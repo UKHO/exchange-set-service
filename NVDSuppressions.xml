@@ -323,4 +323,26 @@
     </notes>
     <cve>CVE-2019-20138</cve>
   </suppress>
+  <suppress>
+		<notes>
+			<![CDATA[
+   file name: Azure.Identity:1.10.3
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+		<cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+	    <cve>CVE-2023-36415</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Azure.Identity.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/Azure\.Identity@.*$</packageUrl>
+		<cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+		<cpe>cpe:/a:microsoft:azure_sdk_for_.net</cpe>
+	</suppress>
+	
+	
 </suppressions>
