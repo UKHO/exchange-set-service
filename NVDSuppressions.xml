@@ -343,6 +343,36 @@
 		<cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
 		<cpe>cpe:/a:microsoft:azure_sdk_for_.net</cpe>
 	</suppress>
-	
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: GetDocument.Insider.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/GetDocument\.Insider@.*$</packageUrl>
+		<cpe>cpe:/a:microsoft:.net_core</cpe>
+		<cpe>cpe:/a:microsoft:asp.net</cpe>
+		<cpe>cpe:/a:microsoft:asp.net_core</cpe>
+		<cve>CVE-2023-44487</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Serilog.Extensions.Logging.File.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/Serilog\.Extensions\.Logging\.File@.*$</packageUrl>
+		<cpe>cpe:/a:line:line</cpe>
+		<cve>CVE-2015-0897</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: dotnet-getdocument.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/dotnet\-getdocument@.*$</packageUrl>
+		<cve>CVE-2023-44487</cve>
+	</suppress>
 	
 </suppressions>
