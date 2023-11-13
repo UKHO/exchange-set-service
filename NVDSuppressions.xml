@@ -335,4 +335,10 @@
    ]]></notes>
    <cve>CVE-2023-44487</cve>
 </suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Serilog.Extensions.Logging.File.dll
+   ]]></notes>
+   <cve>CVE-2015-0897</cve>
+</suppress>
 </suppressions>
