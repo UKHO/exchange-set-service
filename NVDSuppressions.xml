@@ -341,4 +341,10 @@
    ]]></notes>
    <cve>CVE-2015-0897</cve>
 </suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Azure.Core.dll
+   ]]></notes>
+   <cve>CVE-2023-36052</cve>
+</suppress>
 </suppressions>
