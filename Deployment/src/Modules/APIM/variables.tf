@@ -59,6 +59,7 @@ variable "env_suffix" {
     "dev"     = "Dev"
     "qa"      = "QA"
     "vne"     = "VNE"
+    "vni"     = "VNI"
   }
 }
 
