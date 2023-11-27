@@ -329,4 +329,58 @@
     </notes>
     <cve>CVE-2023-36052</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity.dll
+   Applies to Azure.Identity < 1.10.2
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2023-36415</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:various
+   Applies to Azure.Identity < 1.10.2
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2023-36415</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: GetDocument.Insider.dll
+   CVE-2023-44487 applies to .NET < 6.0.23
+   CVE-2023-36558 applies to .NET < 6.0.25
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/GetDocument\.Insider@.*$</packageUrl>
+    <cve>CVE-2023-44487</cve>
+    <cve>CVE-2023-36558</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Serilog.Extensions.Logging.File.dll
+   False positive - applies to LINE for Android and iOS.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Serilog\.Extensions\.Logging\.File@.*$</packageUrl>
+    <cve>CVE-2015-0897</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: dotnet-getdocument.dll
+   CVE-2023-44487 applies to .NET < 6.0.23
+   CVE-2023-36558 applies to .NET < 6.0.25
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/dotnet\-getdocument@.*$</packageUrl>
+    <cve>CVE-2023-44487</cve>
+    <cve>CVE-2023-36558</cve>
+  </suppress>
 </suppressions>
