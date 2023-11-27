@@ -347,4 +347,10 @@
    ]]></notes>
    <cve>CVE-2023-36052</cve>
 </suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: GetDocument.Insider.dll
+   ]]></notes>
+   <cve>CVE-2023-36558</cve>
+</suppress>
 </suppressions>
