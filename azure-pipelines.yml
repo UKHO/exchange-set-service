@@ -613,6 +613,9 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                  submodules: recursive
+
                 - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
                   parameters:
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
