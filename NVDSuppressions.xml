@@ -205,17 +205,6 @@
   <suppress>
 	<notes>
 	  <![CDATA[
-     vulnerability: Buffer overflow and spoofing
-     Affects .Net 3.1 .Net 5.0 and <= .Net 6.0.8 
-	 Currently running Net 6.0.13,  sdk 6.0.405
-   ]]>
-	</notes>
-	<cve>CVE-2020-8927</cve>
-	<cve>CVE-2022-34716</cve>
-  </suppress>
-  <suppress>
-	<notes>
-	  <![CDATA[
      vulnerability: .NET Framework Information Disclosure
      Affects .Net 4.x.x
 	 Currently running Net 6.0.13,  sdk 6.0.405
