@@ -70,11 +70,11 @@ stages:
         - checkout: self
           submodules: recursive
         - task: UseDotNet@2
-          displayName: 'Use .NET Core  $(SdkVersion) sdk'
+          displayName: 'Use .NET SDK'
           inputs:
             packageType: sdk
-            version: $(SdkVersion)
-            installationPath: $(Agent.ToolsDirectory)/dotnet
+            useGlobalJson: true
+            workingDirectory: '$(Build.SourcesDirectory)'
         - checkout: covscan
         - template: dotnet-cov.yml@covScan
           parameters:
@@ -469,6 +469,9 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                  submodules: recursive
+
                 - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
