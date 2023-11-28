@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj" />
     <ProjectReference Include="..\UKHO.ExchangeSetService.FulfilmentService\UKHO.ExchangeSetService.FulfilmentService.csproj" />
   </ItemGroup>
 </Project>
