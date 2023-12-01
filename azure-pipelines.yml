@@ -70,11 +70,11 @@ stages:
         - checkout: self
           submodules: recursive
         - task: UseDotNet@2
-          displayName: 'Use .NET Core  $(SdkVersion) sdk'
+          displayName: 'Use .NET SDK'
           inputs:
             packageType: sdk
-            version: $(SdkVersion)
-            installationPath: $(Agent.ToolsDirectory)/dotnet
+            useGlobalJson: true
+            workingDirectory: '$(Build.SourcesDirectory)'
         - checkout: covscan
         - template: dotnet-cov.yml@covScan
           parameters:
@@ -95,9 +95,11 @@ stages:
         clean: all
       steps:
         - task: UseDotNet@2
-          displayName: 'Use dotnet 6'
+          displayName: 'Use .NET SDK'
           inputs:
-            version: 6.x
+            packageType: sdk
+            useGlobalJson: true
+            workingDirectory: '$(Build.SourcesDirectory)'
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
           inputs:
@@ -126,11 +128,11 @@ stages:
         displayName: "Dependencychecker"
         steps:          
           - task: UseDotNet@2
-            displayName: 'Use .NET Core $(SdkVersion) sdk'
+            displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore non test projects only"
@@ -172,11 +174,11 @@ stages:
         displayName: "Dotnet Test and Publish Code Coverage"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core $(SdkVersion) sdk'
+            displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore test projects only"
@@ -224,11 +226,11 @@ stages:
               arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
 
           - task: UseDotNet@2
-            displayName: 'Use .NET Core $(SdkVersion) sdk'
+            displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -305,11 +307,11 @@ stages:
         displayName: "Publish Functional Tests And Terraform"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET Core $(SdkVersion) sdk'
+            displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -385,11 +387,11 @@ stages:
               arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$(UKHOAssemblyProduct) Mock"'
 
           - task: UseDotNet@2
-            displayName: 'Use .NET Core  $(SdkVersion) sdk'
+            displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -467,6 +469,9 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                  submodules: recursive
+
                 - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
@@ -506,10 +511,11 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core  $(SdkVersion) sdk'
+                  displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    version: $(SdkVersion)
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
@@ -610,6 +616,9 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                  submodules: recursive
+
                 - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
                   parameters:
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
@@ -638,10 +647,11 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core $(SdkVersion) sdk'
+                  displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    version: $(SdkVersion)
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
@@ -774,10 +784,11 @@ stages:
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
-                  displayName: 'Use .NET Core $(SdkVersion) sdk'
+                  displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    version: $(SdkVersion)
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"

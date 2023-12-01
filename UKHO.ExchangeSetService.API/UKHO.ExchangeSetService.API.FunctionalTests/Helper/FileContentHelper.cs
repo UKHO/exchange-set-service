@@ -1,12 +1,12 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Net.Http;
+using System.Threading.Tasks;
+using NUnit.Framework;
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -297,10 +297,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string dvd_service = fileContent_1[4];
 
             Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned '{FolderInitial}'.");
-            Assert.AreEqual(Avcs, FileContent_avcs, $"Incorrect file content is returned 'M{Avcs}'.");
+            Assert.AreEqual(FileContent_avcs, Avcs, $"Incorrect file content is returned 'M{Avcs}'.");
             Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(baseContent, FileContent_base, $"Incorrect file content is returned 'M{baseContent}'.");
-            Assert.AreEqual(dvd_service, FileContent_dvd, $"Incorrect file content is returned 'M{dvd_service}'.");
+            Assert.AreEqual(FileContent_base, baseContent, $"Incorrect file content is returned 'M{baseContent}'.");
+            Assert.AreEqual(FileContent_dvd, dvd_service, $"Incorrect file content is returned 'M{dvd_service}'.");
 
             //Verification of the lines describing folders and country code(s) of the Media.txt here
             string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
@@ -315,9 +315,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 string baseFolderNumber = new DirectoryInfo(codes).Name;
                 string count = baseFolderNumber.Substring(1, 1);
                 string encRootFolder = Path.Combine(codes, Config.ExchangeSetEncRootFolder);
-                string[] addDirectiory = FssBatchHelper.CheckforDirectories(encRootFolder);
+                string[] addDirectory = FssBatchHelper.CheckforDirectories(encRootFolder);
 
-                foreach (string countryName in addDirectiory)
+                foreach (string countryName in addDirectory)
                 {
                     string dirName = new DirectoryInfo(countryName).Name;
                     countryCodes.Add(dirName);
@@ -329,7 +329,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 lineNumber++;
             }
         }
-        
+
         public static void CheckSerialEncFileContentForLargeMediaExchangeSet(string inputFile, int baseNumber)
         {
             string[] lines = File.ReadAllLines(inputFile);
