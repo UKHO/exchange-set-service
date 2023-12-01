@@ -322,35 +322,13 @@
 		<cve>CVE-2021-37941</cve>
 		<cve>CVE-2019-7617</cve>
 	</suppress>
-  <suppress>
-   <notes><![CDATA[
+	<suppress>
+		<notes>
+			<![CDATA[
    file name: Azure.Identity:1.8.2
-   ]]></notes>
-   <cve>CVE-2023-36414</cve>
-   <cve>CVE-2023-36415</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
-   file name: GetDocument.Insider.dll
-   ]]></notes>
-   <cve>CVE-2023-44487</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
-   file name: Serilog.Extensions.Logging.File.dll
-   ]]></notes>
-   <cve>CVE-2015-0897</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
-   file name: Azure.Core.dll
-   ]]></notes>
-   <cve>CVE-2023-36052</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
-   file name: GetDocument.Insider.dll
-   ]]></notes>
-   <cve>CVE-2023-36558</cve>
-</suppress>
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+		<cve>CVE-2023-36414</cve>
+	</suppress>
 </suppressions>

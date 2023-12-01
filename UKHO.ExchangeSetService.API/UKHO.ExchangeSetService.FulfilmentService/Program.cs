@@ -26,11 +26,9 @@ using UKHO.ExchangeSetService.Common.Logging;
 using Microsoft.ApplicationInsights.Extensibility;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
-using System.Collections.Generic;
 using Elastic.Apm.Azure.Storage;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm;
-using Elastic.Apm.Api;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -49,16 +47,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
             HostBuilder hostBuilder = BuildHostConfiguration();
             IHost host = hostBuilder.Build();
-            string transactionName = $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
-
-            Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, () =>
+            
+            using (host)
             {
-                using (host)
-                {
-                    host.Run();
-                }
-            });
-
+                host.Run();
+            }
         }
         private static HostBuilder BuildHostConfiguration()
         {
