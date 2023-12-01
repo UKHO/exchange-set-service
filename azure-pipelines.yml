@@ -908,7 +908,7 @@ stages:
 
   - stage: vnextiatDeploy
     dependsOn:
-      - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+      - Devdeploy
     displayName: vnextiatDeploy (inc terraform, webapp deploy)
     jobs:
       - deployment: vnextiatDeploy
@@ -997,17 +997,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                # - task: DotNetCoreCLI@2
-                #   displayName: "Run Functional tests AIOEnabled"
-                #   inputs:
-                #     command: "test"
-                #     projects: |
-                #       **/*FunctionalTest*.dll
-                #       !**/*TestAdapter.dll
-                #       !**/obj/**
-                #     arguments: '--filter Category=SmokeTest-AIOEnabled'
-                #     testRunTitle: "QA-AutomationTests"
-                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIOEnabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=SmokeTest-AIOEnabled'
+                    testRunTitle: "QA-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
@@ -1018,17 +1018,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                # - task: DotNetCoreCLI@2
-                #   displayName: "Run Functional tests AIODisabled"
-                #   inputs:
-                #     command: "test"
-                #     projects: |
-                #       **/*FunctionalTest*.dll
-                #       !**/*TestAdapter.dll
-                #       !**/obj/**
-                #     arguments: '--filter Category=SmokeTest-AIODisabled'
-                #     testRunTitle: "QA-AutomationTests"
-                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIODisabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=SmokeTest-AIODisabled'
+                    testRunTitle: "QA-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
@@ -1040,27 +1040,25 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-      # - job: Run_ADDS_E2E_tests
-      #   displayName: Run ADDS E2E tests
-      #   dependsOn: vnextiatDeploy
-      #   pool: $(DeploymentPool)
-      #   variables:
-      #     - group: "ADDS-E2E"
-      #   container: ${{variables.Container}}
-      #   steps:
-      #   - task: PowerShell@2          
-      #     displayName: "Run ADDS E2E pipeline tests"
-      #     inputs:
-      #         pwsh: true
-      #         targetType: filePath
-      #         filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
-      #         arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
+      - job: Run_ADDS_E2E_tests
+        displayName: Run ADDS E2E tests
+        dependsOn: vnextiatDeploy
+        pool: $(DeploymentPool)
+        variables:
+          - group: "ADDS-E2E"
+        container: ${{variables.Container}}
+        steps:
+        - task: PowerShell@2          
+          displayName: "Run ADDS E2E pipeline tests"
+          inputs:
+              pwsh: true
+              targetType: filePath
+              filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
+              arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
           
   - stage: vnexte2eDeploy
     dependsOn: 
-      - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
-      
-    # - vNextIATDeploy
+      - vNextIATDeploy
     displayName: vnexte2eDeploy (inc terraform, webapp deploy)
     jobs:
       - deployment: E2EDeploy
@@ -1149,17 +1147,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                # - task: DotNetCoreCLI@2
-                #   displayName: "Run Functional tests AIOEnabled"
-                #   inputs:
-                #     command: "test"
-                #     projects: |
-                #       **/*FunctionalTest*.dll
-                #       !**/*TestAdapter.dll
-                #       !**/obj/**
-                #     arguments: '--filter Category=SmokeTest-AIOEnabled'
-                #     testRunTitle: "QA-AutomationTests"
-                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIOEnabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=SmokeTest-AIOEnabled'
+                    testRunTitle: "QA-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
@@ -1170,17 +1168,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                # - task: DotNetCoreCLI@2
-                #   displayName: "Run Functional tests AIODisabled"
-                #   inputs:
-                #     command: "test"
-                #     projects: |
-                #       **/*FunctionalTest*.dll
-                #       !**/*TestAdapter.dll
-                #       !**/obj/**
-                #     arguments: '--filter Category=SmokeTest-AIODisabled'
-                #     testRunTitle: "QA-AutomationTests"
-                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIODisabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=SmokeTest-AIODisabled'
+                    testRunTitle: "QA-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
