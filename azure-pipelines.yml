@@ -1058,7 +1058,7 @@ stages:
           
   - stage: vnexte2eDeploy
     dependsOn: 
-      - vNextIATDeploy
+      - Devdeploy
     displayName: vnexte2eDeploy (inc terraform, webapp deploy)
     jobs:
       - deployment: E2EDeploy
