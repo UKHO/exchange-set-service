@@ -377,7 +377,6 @@
    file name: Scrutor:3.3.0
    These vunerabilities are in reference to Drupal, which we do not use.
    ]]></notes>
-   <packageUrl regex="true">^pkg:nuget/Scrutor@.*$</packageUrl>
    <cve>CVE-2014-9152</cve>
    <cve>CVE-2013-2158</cve>
    <cve>CVE-2015-4393</cve>
