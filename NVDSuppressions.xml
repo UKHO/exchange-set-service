@@ -372,4 +372,28 @@
     <cve>CVE-2023-44487</cve>
     <cve>CVE-2023-36558</cve>
   </suppress>
+  <suppress>
+   <notes><![CDATA[
+   file name: Scrutor:3.3.0
+   These vunerabilities are in reference to Drupal, which we do not use.
+   ]]></notes>
+   <cve>CVE-2014-9152</cve>
+   <cve>CVE-2013-2158</cve>
+   <cve>CVE-2015-4393</cve>
+   <cve>CVE-2015-4394</cve>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: System.Threading.Tasks.Dataflow.dll
+   Vunerability due to permissions on VoiceCommandActivity application component, no applicable.
+   ]]></notes>
+   <cve>CVE-2020-22475</cve>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: System.Threading.Tasks.Dataflow.dll
+   Andriod vunerability. Not applicable
+   ]]></notes>
+   <cve>CVE-2022-39349</cve>
+</suppress>
 </suppressions>
