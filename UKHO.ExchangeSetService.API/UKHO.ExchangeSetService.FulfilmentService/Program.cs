@@ -32,7 +32,8 @@ using Elastic.Apm;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
-    [ExcludeFromCodeCoverage]
+    // just a test
+    [ExcludeFromCodeCoverage] 
     public static class Program
     {
         private static IConfiguration ConfigurationBuilder;
