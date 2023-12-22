@@ -40,6 +40,7 @@ namespace UKHO.ExchangeSetService.API
     {
         public static void Main(string[] args)
         {
+            // test
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Configuration.AddEnvironmentVariables();
