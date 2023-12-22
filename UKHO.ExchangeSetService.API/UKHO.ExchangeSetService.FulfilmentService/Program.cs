@@ -35,6 +35,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
     [ExcludeFromCodeCoverage]
     public static class Program
     {
+        //Test
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
