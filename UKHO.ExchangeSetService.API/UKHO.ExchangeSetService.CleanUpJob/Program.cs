@@ -26,6 +26,7 @@ using UKHO.Logging.EventHubLogProvider;
 
 namespace UKHO.ExchangeSetService.CleanUpJob
 {
+//test
     [ExcludeFromCodeCoverage]
     public static class Program
     {
