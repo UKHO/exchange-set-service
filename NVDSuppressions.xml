@@ -396,4 +396,10 @@
    ]]></notes>
    <cve>CVE-2022-39349</cve>
 </suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Microsoft.IdentityModel.JsonWebTokens:6.10.0
+   ]]></notes>
+   <vulnerabilityName>CVE-2024-21319</vulnerabilityName>
+</suppress>
 </suppressions>
