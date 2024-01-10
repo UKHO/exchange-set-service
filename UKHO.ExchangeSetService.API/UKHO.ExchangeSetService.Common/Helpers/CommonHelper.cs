@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -73,34 +74,37 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return fileSize;
         }
 
-        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ILogger logger, string requestType, EventIds eventId, int retryCount, double sleepDuration)
+        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ILogger logger, ServiceType requestType, EventIds eventId, int retryCount, double sleepDuration)
         {
-            return Policy
-                .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable)
-                .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
-                .OrResult(r => r.StatusCode == HttpStatusCode.InternalServerError && requestType == "File Share")
-                .WaitAndRetryAsync(retryCount, (retryAttempt) =>
-                {
-                    return TimeSpan.FromSeconds(Math.Pow(sleepDuration, (retryAttempt - 1)));
-                }, async (response, timespan, retryAttempt, context) =>
-                {
-                    var retryAfterHeader = response.Result.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "retry-after");
-                    var correlationId = response.Result.RequestMessage.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "x-correlation-id");
-                    int retryAfter = 0;
-                    if (response.Result.StatusCode == HttpStatusCode.TooManyRequests && retryAfterHeader.Value != null && retryAfterHeader.Value.Any())
-                    {
-                        retryAfter = int.Parse(retryAfterHeader.Value.First());
-                        await Task.Delay(TimeSpan.FromMilliseconds(retryAfter));
-                    }
-                    logger
-                    .LogInformation(eventId.ToEventId(), "Re-trying {requestType} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
-                    requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId.Value, response.Result.StatusCode);
-                });
+            var policy = Policy
+               .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable)
+               .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
+               .OrResult(r => r.StatusCode == HttpStatusCode.InternalServerError && requestType == ServiceType.FileShareService)
+               .WaitAndRetryAsync(
+                   retryCount: retryCount, 
+                   retryAttempt => TimeSpan.FromSeconds(Math.Pow(sleepDuration, retryAttempt - 1)),
+                   onRetryAsync: async (response, timespan, retryAttempt, context) => await RetryAsync(response, timespan, retryAttempt, logger, eventId, requestType));
+
+            return policy;
         }
 
-        public static bool IsNumeric(object Expression)
+        private static async Task RetryAsync(DelegateResult<HttpResponseMessage> response, TimeSpan timespan, int retryAttempt, ILogger logger, EventIds eventId, ServiceType service)
         {
-            bool isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out _);
+            var retryAfterHeader = response.Result.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "retry-after");
+            var correlationId = response.Result.RequestMessage?.Headers.FirstOrDefault(h => h.Key.ToLowerInvariant() == "x-correlation-id");
+            int retryAfter = 0;
+            if (response.Result.StatusCode == HttpStatusCode.TooManyRequests && retryAfterHeader.Value.Any())
+            {
+                retryAfter = int.Parse(retryAfterHeader.Value.First());
+                await Task.Delay(TimeSpan.FromMilliseconds(retryAfter));
+            }
+            logger.LogInformation(eventId.ToEventId(), "Re-trying {service} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
+                    service, response.Result.RequestMessage?.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId?.Value, response.Result.StatusCode);
+        }
+
+        public static bool IsNumeric(object expression)
+        {
+            bool isNum = double.TryParse(Convert.ToString(expression), NumberStyles.Any, NumberFormatInfo.InvariantInfo, out _);
             return isNum;
         }
     }

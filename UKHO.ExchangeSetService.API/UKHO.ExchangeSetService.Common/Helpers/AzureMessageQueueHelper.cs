@@ -43,9 +43,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             CloudQueue queue = queueClient.GetQueueReference(queueName);
             var queueMessageExists = await queue.ExistsAsync();
             if (queueMessageExists)
+            {
                 return HealthCheckResult.Healthy("Azure message queue is healthy");
+            }
             else
+            {
                 return HealthCheckResult.Unhealthy("Azure message queue is unhealthy", new Exception($"Azure message queue {queueName} does not exists"));
+            }
         }
     }
 }

@@ -32,6 +32,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
 using Elastic.Apm.AspNetCore;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -147,7 +148,7 @@ namespace UKHO.ExchangeSetService.API
                                         Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
                 client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
             }).AddHeaderPropagation().AddPolicyHandler((services, request) =>
-                    CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), "Sales Catalogue", EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
+                    CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), ServiceType.SalesCatalogueService, EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
 
 
             builder.Services.Configure<FileShareServiceConfiguration>(builder.Configuration.GetSection("FileShareService"));
@@ -163,7 +164,7 @@ namespace UKHO.ExchangeSetService.API
                                             Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version);
                 client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
             }).AddHeaderPropagation().AddPolicyHandler((services, request) =>
-                    CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
+                    CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), ServiceType.FileShareService, EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
 
 
             builder.Services.AddScoped<IFileSystemHelper, FileSystemHelper>();

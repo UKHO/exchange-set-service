@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.Logging.EventHubLogProvider;
 #pragma warning disable S1128 // Unused "using" should be removed
 using Serilog;
@@ -160,7 +161,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                      client.Timeout = TimeSpan.FromMinutes(Convert.ToDouble(ConfigurationBuilder["FileShareService:TimeOutInMins"]));
                  })
-                 .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
+                 .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), ServiceType.FileShareService, EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
 
                  services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
                  {
@@ -168,7 +169,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
                      client.DefaultRequestHeaders.UserAgent.Add(productHeaderValue);
                  })
-                 .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), "Sales Catalogue", EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
+                 .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<ISalesCatalogueClient>>(), ServiceType.SalesCatalogueService, EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration));
 
                  services.AddHttpClient<ICallBackClient, CallBackClient>();
 

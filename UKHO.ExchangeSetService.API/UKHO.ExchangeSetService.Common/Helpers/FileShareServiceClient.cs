@@ -19,15 +19,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri,CancellationToken cancellationToken, string correlationId="")
+        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri, CancellationToken cancellationToken, string correlationId = "")
         {
             HttpContent content = null;
 
             if (requestBody != null)
+            {
                 content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+            }
 
-            using var httpRequestMessage = new HttpRequestMessage(method, uri)
-            { Content = content };
+            using var httpRequestMessage = new HttpRequestMessage(method, uri);
+            httpRequestMessage.Content = content;
 
             if (correlationId != "")
             {
@@ -39,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
-        public async Task<HttpResponseMessage> AddFileInBatchAsync(HttpMethod method, FileCreateModel fileModel, string authToken,string baseUrl,string batchId, string fileName, long? fileContentSizeHeader,
+        public async Task<HttpResponseMessage> AddFileInBatchAsync(HttpMethod method, FileCreateModel fileModel, string authToken, string baseUrl, string batchId, string fileName, long? fileContentSizeHeader,
                 string mimeTypeHeader = "application/octet-stream", string correlationId = "")
         {
             string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}";
@@ -64,7 +66,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
 
-        public async Task<HttpResponseMessage> UploadFileBlockAsync(HttpMethod method, string baseUrl,string batchId, string fileName, string blockId, byte[] blockBytes, byte[] md5Hash, string accessToken, CancellationToken cancellationToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
+        public async Task<HttpResponseMessage> UploadFileBlockAsync(HttpMethod method, string baseUrl, string batchId, string fileName, string blockId, byte[] blockBytes, byte[] md5Hash, string accessToken, CancellationToken cancellationToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
         {
             string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}/{blockId}";
 

@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
@@ -96,7 +97,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             retryCount = 1;
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, "File Share", Common.Logging.EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration))
+                .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, ServiceType.FileShareService, Common.Logging.EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration))
                 .AddHttpMessageHandler(() => new TooManyRequestsDelegatingHandler());
 
             HttpClient configuredClient =
@@ -121,7 +122,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             _isRetryCalled = false;
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, "Sales Catalogue", Common.Logging.EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration))
+                .AddPolicyHandler(CommonHelper.GetRetryPolicy(fakeLogger, ServiceType.SalesCatalogueService, Common.Logging.EventIds.RetryHttpClientSCSRequest, retryCount, sleepDuration))
                 .AddHttpMessageHandler(() => new ServiceUnavailableDelegatingHandler());
 
             HttpClient configuredClient =
