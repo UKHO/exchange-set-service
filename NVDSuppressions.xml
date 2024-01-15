@@ -440,6 +440,16 @@
   <suppress>
     <notes>
       <![CDATA[
+   file name: System.IdentityModel.Tokens.Jwt:Various
+   Fixed in SDK >= 6.0.418
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/System\.IdentityModel\.Tokens\.Jwt@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-21319</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: System.Security.Cryptography.X509Certificates:Various
    Fixed in SDK >= 6.0.418
    ]]>
