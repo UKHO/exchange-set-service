@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
-    <notes><![CDATA[
+    <notes>
+      <![CDATA[
    file name: GetDocument.Insider.dll
    Suppressing this CVE as it is a .NetCore runtime issue affecting .NetCore runtimes below .NET Core 3.1.4 or lower. The ESS Runs in an AppService which will have the fixes already applied, and the global.json has been addeded to require .NetCore 3.1.408 or greater.
    More details can be found here: https://github.com/dotnet/announcements/issues/156
-   ]]>    </notes>
+   ]]>
+    </notes>
     <cve>CVE-2020-1108</cve>
   </suppress>
   <suppress>
@@ -159,26 +161,31 @@
     <cve>CVE-2022-30187</cve>
   </suppress>
   <suppress>
-	<notes><![CDATA[
+    <notes>
+      <![CDATA[
 	file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
 	See https://nvd.nist.gov/vuln/detail/CVE-2018-8409 for details on this CVE.
 	Note: This was reanalysed by NIST on 4th October, and is now a breaking issue.
 	Affects .NET Core 2.1 - now on .NET 6 so false positive.
 	See https://msrc.microsoft.com/update-guide/en-us/vulnerability/CVE-2018-8409
-	]]></notes>
-	<cve>CVE-2018-8409</cve>
+	]]>
+    </notes>
+    <cve>CVE-2018-8409</cve>
   </suppress>
   <suppress>
-	<notes><![CDATA[
+    <notes>
+      <![CDATA[
 	file name: Microsoft.Extensions.Hosting.Abstractions.dll
 	See https://nvd.nist.gov/vuln/detail/CVE-2020-1147 for details on this CVE.
 	This is a temporary suppression pending a fix being available.
 	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58192
-	]]></notes>
-	<cve>CVE-2020-1147</cve>
+	]]>
+    </notes>
+    <cve>CVE-2020-1147</cve>
   </suppress>
   <suppress>
-	<notes><![CDATA[
+    <notes>
+      <![CDATA[
 	file name: System.Net.WebSockets.Client:4.0.0
 	For details on these CVEs see:
 		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0247
@@ -186,121 +193,129 @@
 		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0256
 	This is a temporary suppression pending a fix being available.
 	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58195
-	]]></notes>
-	<cve>CVE-2017-0247</cve>
-	<cve>CVE-2017-0249</cve>
-	<cve>CVE-2017-0256</cve>
+	]]>
+    </notes>
+    <cve>CVE-2017-0247</cve>
+    <cve>CVE-2017-0249</cve>
+    <cve>CVE-2017-0256</cve>
   </suppress>
   <suppress>
-	<notes>
-	  <![CDATA[
+    <notes>
+      <![CDATA[
      vulnerability: DOS
      Affects >Net >= 6.0.0, < 6.0.12. 
 	 Currently running Net 6.0.13,  sdk 6.0.405
    ]]>
-	</notes>
-	<cve>CVE-2023-21538</cve> 
-	<cve>CVE-2022-24464</cve>  
+    </notes>
+    <cve>CVE-2023-21538</cve>
+    <cve>CVE-2022-24464</cve>
   </suppress>
   <suppress>
-	<notes>
-	  <![CDATA[
+    <notes>
+      <![CDATA[
      vulnerability: .NET Framework Information Disclosure
      Affects .Net 4.x.x
 	 Currently running Net 6.0.13,  sdk 6.0.405
    ]]>
-	</notes>
-	<cve>CVE-2022-41064</cve>
+    </notes>
+    <cve>CVE-2022-41064</cve>
   </suppress>
   <suppress>
-	<notes>
-	  <![CDATA[
+    <notes>
+      <![CDATA[
      vulnerability: .NET and Visual Studio Information Disclosure Vulnerability 
      Affects .Net 6.0.0
 	 Currently running Net 6.0.13,  sdk 6.0.405
    ]]>
-	</notes>
-	<cve>CVE-2022-30184</cve>
-   </suppress>
+    </notes>
+    <cve>CVE-2022-30184</cve>
+  </suppress>
   <suppress>
-	<notes>
-	  <![CDATA[
+    <notes>
+      <![CDATA[
      vulnerability:  Information disclosure  
      Affects Active directory up to 2021-11-02
    ]]>
-	</notes>
-	<cve>CVE-2021-42306</cve>
+    </notes>
+    <cve>CVE-2021-42306</cve>
   </suppress>
   <suppress>
-	<notes>
-	  <![CDATA[
+    <notes>
+      <![CDATA[
      vulnerability:  Elevation of Privilege   
      Affects Azure Open Management Infrastructure (OMI) version <= 1.6.9-0 (VMs running Linux)
    ]]>
-	</notes>
-	<cve>CVE-2022-29149</cve>
+    </notes>
+    <cve>CVE-2022-29149</cve>
   </suppress>
-	<suppress>
-   <notes><![CDATA[
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: System.Security.Cryptography.X509Certificates:4.1.0
    This part of .NetCoreApp. Either waiting on fix through .net sdk to fix, or update to .net core 8 when available.
-   ]]></notes>
-   <cve>CVE-2017-11770</cve>
-	</suppress>
-	<suppress>
-		<notes><![CDATA[
+   ]]>
+    </notes>
+    <cve>CVE-2017-11770</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Elastic.Apm.AspNetCore.dll
    False positive - impacts Java or Python
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
-		<cpe>cpe:/a:asp-project:asp-project</cpe>
-		<cpe>cpe:/a:elastic:apm_agent</cpe>
-		<cve>CVE-2021-37941</cve>
-		<cve>CVE-2019-7617</cve>
-	</suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
+    <cpe>cpe:/a:asp-project:asp-project</cpe>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cve>CVE-2021-37941</cve>
+    <cve>CVE-2019-7617</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Elastic.Apm.Extensions.Logging.dll
    False positive - impacts Java or Python
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
-		<cpe>cpe:/a:elastic:apm_agent</cpe>
-		<cve>CVE-2021-37941</cve>
-		<cve>CVE-2019-7617</cve>
-	</suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cve>CVE-2021-37941</cve>
+    <cve>CVE-2019-7617</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Elastic.Apm.dll
    False positive - impacts Java or Python
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
-		<cpe>cpe:/a:elastic:apm_agent</cpe>
-		<cve>CVE-2021-37941</cve>
-		<cve>CVE-2019-7617</cve>
-	</suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cve>CVE-2021-37941</cve>
+    <cve>CVE-2019-7617</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Elastic.Apm.Extensions.Hosting.dll
    False positive - impacts Java or Python
-   ]]></notes>
-		<packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
-		<cpe>cpe:/a:elastic:apm_agent</cpe>
-		<cve>CVE-2021-37941</cve>
-		<cve>CVE-2019-7617</cve>
-	</suppress>
-  
-	<suppress>
-		<notes>
-			<![CDATA[
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cve>CVE-2021-37941</cve>
+    <cve>CVE-2019-7617</cve>
+  </suppress>
+
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Azure.Identity:1.8.2
    ]]>
-		</notes>
-		<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
-		<cve>CVE-2023-36414</cve>
-	</suppress>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2023-36414</cve>
+  </suppress>
   <suppress>
     <notes>
       <![CDATA[
@@ -373,27 +388,63 @@
     <cve>CVE-2023-36558</cve>
   </suppress>
   <suppress>
-   <notes><![CDATA[
+    <notes>
+      <![CDATA[
    file name: Scrutor:3.3.0
    These vunerabilities are in reference to Drupal, which we do not use.
-   ]]></notes>
-   <cve>CVE-2014-9152</cve>
-   <cve>CVE-2013-2158</cve>
-   <cve>CVE-2015-4393</cve>
-   <cve>CVE-2015-4394</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
+   ]]>
+    </notes>
+    <cve>CVE-2014-9152</cve>
+    <cve>CVE-2013-2158</cve>
+    <cve>CVE-2015-4393</cve>
+    <cve>CVE-2015-4394</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: System.Threading.Tasks.Dataflow.dll
    Vunerability due to permissions on VoiceCommandActivity application component, no applicable.
-   ]]></notes>
-   <cve>CVE-2020-22475</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
+   ]]>
+    </notes>
+    <cve>CVE-2020-22475</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: System.Threading.Tasks.Dataflow.dll
    Andriod vunerability. Not applicable
-   ]]></notes>
-   <cve>CVE-2022-39349</cve>
-</suppress>
+   ]]>
+    </notes>
+    <cve>CVE-2022-39349</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.IdentityModel.JsonWebTokens:Various
+   Fixed in SDK >= 6.0.418
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.IdentityModel\.JsonWebTokens@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-21319</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.IdentityModel.Tokens:Various
+   Fixed in SDK >= 6.0.418
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.IdentityModel\.Tokens@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-21319</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Security.Cryptography.X509Certificates:Various
+   Fixed in SDK >= 6.0.418
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/System\.Security\.Cryptography\.X509Certificates@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-0057</vulnerabilityName>
+  </suppress>
 </suppressions>
