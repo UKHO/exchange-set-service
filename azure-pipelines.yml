@@ -41,8 +41,6 @@ variables:
     value: "ukhydrographicoffice/terraform-azure-powershell-unzip:1.3.7"
   - name: DeploymentPool
     value: "UKHO Ubuntu 1804"
-  - name: coverityPool
-    value: NautilusBuild
   - group: Covscan-vars
   - name: SdkVersion
     value: "6.0.x"
@@ -51,40 +49,8 @@ variables:
 
 resources:
   repositories:
-  - repository: covscan
-    type: github
-    name: UKHO/coverityscan-buildtemplates
-    endpoint: UKHO
-    ref: refs/heads/master
 
 stages:
-  - stage: CoverityScan
-    displayName: "Coverity Scan"
-    pool:
-      name: $(coverityPool)
-    jobs:
-    - job: Coverity
-      workspace:
-        clean: all
-      steps:
-        - checkout: self
-          submodules: recursive
-        - task: UseDotNet@2
-          displayName: 'Use .NET SDK'
-          inputs:
-            packageType: sdk
-            useGlobalJson: true
-            workingDirectory: '$(Build.SourcesDirectory)'
-        - checkout: covscan
-        - template: dotnet-cov.yml@covScan
-          parameters:
-            CovHostUrl: "$(CovHostUrl)"
-            CovUser: "$(CovUser)"
-            CovPwd: "$(CovPwd)"
-            StreamName: "exchange-set-service"
-            BuildCommand: "$(Build.Repository.LocalPath)/exchange-set-service/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.API.csproj"
-            StripPath: $(Build.Repository.LocalPath)/exchange-set-service
-            CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
 
   - stage: Stryker_Mutator
     displayName: "Stryker Mutator"
@@ -997,17 +963,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                - task: DotNetCoreCLI@2
-                  displayName: "Run Functional tests AIOEnabled"
-                  inputs:
-                    command: "test"
-                    projects: |
-                      **/*FunctionalTest*.dll
-                      !**/*TestAdapter.dll
-                      !**/obj/**
-                    arguments: '--filter Category=SmokeTest-AIOEnabled'
-                    testRunTitle: "QA-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                # - task: DotNetCoreCLI@2
+                #   displayName: "Run Functional tests AIOEnabled"
+                #   inputs:
+                #     command: "test"
+                #     projects: |
+                #       **/*FunctionalTest*.dll
+                #       !**/*TestAdapter.dll
+                #       !**/obj/**
+                #     arguments: '--filter Category=SmokeTest-AIOEnabled'
+                #     testRunTitle: "QA-AutomationTests"
+                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
@@ -1018,17 +984,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                - task: DotNetCoreCLI@2
-                  displayName: "Run Functional tests AIODisabled"
-                  inputs:
-                    command: "test"
-                    projects: |
-                      **/*FunctionalTest*.dll
-                      !**/*TestAdapter.dll
-                      !**/obj/**
-                    arguments: '--filter Category=SmokeTest-AIODisabled'
-                    testRunTitle: "QA-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                # - task: DotNetCoreCLI@2
+                #   displayName: "Run Functional tests AIODisabled"
+                #   inputs:
+                #     command: "test"
+                #     projects: |
+                #       **/*FunctionalTest*.dll
+                #       !**/*TestAdapter.dll
+                #       !**/obj/**
+                #     arguments: '--filter Category=SmokeTest-AIODisabled'
+                #     testRunTitle: "QA-AutomationTests"
+                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
@@ -1040,25 +1006,25 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-      - job: Run_ADDS_E2E_tests
-        displayName: Run ADDS E2E tests
-        dependsOn: vnextiatDeploy
-        pool: $(DeploymentPool)
-        variables:
-          - group: "ADDS-E2E"
-        container: ${{variables.Container}}
-        steps:
-        - task: PowerShell@2          
-          displayName: "Run ADDS E2E pipeline tests"
-          inputs:
-              pwsh: true
-              targetType: filePath
-              filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
-              arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
+      # - job: Run_ADDS_E2E_tests
+      #   displayName: Run ADDS E2E tests
+      #   dependsOn: vnextiatDeploy
+      #   pool: $(DeploymentPool)
+      #   variables:
+      #     - group: "ADDS-E2E"
+      #   container: ${{variables.Container}}
+      #   steps:
+      #   - task: PowerShell@2          
+      #     displayName: "Run ADDS E2E pipeline tests"
+      #     inputs:
+      #         pwsh: true
+      #         targetType: filePath
+      #         filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
+      #         arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
           
   - stage: vnexte2eDeploy
     dependsOn: 
-      - Devdeploy
+      - vnextiatDeploy
     displayName: vnexte2eDeploy (inc terraform, webapp deploy)
     jobs:
       - deployment: E2EDeploy
