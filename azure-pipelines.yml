@@ -872,7 +872,7 @@ stages:
   - stage: vnextiatDeploy
     dependsOn:
       - Devdeploy
-    displayName: vnextiatDeploy (inc terraform, webapp deploy)
+    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
     jobs:
       - deployment: vnextiatDeploy
         displayName: VnexT IAT - deploy terraform and dotnet App
@@ -1022,7 +1022,7 @@ stages:
   - stage: vnexte2eDeploy
     dependsOn: 
       - vnextiatDeploy
-    displayName: vnexte2eDeploy (inc terraform, webapp deploy)
+    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
     jobs:
       - deployment: E2EDeploy
         displayName: vnexte2e - deploy terraform and dotnet App
