@@ -47,9 +47,6 @@ variables:
   - name: WindowPool
     value: "NautilusBuild"
 
-resources:
-  repositories:
-
 stages:
 
   - stage: Stryker_Mutator
