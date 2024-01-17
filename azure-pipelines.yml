@@ -41,7 +41,6 @@ variables:
     value: "ukhydrographicoffice/terraform-azure-powershell-unzip:1.3.7"
   - name: DeploymentPool
     value: "UKHO Ubuntu 1804"
-  - group: Covscan-vars
   - name: SdkVersion
     value: "6.0.x"
   - name: WindowPool
