@@ -872,6 +872,7 @@ stages:
     dependsOn:
       - Devdeploy
     displayName: vNext IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/main'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: vnextiatDeploy
         displayName: VnexT IAT - deploy terraform and dotnet App
@@ -1022,6 +1023,7 @@ stages:
     dependsOn: 
       - vnextiatDeploy
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/main'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
       - deployment: E2EDeploy
         displayName: vnexte2e - deploy terraform and dotnet App
