@@ -707,6 +707,9 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                  submodules: recursive
+
                 - template: Deployment/templates/continuous-deployment.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
