@@ -6,6 +6,7 @@ namespace UKHO.ExchangeSetService.Common.Models.Request
     {
         public List<ProductVersionRequest> ProductVersions { get; set; }
         public string CallbackUri { get; set; }
+        public bool IsUnencrypted { get; set; }
         public string CorrelationId { get; set; }
     }
 }
