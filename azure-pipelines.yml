@@ -828,7 +828,7 @@ stages:
     dependsOn:
     - QAdeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    condition: and(succeeded(), variables['Build.SourceBranch'], 'refs/heads/develop', startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/'))
     jobs:
       - deployment: LiveDeployApp
         displayName: Live - deploy terraform and dotnet App
@@ -1027,6 +1027,7 @@ stages:
       - vnextiatDeploy
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/main'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    
     jobs:
       - deployment: E2EDeploy
         displayName: vnexte2e - deploy terraform and dotnet App
