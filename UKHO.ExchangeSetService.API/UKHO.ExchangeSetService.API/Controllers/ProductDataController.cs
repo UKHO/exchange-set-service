@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] bool isUnencrypted)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
-                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}",
+                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
                 async () =>
                 {
                     if (productIdentifiers == null || productIdentifiers.Length == 0)
@@ -119,7 +119,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId());
+                }, GetCurrentCorrelationId(), isUnencrypted);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] bool isUnencrypted)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
-                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId}",
+                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
                 async () =>
                 {
                     if (productVersionsRequest == null || !productVersionsRequest.Any())
@@ -206,7 +206,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId());
+                }, GetCurrentCorrelationId(), isUnencrypted);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             [FromQuery] string callbackUri, [FromQuery] bool isUnencrypted)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
-                "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId}",
+                "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
                 async () =>
                 {
                     ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
@@ -284,8 +284,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     }
 
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId());
-
+                }, GetCurrentCorrelationId(), isUnencrypted);
         }
     }
 }

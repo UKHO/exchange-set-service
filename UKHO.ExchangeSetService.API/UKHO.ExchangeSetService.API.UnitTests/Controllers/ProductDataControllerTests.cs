@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool         isUnencrypted)
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool            isUnencrypted)
+        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -150,7 +150,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool           isUnencrypted)
+        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -211,7 +211,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified(bool        isUnencrypted)
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -239,7 +239,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
         [Test]
         [TestCase(false)]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest(bool                isUnencrypted)
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -268,7 +268,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated     (bool isUnencrypted)
+        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated(bool isUnencrypted)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -299,7 +299,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(bool   isUnencrypted)
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(bool isUnencrypted)
         {
             var validationMessage = new ValidationFailure("productName", "productName cannot be blank or null.")
             {
@@ -331,7 +331,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidNullProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest      (bool isUnencrypted)
+        public async Task WhenInvalidNullProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(bool isUnencrypted)
         {
             var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.")
             {
@@ -391,7 +391,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsNotModified        (bool isUnencrypted)
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsNotModified(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -417,7 +417,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
         [Test]
         [TestCase(false)]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest(bool      isUnencrypted)
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest(bool isUnencrypted)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -473,7 +473,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest(bool         isUnencrypted)
+        public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest(bool isUnencrypted)
         {
             var validationMessage = new ValidationFailure("SinceDateTime", "Query parameter 'sinceDateTime' is required.")
             {
@@ -503,7 +503,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsInternalServerError   (bool isUnencrypted)
+        public async Task WhenInvalidSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsInternalServerError(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -530,7 +530,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsNotModified(bool             isUnencrypted)
+        public async Task WhenSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsNotModified(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -554,7 +554,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
         [Test]
         [TestCase(false)]
-        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest(bool            isUnencrypted)
+        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest(bool isUnencrypted)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
