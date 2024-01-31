@@ -305,13 +305,13 @@ components:
         type: string
 
     isUnencrypted:
-      in: parameter
+      in: query
       name: isUnencrypted
       required: false
       description: |
-       An optional isUnencrypted parameter will create either encrypted/unencrypted Exchange Set.
+       An optional isUnencrypted parameter will create either encrypted/unencrypted Exchange Set.Bydefault value for isUnencrypted would always be false.
       schema:
-        type: string
+        type: boolean
 
   ################################################################################
   #                          Common Response Definitions                         #
