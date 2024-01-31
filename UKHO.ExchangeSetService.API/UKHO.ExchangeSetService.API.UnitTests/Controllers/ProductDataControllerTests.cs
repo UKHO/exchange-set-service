@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
@@ -117,7 +118,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("Product Identifiers cannot be null or empty.", errors.Errors.Single().Description);
-
         }
 
         [Test]
@@ -180,8 +180,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsInternalServerError(
-             bool isUnencrypted)
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsInternalServerError(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -205,7 +204,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
-
         }
 
         [Test]
@@ -234,7 +232,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
             Assert.AreEqual(304, result.StatusCode);
-
         }
 
         [Test]
@@ -263,6 +260,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ExchangeSetTooLarge.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -290,6 +292,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
 
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSPostProductIdentifiersRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}").MustHaveHappened();
         }
 
         #endregion PostProductIdentifiers
@@ -361,8 +367,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsInternalServerError
-            (bool isUnencrypted)
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsInternalServerError(bool isUnencrypted)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -385,7 +390,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
-
         }
 
         [Test]
@@ -412,7 +416,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (StatusCodeResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new ProductVersionRequest() { ProductName = "demo" } }, "", isUnencrypted);
             Assert.AreEqual(304, result.StatusCode);
-
         }
 
         [Test]
@@ -439,13 +442,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ExchangeSetTooLarge.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.").MustHaveHappened();
         }
 
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenValidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsOkResponse(
-             bool isUnencrypted)
+        public async Task WhenValidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsOkResponse(bool isUnencrypted)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -464,6 +471,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                             { new ProductVersionRequest() { ProductName = "demo" } }, "", isUnencrypted);
 
             Assert.AreSame(exchangeSetServiceResponse.ExchangeSetResponse, result.Value);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}").MustHaveHappened();
         }
 
         #endregion
@@ -575,13 +587,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ExchangeSetTooLarge.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.").MustHaveHappened();
         }
 
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess(
-             bool isUnencrypted)
+        public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess(bool isUnencrypted)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -600,8 +616,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
             Assert.AreEqual(200, result.StatusCode);
-        }
 
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}").MustHaveHappened();
+        }
         #endregion ProductDataSinceDateTime
     }
 }
