@@ -309,7 +309,8 @@ components:
       name: isUnencrypted
       required: false
       description: |
-       An optional isUnencrypted parameter will create either encrypted/unencrypted Exchange Set.Bydefault value for isUnencrypted would always be false.
+       An optional isUnencrypted parameter will create encrypted Exchange set when value is passed as false and unencrypted Exchange Set when value is passed as true.
+       Bydefault value for isUnencrypted would always be false.
       schema:
         type: boolean
 
