@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// Provide all the releasable data after a datetime. - POST /productData
         /// </summary>
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
-		/// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
+        /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
@@ -57,13 +57,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="productVersionModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
         {
             string uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}";
+                uri += $"?callbackuri={callbackUri}&isUnencrypted={isUnencrypted}";
+            }
+            else
+            {
+                uri += $"?isUnencrypted={isUnencrypted}";
             }
             string payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
@@ -84,17 +89,24 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="productIdentifierModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
         {
             string uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}";
+                uri += $"?callbackuri={callbackUri}&isUnencrypted={isUnencrypted}";
+            }
+            else
+            {
+                uri += $"?isUnencrypted={isUnencrypted}";
             }
             string payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
+
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+        
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
             {
                 if (accessToken != null)
