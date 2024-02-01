@@ -11,7 +11,7 @@ variable "resource_group_name" {
 locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
-  web_app_name		    = "${local.service_name}-${local.env_name}-webapp"
+web_app_name		    = "${local.service_name}-${local.env_name}-webapp"
   key_vault_name		= "${local.service_name}-ukho-${local.env_name}-kv"
   tags = {
     SERVICE          = "Exchange Set Service"
@@ -19,7 +19,7 @@ locals {
     SERVICE_OWNER    = "Robin Chapman"
     RESPONSIBLE_TEAM = "Abzu"
     CALLOUT_TEAM     = "On-Call_N/A"
-    COST_CENTRE      = "A.008.02"
+    COST_CENTRE      = local.env_name == "dev" || local.env_name == "qa" || local.env_name == "prod" ? "A.008.02" : "A.011.08"
   }
   config_data = jsondecode(file("${path.module}/appsettings.json"))
 }
@@ -51,6 +51,14 @@ variable "app_service_sku" {
 	    tier = "PremiumV3"
 	    size = "P1v3"
         }
+    "vne"     = {
+	    tier = "PremiumV3"
+	    size = "P1v3"
+        }
+    "vni"     = {
+	    tier = "PremiumV3"
+	    size = "P1v3"
+        }
     "prod"   = {
 	    tier = "PremiumV3"
 	    size = "P1v3"
@@ -75,9 +83,7 @@ variable "agent_subscription_id" {
 }
 
 variable "elastic_apm_server_url" {
-
 }
 
 variable "elastic_apm_api_key" {
-
 }

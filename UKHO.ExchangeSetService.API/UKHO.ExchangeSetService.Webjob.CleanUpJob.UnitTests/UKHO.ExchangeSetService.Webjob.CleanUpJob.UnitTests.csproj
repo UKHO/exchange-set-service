@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UKHO.ExchangeSetService.CleanUpJob\UKHO.ExchangeSetService.CleanUpJob.csproj" />
-    <ProjectReference Include="..\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj" />
   </ItemGroup>
 
 </Project>
