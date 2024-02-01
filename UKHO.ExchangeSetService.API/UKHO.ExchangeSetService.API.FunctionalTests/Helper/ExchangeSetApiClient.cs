@@ -27,17 +27,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
         {
             string uri = $"{apiHost}/productData";
+            
+            uri += $"?isUnencrypted={isUnencrypted}";
+
             if (sincedateTime != null)
             {
-                uri += $"?sinceDateTime={sincedateTime}&";
+                uri += $"&sinceDateTime={sincedateTime}";
             }
             if (callbackUri != null)
             {
-                uri += $"callbackuri={callbackUri}";
+                uri += $"&callbackuri={callbackUri}";
             }
 
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri))
