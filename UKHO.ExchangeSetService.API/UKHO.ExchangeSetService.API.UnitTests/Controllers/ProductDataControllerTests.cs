@@ -174,6 +174,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("requestBody", errors.Errors.Single().Source);
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
@@ -361,6 +362,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("requestBody", errors.Errors.Single().Source);
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
@@ -509,6 +511,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("sinceDateTime", errors.Errors.Single().Source);
             Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
         }
 
