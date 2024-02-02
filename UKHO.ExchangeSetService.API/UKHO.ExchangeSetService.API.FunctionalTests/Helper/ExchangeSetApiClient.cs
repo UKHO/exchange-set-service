@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string isUnencrypted= "false")
         {
             string uri = $"{apiHost}/productData";
             
@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
         {
             string uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string isUnencrypted="false")
         {
             string uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
