@@ -8,7 +8,12 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         public string BaseUrl { get; set; }
         public string PublicBaseUrl { get; set; }
         public string ResourceId { get; set; }
-        public string BusinessUnit { get; set; }
+        //EssBusinessUnit - ESS BU to store exchange set
+        public string EssBusinessUnit { get; set; }
+        // S63BusinessUnit - Provides S63 encrypted data from FSS
+        public string S63BusinessUnit { get; set; }
+        // S57BusinessUnit - Provides S57 unencrypted data from FSS
+        public string S57BusinessUnit { get; set; }
         public string ExchangeSetFileName { get; set; }
         public string ExchangeSetFileFolder { get; set; }
         public string EncRoot { get; set; }

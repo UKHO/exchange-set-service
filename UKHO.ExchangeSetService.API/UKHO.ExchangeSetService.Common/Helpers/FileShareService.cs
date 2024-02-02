@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var createBatchRequest = new CreateBatchRequest
             {
-                BusinessUnit = fileShareServiceConfig.Value.BusinessUnit,
+                BusinessUnit = fileShareServiceConfig.Value.EssBusinessUnit,
                 Attributes = new List<KeyValuePair<string, string>>()
                 {
                     new KeyValuePair<string, string>("Exchange Set Type", "Update"),
@@ -130,7 +130,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var internalNotFoundProducts = new List<Products>();
                 var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
                 var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
-                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
+                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.S63BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
 
                 HttpResponseMessage httpResponse;
 
@@ -641,7 +641,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string filePath = string.Empty;
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.ReadMeFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.S63BusinessUnit}'";
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
             if (httpResponse.IsSuccessStatusCode)
@@ -672,7 +672,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string filePath = string.Empty;
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.IhoCrtFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.IhoCrtFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.S63BusinessUnit}'";
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
             if (httpResponse.IsSuccessStatusCode)
@@ -703,7 +703,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string filePath = string.Empty;
-            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.IhoPubFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            var uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter={fileShareServiceConfig.Value.ProductType} fileName eq '{fileShareServiceConfig.Value.IhoPubFileName}' and BusinessUnit eq '{fileShareServiceConfig.Value.S63BusinessUnit}'";
             HttpResponseMessage httpResponse;
             httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None, correlationId);
             if (httpResponse.IsSuccessStatusCode)

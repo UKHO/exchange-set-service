@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeEnterpriseEventCacheDataRequestValidator = A.Fake<IEnterpriseEventCacheDataRequestValidator>();
             fakeLogger = A.Fake<ILogger<EssWebhookService>>();
             fakeEssFulfilmentStorageConfig = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
-            fakeCacheConfiguration.Value.CacheBusinessUnit = "ADDS";
+            fakeCacheConfiguration.Value.S63CacheBusinessUnit = "ADDS";
             fakeCacheConfiguration.Value.CacheProductCode = "AVCS";
 
             service= new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig);
