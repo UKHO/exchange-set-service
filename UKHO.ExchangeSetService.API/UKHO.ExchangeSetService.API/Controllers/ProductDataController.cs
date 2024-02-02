@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
+using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -20,6 +21,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [ServiceFilter(typeof(BespokeFilterAttribute))]
     public class ProductDataController : BaseController<ProductDataController>
     {
         private readonly IProductDataService productDataService;
@@ -70,8 +72,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
-                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}", 
-                async() => {
+                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}",
+                async () =>
+                {
                     if (productIdentifiers == null || productIdentifiers.Length == 0)
                     {
                         var error = new List<Error>
@@ -155,7 +158,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId}",
-                async () => {
+                async () =>
+                {
                     if (productVersionsRequest == null || !productVersionsRequest.Any())
                     {
                         var error = new List<Error>
@@ -168,7 +172,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         };
                         return BuildBadRequestErrorResponse(error);
                     }
-                    ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest
+                    ProductDataProductVersionsRequest request = new()
                     {
                         ProductVersions = productVersionsRequest,
                         CallbackUri = callbackUri,
@@ -186,7 +190,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                             return BuildBadRequestErrorResponse(errors);
                         }
                     }
-                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    AzureAdB2C azureAdB2C = new()
                     {
                         AudToken = TokenAudience,
                         IssToken = TokenIssuer
@@ -200,7 +204,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId());            
+                }, GetCurrentCorrelationId());
         }
 
         /// <summary>
@@ -233,8 +237,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
                 "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId}",
-                async () => {
-                    ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
+                async () =>
+                {
+                    ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new()
                     {
                         SinceDateTime = sinceDateTime,
                         CallbackUri = callbackUri,
@@ -260,7 +265,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         return BuildBadRequestErrorResponse(errors);
                     }
-                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    AzureAdB2C azureAdB2C = new()
                     {
                         AudToken = TokenAudience,
                         IssToken = TokenIssuer
@@ -276,7 +281,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
                     return GetEssResponse(productDetail);
                 }, GetCurrentCorrelationId());
-            
+
         }
     }
 }
