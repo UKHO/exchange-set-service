@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace UKHO.ExchangeSetService.API.Filters
 {
     /// <summary>
-    /// Unauthorized response when request is Bespoke exchange set and Non UKHO user requested
+    /// 140109 : ESS API :- Add authorization to allow only UKHO people to create unencrypted exchange set (Bespoke Exchange Set)
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class BespokeFilterAttribute : ActionFilterAttribute
