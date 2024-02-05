@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallExchangeSetApiWithoutIsUnencrytedParameterAndWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallProductIdentifiersApiWithIncorrectValueForIsUnencrytedParameter_ThenAProductTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallExchangeSetApiWithoutIsUnencrytedParameterAndWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallProductIdentifiersApiWithIncorrectValueForIsUnencrytedParameter_ThenAReadMeTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallExchangeSetApiWithoutIsUnencrytedParameterAndWithMultipleProductIdentifiers_ThenACatalogueFileIsGenerated()
+        public async Task WhenICallProductIdentifiersApiWithIncorrectValueForIsUnencrytedParameter_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallExchangeSetApiWithoutIsUnencrytedParameterAndWithAValidProductIdentifiers_ThenASerialEncFileIsGenerated()
+        public void WhenICallProductIdentifiersApiWithIncorrectValueForIsUnencrytedParameter_ThenASerialEncFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallExchangeSetApiWithoutIsUnencrytedParameterAndWithMultipleProductIdentifiers_ThenEncFilesAreDownloaded()
+        public async Task WhenICallProductIdentifiersApiWithIncorrectValueForIsUnencrytedParameter_ThenEncFilesAreDownloaded()
         {
             //Get the product details form sales catalogue service
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
