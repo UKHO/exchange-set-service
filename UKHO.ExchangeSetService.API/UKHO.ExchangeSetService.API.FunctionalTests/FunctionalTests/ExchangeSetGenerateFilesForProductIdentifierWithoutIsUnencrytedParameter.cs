@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             FssApiClient = new FssApiClient();
             DataHelper = new DataHelper();
-            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), accessToken: EssJwtToken);
+            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataWithoutisUnencryptedParameterAsync(DataHelper.GetProductIdentifiers(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)ApiEssResponse.StatusCode, $"Incorrect status code is returned  {ApiEssResponse.StatusCode}, instead of of the expected status 200.");
             var batchId = await ApiEssResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);

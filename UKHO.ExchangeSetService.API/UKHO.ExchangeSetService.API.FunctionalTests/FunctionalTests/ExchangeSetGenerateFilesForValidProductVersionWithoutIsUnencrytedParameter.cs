@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ProductVersionData = new List<ProductVersionModel>();
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416040", 11, 0));
-            ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
+            ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsWithoutisUnencryptedParameterAsync(ProductVersionData, accessToken: EssJwtToken);
             var batchId = await ApiEssResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
