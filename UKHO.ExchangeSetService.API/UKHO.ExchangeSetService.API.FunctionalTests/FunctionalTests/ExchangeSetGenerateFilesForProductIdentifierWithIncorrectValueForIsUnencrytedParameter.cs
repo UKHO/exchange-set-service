@@ -20,11 +20,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             FssApiClient = new FssApiClient();
             DataHelper = new DataHelper();
-            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), null, accessToken: EssJwtToken, "Test123");
-            Assert.AreEqual(200, (int)ApiEssResponse.StatusCode, $"Incorrect status code is returned  {ApiEssResponse.StatusCode}, instead of of the expected status 200.");
-            var batchId = await ApiEssResponse.GetBatchId();
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), null, accessToken: EssJwtToken, "Test123");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of of the expected status 200.");
+            var batchId = await apiResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);
-            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
+            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
         }
 
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
