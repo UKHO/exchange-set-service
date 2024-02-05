@@ -9,7 +9,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    class ExchangeSetGenerateFilesForValidProductVersionWithoutIsUnencrytedParameter : ObjectStorage
+    class ExchangeSetGenerateFilesForProductVersionWithoutIsUnencrytedParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new List<string>();
 
