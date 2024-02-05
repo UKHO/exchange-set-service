@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string isUnencrypted= "false")
         {
             string uri = $"{apiHost}/productData";
             
@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
         {
             string uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
@@ -88,14 +88,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
 
         /// <summary>
-        /// Get latest baseline data for a specified set of ENCs. - POST /productData/productIdentifiers
+        /// Get latest baseline data for a specified set of ENCs. with isUnencrypted parameter - POST /productData/productIdentifiers
         /// </summary>
         /// <param name="productIdentifierModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, bool isUnencrypted = false)
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string isUnencrypted="false")
         {
             string uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
@@ -118,6 +118,65 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     httpRequestMessage.SetBearerToken(accessToken);
                 }
 
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+        }
+
+        /// <summary>
+        /// Get latest baseline data for a specified set of ENCs. without isUnencrypted parameter - POST /productData/productIdentifiers
+        /// </summary>
+        /// <param name="productIdentifierModel"></param>
+        /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataWithoutisUnencryptedParameterAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
+        {
+            string uri = $"{apiHost}/productData/productIdentifiers";
+            if (callbackUri != null)
+            {
+                uri += $"?callbackuri={callbackUri}";
+            }
+           
+            string payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
+
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
+
+                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            }
+        }
+
+        /// <summary>
+        /// Get latest baseline data for a specified set of ENCs. without isUnencrypted parameter  - POST /productData/productVersions
+        /// </summary>
+        /// <param name="productVersionModel"></param>
+        /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> GetProductVersionsWithoutisUnencryptedParameterAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
+        {
+            string uri = $"{apiHost}/productData/productVersions";
+            if (callbackUri != null)
+            {
+                uri += $"?callbackuri={callbackUri}";
+            }
+           
+            string payloadJson = JsonConvert.SerializeObject(productVersionModel);
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                if (accessToken != null)
+                {
+                    httpRequestMessage.SetBearerToken(accessToken);
+                }
                 return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
             }
         }
