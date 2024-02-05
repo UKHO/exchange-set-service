@@ -11,21 +11,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     [TestFixture]
     public class ExchangeSetGenerateFilesForProductVersionWithIncorrectValueForIsUnencrytedParameter : ObjectStorage
     {
-        private readonly List<string> CleanUpBatchIdList = new List<string>();
+        private readonly List<string> cleanUpBatchIdList = new List<string>();
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            Config = new TestConfiguration();
-            ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
-            FssApiClient = new FssApiClient();
-            DataHelper = new DataHelper();
             ProductVersionData = new List<ProductVersionModel>();
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE416040", 11, 0));
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, accessToken: EssJwtToken, "Test123");
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of of the expected status 200.");
             var batchId = await apiResponse.GetBatchId();
-            CleanUpBatchIdList.Add(batchId);
+            cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
         }
 
@@ -66,11 +62,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
-            //Verify Catalog file content
+            //Verify the Catalog file content
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
-            Assert.AreEqual(304, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 304.");
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
-            FileContentHelper.CheckCatalogueFileNoContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), ProductVersionData);
+            FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
         }
 
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
@@ -88,10 +85,26 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithIncorrectValueForIsUnencrytedParameter_ThenNoEncFilesAreDownloaded()
+        public async Task WhenICallProductVersionApiWithIncorrectValueForIsUnencrytedParameter_ThenEncFilesAreDownloaded()
         {
-            //Verify No folder available for the product             
-            FileContentHelper.CheckNoEncFilesDownloadedAsync(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), ProductVersionData[0].ProductName);
+            //Get the product details form sales catalogue service
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
+            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
+            var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
+
+            foreach (var product in apiScsResponseData.Products)
+            {
+                string productName = product.ProductName;
+                int editionNumber = product.EditionNumber;
+
+                //Enc file downloaded verification
+                foreach (var updateNumber in product.UpdateNumbers)
+                {
+                    await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+
+                }
+            }
         }
 
         [OneTimeTearDown]
@@ -100,10 +113,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Clean up downloaded files/folders   
             FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
 
-            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
             {
                 //Clean up batches from local foldar 
-                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
         }

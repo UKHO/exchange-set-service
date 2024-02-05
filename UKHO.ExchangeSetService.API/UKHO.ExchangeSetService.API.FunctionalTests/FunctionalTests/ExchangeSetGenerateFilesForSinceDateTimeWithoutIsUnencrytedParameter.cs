@@ -13,20 +13,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     [TestFixture]
     public class ExchangeSetGenerateFilesForSinceDateTimeWithoutIsUnencrytedParameter : ObjectStorage
     {
-        private readonly List<string> CleanUpBatchIdList = new List<string>();
-        private readonly string SinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        private readonly List<string> cleanUpBatchIdList = new List<string>();
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            Config = new TestConfiguration();
-            ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
-            FssApiClient = new FssApiClient();
-            DataHelper = new DataHelper();
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, null, accessToken: EssJwtToken, "Test123");
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, "Test123");
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of of the expected status 200.");
             var batchId = await apiResponse.GetBatchId();
-            CleanUpBatchIdList.Add(batchId);
+            cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
         }
 
@@ -120,10 +116,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Clean up downloaded files/folders   
             FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
 
-            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
             {
                 //Clean up batches from local foldar 
-                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
         }
