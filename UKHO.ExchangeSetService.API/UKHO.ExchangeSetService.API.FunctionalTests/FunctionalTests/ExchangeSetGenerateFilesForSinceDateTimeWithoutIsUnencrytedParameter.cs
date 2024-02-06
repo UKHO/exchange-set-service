@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Clean up downloaded files/folders   
             FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
 
-            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
+            if (cleanUpBatchIdList?.Count > 0)
             {
                 //Clean up batches from local folder 
                 var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
