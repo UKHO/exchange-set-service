@@ -8,7 +8,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
-    public class ExchangeSetAuthorizationUnencryptedParameterTests : ObjectStorage
+    public class ExchangeSetAuthorizationIsUnencryptedParameterTests : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheSinceDateTimeApiWithAValidB2cTokenAndUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallTheSinceDateTimeApiWithAValidB2cTokenAndIsUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssB2CToken, "True");
 
@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallTheSinceDateTimeApiWithAValidADTokenAndUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
+        public async Task WhenICallTheSinceDateTimeApiWithAValidADTokenAndIsUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, "True");
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductIdentifierApiWithAValidB2cTokenAndUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallTheProductIdentifierApiWithAValidB2cTokenAndIsUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssB2CToken, "True");
 
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductIdentifierApiWithAValidADTokenAndUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
+        public async Task WhenICallTheProductIdentifierApiWithAValidADTokenAndIsUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssJwtToken, "True");
 
@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductVersionApiWithAValidB2cTokenAndUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallTheProductVersionApiWithAValidB2cTokenAndIsUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallTheProductVersionApiWithAValidADTokenAndUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
+        public async Task WhenICallTheProductVersionApiWithAValidADTokenAndIsUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
@@ -117,7 +117,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [OneTimeTearDown]
         public async Task GlobalTeardown()
         {
-            if (cleanUpBatchIdList != null && cleanUpBatchIdList.Count > 0)
+            if (cleanUpBatchIdList?.Count > 0)
             {
                 //Clean up batches from local folder 
                 var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);

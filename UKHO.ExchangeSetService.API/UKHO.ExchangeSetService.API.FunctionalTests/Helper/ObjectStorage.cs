@@ -38,7 +38,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = authTokenProvider.GetScsToken().Result;
             FssApiClient = new FssApiClient();
-            FssJwtToken = authTokenProvider.GetFssToken().Result;
             ProductVersionData = new List<ProductVersionModel>();
         }
     }
