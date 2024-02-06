@@ -22,8 +22,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 DataHelper.GetProductVersionModelData("DE416040", 11, 0)
             };
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsWithoutIsUnencryptedParameterAsync(ProductVersionData, accessToken: EssJwtToken);
-            var batchid = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(batchid);
+            var batchId = await apiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
         }
 
