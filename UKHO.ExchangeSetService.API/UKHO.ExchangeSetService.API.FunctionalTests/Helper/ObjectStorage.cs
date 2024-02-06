@@ -8,13 +8,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     {
         protected ExchangeSetApiClient ExchangeSetApiClient { get; set; }
         public TestConfiguration Config { get; set; }
+        public string EssB2CToken { get; set; }
         public string EssJwtToken { get; set; }
         protected ProductIdentifierModel ProductIdentifierModel { get; set; }
         protected DataHelper Datahelper { get; set; }
         public string FssJwtToken { get; set; }
         public static DataHelper DataHelper = new();
         protected HttpResponseMessage ApiEssResponse { get; set; }
-       
         protected SalesCatalogueApiClient ScsApiClient { get; set; }
         public string ScsJwtToken { get; set; }
         protected FssApiClient FssApiClient { get; set; }
@@ -31,11 +31,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             AuthTokenProvider authTokenProvider = new();
+            AzureB2CAuthTokenProvider b2CAuthTokenProvider = new();
+            EssB2CToken = b2CAuthTokenProvider.GetToken().Result;
             EssJwtToken = authTokenProvider.GetEssToken().Result;
             FssJwtToken = authTokenProvider.GetFssToken().Result;
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = authTokenProvider.GetScsToken().Result;
             FssApiClient = new FssApiClient();
+            FssJwtToken = authTokenProvider.GetFssToken().Result;
             ProductVersionData = new List<ProductVersionModel>();
         }
     }

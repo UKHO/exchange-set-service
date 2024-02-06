@@ -8,12 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
-
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public class ExchangeSetApiClient
     {
-        static HttpClient httpClient = new HttpClient();
+        public static HttpClient httpClient = new();
         private readonly string apiHost;
 
         public ExchangeSetApiClient(string apiHost)
@@ -25,30 +24,32 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// Provide all the releasable data after a datetime. - POST /productData
         /// </summary>
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
-		/// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
+        /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
         {
-            string uri = $"{apiHost}/productData";
+            var uri = $"{apiHost}/productData";
+
+            uri += $"?isUnencrypted={isUnencrypted}";
+
             if (sincedateTime != null)
             {
-                uri += $"?sinceDateTime={sincedateTime}&";
+                uri += $"&sinceDateTime={sincedateTime}";
             }
             if (callbackUri != null)
             {
-                uri += $"callbackuri={callbackUri}";
+                uri += $"&callbackuri={callbackUri}";
             }
 
-            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri))
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri);
+            if (accessToken != null)
             {
-                if (accessToken != null)
-                {
-                    httpRequestMessage.SetBearerToken(accessToken);
-                }
-
-                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+                httpRequestMessage.SetBearerToken(accessToken);
             }
+
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
 
         /// <summary>
@@ -57,70 +58,74 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="productVersionModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
         {
-            string uri = $"{apiHost}/productData/productVersions";
+            var uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}";
+                uri += $"?callbackuri={callbackUri}&isUnencrypted={isUnencrypted}";
             }
-            string payloadJson = JsonConvert.SerializeObject(productVersionModel);
-
-            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            else
             {
-                if (accessToken != null)
-                {
-                    httpRequestMessage.SetBearerToken(accessToken);
-                }
-                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+                uri += $"?isUnencrypted={isUnencrypted}";
             }
+            var payloadJson = JsonConvert.SerializeObject(productVersionModel);
+
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            if (accessToken != null)
+            {
+                httpRequestMessage.SetBearerToken(accessToken);
+            }
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
 
         /// <summary>
-        /// Get latest baseline data for a specified set of ENCs. - POST /productData/productIdentifiers
+        /// Get latest baseline data for a specified set of ENCs. with isUnencrypted parameter - POST /productData/productIdentifiers
         /// </summary>
         /// <param name="productIdentifierModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <param name="isUnencrypted"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
         {
-            string uri = $"{apiHost}/productData/productIdentifiers";
+            var uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}";
+                uri += $"?callbackuri={callbackUri}&isUnencrypted={isUnencrypted}";
             }
-            string payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
-
-            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            else
             {
-                if (accessToken != null)
-                {
-                    httpRequestMessage.SetBearerToken(accessToken);
-                }
-
-                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+                uri += $"?isUnencrypted={isUnencrypted}";
             }
-        }
+            var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            if (accessToken != null)
+            {
+                httpRequestMessage.SetBearerToken(accessToken);
+            }
+
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+        }
+        
         public async Task<HttpResponseMessage> PostNewFilesPublishedAsync([FromBody] JObject request, string accessToken = null)
         {
-            string uri = $"{apiHost}/webhook/newfilespublished";
-            string payloadJson = JsonConvert.SerializeObject(request);
-            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            var uri = $"{apiHost}/webhook/newfilespublished";
+            var payloadJson = JsonConvert.SerializeObject(request);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            if (accessToken != null)
             {
-                if (accessToken != null)
-                {
-                    httpRequestMessage.SetBearerToken(accessToken);
-                }
-
-                return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+                httpRequestMessage.SetBearerToken(accessToken);
             }
+
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
     }
-
 }
