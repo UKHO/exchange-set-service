@@ -16,15 +16,17 @@ namespace UKHO.ExchangeSetService.API.Filters
         private const string TokenAudience = "aud";
         private const string IsUnencrypted = "IsUnencrypted";
         private const string ESSAzureADConfigurationClientId = "ESSAzureADConfiguration:ClientId";
+
         public BespokeFilterAttribute(IConfiguration configuration)
         {
             this.configuration = configuration;
         }
+
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            string tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
-            bool isUnencrypted = Convert.ToBoolean(context.HttpContext.Request.Query[IsUnencrypted]);
-            string azureADClientID = configuration[ESSAzureADConfigurationClientId];
+            var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
+            var isUnencrypted = Convert.ToBoolean(context.HttpContext.Request.Query[IsUnencrypted]);
+            var azureADClientID = configuration[ESSAzureADConfigurationClientId];
 
             //If request is Bespoke exchange set and user is Non UKHO
             if (isUnencrypted)

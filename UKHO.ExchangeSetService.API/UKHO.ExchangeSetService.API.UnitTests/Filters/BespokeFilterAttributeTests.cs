@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public void WhenIsUnencyptedParameterIsFalseAndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnNextRequest()
+        public void WhenIsUnencryptedParameterIsFalseAndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnNextRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public void WhenIsUnencyptedParameterIsTrueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        public void WhenIsUnencryptedParameterIsTrueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenIsUnencyptedParameterIsTrueAndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnUnauthorized()
+        public async Task WhenIsUnencryptedParameterIsTrueAndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnUnauthorized()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
