@@ -20,9 +20,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         private BespokeFilterAttribute bespokeFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
-        public const string TokenAudience = "aud";
-        public const string IsUnencrypted = "IsUnencrypted";
-        public const string ESSAzureADConfigurationClientId = "ESSAzureADConfiguration:ClientId";
+        private const string TokenAudience = "aud";
+        private const string IsUnencrypted = "IsUnencrypted";
+        private const string ESSAzureADConfigurationClientId = "ESSAzureADConfiguration:ClientId";
+        private const string ClientId = "80a6c68b-59aa-49a4-939a-7968ff79d676";
+
         readonly HttpContext httpContext = new DefaultHttpContext();
 
         [SetUp]
@@ -33,14 +35,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             var claims = new List<Claim>()
             {
-                    new Claim(TokenAudience,"80a6c68b-59aa-49a4-939a-7968ff79d676"),
+                    new Claim(TokenAudience, ClientId),
             };
             var identity = httpContext.User.Identities.FirstOrDefault();
             identity.AddClaims(claims);
         }
 
         [Test]
-        public void WhenIsUnencryptedParameterIsFalseAndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnNextRequest()
+        public async Task WhenIsUnencryptedParameterIsFalseAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
@@ -48,30 +50,35 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
 
-            fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59aa-49a4-939a-7968ff79d676";
+            fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
 
             var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
-            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null);
-            var result = bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-            result.IsCompletedSuccessfully.Should().BeTrue();
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+            
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
         }
 
         [Test]
-        public void WhenIsUnencryptedParameterIsTrueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        public async Task WhenIsUnencryptedParameterIsTrueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
                 { IsUnencrypted, "true" }
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
-            fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59aa-49a4-939a-7968ff79d676";
+
+            fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
 
             var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
-            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null);
-            var result = bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-            result.IsCompletedSuccessfully.Should().BeTrue();
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+            
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
         }
 
         [Test]
@@ -81,14 +88,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             {
                 { IsUnencrypted, "true" }
             };
-
             httpContext.Request.Query = new QueryCollection(dictionary);
+
             fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59ab-49a4-939a-7968ff79d678";
 
             var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
-            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
         }
     }
