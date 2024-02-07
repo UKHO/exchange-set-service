@@ -48,12 +48,29 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
 
-            fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59aa-49a4-939a-7968ff79d678";
+            fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59aa-49a4-939a-7968ff79d676";
 
             var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null);
-            var result =  bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+            var result = bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+            result.IsCompletedSuccessfully.Should().BeTrue();
+        }
+
+        [Test]
+        public void WhenIsUnencyptedParameterIsTrueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+                { IsUnencrypted, "true" }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+            fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59aa-49a4-939a-7968ff79d676";
+
+            var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null);
+            var result = bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
             result.IsCompletedSuccessfully.Should().BeTrue();
         }
 
