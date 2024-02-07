@@ -165,7 +165,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         var error = new List<Error>
                         {
-                            new Error()
+                            new()
                             {
                                 Source = "requestBody",
                                 Description = "Either body is null or malformed."
@@ -254,7 +254,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         var error = new List<Error>
                         {
-                            new Error()
+                            new()
                             {
                                 Source = "sinceDateTime",
                                 Description = "Query parameter 'sinceDateTime' is required."
