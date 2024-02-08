@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 namespace UKHO.ExchangeSetService.API.Filters
 {
     /// <summary>
-    /// 140109 : ESS API :- Add authorization to allow only UKHO people to create unencrypted exchange set (Bespoke Exchange Set)
+    /// Authorization to allow only UKHO people to create unencrypted exchange set.
     /// </summary>
-    public class BespokeFilterAttribute : ActionFilterAttribute
+    public class BespokeExchangeSetAuthorizationFilterAttribute : ActionFilterAttribute
     {
         private readonly IConfiguration configuration;
         private const string TokenAudience = "aud";
         private const string IsUnencrypted = "IsUnencrypted";
         private const string ESSAzureADConfigurationClientId = "ESSAzureADConfiguration:ClientId";
 
-        public BespokeFilterAttribute(IConfiguration configuration)
+        public BespokeExchangeSetAuthorizationFilterAttribute(IConfiguration configuration)
         {
             this.configuration = configuration;
         }

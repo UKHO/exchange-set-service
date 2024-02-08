@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
@@ -14,10 +15,11 @@ using UKHO.ExchangeSetService.API.Filters;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 {
-    public class BespokeFilterAttributeTests
+    [TestFixture]
+    public class BespokeExchangeSetAuthorizationFilterAttributeTests
     {
         private IConfiguration fakeConfiguration;
-        private BespokeFilterAttribute bespokeFilterAttribute;
+        private BespokeExchangeSetAuthorizationFilterAttribute bespokeFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
         private const string TokenAudience = "aud";
@@ -31,7 +33,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         public void Setup()
         {
             fakeConfiguration = A.Fake<IConfiguration>();
-            bespokeFilterAttribute = new BespokeFilterAttribute(fakeConfiguration);
+            bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeConfiguration);
 
             var claims = new List<Claim>()
             {
@@ -52,12 +54,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
 
-            var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-            
+
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
         }
 
@@ -72,12 +74,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
 
-            var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-            
+
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
         }
 
