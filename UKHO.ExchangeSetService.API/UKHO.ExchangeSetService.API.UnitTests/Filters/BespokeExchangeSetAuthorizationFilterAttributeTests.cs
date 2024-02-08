@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
@@ -53,12 +54,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
 
-            var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-            
+
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
         }
 
@@ -73,12 +74,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
 
-            var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-            
+
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
         }
 
