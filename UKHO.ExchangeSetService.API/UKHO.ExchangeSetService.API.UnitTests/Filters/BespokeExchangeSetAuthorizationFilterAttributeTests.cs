@@ -14,10 +14,11 @@ using UKHO.ExchangeSetService.API.Filters;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 {
-    public class BespokeFilterAttributeTests
+    [TestFixture]
+    public class BespokeExchangeSetAuthorizationFilterAttributeTests
     {
         private IConfiguration fakeConfiguration;
-        private BespokeFilterAttribute bespokeFilterAttribute;
+        private BespokeExchangeSetAuthorizationFilterAttribute bespokeFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
         private const string TokenAudience = "aud";
@@ -31,7 +32,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         public void Setup()
         {
             fakeConfiguration = A.Fake<IConfiguration>();
-            bespokeFilterAttribute = new BespokeFilterAttribute(fakeConfiguration);
+            bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeConfiguration);
 
             var claims = new List<Claim>()
             {

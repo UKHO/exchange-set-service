@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
     [Authorize]
-    [ServiceFilter(typeof(BespokeFilterAttribute))]
+    [ServiceFilter(typeof(BespokeExchangeSetAuthorizationFilterAttribute))]
     public class ProductDataController : BaseController<ProductDataController>
     {
         private readonly IProductDataService productDataService;
