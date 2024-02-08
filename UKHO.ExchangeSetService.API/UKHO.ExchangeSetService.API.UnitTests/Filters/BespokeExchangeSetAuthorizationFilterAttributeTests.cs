@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59ab-49a4-939a-7968ff79d678";
 
-            var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 

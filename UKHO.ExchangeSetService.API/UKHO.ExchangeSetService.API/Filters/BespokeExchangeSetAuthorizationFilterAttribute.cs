@@ -26,12 +26,12 @@ namespace UKHO.ExchangeSetService.API.Filters
         {
             var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
             var isUnencrypted = Convert.ToBoolean(context.HttpContext.Request.Query[IsUnencrypted]);
-            var azureADClientID = configuration[ESSAzureADConfigurationClientId];
+            var azureADClientId = configuration[ESSAzureADConfigurationClientId];
 
             //If request is Bespoke exchange set and user is Non UKHO
             if (isUnencrypted)
             {
-                if (azureADClientID != tokenAudience)
+                if (azureADClientId != tokenAudience)
                 {
                     context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return;
