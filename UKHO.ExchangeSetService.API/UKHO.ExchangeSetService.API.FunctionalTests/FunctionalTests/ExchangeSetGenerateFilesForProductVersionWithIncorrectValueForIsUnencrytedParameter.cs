@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 DataHelper.GetProductVersionModelData("DE416040", 11, 0)
             };
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, accessToken: EssJwtToken, "Test123");
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of of the expected status 200.");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
             var batchId = await apiResponse.GetBatchId();
             cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);

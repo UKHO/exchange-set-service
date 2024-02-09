@@ -309,10 +309,11 @@ components:
       name: isUnencrypted
       required: false
       description: |
-              An optional isUnencrypted parameter determines whether the Exchange set is encrypted or not. If the value is false, the Exchange set will be encrypted. If the value is true,
-              the Exchange set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange set is encrypted by default.
+              An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true,
+              the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.
       schema:
         type: boolean
+        example: false
 
   ################################################################################
   #                          Common Response Definitions                         #
