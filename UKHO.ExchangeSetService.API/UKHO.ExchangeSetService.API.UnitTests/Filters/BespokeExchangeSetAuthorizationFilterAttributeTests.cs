@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -12,32 +12,33 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Filters;
+using UKHO.ExchangeSetService.Common.Configuration;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 {
     [TestFixture]
     public class BespokeExchangeSetAuthorizationFilterAttributeTests
     {
-        private IConfiguration fakeConfiguration;
         private BespokeExchangeSetAuthorizationFilterAttribute bespokeFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
         private const string TokenAudience = "aud";
         private const string IsUnencrypted = "IsUnencrypted";
-        private const string ESSAzureADConfigurationClientId = "ESSAzureADConfiguration:ClientId";
-        private const string ClientId = "80a6c68b-59aa-49a4-939a-7968ff79d676";
+        private IOptions<AzureADConfiguration> fakeAzureAdConfig;
 
         readonly HttpContext httpContext = new DefaultHttpContext();
 
         [SetUp]
         public void Setup()
         {
-            fakeConfiguration = A.Fake<IConfiguration>();
-            bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeConfiguration);
+            fakeAzureAdConfig = A.Fake<IOptions<AzureADConfiguration>>();
+            fakeAzureAdConfig.Value.ClientId = "80a6c68b-59aa-49a4-939a-7968ff79d676";
+
+            bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig);
 
             var claims = new List<Claim>()
             {
-                    new Claim(TokenAudience, ClientId),
+                    new Claim(TokenAudience, fakeAzureAdConfig.Value.ClientId)
             };
             var identity = httpContext.User.Identities.FirstOrDefault();
             identity.AddClaims(claims);
@@ -51,8 +52,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
                 { IsUnencrypted, "false" }
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
-
-            fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
 
             var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
@@ -72,8 +71,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
 
-            fakeConfiguration[ESSAzureADConfigurationClientId] = ClientId;
-
             var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
@@ -92,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
 
-            fakeConfiguration[ESSAzureADConfigurationClientId] = "80a6c68b-59ab-49a4-939a-7968ff79d678";
+            fakeAzureAdConfig.Value.ClientId = "80a6c68b-59ab-49a4-939a-7968ff79d678";
 
             var actionContext = new ActionContext(httpContext, new RouteData(), new());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);

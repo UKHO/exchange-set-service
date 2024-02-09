@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.Common.Configuration;
 
 namespace UKHO.ExchangeSetService.API.Filters
 {
@@ -12,21 +13,20 @@ namespace UKHO.ExchangeSetService.API.Filters
     /// </summary>
     public class BespokeExchangeSetAuthorizationFilterAttribute : ActionFilterAttribute
     {
-        private readonly IConfiguration configuration;
         private const string TokenAudience = "aud";
         private const string IsUnencrypted = "IsUnencrypted";
-        private const string ESSAzureADConfigurationClientId = "ESSAzureADConfiguration:ClientId";
+        private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
 
-        public BespokeExchangeSetAuthorizationFilterAttribute(IConfiguration configuration)
+        public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration)
         {
-            this.configuration = configuration;
+            this.azureAdConfiguration = azureAdConfiguration;
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
             var isUnencrypted = Convert.ToBoolean(context.HttpContext.Request.Query[IsUnencrypted]);
-            var azureADClientId = configuration[ESSAzureADConfigurationClientId];
+            var azureADClientId = azureAdConfiguration.Value.ClientId;
 
             //If request is Bespoke exchange set and user is Non UKHO
             if (isUnencrypted)
