@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="isUnencrypted">isUnencrypted, pass true for unencrypted and false for encrypted exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string isUnencrypted= "false")
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
         {
             var uri = $"{apiHost}/productData";
             
