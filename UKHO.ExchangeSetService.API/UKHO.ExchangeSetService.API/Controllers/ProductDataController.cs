@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
+using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -20,6 +21,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [ServiceFilter(typeof(BespokeExchangeSetAuthorizationFilterAttribute))]
     public class ProductDataController : BaseController<ProductDataController>
     {
         private readonly IProductDataService productDataService;
@@ -173,7 +175,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         };
                         return BuildBadRequestErrorResponse(error);
                     }
-                    ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest
+                    ProductDataProductVersionsRequest request = new()
                     {
                         ProductVersions = productVersionsRequest,
                         CallbackUri = callbackUri,
@@ -192,7 +194,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                             return BuildBadRequestErrorResponse(errors);
                         }
                     }
-                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    AzureAdB2C azureAdB2C = new()
                     {
                         AudToken = TokenAudience,
                         IssToken = TokenIssuer
@@ -269,7 +271,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         return BuildBadRequestErrorResponse(errors);
                     }
-                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    AzureAdB2C azureAdB2C = new()
                     {
                         AudToken = TokenAudience,
                         IssToken = TokenIssuer
