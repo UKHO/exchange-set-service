@@ -98,7 +98,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #region StoreSaleCatalogueServiceResponseAsync
         [Test]
-        public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue()
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(bool isUnencrypted)
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string containerName = "testContainer";
@@ -119,7 +121,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, isUnencrypted, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
             Assert.IsTrue(response);
         }
