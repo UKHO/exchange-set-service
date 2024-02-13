@@ -101,7 +101,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenIsUnencryptedParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenCodeExecuted()
+        public async Task WhenIsUnencryptedParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
