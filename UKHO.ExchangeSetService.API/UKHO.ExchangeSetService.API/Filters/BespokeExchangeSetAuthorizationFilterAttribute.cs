@@ -25,7 +25,8 @@ namespace UKHO.ExchangeSetService.API.Filters
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
-            var isUnencrypted = Convert.ToBoolean(Convert.ToString(context.HttpContext.Request.Query[IsUnencrypted]).ToLower() == "true");
+            var query = context.HttpContext.Request.Query[IsUnencrypted];
+            var isUnencrypted = Convert.ToBoolean(!string.IsNullOrEmpty(query) ? Convert.ToString(query).ToLower() == "true" : "false");
             var azureADClientId = azureAdConfiguration.Value.ClientId;
 
             //If request is Bespoke exchange set and user is Non UKHO
