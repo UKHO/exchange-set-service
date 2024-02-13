@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private bool ValidateCacheAttributeData(string businessUnit, string productCode, string cellName, string editionNumber, string updateNumber)
         {
-            return (businessUnit == cacheConfiguration.Value.CacheBusinessUnit && productCode == cacheConfiguration.Value.CacheProductCode && !string.IsNullOrWhiteSpace(cellName) && !string.IsNullOrWhiteSpace(editionNumber) && !string.IsNullOrWhiteSpace(updateNumber));
+            return (businessUnit == cacheConfiguration.Value.S63CacheBusinessUnit && productCode == cacheConfiguration.Value.CacheProductCode && !string.IsNullOrWhiteSpace(cellName) && !string.IsNullOrWhiteSpace(editionNumber) && !string.IsNullOrWhiteSpace(updateNumber));
         }
     }
 }

@@ -99,5 +99,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
         }
+
+        [Test]
+        public async Task WhenIsUnencryptedParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+                { IsUnencrypted, "test" }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+        }
     }
 }

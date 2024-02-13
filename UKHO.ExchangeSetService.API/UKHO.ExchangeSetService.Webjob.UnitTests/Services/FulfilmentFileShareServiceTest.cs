@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ExchangeSetFileFolder = "V01X01",
                 Info = "INFO",
                 ProductType = "ProductType",
-                BusinessUnit = "ADDS",
+                S63BusinessUnit = "ADDS",
                 ContentInfo = "DVD INFO",
                 Content = "Catalogue",
                 Adc = "ADC"
