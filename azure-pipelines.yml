@@ -9,6 +9,7 @@ parameters:
 trigger:
   - main
   - release/*
+  - develop
 
 schedules:
 - cron: "0 4 * * 1"
@@ -875,7 +876,7 @@ stages:
     dependsOn:
       - Devdeploy
     displayName: vNext IAT Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), variables['Build.SourceBranch'], 'refs/heads/develop', startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
       - deployment: vnextiatDeploy
         displayName: VnexT IAT - deploy terraform and dotnet App
@@ -1026,7 +1027,7 @@ stages:
     dependsOn: 
       - vnextiatDeploy
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), variables['Build.SourceBranch'], 'refs/heads/develop')
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
     jobs:
       - deployment: E2EDeploy
         displayName: vnexte2e - deploy terraform and dotnet App
