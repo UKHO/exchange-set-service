@@ -9,6 +9,7 @@ parameters:
 trigger:
   - main
   - release/*
+  - develop
 
 schedules:
 - cron: "0 4 * * 1"
