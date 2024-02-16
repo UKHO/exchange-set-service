@@ -1,27 +1,27 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForProductVersionWithoutIsUnencryptedParameter : ObjectStorage
+    public class ExchangeSetGenerateFilesForProductVersionWithIncorrectValueForexchangeSetStandardParameterS57 : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            DataHelper = new DataHelper();
             ProductVersionData = new List<ProductVersionModel>
             {
                 DataHelper.GetProductVersionModelData("DE416040", 11, 0)
             };
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsWithoutIsUnencryptedParameterAsync(ProductVersionData, accessToken: EssJwtToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, accessToken: EssJwtToken, "S57");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
             var batchId = await apiResponse.GetBatchId();
             cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithoutIsUnencryptedParameter_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithIncorrectValueForexchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithoutIsUnencryptedParameter_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallProductVersionApiWithIncorrectValueForexchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithoutIsUnencryptedParameter_ThenACatalogFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithIncorrectValueForexchangeSetStandardParameter_ThenACatalogFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithoutIsUnencryptedParameter_ThenASerialEncFileIsGenerated()
+        public void WhenICallProductVersionApiWithIncorrectValueForexchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
@@ -87,9 +87,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithoutIsUnencryptedParameter_ThenEncFilesAreDownloaded()
+        public async Task WhenICallProductVersionApiWithIncorrectValueForexchangeSetStandardParameter_ThenEncFilesAreDownloaded()
         {
-            //Get the product details form sales catalog service
+            //Get the product details form sales catalogue service
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 

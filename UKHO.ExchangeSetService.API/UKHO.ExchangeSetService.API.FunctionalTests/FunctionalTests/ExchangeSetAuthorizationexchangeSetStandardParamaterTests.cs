@@ -8,7 +8,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
-    public class ExchangeSetAuthorizationIsUnencryptedParameterTests : ObjectStorage
+    public class ExchangeSetAuthorizationexchangeSetStandardParameterTests : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
@@ -23,18 +23,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheSinceDateTimeApiWithAValidB2cTokenAndIsUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallTheSinceDateTimeApiWithAValidB2cTokenAndexchangeSetStandardParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssB2CToken, "True");
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssB2CToken, "s57");
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallTheSinceDateTimeApiWithAValidADTokenAndIsUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
+        public async Task WhenICallTheSinceDateTimeApiWithAValidADTokenAndexchangeSetStandardParameterAsTrue_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, "True");
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, "s57");
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
             //verify model structure
@@ -50,18 +50,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductIdentifierApiWithAValidB2cTokenAndIsUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallTheProductIdentifierApiWithAValidB2cTokenAndexchangeSetStandardParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssB2CToken, "True");
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssB2CToken, "s57");
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductIdentifierApiWithAValidADTokenAndIsUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
+        public async Task WhenICallTheProductIdentifierApiWithAValidADTokenAndexchangeSetStandardParameterAsTrue_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssJwtToken, "True");
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssJwtToken, "s57");
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
 
             //verify model structure
@@ -77,28 +77,28 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductVersionApiWithAValidB2cTokenAndIsUnencryptedParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallTheProductVersionApiWithAValidB2cTokenAndexchangeSetStandardParameterAsTrue_ThenAnUnauthorizedResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
                 DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0)
             };
 
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, accessToken: EssB2CToken, "True");
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, accessToken: EssB2CToken, "s57");
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallTheProductVersionApiWithAValidADTokenAndIsUnencryptedParameterAsTrue_ThenACorrectResponseIsReturned()
+        public async Task WhenICallTheProductVersionApiWithAValidADTokenAndexchangeSetStandardParameterAsTrue_ThenACorrectResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
                 DataHelper.GetProductVersionModelData("DE416080", 9, 1)
             };
 
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, accessToken: EssJwtToken, "True");
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, accessToken: EssJwtToken, "s57");
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
 
             //verify model structure
