@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
@@ -43,19 +43,19 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// Only ENCs that are releasable at the date of the request will be returned.
         ///
         /// If valid ENCs are requested then ENC exchange set with baseline data including requested ENCs will be returned. If valid AIO is requested then AIO exchange set with baseline releasable data including requested AIO will be returned.
-        ///  
-        /// For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
-        /// 
-        /// If an ENC has a re-issue, then the latest batch on the FSS will be used. 
-        /// 
+        ///
+        /// For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the s63 specification.
+        ///
+        /// If an ENC has a re-issue, then the latest batch on the FSS will be used.
+        ///
         /// If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
-        /// 
+        ///
         /// If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
         ///
         /// </remarks>
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
-        /// <param name="isUnencrypted" example="false">An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true, the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.</param>
+        /// <param name="exchangeSetStandard" example="s63">An optional exchangeSetStandard parameter determines whether the Exchange Set is encrypted or not. If the value is s63, the Exchange Set will be encrypted. If the value is s57, the Exchange Set will be unencrypted. The default value of exchangeSetStandard is s63, which means the Exchange Set is encrypted by default.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -70,10 +70,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
-        public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] bool isUnencrypted)
+        public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
-                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
+                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
                     if (productIdentifiers == null || productIdentifiers.Length == 0)
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         ProductIdentifier = productIdentifiers,
                         CallbackUri = callbackUri,
-                        IsUnencrypted = isUnencrypted,
+                        ExchangeSetStandard = exchangeSetStandard,
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
@@ -121,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId(), isUnencrypted);
+                }, GetCurrentCorrelationId(), exchangeSetStandard);
         }
 
         /// <summary>
@@ -130,19 +130,19 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <remarks>
         /// Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
         /// ## Business Rules:
-        /// 
+        ///
         /// If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
-        /// 
+        ///
         /// The rules around cancellation, replacements, additional coverage and re-issues apply as defined in the previous section.
         ///
         /// If none of the ENCs requested have an update, then ENC exchange set with releasable baseline data will be returned.
         ///
         /// If none of the AIO requested have an update, then AIO exchange set with releasable baseline data will be returned.
-        /// 
+        ///
         /// </remarks>
         /// <param name="productVersionsRequest">The JSON body containing product versions.</param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
-        /// <param name="isUnencrypted" example="false">An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true, the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.</param>
+        /// <param name="exchangeSetStandard" example="s63">An optional exchangeSetStandard parameter determines whether the Exchange Set is encrypted or not. If the value is s63, the Exchange Set will be encrypted. If the value is s57, the Exchange Set will be unencrypted. The default value of exchangeSetStandard is s63, which means the Exchange Set is encrypted by default.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates for any of the productVersions, then status code 200 ('OK') will be returned with an empty Exchange Set (containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -157,10 +157,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
-        public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] bool isUnencrypted)
+        public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] string exchangeSetStandard)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
-                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
+                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
                     if (productVersionsRequest == null || !productVersionsRequest.Any())
@@ -179,7 +179,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         ProductVersions = productVersionsRequest,
                         CallbackUri = callbackUri,
-                        IsUnencrypted = isUnencrypted,
+                        ExchangeSetStandard = exchangeSetStandard,
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
@@ -208,7 +208,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId(), isUnencrypted);
+                }, GetCurrentCorrelationId(), exchangeSetStandard);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <br/><para><i>Example</i> : Wed, 21 Oct 2015 07:28:00 GMT</para>
         /// </param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
-        /// <param name="isUnencrypted" example="false">An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true, the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.</param>
+        /// <param name="exchangeSetStandard" example="s63">An optional exchangeSetStandard parameter determines whether the Exchange Set is encrypted or not. If the value is s63, the Exchange Set will be encrypted. If the value is s57, the Exchange Set will be unencrypted. The default value of exchangeSetStandard is s63, which means the Exchange Set is encrypted by default.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</response>
         /// <response code="304">Not modified.</response>
         /// <response code="400">Bad Request.</response>
@@ -238,17 +238,17 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
-            [FromQuery] string callbackUri, [FromQuery] bool isUnencrypted)
+            [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
-                "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
+                "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
                     ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
                     {
                         SinceDateTime = sinceDateTime,
                         CallbackUri = callbackUri,
-                        IsUnencrypted = isUnencrypted,
+                        ExchangeSetStandard = exchangeSetStandard,
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
@@ -286,7 +286,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     }
 
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId(), isUnencrypted);
+                }, GetCurrentCorrelationId(), exchangeSetStandard);
         }
     }
 }

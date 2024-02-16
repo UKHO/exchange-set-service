@@ -1,14 +1,14 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
 using FakeItEasy;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
@@ -270,6 +270,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ScsRequestDateTime = DateTime.UtcNow
             };
         }
+
         private static SalesCatalogueResponse GetSalesCatalogueFileSizeResponse()
         {
             return new SalesCatalogueResponse
@@ -303,9 +304,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ScsRequestDateTime = DateTime.UtcNow
             };
         }
-        #endregion
+
+        #endregion GetSalesCatalogueResponse
 
         #region AzureADB2CToken
+
         private AzureAdB2C GetAzureADToken()
         {
             return new AzureAdB2C()
@@ -314,6 +317,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 IssToken = string.Empty
             };
         }
+
         private AzureAdB2C GetAzureB2CToken()
         {
             return new AzureAdB2C()
@@ -331,9 +335,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 IssToken = "https://www.microsoft.com/9b29766b-896f-46df-8f1a-122d7c822d91/v2.0"
             };
         }
-        #endregion AzureB2CToken
+
+        #endregion AzureADB2CToken
 
         #region CreateBatchResponse
+
         private static CreateBatchResponse CreateBatchResponse()
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
@@ -351,6 +357,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ResponseCode = HttpStatusCode.Created
             };
         }
+
         #endregion CreateBatchResponse
 
         #region ProductIdentifiers
@@ -476,7 +483,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -686,7 +693,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
 
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
         }
 
         [Test]
@@ -717,7 +724,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -798,7 +805,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
                 new ProductIdentifierRequest()
@@ -841,7 +848,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
-        #endregion
+        #endregion ProductIdentifiers
 
         #region ProductVersions
 
@@ -952,7 +959,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -1009,7 +1016,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true); A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true); A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -1069,7 +1076,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true); A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true); A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             {
@@ -1209,7 +1216,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureAdToken);
 
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1390,7 +1397,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
-        #endregion
+        #endregion ProductVersions
 
         #region ProductDataSinceDateTime
 
@@ -1596,7 +1603,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<bool>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1757,6 +1764,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
-        #endregion ProductDataSinceDateTime       
+        #endregion ProductDataSinceDateTime
+
     }
 }
