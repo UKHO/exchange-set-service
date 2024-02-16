@@ -1,12 +1,12 @@
-﻿using FakeItEasy;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Response;
@@ -97,10 +97,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         #region StoreSaleCatalogueServiceResponseAsync
+
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(bool isUnencrypted)
+        public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(string exchangeSetStandard)
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string containerName = "testContainer";
@@ -121,11 +122,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, isUnencrypted, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
             Assert.IsTrue(response);
         }
-        #endregion
+
+        #endregion StoreSaleCatalogueServiceResponseAsync
 
         #region DownloadSalesCatalogueResponse
 
@@ -162,6 +164,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(1, response.Products[0].EditionNumber);
             Assert.AreEqual(0, response.Products[0].UpdateNumbers[0].Value);
         }
-        #endregion
+
+        #endregion DownloadSalesCatalogueResponse
     }
 }

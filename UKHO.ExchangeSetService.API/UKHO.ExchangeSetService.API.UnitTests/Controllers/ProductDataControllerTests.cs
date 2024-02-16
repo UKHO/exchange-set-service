@@ -1,21 +1,20 @@
-﻿using FakeItEasy;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using FakeItEasy;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
-
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
@@ -91,9 +90,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         #region PostProductIdentifiers
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("S63")]
+        [TestCase("s57")]
+        [TestCase("S57")]
+        [TestCase("")]
+        [TestCase(null)]
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -114,16 +117,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("Product Identifiers cannot be null or empty.", errors.Errors.Single().Description);
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -141,16 +144,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
               .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null, isUnencrypted);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null, exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -171,7 +174,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { };
             string callbackUri = string.Empty;
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("requestBody", errors.Errors.Single().Source);
@@ -179,9 +182,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsInternalServerError(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsInternalServerError(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -202,15 +205,15 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
+            var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -231,13 +234,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
+            var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
             Assert.AreEqual(304, result.StatusCode);
         }
 
         [Test]
-        [TestCase(false)]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s57")]
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -256,7 +259,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -269,9 +272,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated(string exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -289,14 +292,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
-            var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, isUnencrypted);
+            var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
 
             Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.ESSPostProductIdentifiersRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
         }
 
         #endregion PostProductIdentifiers
@@ -304,9 +307,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         #region ProductVersions
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(string exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("productName", "productName cannot be blank or null.")
             {
@@ -327,7 +330,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(
-              new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } }, "", isUnencrypted);
+              new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } }, "", exchangeSetStandard);
 
             var errors = (ErrorDescription)result.Value;
 
@@ -336,9 +339,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidNullProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidNullProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(string exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.")
             {
@@ -358,7 +361,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>(), "", isUnencrypted);
+            var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>(), "", exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -367,9 +370,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsInternalServerError(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsInternalServerError(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -388,16 +391,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 .Returns(exchangeSetServiceResponse);
 
             var result = (ObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", isUnencrypted);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsNotModified(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsNotModified(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -416,13 +419,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 .Returns(exchangeSetServiceResponse);
 
             var result = (StatusCodeResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", isUnencrypted);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
             Assert.AreEqual(304, result.StatusCode);
         }
 
         [Test]
-        [TestCase(false)]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s57")]
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest(string exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -439,7 +442,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", isUnencrypted);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -452,9 +455,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenValidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsOkResponse(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenValidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsOkResponse(string exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -470,24 +473,24 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(exchangeSetServiceResponse);
 
             var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", isUnencrypted);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
 
             Assert.AreSame(exchangeSetServiceResponse.ExchangeSetResponse, result.Value);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.ESSPostProductVersionsRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
         }
 
-        #endregion
+        #endregion ProductVersions
 
         #region ProductDataSinceDateTime
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest(string exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("SinceDateTime", "Query parameter 'sinceDateTime' is required.")
             {
@@ -507,7 +510,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com", isUnencrypted);
+            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com", exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -516,9 +519,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsInternalServerError(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsInternalServerError(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -536,16 +539,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
-            var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", isUnencrypted);
+            var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsNotModified(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsNotModified(string exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -563,13 +566,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
-            var result = (StatusCodeResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", isUnencrypted);
+            var result = (StatusCodeResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
             Assert.AreEqual(304, result.StatusCode);
         }
 
         [Test]
-        [TestCase(false)]
-        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest(bool isUnencrypted)
+        [TestCase("s57")]
+        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest(string exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -585,7 +588,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", isUnencrypted);
+            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -598,9 +601,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess(bool isUnencrypted)
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess(string exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -615,7 +618,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", isUnencrypted);
+            var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
 
             Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
             Assert.AreEqual(200, result.StatusCode);
@@ -623,8 +626,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
         }
+
         #endregion ProductDataSinceDateTime
     }
 }
