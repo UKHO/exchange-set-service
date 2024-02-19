@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass true for unencrypted and false for encrypted exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard="s63")
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
