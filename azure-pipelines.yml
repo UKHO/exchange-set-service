@@ -57,16 +57,16 @@ stages:
       workspace:
         clean: all
       steps:
-        - task: UseDotNet@2
-          displayName: 'Use .NET SDK'
-          inputs:
-            packageType: sdk
-            useGlobalJson: true
-            workingDirectory: '$(Build.SourcesDirectory)'
+        # - task: UseDotNet@2
+        #   displayName: 'Use .NET SDK'
+        #   inputs:
+        #     packageType: sdk
+        #     useGlobalJson: true
+        #     workingDirectory: '$(Build.SourcesDirectory)'
         - task: UseDotNet@2
           displayName: 'Use .NET 8 for Stryker'
           inputs:
-            packageType: sdk
+            packageType: runtime
             version: 8.x
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
