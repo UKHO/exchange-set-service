@@ -5,4 +5,13 @@
         s63,
         s57
     }
+
+    public enum ExchangeSetStandardForUnitTests
+    {
+        s63,
+        S63,
+        s57,
+        S57,
+        Test
+    }
 }
