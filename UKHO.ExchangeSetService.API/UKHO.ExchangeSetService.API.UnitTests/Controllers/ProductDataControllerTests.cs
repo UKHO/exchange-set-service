@@ -13,6 +13,7 @@ using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -25,12 +26,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         private IHttpContextAccessor fakeHttpContextAccessor;
         private IProductDataService fakeProductDataService;
         private ILogger<ProductDataController> fakeLogger;
-        public const string errorMessage = "Either body is null or malformed";
-        private static readonly string[] exchangeSetStandardForUnitTest =
-        {
-            "s63",
-            "s57"
-        };
+        public const string errorMessage = "Either body is null or malformed";        
 
         [SetUp]
         public void Setup()
@@ -95,8 +91,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         #region PostProductIdentifiers
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -117,15 +114,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString().ToString());
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("Product Identifiers cannot be null or empty.", errors.Errors.Single().Description);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenNullProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -143,15 +141,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
               .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null, exchangeSetStandard);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null, exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenEmptyProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -172,7 +171,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { };
             string callbackUri = string.Empty;
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("requestBody", errors.Errors.Single().Source);
@@ -180,8 +179,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsInternalServerError(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsInternalServerError(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -202,14 +202,15 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
+            var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsNotModified(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -230,13 +231,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
 
-            var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
+            var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
             Assert.AreEqual(304, result.StatusCode);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -255,7 +257,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -268,8 +270,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidProductIdentifiersRequest_ThenPostProductIdentifiersReturnsOkObjectResultCreated(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -287,7 +290,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
-            var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard);
+            var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
 
             Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
 
@@ -302,8 +305,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         #region ProductVersions
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("productName", "productName cannot be blank or null.")
             {
@@ -324,7 +328,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(
-              new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } }, "", exchangeSetStandard);
+              new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } }, "", exchangeSetStandard.ToString());
 
             var errors = (ErrorDescription)result.Value;
 
@@ -333,8 +337,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidNullProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidNullProductVersionRequest_ThenPostProductDataByProductVersionsReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.")
             {
@@ -354,7 +359,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>(), "", exchangeSetStandard);
+            var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>(), "", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -363,8 +368,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsInternalServerError(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsInternalServerError(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -383,15 +389,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 .Returns(exchangeSetServiceResponse);
 
             var result = (ObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsNotModified(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsNotModified(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -410,13 +417,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 .Returns(exchangeSetServiceResponse);
 
             var result = (StatusCodeResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
             Assert.AreEqual(304, result.StatusCode);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -433,7 +441,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -446,8 +454,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenValidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsOkResponse(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidProductVersionRequest_ThenPostProductDataByProductVersionsReturnsOkResponse(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -463,7 +472,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(exchangeSetServiceResponse);
 
             var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard);
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
 
             Assert.AreSame(exchangeSetServiceResponse.ExchangeSetResponse, result.Value);
 
@@ -478,8 +487,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         #region ProductDataSinceDateTime
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("SinceDateTime", "Query parameter 'sinceDateTime' is required.")
             {
@@ -499,7 +509,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com", exchangeSetStandard);
+            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -508,8 +518,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenInvalidSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsInternalServerError(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsInternalServerError(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -527,15 +538,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
-            var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
+            var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsNotModified(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenSinceDateTimeInRequest_ThenGetProductDataSinceDateTimeReturnsNotModified(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = new ExchangeSetResponse() { };
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -553,13 +565,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                .Returns(exchangeSetServiceResponse);
 
-            var result = (StatusCodeResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
+            var result = (StatusCodeResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
             Assert.AreEqual(304, result.StatusCode);
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -575,7 +588,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
+            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(400, result.StatusCode);
@@ -588,8 +601,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCaseSource(nameof(exchangeSetStandardForUnitTest))]
-        public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeReturnSuccess(ExchangeSetStandard exchangeSetStandard)
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -604,7 +618,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard);
+            var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
 
             Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
             Assert.AreEqual(200, result.StatusCode);
