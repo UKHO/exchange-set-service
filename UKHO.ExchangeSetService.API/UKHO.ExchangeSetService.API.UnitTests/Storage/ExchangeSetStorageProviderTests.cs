@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
@@ -66,9 +67,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Storage
         #endregion GetSalesCatalogueResponse
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenValidBatchId_ThenSaveSalesCatalogueResponseReturnsTrue(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidBatchId_ThenSaveSalesCatalogueResponseReturnsTrue(ExchangeSetStandard exchangeSetStandard)
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             var salesCatalogueResponse = GetSalesCatalogueResponse();
@@ -79,14 +80,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Storage
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
             A.CallTo(() => fakeAzureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueProductResponse>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, cancellationToken, A<string>.Ignored, fakeScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
-            isSCSResponseAdded = await service.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
+            isSCSResponseAdded = await service.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard.ToString(), correlationId, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
             Assert.AreEqual(true, isSCSResponseAdded);
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenInvalidBatchId_ThenSaveSalesCatalogueResponseReturnsFalse(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidBatchId_ThenSaveSalesCatalogueResponseReturnsFalse(ExchangeSetStandard exchangeSetStandard)
         {
             string batchId = null;
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
@@ -96,7 +97,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Storage
             { RequestedAioProductCount = 0, RequestedProductCount = 0 };
             CancellationToken cancellationToken = CancellationToken.None;
             A.CallTo(() => fakeAzureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueProductResponse>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, cancellationToken, A<string>.Ignored, fakeScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(false);
-            bool isSCSResponseAdded = await service.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
+            bool isSCSResponseAdded = await service.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard.ToString(), correlationId, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
             Assert.AreEqual(false, isSCSResponseAdded);
         }
     }
