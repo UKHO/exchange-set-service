@@ -42,7 +42,7 @@ module "user_identity" {
 
 module "app_insights" {
   source              = "./Modules/AppInsights"
-  name                = "${local.service_name}-${local.env_name}-insights"
+  name                = "${local.service_name}-${local.env_name}-insights${var.suffix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   tags                = local.tags
@@ -50,7 +50,7 @@ module "app_insights" {
 
 module "eventhub" {
   source              = "./Modules/EventHub"
-  name                = "${local.service_name}-${local.env_name}-events"
+  name                = "${local.service_name}-${local.env_name}-events${var.suffix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   logstashStorageName = lower("${local.service_name}logstash${local.env_name}")
@@ -166,6 +166,7 @@ module "fulfilment_keyvaults" {
   service_name                              = local.service_name
   resource_group_name                       = azurerm_resource_group.rg.name
   env_name                                  = local.env_name
+  suffix                                    = ${var.suffix}    
   tenant_id                                 = module.user_identity.ess_service_identity_tenant_id
   location                                  = azurerm_resource_group.rg.location
   allowed_ips                               = var.allowed_ips 
@@ -209,7 +210,7 @@ module "fulfilment_keyvaults" {
 
 module "azure-dashboard" {
   source         = "./Modules/azuredashboard"
-  name           = "ESS-${local.env_name}-Monitoring-Dashboard"
+  name           = "ESS-${local.env_name}-Monitoring-Dashboard${var.suffix}"
   location       = azurerm_resource_group.rg.location
   environment    = local.env_name
   resource_group = azurerm_resource_group.rg

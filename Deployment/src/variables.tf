@@ -11,8 +11,8 @@ variable "resource_group_name" {
 locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
-web_app_name		    = "${local.service_name}-${local.env_name}-webapp"
-  key_vault_name		= "${local.service_name}-ukho-${local.env_name}-kv"
+  web_app_name		    = "${local.service_name}-${local.env_name}-webapp${var.suffix}"
+  key_vault_name		= "${local.service_name}-ukho-${local.env_name}-kv${var.suffix}"
   tags = {
     SERVICE          = "Exchange Set Service"
     ENVIRONMENT      = local.env_name
@@ -86,4 +86,8 @@ variable "elastic_apm_server_url" {
 }
 
 variable "elastic_apm_api_key" {
+}
+
+variable "suffix" {
+  default     = ""
 }
