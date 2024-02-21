@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandard.s63.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString());
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandard.s57.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandard.s63.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString());
         }
 
         [Test]
@@ -116,11 +116,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandard.s57.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
 
         [Test]
-        public async Task WhenExchangeSetStandardParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        public async Task WhenExchangeSetStandardParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
@@ -138,7 +138,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
         
         [Test]
-        public async Task WhenExchangeSetStandardParameterIsEmptyAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        public async Task WhenExchangeSetStandardParameterIsEmptyAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
@@ -173,7 +173,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandard.s57.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
     }
 }
