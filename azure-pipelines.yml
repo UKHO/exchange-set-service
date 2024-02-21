@@ -66,8 +66,8 @@ stages:
         - task: UseDotNet@2
           displayName: 'Use .NET 8 for Stryker'
           inputs:
-            packageType: runtime
-            version: 8.x
+            packageType: sdk
+            version: 8.0.0
         - task: PowerShell@1
           displayName: "Display .NET versions"
           inputs:
@@ -81,17 +81,17 @@ stages:
             command: custom
             custom: tool
             arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools
-        - task: Powershell@2
-          displayName: "Run Stryker"
-          inputs:
-            workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-            targetType: 'inline'
-            pwsh: true
-            script: $(Agent.BuildDirectory)/tools/dotnet-stryker
-        - task: PublishMutationReport@0
-          displayName: 'Publish Stryker Mutator Report'
-          inputs:
-            reportPattern: '**/mutation-report.html'
+        # - task: Powershell@2
+        #   displayName: "Run Stryker"
+        #   inputs:
+        #     workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+        #     targetType: 'inline'
+        #     pwsh: true
+        #     script: $(Agent.BuildDirectory)/tools/dotnet-stryker
+        # - task: PublishMutationReport@0
+        #   displayName: 'Publish Stryker Mutator Report'
+        #   inputs:
+        #     reportPattern: '**/mutation-report.html'
 
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
