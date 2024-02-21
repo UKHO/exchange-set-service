@@ -57,13 +57,12 @@ stages:
       workspace:
         clean: all
       steps:
-        - checkout: none
-        # - task: UseDotNet@2
-        #   displayName: 'Use .NET SDK'
-        #   inputs:
-        #     packageType: sdk
-        #     useGlobalJson: true
-        #     workingDirectory: '$(Build.SourcesDirectory)'
+        - task: UseDotNet@2
+          displayName: 'Use .NET SDK'
+          inputs:
+            packageType: sdk
+            useGlobalJson: true
+            workingDirectory: '$(Build.SourcesDirectory)'
         - task: UseDotNet@2
           displayName: 'Use .NET 8 for Stryker'
           inputs:
@@ -74,25 +73,26 @@ stages:
           inputs:
             scriptType: inlineScript
             inlineScript: |
-              dotnet --list-sdks
-              dotnet --list-runtimes
+              dotnet new globaljson --sdk-version 8.x
+              # dotnet --list-sdks
+              # dotnet --list-runtimes
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
           inputs:
             command: custom
             custom: tool
             arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools
-        # - task: Powershell@2
-        #   displayName: "Run Stryker"
-        #   inputs:
-        #     workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
-        #     targetType: 'inline'
-        #     pwsh: true
-        #     script: $(Agent.BuildDirectory)/tools/dotnet-stryker
-        # - task: PublishMutationReport@0
-        #   displayName: 'Publish Stryker Mutator Report'
-        #   inputs:
-        #     reportPattern: '**/mutation-report.html'
+        - task: Powershell@2
+          displayName: "Run Stryker"
+          inputs:
+            workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
+            targetType: 'inline'
+            pwsh: true
+            script: $(Agent.BuildDirectory)/tools/dotnet-stryker
+        - task: PublishMutationReport@0
+          displayName: 'Publish Stryker Mutator Report'
+          inputs:
+            reportPattern: '**/mutation-report.html'
 
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
