@@ -35,10 +35,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
+            ////var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+            ////var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
 
-            return downloadFolderPath;
+            return extractDownloadedFolder;
         }
 
         public static void CheckSerialEncFileContent(string inputFile)
@@ -248,6 +248,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static void DeleteDirectory(string fileName)
         {
             string path = Path.GetTempPath();
+            if(Directory.Exists(Path.Combine(path, "ESSTEMP")))
+            {
+                Directory.Delete(Path.Combine(path, "ESSTEMP"),true);
+            }
 
             if (Directory.Exists(path) && File.Exists(Path.Combine(path, fileName)))
             {
