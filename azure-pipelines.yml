@@ -69,12 +69,18 @@ stages:
             packageType: sdk
             version: 8.0.x
         - task: PowerShell@1
-          displayName: "Update global.json for .NET"
+          displayName: "Create global.json for .NET"
           inputs:
             scriptType: inlineScript
             workingFolder: $(Agent.TempDirectory)
             inlineScript: |
               dotnet new globaljson --sdk-version 8.0.x
+        - task: PowerShell@1
+          displayName: "Display global.json for .NET"
+          inputs:
+            scriptType: inlineScript
+            inlineScript: |
+              get-content '$(Agent.TempDirectory)\global.json'
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
           inputs:
