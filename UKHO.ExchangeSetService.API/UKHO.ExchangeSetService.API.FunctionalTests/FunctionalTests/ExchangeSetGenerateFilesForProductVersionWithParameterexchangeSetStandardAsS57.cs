@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
-                var checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
+                var checkFile = FssBatchHelper.CheckforFileExist(downloadedFolderPath, Config.ExchangeSetSerialEncFile);
                 Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {downloadedFolderPath}");
 
                 //Verify Serial.Enc file content
@@ -124,7 +124,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     foreach (var updateNumber in product.UpdateNumbers)
                     {
                         await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
-
                     }
                 }
             }

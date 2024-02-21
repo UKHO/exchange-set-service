@@ -124,7 +124,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     foreach (var updateNumber in product.UpdateNumbers)
                     {
                         await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
-
                     }
                 }
             }
