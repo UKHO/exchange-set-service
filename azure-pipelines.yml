@@ -63,6 +63,11 @@ stages:
             packageType: sdk
             useGlobalJson: true
             workingDirectory: '$(Build.SourcesDirectory)'
+        - task: UseDotNet@2
+          displayName: 'Use .NET 8 for Stryker'
+          inputs:
+            packageType: runtime
+            version: 8.x
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
           inputs:
@@ -77,7 +82,7 @@ stages:
             pwsh: true
             script: $(Agent.BuildDirectory)/tools/dotnet-stryker
         - task: PublishMutationReport@0
-          displayName: 'Publish Strkyer Mutator Report'
+          displayName: 'Publish Stryker Mutator Report'
           inputs:
             reportPattern: '**/mutation-report.html'
 
