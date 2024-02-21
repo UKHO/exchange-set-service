@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
+using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -20,6 +21,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [ServiceFilter(typeof(BespokeExchangeSetAuthorizationFilterAttribute))]
     public class ProductDataController : BaseController<ProductDataController>
     {
         private readonly IProductDataService productDataService;
@@ -53,6 +55,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// </remarks>
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
+        /// <param name="isUnencrypted" example="false">An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true, the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -67,16 +70,17 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
-        public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri)
+        public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] bool isUnencrypted)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
-                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}", 
-                async() => {
+                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
+                async () =>
+                {
                     if (productIdentifiers == null || productIdentifiers.Length == 0)
                     {
                         var error = new List<Error>
                         {
-                            new Error()
+                            new()
                             {
                                 Source = "requestBody",
                                 Description = "Either body is null or malformed."
@@ -88,6 +92,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         ProductIdentifier = productIdentifiers,
                         CallbackUri = callbackUri,
+                        IsUnencrypted = isUnencrypted,
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
@@ -116,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId());
+                }, GetCurrentCorrelationId(), isUnencrypted);
         }
 
         /// <summary>
@@ -137,6 +142,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// </remarks>
         /// <param name="productVersionsRequest">The JSON body containing product versions.</param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
+        /// <param name="isUnencrypted" example="false">An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true, the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates for any of the productVersions, then status code 200 ('OK') will be returned with an empty Exchange Set (containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.</response>
         /// <response code="400">Bad Request.</response>
         /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
@@ -151,16 +157,17 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
-        public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri)
+        public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] bool isUnencrypted)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
-                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId}",
-                async () => {
+                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
+                async () =>
+                {
                     if (productVersionsRequest == null || !productVersionsRequest.Any())
                     {
                         var error = new List<Error>
                         {
-                            new Error()
+                            new()
                             {
                                 Source = "requestBody",
                                 Description = "Either body is null or malformed."
@@ -168,10 +175,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         };
                         return BuildBadRequestErrorResponse(error);
                     }
-                    ProductDataProductVersionsRequest request = new ProductDataProductVersionsRequest
+                    ProductDataProductVersionsRequest request = new()
                     {
                         ProductVersions = productVersionsRequest,
                         CallbackUri = callbackUri,
+                        IsUnencrypted = isUnencrypted,
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
@@ -186,7 +194,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                             return BuildBadRequestErrorResponse(errors);
                         }
                     }
-                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    AzureAdB2C azureAdB2C = new()
                     {
                         AudToken = TokenAudience,
                         IssToken = TokenIssuer
@@ -200,7 +208,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId());            
+                }, GetCurrentCorrelationId(), isUnencrypted);
         }
 
         /// <summary>
@@ -211,6 +219,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <br/><para><i>Example</i> : Wed, 21 Oct 2015 07:28:00 GMT</para>
         /// </param>
         /// <param name="callbackUri">An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. If not specified, then no call back notification will be sent.</param>
+        /// <param name="isUnencrypted" example="false">An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true, the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.</param>
         /// <response code="200">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set. If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</response>
         /// <response code="304">Not modified.</response>
         /// <response code="400">Bad Request.</response>
@@ -229,15 +238,17 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
-            [FromQuery] string callbackUri)
+            [FromQuery] string callbackUri, [FromQuery] bool isUnencrypted)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
-                "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId}",
-                async () => {
+                "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and isUnencrypted:{isUnencrypted}",
+                async () =>
+                {
                     ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
                     {
                         SinceDateTime = sinceDateTime,
                         CallbackUri = callbackUri,
+                        IsUnencrypted = isUnencrypted,
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
@@ -245,7 +256,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         var error = new List<Error>
                         {
-                            new Error()
+                            new()
                             {
                                 Source = "sinceDateTime",
                                 Description = "Query parameter 'sinceDateTime' is required."
@@ -260,7 +271,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         return BuildBadRequestErrorResponse(errors);
                     }
-                    AzureAdB2C azureAdB2C = new AzureAdB2C()
+                    AzureAdB2C azureAdB2C = new()
                     {
                         AudToken = TokenAudience,
                         IssToken = TokenIssuer
@@ -275,8 +286,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     }
 
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId());
-            
+                }, GetCurrentCorrelationId(), isUnencrypted);
         }
     }
 }

@@ -161,7 +161,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<IEnumerable<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string folderName)
         {
-            string uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}'";
+            string uri = $"{fileShareServiceConfig.Value.BaseUrl}/batch?$filter=$batch{fileShareServiceConfig.Value.ProductType} businessUnit eq '{fileShareServiceConfig.Value.S63BusinessUnit}'";
 
             if (folderName == fileShareServiceConfig.Value.Info)
             {
