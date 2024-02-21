@@ -67,18 +67,20 @@ stages:
           displayName: 'Use .NET 8 for Stryker'
           inputs:
             packageType: sdk
-            version: 8.x
+            version: 8.0.x
         - task: PowerShell@1
           displayName: "Update global.json for .NET"
           inputs:
             scriptType: inlineScript
+            workingFolder: $(Agent.TempDirectory)
             inlineScript: |
-              dotnet new globaljson --force --sdk-version 8.x
+              dotnet new globaljson --sdk-version 8.0.x
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
           inputs:
             command: custom
             custom: tool
+            workingDirectory: $(Agent.TempDirectory)
             arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools
         - task: Powershell@2
           displayName: "Run Stryker"
