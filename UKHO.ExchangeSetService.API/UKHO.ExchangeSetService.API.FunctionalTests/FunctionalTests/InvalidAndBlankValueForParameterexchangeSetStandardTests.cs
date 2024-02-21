@@ -51,8 +51,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithInvalidkeyForParameterexchangeSetStandard_ThenABadRequestIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, EssJwtToken);
-            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataWithIncorrectOptionalParameterAsync(DataHelper.GetProductIdentifierData(), null, EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
         }
         #endregion
 

@@ -248,9 +248,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static void DeleteDirectory(string fileName)
         {
             string path = Path.GetTempPath();
-            if(Directory.Exists(Path.Combine(path, "ESSTEMP")))
+            if(Directory.Exists(Path.Combine(path, Config.BESSConfig.TempFolderName)))
             {
-                Directory.Delete(Path.Combine(path, "ESSTEMP"),true);
+                Directory.Delete(Path.Combine(path, Config.BESSConfig.TempFolderName),true);
             }
 
             if (Directory.Exists(path) && File.Exists(Path.Combine(path, fileName)))
