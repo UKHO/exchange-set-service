@@ -14,16 +14,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     public class ExchangeSetGenerateFilesForSinceDateTimeWithParameterexchangeSetStandardAsS57 : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
-        public List<string> downloadedFolderPathList = new();
+        private readonly List<string> downloadedFolderPathList = new();
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
             DataHelper = new DataHelper();
-            foreach (string data in Config.BESSConfig.S57ExchangeSetTestData)
+            foreach (var exchangeSetStandard in Config.BESSConfig.S57ExchangeSetTestData)
             {
-                var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, data);
+                var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
                 var batchId = await apiResponse.GetBatchId();
                 cleanUpBatchIdList.Add(batchId);

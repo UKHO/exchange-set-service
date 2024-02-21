@@ -76,7 +76,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             return extractPath;
-
         }
 
         private static void WriteToConsole(string message)

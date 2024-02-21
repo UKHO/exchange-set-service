@@ -25,9 +25,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheSinceDateTimeApiWithInvalidValueForParameterexchangeSetStandard_ThenABadRequestIsReturned()
         {
-            foreach (var data in Config.BESSConfig.InvalidExchangeSetTestData)
+            foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {
-                var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, EssJwtToken, data);
+                var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
             }
         }
@@ -39,9 +39,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithInvalidValueForParameterexchangeSetStandard_ThenABadRequestIsReturned()
         {
-            foreach (var data in Config.BESSConfig.InvalidExchangeSetTestData)
+            foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {
-                var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, EssJwtToken, data);
+                var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
             }
         }
@@ -62,14 +62,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithInvalidValueForParameterexchangeSetStandard_ThenABadRequestIsReturned()
         {
-            foreach (var data in Config.BESSConfig.InvalidExchangeSetTestData)
+            foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {
                 List<ProductVersionModel> productVersionData = new()
                 {
                 DataHelper.GetProductVersionModelData("DE4NO18Q", 1, 0)
                 };
 
-                var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, EssJwtToken, data);
+                var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
             }
         }

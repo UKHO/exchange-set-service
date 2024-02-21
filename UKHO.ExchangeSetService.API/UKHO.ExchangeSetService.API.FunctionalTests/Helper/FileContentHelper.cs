@@ -35,9 +35,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            ////var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            ////var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
-
             return extractDownloadedFolder;
         }
 
@@ -270,7 +267,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     File.Delete(Path.Combine(path, fileName));
                 }
             }
-
         }
 
         public static void CheckMediaTxtFileContent(string inputFile, int folderNumber)

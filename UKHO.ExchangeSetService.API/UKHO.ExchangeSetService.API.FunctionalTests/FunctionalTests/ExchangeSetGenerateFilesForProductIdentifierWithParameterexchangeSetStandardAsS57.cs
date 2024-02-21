@@ -12,15 +12,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     public class ExchangeSetGenerateFilesForProductIdentifierWithParameterexchangeSetStandardAsS57 : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
-        public List<string> downloadedFolderPathList = new();
+        private readonly List<string> downloadedFolderPathList = new();
             
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
             DataHelper = new DataHelper();
-            foreach(string data in Config.BESSConfig.S57ExchangeSetTestData)
+            foreach(var exchangeSetStandard in Config.BESSConfig.S57ExchangeSetTestData)
             {
-                var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), null, accessToken: EssJwtToken, data);
+                var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), null, accessToken: EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
                 var batchId = await apiResponse.GetBatchId();
                 cleanUpBatchIdList.Add(batchId);
