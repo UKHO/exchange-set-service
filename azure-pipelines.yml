@@ -84,11 +84,11 @@ stages:
             custom: tool
             arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools
         - task: PowerShell@1
-          displayName: "Try Strykey"
+          displayName: "Try Stryker"
           inputs:
             scriptType: inlineScript
             inlineScript: |
-              dotnet-stryker
+              $(Agent.BuildDirectory)/tools/dotnet-stryker
         # - task: Powershell@2
         #   displayName: "Run Stryker"
         #   inputs:
