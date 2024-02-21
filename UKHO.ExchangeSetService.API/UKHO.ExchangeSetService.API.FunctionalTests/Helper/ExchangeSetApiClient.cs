@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
-        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 for s63 standard exchange set and s57 for s57 standard exchange set</param>
+        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="productVersionModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
-        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 for s63 standard exchange set and s57 for s57 standard exchange set</param>
+        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="productIdentifierModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
-        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 for s63 standard exchange set and s57 for s57 standard exchange set</param>
+        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
