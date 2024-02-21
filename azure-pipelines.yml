@@ -67,7 +67,7 @@ stages:
           displayName: 'Use .NET 8 for Stryker'
           inputs:
             packageType: sdk
-            version: 8.0.0
+            version: 8.0.100
         - task: PowerShell@1
           displayName: "Display .NET versions"
           inputs:
