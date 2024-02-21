@@ -81,6 +81,7 @@ stages:
             scriptType: inlineScript
             inlineScript: |
               get-content '$(Agent.TempDirectory)\global.json'
+              get-content '$(Build.SourcesDirectory)\global.json'
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
           inputs:
