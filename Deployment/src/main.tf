@@ -36,7 +36,7 @@ module "user_identity" {
   source              = "./Modules/UserIdentity"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  suffix              = ${var.suffix}
+  suffix              = var.suffix
   env_name            = local.env_name
   tags                = local.tags
 }
@@ -55,7 +55,7 @@ module "eventhub" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   logstashStorageName = lower("${local.service_name}logstash${local.env_name}${var.suffix}")
-  suffix              = ${var.suffix}
+  suffix              = var.suffix
   m_spoke_subnet      = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
   allowed_ips         = var.allowed_ips  
@@ -170,7 +170,7 @@ module "fulfilment_keyvaults" {
   service_name                              = local.service_name
   resource_group_name                       = azurerm_resource_group.rg.name
   env_name                                  = local.env_name
-  suffix                                    = ${var.suffix}    
+  suffix                                    = var.suffix  
   tenant_id                                 = module.user_identity.ess_service_identity_tenant_id
   location                                  = azurerm_resource_group.rg.location
   allowed_ips                               = var.allowed_ips 
