@@ -1,35 +1,36 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
-using System.Collections.Generic;
-using System;
-using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForSinceDateTimeWithIncorrectValueForexchangeSetStandardParameterS57 : ObjectStorage
+    public class ExchangeSetGenerateFilesForProductVersionWithoutParameterexchangeSetStandard : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
-        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, "S57");
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
+            DataHelper = new DataHelper();
+            ProductVersionData = new List<ProductVersionModel>
+            {
+                DataHelper.GetProductVersionModelData("DE416040", 11, 0)
+            };
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsWithoutexchangeSetStandardParameterAsync(ProductVersionData, accessToken: EssJwtToken);
             var batchId = await apiResponse.GetBatchId();
             cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
         }
 
-        //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
+         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallSinceDateTimeApiWithIncorrectValueForexchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenAProductTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
@@ -43,39 +44,38 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
         }
 
-        //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
+         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallSinceDateTimeApiWithIncorrectValueForexchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenAReadMeTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
-            //Verify README.TXT file content
+            //Verify the README.TXT file content
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
-        //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
+         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallSinceDateTimeApiWithIncorrectValueForexchangeSetStandardParameter_ThenACatalogFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenACatalogFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
+            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
-            //Verify Catalog file content
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
+            //Verify the Catalog file content
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
-
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
             FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
         }
 
-        //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
+         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallSinceDateTimeApiWithIncorrectValueForexchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
+        public void WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenASerialEncFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
@@ -84,13 +84,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckSerialEncFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetSerialEncFile));
         }
 
-        //PBI:139801 : ESS API : Create and add optional parameter IsUnencrypted, add validation and Update Swagger Doc
+         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallSinceDateTimeApiWithIncorrectValueForexchangeSetStandardParameter_ThenEncFilesAreDownloaded()
+        public async Task WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenEncFilesAreDownloaded()
         {
             //Get the product details form sales catalog service
-            var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
@@ -100,13 +100,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 var productName = product.ProductName;
                 var editionNumber = product.EditionNumber;
 
-                //Enc file download verification
+                //Enc file downloaded verification
                 foreach (var updateNumber in product.UpdateNumbers)
                 {
                     await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
-
                 }
-
             }
         }
 

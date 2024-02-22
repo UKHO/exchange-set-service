@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -20,6 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string ExchangeSetCatalogueFile;
         public string DirectoryPath;
         public int FileDownloadWaitTime { get; set; }
+       
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
         public FileShareService FssConfig = new FileShareService();
         public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
@@ -27,6 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public CacheConfiguration ClearCacheConfig = new CacheConfiguration();
         public PeriodicOutputServiceConfiguration POSConfig = new PeriodicOutputServiceConfiguration();
         public AioConfiguration AIOConfig = new AioConfiguration();
+        public BessConfiguration BESSConfig = new BessConfiguration();
 
         public class EssAuthorizationTokenConfiguration
         {
@@ -103,6 +106,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string InvalidAioCellName { get; set; }
         }
 
+        public class BessConfiguration
+        {
+            public List<string> S63ExchangeSetTestData { get; set; }
+            public List<string> S57ExchangeSetTestData { get; set; }
+            public List<string> InvalidExchangeSetTestData { get; set; }
+            public string TempFolderName { get; set; }
+        }
+
         public TestConfiguration()
         {
             ConfigurationRoot = new ConfigurationBuilder()
@@ -128,6 +139,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
             ConfigurationRoot.Bind("PeriodicOutputServiceConfiguration", POSConfig);
             ConfigurationRoot.Bind("AioConfiguration", AIOConfig);
+            ConfigurationRoot.Bind("BessConfiguration", BESSConfig);
         }
     }
 }

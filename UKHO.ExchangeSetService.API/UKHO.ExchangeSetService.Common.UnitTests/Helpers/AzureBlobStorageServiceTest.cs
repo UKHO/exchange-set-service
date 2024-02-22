@@ -9,6 +9,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
@@ -99,9 +100,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region StoreSaleCatalogueServiceResponseAsync
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(string exchangeSetStandard)
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(ExchangeSetStandard exchangeSetStandard)
         {
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string containerName = "testContainer";
@@ -122,7 +123,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard, correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard.ToString(), correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
             Assert.IsTrue(response);
         }

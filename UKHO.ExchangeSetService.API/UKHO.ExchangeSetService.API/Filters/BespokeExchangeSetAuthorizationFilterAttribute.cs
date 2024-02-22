@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 
 namespace UKHO.ExchangeSetService.API.Filters
 {
@@ -25,38 +26,24 @@ namespace UKHO.ExchangeSetService.API.Filters
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
-            var azureADClientId = azureAdConfiguration.Value.ClientId;
-            string exchangeSetStandard = string.Empty;
+            var azureAdClientId = azureAdConfiguration.Value.ClientId;
 
             context.HttpContext.Request.Query.TryGetValue(ExchangeSetStandard, out var queryStringValue);
-            if (context.HttpContext.Request.Query.ContainsKey(ExchangeSetStandard))
-            {
-                exchangeSetStandard = Convert.ToString(queryStringValue).Trim('"');
-            }
+            var exchangeSetStandard = context.HttpContext.Request.Query.ContainsKey(ExchangeSetStandard)
+                ? Convert.ToString(queryStringValue).Trim('"')
+                : Common.Models.Enums.ExchangeSetStandard.s63.ToString();
 
-            if (string.IsNullOrEmpty(exchangeSetStandard))
+            if (string.IsNullOrEmpty(exchangeSetStandard) || !Enum.TryParse(exchangeSetStandard, true, out ExchangeSetStandard parsedEnum))
             {
-                exchangeSetStandard = Common.ExchangeSetStandard.s63.ToString();
-                context.ActionArguments[ExchangeSetStandard] = exchangeSetStandard;
+                context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                 return;
             }
-            else
-            {
-                Common.ExchangeSetStandard parsedEnum;
-                if (!Enum.TryParse(exchangeSetStandard, true, out parsedEnum))
-                {
-                    exchangeSetStandard = Common.ExchangeSetStandard.s63.ToString();
-                    context.ActionArguments[ExchangeSetStandard] = exchangeSetStandard;
-                }
-                else
-                {
-                    context.ActionArguments[ExchangeSetStandard] = parsedEnum.ToString();
-                }
-            }
-
+            context.ActionArguments[ExchangeSetStandard] = parsedEnum.ToString();
+            
             //If request is Bespoke exchange set and user is Non UKHO
-            if (string.Equals(exchangeSetStandard, Common.ExchangeSetStandard.s57.ToString(), StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(exchangeSetStandard, Common.Models.Enums.ExchangeSetStandard.s57.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                if (azureADClientId != tokenAudience)
+                if (azureAdClientId != tokenAudience)
                 {
                     context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return;
