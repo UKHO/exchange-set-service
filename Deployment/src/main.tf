@@ -91,7 +91,7 @@ module "fulfilment_webapp" {
   small_exchange_set_subnets    = data.azurerm_subnet.small_exchange_set_subnet[*].id
   medium_exchange_set_subnets   = data.azurerm_subnet.medium_exchange_set_subnet[*].id
   large_exchange_set_subnets    = data.azurerm_subnet.large_exchange_set_subnet[*].id
-  suffix                        = ${var.suffix}
+  suffix                        = var.suffix
   exchange_set_config           = local.config_data.ESSFulfilmentConfiguration
   env_name                      = local.env_name
   service_name                  = local.service_name
@@ -122,7 +122,7 @@ module "fulfilment_storage" {
   small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
   medium_exchange_set_subnets           = data.azurerm_subnet.medium_exchange_set_subnet[*].id
   large_exchange_set_subnets            = data.azurerm_subnet.large_exchange_set_subnet[*].id
-  suffix                                = ${var.suffix}
+  suffix                                = var.suffix
   m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
   agent_subnet                          = data.azurerm_subnet.agent_subnet.id
   exchange_set_config                   = local.config_data.ESSFulfilmentConfiguration
@@ -233,5 +233,5 @@ module "cache_storage" {
   agent_subnet                          = data.azurerm_subnet.agent_subnet.id
   env_name                              = local.env_name
   service_name                          = local.service_name
-  suffix                                = ${var.suffix}
+  suffix                                = var.suffix
 }
