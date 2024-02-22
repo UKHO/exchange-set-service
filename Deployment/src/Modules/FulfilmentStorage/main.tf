@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "small_exchange_set_storage" {
-  name = lower("${var.service_name}${var.env_name}sxsstorageukho")
+  name = lower("${var.service_name}${var.env_name}sxsstorageukho${var.suffix}")
   resource_group_name = var.resource_group_name
   location = var.location
   account_tier = "Standard"
@@ -30,7 +30,7 @@ resource "azurerm_storage_queue" "small_exchange_set_storage_queue" {
 #Medium exchange set storage
 
 resource "azurerm_storage_account" "medium_exchange_set_storage" {
-  name = lower("${var.service_name}${var.env_name}mxsstorageukho")
+  name = lower("${var.service_name}${var.env_name}mxsstorageukho${var.suffix}")
   resource_group_name = var.resource_group_name
   location = var.location
   account_tier = "Standard"
@@ -61,7 +61,7 @@ resource "azurerm_storage_queue" "medium_exchange_set_storage_queue" {
 #Large exchange set storage
 
 resource "azurerm_storage_account" "large_exchange_set_storage" {
-  name = lower("${var.service_name}${var.env_name}lxsstorageukho")
+  name = lower("${var.service_name}${var.env_name}lxsstorageukho${var.suffix}")
   resource_group_name = var.resource_group_name
   location = var.location
   account_tier = "Standard"
