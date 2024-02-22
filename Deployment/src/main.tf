@@ -36,6 +36,7 @@ module "user_identity" {
   source              = "./Modules/UserIdentity"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
+  suffix              = ${var.suffix}
   env_name            = local.env_name
   tags                = local.tags
 }
@@ -53,7 +54,8 @@ module "eventhub" {
   name                = "${local.service_name}-${local.env_name}-events${var.suffix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  logstashStorageName = lower("${local.service_name}logstash${local.env_name}")
+  logstashStorageName = lower("${local.service_name}logstash${local.env_name}${var.suffix}")
+  suffix              = ${var.suffix}
   m_spoke_subnet      = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
   allowed_ips         = var.allowed_ips  
