@@ -10,7 +10,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     public class ValidateAuthorizationForAPIsWithParameterexchangeSetStandardTests : ObjectStorage
     {
-        private readonly List<string> cleanUpBatchIdList = new();
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [SetUp]
@@ -39,10 +38,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
-
-            //Get the BatchId
-            var fssBatchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(fssBatchId);
         }
         #endregion
 
@@ -66,10 +61,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
-
-            //Get the BatchId
-            var fssBatchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(fssBatchId);
         }
         #endregion
 
@@ -103,22 +94,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
-
-            //Get the BatchId
-            var fssBatchId = await apiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(fssBatchId);
         }
         #endregion
-
-        [OneTimeTearDown]
-        public async Task GlobalTeardown()
-        {
-            if (cleanUpBatchIdList?.Count > 0)
-            {
-                //Clean up batches from local folder 
-                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
-                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned for clean up batches, instead of the expected 200.");
-            }
-        }
     }
 }
