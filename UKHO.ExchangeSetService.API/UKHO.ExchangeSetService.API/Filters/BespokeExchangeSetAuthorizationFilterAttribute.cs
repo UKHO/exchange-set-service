@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -30,16 +31,16 @@ namespace UKHO.ExchangeSetService.API.Filters
 
             context.HttpContext.Request.Query.TryGetValue(ExchangeSetStandard, out var queryStringValue);
             var exchangeSetStandard = context.HttpContext.Request.Query.ContainsKey(ExchangeSetStandard)
-                ? Convert.ToString(queryStringValue).Trim('"')
+                ? Convert.ToString(queryStringValue)
                 : Common.Models.Enums.ExchangeSetStandard.s63.ToString();
 
-            if (string.IsNullOrEmpty(exchangeSetStandard) || !Enum.TryParse(exchangeSetStandard, true, out ExchangeSetStandard parsedEnum))
+            if (string.IsNullOrEmpty(exchangeSetStandard) || !EnumTryParseStrict(exchangeSetStandard, out ExchangeSetStandard parsedEnum, true))
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                 return;
+                return;
             }
             context.ActionArguments[ExchangeSetStandard] = parsedEnum.ToString();
-            
+
             //If request is Bespoke exchange set and user is Non UKHO
             if (string.Equals(exchangeSetStandard, Common.Models.Enums.ExchangeSetStandard.s57.ToString(), StringComparison.OrdinalIgnoreCase))
             {
@@ -50,6 +51,23 @@ namespace UKHO.ExchangeSetService.API.Filters
                 }
             }
             await next();
+        }
+
+        public static bool EnumTryParseStrict<TEnum>(string value, out TEnum result, bool ignoreCase = false) where TEnum : struct, Enum
+        {
+            if (value.Any(x => Char.IsWhiteSpace(x)))
+            {
+                result = default;
+                return false;
+            }
+
+            if (value == "0" || value == "1")
+            {
+                result = default;
+                return false;
+            }
+
+            return Enum.TryParse(value, ignoreCase, out result) && Enum.IsDefined(typeof(TEnum), result);
         }
     }
 }
