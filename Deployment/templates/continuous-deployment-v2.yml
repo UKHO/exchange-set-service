@@ -14,7 +14,7 @@ steps:
       jsonTargetFiles: '**/appsettings.json'
 
   - task: PowerShell@2
-    displayName: "terraform devdeploy for Version2"
+    displayName: "terraform devdeploy for FSSUI"
     inputs:
       targetType: filePath
       filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_v2.ps1'

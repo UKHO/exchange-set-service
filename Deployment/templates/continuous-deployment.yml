@@ -16,8 +16,8 @@ steps:
   - task: powershell@2
     displayname: "terraform devdeploy"
     inputs:
-      targettype: filepath
-      filepath: '$(pipeline.workspace)/terraformartifact/terraform_conditional_run.ps1'
+      targetType: filepath
+      filePath: '$(pipeline.workspace)/terraformartifact/terraform_conditional_run.ps1'
       arguments: '-deploymentresourcegroupname $(deploymentresourcegroupname) -deploymentstorageaccountname $(deploymentstorageaccountname) -workspace $(environment) -continueevenifresourcesaregettingdestroyed $${{ parameters.continueevenifresourcesaregettingdestroyed }} -terraformjsonoutputfile $(pipeline.workspace)/terraformartifact/terraform_output.json -elasticapmserverurl $(elasticapm.serverurl) -elasticapmapikey $(elasticapm.apikey)'
     env:
       arm_client_id: $(terraform-client-id)
