@@ -54,7 +54,7 @@ module "eventhub" {
   name                = "${local.service_name}-${local.env_name}-events${var.suffix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  logstashStorageName = lower("${local.service_name}logstash${local.env_name}${var.suffix}")
+  logstashStorageName = lower("${local.service_name}logstash${local.env_name}${var.storage_suffix}")
   suffix              = var.suffix
   m_spoke_subnet      = data.azurerm_subnet.main_subnet.id
   agent_subnet        = data.azurerm_subnet.agent_subnet.id
