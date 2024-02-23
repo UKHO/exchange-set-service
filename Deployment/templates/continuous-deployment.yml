@@ -14,7 +14,7 @@ steps:
       jsonTargetFiles: '**/appsettings.json'
 
   - task: powershell@2
-    displayname: "terraform devdeploy"
+    displayName: "terraform devdeploy"
     inputs:
       targetType: filepath
       filePath: '$(pipeline.workspace)/terraformartifact/terraform_conditional_run.ps1'
