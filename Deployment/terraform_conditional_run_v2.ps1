@@ -28,7 +28,7 @@ terraform validate
 if ( !$? ) { echo "Something went wrong during terraform validation" ; throw "Error" }
 
 Write-output "Execute Terraform plan"
-terraform plan -out "terraform.deployment.tfplan" -var elastic_apm_server_url=$elasticApmServerUrl -var elastic_apm_api_key=$elasticApmApiKey -var suffix="v2" | tee terraform_output.txt
+terraform plan -out "terraform.deployment.tfplan" -var elastic_apm_server_url=$elasticApmServerUrl -var elastic_apm_api_key=$elasticApmApiKey -var suffix="-v2" -var storage_suffix="v2" | tee terraform_output.txt
 if ( !$? ) { echo "Something went wrong during terraform plan" ; throw "Error" }
 
 $totalDestroyLines=(Get-Content -Path terraform_output.txt | Select-String -Pattern "destroy" -CaseSensitive |  where {$_ -ne ""}).length
