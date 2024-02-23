@@ -156,6 +156,24 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
+        public async Task WhenExchangeSetStandardParameterHasWhiteSpaceAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+               { ExchangeSetStandard, " s63 "}
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        }
+
+        [Test]
         public async Task WhenExchangeSetStandardParameterIss57AndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnUnauthorized()
         {
             var dictionary = new Dictionary<string, StringValues>

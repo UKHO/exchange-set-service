@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 
@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                 ? Convert.ToString(queryStringValue)
                 : Common.Models.Enums.ExchangeSetStandard.s63.ToString();
 
-            if (string.IsNullOrEmpty(exchangeSetStandard) || !EnumTryParseStrict(exchangeSetStandard, out ExchangeSetStandard parsedEnum, true))
+            if (string.IsNullOrEmpty(exchangeSetStandard) || exchangeSetStandard.Any(x => Char.IsWhiteSpace(x)) || !EnumTryParseStrict(exchangeSetStandard, out ExchangeSetStandard parsedEnum, true))
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
@@ -55,12 +55,6 @@ namespace UKHO.ExchangeSetService.API.Filters
 
         public static bool EnumTryParseStrict<TEnum>(string value, out TEnum result, bool ignoreCase = false) where TEnum : struct, Enum
         {
-            if (value.Any(x => Char.IsWhiteSpace(x)))
-            {
-                result = default;
-                return false;
-            }
-
             if (value == "0" || value == "1")
             {
                 result = default;
