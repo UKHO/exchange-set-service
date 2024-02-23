@@ -534,10 +534,10 @@ stages:
                 #     arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
   - stage: Devdeploy
-    displayName: "Devdeploy (inc terraform, webapp deploy)"
+    displayName: "Devdeploy2 for FSSUI (inc terraform, webapp deploy)"
     jobs:
       - deployment: DevDeployApp
-        displayName: "Dev - deploy terraform and dotnet App"
+        displayName: "Dev - deploy terraform and dotnet App for FSSUI"
         environment: "Ess-Dev"
         pool: $(DeploymentPool)
         container: ${{variables.Container}}
