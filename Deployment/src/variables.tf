@@ -91,7 +91,3 @@ variable "elastic_apm_api_key" {
 variable "suffix" {
   default     = ""
 }
-
-variable "storage_suffix" {
-  default     = ""
-}
