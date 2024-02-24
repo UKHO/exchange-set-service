@@ -9,7 +9,7 @@ cd $env:AGENT_BUILDDIRECTORY/terraformartifact/src/Modules/APIM/
 
 Write-output "Executing terraform scripts for APIM deployment in $workSpace enviroment..."
 
-terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=terraform.ess.apim.deployment.tfplan"
+terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=terraform.ess.apim.deployment.v2.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform initialization"; throw "Error" }
 
 Write-output "Selecting workspace..."
