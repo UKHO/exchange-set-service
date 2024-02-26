@@ -543,7 +543,7 @@ stages:
           clean: all
         variables:
           - group: "ESS-Deployment-Variables-DEV"
-          - group: "ESS-Dev-Variables"
+          - group: "ESS-Dev2-Variables"
           - name: "ESSAzureADConfiguration.ClientId"
             value: $(ESSClientId)
           - name: "ESSAzureADConfiguration.TenantId"
