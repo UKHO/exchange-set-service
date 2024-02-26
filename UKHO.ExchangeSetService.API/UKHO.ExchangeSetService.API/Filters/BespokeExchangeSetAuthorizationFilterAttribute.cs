@@ -18,10 +18,11 @@ namespace UKHO.ExchangeSetService.API.Filters
         private const string TokenAudience = "aud";
         private const string ExchangeSetStandard = "exchangeSetStandard";
         private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
+        private static readonly string[] exchangeSetStandards = Enum.GetNames(typeof(ExchangeSetStandard));
 
         public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration)
         {
-            this.azureAdConfiguration = azureAdConfiguration;
+            this.azureAdConfiguration = azureAdConfiguration ?? throw new ArgumentNullException(nameof(azureAdConfiguration));
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -34,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                 ? Convert.ToString(queryStringValue)
                 : Common.Models.Enums.ExchangeSetStandard.s63.ToString();
 
-            if (string.IsNullOrEmpty(exchangeSetStandard) || exchangeSetStandard.Any(x => Char.IsWhiteSpace(x)) || !EnumTryParseStrict(exchangeSetStandard, out ExchangeSetStandard parsedEnum, true))
+            if (!TryParseExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum, true))
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
@@ -53,15 +54,19 @@ namespace UKHO.ExchangeSetService.API.Filters
             await next();
         }
 
-        public static bool EnumTryParseStrict<TEnum>(string value, out TEnum result, bool ignoreCase = false) where TEnum : struct, Enum
+        private static bool TryParseExchangeSetStandard<TEnum>(string value, out TEnum result, bool ignoreCase = false) where TEnum : struct, Enum
         {
-            if (value == "0" || value == "1")
+            if (string.IsNullOrEmpty(value) || value.Any(x => Char.IsWhiteSpace(x)) || !IsKeyPresent(value))
             {
                 result = default;
                 return false;
             }
+            return Enum.TryParse(value, ignoreCase, out result);
+        }
 
-            return Enum.TryParse(value, ignoreCase, out result) && Enum.IsDefined(typeof(TEnum), result);
+        private static bool IsKeyPresent(string key)
+        {
+            return exchangeSetStandards.Any(s => key.Contains(s, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
