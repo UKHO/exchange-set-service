@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -11,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Configuration;
 
@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         private const string ExchangeSetStandard = "exchangeSetStandard";
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
         private HttpContext httpContext;
-        
+
         [SetUp]
         public void Setup()
         {
@@ -136,7 +136,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         }
-        
+
         [Test]
         public async Task WhenExchangeSetStandardParameterIsEmptyAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
         {
@@ -192,6 +192,26 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
             actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+        }
+
+        [Test]
+        [TestCase("0")]
+        [TestCase("1")]
+        public async Task WhenExchangeSetStandardParameterIsZeroOrOneAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest(string value)
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+               { ExchangeSetStandard, value}
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         }
     }
 }
