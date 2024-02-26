@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForProductIdentifierWithoutExchangeSetStandardParameter : ObjectStorage
+    public class ExchangeSetGenerateFilesForProductIdentifiersWithoutExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
 

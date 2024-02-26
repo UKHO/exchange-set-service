@@ -9,16 +9,16 @@ using System.Collections.Generic;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForProductIdentifierWithS63ExchangeSetStandardParameter : ObjectStorage
+    public class ExchangeSetGenerateFilesForProductIdentifiersWithS57ExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly List<string> downloadedFolderPathList = new();
-
+            
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
             DataHelper = new DataHelper();
-            foreach (var exchangeSetStandard in Config.BESSConfig.S63ExchangeSetTestData)
+            foreach(var exchangeSetStandard in Config.BESSConfig.S57ExchangeSetTestData)
             {
                 var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), null, accessToken: EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
+        public async Task WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
+        public void WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -102,7 +102,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
+        public async Task WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
