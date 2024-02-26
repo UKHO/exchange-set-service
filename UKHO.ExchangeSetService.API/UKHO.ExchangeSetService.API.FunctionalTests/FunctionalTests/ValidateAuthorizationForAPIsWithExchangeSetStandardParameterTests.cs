@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
         #endregion
 
-        #region ProductVersion Api
+        #region ProductVersions Api
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
