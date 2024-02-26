@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                 ? Convert.ToString(queryStringValue)
                 : Common.Models.Enums.ExchangeSetStandard.s63.ToString();
 
-            if (!TryParseExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum, true))
+            if (!ValidateExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum))
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
@@ -54,19 +54,24 @@ namespace UKHO.ExchangeSetService.API.Filters
             await next();
         }
 
-        private static bool TryParseExchangeSetStandard<TEnum>(string value, out TEnum result, bool ignoreCase = false) where TEnum : struct, Enum
+        private static bool ValidateExchangeSetStandard<TEnum>(string exchangeSetStandard, out TEnum result) where TEnum : struct, Enum
         {
-            if (string.IsNullOrEmpty(value) || value.Any(x => Char.IsWhiteSpace(x)) || !IsKeyPresent(value))
-            {
-                result = default;
+            result = default;
+            if (string.IsNullOrEmpty(exchangeSetStandard))
                 return false;
-            }
-            return Enum.TryParse(value, ignoreCase, out result);
+
+            if (exchangeSetStandard.Any(x => Char.IsWhiteSpace(x)))
+                return false;
+
+            if (!ExchangeSetStandardExists(exchangeSetStandard))
+                return false;
+
+            return Enum.TryParse(exchangeSetStandard, true, out result);
         }
 
-        private static bool IsKeyPresent(string key)
+        private static bool ExchangeSetStandardExists(string exchangeSetStandard)
         {
-            return exchangeSetStandards.Any(s => key.Contains(s, StringComparison.OrdinalIgnoreCase));
+            return exchangeSetStandards.Any(s => exchangeSetStandard.Contains(s, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
