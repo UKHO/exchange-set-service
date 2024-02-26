@@ -121,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataWithoutexchangeSetStandardParameterAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataWithoutExchangeSetStandardParameterAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
         {
             var uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
@@ -149,7 +149,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsWithoutexchangeSetStandardParameterAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductVersionsWithoutExchangeSetStandardParameterAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
         {
             var uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
@@ -175,7 +175,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeWithoutexchangeSetStandardParameterAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeWithoutExchangeSetStandardParameterAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
         {
             var uri = $"{apiHost}/productData";
 

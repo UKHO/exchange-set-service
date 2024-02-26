@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForProductVersionWithParameterexchangeSetStandardAsS57 : ObjectStorage
+    public class ExchangeSetGenerateFilesForProductVersionWithS63ExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly List<string> downloadedFolderPathList = new();
@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task SetupAsync()
         {
             DataHelper = new DataHelper();
-            foreach (var exchangeSetStandard in Config.BESSConfig.S57ExchangeSetTestData)
+            foreach (var exchangeSetStandard in Config.BESSConfig.S63ExchangeSetTestData)
             {
                 ProductVersionData = new List<ProductVersionModel>
                 {
@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithS57ForParameterexchangeSetStandard_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithS63ExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithS57ForParameterexchangeSetStandard_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallProductVersionApiWithS63ExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithS57ForParameterexchangeSetStandard_ThenACatalogFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithS63ExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithS57ForParameterexchangeSetStandard_ThenASerialEncFileIsGenerated()
+        public void WhenICallProductVersionApiWithS63ExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithS57ForParameterexchangeSetStandard_ThenEncFilesAreDownloaded()
+        public async Task WhenICallProductVersionApiWithS63ExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {

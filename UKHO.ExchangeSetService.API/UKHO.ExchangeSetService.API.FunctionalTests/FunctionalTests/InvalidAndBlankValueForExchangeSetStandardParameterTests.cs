@@ -9,7 +9,7 @@ using System.Globalization;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class InvalidAndBlankValueForParameterexchangeSetStandardTests : ObjectStorage
+    public class InvalidAndBlankValueForExchangeSetStandardParameterTests : ObjectStorage
     {
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheSinceDateTimeApiWithInvalidValueForParameterexchangeSetStandard_ThenABadRequestIsReturned()
+        public async Task WhenICallTheSinceDateTimeApiWithInvalidValueExchangeSetStandardParameter_ThenABadRequestIsReturned()
         {
             foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {
@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductIdentifierApiWithInvalidValueForParameterexchangeSetStandard_ThenABadRequestIsReturned()
+        public async Task WhenICallTheProductIdentifierApiWithInvalidValueExchangeSetStandardParameter_ThenABadRequestIsReturned()
         {
             foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {
@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductIdentifierApiWithInvalidkeyForParameterexchangeSetStandard_ThenABadRequestIsReturned()
+        public async Task WhenICallTheProductIdentifierApiWithInvalidkeyExchangeSetStandardParameter_ThenABadRequestIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataWithIncorrectOptionalParameterAsync(DataHelper.GetProductIdentifierData(), null, EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallTheProductVersionApiWithInvalidValueForParameterexchangeSetStandard_ThenABadRequestIsReturned()
+        public async Task WhenICallTheProductVersionApiWithInvalidValueExchangeSetStandardParameter_ThenABadRequestIsReturned()
         {
             foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {

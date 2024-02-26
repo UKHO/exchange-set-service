@@ -9,7 +9,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForProductVersionWithoutParameterexchangeSetStandard : ObjectStorage
+    public class ExchangeSetGenerateFilesForProductVersionWithoutExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
 
@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 DataHelper.GetProductVersionModelData("DE416040", 11, 0)
             };
-            var apiResponse = await ExchangeSetApiClient.GetProductVersionsWithoutexchangeSetStandardParameterAsync(ProductVersionData, accessToken: EssJwtToken);
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsWithoutExchangeSetStandardParameterAsync(ProductVersionData, accessToken: EssJwtToken);
             var batchId = await apiResponse.GetBatchId();
             cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithoutExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallProductVersionApiWithoutExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenACatalogFileIsGenerated()
+        public async Task WhenICallProductVersionApiWithoutExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenASerialEncFileIsGenerated()
+        public void WhenICallProductVersionApiWithoutExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithoutParameterexchangeSetStandard_ThenEncFilesAreDownloaded()
+        public async Task WhenICallProductVersionApiWithoutExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
         {
             //Get the product details form sales catalog service
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);

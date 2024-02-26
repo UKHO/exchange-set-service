@@ -8,7 +8,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
-    public class ValidateAuthorizationForAPIsWithParameterexchangeSetStandardTests : ObjectStorage
+    public class ValidateAuthorizationForAPIsWithExchangeSetStandardParameterTests : ObjectStorage
     {
         private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 

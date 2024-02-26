@@ -5,26 +5,25 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
+using System;
+using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForProductVersionWithParameterexchangeSetStandardAsS63 : ObjectStorage
+    public class ExchangeSetGenerateFilesForSinceDateTimeWithS57ExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly List<string> downloadedFolderPathList = new();
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
             DataHelper = new DataHelper();
-            foreach (var exchangeSetStandard in Config.BESSConfig.S63ExchangeSetTestData)
+            foreach (var exchangeSetStandard in Config.BESSConfig.S57ExchangeSetTestData)
             {
-                ProductVersionData = new List<ProductVersionModel>
-                {
-                    DataHelper.GetProductVersionModelData("DE416040", 11, 0)
-                };
-                var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, accessToken: EssJwtToken, exchangeSetStandard);
+                var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
                 var batchId = await apiResponse.GetBatchId();
                 cleanUpBatchIdList.Add(batchId);
@@ -36,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithS63ForParameterexchangeSetStandard_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallSinceDateTimeApiWithS57ExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -56,14 +55,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithS63ForParameterexchangeSetStandard_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallSinceDateTimeApiWithS57ExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
                 var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
                 Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
-                //Verify the README.TXT file content
+                //Verify README.TXT file content
                 FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
             }
         }
@@ -71,16 +70,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithS63ForParameterexchangeSetStandard_ThenACatalogFileIsGenerated()
+        public async Task WhenICallSinceDateTimeApiWithS57ExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
                 var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(downloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
 
-                //Verify the Catalog file content
-                var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
+                //Verify Catalog file content
+                var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
                 Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+
                 var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
                 FileContentHelper.CheckCatalogueFileContent(Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductVersionApiWithS63ForParameterexchangeSetStandard_ThenASerialEncFileIsGenerated()
+        public void WhenICallSinceDateTimeApiWithS57ExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -105,12 +105,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithS63ForParameterexchangeSetStandard_ThenEncFilesAreDownloaded()
+        public async Task WhenICallSinceDateTimeApiWithS57ExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
-                //Get the product details form sales catalogue service
-                var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersionData, ScsJwtToken);
+                //Get the product details form sales catalog service
+                var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
                 Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
                 var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
@@ -120,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     var productName = product.ProductName;
                     var editionNumber = product.EditionNumber;
 
-                    //Enc file downloaded verification
+                    //Enc file download verification
                     foreach (var updateNumber in product.UpdateNumbers)
                     {
                         await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
