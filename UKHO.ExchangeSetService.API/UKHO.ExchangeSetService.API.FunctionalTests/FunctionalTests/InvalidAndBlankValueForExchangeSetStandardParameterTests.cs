@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithInvalidValueExchangeSetStandardParameter_ThenABadRequestIsReturned()
+        public async Task WhenICallProductVersionsApiWithInvalidValueExchangeSetStandardParameter_ThenABadRequestIsReturned()
         {
             foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {

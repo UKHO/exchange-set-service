@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallProductVersionsApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAnUnauthorizedResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionApiWithAValidADTokenAnds57AsExchangeSetStandardParameter_ThenACorrectResponseIsReturned()
+        public async Task WhenICallProductVersionsApiWithAValidADTokenAnds57AsExchangeSetStandardParameter_ThenACorrectResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
