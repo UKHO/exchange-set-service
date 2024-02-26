@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.Filters
 
         public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration)
         {
-            this.azureAdConfiguration = azureAdConfiguration;
+            this.azureAdConfiguration = azureAdConfiguration ?? throw new ArgumentNullException(nameof(azureAdConfiguration));
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
