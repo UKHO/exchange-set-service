@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.API.Filters
         private const string TokenAudience = "aud";
         private const string ExchangeSetStandard = "exchangeSetStandard";
         private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
-        private static readonly string[] exchangeSetStandards = Enum.GetNames(typeof(ExchangeSetStandard));
+        private static readonly string[] ExchangeSetStandards = Enum.GetNames(typeof(ExchangeSetStandard));
 
         public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration)
         {
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.Filters
 
         private static bool ExchangeSetStandardExists(string exchangeSetStandard)
         {
-            return exchangeSetStandards.Any(s => exchangeSetStandard.Contains(s, StringComparison.OrdinalIgnoreCase));
+            return ExchangeSetStandards.Any(s => exchangeSetStandard.Contains(s, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
