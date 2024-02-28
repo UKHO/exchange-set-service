@@ -58,13 +58,17 @@ namespace UKHO.ExchangeSetService.API.Filters
         {
             result = default;
             if (string.IsNullOrEmpty(exchangeSetStandard))
+            {
                 return false;
-
+            }
             if (exchangeSetStandard.Any(x => Char.IsWhiteSpace(x)))
+            {
                 return false;
-
+            }
             if (!ExchangeSetStandardExists(exchangeSetStandard))
+            {
                 return false;
+            }
 
             return Enum.TryParse(exchangeSetStandard, true, out result);
         }
