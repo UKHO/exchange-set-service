@@ -33,7 +33,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             DataHelper = new DataHelper();
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
-
         }
 
         [Test]
@@ -62,9 +61,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
-
 
             //Verify Cancellation details
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, ProductIdentifierModel.ProductIdentifier, ScsJwtToken);
@@ -80,9 +76,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count - 1];
 
-                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
-                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
-
+                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
+                CancellationFileHelper.CheckProductFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
             }
         }
 
@@ -114,9 +109,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
-
             //Verify Cancellation details
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(Config.ExchangeSetProductType, ProductVersiondata, ScsJwtToken);
             Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
@@ -131,9 +123,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
                 var updateNumber = product.UpdateNumbers[product.UpdateNumbers.Count - 1];
 
-                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
-                CancellationFileHelper.CheckProductFileContent(Path.Combine(downloadFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
-
+                CancellationFileHelper.CheckCatalogueFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), editionNumber, updateNumber, batchId);
+                CancellationFileHelper.CheckProductFileContent(Path.Combine(extractDownloadedFolder, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), productName, editionNumber);
             }
         }
 
@@ -141,8 +132,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task GlobalTeardown()
         {
             //Clean up downloaded files/folders   
-            CancellationFileHelper.DeleteDirectory(Config.ExchangeSetFileName);
-            
+            FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
+
             if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
             {
                 //Clean up batches from local foldar 

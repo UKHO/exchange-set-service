@@ -26,13 +26,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
-        /// <param name="isUnencrypted">isUnencrypted, pass true for unencrypted and false for encrypted exchange set</param>
+        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData";
             
-            uri += $"?isUnencrypted={isUnencrypted}";
+            uri += $"?exchangeSetStandard={exchangeSetStandard}";
 
             if (sincedateTime != null)
             {
@@ -58,18 +58,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="productVersionModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
-        /// <param name="isUnencrypted">isUnencrypted, pass true for unencrypted and false for encrypted exchange set</param>
+        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string isUnencrypted = "false")
+        public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}&isUnencrypted={isUnencrypted}";
+                uri += $"?callbackuri={callbackUri}&exchangeSetStandard={exchangeSetStandard}";
             }
             else
             {
-                uri += $"?isUnencrypted={isUnencrypted}";
+                uri += $"?exchangeSetStandard={exchangeSetStandard}";
             }
             var payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
@@ -83,23 +83,23 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
 
         /// <summary>
-        /// Get latest baseline data for a specified set of ENCs. with isUnencrypted parameter - POST /productData/productIdentifiers
+        /// Get latest baseline data for a specified set of ENCs. with exchangeSetStandard parameter - POST /productData/productIdentifiers
         /// </summary>
         /// <param name="productIdentifierModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
-        /// <param name="isUnencrypted">isUnencrypted, pass true for unencrypted and false for encrypted exchange set</param>
+        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string isUnencrypted="false")
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}&isUnencrypted={isUnencrypted}";
+                uri += $"?callbackuri={callbackUri}&exchangeSetStandard={exchangeSetStandard}";
             }
             else
             {
-                uri += $"?isUnencrypted={isUnencrypted}";
+                uri += $"?exchangeSetStandard={exchangeSetStandard}";
             }
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
@@ -115,13 +115,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
 
         /// <summary>
-        /// Get latest baseline data for a specified set of ENCs. without isUnencrypted parameter - POST /productData/productIdentifiers
+        /// Get latest baseline data for a specified set of ENCs. without exchangeSetStandard parameter - POST /productData/productIdentifiers
         /// </summary>
         /// <param name="productIdentifierModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductIdentifiersDataWithoutIsUnencryptedParameterAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataWithoutExchangeSetStandardParameterAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null)
         {
             var uri = $"{apiHost}/productData/productIdentifiers";
             if (callbackUri != null)
@@ -143,13 +143,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
 
         /// <summary>
-        /// Get latest baseline data for a specified set of ENCs. without isUnencrypted parameter  - POST /productData/productVersions
+        /// Get latest baseline data for a specified set of ENCs. without exchangeSetStandard parameter  - POST /productData/productVersions
         /// </summary>
         /// <param name="productVersionModel"></param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetProductVersionsWithoutIsUnencryptedParameterAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetProductVersionsWithoutExchangeSetStandardParameterAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null)
         {
             var uri = $"{apiHost}/productData/productVersions";
             if (callbackUri != null)
@@ -169,13 +169,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
 
         /// <summary>
-        /// Provide all the releasable data after a datetime.  without isUnencrypted parameter - POST /productData
+        /// Provide all the releasable data after a datetime.  without exchangeSetStandard parameter - POST /productData
         /// </summary>
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeWithoutIsUnencryptedParameterAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeWithoutExchangeSetStandardParameterAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null)
         {
             var uri = $"{apiHost}/productData";
 
@@ -189,6 +189,39 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri);
+            if (accessToken != null)
+            {
+                httpRequestMessage.SetBearerToken(accessToken);
+            }
+
+            return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+        }
+
+
+        /// <summary>
+        /// Get latest baseline data for a specified set of ENCs. with exchangeSetStandard parameter - POST /productData/productIdentifiers
+        /// </summary>
+        /// <param name="productIdentifierModel"></param>
+        /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
+        /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
+        /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 for s63 standard exchange set and s57 for s57 standard exchange set</param>
+        /// <returns></returns>
+        public async Task<HttpResponseMessage> GetProductIdentifiersDataWithIncorrectOptionalParameterAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
+        {
+            var uri = $"{apiHost}/productData/productIdentifiers";
+            if (callbackUri != null)
+            {
+                uri += $"?callbackuri={callbackUri}&exchangeSetStandar={exchangeSetStandard}";
+            }
+            else
+            {
+                uri += $"?exchangeSetStandar={exchangeSetStandard}";
+            }
+            var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
+
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);

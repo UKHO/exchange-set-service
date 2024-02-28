@@ -8,7 +8,7 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public long FileSize { get; set; }
         public string ScsResponseUri { get; set; }
         public string CallbackUri { get; set; }
-        public bool IsUnencrypted { get; set; }
+        public string ExchangeSetStandard { get; set; }
         public string CorrelationId { get; set; }
         public string ExchangeSetUrlExpiryDate { get; set; }
         public DateTime ScsRequestDateTime { get; set; }

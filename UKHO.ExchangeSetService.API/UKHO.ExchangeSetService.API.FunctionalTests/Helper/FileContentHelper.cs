@@ -35,10 +35,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedFolder(downloadFileUrl.ToString(), FssJwtToken);
 
-            var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-            var downloadFolderPath = Path.Combine(Path.GetTempPath(), downloadFolder);
-
-            return downloadFolderPath;
+            return extractDownloadedFolder;
         }
 
         public static void CheckSerialEncFileContent(string inputFile)
@@ -248,6 +245,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static void DeleteDirectory(string fileName)
         {
             string path = Path.GetTempPath();
+            if(Directory.Exists(Path.Combine(path, Config.BESSConfig.TempFolderName)))
+            {
+                Directory.Delete(Path.Combine(path, Config.BESSConfig.TempFolderName), true);
+            }
 
             if (Directory.Exists(path) && File.Exists(Path.Combine(path, fileName)))
             {
@@ -266,7 +267,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     File.Delete(Path.Combine(path, fileName));
                 }
             }
-
         }
 
         public static void CheckMediaTxtFileContent(string inputFile, int folderNumber)

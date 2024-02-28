@@ -43,7 +43,7 @@ paths:
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
-        - $ref: "#/components/parameters/isUnencrypted"
+        - $ref: "#/components/parameters/exchangeSetStandard"
 
       requestBody:
         description: |
@@ -107,7 +107,7 @@ paths:
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
-        - $ref: "#/components/parameters/isUnencrypted"
+        - $ref: "#/components/parameters/exchangeSetStandard"
 
       requestBody:
         description: |
@@ -163,7 +163,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/sinceDateTime"
         - $ref: "#/components/parameters/callbackUri"
-        - $ref: "#/components/parameters/isUnencrypted"
+        - $ref: "#/components/parameters/exchangeSetStandard"
 
       responses:
         "200":
@@ -304,16 +304,17 @@ components:
       schema:
         type: string
 
-    isUnencrypted:
+    exchangeSetStandard:
       in: query
-      name: isUnencrypted
-      required: false
+      name: exchangeSetStandard
+      required: true
       description: |
-              An optional isUnencrypted parameter determines whether the Exchange Set is encrypted or not. If the value is false, the Exchange Set will be encrypted. If the value is true,
-              the Exchange Set will be unencrypted. The default value of isUnencrypted is false, which means the Exchange Set is encrypted by default.
+              An optional exchangeSetStandard parameter determines **the standard of the Exchange Set**. If the value is s63, the Exchange Set returned will be of s63 standard. If the value is s57, the Exchange Set returned will be of s57 standard.
+              The default value of exchangeSetStandard is s63, which means the Exchange Set returned will be of s63 standard by default.
       schema:
-        type: boolean
+        type: string
         example: false
+        enum: [ "s63", "s57"]
 
   ################################################################################
   #                          Common Response Definitions                         #

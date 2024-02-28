@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -23,16 +24,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
         private const string TokenAudience = "aud";
-        private const string IsUnencrypted = "IsUnencrypted";
+        private const string ExchangeSetStandard = "exchangeSetStandard";
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
-
-        readonly HttpContext httpContext = new DefaultHttpContext();
+        private HttpContext httpContext;
 
         [SetUp]
         public void Setup()
         {
             fakeAzureAdConfig = A.Fake<IOptions<AzureADConfiguration>>();
             fakeAzureAdConfig.Value.ClientId = "80a6c68b-59aa-49a4-939a-7968ff79d676";
+            httpContext = new DefaultHttpContext();
 
             bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig);
 
@@ -45,77 +46,172 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenIsUnencryptedParameterIsFalseAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        public async Task WhenExchangeSetStandardParameterIsNotSentAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
         {
-            var dictionary = new Dictionary<string, StringValues>
-            {
-                { IsUnencrypted, "false" }
-            };
+            var dictionary = new Dictionary<string, StringValues> { };
+
             httpContext.Request.Query = new QueryCollection(dictionary);
 
-            var actionContext = new ActionContext(httpContext, new RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString());
         }
 
         [Test]
-        public async Task WhenIsUnencryptedParameterIsTrueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        public async Task WhenExchangeSetStandardParameterIss57AndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
-                { IsUnencrypted, "true" }
+                {ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString() }
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
 
-            var actionContext = new ActionContext(httpContext, new RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
 
         [Test]
-        public async Task WhenIsUnencryptedParameterIsTrueAndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnUnauthorized()
+        public async Task WhenExchangeSetStandardParameterIss63AndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
-                { IsUnencrypted, "true" }
+                { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString() }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString());
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIsS57AndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+               { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.S57.ToString() }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+               { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.Test.ToString() }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIsEmptyAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+               { ExchangeSetStandard, string.Empty  }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterHasWhiteSpaceAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+               { ExchangeSetStandard, " s63 "}
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIss57AndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnUnauthorized()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+                { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString() }
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
 
             fakeAzureAdConfig.Value.ClientId = "80a6c68b-59ab-49a4-939a-7968ff79d678";
 
-            var actionContext = new ActionContext(httpContext, new RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
 
         [Test]
-        public async Task WhenIsUnencryptedParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        [TestCase("0")]
+        [TestCase("1")]
+        public async Task WhenExchangeSetStandardParameterIsZeroOrOneAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest(string value)
         {
             var dictionary = new Dictionary<string, StringValues>
             {
-                { IsUnencrypted, "test" }
+               { ExchangeSetStandard, value}
             };
             httpContext.Request.Query = new QueryCollection(dictionary);
 
-            var actionContext = new ActionContext(httpContext, new RouteData(), new());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         }
     }
 }
