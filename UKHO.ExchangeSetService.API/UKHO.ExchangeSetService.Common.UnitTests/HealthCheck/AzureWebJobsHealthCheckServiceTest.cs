@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [SetUp]
         public void Setup()
         {
-            this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() { ExchangeSetTypes = "sxs,mxs,lxs" });
+            this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() { ExchangeSetTypes = "sxs,mxs,lxs", WebAppVersion = ""});
             this.fakeWebJobsAccessKeyProvider = A.Fake<IWebJobsAccessKeyProvider>();
             this.fakeWebHostEnvironment = A.Fake<IWebHostEnvironment>();
             this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
