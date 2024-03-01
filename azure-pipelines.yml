@@ -450,88 +450,89 @@ stages:
                      tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
-                - task: downloadbuildartifacts@0
-                  displayname: "download functional test artifact"
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Functional test Artifact"
                   inputs:
-                    buildtype: 'current'
-                    downloadtype: 'single'
-                    artifactname: 'functionaltests'
-                    downloadpath: '$(build.sourcesdirectory)'
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
-                - task: downloadbuildartifacts@0
-                  displayname: "download terraform artifact"
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Terraform Artifact"
                   inputs:
-                    buildtype: 'current'
-                    downloadtype: 'single'
-                    artifactname: 'terraformartifact'
-                    downloadpath: '$(build.sourcesdirectory)'
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'terraformartifact'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
-                - task: filetransform@2
-                  displayname: "file transform: functionaltests"
+                - task: FileTransform@2
+                  displayName: "File Transform: functionaltests"
                   inputs:
-                    folderpath: '$(build.sourcesdirectory)/functionaltests/'
-                    xmltransformationrules:
-                    jsontargetfiles: '**/appsettings.json'
+                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+                    xmlTransformationRules:
+                    jsonTargetFiles: '**/appsettings.json'
 
-                - task: usedotnet@2
-                  displayname: 'use .net sdk'
+                - task: UseDotNet@2
+                  displayName: 'Use .NET SDK'
                   inputs:
-                    packagetype: sdk
-                    useglobaljson: true
-                    workingdirectory: '$(build.sourcesdirectory)'
+                    packageType: sdk
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
-                - task: azurecli@2
-                  displayname: "swap ess api and ess fulfilmentservice configuration aioenabled"
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
                   condition: always()
                   inputs:
-                    azuresubscription: "exchange-set-service-dev-a-008-02"
-                    scripttype: 'pscore'
-                    scriptlocation: 'scriptpath'
-                    scriptpath: "$(build.sourcesdirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(aioconfiguration.aiocells_ft) -aioenabled "true" -resourcegroup $(resource_group_name) -webappname $(web_app_name) -fulfilmentwebappsname $(fulfilmentwebappsname)'
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                - task: dotnetcorecli@2
-                  displayname: "run functional tests aioenabled"
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIOEnabled"
                   inputs:
                     command: "test"
                     projects: |
-                      **/*functionaltest*.dll
-                      !**/*testadapter.dll
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
                       !**/obj/**
-                    arguments: '--filter category=smoketest-aioenabled'
-                    testruntitle: "dev-automationtests"
-                    workingdirectory: '$(build.sourcesdirectory)/functionaltests'
+                    arguments: '--filter Category=SmokeTest-AIOEnabled'
+                    testRunTitle: "Dev-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-                - task: azurecli@2
-                  displayname: "swap ess api and ess fulfilmentservice configuration aiodisabled"                  
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
                   inputs:
-                    azuresubscription: "exchange-set-service-dev-a-008-02"
-                    scripttype: 'pscore'
-                    scriptlocation: 'scriptpath'
-                    scriptpath: "$(build.sourcesdirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(aioconfiguration.aiocells_ft) -aioenabled "false" -resourcegroup $(resource_group_name) -webappname $(web_app_name) -fulfilmentwebappsname $(fulfilmentwebappsname)'
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-                - task: dotnetcorecli@2
-                  displayname: "run functional tests aiodisabled"
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIODisabled"
                   inputs:
                     command: "test"
                     projects: |
-                      **/*functionaltest*.dll
-                      !**/*testadapter.dll
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
                       !**/obj/**
-                    arguments: '--filter category=smoketest-aiodisabled'
-                    testruntitle: "dev-automationtests"
-                    workingdirectory: '$(build.sourcesdirectory)/functionaltests'
+                    arguments: '--filter Category=SmokeTest-AIODisabled'
+                    testRunTitle: "Dev-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-                - task: azurecli@2
-                  displayname: "swap ess api and ess fulfilmentservice configuration"
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration"
                   condition: always()
                   inputs:
-                    azuresubscription: "exchange-set-service-dev-a-008-02"
-                    scripttype: 'pscore'
-                    scriptlocation: 'scriptpath'
-                    scriptpath: "$(build.sourcesdirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(aioconfiguration.aiocells) -aioenabled $(aioconfiguration.aioenabled) -resourcegroup $(resource_group_name) -webappname $(web_app_name) -fulfilmentwebappsname $(fulfilmentwebappsname)'
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+
 
       - deployment: DevDeployApp2
         # dependsOn: DevDeployApp
