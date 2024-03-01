@@ -26,7 +26,7 @@ terraform validate
 if ( !$? ) { echo "Something went wrong during terraform validation" ; throw "Error" }
 
 Write-output "Execute Terraform plan..."
-terraform plan -out "terraform.ess.apim.deployment.v2.tfplan" -var suffix="v2" | tee terraform_output.txt
+terraform plan -out "terraform.ess.apim.deployment.v2.tfplan" -var suffix=" v2" -var pathsuffix="-v2" | tee terraform_output.txt
 if ( !$? ) { echo "Something went wrong during terraform plan" ; throw "Error" }
 
 $totalDestroyLines=(Get-Content -Path terraform_output.txt | Select-String -Pattern "destroy" -CaseSensitive |  where {$_ -ne ""}).length
