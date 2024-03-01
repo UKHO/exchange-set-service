@@ -174,7 +174,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenExchangeSetStandardParameterIss57AndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnUnauthorized()
+        public async Task WhenExchangeSetStandardParameterIss57AndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnForbidden()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
@@ -190,7 +190,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
 
