@@ -14,6 +14,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Configuration;
+using System;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 {
@@ -43,6 +44,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             };
             var identity = httpContext.User.Identities.FirstOrDefault();
             identity.AddClaims(claims);
+        }
+
+        [Test]
+        public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
+        {
+            Action nullBespokeFilterAttribute = () => new BespokeExchangeSetAuthorizationFilterAttribute(null);
+
+            nullBespokeFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("azureAdConfiguration");
         }
 
         [Test]
