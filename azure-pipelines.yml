@@ -535,7 +535,7 @@ stages:
 
 
       - deployment: DevDeployApp2
-        #dependsOn: DevDeployApp
+        dependsOn: DevDeployApp
         displayName: "Dev - deploy terraform and dotnet App for ESS UI"
         environment: "Ess-Dev"
         pool: $(DeploymentPool)
