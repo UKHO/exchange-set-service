@@ -570,10 +570,10 @@ stages:
                 - checkout: self
                   submodules: recursive
 
-                # - template: Deployment/templates/continuous-deployment-v2.yml
-                #   parameters:
-                #     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                #     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                - template: Deployment/templates/continuous-deployment-v2.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
                 - template: Deployment/templates/continuous-deployment-apim-v2.yml
                   parameters:
