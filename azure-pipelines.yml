@@ -400,55 +400,55 @@ stages:
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
-      # - deployment: DevDeployApp
-      #   displayName: "Dev - deploy terraform and dotnet App"
-      #   environment: "Ess-Dev"
-      #   pool: $(DeploymentPool)
-      #   container: ${{variables.Container}}
-      #   workspace:
-      #     clean: all
-      #   variables:
-      #     - group: "ESS-Deployment-Variables-DEV"
-      #     - group: "ESS-Dev-Variables"
-      #     - name: "ESSAzureADConfiguration.ClientId"
-      #       value: $(ESSClientId)
-      #     - name: "ESSAzureADConfiguration.TenantId"
-      #       value: $(TenantId)
-      #     - name: "EssAuthorizationConfiguration.TenantId"
-      #       value: $(TenantId)
-      #     - name: "EssAuthorizationConfiguration.AutoTestClientId"
-      #       value: $(AutoTestClientId_Authed)
-      #     - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
-      #       value: $(AutoTestClientSecret_Authed)
-      #     - name: "EssAuthorizationConfiguration.EssClientId"
-      #       value: $(ESSClientId)
-      #     - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
-      #       value: $(AutoTestClientId_NoAuth)
-      #     - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
-      #       value: $(AutoTestClientSecret_NoAuth)
-      #     - name: "AzureAdB2CTestConfiguration.ClientSecret"
-      #       value: $(AUTOTEST-ESS-SECRET)
-      #   strategy:
-      #     runOnce:
-      #       deploy:
-      #         steps:
-      #           - checkout: self
-      #             submodules: recursive
+      - deployment: DevDeployApp
+        displayName: "Dev - deploy terraform and dotnet App"
+        environment: "Ess-Dev"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        variables:
+          - group: "ESS-Deployment-Variables-DEV"
+          - group: "ESS-Dev-Variables"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
+          - name: "AzureAdB2CTestConfiguration.ClientSecret"
+            value: $(AUTOTEST-ESS-SECRET)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  submodules: recursive
 
-      #           - template: Deployment/templates/continuous-deployment.yml
-      #             parameters:
-      #               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-      #               AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                - template: Deployment/templates/continuous-deployment.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
-      #           - template: Deployment/templates/continuous-deployment-apim.yml
-      #             parameters:
-      #                ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-      #                AzureSubscription: "Fleet Manager Dev/Test"
-      #                TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-      #                APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-      #                APIMServiceInstance: $(APIM_SERVICE_NAME)
-      #                tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-      #                tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                     AzureSubscription: "Fleet Manager Dev/Test"
+                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                     APIMServiceInstance: $(APIM_SERVICE_NAME)
+                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
       #           - task: DownloadBuildArtifacts@0
       #             displayName: "Download Functional test Artifact"
