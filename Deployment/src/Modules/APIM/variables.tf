@@ -115,10 +115,6 @@ variable "suffix" {
     default = ""
 }
 
-variable "pathsuffix" {
-    default = ""
-}
-
 locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
