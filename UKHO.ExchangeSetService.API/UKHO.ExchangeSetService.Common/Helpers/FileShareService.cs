@@ -16,6 +16,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
@@ -124,7 +125,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 Entries = new List<BatchDetail>()
             };
-            List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken) : products;
+
+            string businessUnit = message.ExchangeSetStandard == ExchangeSetStandard.s63.ToString() ? fileShareServiceConfig.Value.S63BusinessUnit : fileShareServiceConfig.Value.S57BusinessUnit;
+            List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, businessUnit, cancellationTokenSource, cancellationToken) : products;
+            
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
                 var internalNotFoundProducts = new List<Products>();
@@ -504,6 +508,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var productName = entry.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
                 var editionNumber = entry.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
                 var updateNumber = entry.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
+                var businessUnit = entry.BusinessUnit;
 
                 var fssSearchResponseCache = new FssSearchResponseCache
                 {
@@ -513,12 +518,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     Response = JsonConvert.SerializeObject(entry)
                 };
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
-                    "File share service search response insert/merge request in azure table for cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                    "File share service search response insert/merge request in azure table for cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
                         await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
                         return result;
-                    }, productName, editionNumber, updateNumber, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
+                    }, productName, editionNumber, updateNumber, businessUnit,entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
             }
             return result;
         }

@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.aioConfiguration = aioConfiguration.Value;
         }
 
-        public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, string businessUnit, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             var internalProductsNotFound = new List<Products>();
 
@@ -77,13 +77,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
                 {
                     updateNumbers.Clear();
-                    var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}";
+                    var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}|{businessUnit}";
                     var productList = new List<string>();
 
                     if (!productList.Contains(compareProducts))
                     {
                         var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-                        var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+                        var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value + "|" + businessUnit, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
                         {

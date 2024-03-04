@@ -10,7 +10,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IFileShareServiceCache
     {
-        Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken);
+        Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, string businessUnit, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken);
         Task CopyFileToBlob(Stream stream, string fileName, string batchId);
         Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache);
     }
