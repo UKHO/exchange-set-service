@@ -125,7 +125,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 Entries = new List<BatchDetail>()
             };
 
-            List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, businessUnit, cancellationTokenSource, cancellationToken) : products;
+            List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken, businessUnit) : products;
 
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
@@ -512,7 +512,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 {
                     BatchId = entry.BatchId,
                     PartitionKey = productName,
-                    RowKey = $"{editionNumber}|{updateNumber}",
+                    RowKey = $"{editionNumber}|{updateNumber}|{businessUnit}",
                     Response = JsonConvert.SerializeObject(entry)
                 };
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,

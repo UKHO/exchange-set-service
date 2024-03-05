@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.aioConfiguration = aioConfiguration.Value;
         }
 
-        public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, string businessUnit, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
         {
             var internalProductsNotFound = new List<Products>();
 
