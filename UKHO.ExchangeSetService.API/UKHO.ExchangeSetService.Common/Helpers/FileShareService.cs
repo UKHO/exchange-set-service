@@ -16,7 +16,6 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
-using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
@@ -119,22 +118,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return createBatchResponse;
         }
 
-        public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
+        public async Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath, string businessUnit)
         {
             var internalSearchBatchResponse = new SearchBatchResponse
             {
                 Entries = new List<BatchDetail>()
             };
 
-            string businessUnit = message.ExchangeSetStandard == ExchangeSetStandard.s63.ToString() ? fileShareServiceConfig.Value.S63BusinessUnit : fileShareServiceConfig.Value.S57BusinessUnit;
             List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, businessUnit, cancellationTokenSource, cancellationToken) : products;
-            
+
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
                 var internalNotFoundProducts = new List<Products>();
                 var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
                 var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
-                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.S63BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
+                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{businessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
 
                 HttpResponseMessage httpResponse;
 
@@ -523,7 +521,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
                         return result;
-                    }, productName, editionNumber, updateNumber, businessUnit,entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
+                    }, productName, editionNumber, updateNumber, businessUnit, entry.BatchId, queueMessage.BatchId, queueMessage.CorrelationId);
             }
             return result;
         }
