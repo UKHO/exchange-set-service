@@ -23,10 +23,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallSinceDateTimeApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallSinceDateTimeApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssB2CToken, "s57");
-            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
+            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 403.");
         }
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
@@ -47,10 +47,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallProductIdentifiersApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssB2CToken, "s57");
-            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
+            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 403.");
         }
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
         [Category("SmokeTest-AIODisabled")]
-        public async Task WhenICallProductVersionsApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAnUnauthorizedResponseIsReturned()
+        public async Task WhenICallProductVersionsApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             };
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, accessToken: EssB2CToken, "s57");
-            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
+            Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 403.");
         }
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
