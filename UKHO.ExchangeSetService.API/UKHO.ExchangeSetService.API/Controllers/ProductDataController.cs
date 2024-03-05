@@ -16,6 +16,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
@@ -287,6 +288,24 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
                     return GetEssResponse(productDetail);
                 }, GetCurrentCorrelationId(), exchangeSetStandard);
+        }
+
+        /// <summary>
+        /// Provide ENC information from sales catalog service.
+        /// </summary>
+        /// <remarks>
+        /// Given a list of ENC name identifiers, return all the versions of the ENCs from sales catalog service.
+        /// </remarks>
+        /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
+        /// <response code="200">A JSON body that containing the information of ENCs</response>
+        [HttpPost]
+        [Route("/productData/validateProductIdentifiers")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
+        public virtual IActionResult PostValidateProductIdentifiers([FromBody] string[] productIdentifiers)
+        {
+            return StatusCode(StatusCodes.Status200OK);
         }
     }
 }
