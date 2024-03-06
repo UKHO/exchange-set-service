@@ -923,25 +923,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         private string GetBusinessUnit(string standard)
         {
-            string businessUnit;
-
-            var exchangeSetStandard = (ExchangeSetStandard)Enum.Parse(typeof(ExchangeSetStandard), standard, true); // ignore case
-            switch (exchangeSetStandard)
+            if (Enum.TryParse(standard, out ExchangeSetStandard exchangeSetStandard))
             {
-                case ExchangeSetStandard.s63:
-                    businessUnit = fileShareServiceConfig.Value.S63BusinessUnit;
-                    break;
+                var businessUnit = exchangeSetStandard switch
+                {
+                    ExchangeSetStandard.s63 => fileShareServiceConfig.Value.S63BusinessUnit,
+                    ExchangeSetStandard.s57 => fileShareServiceConfig.Value.S57BusinessUnit,
+                    _ => throw new FulfilmentException(EventIds.InvalidFssBusinessUnit.ToEventId()) //Exception will be log if fss business unit is not configured
+                };
 
-                case ExchangeSetStandard.s57:
-                    businessUnit = fileShareServiceConfig.Value.S57BusinessUnit;
-                    break;
-
-                default:
-                    businessUnit = "";
-                    break;
+                return businessUnit;
             }
 
-            return businessUnit;
+            throw new FulfilmentException(EventIds.InvalidFssBusinessUnit.ToEventId()); //Exception will be log if fss business unit is not configured
         }
     }
 }
