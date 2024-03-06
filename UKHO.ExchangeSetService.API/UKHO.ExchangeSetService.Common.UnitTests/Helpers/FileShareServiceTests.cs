@@ -342,20 +342,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #endregion CreateBatch
 
         #region GetBatchInfoBasedOnProducts
+
         [Test]
-        public void WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsFulfilmentException()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public void WhenFSSClientReturnsOtherThan201_ThenGetBatchInfoBasedOnProductsReturnsFulfilmentException(string businessUnit)
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty); });
+                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit); });
         }
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponse()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponse(string businessUnit)
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
 
@@ -378,7 +383,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -390,7 +395,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -398,7 +403,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public void WhenFssResponseNotFoundForScsProducts_ThenReturnFulfilmentException()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public void WhenFssResponseNotFoundForScsProducts_ThenReturnFulfilmentException(string businessUnit)
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
 
@@ -431,7 +438,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -452,11 +459,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty); });
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit); });
         }
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProductsWithCancellation_ThenReturnsSearchBatchResponse()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public async Task WhenGetBatchInfoBasedOnProductsWithCancellation_ThenReturnsSearchBatchResponse(string businessUnit)
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
 
@@ -518,10 +527,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 FileSize = 400,
                 Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
             });
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(productList);
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(productList);
             CommonHelper.IsPeriodicOutputService = false;
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -530,7 +539,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public void WhenFssResponseNotFoundForScsProductsWithCancellation_ThenReturnFulfilmentException()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public void WhenFssResponseNotFoundForScsProductsWithCancellation_ThenReturnFulfilmentException(string businessUnit)
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
 
@@ -573,7 +584,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -595,7 +606,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty); });
+                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit); });
 
         }
         #endregion GetBatchInfoBasedOnProducts
@@ -697,10 +708,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public void WhenIsCancellationRequestedinGetBatchInfoBasedOnProducts_ThenThrowCancelledException()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public void WhenIsCancellationRequestedinGetBatchInfoBasedOnProducts_ThenThrowCancelledException(string businessUnit)
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                  .Returns(new HttpResponseMessage()
                  {
@@ -723,7 +736,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty));
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty, businessUnit));
         }
 
         #endregion
@@ -1116,7 +1129,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region LargeMediaExchangeSet
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSet()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSet(string businessUnit)
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
 
@@ -1139,7 +1154,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(GetProductdetails());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -1152,7 +1167,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
             CommonHelper.IsPeriodicOutputService = true;
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -1160,7 +1175,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProductsWithCancellation_ThenReturnsSearchBatchResponseForLargeMediaExchangeSet()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public async Task WhenGetBatchInfoBasedOnProductsWithCancellation_ThenReturnsSearchBatchResponseForLargeMediaExchangeSet(string businessUnit)
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
 
@@ -1223,10 +1240,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 },
                 Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
             });
-            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored)).Returns(productList);
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(productList);
             CommonHelper.IsPeriodicOutputService = true;
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -1516,7 +1533,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProductAndAioToggleDisabled()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
-
+            string businessUnit = "ADDS";
             //Test variable
             string accessTokenParam = null;
             string uriParam = null;
@@ -1538,7 +1555,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored,
                 A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored,
-                A<CancellationToken>.Ignored)).Returns(GetAioProductdetails());
+                A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetAioProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -1553,7 +1570,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeAioConfiguration.Value.AioEnabled = false;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
@@ -1564,7 +1581,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProductAndAioToggleEnabled()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
-
+            string businessUnit = "ADDS";
             //Test variable
             string accessTokenParam = null;
             string uriParam = null;
@@ -1596,7 +1613,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored,
                 A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored,
-                A<CancellationToken>.Ignored)).Returns(GetAioProductdetails());
+                A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetAioProductdetails());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
                {
@@ -1611,7 +1628,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
-            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
