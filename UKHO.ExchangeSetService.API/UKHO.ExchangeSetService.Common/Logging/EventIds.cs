@@ -801,11 +801,14 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805198 - Completed download of 307 response IHO.pub file from the file share service.
         /// </summary>
         DownloadIhoPubFile307RedirectResponse = 805198,
-
         /// <summary>
         /// 805199 - Validate callback request payload start
         /// </summary>
-        ValidateCallbackRequestPayloadStart = 805199
+        ValidateCallbackRequestPayloadStart = 805199,
+        /// <summary>
+        /// 805200 - Invalid FSS business unit provided to fulfilment service
+        /// </summary>
+        InvalidFssBusinessUnit = 805200
     }
 
     public static class EventIdExtensions
