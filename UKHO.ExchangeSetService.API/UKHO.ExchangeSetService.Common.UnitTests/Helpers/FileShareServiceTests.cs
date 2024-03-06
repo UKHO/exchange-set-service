@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -14,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
@@ -632,6 +634,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchResponseStoreToCacheStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search response insert/merge request in azure table for cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -664,6 +671,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.IsNotNull(response);
             Assert.IsInstanceOf(typeof(bool), response);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchResponseStoreToCacheStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search response insert/merge request in azure table for cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -684,6 +696,16 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
                  async delegate { await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None); });
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.DownloadENCFilesNonOkResponse.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in file share service while downloading ENC file:{fileName} with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.CancellationTokenEvent.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Request cancelled for Error in file share service while downloading ENC file:{fileName} from File Share Service with CancellationToken:{cancellationTokenSource.Token} with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
