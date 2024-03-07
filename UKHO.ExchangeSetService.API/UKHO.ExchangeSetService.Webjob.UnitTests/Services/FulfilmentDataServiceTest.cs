@@ -377,12 +377,32 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ExchangeSetCreated.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadReadMeFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateZipFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.UploadExchangeSetToFssStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
         [TestCase("s63", "ADDS")]
         [TestCase("s57", "ADDS-S57")]
-        public void WhenIsCancellationRequestedinExchangeSet_ThenThrowCancelledException(string exchangeSetStandard, string businessUnit)
+        public void WhenIsCancellationRequestedInExchangeSet_ThenThrowCancelledException(string exchangeSetStandard, string businessUnit)
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
@@ -472,6 +492,26 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string largeExchangeSet = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
 
             Assert.AreEqual("Large Media Exchange Set Created Successfully", largeExchangeSet);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadInfoFolderRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceAdcFolderFilesRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadAdcFolderFilesStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateSerialFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -536,9 +576,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         [Test]
         [TestCase("s63")]
-        public void WhenCatalogueFileCreationFails_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
+        public void WhenLargeMediaCatalogueFileCreationFails_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
         {
-            string filePath = @"D:\\Downloads";
+            var filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -549,9 +589,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             IDirectoryInfo[] directoryInfos = { b1, b2, m1 };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
-            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
+            var scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            var salesCatalogueProductResponse = GetSalesCatalogueResponse();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
@@ -576,6 +616,73 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
              && call.GetArgument<LogLevel>(0) == LogLevel.Error
              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}"
              ).MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public void WhenValidMessageQueueTriggerAndZipFolderNotCreated_ThenThrowsFulfilmentException(string exchangeSetStandard)
+        {
+            var scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            var salesCatalogueProductResponse = GetSalesCatalogueResponse();
+
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            var filePath = @"D:\\Downloads";
+
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            IDirectoryInfo fakeDirectoryInfo = GetSubDirectories(EncExchangeSet);
+            A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate); });
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateProductFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadReadMeFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateZipFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ErrorInCreatingZipFile.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        [TestCase("test")]
+        public void WhenExchangeSetStandardParameterOtherThanS63AndS57_ThenThrowsException(string exchangeSetStandard)
+        {
+            var scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            var salesCatalogueProductResponse = GetSalesCatalogueResponse();
+
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate); });
         }
 
         #region AIO
@@ -653,6 +760,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileForAioRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceIhoCrtFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadIhoPubFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test, Description("Creating ENC exchange set without AIO exchange set")]
@@ -1206,6 +1322,66 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
+        [Test]
+        [TestCase("s63")]
+        public void WhenCreationOfCatalogueFileForAIOFails_ThenThrowsException(string exchangeSetStandard)
+        {
+            string filePath = @"D:\\Downloads";
+            var b1 = A.Fake<IDirectoryInfo>();
+            var b2 = A.Fake<IDirectoryInfo>();
+            var m1 = A.Fake<IDirectoryInfo>();
+
+            A.CallTo(() => b1.Name).Returns("B1");
+            A.CallTo(() => b2.Name).Returns("B2");
+            A.CallTo(() => m1.Name).Returns("M01X02");
+
+            IDirectoryInfo[] directoryInfos = { b1, b2, m1 };
+
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles()},
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 1, ProductName = "GB800001", UpdateNumber = 1, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
+            };
+
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
+            IEnumerable<BatchFile> batchFiles = GetFiles();
+
+            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.AioCells = "GB800001";
+
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
+            A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFiles);
+            A.CallTo(() => fakeQueryFssService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, batchFiles, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
+                A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+               async delegate { await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02"); });
+
+            A.CallTo(fakeLogger).Where(call =>
+             call.Method.Name == "Log"
+             && call.GetArgument<LogLevel>(0) == LogLevel.Error
+             && call.GetArgument<EventId>(1) == EventIds.LargeExchangeSetCreatedWithError.ToEventId()
+             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}"
+             ).MustHaveHappenedOnceExactly();
+        }
         #endregion
     }
 }
