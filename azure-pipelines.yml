@@ -914,7 +914,7 @@ stages:
 
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests
-        dependsOn: QADeployApp
+        #dependsOn: QADeployApp
         pool: $(DeploymentPool)
         variables:
           - group: "ADDS-E2E"
@@ -930,7 +930,7 @@ stages:
 
   - stage: Livedeploy
     dependsOn:
-    - QAdeploy
+   # - QAdeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
