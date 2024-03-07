@@ -153,19 +153,20 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #endregion
 
         #region GetSearchBatchResponse
-        private SearchBatchResponse GetSearchBatchResponse()
+        private SearchBatchResponse GetSearchBatchResponse(string businessUnit = "ADDS")
         {
             return new SearchBatchResponse()
             {
                 Entries = new List<BatchDetail>() {
-                    new BatchDetail {
+                    new() {
                         BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc",
-                        Files= new List<BatchFile>(){ new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" }}}},
-                        Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                        Files= new List<BatchFile>(){ new() { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" }}}},
+                        Attributes = new List<Attribute> { new() { Key= "Agency", Value= "DE" } ,
+                                                           new() { Key= "CellName", Value= "DE416050" },
+                                                           new() { Key= "EditionNumber", Value= "0" } ,
+                                                           new() { Key= "UpdateNumber", Value= "0" },
+                                                           new() { Key= "ProductCode", Value= "AVCS" }},
+                        BusinessUnit = businessUnit
                     } },
                 Links = new PagingLinks(),
                 Count = 0,
@@ -371,7 +372,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             string uriParam = null;
             HttpMethod httpMethodParam = null;
             string correlationIdParam = null;
-            var searchBatchResponse = GetSearchBatchResponse();
+            var searchBatchResponse = GetSearchBatchResponse(businessUnit);
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
             var httpResponse = new HttpResponseMessage()
