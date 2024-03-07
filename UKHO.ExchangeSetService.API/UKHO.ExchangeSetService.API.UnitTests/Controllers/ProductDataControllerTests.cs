@@ -630,5 +630,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         #endregion ProductDataSinceDateTime
+
+        #region GetScsResponsebySinceDateTime
+
+        [Test]
+        public void GetProductDataSinceDateTimeShouldReturnSuccess()
+        {
+            var result = (StatusCodeResult)controller.GetProductDataSinceDateTime("Fri, 01 Feb 2024 09:00:00 GMT");
+
+            Assert.AreEqual(StatusCodes.Status200OK, result.StatusCode);
+        }
+
+        #endregion GetScsResponsebySinceDateTime
     }
 }
