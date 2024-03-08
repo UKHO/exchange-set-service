@@ -51,7 +51,19 @@ variable "apim_api_description" {
   type = string
 }
 
+variable "apim_ui_api_name" {
+  type = string
+}
+
+variable "apim_ui_api_description" {
+  type = string
+}
+
 variable "apim_api_openapi" {
+  type = string
+}
+
+variable "apim_ui_openapi" {
   type = string
 }
 

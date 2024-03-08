@@ -40,6 +40,16 @@ variable "api_description" {
     default = "The Exchange Set Service APIs to request ENC Exchange Sets for loading onto an ECDIS."
 }
 
+variable "apim_ui_api_name" {
+    type = string
+    default = "Exchange Set Service UI API"
+}
+
+variable "apim_ui_api_description" {
+    type = string
+    default = "The Exchange Set Service UI api to facilitate ESS UI Application requests."
+}
+
 variable "ui_product_name" {
     type = string
     default = "Exchange Set Service UI"
@@ -118,7 +128,9 @@ locals {
   product_name          = local.env_name == "prod" ? var.product_name : "${var.product_name} ${var.env_suffix[local.env_name]}"
   ui_product_name       = local.env_name == "prod" ? var.ui_product_name : "${var.ui_product_name} ${var.env_suffix[local.env_name]}"
   api_name              = local.env_name == "prod" ? var.api_name : "${var.api_name} ${var.env_suffix[local.env_name]}"
+  ui_api_name           = local.env_name == "prod" ? var.ui_api_name : "${var.ui_api_name} ${var.env_suffix[local.env_name]}"
   apim_api_path         = local.env_name == "prod" ? local.service_name : "${local.service_name}-${local.env_name}"
   apim_api_openapi      = file("${path.module}/exchangeSetService_OpenApi_definition.yaml")
+  apim_ui_openapi       = file("${path.module}/exchangeSetService_ui_OpenApi_definition.yaml")
   cors_origins          = split(";", var.cors_origin_values)
 }

@@ -10,8 +10,11 @@ module "exchange_set_service" {
   apim_ess_product_name				= local.product_name
   apim_ess_product_description		= var.product_description
   apim_api_name						= local.api_name
+  apim_ui_api_name					= local.ui_api_name
   apim_api_description				= var.api_description
+  apim_ui_api_description			= var.ui_api_description
   apim_api_openapi					= local.apim_api_openapi
+  apim_ui_openapi					= local.apim_ui_openapi   
   product_rate_limit				= var.product_rate_limit
   product_quota						= var.product_quota
   client_credentials_operation_id   = var.client_credentials_operation_id
