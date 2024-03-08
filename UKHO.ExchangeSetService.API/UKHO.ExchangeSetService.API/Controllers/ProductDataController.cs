@@ -298,6 +298,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// </remarks>
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
         /// <response code="200">A JSON body that containing the information of ENCs</response>
+        /// <response code="400">Bad Request.</response>
         [HttpPost]
         [Route("/productData/validateProductIdentifiers")]
         [Consumes("application/json")]
@@ -305,6 +306,18 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
         public virtual IActionResult PostValidateProductIdentifiers([FromBody] string[] productIdentifiers)
         {
+            if (productIdentifiers == null || productIdentifiers.Length == 0)
+            {
+                var error = new List<Error>
+                {
+                    new()
+                    {
+                        Source = "requestBody",
+                        Description = "Either body is null or malformed."
+                    }
+                };
+                return BuildBadRequestErrorResponse(error);
+            }
             return StatusCode(StatusCodes.Status200OK);
         }
     }
