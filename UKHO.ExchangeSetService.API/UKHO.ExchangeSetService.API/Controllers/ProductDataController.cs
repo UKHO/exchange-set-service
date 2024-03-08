@@ -304,6 +304,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         public virtual IActionResult PostValidateProductIdentifiers([FromBody] string[] productIdentifiers)
         {
             if (productIdentifiers == null || productIdentifiers.Length == 0)
