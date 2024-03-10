@@ -35,12 +35,6 @@ resource "azurerm_app_service" "webapp_service" {
     }
   }
 
-    lifecycle {
-    ignore_changes = [
-      ip_restriction,
-    ]
-  }
-
   app_settings = var.app_settings
 
   identity {
