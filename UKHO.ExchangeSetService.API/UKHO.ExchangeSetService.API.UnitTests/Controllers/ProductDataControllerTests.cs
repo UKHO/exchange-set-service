@@ -653,7 +653,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
         }
 
-
         #endregion GetScsResponsebySinceDateTime
     }
 }
