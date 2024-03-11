@@ -1,4 +1,4 @@
-module "exchange_set_service" {apim_ui_api_path
+module "exchange_set_service" {
   source							= "./Modules/ExchangeSetService"
   apim_name							= var.apim_name
   apim_rg							= var.apim_rg
