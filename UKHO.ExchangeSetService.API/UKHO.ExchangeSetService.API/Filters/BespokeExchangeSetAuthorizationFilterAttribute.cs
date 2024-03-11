@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.Filters
             {
                 if (azureAdClientId != tokenAudience)
                 {
-                    context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                     return;
                 }
             }
