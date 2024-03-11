@@ -233,7 +233,7 @@ resource "azurerm_api_management_api" "ess_ui_api" {
   display_name        = var.apim_ui_api_name
   description         = var.apim_ui_api_description
   revision            = "1"
-  path                = var.apim_api_path
+  path                = var.apim_ui_api_path
   protocols           = ["https"]
   service_url         = var.apim_api_backend_url
 

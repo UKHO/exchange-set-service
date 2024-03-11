@@ -1,9 +1,10 @@
-module "exchange_set_service" {
+module "exchange_set_service" {apim_ui_api_path
   source							= "./Modules/ExchangeSetService"
   apim_name							= var.apim_name
   apim_rg							= var.apim_rg
   env_name							= local.env_name
-  apim_api_path						= local.apim_api_path 
+  apim_api_path						= local.apim_api_path
+  apim_ui_api_path                  = local.apim_ui_api_path
   apim_api_backend_url				= var.apim_api_backend_url
   apim_group_name					= local.group_name
   apim_group_description			= var.group_description
