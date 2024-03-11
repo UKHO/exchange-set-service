@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithValidToken_ThenACorrectResponseIsReturned()
         {
             var date = DateTime.Now.AddDays(-10).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'");
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetDataProductDateTimeAsync(EssJwtToken, date);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetProductDataByDateTimeAsync(EssJwtToken, date);
             Assert.AreEqual(200, (int)apiResponse.StatusCode);
         }
     }
