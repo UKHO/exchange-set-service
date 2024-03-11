@@ -40,12 +40,12 @@ variable "api_description" {
     default = "The Exchange Set Service APIs to request ENC Exchange Sets for loading onto an ECDIS."
 }
 
-variable "apim_ui_api_name" {
+variable "ui_api_name" {
     type = string
     default = "Exchange Set Service UI API"
 }
 
-variable "apim_ui_api_description" {
+variable "ui_api_description" {
     type = string
     default = "The Exchange Set Service UI api to facilitate ESS UI Application requests."
 }
