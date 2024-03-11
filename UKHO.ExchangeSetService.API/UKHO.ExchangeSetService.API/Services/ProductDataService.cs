@@ -26,6 +26,7 @@ namespace UKHO.ExchangeSetService.API.Services
     {
         private const string RFC1123Format = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
         private readonly IProductIdentifierValidator productIdentifierValidator;
+        private readonly IScsProductIdentifierValidator scsProductIdentifierValidator;
         private readonly IProductDataProductVersionsValidator productVersionsValidator;
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
         private readonly ISalesCatalogueService salesCatalogueService;
@@ -40,18 +41,22 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly AioConfiguration aioConfiguration;
         private bool isEmptyEncExchangeSet = false;
         private bool isEmptyAioExchangeSet = false;
+        private readonly IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
+            IScsProductIdentifierValidator scsProductIdentifierValidator,
             IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
             ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
             IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
-            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration)
+            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration,
+            IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator)
         {
             this.productIdentifierValidator = productIdentifierValidator;
+            this.scsProductIdentifierValidator = scsProductIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
             this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
             this.salesCatalogueService = salesCatalougeService;
@@ -64,6 +69,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.userIdentifier = userIdentifier;
             this.azureAdB2CHelper = azureAdB2CHelper;
             this.aioConfiguration = aioConfiguration.Value;
+            this.scsDataSinceDateTimeValidator = scsDataSinceDateTimeValidator;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -118,6 +124,13 @@ namespace UKHO.ExchangeSetService.API.Services
             return response;
         }
 
+        public async Task<SalesCatalogueResponse> CreateProductDataByProductIdentifiers(ScsProductIdentifierRequest scsProductIdentifierRequest)
+        {
+            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);  
+            return salesCatalogueResponse;
+
+        }
+
         private ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
         {
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
@@ -145,7 +158,10 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             return productIdentifierValidator.Validate(productIdentifierRequest);
         }
-
+        public Task<ValidationResult> ValidateScsProductDataByProductIdentifiers(ScsProductIdentifierRequest scsProductIdentifierRequest)
+        {
+            return scsProductIdentifierValidator.Validate(scsProductIdentifierRequest);
+        }
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
@@ -276,6 +292,16 @@ namespace UKHO.ExchangeSetService.API.Services
         public Task<ValidationResult> ValidateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
             return productDataSinceDateTimeValidator.Validate(productDataSinceDateTimeRequest);
+        }
+        public async Task<SalesCatalogueResponse> GetProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        {
+            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
+            return salesCatalogueResponse;
+        }
+
+        public Task<ValidationResult> ValidateScsDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        {
+            return scsDataSinceDateTimeValidator.Validate(productDataSinceDateTimeRequest);
         }
 
         private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isNotModifiedToOk)
@@ -494,6 +520,6 @@ namespace UKHO.ExchangeSetService.API.Services
             //create standard empty exchange set when invalid enc or aio cell requested PBI #93502.
             isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0 // when enc cell already up to date
                                     || exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Any();// when invalid enc or aio cell requested
-        }
+        }      
     }
 }
