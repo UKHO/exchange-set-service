@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -313,6 +314,23 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "<p>A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</p><p>If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</p>")]
         public virtual IActionResult GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime)
         {
+            ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
+            {
+                SinceDateTime = sinceDateTime
+            };
+
+            if (productDataSinceDateTimeRequest.SinceDateTime == null)
+            {
+                var error = new List<Error>
+                {
+                    new()
+                    {
+                        Source = "sinceDateTime",
+                        Description = "Query parameter 'sinceDateTime' is required."
+                    }
+                };
+                return BuildBadRequestErrorResponse(error);
+            }
             return StatusCode(StatusCodes.Status200OK);
         }
     }

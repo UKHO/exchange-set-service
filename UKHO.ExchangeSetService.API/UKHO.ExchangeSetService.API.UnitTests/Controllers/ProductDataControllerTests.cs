@@ -641,6 +641,19 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual(StatusCodes.Status200OK, result.StatusCode);
         }
 
+        [Test]
+       public void WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeShouldReturnBadRequest()
+        {
+            var result = (BadRequestObjectResult) controller.GetProductDataSinceDateTime(null); 
+            
+            var errors = (ErrorDescription)result.Value;
+
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("sinceDateTime", errors.Errors.Single().Source);
+            Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
+        }
+
+
         #endregion GetScsResponsebySinceDateTime
     }
 }
