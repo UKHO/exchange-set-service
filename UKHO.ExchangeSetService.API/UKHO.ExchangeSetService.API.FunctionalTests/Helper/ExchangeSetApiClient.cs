@@ -243,5 +243,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
+
+        public async Task<HttpResponseMessage> GetExchangeSetValidateIdentifierAsync(string accessToken, List<string> payload)
+        {
+            var uri = $"{apiHost}/productData/validateProductIdentifiers";
+            var payloadJson = JsonConvert.SerializeObject(payload);
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+                       { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            {
+                httpRequestMessage.SetBearerToken(accessToken);
+                return await httpClient.SendAsync(httpRequestMessage);
+            }
+        }
     }
 }
