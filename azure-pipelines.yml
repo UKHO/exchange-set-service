@@ -970,7 +970,7 @@ stages:
       #               tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
   
       - deployment: LiveDeployApp2
-        dependsOn: LiveDeployApp
+        #dependsOn: LiveDeployApp
         displayName: "Live - deploy terraform and dotnet App for FSS UI"
         environment: "Ess-Live"
         pool: $(DeploymentPool)
@@ -1005,7 +1005,7 @@ stages:
 
       - job: PostDeploymentActions
         dependsOn:
-        - LiveDeployApp
+        #- LiveDeployApp
         - LiveDeployApp2                 
         pool: $(WindowPool)        
         displayName: Post Deployment Actions
