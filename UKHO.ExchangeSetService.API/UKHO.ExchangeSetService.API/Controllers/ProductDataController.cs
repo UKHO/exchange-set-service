@@ -309,8 +309,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Produces("application/json")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
-        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
-        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostValidateProductIdentifiers([FromBody] string[] productIdentifiers)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.PostValidateProductIdentifiersRequestForScsResponseStart, EventIds.PostValidateProductIdentifiersRequestForScsResponseCompleted,
@@ -320,13 +318,13 @@ namespace UKHO.ExchangeSetService.API.Controllers
                    if (productIdentifiers == null || productIdentifiers.Length == 0)
                    {
                        var error = new List<Error>
-                     {
-                    new()
-                      {
-                        Source = "requestBody",
-                        Description = "Either body is null or malformed."
-                        }
-                     };
+                       {
+                           new()
+                           {
+                               Source = "requestBody",
+                               Description = "Either body is null or malformed."
+                           }
+                       };
                        return BuildBadRequestErrorResponse(error);
                    }
                    ScsProductIdentifierRequest scsProductIdentifierRequest = new ScsProductIdentifierRequest()
@@ -371,6 +369,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Produces("application/json")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.OK, name: "Date", type: "string", description: "Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "<p>A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</p><p>If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</p>")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
         public virtual Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSGetProductDataSinceDateTimeRequestStart, EventIds.SCSGetProductDataSinceDateTimeRequestCompleted,
@@ -386,11 +385,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     {
                         var error = new List<Error>
                         {
-                     new()
-                     {
-                         Source = "sinceDateTime",
-                         Description = "Query parameter 'sinceDateTime' is required."
-                     }
+                            new()
+                            {
+                                Source = "sinceDateTime",
+                                Description = "Query parameter 'sinceDateTime' is required."
+                            }
                         };
                         return BuildBadRequestErrorResponse(error);
                     }
