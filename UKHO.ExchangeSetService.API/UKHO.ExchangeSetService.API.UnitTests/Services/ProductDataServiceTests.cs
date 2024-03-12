@@ -1402,49 +1402,92 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         #endregion ProductVersions
-        #region ScsValidateProductIndentifier
 
+        #region ScsValidateProductIndentifier
+ 
         [Test]
         public async Task WhenInvalidScsProductIdentifierRequest_ThenValidateProductDataByScsProductIdentifiersReturnsBadrequest()
         {
             A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
                     {new ValidationFailure("ProductIdentifiers", "Product Identifiers cannot be blank or null.")}));
-
+ 
             var result = await service.ValidateScsProductDataByProductIdentifiers(new ScsProductIdentifierRequest());
-
+ 
             Assert.IsFalse(result.IsValid);
             Assert.AreEqual("Product Identifiers cannot be blank or null.", result.Errors.Single().ErrorMessage);
         }
-
+ 
         [Test]
         public async Task WhenInvalidNullScsProductIdentifierRequest_ThenValidateProductDataByScsProductIdentifiersReturnsBadrequest()
         {
             A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>
                     {new ValidationFailure("RequestBody", "Either body is null or malformed.")}));
-
+ 
             var result = await service.ValidateScsProductDataByProductIdentifiers(null);
             Assert.IsFalse(result.IsValid);
             Assert.AreEqual("Either body is null or malformed.", result.Errors.Single().ErrorMessage);
         }
-
+ 
         [Test]
         public async Task WhenValidScsProductIdentifierRequest_ThenValidateProductDataByScsProductIdentifierReturnsOkrequest()
         {
             A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             string[] scsProductIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
-
+ 
             var result = await service.ValidateScsProductDataByProductIdentifiers(
                 new ScsProductIdentifierRequest()
                 {
                     ProductIdentifier = scsProductIdentifiers,
                 });
-
+ 
             Assert.IsTrue(result.IsValid);
         }
-
+ 
+        [Test]
+        public async Task WhenValidScsProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
+        {
+            A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+ 
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+ 
+            var result = await service.CreateProductDataByProductIdentifiers(
+                new ScsProductIdentifierRequest()
+                {
+                    ProductIdentifier = productIdentifiers
+                });
+ 
+            Assert.AreEqual(HttpStatusCode.OK, result.ResponseCode);
+        }
+ 
+        [Test]
+        public async Task WhenEmptyScsProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsBadrequest()
+        {
+            A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            string[] productIdentifiers = new string[] { };
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+ 
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.BadRequest;
+            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+ 
+            var result = await service.CreateProductDataByProductIdentifiers(
+                new ScsProductIdentifierRequest()
+                {
+                    ProductIdentifier = productIdentifiers
+                });
+ 
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.ResponseCode);
+        }
+ 
         #endregion ScsValidateProductIndentifier
 
         #region ProductDataSinceDateTime
@@ -1813,6 +1856,69 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         #endregion ProductDataSinceDateTime
+
+        #region ScsProductDataSinceDateTime
+
+        [Test]
+        public async Task GetProductDataSinceDateTimeReturnNotModified()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.NotModified;
+            salesCatalogueResponse.LastModified = DateTime.UtcNow;
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var result = await service.GetProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsInstanceOf<SalesCatalogueResponse>(result);
+        }
+
+        [Test]
+        public async Task GetProductDataSinceDateTimeReturnSuccess()
+        {
+            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
+            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
+            salesCatalogueResponse.LastModified = DateTime.UtcNow;
+
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var result = await service.GetProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.AreEqual(HttpStatusCode.OK, result.ResponseCode);
+        }
+
+        [Test]
+        public async Task WhenInvalidSinceDateTimeInRequest_ThenValidateScsDataSinceDateTimeReturnsBadRequest()
+        {
+            A.CallTo(() => fakeScsDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                    { new ValidationFailure("SinceDateTime", "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.")}));
+
+            var result = await service.ValidateScsDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.", result.Errors.Single().ErrorMessage);
+        }
+
+        [Test]
+        public async Task WhenSinceDateTimeFormatIsGreaterThanCurrrentDateTimeInRequest_ThenValidateScsDataSinceDateTimeReturnsBadRequest()
+        {
+            A.CallTo(() => fakeScsDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                    { new ValidationFailure("SinceDateTime", "Provided sinceDateTime cannot be a future date.")}));
+
+            var result = await service.ValidateScsDataSinceDateTime(new ProductDataSinceDateTimeRequest());
+
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual("Provided sinceDateTime cannot be a future date.", result.Errors.Single().ErrorMessage);
+        }
+
+        #endregion ScsProductDataSinceDateTime
 
     }
 }

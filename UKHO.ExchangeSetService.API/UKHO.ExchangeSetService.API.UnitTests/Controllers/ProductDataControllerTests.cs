@@ -657,13 +657,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual(salesCatalogueResponse.ResponseBody.ProductCounts, ((SalesCatalogueProductResponse)result.Value).ProductCounts);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-                                               && call.GetArgument<LogLevel>(0) == LogLevel.Information
-                                               && call.GetArgument<EventId>(1) == EventIds.PostValidateProductIdentifiersRequestForScsResponseStart.ToEventId()
-                                               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validate Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+        && call.GetArgument<LogLevel>(0) == LogLevel.Information
+        && call.GetArgument<EventId>(1) == EventIds.PostValidateProductIdentifiersRequestForScsResponseStart.ToEventId()
+        && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validate Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
         }
 
         [Test]
-        public async Task WhenValidateProductIdentifiersRequest_ThenPostValidateProductIdentifiersReturnsBadRequestResult()
+        public async Task WhenInValidateScsProductIdentifiersRequest_ThenPostValidateProductIdentifiersReturnsBadRequestResult()
         {
             var mockSalesCatalogueResponse = GetSalesCatalogueResponse();
             var salesCatalogueResponse = new SalesCatalogueResponse()
@@ -690,6 +690,31 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Product Identifiers cannot be null or empty.", errors.Errors.Single().Description);
         }
 
+        [Test]
+        public async Task WhenNullScsProductIdentifiersRequest_ThenPostProductIdentifiersReturnsBadRequest()
+        {
+            var mockSalesCatalogueResponse = GetSalesCatalogueResponse();
+            var salesCatalogueResponse = new SalesCatalogueResponse()
+            {
+                ResponseBody = mockSalesCatalogueResponse.ResponseBody,
+                ResponseCode = HttpStatusCode.BadRequest
+            };
+
+            var validationMessage = new ValidationFailure("RequestBody", "Either body is null or malformed.");
+            validationMessage.ErrorCode = HttpStatusCode.BadRequest.ToString();
+
+            A.CallTo(() => fakeProductDataService.ValidateScsProductDataByProductIdentifiers(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var result = (BadRequestObjectResult)await controller.PostValidateProductIdentifiers(null);
+            var errors = (ErrorDescription)result.Value;
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
+        }
+
         #endregion ValidatePostProductIdentifiers
 
         #region GetScsResponsebySinceDateTime
@@ -698,7 +723,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         public async Task WhenValidRequest_ThenGetProductDataSinceDateTimeShouldReturnSuccess()
         {
             var salesCatalogueResponse = GetSalesCatalogueResponse();
-
 
             A.CallTo(() => fakeProductDataService.ValidateScsDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -741,8 +765,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').", errors.Errors.Single().Description);
         }
 
-
-
         [Test]
         public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeShouldReturnBadRequest()
         {
@@ -753,8 +775,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("sinceDateTime", errors.Errors.Single().Source);
             Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
         }
-
-
         private SalesCatalogueResponse GetSalesCatalogueResponse()
         {
             return new SalesCatalogueResponse
@@ -790,6 +810,5 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         #endregion GetScsResponsebySinceDateTime
-
     }
 }
