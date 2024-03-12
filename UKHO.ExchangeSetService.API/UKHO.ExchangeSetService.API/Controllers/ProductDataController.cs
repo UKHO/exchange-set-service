@@ -14,7 +14,6 @@ using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
-using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -300,12 +299,18 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
         /// <response code="200">A JSON body that containing the information of ENCs</response>
         /// <response code="400">Bad Request.</response>
+        /// <response code="401">Unauthorized - either you have not provided any credentials, or your credentials are not recognized.</response>
+        /// <response code="403">Forbidden - you have been authorized, but you are not allowed to access this resource.</response>
+        /// <response code="429">You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="500">Internal Server Error.</response>
         [HttpPost]
         [Route("/productData/validateProductIdentifiers")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostValidateProductIdentifiers([FromBody] string[] productIdentifiers)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.PostValidateProductIdentifiersRequestForScsResponseStart, EventIds.PostValidateProductIdentifiersRequestForScsResponseCompleted,
@@ -341,11 +346,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
                            return BuildBadRequestErrorResponse(errors);
                        }
                    }
-                    var productDetail = await productDataService.CreateProductDataByProductIdentifiers(scsProductIdentifierRequest);
+                   var productDetail = await productDataService.CreateProductDataByProductIdentifiers(scsProductIdentifierRequest);
                    return GetScsResponse(productDetail);
-               }, GetCurrentCorrelationId());        
+               }, GetCurrentCorrelationId());
         }
-
 
         /// <summary>
         /// Provide all the releasable data after a datetime.
@@ -361,7 +365,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <response code="403">Forbidden - you have been authorised, but you are not allowed to access this resource.</response>
         /// <response code="429">You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
         /// <response code="500">Internal Server Error.</response>
-
         [HttpGet]
         [Route("/productData")]
         [Consumes("application/json")]

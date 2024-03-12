@@ -126,9 +126,8 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<SalesCatalogueResponse> CreateProductDataByProductIdentifiers(ScsProductIdentifierRequest scsProductIdentifierRequest)
         {
-            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);  
+            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);
             return salesCatalogueResponse;
-
         }
 
         private ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
@@ -520,6 +519,6 @@ namespace UKHO.ExchangeSetService.API.Services
             //create standard empty exchange set when invalid enc or aio cell requested PBI #93502.
             isEmptyEncExchangeSet = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount == 0 && exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount > 0 // when enc cell already up to date
                                     || exchangeSetServiceResponse.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Any();// when invalid enc or aio cell requested
-        }      
+        }
     }
 }
