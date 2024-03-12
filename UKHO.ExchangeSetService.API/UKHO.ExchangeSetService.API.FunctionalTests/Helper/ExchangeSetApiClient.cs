@@ -248,12 +248,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             var uri = $"{apiHost}/productData/validateProductIdentifiers";
             var payloadJson = JsonConvert.SerializeObject(payload);
-            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-                       { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") })
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);
-                return await httpClient.SendAsync(httpRequestMessage);
             }
+            return await httpClient.SendAsync(httpRequestMessage);
         }
 
         public async Task<HttpResponseMessage> GetExchangeSetProductDataByDateTimeAsync(string accessToken = null, string sinceDateTime = null)
