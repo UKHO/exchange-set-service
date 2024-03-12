@@ -285,11 +285,11 @@ components:
             requestedProductsNotReturned:
               type: array
               description: |
-                     Where a requested product is not included in the return, the product will be listed in the requestedProductNotReturned portion of the response along with a reason. The reason will be one of:
-                        * productWithdrawn (the product has been withdrawn from the AVCS service)
-                        * invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
-                        * noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the exchange set)
-                        * duplicateProduct (the product was included in the request more than once)
+                Where a requested product is not included in the return, the product will be listed in the requestedProductNotReturned portion of the response along with a reason. The reason will be one of:
+                  * productWithdrawn (the product has been withdrawn from the AVCS service)
+                  * invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
+                  * noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the exchange set)
+                  * duplicateProduct (the product was included in the request more than once)
               items:
                 type: object
                 required:
