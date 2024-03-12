@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static async Task<string> ExtractDownloadedFolder(string downloadFileUrl, string jwtToken)
         {
             //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
-            await Task.Delay(20000);
+            await Task.Delay(40000);
             string batchId = downloadFileUrl.Split('/')[4];
             string fileName = downloadFileUrl.Split('/')[6];
             string tempFilePath = Path.Combine(Path.GetTempPath(), bessConfig.TempFolderName);
@@ -139,7 +139,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static async Task<string> ExtractDownloadedAioFolder(string downloadFileUrl, string jwtToken)
         {
             //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
-            await Task.Delay(20000);
+            await Task.Delay(40000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.AIOConfig.AioExchangeSetFileName);
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);

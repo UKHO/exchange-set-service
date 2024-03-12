@@ -41,7 +41,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private UserIdentifier fakeUserIdentifier;
         private IAzureAdB2CHelper fakeAzureAdB2CHelper;
         private IOptions<AioConfiguration> fakeAioConfiguration;
-
+        private IScsProductIdentifierValidator fakeScsProductIdentifierValidator;
+        private IScsDataSinceDateTimeValidator fakeScsDataSinceDateTimeValidator;
+   
         [SetUp]
         public void Setup()
         {
@@ -59,10 +61,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAzureAdB2CHelper = A.Fake<IAzureAdB2CHelper>();
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
             fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;
+            fakeScsProductIdentifierValidator=A.Fake<IScsProductIdentifierValidator>();
+            fakeScsDataSinceDateTimeValidator = A.Fake<IScsDataSinceDateTimeValidator>();
 
-            service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeProductDataSinceDateTimeValidator,
+            service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeScsProductIdentifierValidator, fakeProductDataSinceDateTimeValidator,
                 fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
-            , fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureAdB2CHelper, fakeAioConfiguration);
+            , fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureAdB2CHelper, fakeAioConfiguration, fakeScsDataSinceDateTimeValidator);
         }
 
         #region GetExchangeSetResponse
@@ -1398,6 +1402,50 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         #endregion ProductVersions
+        #region ScsValidateProductIndentifier
+
+        [Test]
+        public async Task WhenInvalidScsProductIdentifierRequest_ThenValidateProductDataByScsProductIdentifiersReturnsBadrequest()
+        {
+            A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                    {new ValidationFailure("ProductIdentifiers", "Product Identifiers cannot be blank or null.")}));
+
+            var result = await service.ValidateScsProductDataByProductIdentifiers(new ScsProductIdentifierRequest());
+
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual("Product Identifiers cannot be blank or null.", result.Errors.Single().ErrorMessage);
+        }
+
+        [Test]
+        public async Task WhenInvalidNullScsProductIdentifierRequest_ThenValidateProductDataByScsProductIdentifiersReturnsBadrequest()
+        {
+            A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>
+                    {new ValidationFailure("RequestBody", "Either body is null or malformed.")}));
+
+            var result = await service.ValidateScsProductDataByProductIdentifiers(null);
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual("Either body is null or malformed.", result.Errors.Single().ErrorMessage);
+        }
+
+        [Test]
+        public async Task WhenValidScsProductIdentifierRequest_ThenValidateProductDataByScsProductIdentifierReturnsOkrequest()
+        {
+            A.CallTo(() => fakeScsProductIdentifierValidator.Validate(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure>()));
+            string[] scsProductIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+
+            var result = await service.ValidateScsProductDataByProductIdentifiers(
+                new ScsProductIdentifierRequest()
+                {
+                    ProductIdentifier = scsProductIdentifiers,
+                });
+
+            Assert.IsTrue(result.IsValid);
+        }
+
+        #endregion ScsValidateProductIndentifier
 
         #region ProductDataSinceDateTime
 

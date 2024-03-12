@@ -243,5 +243,29 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
+
+        public async Task<HttpResponseMessage> GetExchangeSetValidateIdentifierAsync(string accessToken, List<string> payload)
+        {
+            var uri = $"{apiHost}/productData/validateProductIdentifiers";
+            var payloadJson = JsonConvert.SerializeObject(payload);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            if (accessToken != null)
+            {
+                httpRequestMessage.SetBearerToken(accessToken);
+            }
+            return await httpClient.SendAsync(httpRequestMessage);
+        }
+
+        public async Task<HttpResponseMessage> GetExchangeSetProductDataByDateTimeAsync(string accessToken = null, string sinceDateTime = null)
+        {
+            var uri = $"{apiHost}/productData";
+            if(sinceDateTime != null)
+                uri += $"?sinceDateTime={sinceDateTime}";
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
+            if (accessToken != null)
+                httpRequestMessage.SetBearerToken(accessToken);
+            return await httpClient.SendAsync(httpRequestMessage);
+        }
     }
 }
