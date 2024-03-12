@@ -23,6 +23,7 @@ paths:
       summary: Provide ENC information from sales catalog service..
 
       operationId: postProductIdentifiers
+
       description: |
         Given a list of ENC name identifiers, return all the versions of the ENCs from sales catalog service. 
 
@@ -68,7 +69,9 @@ paths:
       summary: Get all releasable changes to products since a date
       description: |
         Given a datetime, get all ENC versions that have been issued since that datetime.
+
       operationId: getProducts
+
       parameters:
         - $ref: "#/components/parameters/sinceDateTime"
 
