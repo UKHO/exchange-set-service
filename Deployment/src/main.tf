@@ -222,7 +222,7 @@ module "azure-dashboard" {
 }
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
-  name                                  = local.env_name == "prod" && var.storage_suffix == "v2" ? "${var.service_name}${var.env_name}cachestorageukho2" : "${var.service_name}${var.env_name}cachestorageukho${var.suffix}"
+  name                                  = local.env_name == "prod" && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.suffix}"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location
