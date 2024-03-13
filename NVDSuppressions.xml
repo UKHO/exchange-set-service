@@ -463,4 +463,14 @@
     </notes>
     <cve>CVE-2024-21907</cve>
   </suppress>
+    <suppress>
+    <notes>
+      <![CDATA[
+   file name: GetDocument.Insider.dll
+   Vunerability is related to a Dotnet tool function that is not used in the production code
+   ]]>
+    </notes>
+    <cve>CVE-2024-21386</cve>
+    <cve>CVE-2024-21404</cve>
+  </suppress>
 </suppressions>
