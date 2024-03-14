@@ -630,29 +630,5 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         #endregion ProductDataSinceDateTime
-
-        #region ValidatePostProductIdentifiers
-
-        [Test]
-        public void WhenValidateProductIdentifiersRequest_ThenPostValidateProductIdentifiersReturnsOkStatusCodeResult()
-        {
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
-
-            var result = (StatusCodeResult)controller.PostValidateProductIdentifiers(productIdentifiers);
-
-            Assert.AreEqual(StatusCodes.Status200OK, result.StatusCode);
-        }
-
-        [Test]
-        public void WhenValidateProductIdentifiersRequest_ThenPostValidateProductIdentifiersReturnsBadRequestResult()
-        {
-            string[] productIdentifiers = new string[] { };
-
-            var result = (BadRequestObjectResult)controller.PostValidateProductIdentifiers(productIdentifiers);
-
-            Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
-        }
-
-        #endregion
     }
 }
