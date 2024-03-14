@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithValidToken_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetValidateIdentifierAsync(EssJwtToken, DataHelper.GetOnlyProductIdentifierData());
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetProductIdentifiersAsync(EssJwtToken, DataHelper.GetOnlyProductIdentifierData());
             Assert.AreEqual(200, (int)apiResponse.StatusCode);
         }
     }
