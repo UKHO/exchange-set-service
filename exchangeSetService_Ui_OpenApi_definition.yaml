@@ -18,9 +18,9 @@ security:
   - jwtBearerAuth: []
 
 paths:
-  /productData/validateProductIdentifiers:
+  /productInformation/productIdentifiers:
     post:
-      summary:  Provide ENC information from sales catalog service..
+      summary:  Provide ENC information from sales catalog service.
 
       operationId:  postProductIdentifiers
 
@@ -64,7 +64,7 @@ paths:
           $ref: "#/components/responses/internalServerError"
 
 
-  /productData:
+  /productInformation:
     get:
       summary:  Get all releasable changes to products since a date
       description:  |
