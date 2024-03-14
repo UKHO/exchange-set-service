@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         {
             var productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
 
-            var result = (StatusCodeResult)controller.PostValidateProductIdentifiers(productIdentifiers);
+            var result = (StatusCodeResult)controller.PostProductIdentifiers(productIdentifiers);
 
             Assert.AreEqual(StatusCodes.Status200OK, result.StatusCode);
         }
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         {
             var productIdentifiers = System.Array.Empty<string>();
 
-            var result = (BadRequestObjectResult)controller.PostValidateProductIdentifiers(productIdentifiers);
+            var result = (BadRequestObjectResult)controller.PostProductIdentifiers(productIdentifiers);
             var errors = (ErrorDescription)result.Value;
 
             Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);

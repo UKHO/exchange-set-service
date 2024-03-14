@@ -32,12 +32,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <response code="200">A JSON body that containing the information of ENCs</response>
         /// <response code="400">Bad Request.</response>
         [HttpPost]
-        [Route("/ProductInformation/productIdentifiers")]
+        [Route("/productInformation/productIdentifiers")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
-        public virtual IActionResult PostValidateProductIdentifiers([FromBody] string[] productIdentifiers)
+        public virtual IActionResult PostProductIdentifiers([FromBody] string[] productIdentifiers)
         {
             if (productIdentifiers == null || productIdentifiers.Length == 0)
             {
