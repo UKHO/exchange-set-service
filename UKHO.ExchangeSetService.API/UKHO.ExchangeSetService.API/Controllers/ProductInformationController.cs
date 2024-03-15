@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.Net;
-using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
@@ -13,7 +12,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
     [Authorize]
-    [ServiceFilter(typeof(BespokeExchangeSetAuthorizationFilterAttribute))]
     public class ProductInformationController : BaseController<ProductInformationController>
     {
         public ProductInformationController(IHttpContextAccessor contextAccessor,
