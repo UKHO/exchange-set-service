@@ -50,6 +50,30 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
-        #endregion
+        #endregion ValidatePostProductIdentifiers
+
+        #region GetProductInformationbySinceDateTime
+
+        [Test]
+        public void GetProductDataSinceDateTimeShouldReturnSuccess()
+        {
+            var result = (StatusCodeResult)controller.GetProductInformationSinceDateTime("Fri, 01 Feb 2024 09:00:00 GMT");
+
+            Assert.AreEqual(StatusCodes.Status200OK, result.StatusCode);
+        }
+
+        [Test]
+        public void WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeShouldReturnBadRequest()
+        {
+            var result = (BadRequestObjectResult)controller.GetProductInformationSinceDateTime(null);
+
+            var errors = (ErrorDescription)result.Value;
+
+            Assert.AreEqual(400, result.StatusCode);
+            Assert.AreEqual("sinceDateTime", errors.Errors.Single().Source);
+            Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
+        }
+
+        #endregion GetProductInformationbySinceDateTime
     }
 }
