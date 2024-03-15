@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System.Linq;
 using UKHO.ExchangeSetService.API.Controllers;
+using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
@@ -14,16 +15,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
     {
         private ProductInformationController controller;
         private IHttpContextAccessor fakeHttpContextAccessor;
+        private IProductDataService fakeProductDataService;
         private ILogger<ProductInformationController> fakeLogger;
 
         [SetUp]
         public void Setup()
         {
             fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
+            fakeProductDataService = A.Fake<IProductDataService>();
             fakeLogger = A.Fake<ILogger<ProductInformationController>>();
             A.CallTo(() => fakeHttpContextAccessor.HttpContext).Returns(new DefaultHttpContext());
 
-            controller = new ProductInformationController(fakeHttpContextAccessor, fakeLogger);
+            controller = new ProductInformationController(fakeHttpContextAccessor, fakeLogger, fakeProductDataService);
         }
 
         #region ValidatePostProductIdentifiers
