@@ -22,7 +22,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
             fakeLogger = A.Fake<ILogger<ProductInformationController>>();
             A.CallTo(() => fakeHttpContextAccessor.HttpContext).Returns(new DefaultHttpContext());
-
             controller = new ProductInformationController(fakeHttpContextAccessor, fakeLogger);
         }
 

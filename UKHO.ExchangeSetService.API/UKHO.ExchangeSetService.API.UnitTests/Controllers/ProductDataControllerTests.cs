@@ -630,6 +630,5 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         #endregion ProductDataSinceDateTime
-
     }
 }

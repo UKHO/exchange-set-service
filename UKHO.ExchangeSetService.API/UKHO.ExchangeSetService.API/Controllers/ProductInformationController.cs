@@ -6,7 +6,6 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Collections.Generic;
 using System.Net;
-using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -14,7 +13,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
 {
     [ApiController]
     [Authorize]
-    [ServiceFilter(typeof(BespokeExchangeSetAuthorizationFilterAttribute))]
     public class ProductInformationController : BaseController<ProductInformationController>
     {
         public ProductInformationController(IHttpContextAccessor contextAccessor,
@@ -37,7 +35,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <response code="403">Forbidden - you have been authorised, but you are not allowed to access this resource.</response>
         /// <response code="429">You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
         /// <response code="500">Internal Server Error.</response>
-
         [HttpGet]
         [Route("/productInformation")]
         [Consumes("application/json")]
