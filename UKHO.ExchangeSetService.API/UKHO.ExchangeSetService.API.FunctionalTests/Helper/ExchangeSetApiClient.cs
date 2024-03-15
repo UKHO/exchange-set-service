@@ -257,7 +257,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return await httpClient.SendAsync(httpRequestMessage);
         }
 
-        public async Task<HttpResponseMessage> GetExchangeSetProductDataByDateTimeAsync(string accessToken = null, string sinceDateTime = null)
+        public async Task<HttpResponseMessage> GetProductInformationByDateTimeAsync(string accessToken = null, string sinceDateTime = null)
         {
             var uri = $"{apiHost}/productInformation";
             if(sinceDateTime != null)
