@@ -25,7 +25,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         private IHttpContextAccessor fakeHttpContextAccessor;
         private IProductDataService fakeProductDataService;
         private ILogger<ProductInformationController> fakeLogger;
-        private IProductDataService fakeProductDataService;
 
         [SetUp]
         public void Setup()
@@ -33,7 +32,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
             fakeProductDataService = A.Fake<IProductDataService>();
             fakeLogger = A.Fake<ILogger<ProductInformationController>>();
-            fakeProductDataService = A.Fake<IProductDataService>();
             A.CallTo(() => fakeHttpContextAccessor.HttpContext).Returns(new DefaultHttpContext());
 
             controller = new ProductInformationController(fakeHttpContextAccessor, fakeLogger, fakeProductDataService);
