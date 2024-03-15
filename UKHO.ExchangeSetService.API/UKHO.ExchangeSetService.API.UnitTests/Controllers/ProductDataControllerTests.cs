@@ -16,7 +16,6 @@ using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
