@@ -463,7 +463,7 @@
     </notes>
     <cve>CVE-2024-21907</cve>
   </suppress>
-  <suppress>
+    <suppress>
     <notes>
       <![CDATA[
    file name: GetDocument.Insider.dll

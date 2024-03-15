@@ -14,6 +14,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Configuration;
+using System;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 {
@@ -43,6 +44,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             };
             var identity = httpContext.User.Identities.FirstOrDefault();
             identity.AddClaims(claims);
+        }
+
+        [Test]
+        public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
+        {
+            Action nullBespokeFilterAttribute = () => new BespokeExchangeSetAuthorizationFilterAttribute(null);
+
+            nullBespokeFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("azureAdConfiguration");
         }
 
         [Test]
@@ -174,7 +183,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenExchangeSetStandardParameterIss57AndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnUnauthorized()
+        public async Task WhenExchangeSetStandardParameterIss57AndAzureADClientIDIsNotEqualsWithTokenAudience_ThenReturnForbidden()
         {
             var dictionary = new Dictionary<string, StringValues>
             {
@@ -190,7 +199,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
 
