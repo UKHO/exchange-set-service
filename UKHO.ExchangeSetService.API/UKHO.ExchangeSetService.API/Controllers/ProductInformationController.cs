@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// Given a list of ENC name identifiers, return all the versions of the ENCs from sales catalog service.
         /// </remarks>
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
-        /// <response code="200">A JSON body that containing the information of ENCs</response>
+        /// <response code="200">A JSON body that containing the information of ENCs.</response>
         /// <response code="400">Bad Request.</response>
         [HttpPost]
         [Route("/productInformation/productIdentifiers")]
