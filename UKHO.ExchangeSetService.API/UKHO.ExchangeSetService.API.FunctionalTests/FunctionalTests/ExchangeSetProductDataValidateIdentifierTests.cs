@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -25,8 +28,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithValidToken_ThenACorrectResponseIsReturned()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetProductIdentifiersAsync(EssJwtToken, DataHelper.GetOnlyProductIdentifierData());
+            var payload = DataHelper.GetProductIdentifierData();
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetValidateIdentifierAsync(EssJwtToken, payload);
             Assert.AreEqual(200, (int)apiResponse.StatusCode);
+            var responseContent = await apiResponse.Content.ReadFromJsonAsync<ExchangeSetProductIdentifierResponse>();
+            var productNames = responseContent.Products.Select(r => r.ProductName).ToList();
+            Assert.IsTrue(productNames.All(r => payload.Contains(r)));
         }
     }
 }
