@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
+using System;
+using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -13,7 +15,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly List<string> downloadedFolderPathList = new();
-            
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
@@ -26,13 +29,34 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 cleanUpBatchIdList.Add(batchId);
                 var downloadFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
                 downloadedFolderPathList.Add(downloadFolderPath);
+
+                ////product version
+                ProductVersionData = new List<ProductVersionModel>
+                {
+                    DataHelper.GetProductVersionModelData("DE416040", 11, 0),
+                    DataHelper.GetProductVersionModelData("DE360010", 1, 0)
+                };
+                var apiResponsepv = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, accessToken: EssJwtToken, exchangeSetStandard);
+                Assert.AreEqual(200, (int)apiResponsepv.StatusCode, $"Incorrect status code is returned  {apiResponsepv.StatusCode}, instead of the expected status 200.");
+                var batchIdpv = await apiResponsepv.GetBatchId();
+                cleanUpBatchIdList.Add(batchIdpv);
+                var downloadFolderPathpv = await FileContentHelper.CreateExchangeSetFile(apiResponsepv, FssJwtToken);
+                downloadedFolderPathList.Add(downloadFolderPathpv);
+
+                ////since dateTime
+                var apiResponsesdt = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, exchangeSetStandard);
+                Assert.AreEqual(200, (int)apiResponsesdt.StatusCode, $"Incorrect status code is returned  {apiResponsesdt.StatusCode}, instead of the expected status 200.");
+                var batchIdsdt = await apiResponsesdt.GetBatchId();
+                cleanUpBatchIdList.Add(batchIdsdt);
+                var downloadFolderPathsdt = await FileContentHelper.CreateExchangeSetFile(apiResponsesdt, FssJwtToken);
+                downloadedFolderPathList.Add(downloadFolderPathsdt);
             }
         }
 
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallAllApiWithS57ExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -52,7 +76,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallAllApiWithS57ExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -67,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
+        public async Task WhenICallAllApiWithS57ExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -87,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
+        public void WhenICallAllApiWithS57ExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -102,7 +126,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS57ExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
+        public async Task WhenICalAllApiWithS57ExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
@@ -130,7 +154,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task GlobalTeardown()
         {
             //Clean up downloaded files/folders   
-            FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
+            ////FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
 
             if (cleanUpBatchIdList?.Count > 0)
             {
