@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithValidToken_ThenACorrectResponseIsReturned()
         {
             var payload = DataHelper.GetProductIdentifierData();
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetValidateIdentifierAsync(EssJwtToken, payload);
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetProductIdentifiersAsync(EssJwtToken, payload);
             Assert.AreEqual(200, (int)apiResponse.StatusCode);
             var responseContent = await apiResponse.Content.ReadFromJsonAsync<ExchangeSetProductIdentifierResponse>();
             var productNames = responseContent.Products.Select(r => r.ProductName).ToList();
