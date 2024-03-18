@@ -194,7 +194,7 @@ components:
               productName:
                 type: string
                 description:  The unique product identifiers
-                example:  ["GB102505", "GB100160", "AU334550"]
+                example:  "GB102505"
               editionNumber:
                 type: integer
                 description:  The edition number
