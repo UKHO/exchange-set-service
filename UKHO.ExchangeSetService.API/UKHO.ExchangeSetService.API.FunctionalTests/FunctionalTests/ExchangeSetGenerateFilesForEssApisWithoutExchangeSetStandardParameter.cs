@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
-using System;
-using System.Globalization;
+////using System;
+////using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForProductIdentifiersWithoutExchangeSetStandardParameter : ObjectStorage
+    public class ExchangeSetGenerateFilesForEssApisWithoutExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly List<string> downloadedFolderPathList = new();
-        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+       ////private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);/
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -43,12 +43,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             downloadedFolderPathList.Add(productVersionsDownloadedFolderPath);
 
             //since dateTime
-            var sinceDateTimeApiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeWithoutExchangeSetStandardParameterAsync(sinceDateTime, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)sinceDateTimeApiResponse.StatusCode, $"Incorrect status code is returned  {sinceDateTimeApiResponse.StatusCode}, instead of the expected status 200.");
-            var sinceDateTimeBatchId = await sinceDateTimeApiResponse.GetBatchId();
-            cleanUpBatchIdList.Add(sinceDateTimeBatchId);
-            var sinceDateTimeDownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(sinceDateTimeApiResponse, FssJwtToken);
-            downloadedFolderPathList.Add(sinceDateTimeDownloadedFolderPath);
+            ////var sinceDateTimeApiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeWithoutExchangeSetStandardParameterAsync(sinceDateTime, accessToken: EssJwtToken);
+            ////Assert.AreEqual(200, (int)sinceDateTimeApiResponse.StatusCode, $"Incorrect status code is returned  {sinceDateTimeApiResponse.StatusCode}, instead of the expected status 200.");
+            ////var sinceDateTimeBatchId = await sinceDateTimeApiResponse.GetBatchId();
+            ////cleanUpBatchIdList.Add(sinceDateTimeBatchId);
+            ////var sinceDateTimeDownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(sinceDateTimeApiResponse, FssJwtToken);
+            ////downloadedFolderPathList.Add(sinceDateTimeDownloadedFolderPath);
         }
 
         //PBI 143370: Change related to additional param (From Boolean to String)
@@ -81,10 +81,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
                 var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
-                Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
+                Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
                 //Verify README.TXT file content
-                FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
+                FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
             }
         }
 

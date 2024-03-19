@@ -112,6 +112,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public List<string> S57ExchangeSetTestData { get; set; }
             public List<string> InvalidExchangeSetTestData { get; set; }
             public string TempFolderName { get; set; }
+            public string S57BusinessUnit { get; set; }
         }
 
         public TestConfiguration()

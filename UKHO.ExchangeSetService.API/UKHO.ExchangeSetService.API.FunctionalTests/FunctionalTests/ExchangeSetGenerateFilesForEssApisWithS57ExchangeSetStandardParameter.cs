@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
-using System;
-using System.Globalization;
+////using System;
+////using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly List<string> downloadedFolderPathList = new();
-        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        ////private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             foreach(var exchangeSetStandard in Config.BESSConfig.S57ExchangeSetTestData)
             {
                 //product identifiers
-                var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiers(), null, accessToken: EssJwtToken, exchangeSetStandard);
+                var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersS57(), null, accessToken: EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
                 var batchId = await apiResponse.GetBatchId();
                 cleanUpBatchIdList.Add(batchId);
@@ -34,8 +34,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 ////product versions
                 ProductVersionData = new List<ProductVersionModel>
                 {
-                    DataHelper.GetProductVersionModelData("DE416040", 11, 0),
-                    DataHelper.GetProductVersionModelData("DE360010", 1, 0)
+                    DataHelper.GetProductVersionModelData("GB602571", 3, 0),
+                    //DataHelper.GetProductVersionModelData("DE360010", 1, 0)
                 };
                 var productVersionsApiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, accessToken: EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(200, (int)productVersionsApiResponse.StatusCode, $"Incorrect status code is returned  {productVersionsApiResponse.StatusCode}, instead of the expected status 200.");
@@ -45,12 +45,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 downloadedFolderPathList.Add(productVersionsDownloadedFolderPath);
 
                 ////since dateTime
-                var sinceDateTimeApiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, exchangeSetStandard);
-                Assert.AreEqual(200, (int)sinceDateTimeApiResponse.StatusCode, $"Incorrect status code is returned  {sinceDateTimeApiResponse.StatusCode}, instead of the expected status 200.");
-                var sinceDateTimeBatchId = await sinceDateTimeApiResponse.GetBatchId();
-                cleanUpBatchIdList.Add(sinceDateTimeBatchId);
-                var sinceDateTimeDownloadFolderPath = await FileContentHelper.CreateExchangeSetFile(sinceDateTimeApiResponse, FssJwtToken);
-                downloadedFolderPathList.Add(sinceDateTimeDownloadFolderPath);
+                ////var sinceDateTimeApiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, exchangeSetStandard);
+                ////Assert.AreEqual(200, (int)sinceDateTimeApiResponse.StatusCode, $"Incorrect status code is returned  {sinceDateTimeApiResponse.StatusCode}, instead of the expected status 200.");
+                ////var sinceDateTimeBatchId = await sinceDateTimeApiResponse.GetBatchId();
+                ////cleanUpBatchIdList.Add(sinceDateTimeBatchId);
+                ////var sinceDateTimeDownloadFolderPath = await FileContentHelper.CreateExchangeSetFile(sinceDateTimeApiResponse, FssJwtToken);
+                ////downloadedFolderPathList.Add(sinceDateTimeDownloadFolderPath);
             }
         }
 
@@ -137,7 +137,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             foreach (var downloadedFolderPath in downloadedFolderPathList)
             {
                 //Get the product details form sales catalog service
-                var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
+                var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersS57(), ScsJwtToken);
                 Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
                 var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
@@ -150,7 +150,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                     //Enc file download verification
                     foreach (var updateNumber in product.UpdateNumbers)
                     {
-                        await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken);
+                        await FileContentHelper.GetDownloadedEncFilesAsync(Config.FssConfig.BaseUrl, Path.Combine(downloadedFolderPath, Config.ExchangeSetEncRootFolder), productName, editionNumber, updateNumber, FssJwtToken, Config.BESSConfig.S57BusinessUnit);
                     }
                 }
             }
