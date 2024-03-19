@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
+using System;
+using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -12,6 +14,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     public class ExchangeSetGenerateFilesForProductIdentifiersWithoutExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
+        private readonly List<string> downloadedFolderPathList = new();
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -21,10 +25,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
             var batchId = await apiResponse.GetBatchId();
             cleanUpBatchIdList.Add(batchId);
-            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
+            var downloadFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
+            downloadedFolderPathList.Add(downloadFolderPath);
+
+            //product version
+            ProductVersionData = new List<ProductVersionModel>
+            {
+                 DataHelper.GetProductVersionModelData("DE416040", 11, 0),
+                 DataHelper.GetProductVersionModelData("DE360010", 1, 0)
+            };
+            var apiResponsepv = await ExchangeSetApiClient.GetProductVersionsWithoutExchangeSetStandardParameterAsync(ProductVersionData, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponsepv.StatusCode, $"Incorrect status code is returned  {apiResponsepv.StatusCode}, instead of the expected status 200.");
+            var batchIdpv = await apiResponsepv.GetBatchId();
+            cleanUpBatchIdList.Add(batchIdpv);
+            var downloadedFolderPathpv = await FileContentHelper.CreateExchangeSetFile(apiResponsepv, FssJwtToken);
+            downloadedFolderPathList.Add(downloadedFolderPathpv);
+
+            //since dateTime
+            var apiResponsesdt = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeWithoutExchangeSetStandardParameterAsync(sinceDateTime, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiResponsesdt.StatusCode, $"Incorrect status code is returned  {apiResponsesdt.StatusCode}, instead of the expected status 200.");
+            var batchIdsdt = await apiResponsesdt.GetBatchId();
+            cleanUpBatchIdList.Add(batchIdsdt);
+            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponsesdt, FssJwtToken);
         }
 
-         //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()

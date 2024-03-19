@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [Ignore("Temp")]
     [TestFixture]
     public class ExchangeSetGenerateFilesForProductVersionsWithS63ExchangeSetStandardParameter : ObjectStorage
     {
