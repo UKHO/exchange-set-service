@@ -463,4 +463,40 @@
     </notes>
     <cve>CVE-2024-21907</cve>
   </suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: GetDocument.Insider.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/GetDocument\.Insider@.*$</packageUrl>
+		<cve>CVE-2024-21386</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: GetDocument.Insider.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/GetDocument\.Insider@.*$</packageUrl>
+		<cve>CVE-2024-21404</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: dotnet-getdocument.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/dotnet\-getdocument@.*$</packageUrl>
+		<cve>CVE-2024-21386</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: dotnet-getdocument.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/dotnet\-getdocument@.*$</packageUrl>
+		<cve>CVE-2024-21404</cve>
+	</suppress>
 </suppressions>
