@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
+using System;
+using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -12,22 +14,48 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     public class ExchangeSetGenerateFilesForProductIdentifiersWithoutExchangeSetStandardParameter : ObjectStorage
     {
         private readonly List<string> cleanUpBatchIdList = new();
+        private readonly List<string> downloadedFolderPathList = new();
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
+            //product identifiers
             DataHelper = new DataHelper();
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataWithoutExchangeSetStandardParameterAsync(DataHelper.GetProductIdentifiers(), accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
             var batchId = await apiResponse.GetBatchId();
             cleanUpBatchIdList.Add(batchId);
-            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
+            var downloadFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
+            downloadedFolderPathList.Add(downloadFolderPath);
+
+            //product versions
+            ProductVersionData = new List<ProductVersionModel>
+            {
+                 DataHelper.GetProductVersionModelData("DE416040", 11, 0),
+                 DataHelper.GetProductVersionModelData("DE360010", 1, 0)
+            };
+            var productVersionsApiResponse = await ExchangeSetApiClient.GetProductVersionsWithoutExchangeSetStandardParameterAsync(ProductVersionData, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)productVersionsApiResponse.StatusCode, $"Incorrect status code is returned  {productVersionsApiResponse.StatusCode}, instead of the expected status 200.");
+            var productVersionsBatchId = await productVersionsApiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(productVersionsBatchId);
+            var productVersionsDownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(productVersionsApiResponse, FssJwtToken);
+            downloadedFolderPathList.Add(productVersionsDownloadedFolderPath);
+
+            //since dateTime
+            var sinceDateTimeApiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeWithoutExchangeSetStandardParameterAsync(sinceDateTime, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)sinceDateTimeApiResponse.StatusCode, $"Incorrect status code is returned  {sinceDateTimeApiResponse.StatusCode}, instead of the expected status 200.");
+            var sinceDateTimeBatchId = await sinceDateTimeApiResponse.GetBatchId();
+            cleanUpBatchIdList.Add(sinceDateTimeBatchId);
+            var sinceDateTimeDownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(sinceDateTimeApiResponse, FssJwtToken);
+            downloadedFolderPathList.Add(sinceDateTimeDownloadedFolderPath);
         }
 
-         //PBI 143370: Change related to additional param (From Boolean to String)
-        [Test]
+        //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 140672: ESS : Fulfilment service(webjob) - Get data from new BU
+       [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()
+        public async Task WhenICallEssApisWithoutExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath)}");
@@ -41,10 +69,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
         }
 
-         //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 140672: ESS : Fulfilment service(webjob) - Get data from new BU
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
+        public void WhenICallEssApisWithoutExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
@@ -53,10 +82,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
         }
 
-         //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 140672: ESS : Fulfilment service(webjob) - Get data from new BU
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenACatalogFileIsGenerated()
+        public async Task WhenICallEssApisWithoutExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenACatalogFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
             Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
@@ -70,10 +100,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckCatalogueFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder, Config.ExchangeSetCatalogueFile), apiScsResponseData);
         }
 
-         //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 140672: ESS : Fulfilment service(webjob) - Get data from new BU
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public void WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameterAndWithAValidProductIdentifiers_ThenASerialEncFileIsGenerated()
+        public void WhenICallEssApisWithoutExchangeSetStandardParameterAndWithAValidProductIdentifiers_ThenASerialEncFileIsGenerated()
         {
             var checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
             Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
@@ -82,10 +113,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FileContentHelper.CheckSerialEncFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetSerialEncFile));
         }
 
-         //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 143370: Change related to additional param (From Boolean to String)
+        //PBI 140672: ESS : Fulfilment service(webjob) - Get data from new BU
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenEncFilesAreDownloaded()
+        public async Task WhenICallEssApisWithoutExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenEncFilesAreDownloaded()
         {
             //Get the product details form sales catalog service
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);

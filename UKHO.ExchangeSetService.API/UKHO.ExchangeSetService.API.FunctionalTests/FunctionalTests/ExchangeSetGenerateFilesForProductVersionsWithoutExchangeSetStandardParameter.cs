@@ -8,6 +8,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [Ignore("Testing")]
     [TestFixture]
     public class ExchangeSetGenerateFilesForProductVersionsWithoutExchangeSetStandardParameter : ObjectStorage
     {

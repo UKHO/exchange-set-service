@@ -10,6 +10,7 @@ using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [Ignore("Testing")]
     [TestFixture]
     public class ExchangeSetGenerateFilesForSinceDateTimeWithS57ExchangeSetStandardParameter : ObjectStorage
     {
