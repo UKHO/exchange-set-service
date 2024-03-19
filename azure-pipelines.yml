@@ -87,7 +87,7 @@ stages:
             command: custom
             custom: tool
             workingDirectory: $(Agent.TempDirectory)
-            arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools
+            arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools --version 4.0.0
 
         - task: Powershell@2
           displayName: "Run Stryker"
@@ -335,6 +335,13 @@ stages:
             inputs:
               SourceFolder: '$(Build.SourcesDirectory)'
               Contents: 'exchangeSetService_OpenApi_definition.yaml'
+              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
+
+          - task: CopyFiles@2
+            displayName: "Copy OpenAPI spec for new UI API for deployment"
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: 'exchangeSetService_Ui_OpenApi_definition.yaml'
               TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
 
           - task: PublishBuildArtifacts@1

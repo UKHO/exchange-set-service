@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.OK, name: "Date", type: "string", description: "Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.")]
-        [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(ExchangeSetResponse), description: "<p>A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</p><p>If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.</p>")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENC versions that have been issued since that datetime.</p>")]
         public virtual Task<IActionResult> GetProductInformationSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSGetProductDataSinceDateTimeRequestStart, EventIds.SCSGetProductDataSinceDateTimeRequestCompleted,

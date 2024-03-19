@@ -33,10 +33,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             fakeProductDataService = A.Fake<IProductDataService>();
             fakeLogger = A.Fake<ILogger<ProductInformationController>>();
             A.CallTo(() => fakeHttpContextAccessor.HttpContext).Returns(new DefaultHttpContext());
-
             controller = new ProductInformationController(fakeHttpContextAccessor, fakeLogger, fakeProductDataService);
         }
-
 
         #region ValidatePostProductIdentifiers
 
@@ -63,9 +61,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual(salesCatalogueResponse.ResponseBody.ProductCounts, ((SalesCatalogueProductResponse)result.Value).ProductCounts);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-        && call.GetArgument<LogLevel>(0) == LogLevel.Information
-        && call.GetArgument<EventId>(1) == EventIds.PostValidateProductIdentifiersRequestForScsResponseStart.ToEventId()
-        && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validate Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+                && call.GetArgument<LogLevel>(0) == LogLevel.Information
+                && call.GetArgument<EventId>(1) == EventIds.PostValidateProductIdentifiersRequestForScsResponseStart.ToEventId()
+                && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validate Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -121,8 +119,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
-       
-
         #endregion ValidatePostProductIdentifiers
 
         #region GetScsResponsebySinceDateTime
@@ -144,9 +140,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual(200, result.StatusCode);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-      && call.GetArgument<LogLevel>(0) == LogLevel.Information
-      && call.GetArgument<EventId>(1) == EventIds.SCSGetProductDataSinceDateTimeRequestStart.ToEventId()
-      && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} ").MustHaveHappened();
+                && call.GetArgument<LogLevel>(0) == LogLevel.Information
+                && call.GetArgument<EventId>(1) == EventIds.SCSGetProductDataSinceDateTimeRequestStart.ToEventId()
+                && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} ").MustHaveHappened();
         }
 
 
@@ -174,8 +170,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').", errors.Errors.Single().Description);
         }
 
-
-
         [Test]
         public async Task WhenEmptySinceDateTimeInRequest_ThenGetProductDataSinceDateTimeShouldReturnBadRequest()
         {
@@ -187,6 +181,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
         }
 
+        #endregion GetScsResponsebySinceDateTime
 
         private SalesCatalogueResponse GetSalesCatalogueResponse()
         {
@@ -201,27 +196,27 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                         RequestedProductsAlreadyUpToDateCount = 8,
                         ReturnedProductCount = 2,
                         RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
-                     new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
-                     new RequestedProductsNotReturned { ProductName = "GB160060", Reason = "invalidProduct" }
-                 }
+                            new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
+                            new RequestedProductsNotReturned { ProductName = "GB160060", Reason = "invalidProduct" }
+
+                        }
                     },
                     Products = new List<Products> {
-                 new Products {
-                     ProductName = "AU334550",
-                     EditionNumber = 2,
-                     UpdateNumbers = new List<int?> { 3, 4 },
-                     Cancellation = new Cancellation {
-                         EditionNumber = 4,
-                         UpdateNumber = 6
-                     },
-                     FileSize = 400
-                 }
-             }
+                        new Products {
+                            ProductName = "AU334550",
+                            EditionNumber = 2,
+                            UpdateNumbers = new List<int?> { 3, 4 },
+                            Cancellation = new Cancellation {
+                                EditionNumber = 4,
+                                UpdateNumber = 6
+                            },
+                            FileSize = 400
+
+                        }
+                    }
                 },
                 ScsRequestDateTime = DateTime.UtcNow
             };
         }
-
-        #endregion GetScsResponsebySinceDateTime
     }
 }
