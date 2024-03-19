@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         private IHttpContextAccessor fakeHttpContextAccessor;
         private IProductDataService fakeProductDataService;
         private ILogger<ProductDataController> fakeLogger;
-        public const string errorMessage = "Either body is null or malformed";        
+        public const string errorMessage = "Either body is null or malformed";
 
         [SetUp]
         public void Setup()
