@@ -9,6 +9,7 @@ using System.Security.Claims;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 
 namespace UKHO.ExchangeSetService.API.Controllers
@@ -123,6 +124,41 @@ namespace UKHO.ExchangeSetService.API.Controllers
         private void LogInfo(EventId eventId, string infoType, string correlationId)
         {
             Logger.LogInformation(eventId, $"{HttpContext.Request.Path} - {infoType} - for CorrelationId - {{correlationId}}", correlationId);
+        }
+        protected IActionResult GetScsResponse(SalesCatalogueResponse model, List<Error> errors = null)
+        {
+            switch (model.ResponseCode)
+            {
+                case HttpStatusCode.OK:
+                    return BuildOkScsResponse(model);
+
+                case HttpStatusCode.InternalServerError:
+                    return BuildInternalServerErrorResponse();
+
+                case HttpStatusCode.BadRequest:
+                    return BuildBadRequestErrorResponse(errors);
+
+                case HttpStatusCode.NotModified:
+                    return BuildNotModifiedScsResponse(model);
+
+                default:
+                    return BuildInternalServerErrorResponse();
+            }
+        }
+
+        private IActionResult BuildOkScsResponse(SalesCatalogueResponse model)
+        {
+            if (model.LastModified != null)
+                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified.ToString());
+            return Ok(model.ResponseBody);
+        }
+
+        private IActionResult BuildNotModifiedScsResponse(SalesCatalogueResponse model)
+        {
+            LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
+            if (model.LastModified != null)
+                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified.ToString());
+            return new StatusCodeResult(StatusCodes.Status304NotModified);
         }
     }
 }
