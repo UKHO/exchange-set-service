@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Collections.Generic;
-////using System;
-////using System.Globalization;
+using System;
+using System.Globalization;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
     {
         private readonly List<string> cleanUpBatchIdList = new();
         private readonly List<string> downloadedFolderPathList = new();
-        ////private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
+        private readonly string sinceDateTime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -31,11 +31,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 var downloadFolderPath = await FileContentHelper.CreateExchangeSetFile(apiResponse, FssJwtToken);
                 downloadedFolderPathList.Add(downloadFolderPath);
 
-                ////product versions
+                //product versions
                 ProductVersionData = new List<ProductVersionModel>
                 {
                     DataHelper.GetProductVersionModelData("GB602571", 3, 0),
-                    //DataHelper.GetProductVersionModelData("DE360010", 1, 0)
                 };
                 var productVersionsApiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, accessToken: EssJwtToken, exchangeSetStandard);
                 Assert.AreEqual(200, (int)productVersionsApiResponse.StatusCode, $"Incorrect status code is returned  {productVersionsApiResponse.StatusCode}, instead of the expected status 200.");
@@ -44,13 +43,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 var productVersionsDownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(productVersionsApiResponse, FssJwtToken);
                 downloadedFolderPathList.Add(productVersionsDownloadedFolderPath);
 
-                ////since dateTime
-                ////var sinceDateTimeApiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, exchangeSetStandard);
-                ////Assert.AreEqual(200, (int)sinceDateTimeApiResponse.StatusCode, $"Incorrect status code is returned  {sinceDateTimeApiResponse.StatusCode}, instead of the expected status 200.");
-                ////var sinceDateTimeBatchId = await sinceDateTimeApiResponse.GetBatchId();
-                ////cleanUpBatchIdList.Add(sinceDateTimeBatchId);
-                ////var sinceDateTimeDownloadFolderPath = await FileContentHelper.CreateExchangeSetFile(sinceDateTimeApiResponse, FssJwtToken);
-                ////downloadedFolderPathList.Add(sinceDateTimeDownloadFolderPath);
+                //since dateTime
+                var sinceDateTimeApiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, exchangeSetStandard);
+                Assert.AreEqual(200, (int)sinceDateTimeApiResponse.StatusCode, $"Incorrect status code is returned  {sinceDateTimeApiResponse.StatusCode}, instead of the expected status 200.");
+                var sinceDateTimeBatchId = await sinceDateTimeApiResponse.GetBatchId();
+                cleanUpBatchIdList.Add(sinceDateTimeBatchId);
+                var sinceDateTimeDownloadFolderPath = await FileContentHelper.CreateExchangeSetFile(sinceDateTimeApiResponse, FssJwtToken);
+                downloadedFolderPathList.Add(sinceDateTimeDownloadFolderPath);
             }
         }
 
