@@ -6,6 +6,12 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
+using UKHO.ExchangeSetService.API.Extensions;
+using UKHO.ExchangeSetService.API.Filters;
+using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Extensions;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -16,10 +22,68 @@ namespace UKHO.ExchangeSetService.API.Controllers
     [Authorize]
     public class ProductInformationController : BaseController<ProductInformationController>
     {
+        private readonly IProductDataService productDataService;
         public ProductInformationController(IHttpContextAccessor contextAccessor,
-            ILogger<ProductInformationController> logger)
+            ILogger<ProductInformationController> logger,
+            IProductDataService productDataService)
             : base(contextAccessor, logger)
         {
+            this.productDataService = productDataService;
+        }
+
+        /// <summary>
+        /// Provide ENC information from sales catalog service.
+        /// </summary>
+        /// <remarks>
+        /// Given a list of ENC name identifiers, return all the versions of the ENCs from sales catalog service.
+        /// </remarks>
+        /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
+        /// <response code="200">A JSON body that containing the information of ENCs.</response>
+        /// <response code="400">Bad Request.</response>
+        [HttpPost]
+        [Route("/productInformation/productIdentifiers")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers)
+        {
+            return Logger.LogStartEndAndElapsedTimeAsync(EventIds.PostValidateProductIdentifiersRequestForScsResponseStart, EventIds.PostValidateProductIdentifiersRequestForScsResponseCompleted,
+                "Validate Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}",
+                async () =>
+                {
+                    if (productIdentifiers == null || productIdentifiers.Length == 0)
+                    {
+                        var error = new List<Error>
+                        {
+                            new()
+                            {
+                                Source = "requestBody",
+                                Description = "Either body is null or malformed."
+                            }
+                        };
+                        return BuildBadRequestErrorResponse(error);
+                    }
+                    ScsProductIdentifierRequest scsProductIdentifierRequest = new ScsProductIdentifierRequest()
+                    {
+                        ProductIdentifier = productIdentifiers,
+                        CorrelationId = GetCurrentCorrelationId()
+                    };
+
+                    var validationResult = await productDataService.ValidateScsProductDataByProductIdentifiers(scsProductIdentifierRequest);
+
+                    if (!validationResult.IsValid)
+                    {
+                        List<Error> errors;
+
+                        if (validationResult.HasBadRequestErrors(out errors))
+                        {
+                            return BuildBadRequestErrorResponse(errors);
+                        }
+                    }
+                    var productDetail = await productDataService.CreateProductDataByProductIdentifiers(scsProductIdentifierRequest);
+                    return GetScsResponse(productDetail);
+                }, GetCurrentCorrelationId());
         }
 
         /// <summary>
@@ -42,26 +106,41 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Produces("application/json")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.OK, name: "Date", type: "string", description: "Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENC versions that have been issued since that datetime.</p>")]
-        public virtual IActionResult GetProductInformationSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime)
+        public virtual Task<IActionResult> GetProductInformationSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime)
         {
-            ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
-            {
-                SinceDateTime = sinceDateTime
-            };
-
-            if (productDataSinceDateTimeRequest.SinceDateTime == null)
-            {
-                var error = new List<Error>
+            return Logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSGetProductDataSinceDateTimeRequestStart, EventIds.SCSGetProductDataSinceDateTimeRequestCompleted,
+                "SCS Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} ",
+                async () =>
                 {
-                    new()
+                    ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
                     {
-                        Source = "sinceDateTime",
-                        Description = "Query parameter 'sinceDateTime' is required."
+                        SinceDateTime = sinceDateTime,
+                        CorrelationId = GetCurrentCorrelationId()
+                    };
+                    if (productDataSinceDateTimeRequest.SinceDateTime == null)
+                    {
+                        var error = new List<Error>
+                        {
+                            new()
+                            {
+                                Source = "sinceDateTime",
+                                Description = "Query parameter 'sinceDateTime' is required."
+                            }
+                        };
+                        return BuildBadRequestErrorResponse(error);
                     }
-                };
-                return BuildBadRequestErrorResponse(error);
-            }
-            return StatusCode(StatusCodes.Status200OK);
+
+                    var validationResult = await productDataService.ValidateScsDataSinceDateTime(productDataSinceDateTimeRequest);
+
+                    if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
+                    {
+                        return BuildBadRequestErrorResponse(errors);
+                    }
+                    var productDetail = await productDataService.GetProductDataSinceDateTime(productDataSinceDateTimeRequest);
+
+                    return GetScsResponse(productDetail);
+                }, GetCurrentCorrelationId());
         }
     }
 }
+

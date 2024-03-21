@@ -806,9 +806,25 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         ValidateCallbackRequestPayloadStart = 805199,
         /// <summary>
-        /// 805200 - Invalid FSS business unit provided to fulfilment service
+        /// 805200 - Request for sales catalog service product identifiers endpoint is started.
         /// </summary>
-        InvalidFssBusinessUnit = 805200
+        PostValidateProductIdentifiersRequestForScsResponseStart = 805200,
+        /// <summary>
+        /// 805201 - Request for sales catalog service product identifiers endpoint is completed.
+        /// </summary>
+        PostValidateProductIdentifiersRequestForScsResponseCompleted = 805201,
+        /// <summary>
+        /// 805202 - Request for sales catalouge service product data sincedatetime endpoint is started.
+        /// </summary>
+        SCSGetProductDataSinceDateTimeRequestStart = 805202,
+        /// <summary>
+        /// 805203 - Request for sales catalouge service product data sincedatetime endpoint is completed.
+        /// </summary>
+        SCSGetProductDataSinceDateTimeRequestCompleted = 805203,
+        /// <summary>
+        /// 805204 - Invalid FSS business unit provided to fulfilment service
+        /// </summary>
+        InvalidFssBusinessUnit = 805204
     }
 
     public static class EventIdExtensions
