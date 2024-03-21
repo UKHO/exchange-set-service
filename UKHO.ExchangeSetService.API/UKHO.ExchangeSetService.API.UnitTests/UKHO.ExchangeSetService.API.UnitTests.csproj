@@ -28,12 +28,12 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Controllers\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.csproj" />
+	</ItemGroup>
 
 </Project>
