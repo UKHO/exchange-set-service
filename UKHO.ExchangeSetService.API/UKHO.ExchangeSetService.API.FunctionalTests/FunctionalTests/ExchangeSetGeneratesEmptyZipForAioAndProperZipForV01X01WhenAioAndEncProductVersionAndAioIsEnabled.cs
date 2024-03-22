@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 77585: ESS : Empty AIO Exchange Set Creation
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadV01X01ZipExchangeSet_ThenEncFilesShouldNotBeAvailable()
         {
             //Get the product details form sales catalogue service
