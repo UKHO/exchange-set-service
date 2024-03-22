@@ -3264,5 +3264,161 @@
         }
       ]
     }
+  },
+  {
+    "id": "productIdentifier-AB1234GH-GZ800112",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 0,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "AB1234GH",
+            "reason": "invalidProduct"
+          },
+          {
+            "productName": "GZ800112",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": []
+    }
+  },
+  {
+    "id": "productIdentifier-AB1234GH-GB800001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "AB1234GH",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 76909
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-GZ800112",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 0,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "GZ800112",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": []
+    }
+  },
+  {
+    "id": "productIdentifier-AB1234GH-GZ800112-GB800001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "AB1234GH",
+            "reason": "invalidProduct"
+          },
+          {
+            "productName": "GZ800112",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 76909
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-GB800001-GZ800112",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "GZ800112",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 76909
+        }
+      ]
+    }
   }
 ]
