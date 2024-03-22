@@ -15,8 +15,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private const string FileContent_avcs = "AVCS";
         private const string FileContent_base = "Base";
         private const string FileContent_dvd = "Media','DVD_SERVICE'";
-        private static TestConfiguration Config = new TestConfiguration();
-        private static FssApiClient FssApiClient = new FssApiClient();
+        private static TestConfiguration Config = new();
+        private static FssApiClient FssApiClient = new();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
