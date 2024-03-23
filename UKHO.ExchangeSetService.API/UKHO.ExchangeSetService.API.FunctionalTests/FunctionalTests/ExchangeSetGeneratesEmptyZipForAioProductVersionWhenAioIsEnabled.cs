@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: objStorage.EssJwtToken);
             //////Get the BatchId
             batchId = await ApiEssResponse.GetBatchId();
+            Console.WriteLine("ExchangeSetGeneratesEmptyZipForAioProductVersionWhenAioIsEnabled batchId" + batchId);
             DownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(ApiEssResponse, objStorage.FssJwtToken);
         }
 

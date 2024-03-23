@@ -2474,34 +2474,18 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 2,
-        "returnedProductCount": 2,
+        "returnedProductCount": 1,
         "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
+        "requestedProductsNotReturned": [
+          {
+            "productName": "GZ800112",
+            "reason": "invalidProduct"
+          }
+        ]
       },
       "products": [
         {
-          "editionNumber": 13,
-          "productName": "DE416080",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-08-21T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-08-21T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 286099,
-          "bundle": [
-            {
-              "bundleType": "DVD",
-              "location": "M2;B8"
-            }
-          ]
-        },
-        {
-          "editionNumber": 4,
+          "editionNumber": 9,
           "productName": "DE416080",
           "updateNumbers": [
             0
