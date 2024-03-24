@@ -3178,9 +3178,14 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 3,
-        "returnedProductCount": 3,
+        "returnedProductCount": 2,
         "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
+        "requestedProductsNotReturned": [
+          {
+            "productName": "US2ARCGD",
+            "reason": "invalidProduct"
+          }
+        ]
       },
       "products": [
         {
@@ -3201,27 +3206,6 @@
             {
               "bundleType": "DVD",
               "location": "M2;B8"
-            }
-          ]
-        },
-        {
-          "editionNumber": 2,
-          "productName": "US2ARCGD",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-07-05T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-07-05T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 170103,
-          "bundle": [
-            {
-              "bundleType": "DVD",
-              "location": "M1;B5"
             }
           ]
         },
