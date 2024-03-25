@@ -15,8 +15,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private const string FileContent_avcs = "AVCS";
         private const string FileContent_base = "Base";
         private const string FileContent_dvd = "Media','DVD_SERVICE'";
-        private static TestConfiguration Config = new TestConfiguration();
-        private static FssApiClient FssApiClient = new FssApiClient();
+        private static TestConfiguration Config = new();
+        private static FssApiClient FssApiClient = new();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
@@ -85,41 +85,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
         }
 
-        public static async Task CheckDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, string accessToken)
-        {
-            //Get Countrycode
-            string countryCode = productName.Substring(0, 2);
-
-            //Get folder path
-            string editionFolderPath = Path.Combine(folderPath, countryCode, productName, editionNumber.ToString());
-
-            //Get list of directories
-            List<string> listUpdateNumberPath = GetDirectories(editionFolderPath, "*");
-
-            for (int counter = 0; counter < listUpdateNumberPath.Count; counter++)
-            {
-                string updateNumber = new DirectoryInfo(listUpdateNumberPath[counter]).Name;
-                int totalFileCount = FileCountInDirectories(listUpdateNumberPath[counter]);
-                string[] fileNames = Directory.GetFiles(listUpdateNumberPath[counter]).Select(file => Path.GetFileName(file)).ToArray();
-
-                var searchQueryString = CreateFssSearchQuery(productName, editionNumber.ToString(), updateNumber);
-
-                var apiResponse = await FssApiClient.SearchBatchesAsync(fssBaseUrl, searchQueryString, 100, 0, accessToken);
-                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
-
-                //Batch Search response
-                var responseSearchDetails = await apiResponse.ReadAsTypeAsync<ResponseBatchSearchModel>();
-                int fssFileCount = responseSearchDetails.Entries[0].Files.Count;
-
-                Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count is {totalFileCount}, Instead of expected count {fssFileCount}");
-
-                foreach (var fileName in fileNames)
-                {
-                    Assert.IsTrue(responseSearchDetails.Entries[0].Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
-                }
-            }
-        }
-
         public static void CheckNoEncFilesDownloadedAsync(string folderPath, string productName)
         {
             //Get Countrycode
@@ -132,7 +97,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(0, folderCount, $"Downloaded Enc folder count {folderCount}, Instead of expected count 0");
         }
 
-        public static async Task GetDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, int? updateNumber, string accessToken)
+        public static async Task GetDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, int? updateNumber, string accessToken, string businessUnit = "ADDS")
         {
             int totalFileCount = 0;
             //Get Countrycode
@@ -141,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Get folder path
             string downloadedEncFolderPath = Path.Combine(folderPath, countryCode, productName, editionNumber.ToString(), updateNumber.ToString());
 
-            var searchQueryString = CreateFssSearchQuery(productName, editionNumber.ToString(), updateNumber.ToString());
+            var searchQueryString = CreateFssSearchQuery(businessUnit, productName, editionNumber.ToString(), updateNumber.ToString());
 
             var apiResponse = await FssApiClient.SearchBatchesAsync(fssBaseUrl, searchQueryString, 100, 0, accessToken);
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
@@ -187,9 +152,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 batchDetail.Attributes.Any(a => a.Key == "UpdateNumber" && a.Value == updateNumber);
         }
 
-        public static string CreateFssSearchQuery(string productName, string editionNumber, string updateNumber)
+        public static string CreateFssSearchQuery(string businessUnit, string productName, string editionNumber, string updateNumber)
         {
-            string searchQuery = $"$batch(ProductCode) eq 'AVCS' and $batch(cellname) eq '{productName}' and $batch(editionnumber) eq '{editionNumber}' and $batch(updatenumber) eq '{updateNumber}'";
+            string searchQuery = $"$batch(businessUnit) eq '{businessUnit}' and $batch(ProductCode) eq 'AVCS' and $batch(cellname) eq '{productName}' and $batch(editionnumber) eq '{editionNumber}' and $batch(updatenumber) eq '{updateNumber}'";
             return searchQuery;
         }
 

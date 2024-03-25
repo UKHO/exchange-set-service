@@ -87,8 +87,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ExchangeSetFileName = "V01X01.zip",
                 IhoCrtFileName = "IHO.crt",
                 IhoPubFileName = "IHO.pub",
-                ReadMeFileName = "README.txt"
-                
+                ReadMeFileName = "README.txt",
+                S63BusinessUnit = "ADDS",
+                S57BusinessUnit = "ADDS-S57"
             });
             fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
             { QueueName = "", StorageAccountKey = "", StorageAccountName = "", StorageContainerName = "" });
@@ -119,7 +120,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         #region GetScsResponseQueueMessage
-        private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
+        private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage(string exchangeSetStandard)
         {
             return new SalesCatalogueServiceResponseQueueMessage
             {
@@ -129,7 +130,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CallbackUri = "https://test-callbackuri.com",
                 CorrelationId = "727c5230-2c25-4244-9580-13d90004584a",
                 IsEmptyEncExchangeSet = false,
-                IsEmptyAioExchangeSet = false
+                IsEmptyAioExchangeSet = false,
+                ExchangeSetStandard = exchangeSetStandard
             };
         }
         #endregion
@@ -330,9 +332,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsExchangeSetCreatedSuccessfully()
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
@@ -373,12 +377,34 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ExchangeSetCreated.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadReadMeFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateZipFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.UploadExchangeSetToFssStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
-        public void WhenIsCancellationRequestedinExchangeSet_ThenThrowCancelledException()
+        [TestCase("s63", "ADDS")]
+        [TestCase("s57", "ADDS-S57")]
+        public void WhenIsCancellationRequestedInExchangeSet_ThenThrowCancelledException(string exchangeSetStandard, string businessUnit)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
@@ -399,13 +425,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             CancellationToken cancellationToken = cancellationTokenSource.Token;
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
 
-            Assert.ThrowsAsync<TaskCanceledException>(async () => await fulfilmentDataService.QueryFileShareServiceFiles(scsResponseQueueMessage, productList, null, cancellationTokenSource, cancellationToken));
+            Assert.ThrowsAsync<TaskCanceledException>(async () => await fulfilmentDataService.QueryFileShareServiceFiles(scsResponseQueueMessage, productList, null, cancellationTokenSource, cancellationToken, businessUnit));
         }
 
         [Test]
-        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsExchangeSetIsNotCreated()
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsExchangeSetIsNotCreated(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
             fakeConfiguration["HOME"] = @"D:\\Downloads";
@@ -426,7 +454,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
             string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
@@ -439,7 +468,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             IDirectoryInfo[] directoryInfos = { b1, b2, m1 };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
@@ -463,10 +492,31 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string largeExchangeSet = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
 
             Assert.AreEqual("Large Media Exchange Set Created Successfully", largeExchangeSet);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadInfoFolderRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceAdcFolderFilesRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadAdcFolderFilesStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateSerialFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
-        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetIsNotCreated()
+        [TestCase("s63")]
+        public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
         {
             string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
@@ -479,7 +529,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             IDirectoryInfo[] directoryInfos = { b1, b2, m1 };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             IEnumerable<BatchFile> batchFiles = GetFiles();
@@ -507,14 +557,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void WhenInvalidProductResponse_ThenReturnsLargeMediaExchangeSetIsNotCreated()
+        [TestCase("s63")]
+        public void WhenInvalidProductResponse_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("Products", "Product validation failed")
             {
                 ErrorCode = HttpStatusCode.BadRequest.ToString()
             };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
             A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
@@ -524,9 +575,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void WhenCatalogueFileCreationFails_ThenReturnsLargeMediaExchangeSetIsNotCreated()
+        [TestCase("s63")]
+        public void WhenLargeMediaCatalogueFileCreationFails_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
         {
-            string filePath = @"D:\\Downloads";
+            var filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -537,9 +589,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             IDirectoryInfo[] directoryInfos = { b1, b2, m1 };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
-            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
+            var scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            var salesCatalogueProductResponse = GetSalesCatalogueResponse();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
@@ -566,12 +618,80 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
              ).MustHaveHappenedOnceExactly();
         }
 
+        [Test]
+        [TestCase("s63")]
+        [TestCase("s57")]
+        public void WhenValidMessageQueueTriggerAndZipFolderNotCreated_ThenThrowsFulfilmentException(string exchangeSetStandard)
+        {
+            var scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            var salesCatalogueProductResponse = GetSalesCatalogueResponse();
+
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            var filePath = @"D:\\Downloads";
+
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            IDirectoryInfo fakeDirectoryInfo = GetSubDirectories(EncExchangeSet);
+            A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                  async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate); });
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateProductFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadReadMeFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.CreateZipFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ErrorInCreatingZipFile.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        [TestCase("test")]
+        public void WhenExchangeSetStandardParameterOtherThanS63AndS57_ThenThrowsException(string exchangeSetStandard)
+        {
+            var scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            var salesCatalogueProductResponse = GetSalesCatalogueResponse();
+
+            var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+                async delegate { await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate); });
+        }
+
         #region AIO
 
         [Test]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsStandardAndAioExchangeSetCreatedSuccessfully()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsStandardAndAioExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
@@ -604,7 +724,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-                A<string>.Ignored)).Returns(fulfilmentDataResponse);
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(true);
             IDirectoryInfo fakeDirectoryInfo = GetSubDirectories(EncExchangeSet);
             A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
@@ -618,7 +738,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -640,12 +760,22 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             && call.GetArgument<EventId>(1) == EventIds.CreateCatalogFileForAioRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceIhoCrtFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.DownloadIhoPubFileRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test, Description("Creating ENC exchange set without AIO exchange set")]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsExchangeSetCreatedSuccessfullyWithoutAioCell()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsExchangeSetCreatedSuccessfullyWithoutAioCell(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = null;
@@ -673,7 +803,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-                A<string>.Ignored)).Returns(fulfilmentDataResponse);
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
 
             IDirectoryInfo fakeDirectoryInfo = GetSubDirectories(EncExchangeSet);
             A.CallTo(() => fakeFileSystemHelper.GetSubDirectories(A<string>.Ignored)).Returns(new IDirectoryInfo[] { fakeDirectoryInfo });
@@ -687,7 +817,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -696,9 +826,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test, Description("Creating Empty Aio exchange set without ENC exchange set")]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsEmptyAioExchangeSetCreatedSuccessfully()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsEmptyAioExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             scsResponseQueueMessage.IsEmptyAioExchangeSet = true;
             SalesCatalogueProductResponse salesCatalogueProductResponse = new()
             {
@@ -763,9 +894,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test, Description("Creating Empty ENC exchange set without AIO exchange set")]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsEmptyExchangeSetCreatedSuccessfullyWithoutAioCell()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsEmptyExchangeSetCreatedSuccessfullyWithoutAioCell(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             scsResponseQueueMessage.IsEmptyEncExchangeSet = true;
             SalesCatalogueProductResponse salesCatalogueProductResponse = new()
             {
@@ -834,9 +966,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInValidMessageQueueTrigger_ThenReturnsStandardAndAioExchangeSetIsNotCreated()
+        [TestCase("s63")]
+        public async Task WhenInValidMessageQueueTrigger_ThenReturnsStandardAndAioExchangeSetIsNotCreated(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
             fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
@@ -867,7 +1000,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
             A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-            A<string>.Ignored)).Returns(fulfilmentDataResponse);
+            A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(true);
 
             string result = await fulfilmentDataService.CreateExchangeSet(scsResponseQueueMessage, currentUtcDate);
@@ -877,7 +1010,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -896,7 +1029,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaAndAioExchangeSetCreatedSuccessfully()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaAndAioExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
             string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
@@ -914,7 +1048,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 1, ProductName = "GB800001", UpdateNumber = 1, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
@@ -943,7 +1077,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.CommitLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-                A<string>.Ignored)).Returns(fulfilmentDataResponse);
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<DateTime>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
@@ -956,7 +1090,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -980,7 +1114,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void WhenSerialAIOCreationFails_ThenReturnsLargeMediaAndAioExchangeSetIsNotCreated()
+        [TestCase("s63")]
+        public void WhenSerialAIOCreationFails_ThenReturnsLargeMediaAndAioExchangeSetIsNotCreated(string exchangeSetStandard)
         {
             string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
@@ -998,7 +1133,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 1, ProductName = "GB800001", UpdateNumber = 1, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
@@ -1027,7 +1162,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.CommitLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-                A<string>.Ignored)).Returns(fulfilmentDataResponse);
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(false);
 
@@ -1042,7 +1177,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test, Description("Creating large media exchange set without AIO cell")]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaEncExchangeSetCreatedSuccessfully()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaEncExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
             string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
@@ -1060,7 +1196,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 1, ProductName = "ABC20001", UpdateNumber = 1, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
 
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
@@ -1099,7 +1235,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-                A<string>.Ignored)).Returns(fulfilmentDataResponse);
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
 
             string result = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
 
@@ -1112,9 +1248,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test, Description("Creating only AIO exchange set")]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsAIOExchangeSetCreatedSuccessfully()
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsAIOExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
-            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage();
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponseForAio();
             fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
@@ -1146,7 +1283,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFulfilmentCallBackService.SendCallBackResponse(A<SalesCatalogueProductResponse>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
                 A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-                A<string>.Ignored)).Returns(fulfilmentDataResponse);
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
 
@@ -1162,7 +1299,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.QueryFileShareServiceENCFilesRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1185,6 +1322,66 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
+        [Test]
+        [TestCase("s63")]
+        public void WhenCreationOfCatalogueFileForAIOFails_ThenThrowsException(string exchangeSetStandard)
+        {
+            string filePath = @"D:\\Downloads";
+            var b1 = A.Fake<IDirectoryInfo>();
+            var b2 = A.Fake<IDirectoryInfo>();
+            var m1 = A.Fake<IDirectoryInfo>();
+
+            A.CallTo(() => b1.Name).Returns("B1");
+            A.CallTo(() => b2.Name).Returns("B2");
+            A.CallTo(() => m1.Name).Returns("M01X02");
+
+            IDirectoryInfo[] directoryInfos = { b1, b2, m1 };
+
+            var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles()},
+                new FulfilmentDataResponse{ BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 1, ProductName = "GB800001", UpdateNumber = 1, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
+            };
+
+            SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
+            IEnumerable<BatchFile> batchFiles = GetFiles();
+
+            fakeAioConfiguration.Value.AioEnabled = true;
+            fakeAioConfiguration.Value.AioCells = "GB800001";
+
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
+            A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFiles);
+            A.CallTo(() => fakeQueryFssService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, batchFiles, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.QueryFileShareServiceData(A<List<Products>>.Ignored,
+                A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(false);
+
+            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+               async delegate { await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02"); });
+
+            A.CallTo(fakeLogger).Where(call =>
+             call.Method.Name == "Log"
+             && call.GetArgument<LogLevel>(0) == LogLevel.Error
+             && call.GetArgument<EventId>(1) == EventIds.LargeExchangeSetCreatedWithError.ToEventId()
+             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}"
+             ).MustHaveHappenedOnceExactly();
+        }
         #endregion
     }
 }
