@@ -120,21 +120,15 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenInvalidScsProductIdentifiersRequest_ThenPostProductIdentifiersReturnsInternalServerError()
+        public async Task WhenScsDoesNotRespond200OK_ThenPostProductIdentifiersReturnsInternalServerError()
         {
             var mockSalesCatalogueResponse = GetSalesCatalogueResponse();
             var salesCatalogueResponse = new SalesCatalogueResponse()
             {
                 ResponseBody = mockSalesCatalogueResponse.ResponseBody,
-                ResponseCode = HttpStatusCode.InternalServerError
+                ResponseCode = HttpStatusCode.Unauthorized
             };
-
-            var validationMessage = new ValidationFailure("ProductIdentifiers", "Internal Server Error.");
-            validationMessage.ErrorCode = HttpStatusCode.InternalServerError.ToString();
-
-            A.CallTo(() => fakeProductDataService.ValidateScsProductDataByProductIdentifiers(A<ScsProductIdentifierRequest>.Ignored))
-                            .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
-
+            
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ScsProductIdentifierRequest>.Ignored))
                 .Returns(salesCatalogueResponse);
 
@@ -207,22 +201,20 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenInvalidSinceDateTimeInRequest_ThenGetSinceDateTimeReturnsInternalServerError()
+        public async Task WhenScsDoesNotRespond200OK_ThenGetSinceDateTimeReturnsInternalServerError()
         {
-            var validationMessage = new ValidationFailure("SinceDateTime", "Internal Server Error")
+
+            var mockSalesCatalogueResponse = GetSalesCatalogueResponse();
+            var salesCatalogueResponse = new SalesCatalogueResponse()
             {
-                ErrorCode = HttpStatusCode.InternalServerError.ToString()
+                ResponseBody = mockSalesCatalogueResponse.ResponseBody,
+                ResponseCode = HttpStatusCode.Unauthorized
             };
-
-            var salesCatalogueResponse = new SalesCatalogueResponse();
-
-            A.CallTo(() => fakeProductDataService.ValidateScsDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
             A.CallTo(() => fakeProductDataService.GetProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(salesCatalogueResponse);
 
-            var result = (ObjectResult)await controller.GetProductInformationSinceDateTime("Fri, 8 Mar 2024");
+            var result = (ObjectResult)await controller.GetProductInformationSinceDateTime("Fri, 22 Mar 2024");
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
             Assert.AreEqual(500, result.StatusCode);
         }
