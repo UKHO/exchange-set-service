@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         [TestCase("ADDS")]
         [TestCase("ADDS-S57")]
-        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfillmentDataNullResponse(string businessUnit)
+        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataNullResponse(string businessUnit)
         {
             A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse(businessUnit));
 
