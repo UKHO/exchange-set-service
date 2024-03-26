@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
-using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -40,12 +39,18 @@ namespace UKHO.ExchangeSetService.API.Controllers
         /// <param name="productIdentifiers">The JSON body containing product identifiers.</param>
         /// <response code="200">A JSON body that containing the information of ENCs.</response>
         /// <response code="400">Bad Request.</response>
+        /// <response code="401">Unauthorised - either you have not provided any credentials, or your credentials are not recognised.</response>
+        /// <response code="403">Forbidden - you have been authorised, but you are not allowed to access this resource.</response>
+        /// <response code="429">You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
+        /// <response code="500">Internal Server Error.</response>
         [HttpPost]
         [Route("/productInformation/productIdentifiers")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENCs.</p>")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.PostValidateProductIdentifiersRequestForScsResponseStart, EventIds.PostValidateProductIdentifiersRequestForScsResponseCompleted,
@@ -106,6 +111,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Produces("application/json")]
         [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.OK, name: "Date", type: "string", description: "Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.")]
         [SwaggerResponse(statusCode: (int)HttpStatusCode.OK, type: typeof(SalesCatalogueResponse), description: "<p>A JSON body that containing the information of ENC versions that have been issued since that datetime.</p>")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.NotModified, name: "Date", type: "string", description: "Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.BadRequest, type: typeof(ErrorDescription), description: "Bad request.")]
+        [SwaggerResponseHeader(statusCode: (int)HttpStatusCode.TooManyRequests, name: "Retry-After", type: "integer", description: "Specifies the time you should wait in seconds before retrying.")]
+        [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> GetProductInformationSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime)
         {
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSGetProductDataSinceDateTimeRequestStart, EventIds.SCSGetProductDataSinceDateTimeRequestCompleted,
