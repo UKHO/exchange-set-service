@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IFileShareServiceCache fileShareServiceCache;
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
-        private readonly IMonitorHelper monitorHelper;
+        //private readonly IMonitorHelper monitorHelper;
         private readonly AioConfiguration aioConfiguration;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
         private const string ZIPFILE = "zip";
@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fileShareServiceCache = fileShareServiceCache;
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
-            this.monitorHelper = monitorHelper;
+            //this.monitorHelper = monitorHelper;
             this.aioConfiguration = aioConfiguration.Value;
         }
 
@@ -763,7 +763,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             bool isUploadZipFile = false;
-            DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
+            //DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipRootPath, fileName));
 
             var fileCreateMetaData = new FileCreateMetaData()
@@ -780,8 +780,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 if (isWriteBlock)
                 {
                     isUploadZipFile = true;
-                    DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
-                    monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                    //DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
+                    //monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
                 }
             }
             return isUploadZipFile;
@@ -841,7 +841,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private async Task<BatchStatus> CommitAndGetBatchStatus(string batchId, string correlationId, string accessToken, List<BatchCommitMetaData> batchCommitMetaDataList)
         {
-            DateTime commitTaskStartedAt = DateTime.UtcNow;
+            //DateTime commitTaskStartedAt = DateTime.UtcNow;
             bool isUploadCommitBatchCompleted = await UploadCommitBatch(batchCommitMetaDataList, correlationId);
             BatchStatus batchStatus = BatchStatus.CommitInProgress;
             if (isUploadCommitBatchCompleted)
@@ -878,8 +878,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 logger.LogError(EventIds.BatchFailedStatus.ToEventId(), "Batch status failed for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                 throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
             }
-            DateTime commitTaskCompletedAt = DateTime.UtcNow;
-            monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null, batchId);
+            //DateTime commitTaskCompletedAt = DateTime.UtcNow;
+            //monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null, batchId);
             return batchStatus;
         }
 
@@ -1068,7 +1068,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             bool isWriteBlock = false;
-            DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
+            //DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
             CustomFileInfo customFileInfo = fileSystemHelper.GetFileInfo(Path.Combine(exchangeSetZipPath, fileName));
 
             var fileCreateMetaData = new FileCreateMetaData()
@@ -1084,8 +1084,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 isWriteBlock = await UploadAndWriteBlock(batchId, correlationId, accessToken, customFileInfo);
                 if (isWriteBlock)
                 {
-                    DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
-                    monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                    //DateTime uploadZipFileTaskCompletedAt = DateTime.UtcNow;
+                    //monitorHelper.MonitorRequest("Upload Zip File Task", uploadZipFileTaskStartedAt, uploadZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
                 }
             }
             return isWriteBlock;
@@ -1152,7 +1152,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 throw new FulfilmentException(EventIds.BatchFailedStatus.ToEventId());
             }
             DateTime commitTaskCompletedAt = DateTime.UtcNow;
-            monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null, batchId);
+            //monitorHelper.MonitorRequest("Commit Batch Task", commitTaskStartedAt, commitTaskCompletedAt, correlationId, null, null, null, batchId);
 
             logger.LogInformation(EventIds.BatchStatus.ToEventId(), "BatchStatus:{batchStatus} for large media exchange set of BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", batchStatus, batchId, correlationId);
 
