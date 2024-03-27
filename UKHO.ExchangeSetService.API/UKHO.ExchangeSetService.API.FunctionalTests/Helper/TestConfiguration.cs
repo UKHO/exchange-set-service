@@ -59,6 +59,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public class FileShareService
         {
             public string BaseUrl { get; set; }
+            public string PublicBaseUrl { get; set; }
             public string ResourceId { get; set; }
             public bool IsRunningOnLocalMachine { get; set; }
             public int BatchCommitWaitTime { get; set; }
