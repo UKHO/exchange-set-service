@@ -463,4 +463,24 @@
     </notes>
     <cve>CVE-2024-21907</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: GetDocument.Insider.dll
+   Suppressing this CVE as it is a .NetCore runtime issue affecting .NetCore runtimes below .NET Core 3.1.4 or lower. The ESS Runs in an AppService which will have the fixes already applied, and the global.json has been addeded to require .NetCore 3.1.408 or greater.
+   More details can be found here: https://github.com/dotnet/announcements/issues/156
+   ]]>
+    </notes>
+    <cve>CVE-2024-21386</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: GetDocument.Insider.dll
+   Suppressing this CVE as it is a .NetCore runtime issue affecting .NetCore runtimes below .NET Core 3.1.4 or lower. The ESS Runs in an AppService which will have the fixes already applied, and the global.json has been addeded to require .NetCore 3.1.408 or greater.
+   More details can be found here: https://github.com/dotnet/announcements/issues/156
+   ]]>
+    </notes>
+    <cve>CVE-2024-21404</cve>
+  </suppress>
 </suppressions>
