@@ -418,282 +418,282 @@ stages:
               PathtoPublish: '$(Build.SourcesDirectory)\MockApiDeployment'
               ArtifactName: mockapiterraformartifact              
               
-  # - stage: Devdeploy
-  #   displayName: "Devdeploy (inc terraform, webapp deploy)"
-  #   jobs:
-  #     - deployment: DevDeployApp
-  #       displayName: "Dev - deploy terraform and dotnet App"
-  #       environment: "Ess-Dev"
-  #       pool: $(DeploymentPool)
-  #       container: ${{variables.Container}}
-  #       workspace:
-  #         clean: all
-  #       variables:
-  #         - group: "ESS-Deployment-Variables-DEV"
-  #         - group: "ESS-Dev-Variables"
-  #         - name: "ESSAzureADConfiguration.ClientId"
-  #           value: $(ESSClientId)
-  #         - name: "ESSAzureADConfiguration.TenantId"
-  #           value: $(TenantId)
-  #         - name: "EssAuthorizationConfiguration.TenantId"
-  #           value: $(TenantId)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientId"
-  #           value: $(AutoTestClientId_Authed)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
-  #           value: $(AutoTestClientSecret_Authed)
-  #         - name: "EssAuthorizationConfiguration.EssClientId"
-  #           value: $(ESSClientId)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
-  #           value: $(AutoTestClientId_NoAuth)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
-  #           value: $(AutoTestClientSecret_NoAuth)
-  #         - name: "AzureAdB2CTestConfiguration.ClientSecret"
-  #           value: $(AUTOTEST-ESS-SECRET)
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - checkout: self
-  #                 submodules: recursive
+  - stage: Devdeploy
+    displayName: "Devdeploy (inc terraform, webapp deploy)"
+    jobs:
+      - deployment: DevDeployApp
+        displayName: "Dev - deploy terraform and dotnet App"
+        environment: "Ess-Dev"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        variables:
+          - group: "ESS-Deployment-Variables-DEV"
+          - group: "ESS-Dev-Variables"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
+          - name: "AzureAdB2CTestConfiguration.ClientSecret"
+            value: $(AUTOTEST-ESS-SECRET)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  submodules: recursive
 
-  #               - template: Deployment/templates/continuous-deployment.yml
-  #                 parameters:
-  #                   ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-  #                   AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                - template: Deployment/templates/continuous-deployment.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
-  #               - template: Deployment/templates/continuous-deployment-apim.yml
-  #                 parameters:
-  #                   ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-  #                   AzureSubscription: "Fleet Manager Dev/Test"
-  #                   TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-  #                   APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-  #                   APIMServiceInstance: $(APIM_SERVICE_NAME)
-  #                   tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-  #                   tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+                - template: Deployment/templates/continuous-deployment-apim.yml
+                  parameters:
+                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                    AzureSubscription: "Fleet Manager Dev/Test"
+                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                    APIMServiceInstance: $(APIM_SERVICE_NAME)
+                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
-  #               - task: DownloadBuildArtifacts@0
-  #                 displayName: "Download Functional test Artifact"
-  #                 inputs:
-  #                   buildType: 'current'
-  #                   downloadType: 'single'
-  #                   artifactName: 'functionaltests'
-  #                   downloadPath: '$(Build.SourcesDirectory)'
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Functional test Artifact"
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
-  #               - task: DownloadBuildArtifacts@0
-  #                 displayName: "Download Terraform Artifact"
-  #                 inputs:
-  #                   buildType: 'current'
-  #                   downloadType: 'single'
-  #                   artifactName: 'terraformartifact'
-  #                   downloadPath: '$(Build.SourcesDirectory)'
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Terraform Artifact"
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'terraformartifact'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
-  #               - task: FileTransform@2
-  #                 displayName: "File Transform: functionaltests"
-  #                 inputs:
-  #                   folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-  #                   xmlTransformationRules:
-  #                   jsonTargetFiles: '**/appsettings.json'
+                - task: FileTransform@2
+                  displayName: "File Transform: functionaltests"
+                  inputs:
+                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+                    xmlTransformationRules:
+                    jsonTargetFiles: '**/appsettings.json'
 
-  #               - task: UseDotNet@2
-  #                 displayName: 'Use .NET SDK'
-  #                 inputs:
-  #                   packageType: sdk
-  #                   useGlobalJson: true
-  #                   workingDirectory: '$(Build.SourcesDirectory)'
+                - task: UseDotNet@2
+                  displayName: 'Use .NET SDK'
+                  inputs:
+                    packageType: sdk
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
-  #               - task: AzureCLI@2
-  #                 displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
-  #                 condition: always()
-  #                 inputs:
-  #                   azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-  #                   scriptType: 'pscore'
-  #                   scriptLocation: 'scriptPath'
-  #                   scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-  #                   arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
+                  condition: always()
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-  #               - task: DotNetCoreCLI@2
-  #                 displayName: "Run Functional tests AIOEnabled"
-  #                 inputs:
-  #                   command: "test"
-  #                   projects: |
-  #                     **/*FunctionalTest*.dll
-  #                     !**/*TestAdapter.dll
-  #                     !**/obj/**
-  #                   arguments: '--filter Category=SmokeTest-AIOEnabled'
-  #                   testRunTitle: "Dev-AutomationTests"
-  #                   workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIOEnabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=SmokeTest-AIOEnabled'
+                    testRunTitle: "Dev-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-  #               - task: AzureCLI@2
-  #                 displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
-  #                 inputs:
-  #                   azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-  #                   scriptType: 'pscore'
-  #                   scriptLocation: 'scriptPath'
-  #                   scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-  #                   arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-  #               - task: DotNetCoreCLI@2
-  #                 displayName: "Run Functional tests AIODisabled"
-  #                 inputs:
-  #                   command: "test"
-  #                   projects: |
-  #                     **/*FunctionalTest*.dll
-  #                     !**/*TestAdapter.dll
-  #                     !**/obj/**
-  #                   arguments: '--filter Category=SmokeTest-AIODisabled'
-  #                   testRunTitle: "Dev-AutomationTests"
-  #                   workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIODisabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=SmokeTest-AIODisabled'
+                    testRunTitle: "Dev-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-  #               - task: AzureCLI@2
-  #                 displayName: "Swap ESS API and ESS FulfilmentService Configuration"
-  #                 condition: always()
-  #                 inputs:
-  #                   azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-  #                   scriptType: 'pscore'
-  #                   scriptLocation: 'scriptPath'
-  #                   scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-  #                   arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration"
+                  condition: always()
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-  # - stage: QCdeploy
-  #   dependsOn:
-  #   - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
-  #   displayName: "QCdeploy (inc terraform, mock webapp deploy)"
-  #   jobs:
-  #     - deployment: QCDeployApp
-  #       displayName: "QC - deploy terraform and WebApps"
-  #       environment: "Ess-Dev"
-  #       pool: $(DeploymentPool)
-  #       container: ${{variables.Container}}
-  #       workspace:
-  #         clean: all
-  #       variables:
-  #         - group: "ESS-Deployment-Variables-DEV"
-  #         - group: "ESS-Dev-Variables"
-  #         - name: "ESSAzureADConfiguration.ClientId"
-  #           value: $(ESSClientId)
-  #         - name: "ESSAzureADConfiguration.TenantId"
-  #           value: $(TenantId)
-  #         - name: "EssAuthorizationConfiguration.TenantId"
-  #           value: $(TenantId)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientId"
-  #           value: $(AutoTestClientId_Authed)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
-  #           value: $(AutoTestClientSecret_Authed)
-  #         - name: "EssAuthorizationConfiguration.EssClientId"
-  #           value: $(ESSClientId)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
-  #           value: $(AutoTestClientId_NoAuth)
-  #         - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
-  #           value: $(AutoTestClientSecret_NoAuth)
-  #         - name: "AzureAdB2CTestConfiguration.ClientSecret"
-  #           value: $(AUTOTEST-ESS-SECRET)
-  #           #This variables are overridden since they are different from dev and we have used same library
-  #         - name: "Environment"
-  #           value: "qc"
-  #         - name: "ESSFulfilmentConfiguration.SmallExchangeSetInstance"
-  #           value: 1
-  #         - name: "ESSFulfilmentConfiguration.MediumExchangeSetInstance"
-  #           value: 1
-  #         - name: "ESSFulfilmentConfiguration.LargeExchangeSetInstance"
-  #           value: 1
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - checkout: self
-  #                 submodules: recursive
+  - stage: QCdeploy
+    dependsOn:
+    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    displayName: "QCdeploy (inc terraform, mock webapp deploy)"
+    jobs:
+      - deployment: QCDeployApp
+        displayName: "QC - deploy terraform and WebApps"
+        environment: "Ess-Dev"
+        pool: $(DeploymentPool)
+        container: ${{variables.Container}}
+        workspace:
+          clean: all
+        variables:
+          - group: "ESS-Deployment-Variables-DEV"
+          - group: "ESS-Dev-Variables"
+          - name: "ESSAzureADConfiguration.ClientId"
+            value: $(ESSClientId)
+          - name: "ESSAzureADConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.TenantId"
+            value: $(TenantId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientId"
+            value: $(AutoTestClientId_Authed)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+            value: $(AutoTestClientSecret_Authed)
+          - name: "EssAuthorizationConfiguration.EssClientId"
+            value: $(ESSClientId)
+          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+            value: $(AutoTestClientId_NoAuth)
+          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+            value: $(AutoTestClientSecret_NoAuth)
+          - name: "AzureAdB2CTestConfiguration.ClientSecret"
+            value: $(AUTOTEST-ESS-SECRET)
+            #This variables are overridden since they are different from dev and we have used same library
+          - name: "Environment"
+            value: "qc"
+          - name: "ESSFulfilmentConfiguration.SmallExchangeSetInstance"
+            value: 1
+          - name: "ESSFulfilmentConfiguration.MediumExchangeSetInstance"
+            value: 1
+          - name: "ESSFulfilmentConfiguration.LargeExchangeSetInstance"
+            value: 1
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  submodules: recursive
 
-  #               - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
-  #                 parameters:
-  #                   AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
+                  parameters:
+                    AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
-  #               - task: DownloadBuildArtifacts@0
-  #                 displayName: "Download Functional test Artifact"
-  #                 inputs:
-  #                   buildType: 'current'
-  #                   downloadType: 'single'
-  #                   artifactName: 'functionaltests'
-  #                   downloadPath: '$(Build.SourcesDirectory)'
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Functional test Artifact"
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'functionaltests'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
-  #               - task: DownloadBuildArtifacts@0
-  #                 displayName: "Download Terraform Artifact"
-  #                 inputs:
-  #                   buildType: 'current'
-  #                   downloadType: 'single'
-  #                   artifactName: 'terraformartifact'
-  #                   downloadPath: '$(Build.SourcesDirectory)'
+                - task: DownloadBuildArtifacts@0
+                  displayName: "Download Terraform Artifact"
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'terraformartifact'
+                    downloadPath: '$(Build.SourcesDirectory)'
 
-  #               - task: FileTransform@2
-  #                 displayName: "File Transform: functionaltests"
-  #                 inputs:
-  #                   folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-  #                   xmlTransformationRules:
-  #                   jsonTargetFiles: '**/appsettings.json'
+                - task: FileTransform@2
+                  displayName: "File Transform: functionaltests"
+                  inputs:
+                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+                    xmlTransformationRules:
+                    jsonTargetFiles: '**/appsettings.json'
 
-  #               - task: UseDotNet@2
-  #                 displayName: 'Use .NET SDK'
-  #                 inputs:
-  #                   packageType: sdk
-  #                   useGlobalJson: true
-  #                   workingDirectory: '$(Build.SourcesDirectory)'
+                - task: UseDotNet@2
+                  displayName: 'Use .NET SDK'
+                  inputs:
+                    packageType: sdk
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
-  #               - task: AzureCLI@2
-  #                 displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
-  #                 condition: always()
-  #                 inputs:
-  #                   azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-  #                   scriptType: 'pscore'
-  #                   scriptLocation: 'scriptPath'
-  #                   scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-  #                   arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
+                  condition: always()
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
-  #               - task: DotNetCoreCLI@2
-  #                 displayName: "Run Functional tests AIOEnabled"
-  #                 inputs:
-  #                   command: "test"
-  #                   projects: |
-  #                     **/*FunctionalTest*.dll
-  #                     !**/*TestAdapter.dll
-  #                     !**/obj/**
-  #                   arguments: '--filter Category=QCOnlyTest-AIOEnabled'
-  #                   testRunTitle: "QC-AutomationTests"
-  #                   workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIOEnabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=QCOnlyTest-AIOEnabled'
+                    testRunTitle: "QC-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-  #               - task: AzureCLI@2
-  #                 displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
-  #                 inputs:
-  #                   azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-  #                   scriptType: 'pscore'
-  #                   scriptLocation: 'scriptPath'
-  #                   scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-  #                   arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
-  #               - task: DotNetCoreCLI@2
-  #                 displayName: "Run Functional tests AIODisabled"
-  #                 inputs:
-  #                   command: "test"
-  #                   projects: |
-  #                     **/*FunctionalTest*.dll
-  #                     !**/*TestAdapter.dll
-  #                     !**/obj/**
-  #                   arguments: '--filter Category=QCOnlyTest-AIODisabled'
-  #                   testRunTitle: "QC-AutomationTests"
-  #                   workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIODisabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=QCOnlyTest-AIODisabled'
+                    testRunTitle: "QC-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-  #               - task: AzureCLI@2
-  #                 displayName: "Swap ESS API and ESS FulfilmentService Configuration"
-  #                 condition: always()
-  #                 inputs:
-  #                   azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-  #                   scriptType: 'pscore'
-  #                   scriptLocation: 'scriptPath'
-  #                   scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-  #                   arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration"
+                  condition: always()
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
-    #dependsOn:
-    #- Devdeploy
-    #- QCdeploy
+    dependsOn:
+    - Devdeploy
+    - QCdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
     #condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
