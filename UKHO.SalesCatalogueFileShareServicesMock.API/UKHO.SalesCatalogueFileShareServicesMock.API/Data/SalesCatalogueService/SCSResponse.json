@@ -736,7 +736,7 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 0,
-        "returnedProductCount": 8,
+        "returnedProductCount": 9,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": []
       },
@@ -892,6 +892,36 @@
             }
           ],
           "fileSize": 666602
+        },
+        {
+          "editionNumber": 3,
+          "productName": "GB602571",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "dates": [
+            {
+              "issueDate": "2017-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2017-04-07T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2018-08-03T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2020-07-10T00:00:00.0000000Z",
+              "updateNumber": 3
+            }
+          ],
+          "fileSize": 23913
         }
       ]
     }
@@ -3385,6 +3415,152 @@
             }
           ],
           "fileSize": 76909
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-GB602571",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 3,
+          "productName": "GB602571",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "dates": [
+            {
+              "issueDate": "2017-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2017-04-07T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2018-08-03T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2020-07-10T00:00:00.0000000Z",
+              "updateNumber": 3
+            }
+          ],
+          "fileSize": 23913,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE416040-11-0-DE360010-1-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 11,
+          "productName": "DE416040",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-01-20T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-01-20T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-03-24T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 59752
+        },
+        {
+          "editionNumber": 1,
+          "productName": "DE360010",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-05-22T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 9228
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-GB602571-3-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 3,
+          "productName": "GB602571",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "dates": [
+            {
+              "issueDate": "2017-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2017-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2017-04-07T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2018-08-03T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2020-07-10T00:00:00.0000000Z",
+              "updateNumber": 3
+            }
+          ],
+          "fileSize": 23913,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
+          ]
         }
       ]
     }

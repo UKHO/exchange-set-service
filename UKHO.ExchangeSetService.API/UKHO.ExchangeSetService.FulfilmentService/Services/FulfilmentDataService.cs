@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -84,6 +85,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
+            var businessUnit = GetBusinessUnit(message.ExchangeSetStandard);
+
             if (aioConfiguration.IsAioEnabled)
             {
                 SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
@@ -92,7 +95,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 {
                     salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
                                                                  .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                    await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                    await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse, businessUnit);
                 }
                 if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
                 {
@@ -103,7 +106,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             else
             {
-                await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse, businessUnit);
             }
 
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
@@ -233,16 +236,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, message.BatchId, message.CorrelationId);
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
         {
             return await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceENCFilesRequestStart,
                    EventIds.QueryFileShareServiceENCFilesRequestCompleted,
-                   "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                   "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                    async () =>
                    {
-                       return await fulfilmentFileShareService.QueryFileShareServiceData(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                       return await fulfilmentFileShareService.QueryFileShareServiceData(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath, businessUnit);
                    },
-               message.BatchId, message.CorrelationId);
+                   businessUnit, message.BatchId, message.CorrelationId);
         }
 
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
@@ -512,7 +515,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 var tasks = productsList.Select(async item =>
                 {
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
+                    //Only S63 data will be fetched
+                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
                     int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -718,7 +722,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 var tasks = productsList.Select(async item =>
                 {
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, aioExchangeSetRootPath, cancellationTokenSource, cancellationToken);
+                    //Only S63 data will be fetched
+                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, aioExchangeSetRootPath, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
                     int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -749,7 +754,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         #endregion
 
-        private async Task CreateStandardExchangeSet(SalesCatalogueServiceResponseQueueMessage message, SalesCatalogueProductResponse response, List<Products> essItems, string exchangeSetPath, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
+        private async Task CreateStandardExchangeSet(SalesCatalogueServiceResponseQueueMessage message, SalesCatalogueProductResponse response, List<Products> essItems, string exchangeSetPath, SalesCatalogueDataResponse salesCatalogueEssDataResponse, string businessUnit)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
@@ -768,7 +773,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 var tasks = productsList.Select(async item =>
                 {
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
+                    //S63 or S57 data will be fetched
+                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken, businessUnit);
                     int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -913,6 +919,23 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             return isFileCreated;
+        }
+
+        private string GetBusinessUnit(string standard)
+        {
+            if (Enum.TryParse(standard, out ExchangeSetStandard exchangeSetStandard))
+            {
+                var businessUnit = exchangeSetStandard switch
+                {
+                    ExchangeSetStandard.s63 => fileShareServiceConfig.Value.S63BusinessUnit,
+                    ExchangeSetStandard.s57 => fileShareServiceConfig.Value.S57BusinessUnit,
+                    _ => throw new FulfilmentException(EventIds.InvalidFssBusinessUnit.ToEventId()) //Exception will be log if fss business unit is not configured
+                };
+
+                return businessUnit;
+            }
+
+            throw new FulfilmentException(EventIds.InvalidFssBusinessUnit.ToEventId()); //Exception will be log if fss business unit is not configured
         }
     }
 }

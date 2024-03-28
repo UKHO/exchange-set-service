@@ -801,7 +801,6 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805198 - Completed download of 307 response IHO.pub file from the file share service.
         /// </summary>
         DownloadIhoPubFile307RedirectResponse = 805198,
-
         /// <summary>
         /// 805199 - Validate callback request payload start
         /// </summary>
@@ -821,9 +820,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805203 - Request for sales catalouge service product data sincedatetime endpoint is completed.
         /// </summary>
-        SCSGetProductDataSinceDateTimeRequestCompleted = 805203
-
-
+        SCSGetProductDataSinceDateTimeRequestCompleted = 805203,
+        /// <summary>
+        /// 805204 - Invalid FSS business unit provided to fulfilment service
+        /// </summary>
+        InvalidFssBusinessUnit = 805204
     }
 
     public static class EventIdExtensions

@@ -429,6 +429,7 @@ stages:
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
       - deployment: DevDeployApp
+        timeoutInMinutes: 75
         displayName: "Dev - deploy terraform and dotnet App"
         environment: "Ess-Dev"
         pool: $(DeploymentPool)

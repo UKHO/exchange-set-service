@@ -39,10 +39,15 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             {
                 fileName = fileShareServiceConfiguration.Value.FssAdcResponseFile;
             }
+            else if (filter.ToUpper().Contains("ADDS-S57"))
+            {
+                fileName = fileShareServiceConfiguration.Value.S57FssResponseFile;
+            }
             else
             {
-                fileName = fileShareServiceConfiguration.Value.ScsResponseFile;
+                fileName = fileShareServiceConfiguration.Value.S63FssResponseFile;
             }
+
             var response = FileHelper.ReadJsonFile<SearchBatchResponse>(fileShareServiceConfiguration.Value.FileDirectoryPath + fileName);
             if (filter.ToUpper().Contains("README.TXT", StringComparison.OrdinalIgnoreCase))
             {
@@ -59,21 +64,21 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             var setZipPath = Path.Combine(homeDirectoryPath, fileShareServiceConfiguration.Value.FolderDirectoryName, batchId);
             switch (string.IsNullOrEmpty(setZipPath))
             {
-                case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && (string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("AIO.zip", filesName, StringComparison.OrdinalIgnoreCase)): 
+                case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && (string.Equals("V01X01.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("AIO.zip", filesName, StringComparison.OrdinalIgnoreCase)):
                 case false when FileHelper.ValidateFilePath(setZipPath) && Directory.Exists(setZipPath) && FileHelper.ValidateFilePath(Directory.GetFiles(setZipPath, filesName).FirstOrDefault()) && (string.Equals("M01X02.zip", filesName, StringComparison.OrdinalIgnoreCase) || string.Equals("M02X02.zip", filesName, StringComparison.OrdinalIgnoreCase)):
                     filePaths = Directory.GetFiles(setZipPath, filesName);
                     break;
                 default:
                     {
                         string[] fileDirectorys = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPath, $"*{Path.GetExtension(filesName)}*", SearchOption.AllDirectories).Where(i => i.Split("\\").Last().Equals(filesName)).ToArray();
-                       
-                        bool isEnc = (fileDirectorys == null || fileDirectorys.Length == 0) || (fileDirectorys.Length > 0 &&  fileDirectorys[0].Contains(fileShareServiceConfiguration.Value.FileDirectoryPathForENC));
-                        
+
+                        bool isEnc = (fileDirectorys == null || fileDirectorys.Length == 0) || (fileDirectorys.Length > 0 && fileDirectorys[0].Contains(fileShareServiceConfiguration.Value.FileDirectoryPathForENC));
+
                         if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && isEnc)
                         {
                             filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
                         }
-                        else if(fileDirectorys != null && fileDirectorys.Length > 0)
+                        else if (fileDirectorys != null && fileDirectorys.Length > 0)
                         {
                             filePaths = fileDirectorys;
                         }
