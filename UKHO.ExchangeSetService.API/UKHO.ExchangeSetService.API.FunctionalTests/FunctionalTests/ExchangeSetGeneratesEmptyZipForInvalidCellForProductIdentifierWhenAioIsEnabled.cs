@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [TestCaseSource(nameof(TestDataForProductIdentifier))]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")][Category("SmokeTemp")]
         public async Task VerifyEmptyExchangeSetForProductIdentifier(List<string> product)
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(product, accessToken: objStorage.EssJwtToken);

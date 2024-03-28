@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithValidToken_ThenACorrectResponseIsReturned()
         {
             var date = DateTime.Now.AddDays(-10).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'");

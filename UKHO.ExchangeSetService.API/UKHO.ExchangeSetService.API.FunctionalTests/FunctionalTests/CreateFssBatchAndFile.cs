@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenACorrectResponseIsReturned()
         {
             string sinceDatetime = DateTime.Now.AddDays(-5).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetOnlyProductIdentifierData(), accessToken: EssJwtToken);
@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
@@ -91,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithAValidProductVersion_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();
@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithValidAndInvalidProductVersion_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersionData = new List<ProductVersionModel>();

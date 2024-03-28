@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallExchangeSetApiWithAnInValidProductVersion_ThenAProductTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public void WhenICallExchangeSetApiWithAnInvalidProductVersion_ThenAReadMeTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallExchangeSetApiWithAnInValidProductVersion_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
@@ -93,7 +93,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenASerialEncFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public void WhenICallExchangeSetApiWithAnInValidProductVersion_ThenNoEncFilesAreDownloaded()
         {
             //Verify No folder available for the product             

@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithValidToken_ThenACorrectResponseIsReturned()
         {
             var payload = DataHelper.GetProductIdentifierData();

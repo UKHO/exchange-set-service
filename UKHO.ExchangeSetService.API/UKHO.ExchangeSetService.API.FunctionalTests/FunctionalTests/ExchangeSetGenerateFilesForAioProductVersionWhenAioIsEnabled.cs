@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71610: Create empty SERIAL.AIO file and add to AIO exchange set
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
         public void WhenIDownloadAioZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
         {
 
@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 74322: AIO exchange set ENC Data Set files & Signature Files
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesAreAvailable()
         {
             //Get the product details form sales catalogue service
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71646: Create CATALOG.031 file and add to AIO exchange set
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenCatalog031IsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")][Category("SmokeTemp")]
         public async Task WhenICallEssWithAioProductAndAioIsEnabled_ThenLargeMediaZipsShouldNotBeAvailable()
         {
             LargeExchangeSetFolderName.Add(Config.POSConfig.LargeExchangeSetFolderName1 + ".zip");

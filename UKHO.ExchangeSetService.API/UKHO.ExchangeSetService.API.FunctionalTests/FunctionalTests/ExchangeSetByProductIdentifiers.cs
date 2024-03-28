@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData());
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), accessToken: EssJwtCustomizedToken);
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithNoRoleToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), accessToken: EssJwtTokenNoRole);
@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), accessToken: EssJwtToken);
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
@@ -115,7 +115,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithDuplicateProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE5NOBRK", "DE5NOBRK" };
@@ -133,7 +133,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithValidAndInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE4NO18Q", "GB123789" };
@@ -154,7 +154,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallTheApiWithAValidProductIdentifierswithCallBackURI_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22", accessToken: EssJwtToken);
@@ -166,7 +166,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithAnEmptyProductIdentifier_ThenABadRequestStatusIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>();
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithANullProductIdentifier_ThenABadRequestStatusIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { null };
@@ -198,7 +198,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
         [TestCase("https://", TestName = "Callback URL with only https request")]
         [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
         public async Task WhenICallTheApiWithAInvalidCallbackURIWithProductIdentifier_ThenABadRequestResponseIsReturned(string callBackUrl)
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), callBackUrl, accessToken: EssJwtToken);

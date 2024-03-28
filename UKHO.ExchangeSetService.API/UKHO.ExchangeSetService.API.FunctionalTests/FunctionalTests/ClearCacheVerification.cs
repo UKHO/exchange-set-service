@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
         public async Task WhenICallExchangeSetApiWithProductIdentifiers_AndCalledClearCache_ThenItsClearTheCache()
         {
             //Get the product details form sales catalogue service
