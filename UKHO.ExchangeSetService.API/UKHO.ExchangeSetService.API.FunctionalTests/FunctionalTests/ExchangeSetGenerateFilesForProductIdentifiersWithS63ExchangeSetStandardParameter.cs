@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenAProductTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public void WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenAReadMeTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenACatalogFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
@@ -86,7 +86,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public void WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenASerialEncFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
@@ -101,7 +101,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
          //PBI 143370: Change related to additional param (From Boolean to String)
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallProductIdentifiersApiWithS63ExchangeSetStandardParameter_ThenEncFilesAreDownloaded()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)

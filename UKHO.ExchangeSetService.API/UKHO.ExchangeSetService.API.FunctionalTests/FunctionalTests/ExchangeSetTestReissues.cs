@@ -39,7 +39,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallExchangeSetApiWithMultipleReissueProductIdentifiers_ThenEncFilesAreDownloaded()
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetReissueProducts(), accessToken: EssJwtToken);
@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallExchangeSetApiWithAnUpdatePriorToSpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 
@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallExchangeSetApiWithASpecifiedReissueProductVersion_ThenEncFilesWillBeCreatedForLatestProductVersion()
         {
 

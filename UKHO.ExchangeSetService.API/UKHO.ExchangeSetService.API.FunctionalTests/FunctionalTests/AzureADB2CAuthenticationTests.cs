@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region Set DateTime Api
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, accessToken: EssB2CToken);
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region ProductIdentifier Api
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData());
@@ -96,7 +96,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssB2CCustomizedToken);
@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifiersApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssB2CToken);
@@ -133,7 +133,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region ProductVersion Api
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithOutB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new List<ProductVersionModel> { DataHelper.GetProductVersionModelData("DE416080", 9, 6) };
@@ -144,7 +144,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
@@ -160,7 +160,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new List<ProductVersionModel>
@@ -175,7 +175,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithAValidB2cToken_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new List<ProductVersionModel>

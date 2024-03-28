@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("SmokeTemp")]
+        [Category("SmokeTest-AIOEnabled")]
         public async Task VerifyEmptyEncExchangeSetForProductVersion()
         {
             //// ENC_ROOT >>> ReadmeTxtFile

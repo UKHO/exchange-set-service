@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("NO3B2020", TestName = "bundle >> location as 'MA;B2' instead of 'M(1-2);B2'")]
         [TestCase("NZ300661", TestName = "bundle >> location as 'M2;B100' instead of 'M2;B(1-99)'")]
         [TestCase("RU3P0ZM0", TestName = "bundle >> location as 'M1;BA' instead of 'M1;B(1-99)'")]
-        [Category("QCOnlyTest-AIODisabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallExchangeSetApiWithInvalidBundleInfoProperties_ThenAnErrorTxtFileIsGenerated(string Product)
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { Product };
