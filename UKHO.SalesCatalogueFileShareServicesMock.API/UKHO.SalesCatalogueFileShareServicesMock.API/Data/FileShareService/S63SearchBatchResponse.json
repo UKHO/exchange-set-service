@@ -358,6 +358,70 @@
       ]
     },
     {
+      "batchId": "955ad033-6191-48bd-9d4d-036cce9d9f2a",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE416080"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "13"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "899d2ea3-86bd-4e7b-9aa4-ab21300bdbfe"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "2"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-11T11:36:16.607Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEL16080.011",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "kDCOLao5w204mVT6z7QHgQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/455ad033-6191-48bd-9d4d-036cce9d9f2a/files/DEL16080.011"
+            }
+          }
+        },
+        {
+          "filename": "DE416080.011",
+          "fileSize": 1472,
+          "mimeType": "application/s63",
+          "hash": "dZT408EbWUwQj2nTBcM6Hg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "30664F01"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/455ad033-6191-48bd-9d4d-036cce9d9f2a/files/DE416080.011"
+            }
+          }
+        }
+      ]
+    },
+    {
       "batchId": "99840ed9-1be0-4f34-b0a3-03c6349fead6",
       "status": "Committed",
       "attributes": [

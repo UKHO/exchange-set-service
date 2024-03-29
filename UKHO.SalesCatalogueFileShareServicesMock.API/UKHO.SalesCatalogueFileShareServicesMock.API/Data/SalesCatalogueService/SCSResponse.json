@@ -3002,13 +3002,13 @@
           "editionNumber": 13,
           "productName": "DE416080",
           "updateNumbers": [
-            0
+            2
           ],
           "dates": [
             {
               "issueDate": "2023-08-21T00:00:00.0000000Z",
               "updateApplicationDate": "2023-08-21T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 2
             }
           ],
           "fileSize": 286099,
