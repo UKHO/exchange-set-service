@@ -373,34 +373,31 @@
     }
   },
   {
-    "id": "productVersion-DE416080-9-1",  
-    "productCounts": {
-      "requestedProductCount": 1,
-      "returnedProductCount": 1,
-      "requestedProductsAlreadyUpToDateCount": 0,
-      "requestedProductsNotReturned": []
-    },
-    "products": [
-      {
-        "editionNumber": 9,
-        "productName": "DE416080",
-        "updateNumbers": [
-          1,
-          2
-        ],
-        "dates": [
-          {
-            "issueDate": "2020-04-22T00:00:00.0000000Z",
-            "updateNumber": 1
-          },
-          {
-            "issueDate": "2020-10-28T00:00:00.0000000Z",
-            "updateNumber": 2
-          }
-        ],
-        "fileSize": 4788
-      }
-    ]
+    "id": "productVersion-DE416080-9-1",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 9,
+          "productName": "DE416080",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 4788
+        }
+      ]
+    }
   },
   {
     "id": "productVersion-DE416080-11-0",

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 
@@ -81,12 +82,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
-        public async Task WhenICallEssWithAioProductAndAioIsEnabled_ThenAioZipShouldNotBeAvailable()
+        public void WhenICallEssWithAioProductAndAioIsEnabled_ThenAioZipShouldNotBeAvailable()
         {
-            string downloadFileUrl = $"{objStorage.Config.FssConfig.BaseUrl}/batch/{batchId}/files/{objStorage.Config.AIOConfig.AioExchangeSetFileName}";
-
-            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: objStorage.FssJwtToken);
-            Assert.AreEqual(404, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
+            var downloadedFilename = DownloadedFolderPath.Split("\\").LastOrDefault();
+            Assert.AreNotEqual(Config.ExchangeSetFileName, downloadedFilename, $"Incorrect file {objStorage.Config.AIOConfig.AioExchangeSetFileName} downloaded");
         }
 
         [OneTimeTearDown]

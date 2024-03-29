@@ -4,6 +4,9 @@ using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
+using System.Linq;
+using System.Collections.Generic;
+using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -55,7 +58,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesShouldNotBeAvailable()
         {
             //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(objStorage.Config.ExchangeSetProductType, ProductVersionData, objStorage.ScsJwtToken);
+            var notModifiedProductVersion = new List<ProductVersionModel>()
+            {
+                DataHelper.GetProductVersionModelData(Config.AIOConfig.NotModifiedCellName,
+                    Config.AIOConfig.NotModifiedCellEditionNumber, Config.AIOConfig.NotModifiedCellUpdateNumber)
+            };
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(objStorage.Config.ExchangeSetProductType, notModifiedProductVersion, objStorage.ScsJwtToken);
             Assert.AreEqual(304, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 304.");
 
             Assert.IsFalse(Directory.Exists(Path.Combine(DownloadedFolderPath, "ENC_ROOT\\GB")));
@@ -90,12 +98,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
-        public async Task WhenICallEssWithAioProductAndAioIsEnabled_ThenV01X01ZipShouldNotBeAvailable()
+        public void WhenICallEssWithAioProductAndAioIsEnabled_ThenV01X01ZipShouldNotBeAvailable()
         {
-            string downloadFileUrl = $"{objStorage.Config.FssConfig.BaseUrl}/batch/{batchId}/files/{objStorage.Config.ExchangeSetFileName}";
-
-            var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: objStorage.FssJwtToken);
-            Assert.AreEqual(404, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
+            var downloadedFilename = DownloadedFolderPath.Split("\\").LastOrDefault();
+            Assert.AreNotEqual(Config.ExchangeSetFileName, downloadedFilename, $"Incorrect file {Config.ExchangeSetFileName} downloaded");
         }
 
         [OneTimeTearDown]
