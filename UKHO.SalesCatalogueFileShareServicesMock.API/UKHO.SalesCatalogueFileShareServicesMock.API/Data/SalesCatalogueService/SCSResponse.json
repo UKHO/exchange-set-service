@@ -105,27 +105,16 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 1,
-        "returnedProductCount": 1,
+        "returnedProductCount": 0,
         "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
+        "requestedProductsNotReturned": [
+          {
+            "productName": "GB123789",
+            "reason": "invalidProduct"
+          }
+        ]
       },
-      "products": [
-        {
-          "editionNumber": 1,
-          "productName": "GB123789",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2009-05-15T00:00:00.0000000Z",
-              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 140018
-        }
-      ]
+      "products": []
     }
   },
   {
@@ -2598,9 +2587,14 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 1,
-        "returnedProductCount": 1,
+        "returnedProductCount": 0,
         "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
+        "requestedProductsNotReturned": [
+          {
+            "productName": "DE416080",
+            "reason": "invalidProduct"
+          }
+        ]
       },
       "products": []
     }
@@ -2610,9 +2604,14 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 1,
-        "returnedProductCount": 1,
+        "returnedProductCount": 0,
         "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": []
+        "requestedProductsNotReturned": [
+          {
+            "productName": "DE416080",
+            "reason": "invalidProduct"
+          }
+        ]
       },
       "products": []
     }
