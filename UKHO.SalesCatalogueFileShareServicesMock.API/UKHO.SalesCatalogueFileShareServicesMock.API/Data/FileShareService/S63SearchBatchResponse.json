@@ -30420,6 +30420,70 @@
           }
         }
       ]
+    },
+    {
+      "batchId": "aabbe5f8-7791-4b4f-aebf-01b55c3d6964",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB123789"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "h59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:24:38.737Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB123789.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "UI+tf5JA2vkQg3jshJ59uw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/aabbe5f8-7791-4b4f-aebf-01b55c3d6964/files/GB123789.000"
+            }
+          }
+        },
+        {
+          "filename": "GB123789.001",
+          "fileSize": 8208,
+          "mimeType": "application/s63",
+          "hash": "x3BKBRQUy2NBCnWxI8ywUw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "56346F59"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/aabbe5f8-7791-4b4f-aebf-01b55c3d6964/files/GB123789.001"
+            }
+          }
+        }
+      ]
     }
   ],
   "_Links": {
