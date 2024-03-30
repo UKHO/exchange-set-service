@@ -1642,7 +1642,7 @@
         "requestedProductsNotReturned": []
       },
       "products": [
-        {
+        { 
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
@@ -1987,13 +1987,13 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
+            1
           ],
           "dates": [
             {
               "issueDate": "2022-03-31T00:00:00.0000000Z",
               "updateApplicationDate": "2022-03-31T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 1
             }
           ],
           "fileSize": 140018
@@ -2940,13 +2940,13 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
+            1
           ],
           "dates": [
             {
               "issueDate": "2023-08-21T00:00:00.0000000Z",
               "updateApplicationDate": "2023-08-21T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 1
             }
           ],
           "fileSize": 286099,
@@ -2995,13 +2995,13 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
+            1
           ],
           "dates": [
             {
               "issueDate": "2023-03-24T00:00:00.0000000Z",
               "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 1
             }
           ],
           "fileSize": 637124,
@@ -3050,13 +3050,13 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
+            1
           ],
           "dates": [
             {
               "issueDate": "2023-03-24T00:00:00.0000000Z",
               "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 1
             }
           ],
           "fileSize": 637124,
@@ -3105,13 +3105,13 @@
           "editionNumber": 31,
           "productName": "GB800001",
           "updateNumbers": [
-            0
+            1
           ],
           "dates": [
             {
               "issueDate": "2023-03-24T00:00:00.0000000Z",
               "updateApplicationDate": "2023-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 1
             }
           ],
           "fileSize": 637124,
