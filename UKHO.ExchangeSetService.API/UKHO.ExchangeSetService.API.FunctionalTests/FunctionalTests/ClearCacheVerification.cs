@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
             essCacheJson["Source"] = "AcceptanceTest";
             essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            JObject.FromObject(GetCacheRequestData(Config.BESSConfig.S63BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
+            essCacheJson["Data"] = JObject.FromObject(GetCacheRequestData(Config.BESSConfig.S63BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
@@ -136,7 +136,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
             essCacheJson["Source"] = "AcceptanceTest";
             essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            JObject.FromObject(GetCacheRequestData(Config.BESSConfig.S57BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
+            essCacheJson["Data"] = JObject.FromObject(GetCacheRequestData(Config.BESSConfig.S57BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
