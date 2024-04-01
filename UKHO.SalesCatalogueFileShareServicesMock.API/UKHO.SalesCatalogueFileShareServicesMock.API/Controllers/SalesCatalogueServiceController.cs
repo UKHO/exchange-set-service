@@ -65,6 +65,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return Ok(response.ResponseBody);
                 }
             }
+            if (!productIdentifiers.Any())
+            {
+                var response = salesCatalogueService.GetProductIdentifier("productIdentifier-" + String.Join("-", productIdentifiers));
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
         }
 
@@ -90,6 +98,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     isInitalIndex = false;
                 }
                 var response = salesCatalogueService.GetProductVersion("productVersion-" + productVersionRequestSearchText.ToString());
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
+            if (!productVersionRequest.Any())
+            {
+                var response = salesCatalogueService.GetProductVersion("productVersion-");
                 if (response != null)
                 {
                     return Ok(response.ResponseBody);
