@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenAProductTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenICallExchangeSetApiWithAValidProductVersion_ThenAReadMeTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenICallExchangeSetApiWithAValidProductVersion_ThenACatalogueFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeSetCatalogueFile);
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenICallExchangeSetApiWithAValidProductVersion_ThenASerialEncFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, objStorage.Config.ExchangeSetSerialEncFile);
@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenEncFilesShouldNotBeDownloaded()
         {
             //Get the product details form sales catalogue service
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenICallEssWithAioProductAndAioIsEnabled_ThenAioZipShouldNotBeAvailable()
         {
             var downloadedFilename = DownloadedFolderPath.Split("\\").LastOrDefault();

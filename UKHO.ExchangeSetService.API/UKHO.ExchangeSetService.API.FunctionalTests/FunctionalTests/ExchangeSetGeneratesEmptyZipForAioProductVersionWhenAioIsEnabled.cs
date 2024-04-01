@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 77585: ESS : Empty AIO Exchange Set Creation
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, objStorage.Config.AIOConfig.ExchangeSetSerialAioFile);
@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 77585: ESS : Empty AIO Exchange Set Creation
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesShouldNotBeAvailable()
         {
             //Get the product details form sales catalogue service
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71646: Create CATALOG.031 file and add to AIO exchange set
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenCatalog031IsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeSetCatalogueFile);
@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenICallEssWithAioProductAndAioIsEnabled_ThenV01X01ZipShouldNotBeAvailable()
         {
             var downloadedFilename = DownloadedFolderPath.Split("\\").LastOrDefault();

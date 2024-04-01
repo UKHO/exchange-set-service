@@ -122,7 +122,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenICallEssWithAioProductAndAioIsEnabled_ThenLargeMediaZipsShouldNotBeAvailable()
         {
             LargeExchangeSetFolderName.Add(Config.POSConfig.LargeExchangeSetFolderName1 + ".zip");
@@ -135,7 +135,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")][Category("Temp")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenICallEssWithAioProductAndAioIsEnabled_ThenV01X01ZipShouldNotBeAvailable()
         {
             var downloadedFilename = DownloadedFolderPath.Split("\\").LastOrDefault();
