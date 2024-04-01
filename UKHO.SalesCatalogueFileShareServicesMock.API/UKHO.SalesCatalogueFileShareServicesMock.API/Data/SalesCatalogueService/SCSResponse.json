@@ -3677,24 +3677,16 @@
           "productName": "AU220150",
           "editionNumber": 8,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-06-06T00:00:00Z",
               "issueDate": "2022-06-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-01-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 341533,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3706,36 +3698,16 @@
           "productName": "CN484220",
           "editionNumber": 6,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-09-01T00:00:00Z",
               "issueDate": "2022-09-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-01-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 396800,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3756,9 +3728,7 @@
               "issueDate": "2022-05-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 8456,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3770,48 +3740,16 @@
           "productName": "AU5PTL01",
           "editionNumber": 1,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-04-12T00:00:00Z",
               "issueDate": "2022-04-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 237411,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3845,9 +3783,7 @@
               "issueDate": "2021-07-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1391996,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3868,9 +3804,7 @@
               "issueDate": "2017-02-16T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 806679,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3882,54 +3816,16 @@
           "productName": "CA476069",
           "editionNumber": 3,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2011-08-31T00:00:00Z",
               "issueDate": "2011-08-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2012-01-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2012-05-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2017-08-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2019-02-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2019-12-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2021-03-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 412474,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3941,42 +3837,16 @@
           "productName": "CA476189",
           "editionNumber": 3,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2017-08-03T00:00:00Z",
               "issueDate": "2017-08-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2018-06-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2019-03-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2020-01-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2022-10-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 481681,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -3988,24 +3858,16 @@
           "productName": "DE5NOBRK",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-08-09T00:00:00Z",
               "issueDate": "2023-08-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 87933,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4026,9 +3888,7 @@
               "issueDate": "2022-02-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 20791,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4040,24 +3900,16 @@
           "productName": "US6MI07M",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-03-30T00:00:00Z",
               "issueDate": "2022-03-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-22T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 261132,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4069,30 +3921,16 @@
           "productName": "US6NY33M",
           "editionNumber": 5,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-06-16T00:00:00Z",
               "issueDate": "2022-06-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 29717,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4113,9 +3951,7 @@
               "issueDate": "2022-05-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 27539,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4127,24 +3963,16 @@
           "productName": "US6OH05M",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-03-25T00:00:00Z",
               "issueDate": "2022-03-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 151873,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4156,24 +3984,16 @@
           "productName": "US6OH08M",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-10-25T00:00:00Z",
               "issueDate": "2022-10-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 371556,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4194,9 +4014,7 @@
               "issueDate": "2020-12-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 58854,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4217,9 +4035,7 @@
               "issueDate": "2020-12-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 58854,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4244,24 +4060,16 @@
           "productName": "AU210130",
           "editionNumber": 5,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-06-06T00:00:00Z",
               "issueDate": "2022-06-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-08-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 21425,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4273,30 +4081,16 @@
           "productName": "AU220130",
           "editionNumber": 7,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-05-17T00:00:00Z",
               "issueDate": "2023-05-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 594681,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4308,132 +4102,16 @@
           "productName": "AU314128",
           "editionNumber": 6,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2014-06-02T00:00:00Z",
               "issueDate": "2014-06-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2017-04-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2017-09-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2018-07-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2018-08-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2018-10-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2019-08-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2019-11-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2020-02-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2021-04-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2022-02-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2022-02-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2022-03-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 13,
-              "updateApplicationDate": null,
-              "issueDate": "2022-03-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 14,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 15,
-              "updateApplicationDate": null,
-              "issueDate": "2022-07-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 16,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 17,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 18,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 19,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 129275,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4445,66 +4123,16 @@
           "productName": "AU411129",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-09-23T00:00:00Z",
               "issueDate": "2021-09-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 92957,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4516,60 +4144,16 @@
           "productName": "AU412129",
           "editionNumber": 5,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-09-24T00:00:00Z",
               "issueDate": "2021-09-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 155797,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4581,72 +4165,16 @@
           "productName": "AU415128",
           "editionNumber": 2,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2016-02-24T00:00:00Z",
               "issueDate": "2016-02-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2018-01-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2018-07-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2018-08-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2018-10-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2018-11-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2019-04-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2019-10-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2022-07-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 765460,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4658,24 +4186,16 @@
           "productName": "AU416145",
           "editionNumber": 10,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-06-17T00:00:00Z",
               "issueDate": "2021-06-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 743208,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4687,72 +4207,16 @@
           "productName": "AU421116",
           "editionNumber": 21,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-04-19T00:00:00Z",
               "issueDate": "2023-04-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 956076,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4764,126 +4228,16 @@
           "productName": "AU424150",
           "editionNumber": 12,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-02-02T00:00:00Z",
               "issueDate": "2021-02-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2021-02-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2021-02-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2021-03-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2021-09-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2021-10-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2021-11-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2021-12-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2022-04-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2022-07-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2022-07-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 13,
-              "updateApplicationDate": null,
-              "issueDate": "2022-07-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 14,
-              "updateApplicationDate": null,
-              "issueDate": "2022-10-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 15,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 16,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 17,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 18,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 570075,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4895,30 +4249,16 @@
           "productName": "AU426113",
           "editionNumber": 8,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-05-16T00:00:00Z",
               "issueDate": "2023-05-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 282893,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -4930,78 +4270,16 @@
           "productName": "AU432115",
           "editionNumber": 14,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-11-24T00:00:00Z",
               "issueDate": "2022-11-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 499745,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5022,9 +4300,7 @@
               "issueDate": "2023-09-20T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2516546,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5036,30 +4312,16 @@
           "productName": "AU439146",
           "editionNumber": 17,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-07-03T00:00:00Z",
               "issueDate": "2023-07-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 853551,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5071,54 +4333,16 @@
           "productName": "AU5BTB01",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-03-07T00:00:00Z",
               "issueDate": "2023-03-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 621597,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5139,9 +4363,7 @@
               "issueDate": "2022-11-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 32929,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5153,36 +4375,16 @@
           "productName": "AU5DAM02",
           "editionNumber": 5,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-04-11T00:00:00Z",
               "issueDate": "2023-04-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-24T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 460934,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5194,78 +4396,16 @@
           "productName": "AU5MEL01",
           "editionNumber": 3,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-10-25T00:00:00Z",
               "issueDate": "2022-10-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 349447,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5277,66 +4417,16 @@
           "productName": "AU5PHE01",
           "editionNumber": 5,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-03-16T00:00:00Z",
               "issueDate": "2023-03-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 590894,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5348,48 +4438,16 @@
           "productName": "AU5SYD01",
           "editionNumber": 6,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-04-13T00:00:00Z",
               "issueDate": "2023-04-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-22T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1133276,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5410,9 +4468,7 @@
               "issueDate": "2023-09-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 107506,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5424,42 +4480,16 @@
           "productName": "BR221010",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-04-29T00:00:00Z",
               "issueDate": "2020-04-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2021-08-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-04-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 295146,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5471,120 +4501,16 @@
           "productName": "BR221070",
           "editionNumber": 8,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-09-22T00:00:00Z",
               "issueDate": "2020-09-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2021-01-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2021-02-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2021-03-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2021-03-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2021-04-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2021-06-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2021-08-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2021-11-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2022-01-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2022-01-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2022-03-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2022-04-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 13,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 14,
-              "updateApplicationDate": null,
-              "issueDate": "2022-08-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 15,
-              "updateApplicationDate": null,
-              "issueDate": "2022-10-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 16,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 17,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 271135,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5596,36 +4522,16 @@
           "productName": "BR321200",
           "editionNumber": 8,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-03-18T00:00:00Z",
               "issueDate": "2022-03-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-04-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 153800,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5637,54 +4543,16 @@
           "productName": "BR321400",
           "editionNumber": 10,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-09-22T00:00:00Z",
               "issueDate": "2021-09-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-01-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 517102,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5705,9 +4573,7 @@
               "issueDate": "2023-09-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 156946,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5719,31 +4585,13 @@
           "productName": "BR401507",
           "editionNumber": 5,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-05-24T00:00:00Z",
               "issueDate": "2022-05-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
           "cancellation": {
@@ -5751,7 +4599,6 @@
             "updateNumber": 3
           },
           "fileSize": 213632,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5772,9 +4619,7 @@
               "issueDate": "2022-11-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 170951,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5786,60 +4631,16 @@
           "productName": "CA370016",
           "editionNumber": 7,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-03-25T00:00:00Z",
               "issueDate": "2020-03-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2021-03-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2021-06-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2021-10-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2022-02-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2489165,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5851,66 +4652,16 @@
           "productName": "CA370382",
           "editionNumber": 5,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2014-03-12T00:00:00Z",
               "issueDate": "2014-03-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2015-07-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2017-08-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2018-10-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2019-03-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2019-04-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2019-07-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2020-01-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1000198,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5922,24 +4673,16 @@
           "productName": "CA370381",
           "editionNumber": 7,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-10-26T00:00:00Z",
               "issueDate": "2021-10-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2323846,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5960,9 +4703,7 @@
               "issueDate": "2022-05-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2708941,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -5974,31 +4715,13 @@
           "productName": "CA379115",
           "editionNumber": 2,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-03-24T00:00:00Z",
               "issueDate": "2021-03-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-04-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-18T00:00:00Z"
             }
           ],
           "cancellation": {
@@ -6006,7 +4729,6 @@
             "updateNumber": 3
           },
           "fileSize": 2102970,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6018,25 +4740,13 @@
           "productName": "CA479155",
           "editionNumber": 14,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-05-26T00:00:00Z",
               "issueDate": "2023-05-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-15T00:00:00Z"
             }
           ],
           "cancellation": {
@@ -6044,7 +4754,6 @@
             "updateNumber": 2
           },
           "fileSize": 426758,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6056,31 +4765,13 @@
           "productName": "CA579146",
           "editionNumber": 1,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2013-08-26T00:00:00Z",
               "issueDate": "2013-08-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2017-08-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-04-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-25T00:00:00Z"
             }
           ],
           "cancellation": {
@@ -6088,7 +4779,6 @@
             "updateNumber": 3
           },
           "fileSize": 26636,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6100,31 +4790,13 @@
           "productName": "CA579156",
           "editionNumber": 11,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-11-03T00:00:00Z",
               "issueDate": "2020-11-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-10-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-21T00:00:00Z"
             }
           ],
           "cancellation": {
@@ -6132,7 +4804,6 @@
             "updateNumber": 3
           },
           "fileSize": 71860,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6144,25 +4815,13 @@
           "productName": "CA579246",
           "editionNumber": 2,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2019-01-18T00:00:00Z",
               "issueDate": "2019-01-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-10-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-07T00:00:00Z"
             }
           ],
           "cancellation": {
@@ -6170,7 +4829,6 @@
             "updateNumber": 2
           },
           "fileSize": 27984,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6182,156 +4840,16 @@
           "productName": "CL2LL070",
           "editionNumber": 2,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2011-08-12T00:00:00Z",
               "issueDate": "2011-08-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2011-11-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2011-12-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2012-03-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2012-05-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2013-01-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2013-08-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2013-11-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2013-12-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2014-01-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2014-08-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2014-08-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2014-11-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 13,
-              "updateApplicationDate": null,
-              "issueDate": "2015-04-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 14,
-              "updateApplicationDate": null,
-              "issueDate": "2016-10-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 15,
-              "updateApplicationDate": null,
-              "issueDate": "2019-03-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 16,
-              "updateApplicationDate": null,
-              "issueDate": "2019-07-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 17,
-              "updateApplicationDate": null,
-              "issueDate": "2020-03-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 18,
-              "updateApplicationDate": null,
-              "issueDate": "2020-12-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 19,
-              "updateApplicationDate": null,
-              "issueDate": "2021-01-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 20,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 21,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 22,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 23,
-              "updateApplicationDate": null,
-              "issueDate": "2023-07-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1242048,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6343,90 +4861,16 @@
           "productName": "CL3BB010",
           "editionNumber": 2,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2016-05-30T00:00:00Z",
               "issueDate": "2016-05-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2016-11-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2017-06-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2017-12-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2018-06-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2019-12-05T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2020-02-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2020-08-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2020-10-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2021-01-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2021-06-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2021-06-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2023-01-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1501298,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6438,90 +4882,16 @@
           "productName": "CL3LL075",
           "editionNumber": 1,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2009-01-27T00:00:00Z",
               "issueDate": "2009-01-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2009-04-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2010-01-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2010-09-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2011-07-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2013-01-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2014-10-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2016-10-13T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2018-06-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2018-09-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2022-02-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 825770,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6533,30 +4903,16 @@
           "productName": "CL5BB020",
           "editionNumber": 4,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-11-10T00:00:00Z",
               "issueDate": "2021-11-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-02-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1213262,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6568,30 +4924,16 @@
           "productName": "CL5VA019",
           "editionNumber": 1,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2019-05-03T00:00:00Z",
               "issueDate": "2019-05-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-09-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 633110,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6603,90 +4945,16 @@
           "productName": "CN384001",
           "editionNumber": 8,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-10-18T00:00:00Z",
               "issueDate": "2020-10-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2020-11-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2020-11-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2021-04-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2021-11-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2021-11-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2021-12-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2022-02-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 437282,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6698,246 +4966,16 @@
           "productName": "CN383001",
           "editionNumber": 7,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24,
-            25,
-            26,
-            27,
-            28,
-            29,
-            30,
-            31,
-            32,
-            33,
-            34,
-            35,
-            36,
-            37,
-            38
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2018-04-19T00:00:00Z",
               "issueDate": "2018-04-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2018-05-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2018-07-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2018-07-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2018-08-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2018-10-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2018-12-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2018-12-24T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2018-12-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2019-01-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2019-05-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2019-05-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2019-07-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 13,
-              "updateApplicationDate": null,
-              "issueDate": "2019-07-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 14,
-              "updateApplicationDate": null,
-              "issueDate": "2019-12-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 15,
-              "updateApplicationDate": null,
-              "issueDate": "2019-12-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 16,
-              "updateApplicationDate": null,
-              "issueDate": "2020-06-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 17,
-              "updateApplicationDate": null,
-              "issueDate": "2020-07-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 18,
-              "updateApplicationDate": null,
-              "issueDate": "2021-04-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 19,
-              "updateApplicationDate": null,
-              "issueDate": "2021-05-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 20,
-              "updateApplicationDate": null,
-              "issueDate": "2021-05-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 21,
-              "updateApplicationDate": null,
-              "issueDate": "2021-05-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 22,
-              "updateApplicationDate": null,
-              "issueDate": "2021-07-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 23,
-              "updateApplicationDate": null,
-              "issueDate": "2021-08-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 24,
-              "updateApplicationDate": null,
-              "issueDate": "2021-08-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 25,
-              "updateApplicationDate": null,
-              "issueDate": "2021-09-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 26,
-              "updateApplicationDate": null,
-              "issueDate": "2021-11-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 27,
-              "updateApplicationDate": null,
-              "issueDate": "2022-01-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 28,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 29,
-              "updateApplicationDate": null,
-              "issueDate": "2022-06-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 30,
-              "updateApplicationDate": null,
-              "issueDate": "2022-08-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 31,
-              "updateApplicationDate": null,
-              "issueDate": "2022-09-11T00:00:00Z"
-            },
-            {
-              "updateNumber": 32,
-              "updateApplicationDate": null,
-              "issueDate": "2022-10-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 33,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 34,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 35,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 36,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 37,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 38,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 953462,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6949,30 +4987,16 @@
           "productName": "CN483101",
           "editionNumber": 16,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-07-27T00:00:00Z",
               "issueDate": "2023-07-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 815446,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -6984,60 +5008,16 @@
           "productName": "CN384002",
           "editionNumber": 25,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-05-18T00:00:00Z",
               "issueDate": "2023-05-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-23T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1396488,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7049,42 +5029,16 @@
           "productName": "CN484203",
           "editionNumber": 12,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2021-04-02T00:00:00Z",
               "issueDate": "2021-04-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2021-11-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2022-07-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2022-11-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 384058,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7105,9 +5059,7 @@
               "issueDate": "2022-08-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 86506,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7134,9 +5086,7 @@
               "issueDate": "2023-03-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 416124,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7148,108 +5098,16 @@
           "productName": "CN484211",
           "editionNumber": 13,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-03-19T00:00:00Z",
               "issueDate": "2020-03-19T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2020-07-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2020-08-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2020-11-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2020-12-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2021-03-22T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2021-05-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2021-05-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2022-02-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2022-07-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2022-09-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-16T00:00:00Z"
-            },
-            {
-              "updateNumber": 13,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 14,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-14T00:00:00Z"
-            },
-            {
-              "updateNumber": 15,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 330496,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7261,48 +5119,16 @@
           "productName": "CN484214",
           "editionNumber": 16,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-01-29T00:00:00Z",
               "issueDate": "2023-01-29T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-15T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 422676,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7314,96 +5140,16 @@
           "productName": "CN484218",
           "editionNumber": 17,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-03-26T00:00:00Z",
               "issueDate": "2020-03-26T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2020-08-30T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2020-09-17T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2020-11-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2021-01-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 5,
-              "updateApplicationDate": null,
-              "issueDate": "2021-03-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 6,
-              "updateApplicationDate": null,
-              "issueDate": "2021-05-25T00:00:00Z"
-            },
-            {
-              "updateNumber": 7,
-              "updateApplicationDate": null,
-              "issueDate": "2021-10-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 8,
-              "updateApplicationDate": null,
-              "issueDate": "2021-11-28T00:00:00Z"
-            },
-            {
-              "updateNumber": 9,
-              "updateApplicationDate": null,
-              "issueDate": "2022-01-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 10,
-              "updateApplicationDate": null,
-              "issueDate": "2022-05-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 11,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 12,
-              "updateApplicationDate": null,
-              "issueDate": "2023-06-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 13,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 425404,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7424,9 +5170,7 @@
               "issueDate": "2023-09-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1125626,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7438,42 +5182,16 @@
           "productName": "CN484219",
           "editionNumber": 11,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3,
-            4
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2020-01-20T00:00:00Z",
               "issueDate": "2020-01-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2020-11-12T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2021-09-10T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2022-12-20T00:00:00Z"
-            },
-            {
-              "updateNumber": 4,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-16T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 384450,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7485,30 +5203,16 @@
           "productName": "CN583104",
           "editionNumber": 19,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-12-02T00:00:00Z",
               "issueDate": "2022-12-02T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-02T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 222342,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7520,24 +5224,16 @@
           "productName": "CN484301",
           "editionNumber": 8,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-04-18T00:00:00Z",
               "issueDate": "2023-04-18T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 515828,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7558,9 +5254,7 @@
               "issueDate": "2023-08-29T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 144450,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7581,9 +5275,7 @@
               "issueDate": "2018-12-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 243586,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7595,24 +5287,16 @@
           "productName": "CN584224",
           "editionNumber": 20,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-02-04T00:00:00Z",
               "issueDate": "2023-02-04T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 196452,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7633,9 +5317,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 862410,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7647,24 +5329,16 @@
           "productName": "CN584227",
           "editionNumber": 18,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-01-06T00:00:00Z",
               "issueDate": "2023-01-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 204060,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7676,36 +5350,16 @@
           "productName": "CN584226",
           "editionNumber": 18,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-02-01T00:00:00Z",
               "issueDate": "2023-02-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-09T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-01T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 540328,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7726,9 +5380,7 @@
               "issueDate": "2023-01-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 143898,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7740,30 +5392,16 @@
           "productName": "CN584230",
           "editionNumber": 18,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-02-06T00:00:00Z",
               "issueDate": "2023-02-06T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-02-27T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 264710,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7775,36 +5413,16 @@
           "productName": "CN584231",
           "editionNumber": 20,
           "updateNumbers": [
-            0,
-            1,
-            2,
-            3
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2023-01-31T00:00:00Z",
               "issueDate": "2023-01-31T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-03-07T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-21T00:00:00Z"
-            },
-            {
-              "updateNumber": 3,
-              "updateApplicationDate": null,
-              "issueDate": "2023-08-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 387848,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7825,9 +5443,7 @@
               "issueDate": "2023-09-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 417282,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7839,8 +5455,7 @@
           "productName": "CN584235",
           "editionNumber": 19,
           "updateNumbers": [
-            0,
-            1
+            0
           ],
           "dates": [
             {
@@ -7854,9 +5469,7 @@
               "issueDate": "2023-02-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 277684,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7877,9 +5490,7 @@
               "issueDate": "2023-02-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 207226,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7900,9 +5511,7 @@
               "issueDate": "2023-02-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 406650,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7923,9 +5532,7 @@
               "issueDate": "2022-09-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 404914,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7946,9 +5553,7 @@
               "issueDate": "2022-09-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 534602,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7969,9 +5574,7 @@
               "issueDate": "2022-09-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 59746,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -7992,9 +5595,7 @@
               "issueDate": "2022-10-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 161026,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8006,30 +5607,16 @@
           "productName": "CN584307",
           "editionNumber": 7,
           "updateNumbers": [
-            0,
-            1,
-            2
+            0
           ],
           "dates": [
             {
               "updateNumber": 0,
               "updateApplicationDate": "2022-09-08T00:00:00Z",
               "issueDate": "2022-09-08T00:00:00Z"
-            },
-            {
-              "updateNumber": 1,
-              "updateApplicationDate": null,
-              "issueDate": "2023-04-03T00:00:00Z"
-            },
-            {
-              "updateNumber": 2,
-              "updateApplicationDate": null,
-              "issueDate": "2023-05-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 334782,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8056,9 +5643,7 @@
               "issueDate": "2023-05-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 365596,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8085,9 +5670,7 @@
               "issueDate": "2023-05-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 646356,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8132,9 +5715,7 @@
               "issueDate": "2023-08-29T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 554570,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8155,9 +5736,7 @@
               "issueDate": "2023-09-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1230514,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8196,9 +5775,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 396800,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8249,9 +5826,7 @@
               "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 704044,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8272,9 +5847,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1070914,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8295,9 +5868,7 @@
               "issueDate": "2023-08-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 420722,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8324,9 +5895,7 @@
               "issueDate": "2023-08-29T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 127508,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8365,9 +5934,7 @@
               "issueDate": "2023-07-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 351048,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8388,9 +5955,7 @@
               "issueDate": "2023-02-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 812506,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8519,9 +6084,7 @@
               "issueDate": "2022-05-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 206359,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8542,9 +6105,7 @@
               "issueDate": "2022-05-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 8456,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8565,9 +6126,7 @@
               "issueDate": "2022-05-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 6695,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8600,9 +6159,7 @@
               "issueDate": "2023-04-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 264759,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8623,9 +6180,7 @@
               "issueDate": "2022-05-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 51534,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8670,9 +6225,7 @@
               "issueDate": "2023-07-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1717281,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8699,9 +6252,7 @@
               "issueDate": "2022-12-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 31340,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8728,9 +6279,7 @@
               "issueDate": "2022-10-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 19688,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8757,9 +6306,7 @@
               "issueDate": "2022-10-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 36167,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8792,9 +6339,7 @@
               "issueDate": "2022-10-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 282594,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8815,9 +6360,7 @@
               "issueDate": "2022-05-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 192244,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8850,9 +6393,7 @@
               "issueDate": "2022-10-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 126656,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8879,9 +6420,7 @@
               "issueDate": "2022-11-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2421265,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8932,9 +6471,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 237411,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8961,9 +6498,7 @@
               "issueDate": "2022-11-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2421265,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -8990,9 +6525,7 @@
               "issueDate": "2022-11-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2421265,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9032,9 +6565,7 @@
               "issueDate": "2023-01-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 341533,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9073,9 +6604,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 396800,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9108,9 +6637,7 @@
               "issueDate": "2022-05-30T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 82586,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9131,9 +6658,7 @@
               "issueDate": "2022-05-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 8456,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9184,9 +6709,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 237411,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9226,9 +6749,7 @@
               "issueDate": "2022-08-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 21425,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9261,9 +6782,7 @@
               "issueDate": "2023-07-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 594681,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9290,9 +6809,7 @@
               "issueDate": "2023-01-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 341533,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9427,9 +6944,7 @@
               "issueDate": "2023-06-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 129275,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9498,9 +7013,7 @@
               "issueDate": "2023-08-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 92957,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9563,9 +7076,7 @@
               "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 155797,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9640,9 +7151,7 @@
               "issueDate": "2022-07-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 765460,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9669,9 +7178,7 @@
               "issueDate": "2022-06-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 743208,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9746,9 +7253,7 @@
               "issueDate": "2023-09-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 956076,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9877,9 +7382,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 570075,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9912,9 +7415,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 282893,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9995,9 +7496,7 @@
               "issueDate": "2023-09-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 499745,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10018,9 +7517,7 @@
               "issueDate": "2023-09-20T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2516546,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10053,9 +7550,7 @@
               "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 853551,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10112,9 +7607,7 @@
               "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 621597,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10135,9 +7628,7 @@
               "issueDate": "2022-11-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 32929,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10176,9 +7667,7 @@
               "issueDate": "2023-08-24T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 460934,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10259,9 +7748,7 @@
               "issueDate": "2023-09-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 349447,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10330,9 +7817,7 @@
               "issueDate": "2023-09-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 590894,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10383,9 +7868,7 @@
               "issueDate": "2023-09-22T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1133276,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10406,9 +7889,7 @@
               "issueDate": "2023-09-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 107506,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10453,9 +7934,7 @@
               "issueDate": "2023-06-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 295146,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10578,9 +8057,7 @@
               "issueDate": "2023-06-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 271135,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10619,9 +8096,7 @@
               "issueDate": "2023-02-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 153800,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10678,9 +8153,7 @@
               "issueDate": "2023-06-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 517102,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10701,9 +8174,7 @@
               "issueDate": "2023-09-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 156946,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10747,7 +8218,6 @@
             "updateNumber": 3
           },
           "fileSize": 213632,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -10768,9 +8238,7 @@
               "issueDate": "2022-11-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 170951,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11103,9 +8571,7 @@
               "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 368012,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11174,9 +8640,7 @@
               "issueDate": "2023-09-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 207858,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11335,9 +8799,7 @@
               "issueDate": "2023-07-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 212056,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11382,9 +8844,7 @@
               "issueDate": "2023-04-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 521610,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11441,9 +8901,7 @@
               "issueDate": "2023-09-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 350398,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11566,9 +9024,7 @@
               "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 261828,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11661,9 +9117,7 @@
               "issueDate": "2023-09-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 543674,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11768,9 +9222,7 @@
               "issueDate": "2023-08-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 154214,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -11965,9 +9417,7 @@
               "issueDate": "2023-10-02T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 401372,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12486,9 +9936,7 @@
               "issueDate": "2023-08-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 720096,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12509,9 +9957,7 @@
               "issueDate": "2023-08-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 65522,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12622,9 +10068,7 @@
               "issueDate": "2023-09-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 541692,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12651,9 +10095,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 48948,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12686,9 +10128,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 154718,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12733,9 +10173,7 @@
               "issueDate": "2023-08-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 310722,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12768,9 +10206,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 301870,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12797,9 +10233,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 152004,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12826,9 +10260,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 100284,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12855,9 +10287,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 97436,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12884,9 +10314,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 362076,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12949,9 +10377,7 @@
               "issueDate": "2023-09-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 292797,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -12972,9 +10398,7 @@
               "issueDate": "2023-06-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 412210,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13001,9 +10425,7 @@
               "issueDate": "2023-08-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 233581,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13024,9 +10446,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 148290,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13071,9 +10491,7 @@
               "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 343962,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13100,9 +10518,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 53348,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13129,9 +10545,7 @@
               "issueDate": "2022-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 272440,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13158,9 +10572,7 @@
               "issueDate": "2022-07-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 90404,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13409,9 +10821,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2032790,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13456,9 +10866,7 @@
               "issueDate": "2022-11-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 253474,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13527,9 +10935,7 @@
               "issueDate": "2021-10-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 278994,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13550,9 +10956,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 195970,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13879,9 +11283,7 @@
               "issueDate": "2023-06-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 792368,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -13902,9 +11304,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 888810,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14009,9 +11409,7 @@
               "issueDate": "2023-02-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1400350,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14074,9 +11472,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 820568,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14097,9 +11493,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 467186,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14318,9 +11712,7 @@
               "issueDate": "2023-09-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 671036,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14341,9 +11733,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 912658,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14412,9 +11802,7 @@
               "issueDate": "2023-10-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 329010,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14513,9 +11901,7 @@
               "issueDate": "2023-10-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 343572,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14584,9 +11970,7 @@
               "issueDate": "2023-10-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 869962,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14673,9 +12057,7 @@
               "issueDate": "2023-05-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 222128,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14696,9 +12078,7 @@
               "issueDate": "2023-07-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 619490,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14719,9 +12099,7 @@
               "issueDate": "2023-07-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 855746,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14784,9 +12162,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2489165,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14855,9 +12231,7 @@
               "issueDate": "2023-02-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1000198,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14884,9 +12258,7 @@
               "issueDate": "2023-02-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2323846,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14907,9 +12279,7 @@
               "issueDate": "2022-05-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2708941,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14953,7 +12323,6 @@
             "updateNumber": 3
           },
           "fileSize": 2102970,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -14991,7 +12360,6 @@
             "updateNumber": 2
           },
           "fileSize": 426758,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15035,7 +12403,6 @@
             "updateNumber": 3
           },
           "fileSize": 26636,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15079,7 +12446,6 @@
             "updateNumber": 3
           },
           "fileSize": 71860,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15117,7 +12483,6 @@
             "updateNumber": 2
           },
           "fileSize": 27984,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15276,9 +12641,7 @@
               "issueDate": "2023-07-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1242048,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15371,9 +12734,7 @@
               "issueDate": "2023-01-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1501298,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15466,9 +12827,7 @@
               "issueDate": "2023-08-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 825770,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15501,9 +12860,7 @@
               "issueDate": "2022-06-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1213262,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15536,9 +12893,7 @@
               "issueDate": "2022-09-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 633110,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15631,9 +12986,7 @@
               "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 437282,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15882,9 +13235,7 @@
               "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 953462,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15917,9 +13268,7 @@
               "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 815446,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -15982,9 +13331,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1396488,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16029,9 +13376,7 @@
               "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 384058,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16052,9 +13397,7 @@
               "issueDate": "2022-08-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 86506,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16081,9 +13424,7 @@
               "issueDate": "2023-03-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 416124,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16194,9 +13535,7 @@
               "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 330496,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16247,9 +13586,7 @@
               "issueDate": "2023-08-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 422676,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16348,9 +13685,7 @@
               "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 425404,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16371,9 +13706,7 @@
               "issueDate": "2023-09-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1125626,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16418,9 +13751,7 @@
               "issueDate": "2023-05-16T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 384450,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16453,9 +13784,7 @@
               "issueDate": "2023-08-02T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 222342,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16482,9 +13811,7 @@
               "issueDate": "2023-05-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 515828,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16505,9 +13832,7 @@
               "issueDate": "2023-08-29T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 144450,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16528,9 +13853,7 @@
               "issueDate": "2018-12-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 243586,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16557,9 +13880,7 @@
               "issueDate": "2023-03-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 196452,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16580,9 +13901,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 862410,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16609,9 +13928,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 204060,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16650,9 +13967,7 @@
               "issueDate": "2023-08-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 540328,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16673,9 +13988,7 @@
               "issueDate": "2023-01-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 143898,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16708,9 +14021,7 @@
               "issueDate": "2023-08-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 264710,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16749,9 +14060,7 @@
               "issueDate": "2023-08-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 387848,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16772,9 +14081,7 @@
               "issueDate": "2023-09-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 417282,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16801,9 +14108,7 @@
               "issueDate": "2023-02-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 277684,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16824,9 +14129,7 @@
               "issueDate": "2023-02-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 207226,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16847,9 +14150,7 @@
               "issueDate": "2023-02-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 406650,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16870,9 +14171,7 @@
               "issueDate": "2022-09-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 404914,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16893,9 +14192,7 @@
               "issueDate": "2022-09-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 534602,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16916,9 +14213,7 @@
               "issueDate": "2022-09-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 59746,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16939,9 +14234,7 @@
               "issueDate": "2022-10-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 161026,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -16974,9 +14267,7 @@
               "issueDate": "2023-05-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 334782,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17003,9 +14294,7 @@
               "issueDate": "2023-05-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 365596,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17032,9 +14321,7 @@
               "issueDate": "2023-05-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 646356,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17079,9 +14366,7 @@
               "issueDate": "2023-08-29T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 554570,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17102,9 +14387,7 @@
               "issueDate": "2023-09-15T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1230514,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17143,9 +14426,7 @@
               "issueDate": "2023-09-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 396800,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17196,9 +14477,7 @@
               "issueDate": "2023-09-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 704044,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17219,9 +14498,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1070914,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17242,9 +14519,7 @@
               "issueDate": "2023-08-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 420722,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17271,9 +14546,7 @@
               "issueDate": "2023-08-29T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 127508,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17312,9 +14585,7 @@
               "issueDate": "2023-07-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 351048,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17335,9 +14606,7 @@
               "issueDate": "2023-02-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 812506,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17466,9 +14735,7 @@
               "issueDate": "2022-05-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 206359,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17489,9 +14756,7 @@
               "issueDate": "2023-08-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 300615,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17620,9 +14885,7 @@
               "issueDate": "2023-09-27T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 568698,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17769,9 +15032,7 @@
               "issueDate": "2023-04-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 263820,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17792,9 +15053,7 @@
               "issueDate": "2023-01-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 143910,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17827,9 +15086,7 @@
               "issueDate": "2023-05-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 190450,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17850,9 +15107,7 @@
               "issueDate": "2023-08-23T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 34041,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17909,9 +15164,7 @@
               "issueDate": "2022-08-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 24304,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17938,9 +15191,7 @@
               "issueDate": "2023-09-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 44140,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -17985,9 +15236,7 @@
               "issueDate": "2022-06-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 17892,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18020,9 +15269,7 @@
               "issueDate": "2023-04-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 27713,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18049,9 +15296,7 @@
               "issueDate": "2023-09-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 158889,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18078,9 +15323,7 @@
               "issueDate": "2023-09-20T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 104496,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18113,9 +15356,7 @@
               "issueDate": "2022-06-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 79383,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18142,9 +15383,7 @@
               "issueDate": "2022-06-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 83061,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18171,9 +15410,7 @@
               "issueDate": "2023-09-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 275412,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18200,9 +15437,7 @@
               "issueDate": "2023-10-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 494927,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18247,9 +15482,7 @@
               "issueDate": "2023-09-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 688835,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18270,9 +15503,7 @@
               "issueDate": "2023-09-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 752128,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18293,9 +15524,7 @@
               "issueDate": "2023-09-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1271099,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18322,9 +15551,7 @@
               "issueDate": "2023-09-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1238278,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18351,9 +15578,7 @@
               "issueDate": "2023-09-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 608801,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18374,9 +15599,7 @@
               "issueDate": "2023-06-16T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 10684,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18409,9 +15632,7 @@
               "issueDate": "2023-02-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 18491,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18432,9 +15653,7 @@
               "issueDate": "2023-07-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 27616,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18497,9 +15716,7 @@
               "issueDate": "2023-09-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 81976,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18520,9 +15737,7 @@
               "issueDate": "2023-10-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 50980,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18549,9 +15764,7 @@
               "issueDate": "2022-12-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 50374,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18584,9 +15797,7 @@
               "issueDate": "2023-07-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 215782,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18613,9 +15824,7 @@
               "issueDate": "2022-06-02T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 20428,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18696,9 +15905,7 @@
               "issueDate": "2023-09-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 883006,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18743,9 +15950,7 @@
               "issueDate": "2023-08-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 267746,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18772,9 +15977,7 @@
               "issueDate": "2022-06-08T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 200084,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18801,9 +16004,7 @@
               "issueDate": "2023-04-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 376468,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18872,9 +16073,7 @@
               "issueDate": "2023-04-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 266570,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -18937,9 +16136,7 @@
               "issueDate": "2023-07-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 244744,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19014,9 +16211,7 @@
               "issueDate": "2023-07-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 263028,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19115,9 +16310,7 @@
               "issueDate": "2023-06-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 399146,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19294,9 +16487,7 @@
               "issueDate": "2023-06-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1718222,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19365,9 +16556,7 @@
               "issueDate": "2022-05-30T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 693434,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19520,9 +16709,7 @@
               "issueDate": "2023-05-24T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1893430,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19681,9 +16868,7 @@
               "issueDate": "2023-09-22T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 636384,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19740,9 +16925,7 @@
               "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1301062,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19775,9 +16958,7 @@
               "issueDate": "2023-08-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 943958,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19834,9 +17015,7 @@
               "issueDate": "2023-08-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 625310,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -19875,9 +17054,7 @@
               "issueDate": "2023-09-13T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 44776,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20054,9 +17231,7 @@
               "issueDate": "2023-08-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1224174,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20089,9 +17264,7 @@
               "issueDate": "2023-05-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 144302,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20130,9 +17303,7 @@
               "issueDate": "2022-08-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 432592,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20153,9 +17324,7 @@
               "issueDate": "2022-12-01T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 224066,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20182,9 +17351,7 @@
               "issueDate": "2022-05-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 77980,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20403,9 +17570,7 @@
               "issueDate": "2023-02-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1227124,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20456,9 +17621,7 @@
               "issueDate": "2022-05-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 264236,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20503,9 +17666,7 @@
               "issueDate": "2022-05-30T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 334522,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20562,9 +17723,7 @@
               "issueDate": "2023-09-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1342734,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20681,9 +17840,7 @@
               "issueDate": "2023-05-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 230258,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -20836,9 +17993,7 @@
               "issueDate": "2023-03-02T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 435294,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21039,9 +18194,7 @@
               "issueDate": "2023-05-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 260790,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21164,9 +18317,7 @@
               "issueDate": "2023-07-24T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 721524,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21433,9 +18584,7 @@
               "issueDate": "2023-09-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 585932,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21486,9 +18635,7 @@
               "issueDate": "2023-09-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 521796,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21521,9 +18668,7 @@
               "issueDate": "2022-07-07T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 316126,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21574,9 +18719,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 76444,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21621,9 +18764,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 61186,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21644,9 +18785,7 @@
               "issueDate": "2023-09-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1323244,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21799,9 +18938,7 @@
               "issueDate": "2023-05-31T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 811622,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -21990,9 +19127,7 @@
               "issueDate": "2023-07-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 763922,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22061,9 +19196,7 @@
               "issueDate": "2023-08-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1169938,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22108,9 +19241,7 @@
               "issueDate": "2023-09-14T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 568930,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22131,9 +19262,7 @@
               "issueDate": "2022-10-20T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 175805,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22154,9 +19283,7 @@
               "issueDate": "2022-10-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 141584,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22177,9 +19304,7 @@
               "issueDate": "2023-05-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 368979,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22206,9 +19331,7 @@
               "issueDate": "2023-02-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 259573,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22427,9 +19550,7 @@
               "issueDate": "2023-01-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 780796,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22480,9 +19601,7 @@
               "issueDate": "2023-09-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 429212,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22629,9 +19748,7 @@
               "issueDate": "2023-03-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 687236,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22652,9 +19769,7 @@
               "issueDate": "2023-09-04T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 361127,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22687,9 +19802,7 @@
               "issueDate": "2023-08-22T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 321756,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22710,9 +19823,7 @@
               "issueDate": "2022-10-20T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 53124,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22793,9 +19904,7 @@
               "issueDate": "2023-01-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 368558,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22828,9 +19937,7 @@
               "issueDate": "2023-03-30T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 412574,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22857,9 +19964,7 @@
               "issueDate": "2023-08-16T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 326848,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22922,9 +20027,7 @@
               "issueDate": "2022-11-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 666032,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22963,9 +20066,7 @@
               "issueDate": "2023-07-03T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 607106,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -22986,9 +20087,7 @@
               "issueDate": "2023-08-25T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 426866,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23009,9 +20108,7 @@
               "issueDate": "2023-09-22T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 539991,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23032,9 +20129,7 @@
               "issueDate": "2022-05-26T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 21360,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23061,9 +20156,7 @@
               "issueDate": "2023-07-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 121219,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23126,9 +20219,7 @@
               "issueDate": "2023-09-28T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 137664,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23149,9 +20240,7 @@
               "issueDate": "2023-05-30T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 430478,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23172,9 +20261,7 @@
               "issueDate": "2022-05-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 8456,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23195,9 +20282,7 @@
               "issueDate": "2022-05-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 6695,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23230,9 +20315,7 @@
               "issueDate": "2023-04-18T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 264759,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23253,9 +20336,7 @@
               "issueDate": "2022-05-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 51534,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23300,9 +20381,7 @@
               "issueDate": "2023-07-11T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 1717281,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23329,9 +20408,7 @@
               "issueDate": "2022-12-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 31340,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23358,9 +20435,7 @@
               "issueDate": "2022-10-06T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 19688,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23387,9 +20462,7 @@
               "issueDate": "2022-10-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 36167,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23422,9 +20495,7 @@
               "issueDate": "2022-10-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 282594,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23445,9 +20516,7 @@
               "issueDate": "2022-05-19T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 192244,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23480,9 +20549,7 @@
               "issueDate": "2022-10-21T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 126656,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23515,9 +20582,7 @@
               "issueDate": "2022-06-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 135018,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23550,9 +20615,7 @@
               "issueDate": "2022-06-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 81194,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23591,9 +20654,7 @@
               "issueDate": "2023-09-27T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 173737,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23620,9 +20681,7 @@
               "issueDate": "2022-06-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 113432,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23649,9 +20708,7 @@
               "issueDate": "2022-11-10T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 2421265,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23702,9 +20759,7 @@
               "issueDate": "2023-07-05T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 237411,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23725,9 +20780,7 @@
               "issueDate": "2022-06-02T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 21954,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23778,9 +20831,7 @@
               "issueDate": "2023-07-17T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 614124,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23807,9 +20858,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 11020,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23830,9 +20879,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 37192,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23859,9 +20906,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 14060,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23888,9 +20933,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 8780,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23911,9 +20954,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 8970,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23934,9 +20975,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 10090,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23963,9 +21002,7 @@
               "issueDate": "2022-12-09T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 9604,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -23986,9 +21023,7 @@
               "issueDate": "2022-12-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 178232,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -24009,9 +21044,7 @@
               "issueDate": "2022-12-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 178232,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -24032,9 +21065,7 @@
               "issueDate": "2022-12-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 178232,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -24055,9 +21086,7 @@
               "issueDate": "2022-12-12T00:00:00Z"
             }
           ],
-          "cancellation": null,
           "fileSize": 178232,
-          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
