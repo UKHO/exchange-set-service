@@ -99,6 +99,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public int EncUpdateNumber { get; set; }
             public string InvalidEncCellName { get; set; }
             public string InvalidAioCellName { get; set; }
+            public string NotModifiedCellName { get; set; }
+            public int NotModifiedCellEditionNumber { get; set; }
+            public int NotModifiedCellUpdateNumber { get; set; }
         }
 
         public class BessConfiguration

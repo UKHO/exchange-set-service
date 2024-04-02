@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -27,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71610: Create empty SERIAL.AIO file and add to AIO exchange set
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(AioDownloadedFolderPath, objStorage.Config.AIOConfig.ExchangeSetSerialAioFile);
@@ -39,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadV01X01ZipExchangeSet_ThenASerialEncFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(EncDownloadedFolderPath, objStorage.Config.ExchangeSetSerialEncFile);
@@ -51,7 +52,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
         {
 
@@ -63,7 +64,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadV01X01ZipExchangeSet_ThenAReadmeTxtFileIsAvailableAsync()
         {
 
@@ -76,11 +77,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 77585: ESS : Empty AIO Exchange Set Creation
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenEncFilesShouldNotBeAvailable()
         {
             //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(objStorage.Config.ExchangeSetProductType, ProductVersionData, objStorage.ScsJwtToken);
+            var notModifiedProductVersion = new List<ProductVersionModel>()
+            {
+                DataHelper.GetProductVersionModelData(Config.AIOConfig.NotModifiedCellName,
+                    Config.AIOConfig.NotModifiedCellEditionNumber, Config.AIOConfig.NotModifiedCellUpdateNumber)
+            };
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(objStorage.Config.ExchangeSetProductType, notModifiedProductVersion, objStorage.ScsJwtToken);
             Assert.AreEqual(304, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 304.");
 
             Assert.IsFalse(Directory.Exists(Path.Combine(AioDownloadedFolderPath, "ENC_ROOT\\GB")));
@@ -88,11 +94,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 77585: ESS : Empty AIO Exchange Set Creation
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadV01X01ZipExchangeSet_ThenEncFilesShouldNotBeAvailable()
         {
             //Get the product details form sales catalogue service
-            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(objStorage.Config.ExchangeSetProductType, ProductVersionData, objStorage.ScsJwtToken);
+            var notModifiedProductVersion = new List<ProductVersionModel>()
+            {
+                DataHelper.GetProductVersionModelData(Config.AIOConfig.NotModifiedCellName,
+                    Config.AIOConfig.NotModifiedCellEditionNumber, Config.AIOConfig.NotModifiedCellUpdateNumber)
+            };
+            var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(objStorage.Config.ExchangeSetProductType, notModifiedProductVersion, objStorage.ScsJwtToken);
             Assert.AreEqual(304, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 304.");
 
             Assert.IsFalse(Directory.Exists(Path.Combine(EncDownloadedFolderPath, "ENC_ROOT\\DE")));
@@ -100,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
@@ -117,7 +128,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadV01X01ZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
@@ -135,7 +146,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         //Product Backlog Item 71646: Create CATALOG.031 file and add to AIO exchange set
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenCatalog031IsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeSetCatalogueFile);
@@ -152,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIOEnabled")]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadV01X01ZipExchangeSet_ThenCatalog031IsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeSetCatalogueFile);
