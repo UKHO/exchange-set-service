@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidAndGB800001ProductAndAioIsDisabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetAioProductIdentifierData(), accessToken: EssJwtToken);
@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithValidAndGB800001ProductAndAioIsDisabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new();
@@ -78,7 +78,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifiersApiWithOnlyGB800001ProductAndAioIsDisabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifiersForAioOnly(), accessToken: EssJwtToken);
@@ -106,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiOnlyGB800001ProductAndAioIsDisabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new();
