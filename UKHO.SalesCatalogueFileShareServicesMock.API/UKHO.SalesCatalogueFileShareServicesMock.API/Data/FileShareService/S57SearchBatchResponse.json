@@ -3,6 +3,666 @@
   "total": 3717,
   "entries": [
     {
+      "batchId": "b2b1bdf6-1c3e-4bbc-a866-1fabe675fc33",
+      "status": "Committed",
+      "allFilesZipSize": 732173,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "31"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "6ea71267-a0d0-419d-1293-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:16:37.47Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GBVESREP.TXT",
+          "fileSize": 87,
+          "mimeType": "text/plain",
+          "hash": "AAwwSt6KO41SIERngtV7Cg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBVESREP.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBPIPLNS.TXT",
+          "fileSize": 88,
+          "mimeType": "text/plain",
+          "hash": "51q6YPoJxYn2BCDbNhB/Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBPIPLNS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMOORIN.TXT",
+          "fileSize": 102,
+          "mimeType": "text/plain",
+          "hash": "1SgHBfUByhLBWIcYCOhchA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMOORIN.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMILEAG.TXT",
+          "fileSize": 105,
+          "mimeType": "text/plain",
+          "hash": "sGNjm1k/sRcUfVAn8quing==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMILEAG.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCABCAR.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "ViAu5pN0oiNXMI/hPesjyw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCABCAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTUNNEL.TXT",
+          "fileSize": 113,
+          "mimeType": "text/plain",
+          "hash": "pgGrHtHyhqSVykv9ltYBUA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTUNNEL.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCHDEPS.TXT",
+          "fileSize": 136,
+          "mimeType": "text/plain",
+          "hash": "C9QQ/hbviSWNV91loEIxsg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCHDEPS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBANCHAR.TXT",
+          "fileSize": 376,
+          "mimeType": "text/plain",
+          "hash": "JylqKb/DN4D4jp9y0qSXCg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBANCHAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTHABAR.TXT",
+          "fileSize": 896,
+          "mimeType": "text/plain",
+          "hash": "x0GNvNePoEgDi71s+b+2BQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTHABAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB6PL050.000",
+          "fileSize": 2288790,
+          "mimeType": "application/s57",
+          "hash": "nJ5R6rgW7KtDkBMpbZygjg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "8CA65C52"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GB6PL050.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "c1b1bdf6-1c3e-4bbc-a866-1fabe675fc33",
+      "status": "Committed",
+      "allFilesZipSize": 732173,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "31"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "6ea71267-a0d0-419d-1293-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:16:37.47Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GBVESREP.TXT",
+          "fileSize": 87,
+          "mimeType": "text/plain",
+          "hash": "AAwwSt6KO41SIERngtV7Cg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBVESREP.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBPIPLNS.TXT",
+          "fileSize": 88,
+          "mimeType": "text/plain",
+          "hash": "51q6YPoJxYn2BCDbNhB/Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBPIPLNS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMOORIN.TXT",
+          "fileSize": 102,
+          "mimeType": "text/plain",
+          "hash": "1SgHBfUByhLBWIcYCOhchA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMOORIN.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMILEAG.TXT",
+          "fileSize": 105,
+          "mimeType": "text/plain",
+          "hash": "sGNjm1k/sRcUfVAn8quing==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMILEAG.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCABCAR.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "ViAu5pN0oiNXMI/hPesjyw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCABCAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTUNNEL.TXT",
+          "fileSize": 113,
+          "mimeType": "text/plain",
+          "hash": "pgGrHtHyhqSVykv9ltYBUA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTUNNEL.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCHDEPS.TXT",
+          "fileSize": 136,
+          "mimeType": "text/plain",
+          "hash": "C9QQ/hbviSWNV91loEIxsg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCHDEPS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBANCHAR.TXT",
+          "fileSize": 376,
+          "mimeType": "text/plain",
+          "hash": "JylqKb/DN4D4jp9y0qSXCg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBANCHAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTHABAR.TXT",
+          "fileSize": 896,
+          "mimeType": "text/plain",
+          "hash": "x0GNvNePoEgDi71s+b+2BQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTHABAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB6PL050.000",
+          "fileSize": 2288790,
+          "mimeType": "application/s57",
+          "hash": "nJ5R6rgW7KtDkBMpbZygjg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "8CA65C52"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GB6PL050.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "d1b1bdf6-1c3e-4bbc-a866-1fabe675fc33",
+      "status": "Committed",
+      "allFilesZipSize": 732173,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "31"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "6ea71267-a0d0-419d-1293-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "2"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:16:37.47Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GBVESREP.TXT",
+          "fileSize": 87,
+          "mimeType": "text/plain",
+          "hash": "AAwwSt6KO41SIERngtV7Cg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBVESREP.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBPIPLNS.TXT",
+          "fileSize": 88,
+          "mimeType": "text/plain",
+          "hash": "51q6YPoJxYn2BCDbNhB/Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBPIPLNS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMOORIN.TXT",
+          "fileSize": 102,
+          "mimeType": "text/plain",
+          "hash": "1SgHBfUByhLBWIcYCOhchA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMOORIN.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMILEAG.TXT",
+          "fileSize": 105,
+          "mimeType": "text/plain",
+          "hash": "sGNjm1k/sRcUfVAn8quing==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMILEAG.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCABCAR.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "ViAu5pN0oiNXMI/hPesjyw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCABCAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTUNNEL.TXT",
+          "fileSize": 113,
+          "mimeType": "text/plain",
+          "hash": "pgGrHtHyhqSVykv9ltYBUA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTUNNEL.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCHDEPS.TXT",
+          "fileSize": 136,
+          "mimeType": "text/plain",
+          "hash": "C9QQ/hbviSWNV91loEIxsg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCHDEPS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBANCHAR.TXT",
+          "fileSize": 376,
+          "mimeType": "text/plain",
+          "hash": "JylqKb/DN4D4jp9y0qSXCg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBANCHAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTHABAR.TXT",
+          "fileSize": 896,
+          "mimeType": "text/plain",
+          "hash": "x0GNvNePoEgDi71s+b+2BQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTHABAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB6PL050.000",
+          "fileSize": 2288790,
+          "mimeType": "application/s57",
+          "hash": "nJ5R6rgW7KtDkBMpbZygjg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "8CA65C52"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GB6PL050.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33",
+      "status": "Committed",
+      "allFilesZipSize": 732173,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "31"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "6ea71267-a0d0-419d-1293-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "6"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:16:37.47Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GBVESREP.TXT",
+          "fileSize": 87,
+          "mimeType": "text/plain",
+          "hash": "AAwwSt6KO41SIERngtV7Cg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBVESREP.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBPIPLNS.TXT",
+          "fileSize": 88,
+          "mimeType": "text/plain",
+          "hash": "51q6YPoJxYn2BCDbNhB/Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBPIPLNS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMOORIN.TXT",
+          "fileSize": 102,
+          "mimeType": "text/plain",
+          "hash": "1SgHBfUByhLBWIcYCOhchA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMOORIN.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMILEAG.TXT",
+          "fileSize": 105,
+          "mimeType": "text/plain",
+          "hash": "sGNjm1k/sRcUfVAn8quing==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMILEAG.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCABCAR.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "ViAu5pN0oiNXMI/hPesjyw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCABCAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTUNNEL.TXT",
+          "fileSize": 113,
+          "mimeType": "text/plain",
+          "hash": "pgGrHtHyhqSVykv9ltYBUA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTUNNEL.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCHDEPS.TXT",
+          "fileSize": 136,
+          "mimeType": "text/plain",
+          "hash": "C9QQ/hbviSWNV91loEIxsg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCHDEPS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBANCHAR.TXT",
+          "fileSize": 376,
+          "mimeType": "text/plain",
+          "hash": "JylqKb/DN4D4jp9y0qSXCg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBANCHAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTHABAR.TXT",
+          "fileSize": 896,
+          "mimeType": "text/plain",
+          "hash": "x0GNvNePoEgDi71s+b+2BQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTHABAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB6PL050.000",
+          "fileSize": 2288790,
+          "mimeType": "application/s57",
+          "hash": "nJ5R6rgW7KtDkBMpbZygjg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "8CA65C52"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GB6PL050.000"
+            }
+          }
+        }
+      ]
+    },
+    {
       "batchId": "e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33",
       "status": "Committed",
       "allFilesZipSize": 732173,
@@ -8687,6 +9347,94 @@
       ]
     },
     {
+      "batchId": "352a94cf-2408-4876-bfaa-112beb61c3ad",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE5NOBRK"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "deb186e5-56d4-4af8-9375-92a0826b7bb4"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2021-08-10T12:10:41.593Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DESLT22E.TXT",
+          "fileSize": 327,
+          "mimeType": "text/plain",
+          "hash": "lLJE1bIcknO5QDflq5WRhQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/152a94cf-2408-4876-bfaa-112beb61c3ad/files/DESLT22E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESLT22D.TXT",
+          "fileSize": 370,
+          "mimeType": "text/plain",
+          "hash": "wPfCiezteu7K/4F9l60s8Q==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/152a94cf-2408-4876-bfaa-112beb61c3ad/files/DESLT22D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEMNOBRK.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "GWAyrVLIMHhXeFh7mUed7g==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/152a94cf-2408-4876-bfaa-112beb61c3ad/files/DEMNOBRK.000"
+            }
+          }
+        },
+        {
+          "filename": "DE5NOBRK.000",
+          "fileSize": 84224,
+          "mimeType": "application/s63",
+          "hash": "iXjOc9dib1jQrGjoGU7qXw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "759294C5"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/152a94cf-2408-4876-bfaa-112beb61c3ad/files/DE5NOBRK.000"
+            }
+          }
+        }
+      ]
+    },
+    {
       "batchId": "f1e04bcf-43ea-4d7d-94ee-2905a32494a7",
       "status": "Committed",
       "attributes": [
@@ -8801,6 +9549,134 @@
         {
           "key": "UpdateNumber",
           "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T12:08:32.807Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DELNO18Q.001",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "BD0mT6mRwTP7y39zjdYNpg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6f935d44-f61c-4975-9897-52102fba6d3b/files/DELNO18Q.001"
+            }
+          }
+        },
+        {
+          "filename": "DE4NO18Q.001",
+          "fileSize": 1416,
+          "mimeType": "application/s63",
+          "hash": "nm+S5lh1rKr0MA+sTEaGFA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "6F2AFB26"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/6f935d44-f61c-4975-9897-52102fba6d3b/files/DE4NO18Q.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "7f935d44-f61c-4975-9897-52102fba6d3b",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE4NO18Q"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "3da2e76b-6c80-480b-abc3-baf5ba08fd10"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "2"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T12:08:32.807Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DELNO18Q.001",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "BD0mT6mRwTP7y39zjdYNpg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6f935d44-f61c-4975-9897-52102fba6d3b/files/DELNO18Q.001"
+            }
+          }
+        },
+        {
+          "filename": "DE4NO18Q.001",
+          "fileSize": 1416,
+          "mimeType": "application/s63",
+          "hash": "nm+S5lh1rKr0MA+sTEaGFA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "6F2AFB26"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/6f935d44-f61c-4975-9897-52102fba6d3b/files/DE4NO18Q.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "8f935d44-f61c-4975-9897-52102fba6d3b",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE416080"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "3da2e76b-6c80-480b-abc3-baf5ba08fd10"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
         }
       ],
       "businessUnit": "ADDS",
@@ -9525,6 +10401,70 @@
           "links": {
             "get": {
               "href": "/batch/51cdeeb3-dbfd-4b53-bf15-406ff5cd71c2/files/JP5BHTR7.007"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "6h935d44-f61c-4975-9897-52102fba6d3b",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "US2ARCGD"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "3da2e76b-6c80-480b-abc3-baf5ba08fd10"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T12:08:32.807Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DELNO18Q.001",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "BD0mT6mRwTP7y39zjdYNpg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6f935d44-f61c-4975-9897-52102fba6d3b/files/DELNO18Q.001"
+            }
+          }
+        },
+        {
+          "filename": "DE4NO18Q.001",
+          "fileSize": 1416,
+          "mimeType": "application/s63",
+          "hash": "nm+S5lh1rKr0MA+sTEaGFA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "6F2AFB26"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/6f935d44-f61c-4975-9897-52102fba6d3b/files/DE4NO18Q.001"
             }
           }
         }

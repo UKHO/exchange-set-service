@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallSinceDateTimeApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssB2CToken, "s57");
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallProductIdentifiersApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssB2CToken, "s57");
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallProductIdentifiersApiWithAValidADTokenAnds57AsExchangeSetStandardParameter_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, accessToken: EssJwtToken, "s57");
@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallProductVersionsApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
