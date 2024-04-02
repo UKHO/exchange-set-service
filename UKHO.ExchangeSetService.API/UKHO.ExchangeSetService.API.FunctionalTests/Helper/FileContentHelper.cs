@@ -19,7 +19,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private static FssApiClient FssApiClient = new();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
-            Console.WriteLine("CreateExchangeSetFile method ==> "+ apiEssResponse.StatusCode);
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -405,7 +404,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> DownloadAndExtractAioZip(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
-            Console.WriteLine("DownloadAndExtractAioZip method ==> " + apiEssResponse.StatusCode);
             Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();

@@ -23,7 +23,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: objStorage.EssJwtToken);
             //////Get the BatchId
             batchId = await ApiEssResponse.GetBatchId();
-            Console.WriteLine("ExchangeSetGeneratesEmptyZipForAioProductVersionWhenAioIsEnabled batchId" + batchId);
             DownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(ApiEssResponse, objStorage.FssJwtToken);
         }
 
