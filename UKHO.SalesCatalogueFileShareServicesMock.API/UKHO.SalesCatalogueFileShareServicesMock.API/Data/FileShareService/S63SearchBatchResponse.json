@@ -30329,6 +30329,690 @@
       ]
     },
     {
+      "batchId": "218525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA473456"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/218525dd-36a7-4588-a767-d3e071ab31e2/files/CA473456.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "118525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA473483"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/118525dd-36a7-4588-a767-d3e071ab31e2/files/CA473483.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "518525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA476069"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/518525dd-36a7-4588-a767-d3e071ab31e2/files/CA476069.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "618525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA476189"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/618525dd-36a7-4588-a767-d3e071ab31e2/files/CA476189.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "718525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6MI71M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/718525dd-36a7-4588-a767-d3e071ab31e2/files/US6MI71M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "818525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6MI07M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/818525dd-36a7-4588-a767-d3e071ab31e2/files/US6MI07M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6NY33M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "5"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e2/files/US6NY33M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e3",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6NY27M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e3/files/US6NY27M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e4",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6OH05M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e4/files/US6OH05M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e5",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6OH08M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e5/files/US6OH08M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e6",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6WI01M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e6/files/US6WI01M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e7",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA270388"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e7/files/CA270388.001"
+            }
+          }
+        }
+      ]
+    },
+    {
       "batchId": "0726242e-49d7-4cb0-9d3b-75aa221b837a",
       "status": "Committed",
       "allFilesZipSize": 12338,
