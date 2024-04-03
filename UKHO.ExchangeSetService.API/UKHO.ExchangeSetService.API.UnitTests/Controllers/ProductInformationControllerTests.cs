@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             controller = new ProductInformationController(fakeHttpContextAccessor, fakeLogger, fakeProductDataService);
         }
 
-        #region ValidatePostProductIdentifiers
+        #region PostProductIdentifiers
 
         [Test]
         public async Task WhenValidateProductIdentifiersRequest_ThenPostValidateProductIdentifiersReturnsOkStatusCodeResult()
@@ -119,7 +119,27 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
         }
 
-        #endregion ValidatePostProductIdentifiers
+        [Test]
+        public async Task WhenScsDoesNotRespond200OK_ThenPostProductIdentifiersReturnsInternalServerError()
+        {
+            var mockSalesCatalogueResponse = GetSalesCatalogueResponse();
+            var salesCatalogueResponse = new SalesCatalogueResponse()
+            {
+                ResponseBody = mockSalesCatalogueResponse.ResponseBody,
+                ResponseCode = HttpStatusCode.Unauthorized
+            };
+            
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ScsProductIdentifierRequest>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            
+            var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers);
+            Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
+            Assert.AreEqual(500, result.StatusCode);
+        }
+
+        #endregion PostProductIdentifiers
 
         #region GetScsResponsebySinceDateTime
 
@@ -144,7 +164,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 && call.GetArgument<EventId>(1) == EventIds.SCSGetProductDataSinceDateTimeRequestStart.ToEventId()
                 && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} ").MustHaveHappened();
         }
-
 
         [Test]
         public async Task WhenInvalidSinceDateTimeFormatInRequest_ThenGetProductDataSinceDateTimeShouldReturnBadRequest()
@@ -181,9 +200,28 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
         }
 
-        #endregion GetScsResponsebySinceDateTime
+        [Test]
+        public async Task WhenScsDoesNotRespond200OK_ThenGetSinceDateTimeReturnsInternalServerError()
+        {
 
-        private SalesCatalogueResponse GetSalesCatalogueResponse()
+            var mockSalesCatalogueResponse = GetSalesCatalogueResponse();
+            var salesCatalogueResponse = new SalesCatalogueResponse()
+            {
+                ResponseBody = mockSalesCatalogueResponse.ResponseBody,
+                ResponseCode = HttpStatusCode.Unauthorized
+            };
+
+            A.CallTo(() => fakeProductDataService.GetProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
+                .Returns(salesCatalogueResponse);
+
+            var result = (ObjectResult)await controller.GetProductInformationSinceDateTime("Fri, 22 Mar 2024");
+            Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
+            Assert.AreEqual(500, result.StatusCode);
+        }
+
+            #endregion GetScsResponsebySinceDateTime
+
+            private SalesCatalogueResponse GetSalesCatalogueResponse()
         {
             return new SalesCatalogueResponse
             {
