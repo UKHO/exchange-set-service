@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
             fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestS63Data());
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData("ADDS"));
 
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
@@ -152,7 +152,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
             fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestS63Data());
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData("ADDS"));
 
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
@@ -185,7 +185,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
             fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestS57Data());
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData("ADDS-S57"));
 
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
@@ -212,7 +212,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event completed for ProductName:{productName} of BusinessUnit:{businessUnit} with OK response and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
         }
 
-        private EnterpriseEventCacheDataRequest GetCacheRequestS63Data()
+        private EnterpriseEventCacheDataRequest GetCacheRequestData(string businessUnit)
         {
             BatchDetails linkBatchDetails = new BatchDetails()
             {
@@ -235,41 +235,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
-                BusinessUnit = "ADDS",
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "2" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
-                BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
-                BatchPublishedDate = DateTime.UtcNow
-            };
-        }
-
-        private EnterpriseEventCacheDataRequest GetCacheRequestS57Data()
-        {
-            BatchDetails linkBatchDetails = new BatchDetails()
-            {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272"
-            };
-            BatchStatus linkBatchStatus = new BatchStatus()
-            {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/status"
-            };
-            Get linkGet = new Get()
-            {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
-            };
-            CacheLinks links = new CacheLinks()
-            {
-                BatchDetails = linkBatchDetails,
-                BatchStatus = linkBatchStatus,
-                Get = linkGet
-            };
-            return new EnterpriseEventCacheDataRequest
-            {
-                Links = links,
-                BusinessUnit = "ADDS-S57",
+                BusinessUnit = businessUnit,
                 Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,

@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [Test]
         public async Task WhenInvalidRequestDataInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
         {
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetS63CacheResponse());
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
             await service.DeleteSearchAndDownloadCacheData(GetInvalidCacheRequestData(), FakeCorrelationId);
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestS63Data(), FakeCorrelationId);
+            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(fakeCacheConfiguration.Value.S63CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -120,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestS57Data(), FakeCorrelationId);
+            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -144,10 +144,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [Test]
         public async Task WhenS63CacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseTrue()
         {
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetS63CacheResponse());
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestS63Data(), FakeCorrelationId);
+            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(fakeCacheConfiguration.Value.S63CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -181,10 +181,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [Test]
         public async Task WhenS57CacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseTrue()
         {
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetS57CacheResponse());
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S57CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestS57Data(), FakeCorrelationId);
+            await service.DeleteSearchAndDownloadCacheData(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -231,29 +231,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             };
         }
 
-        private FssSearchResponseCache GetS63CacheResponse()
+        private FssSearchResponseCache GetCacheResponse(string businessUnit)
         {
             return new FssSearchResponseCache()
             {
                 BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
                 PartitionKey = "DE416050",
-                RowKey = "2|0|ADDS",
+                RowKey = $"2|0|{businessUnit}",
                 Response = JsonConvert.SerializeObject(GetBatchDetail())
             };
         }
 
-        private FssSearchResponseCache GetS57CacheResponse()
-        {
-            return new FssSearchResponseCache()
-            {
-                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
-                PartitionKey = "DE416050",
-                RowKey = "2|0|ADDS-S57",
-                Response = JsonConvert.SerializeObject(GetBatchDetail())
-            };
-        }
-
-        private EnterpriseEventCacheDataRequest GetCacheRequestS63Data()
+        private EnterpriseEventCacheDataRequest GetCacheRequestData(string businessUnit)
         {
             BatchDetails linkBatchDetails = new BatchDetails()
             {
@@ -276,47 +265,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
-                BusinessUnit = "ADDS",
+                BusinessUnit = businessUnit,
                 Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,
                                                            new Attribute { Key= "UpdateNumber", Value= "0" },
                                                            new Attribute { Key= "ProductCode", Value= "AVCS" }},
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
-                BatchPublishedDate = DateTime.UtcNow
-            };
-        }
-
-        private EnterpriseEventCacheDataRequest GetCacheRequestS57Data()
-        {
-            BatchDetails linkBatchDetails = new BatchDetails()
-            {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272"
-            };
-            BatchStatus linkBatchStatus = new BatchStatus()
-            {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/status"
-            };
-            Get linkGet = new Get()
-            {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
-            };
-            CacheLinks links = new CacheLinks()
-            {
-                BatchDetails = linkBatchDetails,
-                BatchStatus = linkBatchStatus,
-                Get = linkGet
-            };
-            return new EnterpriseEventCacheDataRequest
-            {
-                Links = links,
-                BusinessUnit = "ADDS-S57",
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "2" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
-                BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6f",
                 BatchPublishedDate = DateTime.UtcNow
             };
         }
