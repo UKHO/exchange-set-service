@@ -42,7 +42,7 @@ variable "api_description" {
 
 variable "ui_api_name" {
     type = string
-    default = "The Exchange Set Service UI API"
+    default = "Exchange Set Service UI API"
 }
 
 variable "ui_api_description" {
