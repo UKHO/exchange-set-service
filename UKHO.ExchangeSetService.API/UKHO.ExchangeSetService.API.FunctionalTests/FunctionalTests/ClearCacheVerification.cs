@@ -5,10 +5,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Net.Http;
 using System.Collections.Generic;
-//// The below line of code will be uncommented on implementation of  Product Backlog Item 140111: ESS API : Update ESS webhook
-////using Newtonsoft.Json.Linq;
-////using System;
-////using Attribute = UKHO.ExchangeSetService.API.FunctionalTests.Models.Attribute;
+using Newtonsoft.Json.Linq;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -25,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private string ScsJwtToken { get; set; }
         private string DownloadedFolderPath { get; set; }
         private HttpResponseMessage ApiEssResponse { get; set; }
-        private readonly List<string> CleanUpBatchIdList = new();        
+        private readonly List<string> cleanUpBatchIdList = new();
         private ClearCacheHelper ClearCacheHelper { get; set; }
 
         [OneTimeSetUp]
@@ -34,7 +31,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             FssApiClient = new FssApiClient();
-            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
+            AuthTokenProvider authTokenProvider = new();
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
@@ -50,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
             //Get the BatchId
             var batchId = await ApiEssResponse.GetBatchId();
-            CleanUpBatchIdList.Add(batchId);
+            cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
 
             //Get the product details form sales catalogue service
@@ -81,20 +78,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsNotNull(tableCacheCheck);
             Assert.IsNotEmpty(tableCacheCheck.Response);
 
-            //// The below line of code will be uncommented on implementation of Product Backlog Item 140111: ESS API : Update ESS webhook
-            ////var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
-            ////essCacheJson["Source"] = "AcceptanceTest";
-            ////essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            ////essCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
+            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
+            essCacheJson["Source"] = "AcceptanceTest";
+            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestData(Config.BESSConfig.S63BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
-            ////var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
-            ////Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
+            var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
-            //////Check caching info
-            ////tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+            //Check caching info
+            tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
-            ////// Verify the No Cache available
-            ////Assert.IsNull(tableCacheCheck);
+            // Verify the No Cache available
+            Assert.IsNull(tableCacheCheck);
         }
 
         [Test]
@@ -104,7 +100,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersS57(), null, EssJwtToken, "s57");
             //Get the BatchId
             var batchId = await ApiEssResponse.GetBatchId();
-            CleanUpBatchIdList.Add(batchId);
+            cleanUpBatchIdList.Add(batchId);
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, FssJwtToken);
 
             //Get the product details form sales catalogue service
@@ -117,7 +113,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 var productName = product.ProductName;
                 var editionNumber = product.EditionNumber;
-                 
+
                 //Enc file download verification
                 foreach (var updateNumber in product.UpdateNumbers)
                 {
@@ -135,20 +131,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsNotNull(tableCacheCheck);
             Assert.IsNotEmpty(tableCacheCheck.Response);
 
-            //// The below line of code will be uncommented on implementation of  Product Backlog Item 140111: ESS API : Update ESS webhook
-            ////var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
-            ////essCacheJson["Source"] = "AcceptanceTest";
-            ////essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            ////essCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
+            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
+            essCacheJson["Source"] = "AcceptanceTest";
+            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestData(Config.BESSConfig.S57BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
-            ////var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
-            ////Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
+            var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
-            //////Check caching info
-            ////tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+            //Check caching info
+            tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
-            ////// Verify the No Cache available
-            ////Assert.IsNull(tableCacheCheck);
+            // Verify the No Cache available
+            Assert.IsNull(tableCacheCheck);
         }
 
         [OneTimeTearDown]
@@ -157,47 +152,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Clean up downloaded files/folders   
             FileContentHelper.DeleteDirectory(Config.ExchangeSetFileName);
 
-            if (CleanUpBatchIdList != null && CleanUpBatchIdList.Count > 0)
+            if (cleanUpBatchIdList is { Count: > 0 })
             {
                 //Clean up batches from local folder 
-                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
+                var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
         }
-
-        //// The below line of code will be uncommented on implementation of  Product Backlog Item 140111: ESS API : Update ESS webhook
-        ////private EnterpriseEventCacheDataRequest GetCacheRequestData()
-        ////{
-        ////    BatchDetails linkBatchDetails = new BatchDetails()
-        ////    {
-        ////        Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272"
-        ////    };
-        ////    BatchStatus linkBatchStatus = new BatchStatus()
-        ////    {
-        ////        Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/status"
-        ////    };
-        ////    GetUrl linkGet = new GetUrl()
-        ////    {
-        ////        Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
-        ////    };
-        ////    LinksNew links = new LinksNew()
-        ////    {
-        ////        BatchDetails = linkBatchDetails,
-        ////        BatchStatus = linkBatchStatus,
-        ////        GetUrl =linkGet
-        ////    };
-        ////    return new EnterpriseEventCacheDataRequest
-        ////    {
-        ////        Links = links,
-        ////        BusinessUnit = "ADDS",
-        ////        Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-        ////                                                   new Attribute { Key= "CellName", Value= "DE290001" },
-        ////                                                   new Attribute { Key= "EditionNumber", Value= "1" } ,
-        ////                                                   new Attribute { Key= "UpdateNumber", Value= "0" },
-        ////                                                   new Attribute { Key= "ProductCode", Value= "AVCS" }},
-        ////        BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
-        ////        BatchPublishedDate = DateTime.UtcNow
-        ////    };
-        ////}       
     }
 }
