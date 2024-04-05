@@ -750,9 +750,9 @@ stages:
                     arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
-    dependsOn:
-    - Devdeploy
-    - QCdeploy
+    # dependsOn:
+    # - Devdeploy
+    # - QCdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
     #condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
