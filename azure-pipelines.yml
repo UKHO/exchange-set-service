@@ -5,6 +5,10 @@ parameters:
     displayName: "Continue even if resources are getting destroyed"
     type: boolean
     default: false
+  - name: disableStryker
+    displayName: "Disable Stryker"
+    type: boolean
+    default: false
 
 trigger:
   - main
@@ -51,6 +55,7 @@ stages:
 
   - stage: Stryker_Mutator
     displayName: "Stryker Mutator"
+    condition: ${{ eq(parameters.disableStryker, false) }}
     dependsOn: []
     variables:
     - name: StrykerDotNetVersion
@@ -1056,7 +1061,7 @@ stages:
     dependsOn: 
       - vnextiatDeploy
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
       - deployment: E2EDeploy
         displayName: vnexte2e - deploy terraform and dotnet App
