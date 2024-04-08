@@ -750,7 +750,8 @@ stages:
                     arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
-    # dependsOn:
+    dependsOn:
+      - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     # - Devdeploy
     # - QCdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
