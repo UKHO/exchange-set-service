@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
                 dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
-                FileContentHelper.CheckProductFileContent(Path.Combine(downloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
+                FileContentHelper.CheckProductFileContent(Path.Combine(downloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData, "s57");
             }
         }
 

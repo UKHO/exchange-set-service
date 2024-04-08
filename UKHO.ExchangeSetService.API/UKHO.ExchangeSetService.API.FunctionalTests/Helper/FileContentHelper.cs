@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00U01X01"), $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
-        public static void CheckProductFileContent(string inputFile, dynamic scsResponse)
+        public static void CheckProductFileContent(string inputFile, dynamic scsResponse, string exchangeSetStandard = "s63")
         {
             string[] fileContent = File.ReadAllLines(inputFile);
 
@@ -67,6 +67,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
             Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
             Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
+          
+            int rowNumber = new Random().Next(4, fileContent.Length-1);
+            var productData = fileContent[rowNumber].Split(",").Reverse();
+            var encryptionFlag = productData.ToList()[4];
+            string expectedEncryptionFlag = "1";
+            if (exchangeSetStandard == "s57") 
+                { 
+                    expectedEncryptionFlag = "0"; 
+                }
+
+            Assert.True(encryptionFlag.Equals(expectedEncryptionFlag), $"Product File returned {encryptionFlag}, which is not expected encryptionFlag.");
         }
 
         public static void CheckReadMeTxtFileContent(string inputFile)
