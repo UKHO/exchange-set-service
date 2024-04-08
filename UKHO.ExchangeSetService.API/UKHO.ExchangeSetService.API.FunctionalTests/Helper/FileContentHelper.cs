@@ -72,7 +72,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var productData = fileContent[rowNumber].Split(",").Reverse();
             var encryptionFlag = productData.ToList()[4];
             string expectedEncryptionFlag = "1";
-            if (exchangeSetStandard == "s57") { expectedEncryptionFlag = "0";}
+            if (exchangeSetStandard == "s57") 
+                { 
+                    expectedEncryptionFlag = "0"; 
+                }
+
             Assert.True(encryptionFlag.Equals(expectedEncryptionFlag), $"Product File returned {encryptionFlag}, which is not expected encryptionFlag.");
         }
 
