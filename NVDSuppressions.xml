@@ -463,4 +463,28 @@
     </notes>
     <cve>CVE-2024-21907</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: GetDocument.Insider.dll
+   CVE-2024-21386 - fixed by latest dotnet
+   CVE-2024-21404 - only applies to non-Windows environments (https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-21404)
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/GetDocument\.Insider@.*$</packageUrl>
+    <cve>CVE-2024-21386</cve>
+    <cve>CVE-2024-21404</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: dotnet-getdocument.dll
+   CVE-2024-21386 - fixed by latest dotnet
+   CVE-2024-21404 - only applies to non-Windows environments (https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-21404)
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/dotnet\-getdocument@.*$</packageUrl>
+    <cve>CVE-2024-21386</cve>
+    <cve>CVE-2024-21404</cve>
+  </suppress>
 </suppressions>
