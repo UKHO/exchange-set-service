@@ -317,6 +317,44 @@
     }
   },
   {
+    "id": "productIdentifier-DE360010",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 7,
+          "productName": "DE360010",
+          "updateNumbers": [
+            7,
+            8,
+            9
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-05-15T00:00:00.0000000Z",
+              "updateNumber": 7
+            },
+            {
+              "issueDate": "2023-06-15T00:00:00.0000000Z",
+              "updateNumber": 8
+            },
+            {
+              "issueDate": "2023-07-15T00:00:00.0000000Z",
+              "updateNumber": 9
+            }
+          ],
+          "fileSize": 164526
+        }
+      ]
+    }
+  },
+  {
     "id": "productIdentifier-JP5BHTR7-JP5P9F59",
     "responseBody": {
       "productCounts": {
@@ -636,6 +674,33 @@
   },
   {
     "id": "productVersion-JP5BHTR7-7-6",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 7,
+          "productName": "JP5BHTR7",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-JP5BHTR7",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 1,
@@ -1469,6 +1534,310 @@
             {
               "bundleType": "ABC",
               "location": "M2;B8"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-DE260001-DE516510-JP5BHTR7",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "DE260001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
+          ]
+        },
+        {
+          "editionNumber": 2,
+          "productName": "DE516510",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-04-17T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-04-17T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2015-04-30T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2019-05-31T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 3
+            },
+            {
+              "issueDate": "2021-06-09T00:00:00.0000000Z",
+              "updateNumber": 4
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 38375
+        },
+        {
+          "editionNumber": 7,
+          "productName": "JP5BHTR7",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE260001-0-0-DE516510-1-0-JP5BHTR7-7-6",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "DE260001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
+          ]
+        },
+        {
+          "editionNumber": 2,
+          "productName": "DE516510",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-04-17T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-04-17T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2015-04-30T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2019-05-31T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 3
+            },
+            {
+              "issueDate": "2021-06-09T00:00:00.0000000Z",
+              "updateNumber": 4
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 38375
+        },
+        {
+          "editionNumber": 7,
+          "productName": "JP5BHTR7",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE260001-0-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "DE260001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE516510-1-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE516510",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-04-17T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-04-17T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2015-04-30T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2019-05-31T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 3
+            },
+            {
+              "issueDate": "2021-06-09T00:00:00.0000000Z",
+              "updateNumber": 4
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 38375
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE360010-7-6",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "DE360010",
+          "updateNumbers": [
+            7,
+            8,
+            9
+          ],
+          "dates": [
+            {
+              "issueDate": "2023-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2023-05-15T00:00:00.0000000Z",
+              "updateNumber": 7
+            },
+            {
+              "issueDate": "2023-06-15T00:00:00.0000000Z",
+              "updateNumber": 8
+            },
+            {
+              "issueDate": "2023-07-15T00:00:00.0000000Z",
+              "updateNumber": 9
+            }
+          ],
+          "fileSize": 164526,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
             }
           ]
         }

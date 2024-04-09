@@ -27782,6 +27782,198 @@
       ]
     },
     {
+      "batchId": "956b648a-48c7-4de5-be4f-bc8a53ce66d2",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE360010"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "7"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7904db4f-f9f7-472c-b313-85fcced1e11d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "7"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:30:00.27Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEK60010.007",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "xuv2dK+a9q7mx6DcSC5DnA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/956b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DEK60010.007"
+            }
+          }
+        },
+        {
+          "filename": "DE360010.007",
+          "fileSize": 53968,
+          "mimeType": "application/s63",
+          "hash": "uaErgJclsEoAVSepRfWyNA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "3FA55F3C"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/956b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.007"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "756b648a-48c7-4de5-be4f-bc8a53ce66d2",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE360010"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "7"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7904db4f-f9f7-472c-b313-85fcced1e11d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "8"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:30:00.27Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEK60010.008",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "xuv2dK+a9q7mx6DcSC5DnA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/756b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DEK60010.008"
+            }
+          }
+        },
+        {
+          "filename": "DE360010.008",
+          "fileSize": 53968,
+          "mimeType": "application/s63",
+          "hash": "uaErgJclsEoAVSepRfWyNA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "3FA55F3C"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/756b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.008"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "556b648a-48c7-4de5-be4f-bc8a53ce66d2",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE360010"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "7"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7904db4f-f9f7-472c-b313-85fcced1e11d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "9"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:30:00.27Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEK60010.009",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "xuv2dK+a9q7mx6DcSC5DnA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/556b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DEK60010.009"
+            }
+          }
+        },
+        {
+          "filename": "DE360010.009",
+          "fileSize": 53968,
+          "mimeType": "application/s63",
+          "hash": "uaErgJclsEoAVSepRfWyNA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "3FA55F3C"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/556b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.009"
+            }
+          }
+        }
+      ]
+    },
+    {
       "batchId": "abce34ae-4c44-490e-a791-cb2c0a2a3ddb",
       "status": "Committed",
       "allFilesZipSize": null,
