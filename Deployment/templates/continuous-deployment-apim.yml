@@ -14,9 +14,14 @@ parameters:
     type: string
   - name: tfstateStorageAccountName
     type: string
-  - name: BackendConfigKey
-    type: string
-    default: terraform.ess.apim.deployment.tfplan
+  # If true then set policy to rewrite new APIM links to old. If false then rewrite old to new.
+  - name: SetLinkRewriteNewToOld
+    type: boolean
+    default: true
+  # If true then use new tfplan naming convention.
+  - name: UseNewTfplanName
+    type: boolean
+    default: false
 
 steps:
   - task: AzureKeyVault@2
@@ -33,7 +38,7 @@ steps:
     inputs:
       targetType: filePath
       filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_apim.ps1'
-      arguments: '-deploymentResourceGroupName ${{ parameters.tfstateStorageAccountRG }} -deploymentStorageAccountName ${{ parameters.tfstateStorageAccountName }} -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }} -backendConfigKey ${{ parameters.BackendConfigKey }}'
+      arguments: '-deploymentResourceGroupName ${{ parameters.tfstateStorageAccountRG }} -deploymentStorageAccountName ${{ parameters.tfstateStorageAccountName }} -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }} -useNewTfplanName $${{ parameters.UseNewTfplanName }}'
     env:
       ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
       ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
@@ -50,3 +55,9 @@ steps:
       TF_VAR_ess_ui_product_call_limit: $(essuiproductcalllimit)
       TF_VAR_ess_ui_product_call_renewal_period: $(essuiproductcallrenewalperiod)
       TF_VAR_ess_ui_product_daily_quota_limit: $(essuiproductdailyquotalimit)
+      ${{ if eq(parameters.SetLinkRewriteNewToOld, true) }}:
+        TF_VAR_policy_rewrite_from_gateway: $(APIM_NEW_GATEWAY)
+        TF_VAR_policy_rewrite_to_gateway: $(APIM_OLD_GATEWAY)
+      ${{ else }}:
+        TF_VAR_policy_rewrite_from_gateway: $(APIM_OLD_GATEWAY)
+        TF_VAR_policy_rewrite_to_gateway: $(APIM_NEW_GATEWAY)

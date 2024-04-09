@@ -111,6 +111,14 @@ variable "cors_origin_values" {
   type = string  
 }
 
+variable "policy_rewrite_from_gateway" {
+  type = string  
+}
+
+variable "policy_rewrite_to_gateway" {
+  type = string  
+}
+
 locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
