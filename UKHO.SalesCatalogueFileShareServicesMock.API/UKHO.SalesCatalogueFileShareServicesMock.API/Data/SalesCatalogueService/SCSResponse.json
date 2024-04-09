@@ -700,6 +700,33 @@
     }
   },
   {
+    "id": "productIdentifier-JP5BHTR7",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 7,
+          "productName": "JP5BHTR7",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        }
+      ]
+    }
+  },
+  {
     "id": "productVersion-DE516510-2-1",
     "responseBody": {
       "productCounts": {
@@ -837,31 +864,6 @@
             }
           ],
           "fileSize": 140018
-        },
-        {
-          "editionNumber": 7,
-          "productName": "DE360010",
-          "updateNumbers": [
-            7,
-            8,
-            9
-          ],
-          "dates": [
-            {
-              "issueDate": "2023-05-15T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-05-15T00:00:00.0000000Z",
-              "updateNumber": 7
-            },
-            {
-              "issueDate": "2023-06-15T00:00:00.0000000Z",
-              "updateNumber": 8
-            },
-            {
-              "issueDate": "2023-07-15T00:00:00.0000000Z",
-              "updateNumber": 9
-            }
-          ],
-          "fileSize": 164526
         },
         {
           "editionNumber": 2,
@@ -1539,7 +1541,7 @@
     }
   },
   {
-    "id": "productIdentifier-DE260001-DE516510-DE360010",
+    "id": "productIdentifier-DE260001-DE516510-JP5BHTR7",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 3,
@@ -1610,40 +1612,23 @@
         },
         {
           "editionNumber": 7,
-          "productName": "DE360010",
+          "productName": "JP5BHTR7",
           "updateNumbers": [
-            7,
-            8,
-            9
+            7
           ],
           "dates": [
             {
-              "issueDate": "2023-05-15T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-05-15T00:00:00.0000000Z",
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
               "updateNumber": 7
-            },
-            {
-              "issueDate": "2023-06-15T00:00:00.0000000Z",
-              "updateNumber": 8
-            },
-            {
-              "issueDate": "2023-07-15T00:00:00.0000000Z",
-              "updateNumber": 9
             }
           ],
-          "fileSize": 164526,
-          "bundle": [
-            {
-              "bundleType": "DVD",
-              "location": "M1;B3"
-            }
-          ]
+          "fileSize": 654692
         }
       ]
     }
   },
   {
-    "id": "productVersion-DE260001-0-0-DE516510-1-0-DE360010-7-6",
+    "id": "productVersion-DE260001-0-0-DE516510-1-0-JP5BHTR7-7-6",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 3,
@@ -1714,34 +1699,17 @@
         },
         {
           "editionNumber": 7,
-          "productName": "DE360010",
+          "productName": "JP5BHTR7",
           "updateNumbers": [
-            7,
-            8,
-            9
+            7
           ],
           "dates": [
             {
-              "issueDate": "2023-05-15T00:00:00.0000000Z",
-              "updateApplicationDate": "2023-05-15T00:00:00.0000000Z",
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
               "updateNumber": 7
-            },
-            {
-              "issueDate": "2023-06-15T00:00:00.0000000Z",
-              "updateNumber": 8
-            },
-            {
-              "issueDate": "2023-07-15T00:00:00.0000000Z",
-              "updateNumber": 9
             }
           ],
-          "fileSize": 164526,
-          "bundle": [
-            {
-              "bundleType": "DVD",
-              "location": "M1;B3"
-            }
-          ]
+          "fileSize": 654692
         }
       ]
     }
