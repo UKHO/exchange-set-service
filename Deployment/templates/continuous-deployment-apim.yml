@@ -14,9 +14,17 @@ parameters:
     type: string
   - name: tfstateStorageAccountName
     type: string
+  # If true then set policy to rewrite new APIM links to old. If false then rewrite old to new.
+  - name: SetLinkRewriteNewToOld
+    type: boolean
+    default: true
+  # If true then use new tfplan naming convention.
+  - name: UseNewTfplanName
+    type: boolean
+    default: false
 
 steps:
-  - task: AzureKeyVault@1
+  - task: AzureKeyVault@2
     displayName: 'Read APIM terraform Variables'
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
@@ -30,7 +38,7 @@ steps:
     inputs:
       targetType: filePath
       filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_apim.ps1'
-      arguments: '-deploymentResourceGroupName ${{ parameters.tfstateStorageAccountRG }} -deploymentStorageAccountName ${{ parameters.tfstateStorageAccountName }} -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}'
+      arguments: '-deploymentResourceGroupName ${{ parameters.tfstateStorageAccountRG }} -deploymentStorageAccountName ${{ parameters.tfstateStorageAccountName }} -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }} -useNewTfplanName $${{ parameters.UseNewTfplanName }}'
     env:
       ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
       ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
@@ -38,7 +46,7 @@ steps:
       ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
       TF_VAR_apim_rg: ${{ parameters.APIMResourceGroup }}
       TF_VAR_apim_name: ${{ parameters.APIMServiceInstance }}
-      TF_VAR_apim_api_backend_url: $(EssApiUrl)
+      TF_VAR_apim_api_backend_url: $(SERVICE_DNS_URL)
       TF_VAR_client_credentials_tenant_id: $(AzureAdB2CConfiguration.TenantId)
       TF_VAR_client_credentials_scope: "$(AzureAdB2CConfiguration.ClientId)/.default"
       TF_VAR_b2c_token_issuer: "$(APIM_B2C_TOKEN_ISSUER)"
@@ -47,3 +55,9 @@ steps:
       TF_VAR_ess_ui_product_call_limit: $(essuiproductcalllimit)
       TF_VAR_ess_ui_product_call_renewal_period: $(essuiproductcallrenewalperiod)
       TF_VAR_ess_ui_product_daily_quota_limit: $(essuiproductdailyquotalimit)
+      ${{ if eq(parameters.SetLinkRewriteNewToOld, true) }}:
+        TF_VAR_policy_rewrite_from_gateway: $(APIM_NEW_GATEWAY)
+        TF_VAR_policy_rewrite_to_gateway: $(APIM_OLD_GATEWAY)
+      ${{ else }}:
+        TF_VAR_policy_rewrite_from_gateway: $(APIM_OLD_GATEWAY)
+        TF_VAR_policy_rewrite_to_gateway: $(APIM_NEW_GATEWAY)
