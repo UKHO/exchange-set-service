@@ -111,3 +111,11 @@ variable "ess_ui_product_call_renewal_period" {
 variable "ess_ui_product_daily_quota_limit" {
     type = number
 }
+
+variable "policy_rewrite_from_gateway" {
+  type = string  
+}
+
+variable "policy_rewrite_to_gateway" {
+  type = string  
+}

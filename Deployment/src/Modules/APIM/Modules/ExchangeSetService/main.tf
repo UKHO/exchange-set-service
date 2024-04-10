@@ -82,6 +82,9 @@ resource "azurerm_api_management_product_policy" "ess_product_policy" {
 		 <quota calls="${var.product_quota.calls}" renewal-period="${var.product_quota.renewal-period}" />
 		 <base />
 	  </inbound>
+      <outbound>
+        <find-and-replace from="${var.policy_rewrite_from_gateway}" to="${var.policy_rewrite_to_gateway}" />
+      </outbound>
 	</policies>
 	XML
 }
