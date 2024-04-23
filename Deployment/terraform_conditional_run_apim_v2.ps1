@@ -43,5 +43,5 @@ if($totalDestroyLines -ge 2)
 }
 
 Write-output "Executing terraform apply..."
-#terraform apply  "terraform.ess.apim.deployment.v2.tfplan"
+terraform apply  "terraform.ess.apim.deployment.v2.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform apply" ; throw "Error" }
