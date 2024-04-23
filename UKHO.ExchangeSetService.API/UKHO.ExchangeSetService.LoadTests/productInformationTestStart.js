@@ -7,34 +7,14 @@ const runTestSinceDateTime = require('./scripts/LoadTestForProductInformation.js
 const config = JSON.parse(open('./config.json'));
 const dataHelper = require('./helper/dataHelper.js');
 
-const sinceDateTimeData_Small = dataHelper.GetSinceDateTimeDataForSmallExchangeSet();
-const sinceDateTimeData_Medium = dataHelper.GetSinceDateTimeDataForMediumExchangeSet();
 const sinceDateTimeData_Large = dataHelper.GetSinceDateTimeDataForLargeExchangeSet();
 
 let clientAuthResp = {};
 
 export let options = {
     scenarios: {
-        ESSCreationSmallExchangeSet: {
-            exec: 'ESSCreationSmallExchangeSet',
-            executor: 'per-vu-iterations',
-            startTime: '10s',
-            gracefulStop: '5s',
-            vus: 5,
-            iterations: 30,
-            maxDuration: '1h'
-        },
-        ESSCreationMediumExchangeSet: {
-            exec: 'ESSCreationMediumExchangeSet',
-            executor: 'per-vu-iterations',
-            startTime: '10s',
-            gracefulStop: '5s',
-            vus: 5,
-            iterations: 30,
-            maxDuration: '1h'
-        },
-        ESSCreationLargeExchangeSet: {
-            exec: 'ESSCreationLargeExchangeSet',
+        MaxDateRangeResponse: {
+            exec: 'MaxDateRangeResponse',
             executor: 'per-vu-iterations',
             startTime: '10s',
             gracefulStop: '5s',
@@ -57,20 +37,6 @@ export function setup() {
 
 export function ESSCreationSmallExchangeSet(clientAuthResp) {
     group('SmallEssResponse', () => {
-        runTestSinceDateTime.ESSCreation(clientAuthResp, sinceDateTimeData_Small, "Small");
-    });
-    sleep(1);
-}
-
-export function ESSCreationMediumExchangeSet(clientAuthResp) {
-    group('MediumEssResponse', () => {
-        runTestSinceDateTime.ESSCreation(clientAuthResp, sinceDateTimeData_Medium, "Medium");
-    });
-    sleep(1);
-}
-
-export function ESSCreationLargeExchangeSet(clientAuthResp) {
-    group('LargeEssResponse', () => {
         runTestSinceDateTime.ESSCreation(clientAuthResp, sinceDateTimeData_Large, "Large");
     });
     sleep(1);
