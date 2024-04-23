@@ -503,4 +503,23 @@
 	   </notes>
 	   <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
    </suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: GetDocument.Insider.dll
+   Vunerability is related to a Dotnet tool function that is not used in the production code
+   ]]>
+		</notes>
+		<cve>CVE-2024-21386</cve>
+		<cve>CVE-2024-21404</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+      file name: Microsoft.Identity.Client:4.57.0
+      ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
+		<cve>CVE-2024-27086</cve>
+	</suppress>
 </suppressions>
