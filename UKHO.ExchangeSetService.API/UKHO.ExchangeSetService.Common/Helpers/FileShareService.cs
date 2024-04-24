@@ -186,11 +186,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             };
             //List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken) : products;
             List<Products> cacheProductsNotFound = products;
+            var cacheProductsFound = new List<(string fileName, string filePath, byte[] fileContent)>();
 
             if (fssCacheConfiguration.Value.IsFssCacheEnabled)
             {
             var ListOfProducts = await fileShareServiceCache.GetNonCachedProductDataForFss1(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
                 cacheProductsNotFound = ListOfProducts.NotFound;
+                cacheProductsFound = ListOfProducts.Found;
             }
             
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
@@ -226,11 +228,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         if (httpResponse.IsSuccessStatusCode)
                         {
                             //uri = await SelectLatestPublishedDateBatch(ListOfProducts.NotFound, internalSearchBatchResponse, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
-                            var latestData = await SelectLatestPublishedDateBatch1(ListOfProducts.NotFound, internalSearchBatchResponse, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                            var latestData = await SelectLatestPublishedDateBatch1(cacheProductsNotFound, internalSearchBatchResponse, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
                             uri = latestData.Item1;
+
                             foreach (var fileItem in latestData.Item2)
                             {
-                                ListOfProducts.Found.Add((fileItem.FileName,
+                                cacheProductsFound.Add((fileItem.FileName,
                                 fileItem.FilePath,
                                 fileItem.FileContent));
                             }
@@ -246,10 +249,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
                     internalSearchBatchResponse.QueryCount = queryCount;
                     CheckProductsExistsInFileShareService(products, message.CorrelationId, message.BatchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
-                    return (internalSearchBatchResponse, ListOfProducts.Found);
+                    return (internalSearchBatchResponse, cacheProductsFound);
                 }, productWithAttributes.Item2, message.BatchId, message.CorrelationId);
             }
-            return (internalSearchBatchResponse, ListOfProducts.Found);
+            return (internalSearchBatchResponse, cacheProductsFound);
         }
 
         private void CheckProductsExistsInFileShareService(List<Products> products, string correlationId, string batchId, SearchBatchResponse internalSearchBatchResponse, List<Products> internalNotFoundProducts, int prodCount, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
