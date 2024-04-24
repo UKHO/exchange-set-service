@@ -185,8 +185,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 Entries = new List<BatchDetail>()
             };
             //List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken) : products;
+            List<Products> cacheProductsNotFound = products;
+
+            if (fssCacheConfiguration.Value.IsFssCacheEnabled)
+            {
             var ListOfProducts = await fileShareServiceCache.GetNonCachedProductDataForFss1(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
-            List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? ListOfProducts.NotFound: products;
+                cacheProductsNotFound = ListOfProducts.NotFound;
+            }
             
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
