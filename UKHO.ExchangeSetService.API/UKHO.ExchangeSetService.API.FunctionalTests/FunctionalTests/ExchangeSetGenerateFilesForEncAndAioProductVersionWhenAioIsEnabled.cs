@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             FssApiClient = new FssApiClient();
             DataHelper = new DataHelper();
             ProductVersionData = new List<ProductVersionModel>();
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData(Config.AIOConfig.AioCellName, Config.AIOConfig.AioEditionNumber, 0));
+            ProductVersionData.Add(DataHelper.GetProductVersionModelData(Config.AIOConfig.AioCellName, 31, 0));
             ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 2, 0));
             ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken);
             //Get the BatchId
