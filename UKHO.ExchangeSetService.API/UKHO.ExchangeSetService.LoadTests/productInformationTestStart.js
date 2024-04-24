@@ -1,15 +1,15 @@
 import { sleep, group } from 'k6';
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
-import { authenticateUsingAzure } from './oauth/azure.js';
 
 const runTestSinceDateTime = require('./scripts/LoadTestForProductInformation.js');
-const config = JSON.parse(open('./config.json'));
 const dataHelper = require('./helper/dataHelper.js');
 
 const sinceDateTimeData_Large = dataHelper.GetSinceDateTimeDataForLargeExchangeSet();
+const sinceDateTimeData= dataHelper.GetProductIdentifierDataSinceDateTime();
 
 let clientAuthResp = {};
+let essResponse;
 
 export let options = {
     scenarios: {
@@ -26,18 +26,18 @@ export let options = {
 };
 
 export function setup() {
-     //client credentials authentication flow
-     let essAuthResp = authenticateUsingAzure(
-         `${config.ESS_TENANT_ID}`, `${config.ESS_CLIENT_ID}`, `${config.ESS_CLIENT_SECRET}`, `${config.ESS_SCOPES}`, `${config.ESS_RESOURCE}`
-     );
+    // client credentials authentication flow
+    let essAuthResp = authenticateUsingAzure(
+        `${config.ESS_TENANT_ID}`, `${config.ESS_CLIENT_ID}`, `${config.ESS_CLIENT_SECRET}`, `${config.ESS_SCOPES}`, `${config.ESS_RESOURCE}`
+    );
     clientAuthResp["essToken"] = essAuthResp.access_token;
 
     return clientAuthResp;
 }
 
-export function ESSCreationSmallExchangeSet(clientAuthResp) {
-    group('SmallEssResponse', () => {
-        runTestSinceDateTime.ESSCreation(clientAuthResp, sinceDateTimeData_Large, "Large");
+export function MaxDateRangeResponse(clientAuthResp) {
+    group('MaxDateRangeResponse', () => {        
+        runTestSinceDateTime.DeltaSetResponse(clientAuthResp, sinceDateTimeData, sinceDateTimeData_Large, "Large");
     });
     sleep(1);
 }
