@@ -215,6 +215,7 @@ module "azure-dashboard" {
   resource_group = azurerm_resource_group.rg
   tags           = local.tags
 }
+
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   resource_group_name                   = azurerm_resource_group.rg.name
@@ -226,6 +227,17 @@ module "cache_storage" {
   large_exchange_set_subnets            = data.azurerm_subnet.large_exchange_set_subnet[*].id
   m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
   agent_subnet                          = data.azurerm_subnet.agent_subnet.id
+  env_name                              = local.env_name
+  service_name                          = local.service_name
+}
+
+
+module "redis_cache" {
+  source                                = "./Modules/RedisCache"
+  name                                  = local.redis_cache_name
+  resource_group_name                   = azurerm_resource_group.rg.name
+  location                              = var.location
+  tags                                  = local.tags
   env_name                              = local.env_name
   service_name                          = local.service_name
 }
