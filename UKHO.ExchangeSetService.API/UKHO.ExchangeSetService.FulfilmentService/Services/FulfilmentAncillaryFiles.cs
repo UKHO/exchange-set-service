@@ -60,6 +60,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return checkSerialEncFileCreated;
         }
 
+        public async Task<(bool, List<(string fileName, string filePath, byte[] fileContent)>)> CreateSerialEncFile1(string batchId, string correlationId)
+        {
+            string serialFileName = fileShareServiceConfig.Value.SerialFileName;
+            int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
+            var serialFileContent = String.Format("GBWK{0:D2}-{1}   {2:D4}{3:D2}{4:D2}UPDATE    {5:D2}.00{6}\x0b\x0d\x0a",
+                weekNumber, DateTime.UtcNow.Year.ToString("D4").Substring(2), DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, 2, "U01X01");
+
+            var fileContents = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+            try
+            {
+                fileContents.Add((serialFileName, serialFileName, Encoding.UTF8.GetBytes(serialFileContent)));
+
+                await Task.CompletedTask;
+            }
+            catch (Exception)
+            {
+                logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchId, correlationId);
+                throw new FulfilmentException(EventIds.SerialFileIsNotCreated.ToEventId());
+
+            }
+            return (true, fileContents);
+        }
         public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
@@ -127,6 +150,55 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
+        
+        ////public async Task<List<(string fileName, string filePath, byte[] fileContent)>> CreateCatalogFile1(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        public async Task<List<(string fileName, string filePath, byte[] fileContent)>> CreateCatalogFile1(string batchId, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse, List<(string fileName, string filePath, byte[] fileContent)> lstFiles)
+        {
+            var fileContents = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+            try
+            {
+                var catBuilder = new Catalog031BuilderFactory().Create();
+                var catalogFileName = fileShareServiceConfig.Value.CatalogFileName;
+                var encRoot = fileShareServiceConfig.Value.EncRoot;
+
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileShareServiceConfig.Value.ReadMeFileName,
+                    Implementation = "TXT"
+                });
+
+                if (listFulfilmentData != null && listFulfilmentData.Any())
+                {
+                    listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
+
+                    var orderPreference = new List<Tuple<string, string>> {
+                    new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("text/plain", "ASC"),
+                    new Tuple<string, string>("text/plain", "TXT"),
+                    new Tuple<string, string>("image/tiff", "TIF") };
+
+                    foreach (var listItem in listFulfilmentData)
+                    {
+                        CreateCatalogEntry1(listItem, orderPreference, catBuilder, salesCatalogueDataResponse, salesCatalogueProductResponse, batchId, correlationId, lstFiles);
+                    }
+                }
+
+                var cat031Bytes = catBuilder.WriteCatalog(fileShareServiceConfig.Value.ExchangeSetFileFolder);
+
+                fileContents.Add((catalogFileName, Path.Combine(encRoot,catalogFileName), cat031Bytes));
+
+                await Task.CompletedTask;
+            }
+            catch (Exception) 
+            {
+                logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
+            }
+
+            return fileContents;
+        }
+
         private void CreateCatalogEntry(FulfilmentDataResponse listItem, List<Tuple<string, string>> orderPreference, ICatalog031Builder catBuilder, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse, string exchangeSetRootPath, string batchId, string correlationId)
         {
             int length = 2;
@@ -169,6 +241,53 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
+
+        private void CreateCatalogEntry1(FulfilmentDataResponse listItem, List<Tuple<string, string>> orderPreference, ICatalog031Builder catBuilder, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse, string batchId, string correlationId, List<(string fileName, string filePath, byte[] fileContent)> lstfiles)
+        {
+            int length = 2;
+            listItem.Files = listItem.Files.OrderByDescending(
+                                item => Enumerable.Reverse(orderPreference).ToList().IndexOf(new Tuple<string, string>(item.MimeType.ToLower(), GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId))));
+
+            foreach (var item in listItem.Files)
+            {
+                string fileLocation = Path.Combine(listItem.ProductName.Substring(0, length), listItem.ProductName, listItem.EditionNumber.ToString(), listItem.UpdateNumber.ToString(), item.Filename);
+                string mimeType = GetMimeType(item.Filename.ToLower(), item.MimeType.ToLower(), batchId, correlationId);
+                string comment = string.Empty;
+                var boundingRectangle = new BoundingRectangle();
+
+                if (mimeType == "BIN")
+                {
+                    var salescatalogProduct = salesCatalogueDataResponse.ResponseBody.Where(s => s.ProductName == listItem.ProductName).Select(s => s).FirstOrDefault();
+                    if (salescatalogProduct == null)
+                    {
+                        logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId(), "Error in sales catalogue service catalogue end point when product details not found for Product:{ProductName} and BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", listItem.ProductName, batchId, correlationId);
+                        throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNotFoundForProduct.ToEventId());
+                    }
+
+                    comment = SetCatalogFileComment(listItem, salescatalogProduct, salesCatalogueProductResponse);
+
+                    boundingRectangle.LatitudeNorth = salescatalogProduct.CellLimitNorthernmostLatitude;
+                    boundingRectangle.LatitudeSouth = salescatalogProduct.CellLimitSouthernmostLatitude;
+                    boundingRectangle.LongitudeEast = salescatalogProduct.CellLimitEasternmostLatitude;
+                    boundingRectangle.LongitudeWest = salescatalogProduct.CellLimitWesternmostLatitude;
+                }
+                byte[] targetFileContent = lstfiles.Where(file => file.filePath.Contains(fileLocation))
+                                   .Select(file => file.fileContent)
+                                   .FirstOrDefault();
+
+                var content = GetCrcString1(targetFileContent);
+
+                catBuilder.Add(new CatalogEntry()
+                {
+                    FileLocation = fileLocation,
+                    FileLongName = "",
+                    Implementation = mimeType,
+                    Crc = (mimeType == "BIN") ? item.Attributes.Where(a => a.Key == "s57-CRC").Select(a => a.Value).FirstOrDefault() : content,
+                    Comment = comment,
+                    BoundingRectangle = boundingRectangle
+                });
+            }
+        }
         private string SetCatalogFileComment(FulfilmentDataResponse listItem, SalesCatalogueDataProductResponse salescatalogProduct, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             string getIssueAndUpdateDate = null;
@@ -268,6 +387,63 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
+        public async Task<(bool, List<(string fileName, string filePath, byte[] fileContent)>)> CreateProductFile1(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
+        {
+            if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
+            {
+                string fileName = fileShareServiceConfig.Value.ProductFileName;
+                string filePath = Path.Combine(exchangeSetInfoPath, fileName);
+
+                var productsBuilder = new ProductListBuilder
+                {
+                    UseDefaultOutputTime = false
+                };
+
+                foreach (var product in salesCatalogueDataResponse.ResponseBody.OrderBy(p => p.ProductName))
+                    productsBuilder.Add(new ProductListEntry()
+                    {
+                        ProductName = product.ProductName + fileShareServiceConfig.Value.BaseCellExtension,
+                        Compression = product.Compression,
+                        Encryption = product.Encryption,
+                        BaseCellIssueDate = product.BaseCellIssueDate,
+                        BaseCellEdition = product.BaseCellEditionNumber,
+                        IssueDateLatestUpdate = product.IssueDateLatestUpdate,
+                        LatestUpdateNumber = product.LatestUpdateNumber,
+                        FileSize = product.FileSize,
+                        TenDataCoverageCoordinates = ",,,,,,,,,,,,,,,,,,,",
+                        CellLimitSouthernmostLatitude = Convert.ToDecimal(product.CellLimitSouthernmostLatitude.ToString(Convert.ToString("f10"))),
+                        CellLimitWesternmostLatitude = Convert.ToDecimal(product.CellLimitWesternmostLatitude.ToString(Convert.ToString("f10"))),
+                        CellLimitNorthernmostLatitude = Convert.ToDecimal(product.CellLimitNorthernmostLatitude.ToString(Convert.ToString("f10"))),
+                        CellLimitEasternmostLatitude = Convert.ToDecimal(product.CellLimitEasternmostLatitude.ToString(Convert.ToString("f10"))),
+                        BaseCellUpdateNumber = product.BaseCellUpdateNumber,
+                        LastUpdateNumberForPreviousEdition = product.LastUpdateNumberPreviousEdition,
+                        BaseCellLocation = product.BaseCellLocation,
+                        CancelledCellReplacements = String.Join(";", product.CancelledCellReplacements)
+                    });
+
+                var content = productsBuilder.WriteProductsList(scsRequestDateTime);
+                ////fileSystemHelper.CheckAndCreateFolder(exchangeSetInfoPath);
+
+                var fileContents = new List<(string fileName, string filePath, byte[] fileContent)>();
+                fileContents.Add((fileName, filePath, Encoding.UTF8.GetBytes(content)));
+
+                var response = fileContents;//// fileSystemHelper.CreateFileContent(filePath, content);
+                await Task.CompletedTask;
+
+                if (!response.Any())
+                {
+                    logger.LogError(EventIds.ProductFileIsNotCreated.ToEventId(), "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.ProductFileIsNotCreated.ToEventId());
+                }
+                return (true, fileContents);
+            }
+            else
+            {
+                logger.LogError(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId(), "Error in sales catalogue service catalogue end point for product.txt responded with {ResponseCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", salesCatalogueDataResponse.ResponseCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.SalesCatalogueServiceCatalogueDataNonOkResponse.ToEventId());
+            }
+        }
+
         public async Task<bool> CreateEncUpdateCsv(SalesCatalogueDataResponse salesCatalogueDataResponse, string filePath, string batchId, string correlationId)
         {
             string file = Path.Combine(filePath, "ENC Update List.csv");
@@ -305,6 +481,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         private string GetCrcString(string fullFilePath)
         {
             var crcHash = Crc32CheckSumProvider.Instance.Compute(fileSystemHelper.ReadAllBytes(fullFilePath));
+            return crcHash.ToString("X").PadLeft(crcLength, '0');
+        }
+
+        private string GetCrcString1(byte[] bytes)
+        {
+            var crcHash = Crc32CheckSumProvider.Instance.Compute(bytes);
             return crcHash.ToString("X").PadLeft(crcLength, '0');
         }
 
@@ -522,7 +704,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             string cdType = "UPDATE";
             foreach (var response in salesCatalogueDataAioProductResponse)
             {
-                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2], 
+                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2],
                                            response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0",
                                            response.ProductName + ".000");
                 if (fileSystemHelper.CheckFileExists(path))

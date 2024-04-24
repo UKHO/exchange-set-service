@@ -106,6 +106,28 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return false;
         }
 
+        public byte[] DownloadReadmeFile1(Stream stream, string lineToWrite)
+        {
+            if (stream != null)
+            {
+                var extendedAsciiEncoding = Encoding.GetEncoding("iso-8859-1");
+                using (var memoryStream = new MemoryStream())
+                {
+                    stream.CopyTo(memoryStream);
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+
+                    var text = extendedAsciiEncoding.GetString(memoryStream.ToArray());
+                    var secondLineText = GetLineFromMemory(memoryStream);
+
+                    text = secondLineText.Length == 0 ? lineToWrite : text.Replace(secondLineText, lineToWrite);
+                    byte[] modifiedContent = extendedAsciiEncoding.GetBytes(text);
+
+                    return modifiedContent;
+                }
+            }
+            return null;
+        }
+
         public bool DownloadIhoCrtFile(string filePath, Stream stream, string lineToWrite)
         {
             if (stream != null)
@@ -157,6 +179,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             int lineFound = 2;
             string secondLine = string.Empty;
             using (var sr = new StreamReader(filePath))
+            {
+                for (int i = 1; i < lineFound; i++)
+                    sr.ReadLine();
+                secondLine = sr.ReadLine();
+            }
+            return secondLine ?? string.Empty;
+        }
+
+        private static string GetLineFromMemory(MemoryStream memoryStream)
+        {
+            int lineFound = 2;
+            string secondLine = string.Empty;
+
+            // Create a StreamReader from the memoryStream
+            using (var sr = new StreamReader(memoryStream))
             {
                 for (int i = 1; i < lineFound; i++)
                     sr.ReadLine();

@@ -74,7 +74,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         throw new OperationCanceledException();
                     }
                     var result = await fileShareService.GetBatchInfoBasedOnProducts(item, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+
                     listBatchDetails.AddRange(result.Entries);
+
                     fileShareServiceSearchQueryCount += result.QueryCount;
                 }
 
@@ -89,6 +91,46 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return null;
         }
 
+        public async Task<(List<FulfilmentDataResponse>, List<(string fileName, string filePath, byte[] fileContent)>)> QueryFileShareServiceData1(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
+        {
+            if (products != null && products.Any())
+            {
+                var batchProducts = SliceFileShareServiceProducts(products);
+                var listBatchDetails = new List<BatchDetail>();
+                var listOfProductsFound = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+                int fileShareServiceSearchQueryCount = 0;
+                foreach (var item in batchProducts)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        var productDetail = new StringBuilder();
+                        foreach (var productitem in item)
+                        {
+                            productDetail.AppendFormat("\n Product/CellName:{0}, EditionNumber:{1} and UpdateNumbers:[{2}]", productitem.ProductName, productitem.EditionNumber.ToString(), string.Join(",", productitem?.UpdateNumbers.Select(a => a.Value.ToString())));
+                        }
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, productDetail.ToString(), message.BatchId, message.CorrelationId);
+                        throw new OperationCanceledException();
+                    }
+                    var result = await fileShareService.GetBatchInfoBasedOnProducts1(item, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+
+                    listBatchDetails.AddRange(result.Item1.Entries);
+
+                    fileShareServiceSearchQueryCount += result.Item1.QueryCount;
+
+                    listOfProductsFound.AddRange(result.Item2);
+                }
+
+                var fulFilmentDataResponse = SetFulfilmentDataResponse(new SearchBatchResponse()
+                {
+                    Entries = listBatchDetails
+                });
+                if (fulFilmentDataResponse.Count > 0)
+                    fulFilmentDataResponse.FirstOrDefault().FileShareServiceSearchQueryCount = fileShareServiceSearchQueryCount;
+                return (fulFilmentDataResponse, listOfProductsFound);
+            }
+            return (new List<FulfilmentDataResponse>(), new List<(string fileName, string filePath, byte[] fileContent)>());
+        }
         public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
         {
             return CommonHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
@@ -115,7 +157,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);
         }
-
+        public async Task<List<(string fileName, string filePath, byte[] fileContent)>> DownloadReadMeFile1(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            return await fileShareService.DownloadReadMeFile1(filePath, batchId, exchangeSetRootPath, correlationId);
+        }
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
             return await fileShareService.SearchReadMeFilePath(batchId, correlationId);

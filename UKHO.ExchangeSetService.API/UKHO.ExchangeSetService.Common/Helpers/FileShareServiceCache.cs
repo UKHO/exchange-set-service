@@ -99,6 +99,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         {
                             var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
 
+
                             int fileCount = internalBatchDetail.Files.Count();
 
                             if (updateNumbers.Count == fileCount)
@@ -126,6 +127,87 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return internalProductsNotFound;
         }
 
+
+        public async Task<(List<Products> NotFound, List<(string fileName, string filePath, byte[] fileContent)> Found)> GetNonCachedProductDataForFss1(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        {
+            var internalProductsNotFound = new List<Products>();
+            var fileContents = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+            foreach (var item in products)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumbers:[{UpdateNumbers}]. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                        item.ProductName, item.EditionNumber, string.Join(",", item.UpdateNumbers.Select(a => a.Value.ToString())), queueMessage.BatchId, queueMessage.CorrelationId);
+                    throw new OperationCanceledException();
+                }
+                var internalProductItemNotFound = new Products
+                {
+                    Cancellation = item.Cancellation,
+                    Dates = item.Dates,
+                    EditionNumber = item.EditionNumber,
+                    FileSize = item.FileSize,
+                    ProductName = item.ProductName,
+                    UpdateNumbers = new List<int?>(),
+                    Bundle = item.Bundle
+                };
+
+                List<int?> updateNumbers = new List<int?>();
+                foreach (var itemUpdateNumber in item.UpdateNumbers)
+                {
+                    updateNumbers.Clear();
+                    var compareProducts = $"{item.ProductName}|{item.EditionNumber.Value}|{itemUpdateNumber.Value}";
+                    var productList = new List<string>();
+
+                    if (!productList.Contains(compareProducts))
+                    {
+                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+
+                        if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
+                        {
+                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+
+                            if (cloudBlockBlob != null)
+                            {
+                                cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
+                            }
+                        }
+
+                        if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
+                        {
+                            //var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
+                            var batchDetail = await CheckIfCacheProductsExistsInBlob1(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
+                            var internalBatchDetail = batchDetail.Item1;
+                            fileContents.AddRange(batchDetail.Item2);
+
+
+                            int fileCount = internalBatchDetail.Files.Count();
+
+                            if (updateNumbers.Count == fileCount)
+                            {
+                                internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+                            }
+                            else
+                            {
+                                internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                            }
+                            productList.Add(compareProducts);
+                        }
+                        else
+                        {
+                            internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                        }
+                    }
+                }
+                if (internalProductItemNotFound.UpdateNumbers != null && internalProductItemNotFound.UpdateNumbers.Any())
+                {
+                    internalProductsNotFound.Add(internalProductItemNotFound);
+                }
+            }
+
+            return (internalProductsNotFound, fileContents);
+        }
         private Task<BatchDetail> CheckIfCacheProductsExistsInBlob(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, string storageConnectionString, FssSearchResponseCache cacheInfo)
         {
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
@@ -179,6 +261,64 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     return internalBatchDetail;
                 }, item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
         }
+
+        #region Test MemoryStream traverse
+
+        private async Task<(BatchDetail, List<(string fileName, string filePath, byte[] fileContent)>)> CheckIfCacheProductsExistsInBlob1(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, string storageConnectionString, FssSearchResponseCache cacheInfo)
+        {
+            logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
+            var internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
+            logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
+
+            string downloadPath;
+
+            if (CommonHelper.IsPeriodicOutputService)
+            {
+                var bundleLocation = item.Bundle.FirstOrDefault().Location.Split(";");
+                exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleLocation[0].Substring(1, 1), bundleLocation[1]);
+                downloadPath = GetFileDownloadPath(exchangeSetRootPath, item, itemUpdateNumber);
+            }
+            else
+            {
+                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+            }
+            var fileListWithContent = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+            return await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceDownloadENCFilesFromCacheStart, EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted,
+                "File share service download request from cache container for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    foreach (var fileItem in internalBatchDetail.Files?.Select(a => a.Links.Get.Href))
+                    {
+                        var uriArray = fileItem.Split("/");
+                        var fileName = uriArray[uriArray.Length - 1];
+                        string path = Path.Combine(downloadPath, fileName);
+
+                        var fileContent = await DownloadFileContent(fileName, storageConnectionString, internalBatchDetail.BatchId);
+
+                        fileListWithContent.Add((fileName, path, fileContent));
+                        updateNumbers.Add(itemUpdateNumber.Value);
+                    }
+
+                    internalBatchDetail.IgnoreCache = true;
+
+                    return (internalBatchDetail, fileListWithContent);
+
+                }, item.ProductName, item.EditionNumber, itemUpdateNumber, internalBatchDetail.Files.Select(a => a.Links.Get.Href), queueMessage.BatchId, queueMessage.CorrelationId);
+        }
+
+        private async Task<byte[]> DownloadFileContent(string fileName, string storageConnectionString, string batchId)
+        {
+            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await cloudBlockBlob.DownloadToStreamAsync(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+
+        #endregion
 
         //Returns path where fss files will get download for large media exchange set creation
         private string GetFileDownloadPath(string exchangeSetRootPath, Products item, int? itemUpdateNumber)

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -93,6 +94,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
                                                                  .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
                     await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                    ////await CreateStandardExchangeSet1(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                    await CreateStandardExchangeSet1(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+
                 }
                 if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
                 {
@@ -103,7 +107,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             else
             {
-                await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                //////await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                await CreateStandardExchangeSet1(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
             }
 
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
@@ -244,7 +249,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                    },
                message.BatchId, message.CorrelationId);
         }
-
+        public async Task<(List<FulfilmentDataResponse>, List<(string fileName, string filePath, byte[] fileContent)>)> QueryFileShareServiceFiles1(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
+        {
+            return await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceENCFilesRequestStart,
+                   EventIds.QueryFileShareServiceENCFilesRequestCompleted,
+                   "File share service search query and download request for ENC files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                   async () =>
+                   {
+                       ////return await fulfilmentFileShareService.QueryFileShareServiceData(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                       return await fulfilmentFileShareService.QueryFileShareServiceData1(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                   },
+               message.BatchId, message.CorrelationId);
+        }
         private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
         {
             var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
@@ -256,6 +272,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }
 
+        private async Task<List<(string fileName, string filePath, byte[] fileContent)>> CreateAncillaryFiles1(string batchId, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse, List<(string fileName, string filePath, byte[] fileContent)> lstproducts)
+        //private async Task<List<(string fileName, string filePath, byte[] fileContent)>> CreateAncillaryFiles1(string batchId, string correlationId, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
+        {
+            ////var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetInfoPath = fileShareServiceConfig.Value.Info;
+            var ancillaryProducts = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+            var pfile = await CreateProductFile1(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime);
+            ancillaryProducts.AddRange(pfile.Item2);
+
+            var serialEncFile = await CreateSerialEncFile1(batchId, correlationId);
+            ancillaryProducts.AddRange(serialEncFile.Item2);
+
+            var readMeFile = await DownloadReadMeFile1(batchId, fileShareServiceConfig.Value.EncRoot, correlationId);
+            ancillaryProducts.AddRange(readMeFile);
+
+            var catalogFile = await CreateCatalogFile1(batchId, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse, lstproducts);
+            ancillaryProducts.AddRange(catalogFile);
+
+            return ancillaryProducts;
+        }
         public async Task<bool> DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
         {
             bool isDownloadReadMeFileSuccess = false;
@@ -285,6 +322,39 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             return isDownloadReadMeFileSuccess;
+        }
+
+
+        public async Task<List<(string fileName, string filePath, byte[] fileContent)>> DownloadReadMeFile1(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            var fileContents = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+            string readMeFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
+                  EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
+                  "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () =>
+                  {
+                      return await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
+                  },
+               batchId, correlationId);
+
+            if (!string.IsNullOrWhiteSpace(readMeFilePath))
+            {
+                DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
+                fileContents = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
+                  EventIds.DownloadReadMeFileRequestCompleted,
+                  "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () =>
+                  {
+                      return await fulfilmentFileShareService.DownloadReadMeFile1(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
+                  },
+               batchId, correlationId);
+
+                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+
+            return fileContents;
         }
 
         public async Task<bool> DownloadIhoCrtFile(string batchId, string exchangeSetRootPath, string correlationId)
@@ -360,7 +430,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                       },
                   batchId, correlationId);
         }
-
+        public async Task<(bool, List<(string fileName, string filePath, byte[] fileContent)>)> CreateSerialEncFile1(string batchId, string correlationId)
+        {
+            return await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
+                       EventIds.CreateSerialFileRequestCompleted,
+                       "Create serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                       async () =>
+                       {
+                           return await fulfilmentAncillaryFiles.CreateSerialEncFile1(batchId, correlationId);
+                       },
+                   batchId, correlationId);
+        }
         private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetZipFilePath, string correlationId)
         {
             bool isZipFileCreated = false;
@@ -438,6 +518,25 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isFileCreated;
         }
 
+
+        public async Task<List<(string fileName, string filePath, byte[] fileContent)>> CreateCatalogFile1(string batchId, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse, List<(string fileName, string filePath, byte[] fileContent)> lstFiles)
+        {
+            DateTime createCatalogFileTaskStartedAt = DateTime.UtcNow;
+            var fileContent = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
+                    EventIds.CreateCatalogFileRequestCompleted,
+                    "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () =>
+                    {
+                        return await fulfilmentAncillaryFiles.CreateCatalogFile1(batchId, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse, lstFiles);
+                    },
+                    batchId, correlationId);
+
+            DateTime createCatalogFileTaskCompletedAt = DateTime.UtcNow;
+            monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileTaskStartedAt, createCatalogFileTaskCompletedAt, correlationId, null, null, null, batchId);
+
+            return fileContent;
+        }
+
         public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
         {
             bool isProductFileCreated = false;
@@ -451,6 +550,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         async () =>
                         {
                             return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
+                        },
+                        batchId, correlationId);
+
+                DateTime createProductFileTaskCompletedAt = DateTime.UtcNow;
+                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, correlationId, null, null, null, batchId);
+            }
+
+            return isProductFileCreated;
+        }
+
+        public async Task<(bool, List<(string fileName, string filePath, byte[] fileContent)>)> CreateProductFile1(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
+        {
+            (bool, List<(string, string, byte[])>) isProductFileCreated = (false, null);
+
+            if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
+            {
+                DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
+                isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestStart,
+                        EventIds.CreateProductFileRequestCompleted,
+                        "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                        async () =>
+                        {
+                            return await fulfilmentAncillaryFiles.CreateProductFile1(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
                         },
                         batchId, correlationId);
 
@@ -769,6 +891,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 var tasks = productsList.Select(async item =>
                 {
                     fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
+
                     int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -795,6 +918,93 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse);
+        }
+
+
+        private async Task CreateStandardExchangeSet1(SalesCatalogueServiceResponseQueueMessage message, SalesCatalogueProductResponse response, List<Products> essItems, string exchangeSetPath, SalesCatalogueDataResponse salesCatalogueEssDataResponse)
+        {
+            ////var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetRootPath = fileShareServiceConfig.Value.EncRoot;
+            var listFulfilmentData = new List<FulfilmentDataResponse>();
+            var listOfProducts = new List<(string fileName, string filePath, byte[] fileContent)>();
+
+            if (essItems != null && essItems.Any())
+            {
+                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
+                int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
+                int productGroupCount = essItems.Count % parallelSearchTaskCount == 0 ? essItems.Count / parallelSearchTaskCount : (essItems.Count / parallelSearchTaskCount) + 1;
+                var productsList = CommonHelper.SplitList(essItems, productGroupCount);
+                var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
+                var sync = new object();
+                int fileShareServiceSearchQueryCount = 0;
+                var cancellationTokenSource = new CancellationTokenSource();
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                var tasks = productsList.Select(async item =>
+                {
+                    ////fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
+                    var result = await QueryFileShareServiceFiles1(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken);
+                    fulfilmentDataResponse = result.Item1;
+
+                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
+                    lock (sync)
+                    {
+                        fileShareServiceSearchQueryCount += queryCount;
+                    }
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Cancel();
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
+                        throw new OperationCanceledException();
+                    }
+                    listFulfilmentData.AddRange(fulfilmentDataResponse);
+
+                    listOfProducts.AddRange(result.Item2);
+                });
+
+                await Task.WhenAll(tasks);
+
+                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
+                int downloadedENCFileCount = 0;
+                foreach (var item in listFulfilmentData)
+                {
+                    downloadedENCFileCount += item.Files.Count();
+                }
+                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
+
+
+            }
+
+            var ancillaryFiles = await CreateAncillaryFiles1(message.BatchId, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse, listOfProducts);
+
+            listOfProducts.AddRange(ancillaryFiles);
+
+            await CreateZipArchive(exchangeSetPath, listOfProducts);
+
+        }
+
+        private async Task CreateZipArchive(string zipFilePath, List<(string fileName, string filePath, byte[] fileContent)> zipArchiveContent)
+        {
+            string directoryPath = Path.GetDirectoryName(zipFilePath);
+            if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+            using (var fileStream = new FileStream($"{zipFilePath}.zip", FileMode.Create))
+            {
+                using (var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (var content in zipArchiveContent)
+                    {
+                        var entry = zipArchive.CreateEntry(content.filePath);
+
+                        using (var entryStream = entry.Open())
+                        {
+                            await entryStream.WriteAsync(content.fileContent, 0, content.fileContent.Length);
+                        }
+                    }
+                }
+            }
         }
 
         private async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)

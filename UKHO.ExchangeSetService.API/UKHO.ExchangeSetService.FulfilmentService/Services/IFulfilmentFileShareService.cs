@@ -9,7 +9,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public interface IFulfilmentFileShareService
     {
         Task<List<FulfilmentDataResponse>> QueryFileShareServiceData(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath);
+        Task<(List<FulfilmentDataResponse>, List<(string fileName, string filePath, byte[] fileContent)>)> QueryFileShareServiceData1(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath);
         Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
+        Task<List<(string fileName, string filePath, byte[] fileContent)>> DownloadReadMeFile1(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
         Task<string> SearchReadMeFilePath(string batchId, string correlationId);
         Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
         Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string zipFileName);

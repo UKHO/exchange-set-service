@@ -125,6 +125,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 Entries = new List<BatchDetail>()
             };
             List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken) : products;
+
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
                 var internalNotFoundProducts = new List<Products>();
@@ -173,6 +174,68 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 }, productWithAttributes.Item2, message.BatchId, message.CorrelationId);
             }
             return internalSearchBatchResponse;
+        }
+
+
+        public async Task<(SearchBatchResponse, List<(string fileName, string filePath, byte[] fileContent)>)> GetBatchInfoBasedOnProducts1 (List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
+        {
+            var internalSearchBatchResponse = new SearchBatchResponse
+            {
+                Entries = new List<BatchDetail>()
+            };
+            //List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? await fileShareServiceCache.GetNonCachedProductDataForFss(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken) : products;
+            var ListOfProducts = await fileShareServiceCache.GetNonCachedProductDataForFss1(products, internalSearchBatchResponse, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+            List<Products> cacheProductsNotFound = fssCacheConfiguration.Value.IsFssCacheEnabled ? ListOfProducts.NotFound: products;
+            
+            if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
+            {
+                var internalNotFoundProducts = new List<Products>();
+                var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+                var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
+                var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq '{fileShareServiceConfig.Value.BusinessUnit}' and {fileShareServiceConfig.Value.ProductCode} {productWithAttributes.Item1}";
+
+                HttpResponseMessage httpResponse;
+
+                string payloadJson = string.Empty;
+                var productList = new List<string>();
+                var prodCount = products.Select(a => a.UpdateNumbers).Sum(a => a.Count);
+                int queryCount = 0;
+
+                return await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchDownloadForENCFilesStart,
+                EventIds.FileShareServiceSearchDownloadForENCFilesCompleted,
+                "File share service search and download request for {productDetails}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    do
+                    {
+                        queryCount++;
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files with cancellationToken:{cancellationTokenSource.Token} and uri:{Uri} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), uri, message.BatchId, message.CorrelationId);
+                            throw new OperationCanceledException();
+                        }
+                        httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, cancellationToken, message.CorrelationId);
+
+                        if (httpResponse.IsSuccessStatusCode)
+                        {
+                            uri = await SelectLatestPublishedDateBatch(ListOfProducts.NotFound, internalSearchBatchResponse, httpResponse, productList, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                        }
+                        else
+                        {
+                            cancellationTokenSource.Cancel();
+                            logger.LogError(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId(), "Error in file share service while searching ENC files with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
+                            logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Request cancelled for Error in file share service while searching ENC files with cancellationToken:{cancellationTokenSource.Token} with uri:{RequestUri}, responded with {StatusCode} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, message.BatchId, message.CorrelationId);
+                            throw new FulfilmentException(EventIds.QueryFileShareServiceENCFilesNonOkResponse.ToEventId());
+                        }
+
+                    } while (httpResponse.IsSuccessStatusCode && internalSearchBatchResponse.Entries.Count != 0 && internalSearchBatchResponse.Entries.Count < prodCount && !string.IsNullOrWhiteSpace(uri));
+                    internalSearchBatchResponse.QueryCount = queryCount;
+                    CheckProductsExistsInFileShareService(products, message.CorrelationId, message.BatchId, internalSearchBatchResponse, internalNotFoundProducts, prodCount, cancellationTokenSource, cancellationToken);
+                    return (internalSearchBatchResponse, ListOfProducts.Found);
+                }, productWithAttributes.Item2, message.BatchId, message.CorrelationId);
+            }
+            return (internalSearchBatchResponse, ListOfProducts.Found);
         }
 
         private void CheckProductsExistsInFileShareService(List<Products> products, string correlationId, string batchId, SearchBatchResponse internalSearchBatchResponse, List<Products> internalNotFoundProducts, int prodCount, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
@@ -562,6 +625,44 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         logger.LogInformation(EventIds.DownloadReadmeFile307RedirectResponse.ToEventId(), "File share service download readme.txt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
                     }
                     return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
+                }
+            }
+            else
+            {
+                logger.LogError(EventIds.DownloadReadMeFileNonOkResponse.ToEventId(), "Error in file share service while downloading readme.txt file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
+                throw new FulfilmentException(EventIds.DownloadReadMeFileNonOkResponse.ToEventId());
+            }
+        }
+
+        public async Task<List<(string fileName, string filePath, byte[] fileContent)>> DownloadReadMeFile1(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            string payloadJson = string.Empty;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+
+            string fileName = fileShareServiceConfig.Value.ReadMeFileName;
+            string filePath = Path.Combine(exchangeSetRootPath, fileName);
+
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
+           
+            HttpResponseMessage httpReadMeFileResponse;
+            httpReadMeFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, readMeFilePath, CancellationToken.None, correlationId);
+
+            var requestUri = new Uri(httpReadMeFileResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
+
+            if (httpReadMeFileResponse.IsSuccessStatusCode)
+            {
+                var serverValue = httpReadMeFileResponse.Headers.Server.ToString().Split('/').First();
+                using (Stream stream = await httpReadMeFileResponse.Content.ReadAsStreamAsync())
+                {
+                    if (serverValue == ServerHeaderValue)
+                    {
+                        logger.LogInformation(EventIds.DownloadReadmeFile307RedirectResponse.ToEventId(), "File share service download readme.txt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
+                    }
+                    var content= fileSystemHelper.DownloadReadmeFile1(stream, lineToWrite);
+                    
+                    var fileContents = new List<(string fileName, string filePath, byte[] fileContent)>();
+                    fileContents.Add((fileName, filePath, content));
+                    return fileContents;
                 }
             }
             else
