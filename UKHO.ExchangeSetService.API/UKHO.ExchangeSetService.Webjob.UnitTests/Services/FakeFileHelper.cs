@@ -146,5 +146,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public byte[] DownloadReadmeFile1(Stream stream, string lineToWrite)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
