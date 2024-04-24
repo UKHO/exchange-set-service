@@ -508,8 +508,8 @@
 	<suppress>
 		<notes>
 			<![CDATA[
-file name: Microsoft.Identity.Client:4.57.0
-]]>
+   file name: Microsoft.Identity.Client:4.57.0
+   ]]>
 		</notes>
 		<packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
 		<cve>CVE-2024-27086</cve>
