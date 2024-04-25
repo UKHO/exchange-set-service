@@ -409,7 +409,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             if (CheckProductDoesExistInResponseItem(item, productItem) && productItem.Cancellation != null && productItem.Cancellation.UpdateNumber.HasValue
                                     && Convert.ToInt32(updateNumber) == productItem.Cancellation.UpdateNumber.Value)
             {
-                await CheckProductWithCancellationData(internalSearchBatchResponse, productList, item, productItem, compareProducts, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
+                fileContentList= await CheckProductWithCancellationData1(internalSearchBatchResponse, productList, item, productItem, compareProducts, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath);
             }
             else if (CheckProductDoesExistInResponseItem(item, productItem)
             && CheckEditionNumberDoesExistInResponseItem(item, productItem) && CheckUpdateNumberDoesExistInResponseItem(item, productItem))
@@ -490,6 +490,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 else
                     await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
             }
+        }
+
+        private async Task<List<FileDetails>> CheckProductWithCancellationData1(SearchBatchResponse internalSearchBatchResponse, List<string> productList, BatchDetail item, Products productItem, string compareProducts, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath)
+        {
+            List<FileDetails> fileList = new List<FileDetails>();
+            var matchEditionNumber = item.Attributes.Where(a => a.Key == "EditionNumber").ToList();
+            if (matchEditionNumber.Any(a => a.Value == productItem.Cancellation.EditionNumber.Value.ToString()))
+            {
+                matchEditionNumber.ForEach(c => c.Value = Convert.ToString(productItem.EditionNumber));
+                item.IgnoreCache = true;
+                internalSearchBatchResponse.Entries.Add(item);
+                productList.Add(compareProducts);
+                if (CommonHelper.IsPeriodicOutputService)
+                    await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                else
+                    fileList= await PerformBatchFileDownload1(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+            }
+            return fileList;
         }
 
         private Task PerformBatchFileDownload(BatchDetail item, Products productItem, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
