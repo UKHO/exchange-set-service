@@ -120,9 +120,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             await fulfilmentCallBackService.SendCallBackResponse(response, message);
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             return "Exchange Set Created Successfully";
-            ////}
-            ////monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
-            ////return "Exchange Set Is Not Created";
         }
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             return "Exchange Set Is Not Created";
