@@ -69,7 +69,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
-            ////var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+            var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
 
             //Get SCS catalogue essData response
             SalesCatalogueDataResponse salesCatalogueEssDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId);
@@ -111,11 +111,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await CreateStandardExchangeSet1(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
             }
 
-            ////bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
+            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService1(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
 
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
-            ////if (isZipFileUploaded)
-            ////{
+            if (isZipFileUploaded)
+            {
             logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
             await fulfilmentCallBackService.SendCallBackResponse(response, message);
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
@@ -123,6 +123,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             ////}
             ////monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             ////return "Exchange Set Is Not Created";
+        }
+            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
+            return "Exchange Set Is Not Created";
         }
 
         public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
@@ -494,6 +497,33 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         ////    return isBatchCommitted;
         ////}
+
+        private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService1(string batchId, string exchangeSetZipFilePath, string correlationId)
+        {
+            bool isZipFileUploaded = false;
+            bool isBatchCommitted = false;
+
+            IFileInfo[] fileInfos = fileSystemHelper.GetZipFiles(exchangeSetZipFilePath);
+
+            foreach (var file in fileInfos)
+            {
+                isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
+                  EventIds.UploadExchangeSetToFssCompleted,
+                  "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () =>
+                  {
+                      return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, file.Name);
+                  },
+                batchId, correlationId);
+            }
+
+            if (isZipFileUploaded)
+            {
+                isBatchCommitted = await fulfilmentFileShareService.CommitExchangeSet(batchId, correlationId, exchangeSetZipFilePath);
+            }
+
+            return isBatchCommitted;
+        }
 
         public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
