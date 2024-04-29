@@ -124,6 +124,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 return "Exchange Set Created Successfully";
             }
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId, messageDetails);
+                logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                await fulfilmentCallBackService.SendCallBackResponse(response, message);
+                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
+                return "Exchange Set Created Successfully";
+            }
+            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             return "Exchange Set Is Not Created";
         }
 
@@ -1008,12 +1014,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             listOfProducts.AddRange(ancillaryFiles);
 
-            await CreateZipArchive(exchangeSetPath, listOfProducts);
+            await CreateZipArchive(exchangeSetPath, listOfProducts, message.BatchId, message.CorrelationId);
 
         }
 
-        private async Task CreateZipArchive(string zipFilePath, List<(string fileName, string filePath, byte[] fileContent)> zipArchiveContent)
+        private async Task CreateZipArchive(string zipFilePath, 
+                                            List<(string fileName, string filePath, byte[] fileContent)> zipArchiveContent,
+                                            string batchId,
+                                            string correlationId)
         {
+            DateTime createZipArchive = DateTime.UtcNow;
+
             string directoryPath = Path.GetDirectoryName(zipFilePath);
             if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
             {
@@ -1034,6 +1045,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     }
                 }
             }
+
+            monitorHelper.MonitorRequest("Create Zip File ", createZipArchive, DateTime.UtcNow, correlationId, null, null, null, batchId);
         }
 
         private async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)
