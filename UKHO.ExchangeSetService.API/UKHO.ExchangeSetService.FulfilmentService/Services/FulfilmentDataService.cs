@@ -124,12 +124,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 return "Exchange Set Created Successfully";
             }
             monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId, messageDetails);
-                logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                await fulfilmentCallBackService.SendCallBackResponse(response, message);
-                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
-                return "Exchange Set Created Successfully";
-            }
-            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
             return "Exchange Set Is Not Created";
         }
 
@@ -1018,7 +1012,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         }
 
-        private async Task CreateZipArchive(string zipFilePath, 
+        private async Task CreateZipArchive(string zipFilePath,
                                             List<(string fileName, string filePath, byte[] fileContent)> zipArchiveContent,
                                             string batchId,
                                             string correlationId)
