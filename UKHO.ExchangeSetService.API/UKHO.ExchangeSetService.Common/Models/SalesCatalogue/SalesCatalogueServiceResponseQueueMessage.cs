@@ -19,5 +19,6 @@ namespace UKHO.ExchangeSetService.Common.Models.SalesCatalogue
         public int RequestedProductsAlreadyUpToDateCount { get; set; }
 
         public int RequestedAioProductsAlreadyUpToDateCount { get; set; }
+        public DateTime QueueMessageInsertedOn { get; set; }
     }
 }

@@ -53,6 +53,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
             SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
+            fulfilmentServiceQueueMessage.QueueMessageInsertedOn = message.InsertedOn.HasValue ? message.InsertedOn.Value.DateTime : DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
             string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
             string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate, fulfilmentServiceQueueMessage.BatchId);
