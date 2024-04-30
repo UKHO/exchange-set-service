@@ -1040,7 +1040,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
             }
 
-            monitorHelper.MonitorRequest("Create Zip File ", createZipArchive, DateTime.UtcNow, correlationId, null, null, null, batchId);
+            monitorHelper.MonitorRequest("Create Zip File Task", createZipArchive, DateTime.UtcNow, correlationId, null, null, null, batchId);
         }
 
         private async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)
