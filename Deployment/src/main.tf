@@ -153,6 +153,11 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
         "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
         "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+        "Storage1CacheConfiguration--CacheStorage1AccountName"      = module.cache_storage.cache_storage1_name
+        "Storage1CacheConfiguration--CacheStorage1AccountKey"       = module.cache_storage.cache_storage1_primary_access_key
+        "Storage2CacheConfiguration--CacheStorage2AccountName"      = module.cache_storage.cache_storage2_name
+        "Storage2CacheConfiguration--CacheStorage2AccountKey"       = module.cache_storage.cache_storage2_primary_access_key
+
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
@@ -184,10 +189,10 @@ module "fulfilment_keyvaults" {
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.small_exchange_set_connection_string
     "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
-    "CacheConfiguration--CacheStorageAccountName1"              = module.cache_storage.cache_storage1_name
-    "CacheConfiguration--CacheStorageAccountKey1"               = module.cache_storage.cache_storage1_primary_access_key
-    "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage2_name
-    "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage2_primary_access_key
+    "Storage1CacheConfiguration--CacheStorage1AccountName"      = module.cache_storage.cache_storage1_name
+    "Storage1CacheConfiguration--CacheStorage1AccountKey"       = module.cache_storage.cache_storage1_primary_access_key
+    "Storage2CacheConfiguration--CacheStorage2AccountName"      = module.cache_storage.cache_storage2_name
+    "Storage2CacheConfiguration--CacheStorage2AccountKey"       = module.cache_storage.cache_storage2_primary_access_key
   }
   medium_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
