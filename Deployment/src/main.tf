@@ -186,6 +186,8 @@ module "fulfilment_keyvaults" {
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
     "CacheConfiguration--CacheStorageAccountName1"              = module.cache_storage.cache_storage1_name
     "CacheConfiguration--CacheStorageAccountKey1"               = module.cache_storage.cache_storage1_primary_access_key
+    "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage2_name
+    "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage2_primary_access_key
   }
   medium_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
