@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -533,7 +534,29 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     "File share service upload ENC file request to cache blob container for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
-                        await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
+                        // add logic for multiple storage, test code
+
+                        Regex prodtobeinstorage1 = new Regex("[A-K]");
+                        Regex prodtobeinstorage2 = new Regex("[K-Z]");
+                        string product = fileName.Substring(0, 1);
+
+                        if (prodtobeinstorage1.IsMatch(product))
+                        {
+                            await fileShareServiceCache.CopyFileToBlob1(new MemoryStream(bytes), fileName, entry.BatchId);
+                        }
+                        if (prodtobeinstorage2.IsMatch(product))
+                        {
+                            await fileShareServiceCache.CopyFileToBlob2(new MemoryStream(bytes), fileName, entry.BatchId);
+                        }
+                        else
+                        {
+                            await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
+                        }
+
+                        //test code ends here and commented below og line of code
+
+                        //await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
+                       
                         return Task.CompletedTask;
                     }, entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
             }

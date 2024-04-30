@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -32,6 +33,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private const string CONTENT_TYPE = "application/json";
         private const int StringLength = 2;
         private const int responseFileSizeLimitInKb = 60;
+        private readonly IOptions<Storage1CacheConfiguration> fssCacheConfiguration1;
+        private readonly IOptions<Storage2CacheConfiguration> fssCacheConfiguration2;
 
         public FileShareServiceCache(IAzureBlobStorageClient azureBlobStorageClient,
             IAzureTableStorageClient azureTableStorageClient,
@@ -39,7 +42,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             ISalesCatalogueStorageService azureStorageService,
             IOptions<CacheConfiguration> fssCacheConfiguration,
             IFileSystemHelper fileSystemHelper,
-            IOptions<AioConfiguration> aioConfiguration)
+            IOptions<AioConfiguration> aioConfiguration,
+            IOptions<Storage1CacheConfiguration> fssCacheConfiguration1,
+            IOptions<Storage2CacheConfiguration> fssCacheConfiguration2)
         {
             this.azureBlobStorageClient = azureBlobStorageClient;
             this.azureTableStorageClient = azureTableStorageClient;
@@ -48,6 +53,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
             this.aioConfiguration = aioConfiguration.Value;
+            this.fssCacheConfiguration1 = fssCacheConfiguration1;
+            this.fssCacheConfiguration2 = fssCacheConfiguration2;
         }
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
@@ -82,39 +89,117 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                     if (!productList.Contains(compareProducts))
                     {
-                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-                        var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
-
-                        if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
+                        //test code start====
+                        var storageConnectionString1 = "";
+                        Regex prodtobeinstorage1 = new Regex("[A-K]");
+                        Regex prodtobeinstorage2 = new Regex("[K-Z]");
+                        if (prodtobeinstorage1.IsMatch(compareProducts.Substring(0, 1)))
                         {
-                            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            storageConnectionString1 = azureStorageService.GetStorageAccountConnectionString1(fssCacheConfiguration1.Value.CacheStorage1AccountName, fssCacheConfiguration1.Value.CacheStorage1AccountKey);
+                            var cacheInfo1 = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString1);
 
-                            if (cloudBlockBlob != null)
+                            if (cacheInfo1 != null && string.IsNullOrEmpty(cacheInfo1.Response))
                             {
-                                cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
+                                CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo1.BatchId}.json", storageConnectionString1, cacheInfo1.BatchId);
+
+                                if (cloudBlockBlob != null)
+                                {
+                                    cacheInfo1.Response = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
+                                }
                             }
-                        }
-
-                        if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
-                        {
-                            var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
-
-                            int fileCount = internalBatchDetail.Files.Count();
-
-                            if (updateNumbers.Count == fileCount)
+                            if (cacheInfo1 != null && !string.IsNullOrEmpty(cacheInfo1.Response))
                             {
-                                internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+                                var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString1, cacheInfo1);
+
+                                int fileCount = internalBatchDetail.Files.Count();
+
+                                if (updateNumbers.Count == fileCount)
+                                {
+                                    internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+                                }
+                                else
+                                {
+                                    internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                                }
+                                productList.Add(compareProducts);
                             }
                             else
                             {
                                 internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
                             }
-                            productList.Add(compareProducts);
+
                         }
                         else
                         {
-                            internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                            storageConnectionString1 = azureStorageService.GetStorageAccountConnectionString2(fssCacheConfiguration2.Value.CacheStorage2AccountName, fssCacheConfiguration2.Value.CacheStorage2AccountKey);
+                            var cacheInfo2 = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration2.Value.FssSearchCache2TableName, storageConnectionString1);
+
+                            if (cacheInfo2 != null && string.IsNullOrEmpty(cacheInfo2.Response))
+                            {
+                                CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo2.BatchId}.json", storageConnectionString1, cacheInfo2.BatchId);
+
+                                if (cloudBlockBlob != null)
+                                {
+                                    cacheInfo2.Response = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
+                                }
+                            }
+                            if (cacheInfo2 != null && !string.IsNullOrEmpty(cacheInfo2.Response))
+                            {
+                                var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString1, cacheInfo2);
+
+                                int fileCount = internalBatchDetail.Files.Count();
+
+                                if (updateNumbers.Count == fileCount)
+                                {
+                                    internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+                                }
+                                else
+                                {
+                                    internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                                }
+                                productList.Add(compareProducts);
+                            }
+                            else
+                            {
+                                internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                            }
                         }
+
+                        //test code end==== and commented og code below
+
+                        //var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        //var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+
+                        //if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
+                        //{
+                        //    CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+
+                        //    if (cloudBlockBlob != null)
+                        //    {
+                        //        cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
+                        //    }
+                        //}
+
+                        //if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
+                        //{
+                        //    var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo);
+
+                        //    int fileCount = internalBatchDetail.Files.Count();
+
+                        //    if (updateNumbers.Count == fileCount)
+                        //    {
+                        //        internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+                        //    }
+                        //    else
+                        //    {
+                        //        internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                        //    }
+                        //    productList.Add(compareProducts);
+                        //}
+                        //else
+                        //{
+                        //    internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                        //}
                     }
                 }
                 if (internalProductItemNotFound.UpdateNumbers != null && internalProductItemNotFound.UpdateNumbers.Any())
@@ -212,24 +297,89 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
+        public async Task CopyFileToBlob1(Stream stream, string fileName, string batchId)
+        {
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString1(fssCacheConfiguration1.Value.CacheStorage1AccountName, fssCacheConfiguration1.Value.CacheStorage1AccountKey);
+            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
+            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
+            if (!await cloudBlockBlob.ExistsAsync())
+            {
+                await cloudBlockBlob.UploadFromStreamAsync(stream);
+            }
+        }
+
+        public async Task CopyFileToBlob2(Stream stream, string fileName, string batchId)
+        {
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString2(fssCacheConfiguration2.Value.CacheStorage2AccountName, fssCacheConfiguration2.Value.CacheStorage2AccountKey);
+            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
+            cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
+            if (!await cloudBlockBlob.ExistsAsync())
+            {
+                await cloudBlockBlob.UploadFromStreamAsync(stream);
+            }
+        }
+
         public async Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache)
         {
             int responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
 
-            //If content size is more that responseFileSizeLimitInKb
-            //then store content into json file to avoid azure table storage exception for column limit
-            if (responseSizeInKb > responseFileSizeLimitInKb)
-            {
-                // convert string to stream
-                byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
-                MemoryStream stream = new(byteArray);
+            ////If content size is more that responseFileSizeLimitInKb
+            ////then store content into json file to avoid azure table storage exception for column limit
+            //if (responseSizeInKb > responseFileSizeLimitInKb)
+            //{
+            //    // convert string to stream
+            //    byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
+            //    MemoryStream stream = new(byteArray);
 
-                await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId);
-                fssSearchResponseCache.Response = string.Empty;
+            //    await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId);
+            //    fssSearchResponseCache.Response = string.Empty;
+            //}
+
+            //var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            //await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+
+            //test code start==== and commented above og code
+
+            Regex prodtobeinstorage1 = new Regex("[A-K]");
+            //Regex prodtobeinstorage2 = new Regex("[K-Z]");
+            var productList = fssSearchResponseCache.PartitionKey.Split(',');
+            foreach (var product in productList)
+            {
+                if (prodtobeinstorage1.IsMatch(product.Substring(0, 1)))
+                {
+                    var storage1ConnectionString = azureStorageService.GetStorageAccountConnectionString1(fssCacheConfiguration1.Value.CacheStorage1AccountName, fssCacheConfiguration1.Value.CacheStorage1AccountKey);
+
+                    if (responseSizeInKb > responseFileSizeLimitInKb)
+                    {
+                        // convert string to stream
+                        byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
+                        MemoryStream stream = new(byteArray);
+
+                        await CopyFileToBlob1(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId);
+                        fssSearchResponseCache.Response = string.Empty;
+                    }                    
+                    await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration1.Value.FssSearchCache1TableName, storage1ConnectionString);
+
+                }
+                else
+                {
+                    var storage2ConnectionString = azureStorageService.GetStorageAccountConnectionString2(fssCacheConfiguration2.Value.CacheStorage2AccountName, fssCacheConfiguration2.Value.CacheStorage2AccountKey);
+
+                    if (responseSizeInKb > responseFileSizeLimitInKb)
+                    {
+                        // convert string to stream
+                        byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
+                        MemoryStream stream = new(byteArray);
+
+                        await CopyFileToBlob2(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId);
+                        fssSearchResponseCache.Response = string.Empty;
+                    }
+                    await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration2.Value.FssSearchCache2TableName, storage2ConnectionString);
+
+                }
             }
 
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+            //test code end====
         }
     }
 }

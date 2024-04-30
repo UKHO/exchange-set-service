@@ -31,6 +31,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         private IFileSystemHelper fakeFileSystemHelper;
         private IFileShareServiceCache fileShareServiceCache;
         private IOptions<AioConfiguration> fakeAioConfiguration;
+        private IOptions<Storage1CacheConfiguration> fakeCacheConfiguration1;
+        private IOptions<Storage2CacheConfiguration> fakeCacheConfiguration2;
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
 
         [SetUp]
@@ -47,8 +49,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
             fakeCacheConfiguration.Value.IsFssCacheEnabled = true;
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
+            fakeCacheConfiguration1 = A.Fake<IOptions<Storage1CacheConfiguration>>();
+            fakeCacheConfiguration2 = A.Fake<IOptions<Storage2CacheConfiguration>>();
 
-            fileShareServiceCache = new FileShareServiceCache(fakeAzureBlobStorageClient, fakeAzureTableStorageClient, fakeLogger, fakeAzureStorageService, fakeCacheConfiguration, fakeFileSystemHelper, fakeAioConfiguration);
+            fileShareServiceCache = new FileShareServiceCache(fakeAzureBlobStorageClient, fakeAzureTableStorageClient, fakeLogger, fakeAzureStorageService, fakeCacheConfiguration, fakeFileSystemHelper, fakeAioConfiguration, fakeCacheConfiguration1, fakeCacheConfiguration2);
         }
 
         private (string, string) GetStorageAccountConnectionStringAndContainerName()

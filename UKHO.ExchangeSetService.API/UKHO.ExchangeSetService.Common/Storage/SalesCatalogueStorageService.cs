@@ -26,5 +26,35 @@ namespace UKHO.ExchangeSetService.Common.Storage
 
             return storageAccountConnectionString;
         }
+
+        public string GetStorageAccountConnectionString1(string storageAccountName = null, string storageAccountKey = null)
+        {
+            string ScsStorageAccountAccessKeyValue = !string.IsNullOrEmpty(storageAccountKey) ? storageAccountKey : storageConfig.Value.StorageAccountKey;
+            string ScsStorageAccountName = !string.IsNullOrEmpty(storageAccountName) ? storageAccountName : storageConfig.Value.StorageAccountName;
+
+            if (string.IsNullOrWhiteSpace(ScsStorageAccountAccessKeyValue))
+            {
+                throw new KeyNotFoundException($"Storage account accesskey not found");
+            }
+
+            string storageAccountConnectionString = $"DefaultEndpointsProtocol=https;AccountName={ScsStorageAccountName};AccountKey={ScsStorageAccountAccessKeyValue};EndpointSuffix=core.windows.net";
+
+            return storageAccountConnectionString;
+        }
+
+        public string GetStorageAccountConnectionString2(string storageAccountName = null, string storageAccountKey = null)
+        {
+            string ScsStorageAccountAccessKeyValue = !string.IsNullOrEmpty(storageAccountKey) ? storageAccountKey : storageConfig.Value.StorageAccountKey;
+            string ScsStorageAccountName = !string.IsNullOrEmpty(storageAccountName) ? storageAccountName : storageConfig.Value.StorageAccountName;
+
+            if (string.IsNullOrWhiteSpace(ScsStorageAccountAccessKeyValue))
+            {
+                throw new KeyNotFoundException($"Storage account accesskey not found");
+            }
+
+            string storageAccountConnectionString = $"DefaultEndpointsProtocol=https;AccountName={ScsStorageAccountName};AccountKey={ScsStorageAccountAccessKeyValue};EndpointSuffix=core.windows.net";
+
+            return storageAccountConnectionString;
+        }
     }
 }
