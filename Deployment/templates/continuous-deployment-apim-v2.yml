@@ -47,3 +47,5 @@ steps:
       TF_VAR_ess_ui_product_call_limit: $(essuiproductcalllimit)
       TF_VAR_ess_ui_product_call_renewal_period: $(essuiproductcallrenewalperiod)
       TF_VAR_ess_ui_product_daily_quota_limit: $(essuiproductdailyquotalimit)
+      TF_VAR_policy_rewrite_from_gateway: $(APIM_NEW_GATEWAY)
+      TF_VAR_policy_rewrite_to_gateway: $(APIM_OLD_GATEWAY)
