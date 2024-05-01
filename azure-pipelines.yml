@@ -57,6 +57,20 @@ stages:
           clean: all
         displayName: "Publish Functional Tests And Terraform"
         steps:
+          - task: CopyFiles@2
+            displayName: Copy EssFulfilment Config
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API\'
+              Contents: 'appsettings.json'
+              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src'
+
+          - task: CopyFiles@2
+            displayName: "Copy OpenAPI spec for deployment"
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: 'exchangeSetService_OpenApi_definition.yaml'
+              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
+
           - task: PublishBuildArtifacts@1
             displayName: "Publish terraform Artifacts"
             inputs:
