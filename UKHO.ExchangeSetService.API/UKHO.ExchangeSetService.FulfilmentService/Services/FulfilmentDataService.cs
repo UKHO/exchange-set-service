@@ -109,14 +109,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
 
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
+            Dictionary<string, string> messageDetails = new();
+            messageDetails.Add("QueueMessageInsertedOn", $"{message.QueueMessageInsertedOn.ToUniversalTime():MM/dd/yyyy hh:mm:ss.fff tt}");
             if (isZipFileUploaded)
             {
                 logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 await fulfilmentCallBackService.SendCallBackResponse(response, message);
-                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
+                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId, messageDetails);
                 return "Exchange Set Created Successfully";
             }
-            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
+            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId, messageDetails);
             return "Exchange Set Is Not Created";
         }
 

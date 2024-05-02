@@ -529,11 +529,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             fileSystemHelper.CreateFileCopy(path, new MemoryStream(bytes));
             if (!entry.IgnoreCache && fssCacheConfiguration.Value.IsFssCacheEnabled)
             {
+                var agencyCode = entry.Attributes.Where(x => x.Key == "CellName").Select(x => x.Value).FirstOrDefault();
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceUploadENCFilesToCacheStart, EventIds.FileShareServiceUploadENCFilesToCacheCompleted,
                     "File share service upload ENC file request to cache blob container for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
                         await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
+                        await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId, agencyCode);
                         return Task.CompletedTask;
                     }, entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
             }

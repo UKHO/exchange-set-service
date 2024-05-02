@@ -32,6 +32,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
 using Elastic.Apm.AspNetCore;
+using StackExchange.Redis;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -112,6 +113,9 @@ namespace UKHO.ExchangeSetService.API
                 options.SuppressModelStateInvalidFilter = true;
             });
 
+            builder.Services.AddScoped<IRedisCache, RedisCache>();
+            var redisConnectionString = builder.Configuration["CacheConnectionString"];
+            builder.Services.AddSingleton<IConnectionMultiplexer>(provider => ConnectionMultiplexer.Connect(redisConnectionString));
             builder.Services.Configure<EssFulfilmentStorageConfiguration>(builder.Configuration.GetSection("ESSFulfilmentConfiguration"));
             builder.Services.Configure<CacheConfiguration>(builder.Configuration.GetSection("CacheConfiguration"));
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -125,6 +129,8 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             builder.Services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
+            
+           
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
 

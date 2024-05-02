@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -22,6 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareServiceCache : IFileShareServiceCache
     {
+        private readonly IRedisCache redisCache;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private readonly IAzureTableStorageClient azureTableStorageClient;
         private readonly ILogger<FileShareServiceCache> logger;
@@ -39,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             ISalesCatalogueStorageService azureStorageService,
             IOptions<CacheConfiguration> fssCacheConfiguration,
             IFileSystemHelper fileSystemHelper,
-            IOptions<AioConfiguration> aioConfiguration)
+            IOptions<AioConfiguration> aioConfiguration, IRedisCache redisCache)
         {
             this.azureBlobStorageClient = azureBlobStorageClient;
             this.azureTableStorageClient = azureTableStorageClient;
@@ -48,6 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
             this.aioConfiguration = aioConfiguration.Value;
+            this.redisCache = redisCache;
         }
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
@@ -82,13 +85,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                     if (!productList.Contains(compareProducts))
                     {
-                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnAgencyCode(item.ProductName);
+                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
                         var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+                        redisCache.RemoveData(compareProducts);
+                        ////var cacheInfo = redisCache.GetCacheData<FssSearchResponseCache>(compareProducts);
+
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
                         {
                             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
-
+                            
                             if (cloudBlockBlob != null)
                             {
                                 cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(cloudBlockBlob);
@@ -201,15 +208,26 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return downloadPath;
         }
 
-        public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
+        public async Task CopyFileToBlob(Stream stream, string fileName, string batchId, string code)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnAgencyCode(code);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
             if (!await cloudBlockBlob.ExistsAsync())
             {
                 await cloudBlockBlob.UploadFromStreamAsync(stream);
             }
+        }
+
+        private (string, string) GetStorageAccountNameAndKeyBasedOnAgencyCode(string code)
+        {
+            return code switch
+            {
+               string c when Regex.IsMatch(c, "^[a-mA-M]") => (fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey),
+               string c when Regex.IsMatch(c, "^[n-zN-Z]") => (fssCacheConfiguration.Value.CacheStorageAccountName1, fssCacheConfiguration.Value.CacheStorageAccountKey1),
+                  _ => (string.Empty, string.Empty),
+            };
         }
 
         public async Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache)
@@ -224,12 +242,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
                 MemoryStream stream = new(byteArray);
 
-                await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId);
+                await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId, fssSearchResponseCache.PartitionKey);
                 fssSearchResponseCache.Response = string.Empty;
             }
-
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnAgencyCode(fssSearchResponseCache.PartitionKey);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
             await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+
+            //redisCache.SetCacheData<FssSearchResponseCache>($"{fssSearchResponseCache.PartitionKey}|{fssSearchResponseCache.RowKey}", fssSearchResponseCache);
         }
     }
 }

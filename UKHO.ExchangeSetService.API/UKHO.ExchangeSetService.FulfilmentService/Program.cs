@@ -29,6 +29,7 @@ using UKHO.ExchangeSetService.FulfilmentService.Validation;
 using Elastic.Apm.Azure.Storage;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm;
+using StackExchange.Redis;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -38,7 +39,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private static IConfiguration ConfigurationBuilder;
         private static string AssemblyVersion = Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>().Single().Version;
         public const string ExchangeSetServiceUserAgent = "ExchangeSetService";
-
+       
         public static void Main(string[] args)
         {
             // Elastic APM
@@ -135,6 +136,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              {
                  var buildServiceProvider = services.BuildServiceProvider();
 
+                 services.AddScoped<IRedisCache, RedisCache>();
+                 var redisConnectionString = ConfigurationBuilder["CacheConnectionString"];
+                 services.AddSingleton<IConnectionMultiplexer>(provider => ConnectionMultiplexer.Connect(redisConnectionString));
+
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
                  services.Configure<AioConfiguration>(ConfigurationBuilder.GetSection("AioConfiguration"));
@@ -194,7 +199,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddDistributedMemoryCache();
 
                  // Add App Insights Telemetry Filter
-                 var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
+                  var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
                  var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
                  telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next));
                  telemetryProcessorChainBuilder.Build();
