@@ -534,7 +534,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     "File share service upload ENC file request to cache blob container for Container:{Container}, with FileName: {FileName}. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
-                        await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
                         await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId, agencyCode);
                         return Task.CompletedTask;
                     }, entry.BatchId, fileName, queueMessage.BatchId, queueMessage.CorrelationId);
