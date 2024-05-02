@@ -184,6 +184,11 @@ module "fulfilment_keyvaults" {
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.small_exchange_set_connection_string
     "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+    "CacheConfiguration--CacheStorageAccountName1"              = module.cache_storage.cache_storage1_name
+    "CacheConfiguration--CacheStorageAccountKey1"               = module.cache_storage.cache_storage1_primary_access_key
+    "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage2_name
+    "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage2_primary_access_key
+    "CacheConnectionString"                                     = module.redis_cache.redis_connection_string
 
   }
   medium_exchange_set_secrets = {
@@ -215,6 +220,7 @@ module "azure-dashboard" {
   resource_group = azurerm_resource_group.rg
   tags           = local.tags
 }
+
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   resource_group_name                   = azurerm_resource_group.rg.name
@@ -226,6 +232,17 @@ module "cache_storage" {
   large_exchange_set_subnets            = data.azurerm_subnet.large_exchange_set_subnet[*].id
   m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
   agent_subnet                          = data.azurerm_subnet.agent_subnet.id
+  env_name                              = local.env_name
+  service_name                          = local.service_name
+}
+
+
+module "redis_cache" {
+  source                                = "./Modules/RedisCache"
+  name                                  = local.redis_cache_name
+  resource_group_name                   = azurerm_resource_group.rg.name
+  location                              = var.location
+  tags                                  = local.tags
   env_name                              = local.env_name
   service_name                          = local.service_name
 }

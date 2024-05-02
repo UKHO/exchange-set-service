@@ -66,3 +66,8 @@ output "web_app_slot_name" {
 output "web_app_slot_default_site_hostname" {
   value = module.webapp_service.slot_default_site_hostname
 }
+
+output "redis_connection_string" {
+   value = module.redis_cache.redis_connection_string
+   sensitive = true
+}
