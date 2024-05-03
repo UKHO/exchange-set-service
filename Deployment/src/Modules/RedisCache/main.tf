@@ -11,4 +11,5 @@ resource "azurerm_redis_cache" "redis_cache"{
 
   redis_configuration {
   }
+  tags                = var.tags
 }
