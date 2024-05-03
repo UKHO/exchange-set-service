@@ -514,4 +514,13 @@
 		<packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
 		<cve>CVE-2024-27086</cve>
 	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: StackExchange.Redis.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/StackExchange\.Redis@.*$</packageUrl>
+		<cpe>cpe:/a:redis:redis</cpe>
+	</suppress>
 </suppressions>
