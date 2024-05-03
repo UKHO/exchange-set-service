@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         ////private const int responseFileSizeLimitInKb = 60;
 
         public FileShareServiceCache(IAzureBlobStorageClient azureBlobStorageClient,
-            ////IAzureTableStorageClient azureTableStorageClient,
+            IAzureTableStorageClient azureTableStorageClient,
             ILogger<FileShareServiceCache> logger,
             ISalesCatalogueStorageService azureStorageService,
             IOptions<CacheConfiguration> fssCacheConfiguration,
