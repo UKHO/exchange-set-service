@@ -153,6 +153,7 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
         "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
         "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+        "CacheConnectionString"                                     = module.redis_cache.redis_connection_string
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
