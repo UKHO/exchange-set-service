@@ -544,13 +544,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         {
                             await fileShareServiceCache.CopyFileToBlob1(new MemoryStream(bytes), fileName, entry.BatchId);
                         }
-                        if (prodtobeinstorage2.IsMatch(product))
-                        {
-                            await fileShareServiceCache.CopyFileToBlob2(new MemoryStream(bytes), fileName, entry.BatchId);
-                        }
                         else
                         {
-                            await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, entry.BatchId);
+                            await fileShareServiceCache.CopyFileToBlob2(new MemoryStream(bytes), fileName, entry.BatchId);
                         }
 
                         //test code ends here and commented below og line of code
