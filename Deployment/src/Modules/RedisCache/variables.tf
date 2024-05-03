@@ -12,3 +12,7 @@ variable "location" {
 
 variable "tags" {
 }
+
+variable "env_name" {
+  type = string
+}
