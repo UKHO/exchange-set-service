@@ -83,6 +83,13 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+
+                //check if exchangeSetStandard is S57                
+                var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productIdentifierRequest.ExchangeSetStandard);
+                if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkS57File;
+                }
                 bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, productIdentifierRequest.CorrelationId);
                 if (isAzureB2C)
                 {
@@ -91,8 +98,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     {
                         return checkFileResponse;
                     }
-                }
-            }
+                }                  
+        }
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Sales Catalogue Service Product Identifier Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productIdentifierRequest.CorrelationId, null, null, fileSize, null);
 
@@ -132,8 +139,31 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
         {
+            var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);            
+            if(fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
+            {
+                var exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    IsExchangeSetTooLarge = true
+                };
+                return exchangeSetResponse;
+            }
+            else
+            {
+                var exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.OK,
+                    IsExchangeSetTooLarge = false
+                };
+                return exchangeSetResponse;
+            }
+        }
+
+        private ExchangeSetServiceResponse CheckIfS57ExchangeSetTooLarge(long fileSize, string exchangeSetStandard)
+        {
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
-            if (fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
+            if (exchangeSetStandard =="s57" && fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeMediaExchangeSetSizeInMB)
             {
                 var exchangeSetResponse = new ExchangeSetServiceResponse
                 {
@@ -172,6 +202,12 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                //check if exchangeSetStandard is S57                
+                var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, request.ExchangeSetStandard);
+                if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkS57File;
+                }
                 bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, request.CorrelationId);
                 if (isAzureB2C)
                 {
@@ -249,6 +285,12 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                //check if exchangeSetStandard is S57                
+                var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productDataSinceDateTimeRequest.ExchangeSetStandard);
+                if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkS57File;
+                }
                 bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, productDataSinceDateTimeRequest.CorrelationId);
                 if (isAzureB2C)
                 {
