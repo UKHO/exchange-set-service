@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 
 namespace UKHO.ExchangeSetService.API.Filters
@@ -17,18 +21,35 @@ namespace UKHO.ExchangeSetService.API.Filters
     {
         private const string TokenAudience = "aud";
         private const string ExchangeSetStandard = "exchangeSetStandard";
+        private const string TokenIssuer = "iss";
+        private const string TokenTenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
         private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
+        private readonly IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration;
         private static readonly string[] ExchangeSetStandards = Enum.GetNames(typeof(ExchangeSetStandard));
-
-        public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration)
+        private readonly IConfiguration configuration;
+        private readonly IAzureAdB2CHelper azureAdB2CHelper;
+        public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration, IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration, IConfiguration configuration, IAzureAdB2CHelper azureAdB2CHelper)
         {
             this.azureAdConfiguration = azureAdConfiguration ?? throw new ArgumentNullException(nameof(azureAdConfiguration));
+            this.azureAdB2CConfiguration = azureAdB2CConfiguration ?? throw new ArgumentNullException(nameof(azureAdB2CConfiguration));
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.azureAdB2CHelper = azureAdB2CHelper ?? throw new ArgumentNullException(nameof(azureAdB2CHelper));
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
             var azureAdClientId = azureAdConfiguration.Value.ClientId;
+            var azureAdTenantId = azureAdConfiguration.Value.TenantId;
+            var azureAdB2CClientId = azureAdB2CConfiguration.Value.ClientId;
+            var adminDomains = !string.IsNullOrEmpty(this.configuration["AdminDomains"]) ? new(this.configuration["AdminDomains"].Split(',').Select(s => s.Trim())) : new List<string>();
+
+            var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
+            var tokenTenantId = context.HttpContext.User.FindFirstValue(TokenTenantId);
+            var userEmail = context.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            var tokenIssuer = context.HttpContext.User.FindFirstValue(TokenIssuer);
+            var correlationId = context.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
+
+            var emailDomain = userEmail?.Split('@')[1].ToString();
 
             context.HttpContext.Request.Query.TryGetValue(ExchangeSetStandard, out var queryStringValue);
             var exchangeSetStandard = context.HttpContext.Request.Query.ContainsKey(ExchangeSetStandard)
@@ -45,10 +66,28 @@ namespace UKHO.ExchangeSetService.API.Filters
             //If request is Bespoke exchange set and user is Non UKHO
             if (string.Equals(exchangeSetStandard, Common.Models.Enums.ExchangeSetStandard.s57.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                if (azureAdClientId != tokenAudience)
+                if (tokenTenantId == azureAdTenantId)
                 {
-                    context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return;
+                    if (azureAdClientId != tokenAudience)
+                    {
+                        context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return;
+                    }
+                }
+
+                AzureAdB2C azureAdB2C = new AzureAdB2C
+                {
+                    AudToken = tokenAudience,
+                    IssToken = tokenIssuer,
+                };
+
+                if (azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, correlationId))
+                {
+                    if (!adminDomains.Contains(emailDomain))
+                    {
+                        context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return;
+                    }
                 }
             }
             await next();
