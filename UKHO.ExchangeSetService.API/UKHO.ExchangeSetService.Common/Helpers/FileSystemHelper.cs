@@ -256,6 +256,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return fileDetails;
         }
 
+        public FileDetail UploadLargeMediaCommitBatch2(List<BatchCommitMetaData> batchCommitMetaDataList, byte[] zipArchiveBytes)
+        {
+            var fileMd5Hash = CommonHelper.CalculateMD5(zipArchiveBytes);
+            FileDetail fileDetail = new FileDetail()
+            {
+                FileName = batchCommitMetaDataList?[0].FileName,
+                Hash = Convert.ToBase64String(fileMd5Hash)
+            };
+            
+
+            return fileDetail;
+        }
+
         //Returns fileName from fullPath
         public string GetFileName(string fileFullPath)
         {

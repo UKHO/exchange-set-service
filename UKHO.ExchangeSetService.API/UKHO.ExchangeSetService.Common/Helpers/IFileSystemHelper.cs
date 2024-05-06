@@ -28,6 +28,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         IDirectoryInfo GetParent(string path);
         string[] GetFiles(string path);
         List<FileDetail> UploadLargeMediaCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList);
+        FileDetail UploadLargeMediaCommitBatch2(List<BatchCommitMetaData> batchCommitMetaDataList, byte[] zipArchiveBytes);
         string GetFileName(string fileFullPath);
         TextWriter WriteStream(string filePath);
         void CreateFile(string filePath);

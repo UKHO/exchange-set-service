@@ -151,5 +151,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             throw new System.NotImplementedException();
         }
+
+        public FileDetail UploadLargeMediaCommitBatch2(List<BatchCommitMetaData> batchCommitMetaDataList, byte[] zipArchiveBytes)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
