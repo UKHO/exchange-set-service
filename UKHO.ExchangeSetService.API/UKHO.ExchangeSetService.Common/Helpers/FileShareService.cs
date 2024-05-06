@@ -1113,7 +1113,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> UploadFileToFileShareService2(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName, byte[] zipArchiveBytes)
         {
-            var accessToken = _accesstoken;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId); ;
             bool isUploadZipFile = false;
             DateTime uploadZipFileTaskStartedAt = DateTime.UtcNow;
 
@@ -1201,7 +1201,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> CommitBatchToFss2(string batchId, string correlationId, string exchangeSetZipPath, byte[] zipArchiveBytes, string fileName = ZIPFILE)
         {
-            var accessToken = _accesstoken;
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId); ;
 
             bool isBatchCommitted = false;
             var batchCommitMetaDataList = new List<BatchCommitMetaData>();
