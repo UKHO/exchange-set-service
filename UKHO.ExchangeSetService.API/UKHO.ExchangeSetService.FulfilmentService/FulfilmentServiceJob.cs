@@ -114,8 +114,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 var fulfilmentException = new FulfilmentException(exceptionEventId);
                 string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
-                ////await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
-                await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+                
+                ////from Memory
+                ////////await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+
 
                 if (ex.GetType() != typeof(FulfilmentException))
                     logger.LogError(exceptionEventId, ex, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
