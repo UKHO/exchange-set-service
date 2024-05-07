@@ -114,10 +114,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 var fulfilmentException = new FulfilmentException(exceptionEventId);
                 string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
-                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+                //////await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
                 
                 ////from Memory
-                ////////await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+                await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
 
 
                 if (ex.GetType() != typeof(FulfilmentException))
