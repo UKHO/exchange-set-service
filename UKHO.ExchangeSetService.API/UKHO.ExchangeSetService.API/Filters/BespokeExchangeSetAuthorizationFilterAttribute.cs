@@ -24,14 +24,12 @@ namespace UKHO.ExchangeSetService.API.Filters
         private const string TokenIssuer = "iss";
         private const string TokenTenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
         private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
-        private readonly IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration;
         private static readonly string[] ExchangeSetStandards = Enum.GetNames(typeof(ExchangeSetStandard));
         private readonly IConfiguration configuration;
         private readonly IAzureAdB2CHelper azureAdB2CHelper;
-        public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration, IOptions<AzureAdB2CConfiguration> azureAdB2CConfiguration, IConfiguration configuration, IAzureAdB2CHelper azureAdB2CHelper)
+        public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration, IConfiguration configuration, IAzureAdB2CHelper azureAdB2CHelper)
         {
             this.azureAdConfiguration = azureAdConfiguration ?? throw new ArgumentNullException(nameof(azureAdConfiguration));
-            this.azureAdB2CConfiguration = azureAdB2CConfiguration ?? throw new ArgumentNullException(nameof(azureAdB2CConfiguration));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             this.azureAdB2CHelper = azureAdB2CHelper ?? throw new ArgumentNullException(nameof(azureAdB2CHelper));
         }
@@ -40,16 +38,11 @@ namespace UKHO.ExchangeSetService.API.Filters
         {
             var azureAdClientId = azureAdConfiguration.Value.ClientId;
             var azureAdTenantId = azureAdConfiguration.Value.TenantId;
-            var azureAdB2CClientId = azureAdB2CConfiguration.Value.ClientId;
-            var adminDomains = !string.IsNullOrEmpty(this.configuration["AdminDomains"]) ? new(this.configuration["AdminDomains"].Split(',').Select(s => s.Trim())) : new List<string>();
 
             var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
             var tokenTenantId = context.HttpContext.User.FindFirstValue(TokenTenantId);
-            var userEmail = context.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             var tokenIssuer = context.HttpContext.User.FindFirstValue(TokenIssuer);
             var correlationId = context.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
-
-            var emailDomain = userEmail?.Split('@')[1].ToString();
 
             context.HttpContext.Request.Query.TryGetValue(ExchangeSetStandard, out var queryStringValue);
             var exchangeSetStandard = context.HttpContext.Request.Query.ContainsKey(ExchangeSetStandard)
@@ -66,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.Filters
             //If request is Bespoke exchange set and user is Non UKHO
             if (string.Equals(exchangeSetStandard, Common.Models.Enums.ExchangeSetStandard.s57.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                if (tokenTenantId == azureAdTenantId)
+                if (azureAdTenantId == tokenTenantId)
                 {
                     if (azureAdClientId != tokenAudience)
                     {
@@ -83,7 +76,10 @@ namespace UKHO.ExchangeSetService.API.Filters
 
                 if (azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, correlationId))
                 {
-                    if (!adminDomains.Contains(emailDomain))
+                    var adminDomains = !string.IsNullOrEmpty(this.configuration["AdminDomains"]) ? new(this.configuration["AdminDomains"].Split(',').Select(s => s.Trim())) : new List<string>();
+                    var userDomain = context.HttpContext.User.FindFirstValue(ClaimTypes.Email)?.Split('@')[1].ToString();
+
+                    if (!adminDomains.Contains(userDomain))
                     {
                         context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                         return;
