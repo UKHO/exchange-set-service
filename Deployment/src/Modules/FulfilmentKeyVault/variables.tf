@@ -54,3 +54,7 @@ variable "large_exchange_set_secrets" {
 variable "agent_subnet" {
   type = string
 }
+
+variable "suffix" {
+  default     = ""
+}

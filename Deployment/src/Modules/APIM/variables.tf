@@ -119,14 +119,22 @@ variable "policy_rewrite_to_gateway" {
   type = string  
 }
 
+variable "suffix" {
+    default = ""
+}
+
+variable "pathsuffix" {
+    default = ""
+}
+
 locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
-  group_name            = local.env_name == "prod" ? var.group_name : "${var.group_name} ${var.env_suffix[local.env_name]}"
-  product_name          = local.env_name == "prod" ? var.product_name : "${var.product_name} ${var.env_suffix[local.env_name]}"
-  ui_product_name       = local.env_name == "prod" ? var.ui_product_name : "${var.ui_product_name} ${var.env_suffix[local.env_name]}"
-  api_name              = local.env_name == "prod" ? var.api_name : "${var.api_name} ${var.env_suffix[local.env_name]}"
-  apim_api_path         = local.env_name == "prod" ? local.service_name : "${local.service_name}-${local.env_name}"
+  group_name            = local.env_name == "prod" ? "${var.group_name}${var.suffix}" : "${var.group_name} ${var.env_suffix[local.env_name]}${var.suffix}"
+  product_name          = local.env_name == "prod" ? "${var.product_name}${var.suffix}" : "${var.product_name} ${var.env_suffix[local.env_name]}${var.suffix}"
+  ui_product_name       = local.env_name == "prod" ? "${var.ui_product_name}${var.suffix}" : "${var.ui_product_name} ${var.env_suffix[local.env_name]}${var.suffix}"
+  api_name              = local.env_name == "prod" ? "${var.api_name}${var.suffix}" : "${var.api_name} ${var.env_suffix[local.env_name]}${var.suffix}"
+  apim_api_path         = local.env_name == "prod" ? "${local.service_name}${var.pathsuffix}" : "${local.service_name}-${local.env_name}${var.pathsuffix}"
   apim_api_openapi      = file("${path.module}/exchangeSetService_OpenApi_definition.yaml")
   cors_origins          = split(";", var.cors_origin_values)
 }

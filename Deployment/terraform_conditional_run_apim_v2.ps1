@@ -2,19 +2,14 @@ param (
     [Parameter(Mandatory = $true)] [string] $deploymentResourceGroupName,
     [Parameter(Mandatory = $true)] [string] $deploymentStorageAccountName,
     [Parameter(Mandatory = $true)] [string] $workSpace,
-    [Parameter(Mandatory = $true)] [boolean] $continueEvenIfResourcesAreGettingDestroyed,
-    [Parameter(Mandatory = $true)] [boolean] $useNewTfplanName
+    [Parameter(Mandatory = $true)] [boolean] $continueEvenIfResourcesAreGettingDestroyed
 )
 
 cd $env:AGENT_BUILDDIRECTORY/terraformartifact/src/Modules/APIM/
 
-terraform --version
+Write-output "Executing terraform scripts for APIM deployment in $workSpace enviroment..."
 
-Write-output "Executing terraform scripts for APIM deployment in $workSpace environment..."
-
-$backendConfigKey = $useNewTfplanName ? "terraform.deployment.apim.ess.tfplan" : "terraform.ess.apim.deployment.tfplan"
-Write-output "Using plan $backendConfigKey"
-terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=$backendConfigKey"
+terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=terraform.ess.apim.deployment.v2.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform initialization"; throw "Error" }
 
 Write-output "Selecting workspace..."
@@ -31,7 +26,7 @@ terraform validate
 if ( !$? ) { echo "Something went wrong during terraform validation" ; throw "Error" }
 
 Write-output "Execute Terraform plan..."
-terraform plan -out "$backendConfigKey" -var suffix="" -var pathsuffix="" | tee terraform_output.txt
+terraform plan -out "terraform.ess.apim.deployment.v2.tfplan" -var suffix=" v2" -var pathsuffix="-v2" | tee terraform_output.txt
 if ( !$? ) { echo "Something went wrong during terraform plan" ; throw "Error" }
 
 $totalDestroyLines=(Get-Content -Path terraform_output.txt | Select-String -Pattern "destroy" -CaseSensitive |  where {$_ -ne ""}).length
@@ -48,5 +43,5 @@ if($totalDestroyLines -ge 2)
 }
 
 Write-output "Executing terraform apply..."
-terraform apply "$backendConfigKey"
+terraform apply  "terraform.ess.apim.deployment.v2.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform apply" ; throw "Error" }
