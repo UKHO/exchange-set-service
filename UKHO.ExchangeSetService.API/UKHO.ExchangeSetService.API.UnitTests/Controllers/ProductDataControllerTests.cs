@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -236,9 +237,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(ExchangeSetStandard.s63)]
-        [TestCase(ExchangeSetStandard.s57)]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductIdentifiersReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS57_ThenPostProductIdentifiersReturnsBadRequest()
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -257,16 +256,52 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
+            var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
+            result.StatusCode.Should().Be(400);
+            errors.Errors.Single().Description.Should().BeEquivalentTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.ExchangeSetTooLarge.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS63_ThenPostProductIdentifiersReturnsOkObjectResultAndExchangeSetIsCreated()
+        {
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
+            {
+                ExchangeSetResponse = exchangeSetResponse,
+                IsExchangeSetTooLarge = false,
+                HttpStatusCode = HttpStatusCode.OK
+            };
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string callbackUri = string.Empty;
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
+                 .Returns(exchangeSetServiceResponse);
+
+            var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, ExchangeSetStandard.s63.ToString());
+
+            result.StatusCode.Should().Be(200);
+            ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount.Should().Be(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSPostProductIdentifiersRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSPostProductIdentifiersRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappenedOnceOrLess();
         }
 
         [Test]
@@ -422,9 +457,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(ExchangeSetStandard.s63)]
-        [TestCase(ExchangeSetStandard.s57)]
-        public async Task WhenLargeExchangeSetRequested_ThenPostProductDataByProductVersionsReturnsBadRequest(ExchangeSetStandard exchangeSetStandard)
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS57_ThenPostProductDataByProductVersionsReturnsBadRequest()
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -441,16 +474,50 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
+            result.StatusCode.Should().Be(400);
+            errors.Errors.Single().Description.Should().BeEquivalentTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.ExchangeSetTooLarge.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.").MustHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS63_ThenPostProductDataByProductVersionsReturnsOkObjectResultAndExchangeSetIsCreated()
+        {
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
+            {
+                ExchangeSetResponse = exchangeSetResponse,
+                IsExchangeSetTooLarge = false,
+                HttpStatusCode = HttpStatusCode.OK
+            };
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored))
+                            .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataByProductVersions(A<ProductDataProductVersionsRequest>.Ignored, A<AzureAdB2C>.Ignored))
+                 .Returns(exchangeSetServiceResponse);
+
+            var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
+                            { new ProductVersionRequest() { ProductName = "demo" } }, "", ExchangeSetStandard.s63.ToString());
+
+            result.StatusCode.Should().Be(200);
+            ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount.Should().Be(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSPostProductVersionsRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappenedOnceOrLess();
         }
 
         [Test]
@@ -570,9 +637,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        [TestCase(ExchangeSetStandard.s63)]
-        [TestCase(ExchangeSetStandard.s57)]
-        public async Task WhenLargeExchangeSetRequested_ThenGetProductDataSinceDateTimeReturnBadRequest(ExchangeSetStandard exchangeSetStandard)
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS57_ThenGetProductDataSinceDateTimeReturnBadRequest()
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -588,16 +653,48 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
                 .Returns(exchangeSetServiceResponse);
 
-            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
+            var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.", errors.Errors.Single().Description);
+            result.StatusCode.Should().Be(400);
+            errors.Errors.Single().Description.Should().BeEquivalentTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.ExchangeSetTooLarge.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.").MustHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS63_ThenGetProductDataSinceDateTimeReturnOkObjectResultAndExchangeSetIsCreated()
+        {
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
+            {
+                ExchangeSetResponse = exchangeSetResponse,
+                HttpStatusCode = HttpStatusCode.OK
+            };
+
+            A.CallTo(() => fakeProductDataService.ValidateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+
+            A.CallTo(() => fakeProductDataService.CreateProductDataSinceDateTime(A<ProductDataSinceDateTimeRequest>.Ignored, A<AzureAdB2C>.Ignored))
+                .Returns(exchangeSetServiceResponse);
+
+            var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", ExchangeSetStandard.s63.ToString());
+
+            result.StatusCode.Should().Be(200);
+            ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount.Should().Be(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappenedOnceOrLess();
         }
 
         [Test]
