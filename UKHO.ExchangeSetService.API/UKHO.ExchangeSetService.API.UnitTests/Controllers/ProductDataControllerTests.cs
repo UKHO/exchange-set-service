@@ -504,7 +504,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(exchangeSetServiceResponse);
 
             var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", ExchangeSetStandard.s63.ToString());
+                            { new() { ProductName = "demo" } }, "", ExchangeSetStandard.s63.ToString());
 
             result.StatusCode.Should().Be(200);
             ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount.Should().Be(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount);
@@ -672,6 +672,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
             {
                 ExchangeSetResponse = exchangeSetResponse,
+                IsExchangeSetTooLarge = false,
                 HttpStatusCode = HttpStatusCode.OK
             };
 

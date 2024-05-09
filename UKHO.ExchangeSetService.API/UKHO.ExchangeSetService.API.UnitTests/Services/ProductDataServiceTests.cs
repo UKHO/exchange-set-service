@@ -895,7 +895,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
@@ -1442,8 +1441,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
             var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
-
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
