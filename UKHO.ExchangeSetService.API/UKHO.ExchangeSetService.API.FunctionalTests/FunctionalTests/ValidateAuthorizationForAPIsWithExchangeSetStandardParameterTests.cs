@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallSinceDateTimeApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
+        public async Task WhenICallSinceDateTimeApiWithAValidAdb2cTokenAndEmailOutsideAllowedDomainAndS57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssB2CToken, "s57");
             Assert.AreEqual(403, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 403.");
@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallSinceDateTimeApiWithAValidADTokenAnds57AsExchangeSetStandardParameter_ThenACorrectResponseIsReturned()
+        public async Task WhenICallSinceDateTimeApiWithAValidADTokenAndS57AsExchangeSetStandardParameter_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, accessToken: EssJwtToken, "s57");
             Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 142740: ESS APIs : UKHO Authorization - Change Unauthorize(401) to Forbidden(403)
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionsApiWithAValidB2cTokenAnds57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
+        public async Task WhenICallProductVersionsApiWithAValidAdb2cTokenAndEmailOutsideAllowedDomainAndS57AsExchangeSetStandardParameter_ThenAForbiddenResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallProductVersionsApiWithAValidADTokenAnds57AsExchangeSetStandardParameter_ThenACorrectResponseIsReturned()
+        public async Task WhenICallProductVersionsApiWithAValidADTokenAndS57AsExchangeSetStandardParameter_ThenACorrectResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new()
             {
