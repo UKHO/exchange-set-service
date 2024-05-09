@@ -394,7 +394,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductIdentifierRequest_ThenValidateProductDataByProductIdentifierReturnsOkrequest()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidProductIdentifierRequest_ThenValidateProductDataByProductIdentifierReturnsOkrequest(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -405,7 +407,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri
+                    CallbackUri = callbackUri,
+                    ExchangeSetStandard = exchangeSetStandard.ToString()
+
                 });
 
             Assert.IsTrue(result.IsValid);
@@ -464,7 +468,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidProductIdentifierRequest_AndFileSizeIsLessThan700Mb_ThenCreateProductDataByProductIdentifierReturnsOkAndCreatesExchangeSet(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -472,8 +478,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
+            fakeEssFulfilmentStorageConfig.Value.LargeMediaExchangeSetSizeInMB = 700;
 
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
@@ -484,7 +490,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
@@ -495,7 +500,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri
+                    CallbackUri = callbackUri,
+                    ExchangeSetStandard = exchangeSetStandard.ToString()
                 }, azureAdToken);
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
@@ -612,7 +618,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInvalidFSSCreateBatchProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsInternalServerError()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidFSSCreateBatchProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsInternalServerError(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -643,7 +651,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri
+                    CallbackUri = callbackUri,
+                    ExchangeSetStandard = exchangeSetStandard.ToString()
                 }, azureAdToken);
 
             Assert.IsNull(result.ExchangeSetResponse);
@@ -681,7 +690,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri
+                    CallbackUri = callbackUri,
+                    ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
                 }, azureAdToken);
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
@@ -736,7 +746,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri
+                    CallbackUri = callbackUri,
+                    ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
                 }, azureAdToken);
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
@@ -817,7 +828,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 new ProductIdentifierRequest()
                 {
                     ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri
+                    CallbackUri = callbackUri,
+                    ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
                 }, azureAdToken);
 
             var exchangeSetResponseAioToggleOn = GetExchangeSetResponseAioToggleON();
@@ -1026,14 +1038,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkRequest()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidProductVersionRequest_AndFileSizeIsLessThan700Mb_ThenCreateProductDataByProductVersionsReturnsOkRequest(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
+            fakeEssFulfilmentStorageConfig.Value.LargeMediaExchangeSetSizeInMB = 700;
 
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
@@ -1044,7 +1058,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
             var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
 
@@ -1062,7 +1075,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                             ProductName = "AU334550", EditionNumber = 8, UpdateNumber = 1
                     }
                 },
-                CallbackUri = ""
+                CallbackUri = string.Empty,
+                ExchangeSetStandard = exchangeSetStandard.ToString()
             }, azureAdToken);
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
@@ -1207,7 +1221,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsNotModifiedToBadRequest()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsNotModifiedToBadRequest(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1223,7 +1239,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             {
                 ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
                 ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } },
-                CallbackUri = ""
+                CallbackUri = "",
+                ExchangeSetStandard = exchangeSetStandard.ToString()
+
             }, azureADToken);
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
@@ -1232,7 +1250,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInvalidFSSCreateBatchProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsInternalServerError()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenInvalidFSSCreateBatchProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsInternalServerError(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1260,7 +1280,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             {
                 ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest {
                 ProductName = "GB123789", EditionNumber = 6, UpdateNumber = 3 } },
-                CallbackUri = ""
+                CallbackUri = "",
+                ExchangeSetStandard = exchangeSetStandard.ToString()
             }, azureAdToken);
 
             Assert.IsNull(result.ExchangeSetResponse);
@@ -1268,7 +1289,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenBtachNotCreatedProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkWithoutStoringData()
+        public async Task WhenBatchNotCreatedProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkWithoutStoringData()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1303,7 +1324,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                             ProductName = "AU334550", EditionNumber = 8, UpdateNumber = 1
                     }
                 },
-                CallbackUri = ""
+                CallbackUri = "",
+                ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
             }, azureAdToken);
 
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
@@ -1362,7 +1384,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                             ProductName = "US2ARCGD", EditionNumber = 4, UpdateNumber = 6
                     }
                 },
-                CallbackUri = ""
+                CallbackUri = "",
+                ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
             }, azureAdToken);
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
@@ -1539,7 +1562,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                             ProductName = "US2ARCGD", EditionNumber = 4, UpdateNumber = 6
                     }
                 },
-                CallbackUri = ""
+                CallbackUri = "",
+                ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
             }, azureAdToken);
 
             var exchangeSetResponseAioToggleOn = GetExchangeSetResponseAioToggleON();
@@ -1708,18 +1732,65 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidateProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnSuccess()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidProductDataSinceDateTimeInRequest_AndFileSizeIsLessThan700Mb_ThenCreateProductDataSinceDateTimeReturnsOkAndCreatesExchangeSet(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+            var salesCatalogueResponse = GetSalesCatalogueResponse();
+            salesCatalogueResponse.LastModified = DateTime.UtcNow;
+            var exchangeSetResponse = GetExchangeSetResponse();
+            var CreateBatchResponseModel = CreateBatchResponse();
+            fakeEssFulfilmentStorageConfig.Value.LargeMediaExchangeSetSizeInMB = 700;
 
-            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureADToken());
+            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
+                .Returns(salesCatalogueResponse);
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
+            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
+                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
+            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
-            Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
+            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest()
+            {
+                ExchangeSetStandard = exchangeSetStandard.ToString(),
+                CallbackUri = string.Empty
+            }, GetAzureADToken());
+
+            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
+
+            result.Should().BeOfType<ExchangeSetServiceResponse>();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
+            result.ExchangeSetResponse.ExchangeSetCellCount.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetCellCount);
+            result.ExchangeSetResponse.RequestedProductCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductCount);
+            result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount);
+            result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href);
+            result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href);
+            result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href);
+            result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime);
+            result.BatchId.Should().Be(exchangeSetResponseAioToggleOff.BatchId);
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(logger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
-        public async Task WhenValidateProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnNotModified()
+        [TestCase(ExchangeSetStandard.s63)]
+        [TestCase(ExchangeSetStandard.s57)]
+        public async Task WhenValidateProductDataSinceDateTimeInRequest_ThenCreateProductDataSinceDateTimeReturnNotModified(ExchangeSetStandard exchangeSetStandard)
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1730,7 +1801,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
-            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureADToken());
+            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest()
+            {
+                CallbackUri = string.Empty,
+                ExchangeSetStandard = exchangeSetStandard.ToString()
+            }, GetAzureADToken());
 
             Assert.IsInstanceOf<ExchangeSetServiceResponse>(result);
         }

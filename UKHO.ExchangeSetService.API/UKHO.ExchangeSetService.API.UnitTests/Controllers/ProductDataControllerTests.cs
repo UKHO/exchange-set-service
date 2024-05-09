@@ -474,7 +474,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                  .Returns(exchangeSetServiceResponse);
 
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
-                            { new ProductVersionRequest() { ProductName = "demo" } }, "", ExchangeSetStandard.s57.ToString());
+                            { new() { ProductName = "demo" } }, "", ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
             result.StatusCode.Should().Be(400);
