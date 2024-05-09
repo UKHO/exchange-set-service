@@ -637,7 +637,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS57_ThenGetProductDataSinceDateTimeReturnBadRequest()
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS57_ThenGetProductDataSinceDateTimeReturnsBadRequest()
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()
@@ -666,7 +666,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS63_ThenGetProductDataSinceDateTimeReturnOkObjectResultAndExchangeSetIsCreated()
+        public async Task WhenLargeExchangeSetRequestedAndExchangeSetStandardIsS63_ThenGetProductDataSinceDateTimeReturnsOkObjectResultAndExchangeSetIsCreated()
         {
             var exchangeSetResponse = GetExchangeSetResponse();
             var exchangeSetServiceResponse = new ExchangeSetServiceResponse()

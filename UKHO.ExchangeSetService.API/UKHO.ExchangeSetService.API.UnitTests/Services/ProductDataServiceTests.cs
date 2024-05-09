@@ -17,6 +17,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
@@ -854,7 +855,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductIdentifierRequestWithExchangeSetStandardS57ForBes_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductIdentifierReturnsBadRequest()
+        public async Task WhenValidProductIdentifierRequestWithExchangeSetStandardS57_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductIdentifierReturnsBadRequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -869,7 +870,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 {
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = string.Empty,
-                    ExchangeSetStandard = "s57"
+                    ExchangeSetStandard = ExchangeSetStandard.s57.ToString()
                 }, GetAzureADToken());
 
             result.Should().BeOfType<ExchangeSetServiceResponse>();
@@ -877,7 +878,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductIdentifierRequestWithExchangeSetStandardS63ForBes_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductIdentifierReturnsOkAndCreatesExchangeSet()
+        public async Task WhenValidProductIdentifierRequestWithExchangeSetStandardS63_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductIdentifierReturnsOkAndCreatesExchangeSet()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -906,7 +907,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 {
                     ProductIdentifier = productIdentifiers,
                     CallbackUri = callBackUri,
-                    ExchangeSetStandard = "s63"
+                    ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
                 }, GetAzureADToken());
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
@@ -1398,7 +1399,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequestWithExchangeSetStandardS57ForBes_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductVersionsReturnsBadRequest()
+        public async Task WhenValidProductVersionRequestWithExchangeSetStandardS57_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductVersionsReturnsBadRequest()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1418,7 +1419,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     }
                 },
                 CallbackUri = string.Empty,
-                ExchangeSetStandard = "s57"
+                ExchangeSetStandard = ExchangeSetStandard.s57.ToString()
             }, GetAzureADToken());
 
             result.Should().BeOfType<ExchangeSetServiceResponse>();
@@ -1426,7 +1427,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequestWithExchangeSetStandardS63ForBes_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductVersionsReturnsOkRequestAndCreatesExchangeSet()
+        public async Task WhenValidProductVersionRequestWithExchangeSetStandardS63_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductVersionsReturnsOkAndCreatesExchangeSet()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1457,7 +1458,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     }
                 },
                 CallbackUri = string.Empty,
-                ExchangeSetStandard = "s63"
+                ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
             }, GetAzureADToken());
 
             var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
@@ -2034,7 +2035,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductDataSinceDateTimeInRequestWithExchangeSetStandardS57ForBes_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataSinceDateTimeReturnsBadRequest()
+        public async Task WhenValidProductDataSinceDateTimeInRequestWithExchangeSetStandardS57_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataSinceDateTimeReturnsBadRequest()
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -2046,7 +2047,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest()
             {
-                ExchangeSetStandard = "s57",
+                ExchangeSetStandard = ExchangeSetStandard.s57.ToString(),
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
@@ -2055,7 +2056,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductDataSinceDateTimeInRequestWithExchangeSetStandardS63ForBes_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataSinceDateTimeReturnsOkAndCreatesExchangeSet()
+        public async Task WhenValidProductDataSinceDateTimeInRequestWithExchangeSetStandardS63_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataSinceDateTimeReturnsOkAndCreatesExchangeSet()
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -2074,7 +2075,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest()
             {
-                ExchangeSetStandard = "s63",
+                ExchangeSetStandard = ExchangeSetStandard.s63.ToString(),
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 

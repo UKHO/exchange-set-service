@@ -1,13 +1,13 @@
-﻿using System;
+﻿using AutoMapper;
+using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
-using FluentValidation.Results;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -98,8 +99,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     {
                         return checkFileResponse;
                     }
-                }                  
-        }
+                }
+            }
             DateTime salesCatalogueServiceRequestCompletedAt = DateTime.UtcNow;
             monitorHelper.MonitorRequest("Sales Catalogue Service Product Identifier Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productIdentifierRequest.CorrelationId, null, null, fileSize, null);
 
@@ -139,8 +140,8 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
         {
-            var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);            
-            if(fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
+            var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
+            if (fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeExchangeSetSizeInMB)
             {
                 var exchangeSetResponse = new ExchangeSetServiceResponse
                 {
@@ -163,7 +164,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private ExchangeSetServiceResponse CheckIfS57ExchangeSetTooLarge(long fileSize, string exchangeSetStandard)
         {
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
-            if (exchangeSetStandard =="s57" && fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeMediaExchangeSetSizeInMB)
+            if (exchangeSetStandard == ExchangeSetStandard.s57.ToString() && fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeMediaExchangeSetSizeInMB)
             {
                 var exchangeSetResponse = new ExchangeSetServiceResponse
                 {
