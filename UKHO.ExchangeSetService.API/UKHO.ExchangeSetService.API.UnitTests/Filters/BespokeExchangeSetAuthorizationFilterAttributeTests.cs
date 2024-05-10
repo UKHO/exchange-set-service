@@ -48,6 +48,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             fakeAzureAdConfig.Value.TenantId = "azure-ad-tenant";
             fakeAzureAdB2CConfiguration.Value.Instance = "https://azureAdB2CInstance/";
             fakeAzureAdB2CConfiguration.Value.TenantId = "azure-ad2c-tenant";
+            fakeAzureAdConfig.Value.MicrosoftOnlineLoginUrl = "https://login.microsoftonline.com/";
             this.fakeConfiguration["AdminDomains"] = "abc.com";
             httpContext = new DefaultHttpContext();
 
@@ -300,6 +301,62 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIss57AndAzureADB2CClientIDIsEqualsWithTokenAudienceAndUserisAdmin_ThenReturnNextRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+                { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString() }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var claims = new List<Claim>()
+            {
+                    new Claim(TokenAudience, fakeAzureAdB2CConfiguration.Value.ClientId),
+                    new Claim(ClaimTypes.Email, "testUser@abc.com"),
+                    new Claim(TokenIssuer, "https://login.microsoftonline.com/azure-ad2c-tenant/v2.0/"),
+            };
+
+            var identity = httpContext.User.Identities.FirstOrDefault();
+            identity.AddClaims(claims);
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIss57AndAzureADB2CClientIDIsEqualsWithTokenAudienceAndUserisNotAdmin_ThenReturnForbidden()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+                { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString() }
+            };
+            httpContext.Request.Query = new QueryCollection(dictionary);
+
+            var claims = new List<Claim>()
+            {
+                    new Claim(TokenAudience, fakeAzureAdB2CConfiguration.Value.ClientId),
+                    new Claim(ClaimTypes.Email, "testUser@gmail.com"),
+                    new Claim(TokenIssuer, "https://login.microsoftonline.com/azure-ad2c-tenant/v2.0/"),
+            };
+
+            var identity = httpContext.User.Identities.FirstOrDefault();
+            identity.AddClaims(claims);
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
         }
     }
