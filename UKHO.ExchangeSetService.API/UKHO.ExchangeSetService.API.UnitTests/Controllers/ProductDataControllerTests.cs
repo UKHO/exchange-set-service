@@ -260,7 +260,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
 
             result.StatusCode.Should().Be(400);
-            errors.Errors.Single().Description.Should().BeEquivalentTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
+            errors.Errors.Single().Description.Should().Be("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -478,7 +478,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
 
             result.StatusCode.Should().Be(400);
-            errors.Errors.Single().Description.Should().BeEquivalentTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
+            errors.Errors.Single().Description.Should().Be("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -657,7 +657,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var errors = (ErrorDescription)result.Value;
 
             result.StatusCode.Should().Be(400);
-            errors.Errors.Single().Description.Should().BeEquivalentTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
+            errors.Errors.Single().Description.Should().Be("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
