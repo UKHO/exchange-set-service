@@ -66,6 +66,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
+            byte[] zipFileContent = Array.Empty<byte>(); 
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
@@ -106,22 +107,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             else
             {
                 ////await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
-
+                ////await CreateStandardExchangeSet1(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
+                #region in memory
+                zipFileContent = await CreateStandardExchangeSet2(message, response, essItems, salesCatalogueEssDataResponse);
+                #endregion
             }
 
             int count = 0;
             int maxCount = 50000;
             if (count > maxCount) //exclude execution and refrain build errors
             {
-                await CreateStandardExchangeSet1(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
-                ////var zipFileContent =await CreateStandardExchangeSet2(message, response, essItems, salesCatalogueEssDataResponse);
                 await PackageAndUploadExchangeSetZipFileToFileShareService1(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
-                ////await PackageAndUploadExchangeSetZipFileToFileShareService2(message.BatchId, exchangeSetZipFilePath, message.CorrelationId, zipFileContent);
             }
 
             #region in memory
-            var zipFileContent = await CreateStandardExchangeSet2(message, response, essItems, salesCatalogueEssDataResponse);
-            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService2(message.BatchId, exchangeSetZipFilePath, message.CorrelationId, zipFileContent);
+            var isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService2(message.BatchId, exchangeSetZipFilePath, message.CorrelationId, zipFileContent);
             #endregion
 
             //////bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService1(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
