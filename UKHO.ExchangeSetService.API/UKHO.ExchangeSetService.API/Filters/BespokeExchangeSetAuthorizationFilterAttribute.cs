@@ -77,9 +77,9 @@ namespace UKHO.ExchangeSetService.API.Filters
                 if (azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, correlationId))
                 {
                     var adminDomains = !string.IsNullOrEmpty(this.configuration["AdminDomains"]) ? new(this.configuration["AdminDomains"].Split(',').Select(s => s.Trim())) : new List<string>();
-                    var userDomain = context.HttpContext.User.FindFirstValue(ClaimTypes.Email)?.Split('@')[1].ToString();
+                    var userEmail = context.HttpContext.User.FindFirstValue(ClaimTypes.Email);
 
-                    if (!adminDomains.Contains(userDomain))
+                    if (!adminDomains.Any(x => userEmail.EndsWith(x, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                         return;
