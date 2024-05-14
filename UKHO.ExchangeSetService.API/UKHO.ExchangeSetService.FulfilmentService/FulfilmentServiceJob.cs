@@ -114,10 +114,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 var fulfilmentException = new FulfilmentException(exceptionEventId);
                 string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
 
-                //////await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
-                
-                ////from Memory
-                await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+
+                //////////from Memory
+                //////await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
 
 
                 if (ex.GetType() != typeof(FulfilmentException))
@@ -164,40 +164,40 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             await SendErrorCallBackResponse(fulfilmentServiceQueueMessage);
         }
 
-        public async Task CreateAndUploadErrorFileToFileShareService2(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage, EventId eventId, string errorMessage, string batchFolderPath)
-        {
-            ////fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
+        //////public async Task CreateAndUploadErrorFileToFileShareService2(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage, EventId eventId, string errorMessage, string batchFolderPath)
+        //////{
+        //////    ////fileSystemHelper.CheckAndCreateFolder(batchFolderPath);
 
-            var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
-            byte[] errorfileBytes = Encoding.ASCII.GetBytes(errorMessage);
-            ////fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
+        //////    var errorFileFullPath = Path.Combine(batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+        //////    byte[] errorfileBytes = Encoding.ASCII.GetBytes(errorMessage);
+        //////    ////fileSystemHelper.CreateFileContent(errorFileFullPath, errorMessage);
 
-            //if (fileSystemHelper.CheckFileExists(errorFileFullPath))
-            if(!string.IsNullOrEmpty(errorFileFullPath))
-            {
-                var isErrorFileCommitted = false;
-                var isUploaded = await fileShareService.UploadFileToFileShareService2(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName, errorfileBytes);
+        //////    //if (fileSystemHelper.CheckFileExists(errorFileFullPath))
+        //////    if(!string.IsNullOrEmpty(errorFileFullPath))
+        //////    {
+        //////        var isErrorFileCommitted = false;
+        //////        var isUploaded = await fileShareService.UploadFileToFileShareService2(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName, errorfileBytes);
 
-                if (isUploaded)
-                {
-                    isErrorFileCommitted = await fileShareService.CommitBatchToFss2(fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, batchFolderPath, errorfileBytes, fileShareServiceConfig.Value.ErrorFileName);
-                }
+        //////        if (isUploaded)
+        //////        {
+        //////            isErrorFileCommitted = await fileShareService.CommitBatchToFss2(fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, batchFolderPath, errorfileBytes, fileShareServiceConfig.Value.ErrorFileName);
+        //////        }
 
-                if (isErrorFileCommitted)
-                {
-                    logger.LogError(EventIds.ErrorTxtIsUploaded.ToEventId(), "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", eventId.Id, eventId.Name, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                    logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                }
-                else
-                    logger.LogError(EventIds.ErrorTxtNotUploaded.ToEventId(), "Error while uploading error.txt file to file share service for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-            }
-            else
-            {
-                logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-            }
+        //////        if (isErrorFileCommitted)
+        //////        {
+        //////            logger.LogError(EventIds.ErrorTxtIsUploaded.ToEventId(), "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", eventId.Id, eventId.Name, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+        //////            logger.LogError(EventIds.ExchangeSetCreatedWithError.ToEventId(), "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+        //////        }
+        //////        else
+        //////            logger.LogError(EventIds.ErrorTxtNotUploaded.ToEventId(), "Error while uploading error.txt file to file share service for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+        //////    }
+        //////    else
+        //////    {
+        //////        logger.LogError(EventIds.ErrorTxtNotCreated.ToEventId(), "Error while creating error.txt for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+        //////    }
 
-            await SendErrorCallBackResponse(fulfilmentServiceQueueMessage);
-        }
+        //////    await SendErrorCallBackResponse(fulfilmentServiceQueueMessage);
+        //////}
         public async Task SendErrorCallBackResponse(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage)
         {
             SalesCatalogueProductResponse salesCatalogueProductResponse = await azureBlobStorageService.DownloadSalesCatalogueResponse(fulfilmentServiceQueueMessage.ScsResponseUri, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
