@@ -15,7 +15,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
-using System.Text;
+//////using System.Text;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -117,7 +117,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
 
                 //////////from Memory
-                //////await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+                //////////await CreateAndUploadErrorFileToFileShareService2(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
 
 
                 if (ex.GetType() != typeof(FulfilmentException))

@@ -66,7 +66,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
-            byte[] zipFileContent = Array.Empty<byte>(); 
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
             var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
