@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                     var adminDomains = !string.IsNullOrEmpty(this.configuration["AdminDomains"]) ? new(this.configuration["AdminDomains"].Split(',').Select(s => s.Trim())) : new List<string>();
                     var userEmail = context.HttpContext.User.FindFirstValue(ClaimTypes.Email);
 
-                    if (!adminDomains.Any(x => userEmail.EndsWith(x, StringComparison.InvariantCultureIgnoreCase)))
+                    if (userEmail == null || !adminDomains.Any(x => userEmail.EndsWith(x, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                         return;
