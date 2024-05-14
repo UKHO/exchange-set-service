@@ -1221,9 +1221,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         }
                     }
                 }
-                Directory.CreateDirectory(Path.GetDirectoryName(zipFilePath));
-                await File.WriteAllBytesAsync(zipFilePath, memoryStream.ToArray());
+
+                string folderPath = Path.GetDirectoryName(zipFilePath);
+                
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                await using (var fileStream = new FileStream($"{zipFilePath}.zip", FileMode.Create))
+                {
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    await memoryStream.CopyToAsync(fileStream);
+                }
             }
+
             monitorHelper.MonitorRequest("Create Zip File Task", createZipArchive, DateTime.UtcNow, correlationId, null, null, null, batchId);
         }
 
