@@ -54,9 +54,8 @@ namespace UKHO.ExchangeSetService.API.Filters
             }
             else
             {
-                var cId = correlationId;
                 correlationId = Guid.Empty.ToString();
-                logger.LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid :{correlationId}", cId);
+                logger.LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid :{correlationId}", correlationId);
             }
 
             context.HttpContext.Request.Query.TryGetValue(ExchangeSetStandard, out var queryStringValue);
