@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 
@@ -27,11 +29,13 @@ namespace UKHO.ExchangeSetService.API.Filters
         private static readonly string[] ExchangeSetStandards = Enum.GetNames(typeof(ExchangeSetStandard));
         private readonly IConfiguration configuration;
         private readonly IAzureAdB2CHelper azureAdB2CHelper;
-        public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration, IConfiguration configuration, IAzureAdB2CHelper azureAdB2CHelper)
+        private readonly ILogger<BespokeExchangeSetAuthorizationFilterAttribute> logger;
+        public BespokeExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration, IConfiguration configuration, IAzureAdB2CHelper azureAdB2CHelper, ILogger<BespokeExchangeSetAuthorizationFilterAttribute> logger)
         {
             this.azureAdConfiguration = azureAdConfiguration ?? throw new ArgumentNullException(nameof(azureAdConfiguration));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             this.azureAdB2CHelper = azureAdB2CHelper ?? throw new ArgumentNullException(nameof(azureAdB2CHelper));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(BespokeExchangeSetAuthorizationFilterAttribute));
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -43,7 +47,16 @@ namespace UKHO.ExchangeSetService.API.Filters
             var tokenTenantId = context.HttpContext.User.FindFirstValue(TokenTenantId);
             var tokenIssuer = context.HttpContext.User.FindFirstValue(TokenIssuer);
             var correlationId = context.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
-            correlationId = Guid.TryParse(correlationId, out Guid correlationIdGuid) ? correlationIdGuid.ToString() : Guid.Empty.ToString();
+
+            if (Guid.TryParse(correlationId, out Guid correlationIdGuid))
+            {
+                correlationId = correlationIdGuid.ToString();
+            }
+            else
+            {
+                logger.LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid :{correlationId}", correlationId);
+                correlationId = Guid.Empty.ToString();
+            }
 
             context.HttpContext.Request.Query.TryGetValue(ExchangeSetStandard, out var queryStringValue);
             var exchangeSetStandard = context.HttpContext.Request.Query.ContainsKey(ExchangeSetStandard)

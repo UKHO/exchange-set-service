@@ -42,8 +42,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
             }
             else
             {
+                Logger.LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid :{correlationId}", correlationId);
                 correlationId = Guid.Empty.ToString();
-                LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid", correlationId);
             }
             return correlationId;
         }

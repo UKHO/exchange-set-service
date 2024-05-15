@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
@@ -17,6 +18,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters
@@ -31,11 +33,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         private const string ExchangeSetStandard = "exchangeSetStandard";
         private const string TokenIssuer = "iss";
         private const string TokenTenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
+        public const string XCorrelationIdHeaderKey = "X-Correlation-ID";
         private IOptions<AzureADConfiguration> fakeAzureAdConfig;
         private IOptions<AzureAdB2CConfiguration> fakeAzureAdB2CConfiguration;
         private IConfiguration fakeConfiguration;
         private HttpContext httpContext;
         private IAzureAdB2CHelper fakeAzureAdB2CHelper;
+        private ILogger<BespokeExchangeSetAuthorizationFilterAttribute> fakelogger;
         [SetUp]
         public void Setup()
         {
@@ -43,6 +47,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             fakeAzureAdB2CConfiguration = A.Fake<IOptions<AzureAdB2CConfiguration>>();
             fakeConfiguration = A.Fake<IConfiguration>();
             fakeAzureAdB2CHelper = A.Fake<IAzureAdB2CHelper>();
+            fakelogger = A.Fake<ILogger<BespokeExchangeSetAuthorizationFilterAttribute>>();
             fakeAzureAdConfig.Value.ClientId = "80a6c68b-59aa-49a4-939a-7968ff79d676";
             fakeAzureAdB2CConfiguration.Value.ClientId = "azure-adb2c-client";
             fakeAzureAdConfig.Value.TenantId = "azure-ad-tenant";
@@ -52,7 +57,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             this.fakeConfiguration["AdminDomains"] = "abc.com";
             httpContext = new DefaultHttpContext();
 
-            bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig, fakeConfiguration, fakeAzureAdB2CHelper);
+            bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig, fakeConfiguration, fakeAzureAdB2CHelper, fakelogger);
 
             var claims = new List<Claim>()
             {
@@ -65,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullBespokeFilterAttribute = () => new BespokeExchangeSetAuthorizationFilterAttribute(null, null, null);
+            Action nullBespokeFilterAttribute = () => new BespokeExchangeSetAuthorizationFilterAttribute(null, null, null, null);
 
             nullBespokeFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("azureAdConfiguration");
         }
@@ -339,7 +344,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             {
                 { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString() }
             };
+            var correlationId = "305ae767-35c3-41f7-9f57-f25b019d30c5";
+
             httpContext.Request.Query = new QueryCollection(dictionary);
+            httpContext.Request.Headers.Add(XCorrelationIdHeaderKey, correlationId);
 
             var claims = new List<Claim>()
             {
@@ -385,6 +393,42 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+        }
+
+        [Test]
+        public async Task WhenExchangeSet_Request_Has_Invalid_CorrelationId_ThenLogBadRequest_ThenReturnNextRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues>
+            {
+                { ExchangeSetStandard, Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString() }
+            };
+            var correlationId = "305ae767-35c3-f25b019d30c5";
+
+            httpContext.Request.Query = new QueryCollection(dictionary);
+            httpContext.Request.Headers.Add(XCorrelationIdHeaderKey, correlationId);
+
+            var claims = new List<Claim>()
+            {
+                    new Claim(TokenAudience, fakeAzureAdB2CConfiguration.Value.ClientId),
+                    new Claim(ClaimTypes.Email, "testUser@gmail.com"),
+                    new Claim(TokenIssuer, "https://login.microsoftonline.com/azure-ad2c-tenant/v2.0/"),
+            };
+
+            var identity = httpContext.User.Identities.FirstOrDefault();
+            identity.AddClaims(claims);
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), bespokeFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), bespokeFilterAttribute);
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
+            await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+
+            A.CallTo(fakelogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.BadRequest.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "_X-Correlation-ID is invalid :{correlationId}").MustHaveHappenedOnceExactly();
         }
     }
 }
