@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -33,25 +32,25 @@ namespace UKHO.ExchangeSetService.API.Controllers
             Logger = logger;
         }
 
-        //protected string GetCurrentCorrelationId()
-        //{
-        //    return httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
-        //}
-
         protected string GetCurrentCorrelationId()
         {
-            var cId = httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
-            if (Guid.TryParse(cId, out Guid cIdGuid))
-            {
-                cId = cIdGuid.ToString();
-            }
-            else
-            {
-                cId = Guid.Empty.ToString();
-                LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid", cId);
-            }
-            return cId;
+            return httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
         }
+
+        //protected string GetCurrentCorrelationId()
+        //{
+        //    var cId = httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
+        //    if (Guid.TryParse(cId, out Guid cIdGuid))
+        //    {
+        //        cId = cIdGuid.ToString();
+        //    }
+        //    else
+        //    {
+        //        cId = Guid.Empty.ToString();
+        //        LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid", cId);
+        //    }
+        //    return cId;
+        //}
 
         protected IActionResult BuildBadRequestErrorResponse(List<Error> errors)
         {

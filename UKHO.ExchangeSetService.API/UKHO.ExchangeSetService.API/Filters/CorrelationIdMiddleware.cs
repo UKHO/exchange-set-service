@@ -22,6 +22,13 @@ namespace UKHO.ExchangeSetService.API.Filters
                     context.Request.Headers.Add(XCorrelationIdHeaderKey, correlationId);
                 }
 
+                if (!Guid.TryParse(correlationId, out Guid cIdGuid))
+                {
+                    context.Request.Headers.Remove(XCorrelationIdHeaderKey);
+                    correlationId = Guid.Empty.ToString();
+                    context.Request.Headers.Add(XCorrelationIdHeaderKey, correlationId);
+                }
+
                 context.Response.Headers.Add(XCorrelationIdHeaderKey, correlationId);
 
                 await func();
