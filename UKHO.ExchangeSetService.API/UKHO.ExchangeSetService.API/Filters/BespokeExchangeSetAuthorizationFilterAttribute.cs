@@ -43,6 +43,7 @@ namespace UKHO.ExchangeSetService.API.Filters
             var tokenTenantId = context.HttpContext.User.FindFirstValue(TokenTenantId);
             var tokenIssuer = context.HttpContext.User.FindFirstValue(TokenIssuer);
             var correlationId = context.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
+            correlationId = Guid.TryParse(correlationId, out Guid correlationIdGuid) ? correlationIdGuid.ToString() : Guid.Empty.ToString();
 
             context.HttpContext.Request.Query.TryGetValue(ExchangeSetStandard, out var queryStringValue);
             var exchangeSetStandard = context.HttpContext.Request.Query.ContainsKey(ExchangeSetStandard)
