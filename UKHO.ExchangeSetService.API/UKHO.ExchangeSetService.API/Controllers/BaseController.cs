@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -34,8 +35,19 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         protected string GetCurrentCorrelationId()
         {
-            return httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
+            var correlationId = httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
+            if (Guid.TryParse(correlationId, out Guid correlationIdGuid))
+            {
+                correlationId = correlationIdGuid.ToString();
+            }
+            else
+            {
+                correlationId = Guid.Empty.ToString();
+                Logger.LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid :{correlationId}", correlationId);
+            }
+            return correlationId;
         }
+
         protected IActionResult BuildBadRequestErrorResponse(List<Error> errors)
         {
             LogError(EventIds.BadRequest.ToEventId(), errors, "BadRequest", GetCurrentCorrelationId());
@@ -95,7 +107,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildInternalServerErrorResponse();
             }
         }
-       
+
         private IActionResult BuildNotModifiedResponse(ExchangeSetServiceResponse model)
         {
             LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
