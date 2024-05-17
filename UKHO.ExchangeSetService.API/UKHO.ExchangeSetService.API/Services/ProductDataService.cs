@@ -164,7 +164,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private ExchangeSetServiceResponse CheckIfS57ExchangeSetTooLarge(long fileSize, string exchangeSetStandard)
         {
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
-            if (exchangeSetStandard == ExchangeSetStandard.s57.ToString() && fileSizeInMB >= essFulfilmentStorageconfig.Value.LargeMediaExchangeSetSizeInMB)
+            if (exchangeSetStandard == ExchangeSetStandard.s57.ToString() && fileSizeInMB >= essFulfilmentStorageconfig.Value.S57ExchangeSetSizeInMB)
             {
                 var exchangeSetResponse = new ExchangeSetServiceResponse
                 {
