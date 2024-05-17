@@ -63,6 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeAzureAdB2CHelper = A.Fake<IAzureAdB2CHelper>();
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
             fakeEssFulfilmentStorageConfig.Value.LargeExchangeSetSizeInMB = 300;
+            fakeEssFulfilmentStorageConfig.Value.S57ExchangeSetSizeInMB = 700;
             fakeScsProductIdentifierValidator = A.Fake<IScsProductIdentifierValidator>();
             fakeScsDataSinceDateTimeValidator = A.Fake<IScsDataSinceDateTimeValidator>();
 
@@ -303,7 +304,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                                     EditionNumber = 4,
                                     UpdateNumber = 6
                                 },
-                                FileSize = 500000000
+                                FileSize = 900000000
                             }
                         }
                 },
@@ -478,7 +479,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
-            fakeEssFulfilmentStorageConfig.Value.S57ExchangeSetSizeInMB = 700;
+            
 
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -1045,8 +1046,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
-            var azureAdToken = GetAzureADToken();
-            fakeEssFulfilmentStorageConfig.Value.S57ExchangeSetSizeInMB = 700;
+            var azureAdToken = GetAzureADToken();           
 
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -1741,8 +1741,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
             var exchangeSetResponse = GetExchangeSetResponse();
-            var CreateBatchResponseModel = CreateBatchResponse();
-            fakeEssFulfilmentStorageConfig.Value.S57ExchangeSetSizeInMB = 700;
+            var CreateBatchResponseModel = CreateBatchResponse();           
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
