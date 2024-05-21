@@ -108,7 +108,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 await CreateStandardExchangeSet1(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse);
             }
 
-            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
+            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService1(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
 
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
             Dictionary<string, string> messageDetails = new();
@@ -442,50 +442,77 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                    batchId, correlationId);
         }
 
-        private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetZipFilePath, string correlationId)
+        ////////private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetZipFilePath, string correlationId)
+        ////////{
+        ////////    bool isZipFileCreated = false;
+        ////////    bool isZipFileUploaded = false;
+        ////////    bool isBatchCommitted = false;
+
+        ////////    IDirectoryInfo[] dir = fileSystemHelper.GetSubDirectories(exchangeSetZipFilePath);
+        ////////    DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
+
+        ////////    foreach (var dirPath in dir)
+        ////////    {
+        ////////        isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
+        ////////               EventIds.CreateZipFileRequestCompleted,
+        ////////               "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+        ////////               async () =>
+        ////////               {
+        ////////                   return await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, dirPath.FullName, correlationId);
+        ////////               },
+        ////////               batchId, correlationId);
+
+        ////////        if (!isZipFileCreated)
+        ////////        {
+        ////////            logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", dirPath.Name + ".zip", batchId, correlationId);
+        ////////            throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
+        ////////        }
+        ////////    }
+        ////////    DateTime createZipFileTaskCompletedAt = DateTime.UtcNow;
+        ////////    monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, createZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
+
+        ////////    if (isZipFileCreated)
+        ////////    {
+        ////////        IFileInfo[] fileInfos = fileSystemHelper.GetZipFiles(exchangeSetZipFilePath);
+
+        ////////        foreach (var file in fileInfos)
+        ////////        {
+        ////////            isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
+        ////////              EventIds.UploadExchangeSetToFssCompleted,
+        ////////              "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+        ////////              async () =>
+        ////////              {
+        ////////                  return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, file.Name);
+        ////////              },
+        ////////            batchId, correlationId);
+        ////////        }
+        ////////    }
+
+        ////////    if (isZipFileUploaded)
+        ////////    {
+        ////////        isBatchCommitted = await fulfilmentFileShareService.CommitExchangeSet(batchId, correlationId, exchangeSetZipFilePath);
+        ////////    }
+
+        ////////    return isBatchCommitted;
+        ////////}
+
+        private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService1(string batchId, string exchangeSetZipFilePath, string correlationId)
         {
-            bool isZipFileCreated = false;
             bool isZipFileUploaded = false;
             bool isBatchCommitted = false;
 
-            IDirectoryInfo[] dir = fileSystemHelper.GetSubDirectories(exchangeSetZipFilePath);
-            DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
+            IFileInfo[] fileInfos = fileSystemHelper.GetZipFiles(exchangeSetZipFilePath);
 
-            foreach (var dirPath in dir)
+            foreach (var file in fileInfos)
             {
-                isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
-                       EventIds.CreateZipFileRequestCompleted,
-                       "Create exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                       async () =>
-                       {
-                           return await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, dirPath.FullName, correlationId);
-                       },
-                       batchId, correlationId);
-
-                if (!isZipFileCreated)
-                {
-                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", dirPath.Name + ".zip", batchId, correlationId);
-                    throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
-                }
-            }
-            DateTime createZipFileTaskCompletedAt = DateTime.UtcNow;
-            monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, createZipFileTaskCompletedAt, correlationId, null, null, null, batchId);
-
-            if (isZipFileCreated)
-            {
-                IFileInfo[] fileInfos = fileSystemHelper.GetZipFiles(exchangeSetZipFilePath);
-
-                foreach (var file in fileInfos)
-                {
-                    isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
-                      EventIds.UploadExchangeSetToFssCompleted,
-                      "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                      async () =>
-                      {
-                          return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, file.Name);
-                      },
-                    batchId, correlationId);
-                }
+                isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
+                  EventIds.UploadExchangeSetToFssCompleted,
+                  "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                  async () =>
+                  {
+                      return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, file.Name);
+                  },
+                batchId, correlationId);
             }
 
             if (isZipFileUploaded)
@@ -495,33 +522,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             return isBatchCommitted;
         }
-
-        //////private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService1(string batchId, string exchangeSetZipFilePath, string correlationId)
-        //////{
-        //////    bool isZipFileUploaded = false;
-        //////    bool isBatchCommitted = false;
-
-        //////    IFileInfo[] fileInfos = fileSystemHelper.GetZipFiles(exchangeSetZipFilePath);
-
-        //////    foreach (var file in fileInfos)
-        //////    {
-        //////        isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
-        //////          EventIds.UploadExchangeSetToFssCompleted,
-        //////          "Upload exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-        //////          async () =>
-        //////          {
-        //////              return await fulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, file.Name);
-        //////          },
-        //////        batchId, correlationId);
-        //////    }
-
-        //////    if (isZipFileUploaded)
-        //////    {
-        //////        isBatchCommitted = await fulfilmentFileShareService.CommitExchangeSet(batchId, correlationId, exchangeSetZipFilePath);
-        //////    }
-
-        //////    return isBatchCommitted;
-        //////}
 
         ////////private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService2(string batchId, string exchangeSetZipFilePath, string correlationId, byte[] zipArchiveBytes)
         ////////{
