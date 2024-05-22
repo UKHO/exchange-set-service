@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-////using System.Text;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,9 +23,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareServiceCache : IFileShareServiceCache
     {
-        private readonly IRedisCache redisCache;
+        ////private readonly IRedisCache redisCache;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
-        ////private readonly IAzureTableStorageClient azureTableStorageClient;
+        private readonly IAzureTableStorageClient azureTableStorageClient;
         private readonly ILogger<FileShareServiceCache> logger;
         private readonly ISalesCatalogueStorageService azureStorageService;
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly AioConfiguration aioConfiguration;
         private const string CONTENT_TYPE = "application/json";
         private const int StringLength = 2;
-        ////private const int responseFileSizeLimitInKb = 60;
+        private const int responseFileSizeLimitInKb = 60;
 
         public FileShareServiceCache(IAzureBlobStorageClient azureBlobStorageClient,
             IAzureTableStorageClient azureTableStorageClient,
@@ -44,13 +44,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             IOptions<AioConfiguration> aioConfiguration, IRedisCache redisCache)
         {
             this.azureBlobStorageClient = azureBlobStorageClient;
-            ////this.azureTableStorageClient = azureTableStorageClient;
+            this.azureTableStorageClient = azureTableStorageClient;
             this.logger = logger;
             this.azureStorageService = azureStorageService;
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
             this.aioConfiguration = aioConfiguration.Value;
-            this.redisCache = redisCache;
+            ////this.redisCache = redisCache;
         }
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
@@ -87,8 +87,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnAgencyCode(item.ProductName);
                         var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
-                        ////var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
-                        var cacheInfo = redisCache.GetCacheData<FssSearchResponseCache>(compareProducts);
+                        var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+                        ////var cacheInfo = redisCache.GetCacheData<FssSearchResponseCache>(compareProducts);
 
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
@@ -224,31 +224,31 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return code switch
             {
                string c when Regex.IsMatch(c, "^[a-zA-Z]") => (fssCacheConfiguration.Value.CacheStorageAccountName1, fssCacheConfiguration.Value.CacheStorageAccountKey1),
-               ////string c when Regex.IsMatch(c, "^[n-zN-Z]") => (fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2),
-                  _ => (string.Empty, string.Empty),
+                string c when Regex.IsMatch(c, "^[n-zN-Z]") => (fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2),
+                _ => (string.Empty, string.Empty),
             };
         }
 
         public async Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache)
         {
-            ////int responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
+            int responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
 
-            //////If content size is more that responseFileSizeLimitInKb
-            //////then store content into json file to avoid azure table storage exception for column limit
-            ////if (responseSizeInKb > responseFileSizeLimitInKb)
-            ////{
-            ////    // convert string to stream
-            ////    byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
-            ////    MemoryStream stream = new(byteArray);
+            //If content size is more that responseFileSizeLimitInKb
+            //then store content into json file to avoid azure table storage exception for column limit
+            if (responseSizeInKb > responseFileSizeLimitInKb)
+            {
+                // convert string to stream
+                byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
+                MemoryStream stream = new(byteArray);
 
-            ////    await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId, fssSearchResponseCache.PartitionKey);
-            ////    fssSearchResponseCache.Response = string.Empty;
-            ////}
-            ////var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnAgencyCode(fssSearchResponseCache.PartitionKey);
-            ////var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
-            ////await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+                await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId, fssSearchResponseCache.PartitionKey);
+                fssSearchResponseCache.Response = string.Empty;
+            }
+            var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnAgencyCode(fssSearchResponseCache.PartitionKey);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
+            await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
 
-            redisCache.SetCacheData<FssSearchResponseCache>($"{fssSearchResponseCache.PartitionKey}|{fssSearchResponseCache.RowKey}", fssSearchResponseCache);
+            ////redisCache.SetCacheData<FssSearchResponseCache>($"{fssSearchResponseCache.PartitionKey}|{fssSearchResponseCache.RowKey}", fssSearchResponseCache);
         }
     }
 }
