@@ -16,6 +16,7 @@ resource "azurerm_storage_account" "ess_cache_storage" {
   tags = var.tags
 }
 
+/*
 resource "azurerm_storage_account" "ess_cache_storage1" {
   count               = var.env_name == "qa" ? 1 : 0
   name = lower("${var.service_name}${var.env_name}cachestorageukho1")
@@ -53,3 +54,4 @@ resource "azurerm_storage_account" "ess_cache_storage2" {
 
   tags = var.tags
 }
+*/
