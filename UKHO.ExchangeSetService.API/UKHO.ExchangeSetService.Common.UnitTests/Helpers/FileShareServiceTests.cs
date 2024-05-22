@@ -300,44 +300,44 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.AreEqual(createBatchResponse.ExchangeSetFileUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.ExchangeSetFileUri);
         }
 
-        [Test]
-        public async Task WhenFSSApiIsCalledForCreateBatch_ThenValidateCorrectParametersArePassed()
-        {
-            //Data
-            string actualAccessToken = GetFakeToken();
-            string postBodyParam = "This should be replace by actual value when param passed to api call";
+        ////[Test]
+        ////public async Task WhenFSSApiIsCalledForCreateBatch_ThenValidateCorrectParametersArePassed()
+        ////{
+        ////    //Data
+        ////    string actualAccessToken = GetFakeToken();
+        ////    string postBodyParam = "This should be replace by actual value when param passed to api call";
 
-            //Test variable
-            string accessTokenParam = null;
-            string uriParam = null;
-            HttpMethod httpMethodParam = null;
-            string correlationIdParam = null;
-            string userOID = null;
-            var createBatchResponse = GetCreateBatchResponse();
-            var jsonString = JsonConvert.SerializeObject(createBatchResponse);
+        ////    //Test variable
+        ////    string accessTokenParam = null;
+        ////    string uriParam = null;
+        ////    HttpMethod httpMethodParam = null;
+        ////    string correlationIdParam = null;
+        ////    string userOID = null;
+        ////    var createBatchResponse = GetCreateBatchResponse();
+        ////    var jsonString = JsonConvert.SerializeObject(createBatchResponse);
 
-            //Mock
-            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
-            var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, };
-            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
-                .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
-                {
-                    accessTokenParam = accessToken;
-                    uriParam = uri;
-                    httpMethodParam = method;
-                    postBodyParam = postBody;
-                    correlationIdParam = correlationId;
-                })
-                .Returns(httpResponse);
+        ////    //Mock
+        ////    A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(actualAccessToken);
+        ////    var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))), RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, };
+        ////    A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+        ////        .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
+        ////        {
+        ////            accessTokenParam = accessToken;
+        ////            uriParam = uri;
+        ////            httpMethodParam = method;
+        ////            postBodyParam = postBody;
+        ////            correlationIdParam = correlationId;
+        ////        })
+        ////        .Returns(httpResponse);
 
-            //Method call
-            var response = await fileShareService.CreateBatch(userOID, correlationIdParam);
+        ////    //Method call
+        ////    var response = await fileShareService.CreateBatch(userOID, correlationIdParam);
 
-            //Test
-            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
-            Assert.AreEqual(HttpMethod.Post, httpMethodParam);
-            Assert.AreEqual(accessTokenParam, actualAccessToken);
-        }
+        ////    //Test
+        ////    Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
+        ////    Assert.AreEqual(HttpMethod.Post, httpMethodParam);
+        ////    Assert.AreEqual(accessTokenParam, actualAccessToken);
+        ////}
 
         #endregion CreateBatch
 

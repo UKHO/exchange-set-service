@@ -101,6 +101,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
                                                          .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
                     await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
+                    await CreateZipFileForAio(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
                 }
             }
             else
@@ -440,6 +441,33 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                            return await fulfilmentAncillaryFiles.CreateSerialEncFile1(batchId, correlationId);
                        },
                    batchId, correlationId);
+        }
+
+        private async Task<bool> CreateZipFileForAio(string batchId, string exchangeSetZipFilePath, string correlationId)
+        {
+            bool isZipFileCreated = false;            
+
+            IDirectoryInfo[] dir = fileSystemHelper.GetSubDirectories(exchangeSetZipFilePath);
+            foreach (var dirPath in dir)
+            {
+                isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
+                       EventIds.CreateZipFileRequestCompleted,
+                       "Create exchange set for aio zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                       async () =>
+                       {
+                           return await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, dirPath.FullName, correlationId);
+                       },
+                       batchId, correlationId);
+
+                if (!isZipFileCreated)
+                {
+                    logger.LogError(EventIds.ErrorInCreatingZipFile.ToEventId(), "Error in creating exchange set for aio zip:{ExchangeSetFileName} for BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", dirPath.Name + ".zip", batchId, correlationId);
+                    throw new FulfilmentException(EventIds.ErrorInCreatingZipFile.ToEventId());
+                }
+            }
+            
+            return isZipFileCreated;
+
         }
 
         ////////private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetZipFilePath, string correlationId)
