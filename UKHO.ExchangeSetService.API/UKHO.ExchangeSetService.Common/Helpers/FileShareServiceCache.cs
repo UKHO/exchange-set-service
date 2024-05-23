@@ -223,7 +223,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             return code switch
             {
-               string c when Regex.IsMatch(c, "^[a-zA-Z]") => (fssCacheConfiguration.Value.CacheStorageAccountName1, fssCacheConfiguration.Value.CacheStorageAccountKey1),
+               string c when Regex.IsMatch(c, "^[a-mA-M]") => (fssCacheConfiguration.Value.CacheStorageAccountName1, fssCacheConfiguration.Value.CacheStorageAccountKey1),
                 string c when Regex.IsMatch(c, "^[n-zN-Z]") => (fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2),
                 _ => (string.Empty, string.Empty),
             };
