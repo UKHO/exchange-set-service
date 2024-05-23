@@ -1246,7 +1246,7 @@ stages:
     # dependsOn: 
     #   - vnextiatDeploy
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+ #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
     jobs:
       - deployment: vnexte2eDeployApimSolas
         displayName: "vNext E2E - deploy SOLAS APIM"
