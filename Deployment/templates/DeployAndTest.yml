@@ -1,18 +1,18 @@
 parameters:
-  - name: RunTests
-    type: boolean
-    default: false
-  - name: StageName
-    type: string
-  - name: Environment
-    type: string
-    
-    # Variables for continuous deployment template 
-  - name: ContinueEvenIfResourcesAreGettingDestroyed
-    type: boolean
-    default: false
-  - name: AzureSubscription
-    type: string 
+- name: RunTests
+  type: boolean
+  default: false
+- name: StageName
+  type: string
+- name: Environment
+  type: string
+  
+  # Variables for continuous deployment template 
+- name: ContinueEvenIfResourcesAreGettingDestroyed
+  type: boolean
+  default: false
+- name: AzureSubscription
+  type: string 
 
   #  displayName: "${parameters.StageName} (inc terraform, webapp deploy)"
 jobs:
