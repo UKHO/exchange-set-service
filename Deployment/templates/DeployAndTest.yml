@@ -15,7 +15,7 @@ parameters:
     type: string 
 
     displayName: "${parameters.StageName} (inc terraform, webapp deploy)"
-    job:
+    jobs:
       - deployment: ${parameters.Dev}DeployApim
         displayName: "${parameters.Environment} - deploy SOLAS APIM"
         environment: "Ess-${parameters.Environment}"
