@@ -7,7 +7,7 @@ parameters:
   - name: Environment
     type: string
     
-    # Variables for continuouse deployment template 
+    # Variables for continuous deployment template 
   - name: ContinueEvenIfResourcesAreGettingDestroyed
     type: boolean
     default: false
@@ -15,7 +15,7 @@ parameters:
     type: string 
 
     displayName: "${parameters.StageName} (inc terraform, webapp deploy)"
-    jobs:
+    job:
       - deployment: ${parameters.Dev}DeployApim
         displayName: "${parameters.Environment} - deploy SOLAS APIM"
         environment: "Ess-${parameters.Environment}"
