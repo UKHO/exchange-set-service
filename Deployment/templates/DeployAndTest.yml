@@ -14,7 +14,7 @@ parameters:
   - name: AzureSubscription
     type: string 
 
-    displayName: "${parameters.StageName} (inc terraform, webapp deploy)"
+  #  displayName: "${parameters.StageName} (inc terraform, webapp deploy)"
     jobs:
       - deployment: ${parameters.Dev}DeployApim
         displayName: "${parameters.Environment} - deploy SOLAS APIM"
