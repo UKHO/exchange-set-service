@@ -7,7 +7,7 @@ parameters:
 - name: Environment
   type: string
   
-  # Variables for continuous deployment template 
+  ### This is the template for the deployment of the SOLAS APIM
 - name: ContinueEvenIfResourcesAreGettingDestroyed
   type: boolean
   default: false
@@ -33,7 +33,7 @@ jobs:
     runOnce:
       deploy:
         steps:
-          - template: Deployment/templates/continuous-deployment-apim.yml
+          - template: continuous-deployment-apim.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
               AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
@@ -82,12 +82,12 @@ jobs:
           - checkout: self
             submodules: recursive
 
-          - template: Deployment/templates/continuous-deployment.yml
+          - template: continuous-deployment.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
               AzureSubscription: "Exchange-Set-Service-${parameters.Environment}-A-008-02"
 
-          - template: Deployment/templates/continuous-deployment-apim.yml
+          - template: continuous-deployment-apim.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
               AzureSubscription: "Fleet Manager ${parameters.Environment}/Test"
