@@ -433,7 +433,7 @@ stages:
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
-    - template: Deployment/templates/DeployAndTest.yml
+    - template: Deployment/templates/Deploy.yml
       parameters:
         RunTests: true
         StageName: "DevDeploy"
@@ -441,6 +441,11 @@ stages:
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
         AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
         Container: ${{variables.Container}} 
+      
+    - template: Deployment/templates/RunTests.yml
+      parameters:
+        Environment: "Dev"
+
 
   - stage: QCdeploy
     dependsOn:
