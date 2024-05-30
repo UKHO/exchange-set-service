@@ -433,19 +433,14 @@ stages:
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
-      - deployment: DevDeployApimSolas
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/DeployAndTest.yml
-                  parameters:
-                    RunTests: true
-                    StageName: "DevDeploy"
-                    Environment: "Dev"
-                    ApimDeploymentValue: "DevDeployApimSolas"
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
+    - template: Deployment/templates/DeployAndTest.yml
+      parameters:
+        RunTests: true
+        StageName: "DevDeploy"
+        Environment: "Dev"
+        ApimDeploymentValue: "DevDeployApimSolas"
+        ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+        AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
 
   - stage: QCdeploy
     dependsOn:
