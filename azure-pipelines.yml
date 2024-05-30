@@ -438,7 +438,6 @@ stages:
         RunTests: true
         StageName: "DevDeploy"
         Environment: "Dev"
-        ApimDeploymentValue: "DevDeployApimSolas"
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
         AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
 
