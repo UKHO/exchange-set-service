@@ -3,7 +3,7 @@ parameters:
   type: string
 
 jobs:
- - job: "Run Tests"
+ - job: Run Tests
    steps:
    - task: AzureCLI@2
      displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
