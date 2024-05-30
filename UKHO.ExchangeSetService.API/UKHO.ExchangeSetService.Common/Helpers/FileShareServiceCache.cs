@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareServiceCache : IFileShareServiceCache
     {
-        private readonly IRedisCache redisCache;
+        ////private readonly IRedisCache redisCache;
         private readonly IAzureBlobStorageClient azureBlobStorageClient;
         private readonly IAzureTableStorageClient azureTableStorageClient;
         private readonly ILogger<FileShareServiceCache> logger;
@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
             this.aioConfiguration = aioConfiguration.Value;
-            this.redisCache = redisCache;
+            ////this.redisCache = redisCache;
         }
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
