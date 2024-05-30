@@ -2,7 +2,7 @@ parameters:
 - name: Environment
   type: string
 
-- steps:
+steps:
   - task: AzureCLI@2
     displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
     condition: always()
