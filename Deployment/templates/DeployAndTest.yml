@@ -13,14 +13,16 @@ parameters:
   default: false
 - name: AzureSubscription
   type: string 
+- name: Container
+  type: string
 
   #  displayName: "${parameters.StageName} (inc terraform, webapp deploy)"
 jobs:
-- deployment: ${{parameters.Dev}}DeployApim
+- deployment: ${{parameters.Environment}}DeployApim
   displayName: "${parameters.Environment} - deploy SOLAS APIM"
   environment: "Ess-${parameters.Environment}"
   pool: $(DeploymentPool)
-  container: ${{variables.Container}}
+  container: ${{parameter.Container}}
   workspace:
     clean: all
   variables:

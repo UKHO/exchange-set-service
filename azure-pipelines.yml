@@ -440,6 +440,7 @@ stages:
         Environment: "Dev"
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
         AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
+        Container: ${{variables.Container}} 
 
   - stage: QCdeploy
     dependsOn:
