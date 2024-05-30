@@ -435,8 +435,6 @@ stages:
     jobs:
     - template: Deployment/templates/Deploy.yml
       parameters:
-        RunTests: true
-        StageName: "DevDeploy"
         Environment: "Dev"
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
         AzureSubscription: "UKHO-APIM-SOLAS-NonLive"

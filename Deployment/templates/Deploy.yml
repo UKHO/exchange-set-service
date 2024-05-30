@@ -1,6 +1,4 @@
 parameters:
-- name: StageName
-  type: string
 - name: Environment
   type: string
   
@@ -13,7 +11,6 @@ parameters:
 - name: Container
   type: string
 
-  #  displayName: "${parameters.StageName} (inc terraform, webapp deploy)"
 jobs:
 - deployment: ${{parameters.Environment}}DeployApimSolas
   displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
