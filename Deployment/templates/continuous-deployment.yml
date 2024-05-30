@@ -1,9 +1,9 @@
 parameters:
-  - name: ContinueEvenIfResourcesAreGettingDestroyed
-    type: boolean
-    default: false
-  - name: AzureSubscription
-    type: string
+- name: ContinueEvenIfResourcesAreGettingDestroyed
+  type: boolean
+  default: false
+- name: AzureSubscription
+  type: string
 
 steps:
   - task: FileTransform@2
