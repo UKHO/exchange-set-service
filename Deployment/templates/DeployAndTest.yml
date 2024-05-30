@@ -22,7 +22,7 @@ jobs:
   displayName: "${parameters.Environment} - deploy SOLAS APIM"
   environment: "Ess-${parameters.Environment}"
   pool: $(DeploymentPool)
-  container: ${{parameter.Container}}
+  container: ${{parameters.Container}}
   workspace:
     clean: all
   variables:
@@ -51,7 +51,7 @@ jobs:
   displayName: "${parameters.Environment} - deploy terraform and dotnet App"
   environment: "Ess-${parameters.Environment}"
   pool: $(DeploymentPool)
-  container: ${{variables.Container}}
+  container: ${{parameters.Container}}
   workspace:
     clean: all
   variables:
