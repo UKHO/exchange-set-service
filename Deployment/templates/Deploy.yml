@@ -129,7 +129,7 @@ jobs:
 
 - job: Run Functional Tests
   dependsOn: ["${{parameters.Environment}}DeployApp"]
-  environment: "Ess-${{parameters.Environment}}"
+  #environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
   condition: ${{parameters.RunTests}}
