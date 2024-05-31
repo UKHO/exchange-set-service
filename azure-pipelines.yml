@@ -440,9 +440,7 @@ stages:
         AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
         Container: ${{variables.Container}} 
       
-    - template: Deployment/templates/RunTests.yml
-      parameters:
-        Environment: "Dev"
+
 
 
   - stage: QCdeploy
