@@ -1,6 +1,9 @@
 parameters:
 - name: Environment
   type: string
+- name: RunTests
+  type: boolean
+  default: true
   
   ### This is the template for the deployment of the SOLAS APIM
 - name: ContinueEvenIfResourcesAreGettingDestroyed
@@ -84,7 +87,7 @@ jobs:
           - template: continuous-deployment-apim.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: "Fleet Manager ${{parameters.Environment}}/Test"
+              AzureSubscription: "Fleet Manager dev/Test"
               TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
               APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
               APIMServiceInstance: $(APIM_SERVICE_NAME)
@@ -122,6 +125,7 @@ jobs:
               workingDirectory: '$(Build.SourcesDirectory)'
 
           - template: RunTests.yml
+            condition: ${{parameters.RunTests}}
             parameters:
-              Environment: "Dev"
+              Environment: ${{parameters.Environment}}
 
