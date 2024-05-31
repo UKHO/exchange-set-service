@@ -843,7 +843,7 @@ stages:
     jobs:
       - template: Deployment/templates/Deploy.yml
         parameters:
-          Environment: "vnext-iat"
+          Environment: "vnextiat"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
           Container: ${{variables.Container}}
@@ -857,7 +857,7 @@ stages:
     jobs:
       - template: Deployment/templates/Deploy.yml
         parameters:
-          Environment: "Dev"
+          Environment: "vnexte2e"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
           Container: ${{variables.Container}} 
