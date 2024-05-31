@@ -134,4 +134,5 @@ jobs:
     - template: RunTests.yml
       parameters:
         Environment: ${{parameters.Environment}}
+        AzureSubscription: ${{parameters.AzureSubscription}}
 
