@@ -437,7 +437,7 @@ stages:
       parameters:
         Environment: "Dev"
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-        AzureSubscription: "Exchange-Set-Service-Dev-A.011.08"
+        AzureSubscription: "Exchange-Set-Service-Dev-A-008-0"
         Container: ${{variables.Container}}
       
   - stage: QCdeploy
