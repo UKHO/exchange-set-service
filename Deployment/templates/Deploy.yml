@@ -6,7 +6,7 @@ parameters:
   default: true
 - name: AzureSubscription
   type: string
-- name: LiveOrNonLiveService
+- name: LiveOrNonLive
   type: string
   default: "NonLive"  
 - name: ContinueEvenIfResourcesAreGettingDestroyed
