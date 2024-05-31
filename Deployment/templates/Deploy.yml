@@ -4,15 +4,18 @@ parameters:
 - name: RunTests
   type: boolean
   default: true
-  
-  ### This is the template for the deployment of the SOLAS APIM
+- name: AzureSubscription
+  type: string
+- name: LiveOrNonLiveService
+  type: string
+  default: "NonLive"  
 - name: ContinueEvenIfResourcesAreGettingDestroyed
   type: boolean
   default: false
-- name: AzureSubscription
-  type: string 
+
 - name: Container
   type: string
+  
 
 jobs:
 - deployment: ${{parameters.Environment}}DeployApimSolas
@@ -33,7 +36,7 @@ jobs:
           - template: continuous-deployment-apim.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
+              AzureSubscription: "UKHO-APIM-SOLAS-${{LiveOrNonLive}}"
               TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
               APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
               APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
@@ -82,7 +85,7 @@ jobs:
           - template: continuous-deployment.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: "Exchange-Set-Service-${{parameters.Environment}}-A-008-02"
+              AzureSubscription: ${{parameters.AzureSubscription}}
 
           - template: continuous-deployment-apim.yml
             parameters:

@@ -437,8 +437,8 @@ stages:
       parameters:
         Environment: "Dev"
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-        AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-        Container: ${{variables.Container}} 
+        AzureSubscription: "Exchange-Set-Service-Dev-A.011.08"
+        Container: ${{variables.Container}}
       
   - stage: QCdeploy
     dependsOn:
@@ -845,7 +845,7 @@ stages:
         parameters:
           Environment: "vnextiat"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
+          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
           Container: ${{variables.Container}}
           RunTests: false
         
@@ -859,5 +859,5 @@ stages:
         parameters:
           Environment: "vnexte2e"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
+          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
           Container: ${{variables.Container}} 
