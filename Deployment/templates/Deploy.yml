@@ -126,9 +126,9 @@ jobs:
 
 - job:
   dependsOn: ["${{parameters.Environment}}DeployApp"]
+  condition: ${{parameters.RunTests}}
   steps:
     - template: RunTests.yml
-      condition: ${{parameters.RunTests}}
       parameters:
         Environment: ${{parameters.Environment}}
 
