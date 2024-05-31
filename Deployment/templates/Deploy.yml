@@ -124,8 +124,11 @@ jobs:
               useGlobalJson: true
               workingDirectory: '$(Build.SourcesDirectory)'
 
-          - template: RunTests.yml
-            condition: ${{parameters.RunTests}}
-            parameters:
-              Environment: ${{parameters.Environment}}
+- job:
+  dependsOn: ["${{parameters.Environment}}DeployApp"]
+  steps:
+    - template: RunTests.yml
+      condition: ${{parameters.RunTests}}
+      parameters:
+        Environment: ${{parameters.Environment}}
 
