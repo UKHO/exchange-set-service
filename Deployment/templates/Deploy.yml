@@ -134,9 +134,12 @@ jobs:
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
   condition: ${{parameters.RunTests}}
-  steps:
-    - template: RunTests.yml
-      parameters:
-        Environment: ${{parameters.Environment}}
-        AzureSubscription: ${{parameters.AzureSubscription}}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+          - template: RunTests.yml
+            parameters:
+              Environment: ${{parameters.Environment}}
+              AzureSubscription: ${{parameters.AzureSubscription}}
 
