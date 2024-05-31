@@ -127,8 +127,9 @@ jobs:
               useGlobalJson: true
               workingDirectory: '$(Build.SourcesDirectory)'
 
-- job: Run Functional Tests
+- job: FunctionalTests
   dependsOn: ["${{parameters.Environment}}DeployApp"]
+  displayName: "Run Functional Tests"
   #environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
