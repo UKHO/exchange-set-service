@@ -121,7 +121,7 @@ jobs:
               useGlobalJson: true
               workingDirectory: '$(Build.SourcesDirectory)'
 
-          - template: Deployment/templates/RunTests.yml
+          - template: RunTests.yml
             parameters:
               Environment: "Dev"
 
