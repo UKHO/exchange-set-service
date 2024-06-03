@@ -134,6 +134,8 @@ jobs:
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
   condition: ${{parameters.RunTests}}
+  variables:
+    - group: "ESS-${{parameters.Environment}}-Variables"
   strategy:
     runOnce:
       deploy:
