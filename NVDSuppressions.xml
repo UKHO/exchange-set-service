@@ -487,14 +487,34 @@
     <cve>CVE-2024-21386</cve>
     <cve>CVE-2024-21404</cve>
   </suppress>
-  <suppress>
-   <notes><![CDATA[
-   file name: Azure.Identity:1.11.0
-   Low level vulnerability. Package is set to latest version, when next fix is released must be updated to resolved CVE.
-   ]]></notes>
-   <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
-</suppress>
-   <suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+	file name: Azure.Identity:1.10.3
+	]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+		<cve>CVE-2024-29992</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Azure.Identity:1.7.0
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+		<cve>CVE-2024-29992</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Microsoft.Identity.Client:4.57.0
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
+		<cve>CVE-2024-27086</cve>
+	</suppress>
+	<suppress>
 	   <notes>
 		   <![CDATA[
     file name: Azure.Identity:1.11.0
