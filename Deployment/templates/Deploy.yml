@@ -27,6 +27,8 @@ jobs:
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-${{parameters.Environment}}-APIM-SOLAS-Variables"
+    - name: RESOURCE_GROUP_NAME
+      value: 'ess-$(Environment)-rg'
   strategy:
     runOnce:
       deploy:
