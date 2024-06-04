@@ -136,6 +136,7 @@ jobs:
   condition: ${{parameters.RunTests}}
   variables:
     - group: "ESS-${{parameters.Environment}}-Variables"
+    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
   strategy:
     runOnce:
       deploy:
