@@ -4,11 +4,7 @@ parameters:
 - name: AzureSubscription
   type: string
 
-variables:
-  RESOURCE_GROUP_NAME: 'ess-$(Environment)-rg'
-
 steps:
-
 - task: DownloadBuildArtifacts@0
   displayName: "Download Terraform Artifact"
   inputs:
@@ -20,6 +16,8 @@ steps:
 - task: AzureCLI@2
   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
   condition: always()
+  variables:
+    RESOURCE_GROUP_NAME: 'ess-$(Environment)-rg'
   inputs:
     azureSubscription: ${{parameters.AzureSubscription}}
     scriptType: 'pscore'
@@ -40,7 +38,9 @@ steps:
     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
 - task: AzureCLI@2
-  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
+  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled" 
+  variables:
+    RESOURCE_GROUP_NAME: 'ess-$(Environment)-rg'                 
   inputs:
     azureSubscription: ${{parameters.AzureSubscription}}
     scriptType: 'pscore'
@@ -63,6 +63,8 @@ steps:
 - task: AzureCLI@2
   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
   condition: always()
+  variables:
+    RESOURCE_GROUP_NAME: 'ess-$(Environment)-rg'
   inputs:
     azureSubscription: ${{parameters.AzureSubscription}}
     scriptType: 'pscore'
