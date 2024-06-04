@@ -5,8 +5,7 @@ parameters:
   type: string
 
 variables:
-- name: RESOURCE_GROUP_NAME
-  value: ess-$(Environment)-rg
+  RESOURCE_GROUP_NAME: 'ess-$(Environment)-rg'
 
 steps:
 
