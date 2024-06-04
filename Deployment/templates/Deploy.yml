@@ -135,8 +135,6 @@ jobs:
   variables:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
-    - name: RESOURCE_GROUP_NAME
-      value: 'ess-$(Environment)-rg'
   strategy:
     runOnce:
       deploy:
