@@ -4,6 +4,10 @@ parameters:
 - name: AzureSubscription
   type: string
 
+variables:
+- name: RESOURCE_GROUP_NAME
+  value: ess-$(Environment)-rg
+
 steps:
 
 - task: DownloadBuildArtifacts@0
