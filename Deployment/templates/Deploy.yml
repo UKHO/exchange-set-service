@@ -136,9 +136,9 @@ jobs:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - name: "RESOURCE_GROUP_NAME"
-      value: $(${{parameters.Environment}}DeployApp.outputs['resourceGroupName'])
+      value: $(${{parameters.Environment}}DeployApp.resourceGroupName)
     - name: "WEB_APP_NAME"
-      value: $(${{parameters.Environment}}DeployApp.outputs['webAppName'])
+      value: $(${{parameters.Environment}}DeployApp.webAppName)
   strategy:
     runOnce:
       deploy:
