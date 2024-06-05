@@ -63,7 +63,7 @@ steps:
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       appType: webApp
-      appName: "$(WEB_APP_NAME)"
+      appName: "$(TerraformDeploy.WEB_APP_NAME)"
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
       deployToSlotOrASE: true
       slotName: $(WEB_APP_SLOT_NAME)
@@ -73,7 +73,7 @@ steps:
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       resourceGroupName: $(RESOURCE_GROUP_NAME)
-      webAppName: $(WEB_APP_NAME)
+      webAppName: $(TerraformDeploy.WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
       sourceSlot: $(WEB_APP_SLOT_NAME)  
@@ -91,7 +91,7 @@ steps:
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       resourceGroupName: $(RESOURCE_GROUP_NAME)
-      webAppName: $(WEB_APP_NAME)
+      webAppName: $(TerraformDeploy.WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
       sourceSlot: $(WEB_APP_SLOT_NAME)  
