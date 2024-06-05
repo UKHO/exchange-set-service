@@ -125,6 +125,15 @@ jobs:
               useGlobalJson: true
               workingDirectory: '$(Build.SourcesDirectory)'
 
+- job: VarCheck
+  dependsOn: DeployApp
+  variables:
+    WEB_APP_NAME: $[ dependencies.DeployApp.outputs['TerraformDeploy.WEB_APP_NAME'] ]
+    RESOURCE_GROUP_NAME: $[ dependencies.DeployApp.outputs['TerraformDeploy.RESOURCE_GROUP_NAME'] ]
+  steps:
+  - script: echo $(WEB_APP_NAME)
+  - script: echo $(RESOURCE_GROUP_NAME)
+
 - deployment: FunctionalTests
   dependsOn: DeployApp
   displayName: "Run Functional Tests"
