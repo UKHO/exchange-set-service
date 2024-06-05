@@ -16,7 +16,7 @@ parameters:
   type: string
 
 jobs:
-- deployment: ${{parameters.Environment}}DeployApimSolas
+- deployment: DeployApimSolas
   displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
   environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
@@ -44,7 +44,7 @@ jobs:
               UseNewTfplanName: true
 
 - deployment: DeployApp
-  dependsOn: ["${{parameters.Environment}}DeployApimSolas"]
+  dependsOn: DeployApimSolas
   timeoutInMinutes: 75
   displayName: "${{parameters.Environment}} - deploy terraform and dotnet App"
   environment: "Ess-${{parameters.Environment}}"
@@ -126,7 +126,7 @@ jobs:
               workingDirectory: '$(Build.SourcesDirectory)'
 
 - deployment: FunctionalTests
-  dependsOn: ["DeployApp"]
+  dependsOn: DeployApp
   displayName: "Run Functional Tests"
   environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
