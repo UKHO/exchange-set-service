@@ -72,7 +72,7 @@ steps:
     displayName: "Swap with production slot"
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      resourceGroupName: $(TerraformDeploy.RESOURCE_GROUP_NAME)
       webAppName: $(TerraformDeploy.WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
@@ -90,7 +90,7 @@ steps:
     condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      resourceGroupName: $(TerraformDeploy.RESOURCE_GROUP_NAME)
       webAppName: $(TerraformDeploy.WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
