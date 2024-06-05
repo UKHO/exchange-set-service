@@ -124,6 +124,16 @@ jobs:
               packageType: sdk
               useGlobalJson: true
               workingDirectory: '$(Build.SourcesDirectory)'
+            
+          - task: PowerShell@2
+            displayName: 'Echo Web App Name and Resource Group'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Web App Name: $(WEB_APP_NAME)"
+                echo "Resource Group: $(RESOURCE_GROUP_NAME)"
+                echo "Resource Group: $(TerraformDeploy.WEB_APP_NAME)"
+                echo "Resource Group: $(TerraformDeploy.RESOURCE_GROUP_NAME)"
 
 - job: VarCheck
   dependsOn: DeployApp
