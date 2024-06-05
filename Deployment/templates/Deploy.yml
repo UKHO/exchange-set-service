@@ -130,8 +130,6 @@ jobs:
             inputs:
               targetType: 'inline'
               script: |
-                echo "Web App Name: $(WEB_APP_NAME)"
-                echo "Resource Group: $(RESOURCE_GROUP_NAME)"
                 echo "Resource Group: $(TerraformDeploy.WEB_APP_NAME)"
                 echo "Resource Group: $(TerraformDeploy.RESOURCE_GROUP_NAME)"
 
