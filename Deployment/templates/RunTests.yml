@@ -5,13 +5,14 @@ parameters:
   type: string
 
 steps:
-# - task: DownloadBuildArtifacts@0
-#   displayName: "Download Terraform Artifact"
-#   inputs:
-#     buildType: 'current'
-#     downloadType: 'single'
-#     artifactName: 'terraformartifact'
-#     downloadPath: '$(Build.SourcesDirectory)'
+- task: DownloadBuildArtifacts@0
+  displayName: "Download Terraform Artifact"
+  inputs:
+    buildType: 'current'
+    downloadType: 'single'
+    artifactName: 'terraformartifact'
+    downloadPath: '$(Build.SourcesDirectory)'
+
 - task: DownloadBuildArtifacts@0
   displayName: "Download Functional test Artifact"
   inputs:
