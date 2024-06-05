@@ -136,9 +136,9 @@ jobs:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - name: "RESOURCE_GROUP_NAME"
-      value: $[dependencies.${{parameters.Environment}}DeployApp.outputs['RESOURCE_GROUP_NAME']]
+      value: $[dependencies.${{parameters.Environment}}DeployApp.outputs['TerraformDeploy.RESOURCE_GROUP_NAME']]
     - name: "WEB_APP_NAME"
-      value: $[dependencies.${{parameters.Environment}}DeployApp.outputs['WEB_APP_NAME']]
+      value: $[dependencies.${{parameters.Environment}}DeployApp.outputs['TerraformDeploy.WEB_APP_NAME']]
   strategy:
     runOnce:
       deploy:
