@@ -43,7 +43,7 @@ jobs:
               SetLinkRewriteNewToOld: false
               UseNewTfplanName: true
 
-- deployment: ${{parameters.Environment}}DeployApp
+- deployment: DeployApp
   dependsOn: ["${{parameters.Environment}}DeployApimSolas"]
   timeoutInMinutes: 75
   displayName: "${{parameters.Environment}} - deploy terraform and dotnet App"
@@ -126,7 +126,7 @@ jobs:
               workingDirectory: '$(Build.SourcesDirectory)'
 
 - deployment: FunctionalTests
-  dependsOn: ["${{parameters.Environment}}DeployApp"]
+  dependsOn: ["DeployApp"]
   displayName: "Run Functional Tests"
   environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
@@ -136,9 +136,9 @@ jobs:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - name: "RESOURCE_GROUP_NAME"
-      value: $[dependencies.${{parameters.Environment}}DeployApp.outputs['TerraformDeploy.RESOURCE_GROUP_NAME']]
+      value: $[dependencies.DeployApp.outputs['TerraformDeploy.RESOURCE_GROUP_NAME']]
     - name: "WEB_APP_NAME"
-      value: $[dependencies.${{parameters.Environment}}DeployApp.outputs['TerraformDeploy.WEB_APP_NAME']]
+      value: $[dependencies.DeployApp.outputs['TerraformDeploy.WEB_APP_NAME']]
   strategy:
     runOnce:
       deploy:
