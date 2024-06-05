@@ -126,18 +126,22 @@ jobs:
               workingDirectory: '$(Build.SourcesDirectory)'
             
           - task: PowerShell@2
-            displayName: 'Echo Web App Name and Resource Group'
+            displayName: 'Set env variables'
             inputs:
               targetType: 'inline'
               script: |
-                echo "Resource Group: $(TerraformDeploy.WEB_APP_NAME)"
-                echo "Resource Group: $(TerraformDeploy.RESOURCE_GROUP_NAME)"
+                  echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$(TerraformDeploy.WEB_APP_NAME)"
+                  echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$(TerraformDeploy.RESOURCE_GROUP_NAME)"
+            name: functionalTestVariables
 
 - job: VarCheck
+  environment: "Ess-${{parameters.Environment}}"
   dependsOn: DeployApp
   variables:
-    WEB_APP_NAME: $[ dependencies.DeployApp.outputs['TerraformDeploy.WEB_APP_NAME'] ]
-    RESOURCE_GROUP_NAME: $[ dependencies.DeployApp.outputs['TerraformDeploy.RESOURCE_GROUP_NAME'] ]
+    - name: WEB_APP_NAME
+      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
+    - name: RESOURCE_GROUP_NAME
+      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
   steps:
   - script: echo webapp name $(WEB_APP_NAME)
   - script: echo resource group $(RESOURCE_GROUP_NAME)
@@ -152,6 +156,10 @@ jobs:
   variables:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+    - name: WEB_APP_NAME
+      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
+    - name: RESOURCE_GROUP_NAME
+      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
   strategy:
     runOnce:
       deploy:
