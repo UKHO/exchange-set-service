@@ -135,7 +135,6 @@ jobs:
             name: functionalTestVariables
 
 - job: VarCheck
-  environment: "Ess-${{parameters.Environment}}"
   dependsOn: DeployApp
   variables:
     - name: WEB_APP_NAME
