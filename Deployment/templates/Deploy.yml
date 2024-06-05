@@ -145,6 +145,11 @@ jobs:
         steps:
           - script: echo "RESOURCE_GROUP_NAME - $(RESOURCE_GROUP_NAME)"
             displayName: "Output RESOURCE_GROUP_NAME"
+          - script: echo $(dependencies.DeployApp.outputs['TerraformDeploy.RESOURCE_GROUP_NAME'])
+            displayName: "Output RESOURCE_GROUP_NAME"
+          - script: echo $[dependencies.DeployApp.outputs['TerraformDeploy.RESOURCE_GROUP_NAME']]
+            displayName: "Output RESOURCE_GROUP_NAME"
+            
           - template: RunTests.yml
             parameters:
               Environment: ${{parameters.Environment}}
