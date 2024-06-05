@@ -81,7 +81,6 @@ jobs:
             submodules: recursive
 
           - template: continuous-deployment.yml
-            name: DeployTerraform
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
               AzureSubscription: ${{parameters.AzureSubscription}}
@@ -137,9 +136,9 @@ jobs:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - name: "RESOURCE_GROUP_NAME"
-      value: $(dependencies.${{parameters.Environment}}DeployApp.outputs['DeployTerraform.resourceGroupName'])
+      value: $(dependencies.${{parameters.Environment}}DeployApp.outputs['terraformVariables.resourceGroupName'])
     - name: "WEB_APP_NAME"
-      value: $(dependencies.${{parameters.Environment}}DeployApp.outputs['DeployTerraform.webAppName'])
+      value: $(dependencies.${{parameters.Environment}}DeployApp.outputs['terraformVariables.webAppName'])
   strategy:
     runOnce:
       deploy:
