@@ -152,8 +152,19 @@ jobs:
     - name: RESOURCE_GROUP_NAME
       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
   steps:
-  - script: echo webapp name $(WEB_APP_NAME)
-  - script: echo resource group $(RESOURCE_GROUP_NAME)
+    - task: PowerShell@2
+      displayName: 'Echo functionalTestVariables'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "WEB_APP_NAME: $(functionalTestVariables.WEB_APP_NAME)"
+          echo "RESOURCE_GROUP_NAME: $(functionalTestVariables.RESOURCE_GROUP_NAME)"
+    - script: echo webapp name $(WEB_APP_NAME)
+    - script: echo resource group $(RESOURCE_GROUP_NAME)
+    - script: echo WEB_APP_NAME $(functionalTestVariables.WEB_APP_NAME)
+    - script: echo "RESOURCE_GROUP_NAME $(functionalTestVariables.RESOURCE_GROUP_NAME)"
+    - script: echo "WEB_APP_NAME $(TerraformDeploy.WEB_APP_NAME)"
+    - script: echo "RESOURCE_GROUP_NAME $(TerraformDeploy.RESOURCE_GROUP_NAME)"
 
 - deployment: FunctionalTests
   dependsOn: DeployApp
