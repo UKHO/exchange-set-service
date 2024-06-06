@@ -158,8 +158,8 @@ jobs:
         targetType: 'inline'
     - script: echo webapp name $(WEB_APP_NAME)
     - script: echo resource group $(RESOURCE_GROUP_NAME)
-    - script: echo "WEB_APP_NAME $(TerraformDeploy.WEB_APP_NAME)"
-    - script: echo "RESOURCE_GROUP_NAME $(TerraformDeploy.RESOURCE_GROUP_NAME)"
+    - script: echo WEB_APP_NAME $(TerraformDeploy.WEB_APP_NAME)"=
+    - script: echo RESOURCE_GROUP_NAME $(TerraformDeploy.RESOURCE_GROUP_NAME)
 
 - deployment: FunctionalTests
   dependsOn: DeployApp
