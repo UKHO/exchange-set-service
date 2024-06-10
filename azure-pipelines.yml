@@ -328,26 +328,26 @@ stages:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)\UKHO.ExchangeSetService.API.FunctionalTests'
               ArtifactName: functionaltests
 
-          - task: CopyFiles@2
-            displayName: Copy EssFulfilment Config
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API\'
-              Contents: 'appsettings.json'
-              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src'
+          # - task: CopyFiles@2
+          #   displayName: Copy EssFulfilment Config
+          #   inputs:
+          #     SourceFolder: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API\'
+          #     Contents: 'appsettings.json'
+          #     TargetFolder: '$(Build.SourcesDirectory)\Deployment\src'
 
-          - task: CopyFiles@2
-            displayName: "Copy OpenAPI spec for deployment"
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)'
-              Contents: 'exchangeSetService_OpenApi_definition.yaml'
-              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
+          # - task: CopyFiles@2
+          #   displayName: "Copy OpenAPI spec for deployment"
+          #   inputs:
+          #     SourceFolder: '$(Build.SourcesDirectory)'
+          #     Contents: 'exchangeSetService_OpenApi_definition.yaml'
+          #     TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
 
-          - task: CopyFiles@2
-            displayName: "Copy OpenAPI spec for new UI API for deployment"
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)'
-              Contents: 'exchangeSetService_Ui_OpenApi_definition.yaml'
-              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
+          # - task: CopyFiles@2
+          #   displayName: "Copy OpenAPI spec for new UI API for deployment"
+          #   inputs:
+          #     SourceFolder: '$(Build.SourcesDirectory)'
+          #     Contents: 'exchangeSetService_Ui_OpenApi_definition.yaml'
+          #     TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
 
           - task: PublishBuildArtifacts@1
             displayName: "Publish terraform Artifacts"
@@ -355,80 +355,80 @@ stages:
               PathtoPublish: '$(Build.SourcesDirectory)\Deployment'
               ArtifactName: terraformartifact
           
-          - task: ArchiveFiles@2
-            displayName: "Zip Load Tests"
-            inputs:
-              rootFolderOrFile: '$(Build.SourcesDirectory)/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.LoadTests'
-              includeRootFolder: false
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/loadtests/loadtests.zip'
-              replaceExistingArchive: true
+          # - task: ArchiveFiles@2
+          #   displayName: "Zip Load Tests"
+          #   inputs:
+          #     rootFolderOrFile: '$(Build.SourcesDirectory)/UKHO.ExchangeSetService.API/UKHO.ExchangeSetService.LoadTests'
+          #     includeRootFolder: false
+          #     archiveType: 'zip'
+          #     archiveFile: '$(Build.ArtifactStagingDirectory)/loadtests/loadtests.zip'
+          #     replaceExistingArchive: true
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Load Tests"
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/loadtests/'
-              ArtifactName: LoadTests
+          # - task: PublishBuildArtifacts@1
+          #   displayName: "Publish Load Tests"
+          #   inputs:
+          #     PathtoPublish: '$(Build.ArtifactStagingDirectory)/loadtests/'
+          #     ArtifactName: LoadTests
 
-      - job: BuildAndPublishMockAPIAndTerraform
-        workspace:
-          clean: all
-        displayName: "Build and Publish Mock API And Terraform"
-        steps:
-          - task: PowerShell@2
-            displayName: "Set assembly version numbers based on build ID"
-            inputs:
-              targetType: filePath
-              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
-              arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$(UKHOAssemblyProduct) Mock"'
+      # - job: BuildAndPublishMockAPIAndTerraform
+      #   workspace:
+      #     clean: all
+      #   displayName: "Build and Publish Mock API And Terraform"
+      #   steps:
+      #     - task: PowerShell@2
+      #       displayName: "Set assembly version numbers based on build ID"
+      #       inputs:
+      #         targetType: filePath
+      #         filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
+      #         arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$(UKHOAssemblyCopyright)" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$(UKHOAssemblyProduct) Mock"'
 
-          - task: UseDotNet@2
-            displayName: 'Use .NET SDK'
-            inputs:
-              packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+      #     - task: UseDotNet@2
+      #       displayName: 'Use .NET SDK'
+      #       inputs:
+      #         packageType: sdk
+      #         useGlobalJson: true
+      #         workingDirectory: '$(Build.SourcesDirectory)'
 
-          - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore"
-            inputs:
-              command: restore
-              projects: |
-                **/*.csproj
-              feedsToUse: config
-              noCache: true
-              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
+      #     - task: DotNetCoreCLI@2
+      #       displayName: ".Net Core - NuGet restore"
+      #       inputs:
+      #         command: restore
+      #         projects: |
+      #           **/*.csproj
+      #         feedsToUse: config
+      #         noCache: true
+      #         nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+      #         workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
 
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet build task"
-            inputs:
-              command: "build"
-              projects: "**/*UKHO.SalesCatalogueFileShareServicesMock.API.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
+      #     - task: DotNetCoreCLI@2
+      #       displayName: "dotnet build task"
+      #       inputs:
+      #         command: "build"
+      #         projects: "**/*UKHO.SalesCatalogueFileShareServicesMock.API.csproj"
+      #         arguments: '--configuration $(BuildConfiguration) --output $(Build.BinariesDirectory)'
+      #         workingDirectory: '$(Build.SourcesDirectory)\UKHO.SalesCatalogueFileShareServicesMock.API'
 
-          - task: DotNetCoreCLI@2
-            displayName: "Publish MockWebAPI"
-            inputs:
-              command: "publish"
-              publishWebProjects: false
-              projects: '**/*UKHO.SalesCatalogueFileShareServicesMock.API.csproj'
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\MockWebAPI'
-              zipAfterPublish: true
-              modifyOutputPath: true
+      #     - task: DotNetCoreCLI@2
+      #       displayName: "Publish MockWebAPI"
+      #       inputs:
+      #         command: "publish"
+      #         publishWebProjects: false
+      #         projects: '**/*UKHO.SalesCatalogueFileShareServicesMock.API.csproj'
+      #         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\MockWebAPI'
+      #         zipAfterPublish: true
+      #         modifyOutputPath: true
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish WebAPI Artifact"
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)\MockWebAPI'
-              ArtifactName: MockWebAPI 
+      #     - task: PublishBuildArtifacts@1
+      #       displayName: "Publish WebAPI Artifact"
+      #       inputs:
+      #         PathtoPublish: '$(Build.ArtifactStagingDirectory)\MockWebAPI'
+      #         ArtifactName: MockWebAPI 
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Mock terraform Artifacts"
-            inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)\MockApiDeployment'
-              ArtifactName: mockapiterraformartifact              
+      #     - task: PublishBuildArtifacts@1
+      #       displayName: "Publish Mock terraform Artifacts"
+      #       inputs:
+      #         PathtoPublish: '$(Build.SourcesDirectory)\MockApiDeployment'
+      #         ArtifactName: mockapiterraformartifact              
               
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
