@@ -176,7 +176,7 @@ jobs:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - name: WEB_APP_NAME
-      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
+      value: dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME']
     - name: RESOURCE_GROUP_NAME
       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
   strategy:
