@@ -433,19 +433,19 @@ stages:
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     variables:
-      Environment: "Dev"
-      AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+      Environment: 'Dev'
+      AzureSubscription: 'Exchange-Set-Service-Dev-A-008-02'
     jobs:
     - template: Deployment/templates/Deploy.yml
       parameters:
-        Environment: '$(Environment)'
+        Environment: $(Environment)
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-        AzureSubscription: '$(AzureSubscription)'
+        AzureSubscription: $(AzureSubscription)
         Container: ${{variables.Container}}
     - template: Deployment/templates/RunTests.yml
       parameters:
-        Environment: '$(Environment)'
-        AzureSubscription: '$(AzureSubscription)'
+        Environment: $(Environment)
+        AzureSubscription: $(AzureSubscription)
       
   - stage: QCdeploy
     dependsOn:
