@@ -29,7 +29,7 @@ steps:
     scriptType: 'pscore'
     scriptLocation: 'scriptPath'
     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCEGROUPNAME) -webappname $(WEBAPPNAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup ${{variables.RESOURCE_GROUP_NAME}} -webappname ${{variables.WEB_APP_NAME}} -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
 - task: DotNetCoreCLI@2
   displayName: "Run Functional tests AIOEnabled"
@@ -50,7 +50,7 @@ steps:
     scriptType: 'pscore'
     scriptLocation: 'scriptPath'
     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCEGROUPNAME) -webappname $(WEBAPPNAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup ${{variables.RESOURCE_GROUP_NAME}} -webappname ${{variables.WEB_APP_NAME}} -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
 - task: DotNetCoreCLI@2
   displayName: "Run Functional tests AIODisabled"
@@ -72,4 +72,4 @@ steps:
     scriptType: 'pscore'
     scriptLocation: 'scriptPath'
     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCEGROUPNAME) -webappname $(WEBAPPNAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup ${{variables.RESOURCE_GROUP_NAME}} -webappname ${{variables.WEB_APP_NAME}} -fulfilmentwebappsname $(fulfilmentWebAppsName)'
