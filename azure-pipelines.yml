@@ -854,7 +854,6 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
           Container: ${{variables.Container}}
-          RunTests: false
         
   - stage: vnexte2eDeploy
     dependsOn: 
