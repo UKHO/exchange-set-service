@@ -15,7 +15,7 @@ parameters:
   type: boolean
   default: true
 
-# jobs:
+jobs:
 # - deployment: DeployApimSolas
 #   displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
 #   environment: "Ess-${{parameters.Environment}}"
