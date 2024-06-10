@@ -438,14 +438,14 @@ stages:
     jobs:
     - template: Deployment/templates/Deploy.yml
       parameters:
-        Environment: $(Environment)
+        Environment: '$(Environment)'
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-        AzureSubscription: $(AzureSubscription)
+        AzureSubscription: '$(AzureSubscription)'
         Container: ${{variables.Container}}
     - template: Deployment/templates/RunTests.yml
       parameters:
-        Environment: $(Environment)
-        AzureSubscription: $(AzureSubscription)
+        Environment: '$(Environment)'
+        AzureSubscription: '$(AzureSubscription)'
       
   - stage: QCdeploy
     dependsOn:
