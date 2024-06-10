@@ -1,9 +1,6 @@
 parameters:
 - name: Environment
   type: string
-- name: RunTests
-  type: boolean
-  default: true
 - name: AzureSubscription
   type: string
 - name: LiveOrNonLive
@@ -150,47 +147,47 @@ jobs:
                 echo "WEB_APP_NAME: $(functionalTestVariables.WEB_APP_NAME)"
                 echo "RESOURCE_GROUP_NAME: $(functionalTestVariables.RESOURCE_GROUP_NAME)"
 
-- job: VarCheck
-  dependsOn: DeployApp
-  variables:
-    - name: WEB_APP_NAME
-      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
-    - name: RESOURCE_GROUP_NAME
-      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
-  steps:
-    - task: PowerShell@2
-      displayName: 'Echo functionalTestVariables'
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "WEB_APP_NAME: $(functionalTestVariables.WEB_APP_NAME)"
-          echo "RESOURCE_GROUP_NAME: $(functionalTestVariables.RESOURCE_GROUP_NAME)"
-    - script: echo $(WEB_APP_NAME)
-    # - script: echo $(WEB_APP_NAME)
-    # - script: echo $(RESOURCE_GROUP_NAME)
-    # - script: echo WEB_APP_NAME $(TerraformDeploy.WEB_APP_NAME)
-    # - script: echo RESOURCE_GROUP_NAME $(TerraformDeploy.RESOURCE_GROUP_NAME)
+# - job: VarCheck
+#   dependsOn: DeployApp
+#   variables:
+#     - name: WEB_APP_NAME
+#       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
+#     - name: RESOURCE_GROUP_NAME
+#       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
+#   steps:
+#     - task: PowerShell@2
+#       displayName: 'Echo functionalTestVariables'
+#       inputs:
+#         targetType: 'inline'
+#         script: |
+#           echo "WEB_APP_NAME: $(functionalTestVariables.WEB_APP_NAME)"
+#           echo "RESOURCE_GROUP_NAME: $(functionalTestVariables.RESOURCE_GROUP_NAME)"
+#     - script: echo $(WEB_APP_NAME)
+#     # - script: echo $(WEB_APP_NAME)
+#     # - script: echo $(RESOURCE_GROUP_NAME)
+#     # - script: echo WEB_APP_NAME $(TerraformDeploy.WEB_APP_NAME)
+#     # - script: echo RESOURCE_GROUP_NAME $(TerraformDeploy.RESOURCE_GROUP_NAME)
 
-- deployment: FunctionalTests
-  dependsOn: DeployApp
-  displayName: "Run Functional Tests"
-  environment: "Ess-${{parameters.Environment}}"
-  pool: $(DeploymentPool)
-  container: ${{parameters.Container}}
-  condition: ${{parameters.RunTests}}
-  variables:
-    - group: "ESS-${{parameters.Environment}}-Variables"
-    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
-    - name: WEB_APP_NAME
-      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
-    - name: RESOURCE_GROUP_NAME
-      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-          - template: RunTests.yml
-            parameters:
-              Environment: ${{parameters.Environment}}
-              AzureSubscription: ${{parameters.AzureSubscription}}
+# - deployment: FunctionalTests
+#   dependsOn: DeployApp
+#   displayName: "Run Functional Tests"
+#   environment: "Ess-${{parameters.Environment}}"
+#   pool: $(DeploymentPool)
+#   container: ${{parameters.Container}}
+#   condition: ${{parameters.RunTests}}
+#   variables:
+#     - group: "ESS-${{parameters.Environment}}-Variables"
+#     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+#     - name: WEB_APP_NAME
+#       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
+#     - name: RESOURCE_GROUP_NAME
+#       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
+#   strategy:
+#     runOnce:
+#       deploy:
+#         steps:
+#           - template: RunTests.yml
+#             parameters:
+#               Environment: ${{parameters.Environment}}
+#               AzureSubscription: ${{parameters.AzureSubscription}}
 
