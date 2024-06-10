@@ -9,8 +9,12 @@ jobs:
   dependsOn: DeployApp
   displayName: "Run Tests"
   variables:
-    WEBAPPNAME: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
-    RESOURCEGROUPNAME: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
+  - group: "ESS-${{parameters.Environment}}-Variables"
+  - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+  - name: WEBAPPNAME
+    value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
+  - name: RESOURCEGROUPNAME
+    value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
   steps:
   - task: DownloadBuildArtifacts@0
     displayName: "Download Terraform Artifact"
