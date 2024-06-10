@@ -11,6 +11,9 @@ parameters:
   default: false
 - name: Container
   type: string
+- name: RunTests
+  type: boolean
+  default: true
 
 jobs:
 - deployment: DeployApimSolas
