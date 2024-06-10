@@ -44,7 +44,7 @@ jobs:
 #               UseNewTfplanName: true
 
 - deployment: DeployApp
-  dependsOn: DeployApimSolas
+ # dependsOn: DeployApimSolas
   timeoutInMinutes: 75
   displayName: "${{parameters.Environment}} - deploy terraform and dotnet App"
   environment: "Ess-${{parameters.Environment}}"

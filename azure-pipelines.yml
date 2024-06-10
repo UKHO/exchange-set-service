@@ -835,29 +835,29 @@ stages:
   #       steps:
   #         - template: Deployment/templates/retain-pipeline.yml
 
-  - stage: vnextiatDeploy
-    dependsOn:
-      - Devdeploy
-    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
-    jobs:
-      - template: Deployment/templates/Deploy.yml
-        parameters:
-          Environment: "vnextiat"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
-          Container: ${{variables.Container}}
-          RunTests: false
+  # - stage: vnextiatDeploy
+  #   dependsOn:
+  #     - Devdeploy
+  #   displayName: vNext IAT Deploy (inc terraform, webapp deploy)
+  #   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+  #   jobs:
+  #     - template: Deployment/templates/Deploy.yml
+  #       parameters:
+  #         Environment: "vnextiat"
+  #         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+  #         AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
+  #         Container: ${{variables.Container}}
+  #         RunTests: false
         
-  - stage: vnexte2eDeploy
-    dependsOn: 
-      - vnextiatDeploy
-    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
-    jobs:
-      - template: Deployment/templates/Deploy.yml
-        parameters:
-          Environment: "vnexte2e"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
-          Container: ${{variables.Container}} 
+  # - stage: vnexte2eDeploy
+  #   dependsOn: 
+  #     - vnextiatDeploy
+  #   displayName: vNext E2E Deploy (inc terraform, webapp deploy)
+  #   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+  #   jobs:
+  #     - template: Deployment/templates/Deploy.yml
+  #       parameters:
+  #         Environment: "vnexte2e"
+  #         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+  #         AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
+  #         Container: ${{variables.Container}} 
