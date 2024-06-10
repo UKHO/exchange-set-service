@@ -183,7 +183,11 @@ jobs:
     runOnce:
       deploy:
         steps:
-          - script: echo $(WEB_APP_NAME)
+          - script: echo ${{variables.WEB_APP_NAME}}
+          - script: echo ${variables.WEB_APP_NAME}
+          - script: echo $(variables.WEB_APP_NAME)
+
+
           - template: RunTests.yml
             parameters:
               Environment: ${{parameters.Environment}}
