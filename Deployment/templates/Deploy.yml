@@ -85,45 +85,45 @@ jobs:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
               AzureSubscription: ${{parameters.AzureSubscription}}
 
-          - template: continuous-deployment-apim.yml
-            parameters:
-              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: "Fleet Manager dev/Test"
-              TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-              APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-              APIMServiceInstance: $(APIM_SERVICE_NAME)
-              tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-              tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+          # - template: continuous-deployment-apim.yml
+          #   parameters:
+          #     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          #     AzureSubscription: "Fleet Manager dev/Test"
+          #     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+          #     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+          #     APIMServiceInstance: $(APIM_SERVICE_NAME)
+          #     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+          #     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
               
-          - task: DownloadBuildArtifacts@0
-            displayName: "Download Functional test Artifact"
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'functionaltests'
-              downloadPath: '$(Build.SourcesDirectory)'
+          # - task: DownloadBuildArtifacts@0
+          #   displayName: "Download Functional test Artifact"
+          #   inputs:
+          #     buildType: 'current'
+          #     downloadType: 'single'
+          #     artifactName: 'functionaltests'
+          #     downloadPath: '$(Build.SourcesDirectory)'
 
-          - task: DownloadBuildArtifacts@0
-            displayName: "Download Terraform Artifact"
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'terraformartifact'
-              downloadPath: '$(Build.SourcesDirectory)'
+          # - task: DownloadBuildArtifacts@0
+          #   displayName: "Download Terraform Artifact"
+          #   inputs:
+          #     buildType: 'current'
+          #     downloadType: 'single'
+          #     artifactName: 'terraformartifact'
+          #     downloadPath: '$(Build.SourcesDirectory)'
 
-          - task: FileTransform@2
-            displayName: "File Transform: functionaltests"
-            inputs:
-              folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-              xmlTransformationRules:
-              jsonTargetFiles: '**/appsettings.json'
+          # - task: FileTransform@2
+          #   displayName: "File Transform: functionaltests"
+          #   inputs:
+          #     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+          #     xmlTransformationRules:
+          #     jsonTargetFiles: '**/appsettings.json'
 
-          - task: UseDotNet@2
-            displayName: 'Use .NET SDK'
-            inputs:
-              packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+          # - task: UseDotNet@2
+          #   displayName: 'Use .NET SDK'
+          #   inputs:
+          #     packageType: sdk
+          #     useGlobalJson: true
+          #     workingDirectory: '$(Build.SourcesDirectory)'
             
           - task: PowerShell@2
             displayName: 'Set env variables'
@@ -176,7 +176,7 @@ jobs:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - name: WEB_APP_NAME
-      value: dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME']
+      value: $(TerraformDeploy.WEB_APP_NAME)
     - name: RESOURCE_GROUP_NAME
       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
   strategy:
