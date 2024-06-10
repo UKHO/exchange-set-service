@@ -432,20 +432,13 @@ stages:
               
   - stage: Devdeploy
     displayName: "Devdeploy (inc terraform, webapp deploy)"
-    variables:
-      Environment: 'Dev'
-      AzureSubscription: 'Exchange-Set-Service-Dev-A-008-02'
     jobs:
     - template: Deployment/templates/Deploy.yml
       parameters:
-        Environment: ${{variables.Environment}}
-        AzureSubscription: ${{variables.AzureSubscription}}
+        Environment: "Dev"
         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+        AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
         Container: ${{variables.Container}}
-    - template: Deployment/templates/RunTests.yml
-      parameters:
-        Environment: ${{variables.Environment}}
-        AzureSubscription: ${{variables.AzureSubscription}}
       
   - stage: QCdeploy
     dependsOn:
@@ -854,6 +847,7 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
           Container: ${{variables.Container}}
+          RunTests: false
         
   - stage: vnexte2eDeploy
     dependsOn: 
