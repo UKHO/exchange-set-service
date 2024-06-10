@@ -15,6 +15,12 @@ parameters:
 - name: Container
   type: string
 
+variables:
+  - name: WEB_APP_NAME
+    value: $(TerraformDeploy.WEB_APP_NAME)
+  - name: RESOURCE_GROUP_NAME
+    value: $(TerraformDeploy.RESOURCE_GROUP_NAME)
+
 jobs:
 - deployment: DeployApimSolas
   displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
@@ -159,6 +165,7 @@ jobs:
         script: |
           echo "WEB_APP_NAME: $(functionalTestVariables.WEB_APP_NAME)"
           echo "RESOURCE_GROUP_NAME: $(functionalTestVariables.RESOURCE_GROUP_NAME)"
+    - script: echo $(WEB_APP_NAME)
     # - script: echo $(WEB_APP_NAME)
     # - script: echo $(RESOURCE_GROUP_NAME)
     # - script: echo WEB_APP_NAME $(TerraformDeploy.WEB_APP_NAME)
