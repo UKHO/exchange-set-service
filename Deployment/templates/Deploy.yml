@@ -12,12 +12,6 @@ parameters:
 - name: Container
   type: string
 
-variables:
-- name: WEB_APP_NAME
-  value: $(TerraformDeploy.WEB_APP_NAME)
-- name: RESOURCE_GROUP_NAME
-  value: $(TerraformDeploy.RESOURCE_GROUP_NAME)
-
 jobs:
 - deployment: DeployApimSolas
   displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
