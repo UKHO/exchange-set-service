@@ -188,7 +188,6 @@ jobs:
           - script: echo '$(dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'])'
           - script: echo dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME']
           - script: echo ${dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME']}
-          - script: echo "${{dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME']}}"
           
           - script: echo $(variables.RESOURCE_GROUP_NAME)
 
