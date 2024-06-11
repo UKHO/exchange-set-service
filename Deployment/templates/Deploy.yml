@@ -80,10 +80,10 @@ jobs:
           - checkout: self
             submodules: recursive
 
-          - template: continuous-deployment.yml
-            parameters:
-              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: ${{parameters.AzureSubscription}}
+          # - template: continuous-deployment.yml
+          #   parameters:
+          #     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          #     AzureSubscription: ${{parameters.AzureSubscription}}
 
           # - template: continuous-deployment-apim.yml
           #   parameters:
