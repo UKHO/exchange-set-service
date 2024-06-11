@@ -132,8 +132,7 @@ jobs:
               script: |
                   echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]TEST"
                   echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]TEST"
-                 
-            name: functionalTestVariables
+              name: functionalTestVariables
     # echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$(TerraformDeploy.WEB_APP_NAME)"
     #               echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$(TerraformDeploy.RESOURCE_GROUP_NAME)"
               
@@ -178,8 +177,6 @@ jobs:
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
     - name: WEB_APP_NAME
       value: $(WEB_APP_NAME)
-    - name: RESOURCE_GROUP_NAME
-      value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
   strategy:
     runOnce:
       deploy:
@@ -187,7 +184,7 @@ jobs:
           - script: echo ${{variables.WEB_APP_NAME}}
           # - script: echo ${variables.WEB_APP_NAME}
           - script: echo $(variables.WEB_APP_NAME)
-          - script: echo ${{variables.RESOURCE_GROUP_NAME}}
+          - script: echo $(dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'])
           - script: echo $(variables.RESOURCE_GROUP_NAME)
 
 
