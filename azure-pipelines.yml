@@ -107,10 +107,10 @@ stages:
   #         inputs:
   #           reportPattern: '**/mutation-report.html'
 
-  # - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
-  #   displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
-  #   dependsOn: []
-  #   jobs:
+  - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
+    dependsOn: []
+    jobs:
       # - job: Dependencychecker
       #   workspace:
       #     clean: all
@@ -202,11 +202,11 @@ stages:
       #         PathtoPublish: "$(Build.ArtifactStagingDirectory)/codecoveragereport"
       #         ArtifactName: codecoveragereport
 
-      # - job: BuildAndPublishAPI
-      #   workspace:
-      #     clean: all
-      #   displayName: "Dotnet Build publish API"
-      #   steps:
+      - job: BuildAndPublishAPI
+        workspace:
+          clean: all
+        displayName: "Dotnet Build publish API"
+        steps:
       #     - task: PowerShell@2
       #       displayName: "Set assembly version numbers based on build ID"
       #       inputs:
@@ -349,11 +349,11 @@ stages:
       #     #     Contents: 'exchangeSetService_Ui_OpenApi_definition.yaml'
       #     #     TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
 
-      #     - task: PublishBuildArtifacts@1
-      #       displayName: "Publish terraform Artifacts"
-      #       inputs:
-      #         PathtoPublish: '$(Build.SourcesDirectory)\Deployment'
-      #         ArtifactName: terraformartifact
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish terraform Artifacts"
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)\Deployment'
+              ArtifactName: terraformartifact
           
       #     # - task: ArchiveFiles@2
       #     #   displayName: "Zip Load Tests"
