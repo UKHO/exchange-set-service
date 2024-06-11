@@ -131,7 +131,7 @@ jobs:
               targetType: 'inline'
               script: |
                   echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]TEST"
-                  echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$TEST"
+                  echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]TEST"
                  
             name: functionalTestVariables
     # echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$(TerraformDeploy.WEB_APP_NAME)"
@@ -185,8 +185,10 @@ jobs:
       deploy:
         steps:
           - script: echo ${{variables.WEB_APP_NAME}}
-          - script: echo ${variables.WEB_APP_NAME}
+          # - script: echo ${variables.WEB_APP_NAME}
           - script: echo $(variables.WEB_APP_NAME)
+          - script: echo ${{variables.RESOURCE_GROUP_NAME}}
+          - script: echo $(variables.RESOURCE_GROUP_NAME)
 
 
           - template: RunTests.yml
