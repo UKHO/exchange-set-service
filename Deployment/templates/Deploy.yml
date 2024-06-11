@@ -16,35 +16,35 @@ parameters:
   default: true
 
 jobs:
-# - deployment: DeployApimSolas
-#   displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
-#   environment: "Ess-${{parameters.Environment}}"
-#   pool: $(DeploymentPool)
-#   container: ${{parameters.Container}}
-#   workspace:
-#     clean: all
-#   variables:
-#     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
-#     - group: "ESS-${{parameters.Environment}}-Variables"
-#     - group: "ESS-${{parameters.Environment}}-APIM-SOLAS-Variables"
-#   strategy:
-#     runOnce:
-#       deploy:
-#         steps:
-#           - template: continuous-deployment-apim.yml
-#             parameters:
-#               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-#               AzureSubscription: "UKHO-APIM-SOLAS-${{parameters.LiveOrNonLive}}"
-#               TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-#               APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-#               APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-#               tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-#               tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-#               SetLinkRewriteNewToOld: false
-#               UseNewTfplanName: true
+- deployment: DeployApimSolas
+  displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
+  environment: "Ess-${{parameters.Environment}}"
+  pool: $(DeploymentPool)
+  container: ${{parameters.Container}}
+  workspace:
+    clean: all
+  variables:
+    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+    - group: "ESS-${{parameters.Environment}}-Variables"
+    - group: "ESS-${{parameters.Environment}}-APIM-SOLAS-Variables"
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+          - template: continuous-deployment-apim.yml
+            parameters:
+              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+              AzureSubscription: "UKHO-APIM-SOLAS-${{parameters.LiveOrNonLive}}"
+              TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
+              APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
+              APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
+              tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
+              tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
+              SetLinkRewriteNewToOld: false
+              UseNewTfplanName: true
 
 - deployment: DeployApp
- # dependsOn: DeployApimSolas
+  dependsOn: DeployApimSolas
   timeoutInMinutes: 75
   displayName: "${{parameters.Environment}} - deploy terraform and dotnet App"
   environment: "Ess-${{parameters.Environment}}"
@@ -80,91 +80,51 @@ jobs:
           - checkout: self
             submodules: recursive
 
-          # - template: continuous-deployment.yml
-          #   parameters:
-          #     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          #     AzureSubscription: ${{parameters.AzureSubscription}}
+          - template: continuous-deployment.yml
+            parameters:
+              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+              AzureSubscription: ${{parameters.AzureSubscription}}
 
-          # - template: continuous-deployment-apim.yml
-          #   parameters:
-          #     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          #     AzureSubscription: "Fleet Manager dev/Test"
-          #     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-          #     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-          #     APIMServiceInstance: $(APIM_SERVICE_NAME)
-          #     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
-          #     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+          - template: continuous-deployment-apim.yml
+            parameters:
+              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+              AzureSubscription: "Fleet Manager dev/Test"
+              TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+              APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+              APIMServiceInstance: $(APIM_SERVICE_NAME)
+              tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
+              tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
               
-          # - task: DownloadBuildArtifacts@0
-          #   displayName: "Download Functional test Artifact"
-          #   inputs:
-          #     buildType: 'current'
-          #     downloadType: 'single'
-          #     artifactName: 'functionaltests'
-          #     downloadPath: '$(Build.SourcesDirectory)'
+          - task: DownloadBuildArtifacts@0
+            displayName: "Download Functional test Artifact"
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'functionaltests'
+              downloadPath: '$(Build.SourcesDirectory)'
 
-          # - task: DownloadBuildArtifacts@0
-          #   displayName: "Download Terraform Artifact"
-          #   inputs:
-          #     buildType: 'current'
-          #     downloadType: 'single'
-          #     artifactName: 'terraformartifact'
-          #     downloadPath: '$(Build.SourcesDirectory)'
+          - task: DownloadBuildArtifacts@0
+            displayName: "Download Terraform Artifact"
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'terraformartifact'
+              downloadPath: '$(Build.SourcesDirectory)'
 
-          # - task: FileTransform@2
-          #   displayName: "File Transform: functionaltests"
-          #   inputs:
-          #     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-          #     xmlTransformationRules:
-          #     jsonTargetFiles: '**/appsettings.json'
+          - task: FileTransform@2
+            displayName: "File Transform: functionaltests"
+            inputs:
+              folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+              xmlTransformationRules:
+              jsonTargetFiles: '**/appsettings.json'
 
-          # - task: UseDotNet@2
-          #   displayName: 'Use .NET SDK'
-          #   inputs:
-          #     packageType: sdk
-          #     useGlobalJson: true
-          #     workingDirectory: '$(Build.SourcesDirectory)'
+          - task: UseDotNet@2
+            displayName: 'Use .NET SDK'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
             
-          - task: PowerShell@2
-            displayName: 'Set env variables'
-            inputs:
-              targetType: 'inline'
-              script: |
-                  echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]TEST"
-                  echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]TEST"
-              name: functionalTestVariables
-    # echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$(TerraformDeploy.WEB_APP_NAME)"
-    #               echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$(TerraformDeploy.RESOURCE_GROUP_NAME)"
-              
-          - task: PowerShell@2
-            displayName: 'Echo functionalTestVariables'
-            inputs:
-              targetType: 'inline'
-              script: |
-                echo "WEB_APP_NAME: $(functionalTestVariables.WEB_APP_NAME)"
-                echo "RESOURCE_GROUP_NAME: $(functionalTestVariables.RESOURCE_GROUP_NAME)"
-
-# - job: VarCheck
-#   dependsOn: DeployApp
-#   variables:
-#     - name: WEB_APP_NAME
-#       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'] ]
-#     - name: RESOURCE_GROUP_NAME
-#       value: $[ dependencies.DeployApp.outputs['functionalTestVariables.RESOURCE_GROUP_NAME'] ]
-#   steps:
-#     - task: PowerShell@2
-#       displayName: 'Echo functionalTestVariables'
-#       inputs:
-#         targetType: 'inline'
-#         script: |
-#           echo "WEB_APP_NAME: $(functionalTestVariables.WEB_APP_NAME)"
-#           echo "RESOURCE_GROUP_NAME: $(functionalTestVariables.RESOURCE_GROUP_NAME)"
-#     - script: echo $(WEB_APP_NAME)
-#     # - script: echo $(WEB_APP_NAME)
-#     # - script: echo $(RESOURCE_GROUP_NAME)
-#     # - script: echo WEB_APP_NAME $(TerraformDeploy.WEB_APP_NAME)
-#     # - script: echo RESOURCE_GROUP_NAME $(TerraformDeploy.RESOURCE_GROUP_NAME)
-
 - deployment: FunctionalTests
   dependsOn: DeployApp
   displayName: "Run Functional Tests"
@@ -181,19 +141,71 @@ jobs:
     runOnce:
       deploy:
         steps:
-          - script: echo ${{variables.WEB_APP_NAME}}
-          # - script: echo ${variables.WEB_APP_NAME}
-          - script: echo $(variables.WEB_APP_NAME)
-          - script: echo "$(dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'])"
-          - script: echo '$(dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME'])'
-          - script: echo dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME']
-          - script: echo ${dependencies.DeployApp.outputs['functionalTestVariables.WEB_APP_NAME']}
-          
-          - script: echo $(variables.RESOURCE_GROUP_NAME)
+          - task: DownloadBuildArtifacts@0
+            displayName: "Download Terraform Artifact"
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'terraformartifact'
+              downloadPath: '$(Build.SourcesDirectory)'
 
+          - task: DownloadBuildArtifacts@0
+            displayName: "Download Functional test Artifact"
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'functionaltests'
+              downloadPath: '$(Build.SourcesDirectory)'
 
-          - template: RunTests.yml
-            parameters:
-              Environment: ${{parameters.Environment}}
-              AzureSubscription: ${{parameters.AzureSubscription}}
+          - task: AzureCLI@2
+            displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
+            condition: always()
+            inputs:
+              azureSubscription: ${{parameters.AzureSubscription}}
+              scriptType: 'pscore'
+              scriptLocation: 'scriptPath'
+              scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup ${{variables.RESOURCE_GROUP_NAME}} -webappname ${{variables.WEB_APP_NAME}} -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
+          - task: DotNetCoreCLI@2
+            displayName: "Run Functional tests AIOEnabled"
+            inputs:
+              command: "test"
+              projects: |
+                **/*FunctionalTest*.dll
+                !**/*TestAdapter.dll
+                !**/obj/**
+              arguments: '--filter Category=SmokeTest-AIOEnabled'
+              testRunTitle: "${{parameters.Environment}}-AutomationTests"
+              workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+
+          - task: AzureCLI@2
+            displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
+            inputs:
+              azureSubscription: ${{parameters.AzureSubscription}}
+              scriptType: 'pscore'
+              scriptLocation: 'scriptPath'
+              scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup ${{variables.RESOURCE_GROUP_NAME}} -webappname ${{variables.WEB_APP_NAME}} -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+
+          - task: DotNetCoreCLI@2
+            displayName: "Run Functional tests AIODisabled"
+            inputs:
+              command: "test"
+              projects: |
+                **/*FunctionalTest*.dll
+                !**/*TestAdapter.dll
+                !**/obj/**
+              arguments: '--filter Category=SmokeTest-AIODisabled'
+              testRunTitle: "${{parameters.Environment}}-AutomationTests"
+              workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+
+          - task: AzureCLI@2
+            displayName: "Swap ESS API and ESS FulfilmentService Configuration"
+            condition: always()
+            inputs:
+              azureSubscription: ${{parameters.AzureSubscription}}
+              scriptType: 'pscore'
+              scriptLocation: 'scriptPath'
+              scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+              arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup ${{variables.RESOURCE_GROUP_NAME}} -webappname ${{variables.WEB_APP_NAME}} -fulfilmentwebappsname $(fulfilmentWebAppsName)'
