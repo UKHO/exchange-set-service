@@ -132,8 +132,7 @@ jobs:
               script: |
                   echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]TEST"
                   echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$TEST"
-                  echo "WEB_APP_NAME: $(TerraformDeploy.WEB_APP_NAME)"
-                  echo "RESOURCE_GROUP_NAME: $(TerraformDeploy.RESOURCE_GROUP_NAME)"
+                 
             name: functionalTestVariables
     # echo "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$(TerraformDeploy.WEB_APP_NAME)"
     #               echo "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$(TerraformDeploy.RESOURCE_GROUP_NAME)"
