@@ -1,0 +1,104 @@
+parameters:
+  - name: ContinueEvenIfResourcesAreGettingDestroyed
+    type: boolean
+    default: false
+  - name: AzureSubscription
+    type: string
+
+steps:
+  - task: FileTransform@2
+    displayName: "File Transform: Ess Config" #Replace exchange set instance value from pipeline 
+    inputs:
+      folderPath: '$(Pipeline.Workspace)/terraformartifact/src'
+      xmlTransformationRules:
+      jsonTargetFiles: '**/appsettings.json'
+
+  - task: PowerShell@2
+    displayName: "terraform devdeploy for FSSUI"
+    inputs:
+      targetType: filePath
+      filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_v2.ps1'
+      arguments: '-deploymentResourceGroupName $(DeploymentResourceGroupName) -deploymentStorageAccountName $(DeploymentStorageAccountName) -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }} -terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -elasticApmServerUrl $(ElasticAPM.ServerURL) -elasticApmApiKey $(ElasticAPM.ApiKey)'
+    env:
+      ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
+      ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
+      ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
+      ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
+      TF_VAR_allowed_ips: $(whiteListedIps)
+      TF_VAR_spoke_rg: $(spokeRG)
+      TF_VAR_spoke_vnet_name: $(spokeVnetName)
+      TF_VAR_spoke_subnet_name: $(spokeSubnetName)
+      TF_VAR_agent_rg: $(agentRG)
+      TF_VAR_agent_vnet_name: $(agentVnetName)
+      TF_VAR_agent_subnet_name: $(agentSubnetName)
+      TF_VAR_agent_subscription_id: $(agentSubscriptionId)
+
+  - task: FileTransform@2
+    displayName: "File Transform: WebJob"
+    inputs:
+      folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
+      xmlTransformationRules:
+      jsonTargetFiles: '**/appsettings.json'
+
+  - task: AzureCLI@2
+    displayName: "Azure Fulfilment Webjob Deployment"
+    inputs:
+      azureSubscription: "${{ parameters.AzureSubscription }}"
+      scriptType: 'pscore'
+      scriptLocation: 'scriptPath'
+      scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
+      arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'
+
+
+  - task: FileTransform@2
+    displayName: "File Transform: WebAppSettings"
+    inputs:
+      folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
+      xmlTransformationRules:
+      jsonTargetFiles: '**/appsettings.json'
+
+  - task: AzureWebApp@1
+    displayName: "Azure App Deploy: ess-$(Environment)-webapp to Staging slot"
+    inputs:
+      azureSubscription: "${{ parameters.AzureSubscription }}"
+      appType: webApp
+      appName: "$(WEB_APP_NAME)"
+      package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
+      deployToSlotOrASE: true
+      slotName: $(WEB_APP_SLOT_NAME)
+
+  - task: AzureAppServiceManage@0
+    displayName: "Swap with production slot"
+    inputs:
+      azureSubscription: "${{ parameters.AzureSubscription }}"
+      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      webAppName: $(WEB_APP_NAME)
+      action: "Swap Slots"
+      swapWithProduction: true
+      sourceSlot: $(WEB_APP_SLOT_NAME)  
+
+  - task: PowerShell@2
+    displayName: "Check the status of production slot"
+    inputs:
+      targetType: filePath
+      filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 1"
+
+  - task: AzureAppServiceManage@0
+    displayName: "Swap with production slot - Rollback"
+    condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
+    inputs:
+      azureSubscription: "${{ parameters.AzureSubscription }}"
+      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      webAppName: $(WEB_APP_NAME)
+      action: "Swap Slots"
+      swapWithProduction: true
+      sourceSlot: $(WEB_APP_SLOT_NAME)  
+
+  - task: PowerShell@2
+    displayName: "Check the status of production slot after rollback"
+    condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
+    inputs:
+      targetType: filePath
+      filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 0"

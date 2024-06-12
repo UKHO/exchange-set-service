@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "small_exchange_set_kv" {
-  name                        = lower("${var.service_name}-ukho-${var.env_name}-sxs-kv")
+  name                        = lower("${var.service_name}-ukho-${var.env_name}-sxs-kv${var.suffix}")
   location                    = var.location
   resource_group_name         = var.resource_group_name
   enabled_for_disk_encryption = true
@@ -69,7 +69,7 @@ resource "azurerm_key_vault_secret" "small_exchange_set_passed_in_secrets" {
 #Medium exchange set
 
 resource "azurerm_key_vault" "medium_exchange_set_kv" {
-  name                        = lower("${var.service_name}-ukho-${var.env_name}-mxs-kv")
+  name                        = lower("${var.service_name}-ukho-${var.env_name}-mxs-kv${var.suffix}")
   location                    = var.location
   resource_group_name         = var.resource_group_name
   enabled_for_disk_encryption = true
@@ -136,7 +136,7 @@ resource "azurerm_key_vault_secret" "medium_exchange_set_passed_in_secrets" {
 
 #Large exchange set
 resource "azurerm_key_vault" "large_exchange_set_kv" {
-  name                        = lower("${var.service_name}-ukho-${var.env_name}-lxs-kv")
+  name                        = lower("${var.service_name}-ukho-${var.env_name}-lxs-kv${var.suffix}")
   location                    = var.location
   resource_group_name         = var.resource_group_name
   enabled_for_disk_encryption = true

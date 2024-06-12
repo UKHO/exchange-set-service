@@ -11,7 +11,7 @@ param (
 cd $env:AGENT_BUILDDIRECTORY/terraformartifact/src
 
 Write-output "Executing terraform scripts for deployment in $workSpace enviroment"
-terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=terraform.deployment.tfplan"
+terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=terraform.deployment.v2.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform initialization"; throw "Error" }
 
 Write-output "Selecting workspace"
@@ -28,7 +28,7 @@ terraform validate
 if ( !$? ) { echo "Something went wrong during terraform validation" ; throw "Error" }
 
 Write-output "Execute Terraform plan"
-terraform plan -out "terraform.deployment.tfplan" -var elastic_apm_server_url=$elasticApmServerUrl -var elastic_apm_api_key=$elasticApmApiKey -var suffix="" -var storage_suffix="" | tee terraform_output.txt
+terraform plan -out "terraform.deployment.v2.tfplan" -var elastic_apm_server_url=$elasticApmServerUrl -var elastic_apm_api_key=$elasticApmApiKey -var suffix="-v2" -var storage_suffix="v2" | tee terraform_output.txt
 if ( !$? ) { echo "Something went wrong during terraform plan" ; throw "Error" }
 
 $totalDestroyLines=(Get-Content -Path terraform_output.txt | Select-String -Pattern "destroy" -CaseSensitive |  where {$_ -ne ""}).length
@@ -45,7 +45,7 @@ if($totalDestroyLines -ge 2)
 }
 
 Write-output "Executing terraform apply"
-terraform apply  "terraform.deployment.tfplan"
+terraform apply  "terraform.deployment.v2.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform apply" ; throw "Error" }
 
 Write-output "Terraform output as json"

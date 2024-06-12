@@ -29,3 +29,7 @@ variable "allowed_ips" {
 variable "tags" {
 
 }
+
+variable "suffix" {
+  default     = ""
+}

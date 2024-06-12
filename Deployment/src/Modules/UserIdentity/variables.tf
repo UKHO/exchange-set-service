@@ -13,3 +13,7 @@ variable "env_name" {
 variable "tags" {
 
 }
+
+variable "suffix" {
+  default     = ""
+}
