@@ -135,8 +135,6 @@ jobs:
   variables:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
-    - name: WEB_APP_NAME
-      value: $(WEB_APP_NAME)
   strategy:
     runOnce:
       deploy:
