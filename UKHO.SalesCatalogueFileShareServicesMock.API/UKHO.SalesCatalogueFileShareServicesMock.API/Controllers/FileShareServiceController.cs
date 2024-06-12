@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
@@ -96,7 +97,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             if (!string.IsNullOrEmpty(fileName))
             {
-                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
+                bytes = fileShareService.GetFileData(configuration["HOME"], Sanitise(batchId), fileName);
             }
 
             return File(bytes, "application/octet-stream", fileName);
@@ -115,7 +116,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId) && data != null && !string.IsNullOrEmpty(blockId) && !string.IsNullOrEmpty(contentMD5) && !string.IsNullOrEmpty(contentType))
             {
-                var response = fileShareService.UploadBlockOfFile(batchId, fileName, data, configuration["HOME"]);
+                var response = fileShareService.UploadBlockOfFile(Sanitise(batchId), fileName, data, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.Created);
@@ -134,7 +135,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName) && payload != null)
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
+                var response = fileShareService.CheckBatchWithZipFileExist(Sanitise(batchId), fileName, configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.NoContent);
@@ -151,7 +152,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId) && body != null)
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, body.Select(a => a.FileName).FirstOrDefault(), configuration["HOME"]);
+                var response = fileShareService.CheckBatchWithZipFileExist(Sanitise(batchId), body.Select(a => a.FileName).FirstOrDefault(), configuration["HOME"]);
                 if (response)
                 {
                     return Accepted(new BatchCommitResponse() { Status = new Status { URI = $"/batch/{batchId}/status" } });
@@ -173,7 +174,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId))
             {
-                var response = fileShareService.CheckBatchFolderExists(batchId, configuration["HOME"]);
+                var response = fileShareService.CheckBatchFolderExists(Sanitise(batchId), configuration["HOME"]);
                 if (response)
                 {
                     return StatusCode(StatusCodes.Status201Created);
@@ -189,7 +190,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (!string.IsNullOrEmpty(batchId))
             {
-                BatchStatusResponse batchStatusResponse = fileShareService.GetBatchStatus(batchId, configuration["HOME"]);
+                BatchStatusResponse batchStatusResponse = fileShareService.GetBatchStatus(Sanitise(batchId), configuration["HOME"]);
                 if (batchStatusResponse.Status == "Committed")
                 {
                     return new OkObjectResult(batchStatusResponse);
@@ -204,7 +205,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (batchId != null && batchId.Count > 0)
             {
-                var response = fileShareService.CleanUp(batchId, configuration["HOME"]);
+                var sanitisedBatchIds = batchId.Select(Sanitise).ToList(); 
+                var response = fileShareService.CleanUp(sanitisedBatchIds, configuration["HOME"]);
                 if (response)
                 {
                     return Ok();
@@ -219,11 +221,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             byte[] bytes = null;
             if (!string.IsNullOrEmpty(fileName))
             {
-                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
+                bytes = fileShareService.GetFileData(configuration["HOME"], Sanitise(batchId), fileName);
                 HttpContext.Response.Headers.Add("x-redirect-status", "true");
             }
 
             return File(bytes, "application/octet-stream", fileName);
+        }
+
+        public static string Sanitise(string text)
+        {
+             return  Regex.Replace(text, "[^a-zA-Z0-9-]", "");
         }
     }
 }
