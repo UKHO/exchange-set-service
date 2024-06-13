@@ -306,24 +306,6 @@
     <cve>CVE-2021-37941</cve>
     <cve>CVE-2019-7617</cve>
   </suppress>
-
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Azure.Identity:1.8.2
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
-    <cve>CVE-2023-36414</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Microsoft.Identity.Client.dll
-   ]]>
-    </notes>
-    <cve>CVE-2019-20138</cve>
-  </suppress>
   <suppress>
     <notes>
       <![CDATA[
@@ -487,23 +469,25 @@
     <cve>CVE-2024-21386</cve>
     <cve>CVE-2024-21404</cve>
   </suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
-   file name: Azure.Identity:1.7.0
-   file name: Azure.Identity:1.10.3
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity
+   Temp suppression until package is updated.
    ]]>
-		</notes>
-		<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
-		<cve>CVE-2024-29992</cve>
-	</suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-35255</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Microsoft.Identity.Client:4.57.0
+   Temp suppression until package is updated.
    ]]>
-		</notes>
-		<packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
-		<cve>CVE-2024-27086</cve>
-	</suppress>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
+    <cve>CVE-2024-27086</cve>
+    <vulnerabilityName>CVE-2024-35255</vulnerabilityName>
+  </suppress>
 </suppressions>
