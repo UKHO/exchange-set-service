@@ -147,6 +147,14 @@ jobs:
               artifactName: 'terraformartifact'
               downloadPath: '$(Build.SourcesDirectory)'
 
+          - task: PowerShell@2
+            displayName: "Set Terraform Output Variables"
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "##vso[task.setvariable variable=WEB_APP_NAME]$($terraformOutput.web_app_name.value)"
+                Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME]$($terraformOutput.web_app_resource_group.value)"
+
           - task: DownloadBuildArtifacts@0
             displayName: "Download Functional test Artifact"
             inputs:
