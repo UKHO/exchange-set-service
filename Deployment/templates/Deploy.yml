@@ -154,6 +154,8 @@ jobs:
               script: |
                 Write-Host "##vso[task.setvariable variable=WEB_APP_NAME]$($terraformOutput.web_app_name.value)"
                 Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME]$($terraformOutput.web_app_resource_group.value)"
+            name: SetTerraformOutputVariables
+
 
           - task: PowerShell@2
             displayName: "Echo Variables"
@@ -162,8 +164,8 @@ jobs:
               script: |
                 Write-Host "WEB_APP_NAME: $($terraformOutput.web_app_name.value)"
                 Write-Host "RESOURCE_GROUP_NAME: $($terraformOutput.web_app_resource_group.value)"
-                Write-Host "WEB_APP_NAME: $(WEB_APP_NAME)"
-                Write-Host "RESOURCE_GROUP_NAME: $(RESOURCE_GROUP_NAME)"
+                Write-Host "WEB_APP_NAME: $(SetTerraformOutputVariables.WEB_APP_NAME)"
+                Write-Host "RESOURCE_GROUP_NAME: $(SetTerraformOutputVariables.RESOURCE_GROUP_NAME)"
 
           - task: DownloadBuildArtifacts@0
             displayName: "Download Functional test Artifact"
