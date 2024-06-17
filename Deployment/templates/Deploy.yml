@@ -117,14 +117,7 @@ jobs:
               folderPath: '$(Build.SourcesDirectory)/functionaltests/'
               xmlTransformationRules:
               jsonTargetFiles: '**/appsettings.json'
-
-          - task: UseDotNet@2
-            displayName: 'Use .NET SDK'
-            inputs:
-              packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
-            
+          
 - deployment: FunctionalTests
   dependsOn: DeployApp
   displayName: "Run Functional Tests"
@@ -139,6 +132,13 @@ jobs:
     runOnce:
       deploy:
         steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET SDK'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
+
           - task: DownloadBuildArtifacts@0
             displayName: "Download Terraform Artifact"
             inputs:
