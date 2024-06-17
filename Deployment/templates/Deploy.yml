@@ -155,8 +155,8 @@ jobs:
                 $terraformOutput = Get-Content -Path $(Pipeline.Workspace)/terraformartifact/terraform_output.json | ConvertFrom-Json
                 Write-Host "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$($terraformOutput.web_app_name.value)"
                 Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$($terraformOutput.web_app_resource_group.value)"
-                Write-Host "$(WEB_APP_NAME)"
-
+                Write-Host "$(SetPipelineVariableSetPipelineVariable.WEB_APP_NAME)"
+            name: SetPipelineVariable
           - task: DownloadBuildArtifacts@0
             displayName: "Download Functional test Artifact"
             inputs:
@@ -173,7 +173,7 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
               scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
           - task: DotNetCoreCLI@2
             displayName: "Run Functional tests AIOEnabled"
@@ -194,7 +194,7 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
               scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(SetPipelineVariableSetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
           - task: DotNetCoreCLI@2
             displayName: "Run Functional tests AIODisabled"
@@ -216,4 +216,4 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
               scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-              arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+              arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
