@@ -155,7 +155,6 @@ jobs:
                 $terraformOutput = Get-Content -Path $(Pipeline.Workspace)/terraformartifact/terraform_output.json | ConvertFrom-Json
                 Write-Host "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$($terraformOutput.web_app_name.value)"
                 Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$($terraformOutput.web_app_resource_group.value)"
-                Write-Host "$(SetPipelineVariableSetPipelineVariable.WEB_APP_NAME)"
             name: SetPipelineVariable
           - task: DownloadBuildArtifacts@0
             displayName: "Download Functional test Artifact"
