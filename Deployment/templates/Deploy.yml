@@ -155,7 +155,7 @@ jobs:
                 Write-Host $[ dependencies.DeployApp.outputs['terraformdevdeploy.WEB_APP_NAME'] ]
                 Write-Host "$[ dependencies.DeployApp.outputs['terraformdevdeploy.WEB_APP_NAME'] ]"
 
-                Write-Host "RESOURCE_GROUP_NAME: $(SetTerraformOutputVariables.RESOURCE_GROUP_NAME)"
+                Write-Host "RESOURCE_GROUP_NAME: $(terraformdevdeploy.RESOURCE_GROUP_NAME)"
 
           - task: DownloadBuildArtifacts@0
             displayName: "Download Functional test Artifact"
