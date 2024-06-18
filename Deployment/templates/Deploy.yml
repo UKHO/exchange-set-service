@@ -150,13 +150,6 @@ jobs:
               artifactName: 'terraformartifact'
               downloadPath: '$(Build.SourcesDirectory)'
 
-          - task: FileTransform@2
-            displayName: "File Transform: functionaltests"
-            inputs:
-              folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-              xmlTransformationRules:
-              jsonTargetFiles: '**/appsettings.json'
-          
           - task: DownloadBuildArtifacts@0
             displayName: "Download Functional test Artifact"
             inputs:
@@ -165,6 +158,13 @@ jobs:
               artifactName: 'functionaltests'
               downloadPath: '$(Build.SourcesDirectory)'
 
+          - task: FileTransform@2
+            displayName: "File Transform: functionaltests"
+            inputs:
+              folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+              xmlTransformationRules:
+              jsonTargetFiles: '**/appsettings.json'
+     
           - task: UseDotNet@2
             displayName: 'Use .NET SDK'
             inputs:
