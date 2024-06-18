@@ -886,7 +886,7 @@ stages:
         parameters:
           Environment: "preprod"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-PreProd-A.011.08"
+          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
           Container: ${{variables.Container}}
           RunTests: false
 
