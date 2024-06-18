@@ -95,29 +95,6 @@ jobs:
               tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
               tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
               
-          # - task: DownloadBuildArtifacts@0
-          #   displayName: "Download Functional test Artifact"
-          #   inputs:
-          #     buildType: 'current'
-          #     downloadType: 'single'
-          #     artifactName: 'functionaltests'
-          #     downloadPath: '$(Build.SourcesDirectory)'
-
-          # - task: DownloadBuildArtifacts@0
-          #   displayName: "Download Terraform Artifact"
-          #   inputs:
-          #     buildType: 'current'
-          #     downloadType: 'single'
-          #     artifactName: 'terraformartifact'
-          #     downloadPath: '$(Build.SourcesDirectory)'
-
-          # - task: FileTransform@2
-          #   displayName: "File Transform: functionaltests"
-          #   inputs:
-          #     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-          #     xmlTransformationRules:
-          #     jsonTargetFiles: '**/appsettings.json'
-          
 - deployment: FunctionalTests
   dependsOn: DeployApp
   displayName: "Run Functional Tests"
@@ -194,14 +171,14 @@ jobs:
               testRunTitle: "${{parameters.Environment}}-AutomationTests"
               workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
-          - task: AzureCLI@2
+          - task: AzureCLI@
             displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"                  
             inputs:
               azureSubscription: ${{parameters.AzureSubscription}}
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
               scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(SetPipelineVariableSetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
           - task: DotNetCoreCLI@2
             displayName: "Run Functional tests AIODisabled"
