@@ -861,3 +861,32 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
           Container: ${{variables.Container}} 
+
+  - stage: IatDeploy
+    dependsOn: 
+      - Devdeploy
+    displayName: IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+    jobs:
+      - template: Deployment/templates/Deploy.yml
+        parameters:
+          Environment: "iat"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-IAT-A.011.08"
+          Container: ${{variables.Container}}
+          RunTests: false
+
+  - stage: PreProdDeploy
+    dependsOn: 
+      - IatDeploy
+    displayName: IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+    jobs:
+      - template: Deployment/templates/Deploy.yml
+        parameters:
+          Environment: "preprod"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-PreProd-A.011.08"
+          Container: ${{variables.Container}}
+          RunTests: false
+
