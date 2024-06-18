@@ -95,13 +95,52 @@ jobs:
               tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
               tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
               
-          - task: DownloadBuildArtifacts@0
-            displayName: "Download Functional test Artifact"
+          # - task: DownloadBuildArtifacts@0
+          #   displayName: "Download Functional test Artifact"
+          #   inputs:
+          #     buildType: 'current'
+          #     downloadType: 'single'
+          #     artifactName: 'functionaltests'
+          #     downloadPath: '$(Build.SourcesDirectory)'
+
+          # - task: DownloadBuildArtifacts@0
+          #   displayName: "Download Terraform Artifact"
+          #   inputs:
+          #     buildType: 'current'
+          #     downloadType: 'single'
+          #     artifactName: 'terraformartifact'
+          #     downloadPath: '$(Build.SourcesDirectory)'
+
+          # - task: FileTransform@2
+          #   displayName: "File Transform: functionaltests"
+          #   inputs:
+          #     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+          #     xmlTransformationRules:
+          #     jsonTargetFiles: '**/appsettings.json'
+          
+- deployment: FunctionalTests
+  dependsOn: DeployApp
+  displayName: "Run Functional Tests"
+  environment: "Ess-${{parameters.Environment}}"
+  pool: $(DeploymentPool)
+  container: ${{parameters.Container}}
+  condition: ${{parameters.RunTests}}
+  variables:
+    - group: "ESS-${{parameters.Environment}}-Variables"
+    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+          - task: PowerShell@2
+            displayName: "Set Pipeline Variable"
             inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'functionaltests'
-              downloadPath: '$(Build.SourcesDirectory)'
+              targetType: 'inline'
+              script: |
+                $terraformOutput = Get-Content -Path $(Pipeline.Workspace)/terraformartifact/terraform_output.json | ConvertFrom-Json
+                Write-Host "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$($terraformOutput.web_app_name.value)"
+                Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$($terraformOutput.web_app_resource_group.value)"
+            name: SetPipelineVariable
 
           - task: DownloadBuildArtifacts@0
             displayName: "Download Terraform Artifact"
@@ -118,44 +157,6 @@ jobs:
               xmlTransformationRules:
               jsonTargetFiles: '**/appsettings.json'
           
-- deployment: FunctionalTests
-  dependsOn: DeployApp
-  displayName: "Run Functional Tests"
-  environment: "Ess-${{parameters.Environment}}"
-  pool: $(DeploymentPool)
-  container: ${{parameters.Container}}
-  condition: ${{parameters.RunTests}}
-  variables:
-    - group: "ESS-${{parameters.Environment}}-Variables"
-    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-          - task: UseDotNet@2
-            displayName: 'Use .NET SDK'
-            inputs:
-              packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
-
-          - task: DownloadBuildArtifacts@0
-            displayName: "Download Terraform Artifact"
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'terraformartifact'
-              downloadPath: '$(Build.SourcesDirectory)'
-
-          - task: PowerShell@2
-            displayName: "Set Pipeline Variable"
-            inputs:
-              targetType: 'inline'
-              script: |
-                $terraformOutput = Get-Content -Path $(Pipeline.Workspace)/terraformartifact/terraform_output.json | ConvertFrom-Json
-                Write-Host "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$($terraformOutput.web_app_name.value)"
-                Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$($terraformOutput.web_app_resource_group.value)"
-            name: SetPipelineVariable
           - task: DownloadBuildArtifacts@0
             displayName: "Download Functional test Artifact"
             inputs:
@@ -163,6 +164,13 @@ jobs:
               downloadType: 'single'
               artifactName: 'functionaltests'
               downloadPath: '$(Build.SourcesDirectory)'
+
+          - task: UseDotNet@2
+            displayName: 'Use .NET SDK'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: AzureCLI@2
             displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
