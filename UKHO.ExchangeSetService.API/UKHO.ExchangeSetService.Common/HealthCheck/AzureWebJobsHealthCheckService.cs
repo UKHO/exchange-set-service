@@ -36,33 +36,15 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
             string[] exchangeSetTypes = essFulfilmentStorageConfiguration.Value.ExchangeSetTypes.Split(",");
-            string webAppVersion = essFulfilmentStorageConfiguration.Value.WebAppVersion;
-            string userNameKey, passwordKey, webJobUri = string.Empty;
             List<WebJobDetails> webJobs = new List<WebJobDetails>();
             foreach (string exchangeSetTypeName in exchangeSetTypes)
             {
                 Enum.TryParse(exchangeSetTypeName, out ExchangeSetType exchangeSetType);
                 for (int instance = 1; instance <= azureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(exchangeSetType); instance++)
                 {
-                    if (webAppVersion.ToLowerInvariant() != "v2")
-                    {
-                        userNameKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-username";
-                        passwordKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-password";
-                        webJobUri =
-                            $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
-                    }
-                    else
-                    {
-                        userNameKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-v2-scm-username";
-                        passwordKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-v2-scm-password";
-                        webJobUri =
-                            $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-v2.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
-                    }
-
+                    string userNameKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-username";
+                    string passwordKey = $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-password";
+                    string webJobUri = $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
                     string userPassword = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey) + ":" + webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
                     userPassword = Convert.ToBase64String(Encoding.Default.GetBytes(userPassword));
 

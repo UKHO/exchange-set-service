@@ -11,8 +11,8 @@ variable "resource_group_name" {
 locals {
   env_name				= lower(terraform.workspace)
   service_name			= "ess"
-  web_app_name		    = "${local.service_name}-${local.env_name}-webapp${var.suffix}"
-  key_vault_name		= "${local.service_name}-ukho-${local.env_name}-kv${var.suffix}"
+  web_app_name		    = "${local.service_name}-${local.env_name}-webapp"
+  key_vault_name		= "${local.service_name}-ukho-${local.env_name}-kv"
   tags = {
     SERVICE          = "Exchange Set Service"
     ENVIRONMENT      = local.env_name
@@ -59,6 +59,14 @@ variable "app_service_sku" {
 	    tier = "PremiumV3"
 	    size = "P1v3"
         }
+    "iat"     = {
+      tier = "PremiumV3"
+      size = "P1v3"
+        }
+    "preprod"  = {
+	    tier = "PremiumV3"
+	    size = "P1v3"
+        }
     "prod"   = {
 	    tier = "PremiumV3"
 	    size = "P1v3"
@@ -86,12 +94,4 @@ variable "elastic_apm_server_url" {
 }
 
 variable "elastic_apm_api_key" {
-}
-
-variable "suffix" {
-  default     = ""
-}
-
-variable "storage_suffix" {
-  default     = ""
 }

@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "ess_cache_storage" {
-  name = lower("${var.name}")
+  name = lower("${var.service_name}${var.env_name}cachestorageukho")
   resource_group_name = var.resource_group_name
   location = var.location
   account_tier = "Standard"

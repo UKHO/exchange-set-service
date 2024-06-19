@@ -16,21 +16,21 @@ resource "azurerm_eventhub" "eventhub" {
 }
 
 resource "azurerm_eventhub_consumer_group" "logstash_consumer_group" {
-  name                = "logstash${var.suffix}"
+  name                = "logstash"
   namespace_name      = azurerm_eventhub_namespace.eventhub_namespace.name
   eventhub_name       = azurerm_eventhub.eventhub.name
   resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_eventhub_consumer_group" "logging_application_consumer_group" {
-  name                = "loggingApplication${var.suffix}"
+  name                = "loggingApplication"
   namespace_name      = azurerm_eventhub_namespace.eventhub_namespace.name
   eventhub_name       = azurerm_eventhub.eventhub.name
   resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_eventhub_authorization_rule" "logstash" {
-  name                = "logstashAccessKey${var.suffix}"
+  name                = "logstashAccessKey"
   namespace_name      = azurerm_eventhub_namespace.eventhub_namespace.name
   eventhub_name       = azurerm_eventhub.eventhub.name
   resource_group_name = var.resource_group_name
@@ -40,7 +40,7 @@ resource "azurerm_eventhub_authorization_rule" "logstash" {
 }
 
 resource "azurerm_eventhub_authorization_rule" "log" {
-  name                = "logAccessKey${var.suffix}"
+  name                = "logAccessKey"
   namespace_name      = azurerm_eventhub_namespace.eventhub_namespace.name
   eventhub_name       = azurerm_eventhub.eventhub.name
   resource_group_name = var.resource_group_name

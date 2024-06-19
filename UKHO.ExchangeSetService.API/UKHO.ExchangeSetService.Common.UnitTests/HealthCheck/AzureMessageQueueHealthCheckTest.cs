@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
 
             this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
-            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes= "test", WebAppVersion = "" });
+            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes= "test" });
 
             azureMessageQueueHealthCheck = new AzureMessageQueueHealthCheck(fakeAzureMessageQueueHelperClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger, fakeAzureBlobStorageService);
         }

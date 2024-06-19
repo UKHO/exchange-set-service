@@ -6,6 +6,10 @@ variable "location" {
   type = string
 }
 
+variable "env_name" {
+  type  = string
+}
+
 variable "tags" {
 }
 
@@ -32,7 +36,4 @@ variable "medium_exchange_set_subnets" {
 }
 
 variable "large_exchange_set_subnets" {
-}
-
-variable name {
-}
+} 
