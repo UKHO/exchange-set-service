@@ -70,6 +70,8 @@ variable "env_suffix" {
     "qa"      = "QA"
     "vne"     = "VNE"
     "vni"     = "VNI"
+    "iat"     = "IAT"
+    "preprod" = "PreProd"
   }
 }
 
