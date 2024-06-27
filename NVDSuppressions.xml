@@ -490,4 +490,34 @@
     <cve>CVE-2024-27086</cve>
     <vulnerabilityName>CVE-2024-35255</vulnerabilityName>
   </suppress>
+  <suppress>
+   <notes><![CDATA[
+   file name: Azure.Identity.dll
+   ]]></notes>
+   <cve>CVE-2024-35255</cve>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Microsoft.Identity.Client.Extensions.Msal.dll
+   ]]></notes>
+   <cve>CVE-2024-35255</cve>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Microsoft.Identity.Client.dll
+   ]]></notes>
+   <cve>CVE-2024-35255</cve>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Microsoft.IdentityModel.Clients.ActiveDirectory.dll
+   ]]></notes>
+   <cve>CVE-2024-35255</cve>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Microsoft.Kiota.Authentication.Azure.dll
+   ]]></notes>
+   <cve>CVE-2024-35255</cve>
+</suppress>
 </suppressions>
