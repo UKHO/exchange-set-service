@@ -76,6 +76,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
+                    exchangeSetStandard = SanitizeInputExchangeSetStandard(exchangeSetStandard);
                     if (productIdentifiers == null || productIdentifiers.Length == 0)
                     {
                         var error = new List<Error>
@@ -163,6 +164,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
+                    exchangeSetStandard = SanitizeInputExchangeSetStandard(exchangeSetStandard);
+
                     if (productVersionsRequest == null || !productVersionsRequest.Any())
                     {
                         var error = new List<Error>
@@ -244,6 +247,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
+                    exchangeSetStandard = SanitizeInputExchangeSetStandard(exchangeSetStandard);
                     ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
                     {
                         SinceDateTime = sinceDateTime,
@@ -287,6 +291,16 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
                     return GetEssResponse(productDetail);
                 }, GetCurrentCorrelationId(), exchangeSetStandard);
+        }
+
+        private string SanitizeInputExchangeSetStandard(string input)
+        {
+            if (input.Contains("s57") || input.Contains("s63"))
+            {
+                return input;
+            }
+
+            return "Bad Request";
         }
     }
 }
