@@ -305,6 +305,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
             {
                 return input;
             }
+
+            if(string.IsNullOrWhiteSpace(input) || string.IsNullOrEmpty(input))
+            {
+                return "s63";
+            }
+
             return "Bad Request";
         }
 
