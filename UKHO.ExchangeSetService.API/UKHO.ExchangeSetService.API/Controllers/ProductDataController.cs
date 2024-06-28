@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Filters;
@@ -77,7 +80,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 async () =>
                 {
                     exchangeSetStandard = SanitizeInputExchangeSetStandard(exchangeSetStandard);
-                    if (productIdentifiers == null || productIdentifiers.Length == 0)
+                    
+                    if (!ValidateInputProductIdentifiers(productIdentifiers, out string[] productIdentifiersSanitized))
                     {
                         var error = new List<Error>
                         {
@@ -89,9 +93,10 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         };
                         return BuildBadRequestErrorResponse(error);
                     }
+
                     var productIdentifierRequest = new ProductIdentifierRequest()
                     {
-                        ProductIdentifier = productIdentifiers,
+                        ProductIdentifier = productIdentifiersSanitized,
                         CallbackUri = callbackUri,
                         ExchangeSetStandard = exchangeSetStandard,
                         CorrelationId = GetCurrentCorrelationId()
@@ -165,7 +170,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 async () =>
                 {
                     exchangeSetStandard = SanitizeInputExchangeSetStandard(exchangeSetStandard);
-
+                    
                     if (productVersionsRequest == null || !productVersionsRequest.Any())
                     {
                         var error = new List<Error>
@@ -295,12 +300,30 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         private string SanitizeInputExchangeSetStandard(string input)
         {
-            if (input.Contains("s57") || input.Contains("s63"))
+            Regex regex = new Regex("^(s57|s63)$");
+            if (regex.IsMatch(input))
             {
                 return input;
             }
-
             return "Bad Request";
+        }
+
+        private bool ValidateInputProductIdentifiers(string[] productIdentifiers, out string[] productIdentifiersSanitized)
+        {
+            bool isValid = false;
+            productIdentifiersSanitized = Array.Empty<string>();
+            if (productIdentifiers != null || productIdentifiers.Length != 0)
+            {
+                string pattern = "/^[a-zA-Z0-9]{2}[1-68][a-zA-Z0-9]{5}$/";
+                Regex r = new Regex(pattern);
+                if (productIdentifiers.ToList().TrueForAll(x => r.IsMatch(x)))
+                {
+                    productIdentifiersSanitized = productIdentifiers;
+                    isValid = true;
+                }
+            }
+
+            return isValid;
         }
     }
 }
