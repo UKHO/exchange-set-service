@@ -336,11 +336,15 @@ namespace UKHO.ExchangeSetService.API.Controllers
         private string[] SanitizeProductIdentifiers(string[] productIdentifiers)
         {
             List<string> sanitizedIdentifiers = new List<string>();
-            foreach (string identifier in productIdentifiers)
+            if (productIdentifiers != null && productIdentifiers.Length > 0)
             {
-                string sanitizedIdentifier = identifier.Trim();
-                sanitizedIdentifiers.Add(sanitizedIdentifier);
+                foreach (string identifier in productIdentifiers)
+                {
+                    string sanitizedIdentifier = identifier.Trim();
+                    sanitizedIdentifiers.Add(sanitizedIdentifier);
+                }
             }
+
             return sanitizedIdentifiers.ToArray();
         }
         private string SanitizeString(string input)
