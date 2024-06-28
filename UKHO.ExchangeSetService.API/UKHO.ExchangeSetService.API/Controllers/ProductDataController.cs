@@ -312,11 +312,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             bool isValid = false;
             productIdentifiersSanitized = Array.Empty<string>();
-            if (productIdentifiers != null || productIdentifiers.Length != 0)
+            if (productIdentifiers != null && productIdentifiers.Length != 0)
             {
                 string pattern = "/^[a-zA-Z0-9]{2}[1-68][a-zA-Z0-9]{5}$/";
                 Regex r = new Regex(pattern);
-                if (productIdentifiers.ToList().TrueForAll(x => r.IsMatch(x)))
+                if (productIdentifiers.Any(x => !r.IsMatch(x)))
                 {
                     productIdentifiersSanitized = productIdentifiers;
                     isValid = true;
