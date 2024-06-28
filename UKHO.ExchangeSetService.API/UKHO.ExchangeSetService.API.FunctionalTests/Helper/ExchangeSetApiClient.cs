@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData";
-            
+
             uri += $"?exchangeSetStandard={exchangeSetStandard}";
 
             if (sincedateTime != null)
@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);
@@ -104,8 +104,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-        
-                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);
@@ -128,12 +127,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 uri += $"?callbackuri={callbackUri}";
             }
-           
+
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
 
-                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);
@@ -156,11 +155,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 uri += $"?callbackuri={callbackUri}";
             }
-           
+
             var payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);
@@ -235,7 +234,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var uri = $"{apiHost}/webhook/newfilespublished";
             var payloadJson = JsonConvert.SerializeObject(request);
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);
@@ -249,7 +248,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var uri = $"{apiHost}/ProductInformation/productIdentifiers";
             var payloadJson = JsonConvert.SerializeObject(payload);
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
-                { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
+            { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
             {
                 httpRequestMessage.SetBearerToken(accessToken);
@@ -260,7 +259,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public async Task<HttpResponseMessage> GetProductInformationByDateTimeAsync(string accessToken = null, string sinceDateTime = null)
         {
             var uri = $"{apiHost}/productInformation";
-            if(sinceDateTime != null)
+            if (sinceDateTime != null)
                 uri += $"?sinceDateTime={sinceDateTime}";
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
             if (accessToken != null)
