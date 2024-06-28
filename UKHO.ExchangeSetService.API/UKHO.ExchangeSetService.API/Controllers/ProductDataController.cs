@@ -76,6 +76,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard)
         {
             exchangeSetStandard = SanitizeInputExchangeSetStandard(exchangeSetStandard);
+            productIdentifiers = SanitizeProductIdentifiers(productIdentifiers);
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
@@ -300,6 +301,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         private string SanitizeInputExchangeSetStandard(string input)
         {
+            input = SanitizeString(input);
             Regex regex = new Regex("^(s57|s63)$");
             if (regex.IsMatch(input))
             {
@@ -314,22 +316,44 @@ namespace UKHO.ExchangeSetService.API.Controllers
             return "Bad Request";
         }
 
-        private bool ValidateInputProductIdentifiers(string[] productIdentifiers, out string[] productIdentifiersSanitized)
+        private bool ValidateInputProductIdentifiers(string[] productIdentifiers, out string[] productIdentifiersValidated)
         {
             bool isValid = false;
-            productIdentifiersSanitized = Array.Empty<string>();
+            productIdentifiersValidated = Array.Empty<string>();
             if (productIdentifiers != null && productIdentifiers.Length != 0)
             {
                 string pattern = "/^[a-zA-Z0-9]{2}[1-68][a-zA-Z0-9]{5}$/";
                 Regex r = new Regex(pattern);
                 if (productIdentifiers.Any(x => !r.IsMatch(x)))
                 {
-                    productIdentifiersSanitized = productIdentifiers;
+                    productIdentifiersValidated = productIdentifiers;
                     isValid = true;
                 }
             }
 
             return isValid;
         }
+        private string[] SanitizeProductIdentifiers(string[] productIdentifiers)
+        {
+            List<string> sanitizedIdentifiers = new List<string>();
+            foreach (string identifier in productIdentifiers)
+            {
+                string sanitizedIdentifier = identifier.Trim();
+                sanitizedIdentifiers.Add(sanitizedIdentifier);
+            }
+            return sanitizedIdentifiers.ToArray();
+        }
+        private string SanitizeString(string input)
+        {
+            // Remove leading and trailing white spaces
+            string sanitizedString = input.Trim();
+
+            // Remove any special characters or symbols
+            sanitizedString = Regex.Replace(sanitizedString, @"[^a-zA-Z0-9]", "");
+
+            return sanitizedString;
+        }
+
+
     }
 }
