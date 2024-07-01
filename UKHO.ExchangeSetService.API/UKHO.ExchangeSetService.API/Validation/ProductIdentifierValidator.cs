@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.Validation
                .WithMessage("productIdentifiers cannot be null or empty.");
             
             RuleFor(p => p.ProductIdentifier)
-                .Must(pi => pi == null || pi.Length != 0)
+                .Must(pi => pi != null)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("Either body is null or malformed.").OverridePropertyName("requestBody");
 

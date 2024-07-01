@@ -70,6 +70,20 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
+        [Test]
+        public void WhenNullProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        {
+            string[] productIdentifiers = { null };
+            string callbackUri = string.Empty;
+            var model = new ProductIdentifierRequest
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+        }
 
         [Test]
         public void WhenValidProductIdentifiersAndvalidCallBackuriInProductIdentifiersRequest_ThenReturnSuccess()
