@@ -86,6 +86,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
+        public void WhenZeroProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        {
+            string[] productIdentifiers = {  };
+            string callbackUri = string.Empty;
+            var model = new ProductIdentifierRequest
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+        }
+
+        [Test]
         public void WhenValidProductIdentifiersAndvalidCallBackuriInProductIdentifiersRequest_ThenReturnSuccess()
         {
             string[] productIdentifiers = { "GB123456", "GB160060", "AU334550" };

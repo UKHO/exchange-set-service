@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.API.Validation
         public ProductIdentifierValidator()
         {
             RuleFor(p => p.ProductIdentifier)
-               .Must(pi => pi != null && pi.All(u => !string.IsNullOrWhiteSpace(u)))
+               .Must(pi => pi != null && pi.All(u => !string.IsNullOrWhiteSpace(u)) && pi.Length != 0)
                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                .WithMessage("productIdentifiers cannot be null or empty.");
             
