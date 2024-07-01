@@ -20,7 +20,12 @@ namespace UKHO.ExchangeSetService.API.Validation
             RuleFor(p => p.ProductIdentifier)
                .Must(pi => pi != null && pi.All(u => !string.IsNullOrWhiteSpace(u)))
                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-               .WithMessage("productIdentifiers cannot be null or empty.");           
+               .WithMessage("productIdentifiers cannot be null or empty.");
+            
+            RuleFor(p => p.ProductIdentifier)
+                .Must(pi => pi != null)
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .WithMessage("Either body is null or malformed.");
 
             RuleFor(x => x.CallbackUri)               
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))                
