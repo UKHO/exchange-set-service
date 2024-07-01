@@ -18,12 +18,12 @@ namespace UKHO.ExchangeSetService.API.Validation
         public ProductIdentifierValidator()
         {
             RuleFor(p => p.ProductIdentifier)
-               .Must(pi => pi != null && pi.All(u => !string.IsNullOrWhiteSpace(u)) && pi.Length != 0)
+               .Must(pi => pi != null && pi.All(u => !string.IsNullOrWhiteSpace(u)))
                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                .WithMessage("productIdentifiers cannot be null or empty.");
             
             RuleFor(p => p.ProductIdentifier)
-                .Must(pi => pi != null)
+                .Must(pi => pi != null && pi.Length != 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("Either body is null or malformed.").OverridePropertyName("requestBody");
 
