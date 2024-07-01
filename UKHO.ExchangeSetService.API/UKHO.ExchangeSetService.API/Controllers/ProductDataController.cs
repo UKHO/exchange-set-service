@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    if (productIdentifiers.Length == 0)
+                    if (productIdentifiers == null || productIdentifiers.Length == 0)
                     {
                         var error = new List<Error>
                         {
