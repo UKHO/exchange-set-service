@@ -299,8 +299,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         private string[] SanitizeProductIdentifiers(string[] productIdentifiers)
         {
+            if(productIdentifiers == null)
+            {
+                return null;
+            }
             List<string> sanitizedIdentifiers = new List<string>();
-            if (productIdentifiers != null && productIdentifiers.Length > 0 && productIdentifiers[0] != null)
+            if (productIdentifiers.Length > 0 && productIdentifiers[0] != null)
             {
                 foreach (string identifier in productIdentifiers)
                 {
