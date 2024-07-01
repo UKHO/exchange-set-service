@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.Validation
             RuleFor(p => p.ProductIdentifier)
                 .Must(pi => pi == null || pi.Length != 0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Either body is null or malformed.").WithName("requestBody");
+                .WithMessage("Either body is null or malformed.").OverridePropertyName("requestBody");
 
             RuleFor(x => x.CallbackUri)               
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))                
