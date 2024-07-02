@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    if (productIdentifiers == null || !productIdentifiers.Any())
+                    if (productIdentifiers == null || productIdentifiers.Length == 0)
                     {
                         var error = new List<Error>
                         {
@@ -168,7 +168,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    if (productVersionsRequest == null)
+                    if (productVersionsRequest == null || !productVersionsRequest.Any())
                     {
                         var error = new List<Error>
                         {
