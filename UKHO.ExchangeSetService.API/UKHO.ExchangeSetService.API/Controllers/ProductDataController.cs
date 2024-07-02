@@ -80,8 +80,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-
-
                     var productIdentifierRequest = new ProductIdentifierRequest()
                     {
                         ProductIdentifier = productIdentifiers,
@@ -158,19 +156,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-
-                    if (productVersionsRequest == null || !productVersionsRequest.Any())
-                    {
-                        var error = new List<Error>
-                        {
-                            new()
-                            {
-                                Source = "requestBody",
-                                Description = "Either body is null or malformed."
-                            }
-                        };
-                        return BuildBadRequestErrorResponse(error);
-                    }
                     ProductDataProductVersionsRequest request = new()
                     {
                         ProductVersions = productVersionsRequest,

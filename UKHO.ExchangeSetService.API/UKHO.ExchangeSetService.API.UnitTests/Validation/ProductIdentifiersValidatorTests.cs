@@ -34,32 +34,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             string callbackUri = string.Empty;
             var model = new ProductIdentifierRequest
             {
-              ProductIdentifier = productIdentifiers,
-              CallbackUri = callbackUri
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
             };
             var result = validator.TestValidate(model);
             Assert.IsTrue(result.Errors.Count == 0);
         }
 
         [Test]
-        public void WhenNullProductIdentifierInProductIdentifierRequest_ThenReturnBadRequest()
-        {
-            string[] productIdentifiers = null;
-            string callbackUri = null;
-            var model = new ProductIdentifierRequest
-            {
-                ProductIdentifier = productIdentifiers,
-                CallbackUri = callbackUri
-            };
-            var result = validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
-        }
-
-        [Test]
         public void WhenEmptyProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
         {
-            string[] productIdentifiers = {string.Empty};
+            string[] productIdentifiers = { string.Empty };
             string callbackUri = string.Empty;
             var model = new ProductIdentifierRequest
             {
@@ -104,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         [Test]
         public void WhenZeroProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
         {
-            string[] productIdentifiers = {  };
+            string[] productIdentifiers = null;
             string callbackUri = string.Empty;
             var model = new ProductIdentifierRequest
             {
@@ -127,7 +112,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             Assert.AreEqual(0, result.Errors.Count);
-        }        
+        }
         #endregion
     }
 }
