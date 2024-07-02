@@ -10,27 +10,27 @@ using UKHO.ExchangeSetService.Common.Models.Request;
 namespace UKHO.ExchangeSetService.API.Validation
 {
     public class ProductIdentifierValidator : AbstractValidator<ProductIdentifierRequest>, IProductIdentifierValidator
-    {       
+    {
         public ProductIdentifierValidator()
         {
             RuleFor(p => p.ProductIdentifier)
-                .Must(pi => pi != null && pi.Length != 0)
+                .Must(pi => pi != null)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Either body is null or malformed.").OverridePropertyName("requestBody");
-
+                .WithMessage("Either body is null or malformed.").OverridePropertyName("requestBody")
+                .DependentRules(() =>
             RuleFor(p => p.ProductIdentifier)
                .Must(pi => pi.All(u => !string.IsNullOrWhiteSpace(u)) && pi != Array.Empty<string>())
                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-               .WithMessage("productIdentifiers cannot be null or empty.").When(x => x.ProductIdentifier != null);
-            
-            RuleFor(x => x.CallbackUri)               
-                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))                
+               .WithMessage("productIdentifiers cannot be null or empty."));
+
+            RuleFor(x => x.CallbackUri)
+                .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
                 .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
         }
         Task<ValidationResult> IProductIdentifierValidator.Validate(ProductIdentifierRequest productIdentifierRequest)
         {
             return ValidateAsync(productIdentifierRequest);
-        }       
-    }    
+        }
+    }
 }
