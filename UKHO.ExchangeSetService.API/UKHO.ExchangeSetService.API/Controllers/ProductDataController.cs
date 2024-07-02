@@ -168,7 +168,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    if (productVersionsRequest == null || !productVersionsRequest.Any())
+                    if (productVersionsRequest == null)
                     {
                         var error = new List<Error>
                         {
