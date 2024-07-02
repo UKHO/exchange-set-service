@@ -299,7 +299,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             if(productIdentifiers == null)
             {
-                return null;
+                return productIdentifiers;
             }
             List<string> sanitizedIdentifiers = new List<string>();
             if (productIdentifiers.Length > 0 && productIdentifiers[0] != null)
