@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Response;
@@ -13,6 +13,7 @@ namespace UKHO.ExchangeSetService.Common.Storage
     {
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly IAzureBlobStorageService azureBlobStorageService;
+
         public ExchangeSetStorageProvider(IOptions<EssFulfilmentStorageConfiguration> storageConfig,
             IAzureBlobStorageService azureBlobStorageService)
         {
@@ -20,9 +21,9 @@ namespace UKHO.ExchangeSetService.Common.Storage
             this.azureBlobStorageService = azureBlobStorageService;
         }
 
-        public virtual async Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
+        public virtual async Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
-            return await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(storageConfig.Value.StorageContainerName, batchId, salesCatalogueResponse, callBackUri, correlationId, CancellationToken.None, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse);
+            return await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(storageConfig.Value.StorageContainerName, batchId, salesCatalogueResponse, callBackUri, exchangeSetStandard, correlationId, CancellationToken.None, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentValidation.TestHelper;
+﻿using System;
+using FluentValidation.TestHelper;
 using NUnit.Framework;
 using System.Linq;
 using UKHO.ExchangeSetService.API.Validation;
@@ -29,36 +30,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         [Test]
         public void WhenEmptyCallbackuriInProductDataProductIdentifierRequest_ThenReturnSuccess()
         {
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string[] productIdentifiers = { "GB123456", "GB160060", "AU334550" };
             string callbackUri = string.Empty;
             var model = new ProductIdentifierRequest
             {
-              ProductIdentifier = productIdentifiers,
-              CallbackUri = callbackUri
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
             };
             var result = validator.TestValidate(model);
             Assert.IsTrue(result.Errors.Count == 0);
         }
 
         [Test]
-        public void WhenNullProductIdentifierInProductIdentifierRequest_ThenReturnBadRequest()
-        {
-            string[] productIdentifiers = null;
-            string callbackUri = null;
-            var model = new ProductIdentifierRequest
-            {
-                ProductIdentifier = productIdentifiers,
-                CallbackUri = callbackUri
-            };
-            var result = validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
-        }
-
-        [Test]
         public void WhenEmptyProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
         {
-            string[] productIdentifiers = new string[] {string.Empty};
+            string[] productIdentifiers = { string.Empty };
             string callbackUri = string.Empty;
             var model = new ProductIdentifierRequest
             {
@@ -70,11 +56,55 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
+        [Test]
+        public void WhenNullProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        {
+            string[] productIdentifiers = { null };
+            string callbackUri = string.Empty;
+            var model = new ProductIdentifierRequest
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+        }
+
+        [Test]
+        public void WhenZeroLengthProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        {
+            string[] productIdentifiers = Array.Empty<string>();
+            string callbackUri = string.Empty;
+            var model = new ProductIdentifierRequest
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+        }
+
+        [Test]
+        public void WhenZeroProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        {
+            string[] productIdentifiers = null;
+            string callbackUri = string.Empty;
+            var model = new ProductIdentifierRequest
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+        }
 
         [Test]
         public void WhenValidProductIdentifiersAndvalidCallBackuriInProductIdentifiersRequest_ThenReturnSuccess()
         {
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            string[] productIdentifiers = { "GB123456", "GB160060", "AU334550" };
             string callbackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             var model = new ProductIdentifierRequest
             {
@@ -83,7 +113,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             Assert.AreEqual(0, result.Errors.Count);
-        }        
+        }
         #endregion
     }
 }

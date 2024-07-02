@@ -264,7 +264,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidCreateProductFileRequest_ThenReturnTrueResponseAsync()
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task WhenValidCreateProductFileRequest_ThenReturnTrueResponseAsync(bool encryption)
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             fakeFileHelper.CheckAndCreateFolder(fakeExchangeSetInfoPath);
@@ -272,7 +274,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime);
+            var response = await fulfilmentAncillaryFiles.CreateProductFile(fakeBatchId, fakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime, encryption);
 
             Assert.AreEqual(true, response);
             Assert.AreEqual(true, fakeFileHelper.CheckAndCreateFolderIsCalled);

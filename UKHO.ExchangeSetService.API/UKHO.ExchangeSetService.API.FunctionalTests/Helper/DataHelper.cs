@@ -114,5 +114,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             return new List<string>() { "GB800001", "GZ800112" };
         }
+
+        public List<string> GetProductIdentifiersS57()
+        {
+            return new List<string>() { "GB602571" };
+        }
     }
 }

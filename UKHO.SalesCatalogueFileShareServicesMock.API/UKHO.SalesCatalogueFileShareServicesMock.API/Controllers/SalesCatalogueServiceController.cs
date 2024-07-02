@@ -65,6 +65,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return Ok(response.ResponseBody);
                 }
             }
+            if (!productIdentifiers.Any())
+            {
+                var response = salesCatalogueService.GetProductIdentifier("productIdentifier-" + String.Join("-", productIdentifiers));
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
         }
 
@@ -76,13 +84,13 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 var productVersionRequestSearchText = new StringBuilder();
                 bool isInitalIndex = true;
-                const string NotModifiedProductName = "DE416040";
+                var NotModifiedProductName = new [] { "DE416040" , "DE448899" };
                 const int NotModifiedEditionNumber = 11;
                 const int NotModifiedUpdateNumber = 1;
                 foreach (var item in productVersionRequest)
                 {
                     //code added to handle 304 not modified scenario
-                    if (item.ProductName == NotModifiedProductName && item.EditionNumber == NotModifiedEditionNumber && item.UpdateNumber == NotModifiedUpdateNumber)
+                    if (NotModifiedProductName.Contains(item.ProductName) && item.EditionNumber == NotModifiedEditionNumber && item.UpdateNumber == NotModifiedUpdateNumber)
                     {
                         return StatusCode(StatusCodes.Status304NotModified);
                     }
@@ -90,6 +98,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     isInitalIndex = false;
                 }
                 var response = salesCatalogueService.GetProductVersion("productVersion-" + productVersionRequestSearchText.ToString());
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
+            if (!productVersionRequest.Any())
+            {
+                var response = salesCatalogueService.GetProductVersion("productVersion-");
                 if (response != null)
                 {
                     return Ok(response.ResponseBody);

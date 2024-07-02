@@ -63,13 +63,13 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed as Azure AD Authentication failed with OK response and _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
                 return GetCacheResponse();
             }
-            
+
             var eventGridEvent = new CustomEventGridEvent();
-            JsonConvert.PopulateObject(request.ToString(), eventGridEvent);          
+            JsonConvert.PopulateObject(request.ToString(), eventGridEvent);
             var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
 
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), GetCurrentCorrelationId());
-           
+
             var validationResult = await essWebhookService.ValidateEventGridCacheDataRequest(data);
 
             var productName = data.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             await essWebhookService.DeleteSearchAndDownloadCacheData(data, GetCurrentCorrelationId());
 
-            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{productName} with OK response and _X-Correlation-ID:{correlationId}", productName, GetCurrentCorrelationId());
+            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{productName} of BusinessUnit:{businessUnit} with OK response and _X-Correlation-ID:{correlationId}", productName, data.BusinessUnit, GetCurrentCorrelationId());
 
             return GetCacheResponse();
         }

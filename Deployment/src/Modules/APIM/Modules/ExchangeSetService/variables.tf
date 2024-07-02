@@ -14,6 +14,10 @@ variable "apim_api_path" {
   type = string
 }
 
+variable "apim_ui_api_path" {
+  type = string
+}
+
 variable "apim_api_backend_url" {
   type        = string
   description = "The URL of the backend service serving the API."
@@ -51,7 +55,19 @@ variable "apim_api_description" {
   type = string
 }
 
+variable "apim_ui_api_name" {
+  type = string
+}
+
+variable "apim_ui_api_description" {
+  type = string
+}
+
 variable "apim_api_openapi" {
+  type = string
+}
+
+variable "apim_ui_openapi" {
   type = string
 }
 

@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };

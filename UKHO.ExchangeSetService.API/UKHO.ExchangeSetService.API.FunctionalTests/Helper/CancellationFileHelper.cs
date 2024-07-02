@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System.IO;
 
-
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public static class CancellationFileHelper
@@ -37,32 +36,5 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
         }
-
-        public static void DeleteDirectory(string fileName)
-        {
-            string path = Path.GetTempPath();
-
-            if (Directory.Exists(path))
-            {
-                string folder = Path.GetFileName(Path.Combine(path, fileName));
-                if (folder.Contains(".zip"))
-                {
-                    folder = folder.Replace(".zip", "");
-                }
-
-                //Delete V01XO1 Directory and sub directories from temp Directory
-                Directory.Delete(Path.Combine(path, folder), true);
-
-                //Delete V01X01.zip file from temp Directory
-                if (File.Exists(Path.Combine(path, fileName)))
-                {
-                    File.Delete(Path.Combine(path, fileName));
-                }
-
-            }
-
-        }
     }
-
-    
 }

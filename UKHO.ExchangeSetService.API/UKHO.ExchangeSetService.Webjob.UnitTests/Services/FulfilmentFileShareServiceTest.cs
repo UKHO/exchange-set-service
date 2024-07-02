@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ExchangeSetFileFolder = "V01X01",
                 Info = "INFO",
                 ProductType = "ProductType",
-                BusinessUnit = "ADDS",
+                S63BusinessUnit = "ADDS",
                 ContentInfo = "DVD INFO",
                 Content = "Catalogue",
                 Adc = "ADC"
@@ -66,13 +66,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                         };
         }
 
-        private SearchBatchResponse GetSearchBatchResponse()
+        private SearchBatchResponse GetSearchBatchResponse(string businessUnit)
         {
             return new SearchBatchResponse()
             {
                 Entries = new List<BatchDetail>() {
                     new BatchDetail {
-                        BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc"
+                        BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc",
+                        BusinessUnit = businessUnit
                     } },
                 Links = new PagingLinks(),
                 Count = 0,
@@ -94,11 +95,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
 
         [Test]
-        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataResponse(string businessUnit)
         {
-            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
+            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse(businessUnit));
 
-            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOf(typeof(List<FulfilmentDataResponse>), result);
@@ -107,23 +110,27 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfillmentDataNullResponse()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public async Task WhenRequestQueryFileShareServiceData_ThenReturnsFulfilmentDataNullResponse(string businessUnit)
         {
-            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
+            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse(businessUnit));
 
-            var result = await fulfilmentFileShareService.QueryFileShareServiceData(null, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty);
+            var result = await fulfilmentFileShareService.QueryFileShareServiceData(null, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
             Assert.IsNull(result);
         }
 
         [Test]
-        public void WhenIsCancellationRequestedinQueryFileShareServiceData_ThenThrowCancelledException()
+        [TestCase("ADDS")]
+        [TestCase("ADDS-S57")]
+        public void WhenIsCancellationRequestedinQueryFileShareServiceData_ThenThrowCancelledException(string businessUnit)
         {
-            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse());
+            A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSearchBatchResponse(businessUnit));
 
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty));
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty, businessUnit));
         }
 
         [Test]

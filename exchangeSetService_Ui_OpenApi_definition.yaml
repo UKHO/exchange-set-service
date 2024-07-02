@@ -1,0 +1,352 @@
+openapi: "3.0.0"
+info:
+  version: "0.3"
+  title: Exchange Set Service UI API
+  description: |
+    This API is for the Exchange Set Service UI.
+  contact:
+    name: Martin Rock-Evans
+    email: martin.rock-evans@ukho.gov.uk
+
+externalDocs:
+  url: https://github.com/UKHO/exchange-set-service
+
+servers:
+  - url: https://exchangeset.admiralty.co.uk/avcsData/[version]/
+
+security:
+  - jwtBearerAuth: []
+
+paths:
+  /productInformation/productIdentifiers:
+    post:
+      summary:  Provide ENC information from sales catalog service.
+
+      operationId:  postProductIdentifiers
+
+      description:  |
+        Given a list of ENC name identifiers, return all the versions of the ENCs from sales catalog service.
+
+      requestBody:
+        description:  |
+          The JSON body containing product identifiers.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/productIdentifiers"
+            example:  ["GB102505", "GB100160", "AU334550"]
+
+      responses:
+        "200":
+          description:  A JSON body that containing the information of ENCs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/scsResponse"
+
+        "400":
+          description:  Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+
+  /productInformation:
+    get:
+      summary:  Get all releasable changes to products since a date
+      description:  |
+        Given a datetime, get all ENC versions that have been issued since that datetime.
+
+      operationId:  getProducts
+
+      parameters:
+        - $ref: "#/components/parameters/sinceDateTime"
+
+      responses:
+        "200":
+          description:  A JSON body of product objects
+          headers:
+            Last-Modified:
+              schema:
+                $ref: "#/components/schemas/Date-Header"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/scsResponse"
+
+        "304":
+          description:  Not modified.
+          headers:
+            Last-Modified:
+              schema:
+                $ref: "#/components/schemas/Date-Header"
+                
+        "400":
+          description:  Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+
+components:
+  ################################################################################
+  #                              Parameter Definitions                           #
+  ################################################################################
+
+  parameters:
+    sinceDateTime:
+      in: query
+      name: sinceDateTime
+      required: true
+      description:  |
+        The date and time from which changes are requested. Any changes since the date will be returned. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
+      schema:
+        type: string
+        format: date-time
+      example:  Wed, 21 Oct 2015 07:28:00 GMT
+      
+  ################################################################################
+  #                          Common Response Definitions                         #
+  ################################################################################
+
+  responses:
+    unauthorised:
+      description:  Unauthorised - either you have not provided any credentials, or your credentials are not recognised.
+
+    forbidden:
+      description:  Forbidden - you have been authorised, but you are not allowed to access this resource.
+
+    tooManyRequests:
+      description:  You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description:  Specifies the time you should wait in seconds before retrying.
+
+    internalServerError:
+      description:  Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DefaultErrorResponse"
+
+  ################################################################################
+  #                              Object Definitions                              #
+  ################################################################################
+
+  schemas:
+    ####################################
+    #      Request Objects      #
+    ####################################
+
+    productIdentifiers:
+      type: array
+      items:
+        type: string
+
+    ####################################
+    #      Response Objects      #
+    ####################################
+
+    scsResponse:
+      type: object
+      required:
+        - "products"
+        - "productCounts"
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            required:
+              - "productName"
+              - "editionNumber"
+              - "updateNumbers"
+              - "fileSize"
+            properties:
+              productName:
+                type: string
+                description:  The unique product identifiers
+                example:  "GB102505"
+              editionNumber:
+                type: integer
+                description:  The edition number
+                example:  1
+              updateNumbers:
+                type: array
+                description:  an array of update numbers
+                items:
+                  type: integer
+                  description:  The update number, including update 0 if relevant
+                  example:  [0,1,2]
+              dates:
+                type: array
+                items:
+                  type: object
+                  description:  issue and update dates
+                  properties:
+                    updateNumber:
+                      type: integer
+                      description:  The update number, including update 0 if relevant
+                    updateApplicationDate:
+                      type: string
+                      format: date-time
+                      description:  | 
+                        The update application date for the catalog.031 UADT data field
+                        The base cell issue date or, for re-issues, the issue date of the previous update 
+                        This is optional if not relevant
+                        example: "2019-10-27T00:00:00Z"
+                    issueDate:
+                      type: string
+                      format: date-time
+                      description:  | 
+                        The issue date for the catalog.031 ISDT data field
+                      example:  "2019-10-27T00:00:00Z"
+              cancellation:
+                type: object
+                description:  The details of the cancellation, if one exists
+                properties:
+                  editionNumber:
+                    type: integer
+                    description:  The edition number of the cancellation, i.e. 0
+                  updateNumber:
+                    type: integer
+                    description:  The cancellation update number
+                example:  {"editionNumber": 0, "updateNumber": 8}
+              fileSize:
+                type: integer
+                description:  The total file size in bytes of all the files for this product
+                example:  2012
+              ignoreCache:
+                type: boolean
+              bundle:
+                type: array
+                description:  |
+                  Collection of physical bundles that are associated with the latest update of this product
+                items:
+                  type: object
+                  properties:
+                    bundleType:
+                      type: string
+                      description:  |
+                        Media type of the bundle, which can be one of the following values:- DVD
+                      example:  "DVD"
+                    location:
+                      type: string
+                      description:  |
+                        DVDs: This field is divided into two subfields delimited by a semi colon.
+                        The first subfield contains the media number ID and the second the exchange set number.
+                        The Media ID is designated with a M followed by a number.
+                        
+                        Examples:
+                        - base cell: "M1;B3",
+                        - updates: "M2;U1"
+                      example:  "M1;B3"
+        productCounts:
+          type: object
+          required:
+            - "requestedProductsNotReturned"
+          properties:
+            requestedProductCount:
+              type: integer
+              description:  number of products explicitly requested.
+            returnedProductCount:
+              type: integer
+              description:  number of products that have data included in the produced exchange set.
+            requestedProductsAlreadyUpToDateCount:
+              type: integer
+            requestedProductsNotReturned:
+              type: array
+              description:  |
+                Where a requested product is not included in the return, the product will be listed in the requestedProductNotReturned portion of the response along with a reason. The reason will be one of:
+                *   productWithdrawn (the product has been withdrawn from the AVCS service)
+                *   invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
+                *   noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the exchange set)
+                *   duplicateProduct (the product was included in the request more than once)
+              items:
+                type: object
+                required:
+                  - "productName"
+                  - "reason"
+                properties:
+                  productName:
+                    type: string
+                    example:  "GB102505"
+                  reason:
+                    type: string
+                    enum: [productWithdrawn, invalidProduct, noDataAvailableForCancelledProduct, duplicateProduct]
+    
+    Date-Header:
+      type: string
+      format: date-time
+      description:  |
+        Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
+      example:  Wed, 21 Oct 2015 07:28:00 GMT
+
+    ####################################
+    #      Error Response Objects      #
+    ####################################
+
+    DefaultErrorResponse:
+      type: object
+      title:  Error
+      properties:
+        correlationId:
+          type: string
+        detail:
+          type: string
+
+    errorDescription:
+      type: object
+      properties:
+        correlationId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/fieldError"
+
+    fieldError:
+      type: object
+      properties:
+        source:
+          type: string
+        description:
+          type: string
+
+    ####################################
+    #      Security Objects      #
+    ####################################
+
+  securitySchemes:
+    jwtBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

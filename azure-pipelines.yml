@@ -5,6 +5,10 @@ parameters:
     displayName: "Continue even if resources are getting destroyed"
     type: boolean
     default: false
+  - name: disableStryker
+    displayName: "Disable Stryker"
+    type: boolean
+    default: false
 
 trigger:
   - main
@@ -51,6 +55,7 @@ stages:
 
   - stage: Stryker_Mutator
     displayName: "Stryker Mutator"
+    condition: ${{ eq(parameters.disableStryker, false) }}
     dependsOn: []
     variables:
     - name: StrykerDotNetVersion
@@ -337,6 +342,13 @@ stages:
               Contents: 'exchangeSetService_OpenApi_definition.yaml'
               TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
 
+          - task: CopyFiles@2
+            displayName: "Copy OpenAPI spec for new UI API for deployment"
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: 'exchangeSetService_Ui_OpenApi_definition.yaml'
+              TargetFolder: '$(Build.SourcesDirectory)\Deployment\src\Modules\APIM' 
+
           - task: PublishBuildArtifacts@1
             displayName: "Publish terraform Artifacts"
             inputs:
@@ -450,6 +462,7 @@ stages:
 
       - deployment: DevDeployApp
         dependsOn: [DevDeployApimSolas]
+        timeoutInMinutes: 75
         displayName: "Dev - deploy terraform and dotnet App"
         environment: "Ess-Dev"
         pool: $(DeploymentPool)
@@ -1246,7 +1259,7 @@ stages:
     dependsOn: 
       - vnextiatDeploy
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
       - deployment: vnexte2eDeployApimSolas
         displayName: "vNext E2E - deploy SOLAS APIM"

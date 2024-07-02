@@ -5,7 +5,10 @@
         public string FileDirectoryPath { get; set; }
         public string FileDirectoryPathForENC { get; set; }
         public string FileDirectoryPathForReadme { get; set; }
-        public string ScsResponseFile { get; set; }
+        //To Provide S63 FSS response
+        public string S63FssResponseFile { get; set; }
+        //To Provide S57 FSS response
+        public string S57FssResponseFile { get; set; }
         public string FssInfoResponseFile { get; set; }
         public string FssAdcResponseFile { get; set; }
         public string FolderDirectoryName { get; set; }

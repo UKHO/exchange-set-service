@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData());
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
         {
             string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), accessToken: EssJwtCustomizedToken);
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "GB123789" };
@@ -158,7 +158,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithAValidProductIdentifierswithCallBackURI_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22", accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of of the expected status 200.");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned  {apiResponse.StatusCode}, instead of the expected status 200.");
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
@@ -166,7 +166,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithAnEmptyProductIdentifier_ThenABadRequestStatusIsReturned()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>();
@@ -180,10 +180,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithANullProductIdentifier_ThenABadRequestStatusIsReturned()
         {
-            ProductIdentifierModel.ProductIdentifier = new List<string>() { null };
+            ProductIdentifierModel.ProductIdentifier = new List<string> { null };
 
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272%22", accessToken: EssJwtToken);
             Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 400.");
@@ -198,7 +198,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
         [TestCase("https://", TestName = "Callback URL with only https request")]
         [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithAInvalidCallbackURIWithProductIdentifier_ThenABadRequestResponseIsReturned(string callBackUrl)
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), callBackUrl, accessToken: EssJwtToken);
