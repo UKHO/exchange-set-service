@@ -97,7 +97,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                 CallbackUri = callbackUri
             };
             var result = validator.TestValidate(model);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Either body is null or malformed."));
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
