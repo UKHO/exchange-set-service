@@ -1,4 +1,5 @@
-﻿using FluentValidation.TestHelper;
+﻿using System;
+using FluentValidation.TestHelper;
 using NUnit.Framework;
 using System.Linq;
 using UKHO.ExchangeSetService.API.Validation;
@@ -74,6 +75,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         public void WhenNullProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
         {
             string[] productIdentifiers = { null };
+            string callbackUri = string.Empty;
+            var model = new ProductIdentifierRequest
+            {
+                ProductIdentifier = productIdentifiers,
+                CallbackUri = callbackUri
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+        }
+
+        [Test]
+        public void WhenZeroLengthProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        {
+            string[] productIdentifiers = Array.Empty<string>();
             string callbackUri = string.Empty;
             var model = new ProductIdentifierRequest
             {
