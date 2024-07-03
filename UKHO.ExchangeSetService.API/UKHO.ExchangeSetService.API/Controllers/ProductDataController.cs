@@ -299,15 +299,15 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             if (productIdentifiers == null)
             {
-                return productIdentifiers;
+                return null;
             }
 
             if (productIdentifiers.Any(x => x == null))
             {
-                return productIdentifiers;
+                return new string[] { null };
             }
 
-        List<string> sanitizedIdentifiers = new List<string>();
+            List<string> sanitizedIdentifiers = new List<string>();
             if (productIdentifiers.Length > 0)
             {
                 foreach (string identifier in productIdentifiers)
