@@ -560,7 +560,7 @@ stages:
                       **/*FunctionalTest*.dll
                       !**/*TestAdapter.dll
                       !**/obj/**
-                    arguments: '--filter Category!=QCOnlyTest-AIOEnabled || Category!=QCOnlyTest-AIODisabled'
+                    arguments: '--filter Category!=QCOnlyTest-AIOEnabled && Category!=QCOnlyTest-AIODisabled'
                     testRunTitle: "Dev-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
