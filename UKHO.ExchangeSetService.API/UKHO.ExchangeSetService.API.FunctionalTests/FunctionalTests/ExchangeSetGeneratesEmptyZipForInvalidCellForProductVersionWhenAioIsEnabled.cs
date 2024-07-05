@@ -67,6 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task VerifyEmptyAioExchangeSetForProductVersion()
         {
             //// ENC_ROOT >>> ReadmeTxtFile
