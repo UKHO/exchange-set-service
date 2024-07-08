@@ -33,7 +33,7 @@ export function ESSCreation(clientAuthResp, productIdentifierData, exchangeSetTy
     });
 
     check(filename, {
-        "file is Created": filename === "V01X01.zip",
+         "file is Created": (filename === "V01X01.zip" || filename === "M01X01.zip" || filename === "M02X02.zip"),
     });
 
     let batchId = GetBatchId(batchDetailsUri);

@@ -1,22 +1,23 @@
 ﻿using FakeItEasy;
+using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using Attribute = UKHO.ExchangeSetService.Common.Models.Request.Attribute;
-using System.Net;
-using UKHO.ExchangeSetService.Common.Helpers;
-using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
-using UKHO.ExchangeSetService.Common.Logging;
-using System.Linq;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
@@ -39,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             fakeAzureAdB2CHelper = A.Fake<IAzureAdB2CHelper>();
             fakeWebHookController = new EssWebhookController(fakeHttpContextAccessor, fakeLogger, fakeEssWebhookService, fakeAzureAdB2CHelper);
         }
-       
+
         [Test]
         public void WhenValidHeaderRequestedInNewFilesPublishedOptions_ThenReturnsOkResponse()
         {
@@ -74,12 +75,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
             fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData("ADDS"));
 
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
-            
+
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
-            
+
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
@@ -89,12 +90,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
               && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event started for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
-            
+
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
               && call.GetArgument<EventId>(1) == EventIds.ESSB2CUserValidationEvent.ToEventId()
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Event was triggered with invalid Azure AD token from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
-           
+
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
               && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId()
@@ -117,11 +118,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
-            
+
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
             A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-           
+
             Assert.AreEqual(200, result.StatusCode);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
@@ -146,12 +147,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenValidDataRequestedInNewFilesPublished_ThenDeleteFromStorage()
+        public async Task WhenValidS63DataRequestedInNewFilesPublished_ThenDeleteS63DataFromStorage()
         {
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
             fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
-            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData());
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData("ADDS"));
 
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
@@ -160,7 +161,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
-            Assert.AreEqual(200, result.StatusCode);
+            result.StatusCode.Should().Be(200);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -175,10 +176,43 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
               && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId()
-              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event completed for ProductName:{productName} with OK response and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event completed for ProductName:{productName} of BusinessUnit:{businessUnit} with OK response and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
         }
 
-        private EnterpriseEventCacheDataRequest GetCacheRequestData()
+        [Test]
+        public async Task WhenValidS57DataRequestedInNewFilesPublished_ThenDeleteS57DataFromStorage()
+        {
+            var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
+            fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
+            fakeCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            fakeCacheJson["Data"] = JObject.FromObject(GetCacheRequestData("ADDS-S57"));
+
+            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
+                 .Returns(new ValidationResult(new List<ValidationFailure>()));
+            A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored));
+
+            var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
+
+            result.StatusCode.Should().Be(200);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event started for _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Clear Cache Event completed for ProductName:{productName} of BusinessUnit:{businessUnit} with OK response and _X-Correlation-ID:{correlationId}").MustHaveHappenedOnceExactly();
+        }
+
+        private EnterpriseEventCacheDataRequest GetCacheRequestData(string businessUnit)
         {
             BatchDetails linkBatchDetails = new BatchDetails()
             {
@@ -201,7 +235,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
-                BusinessUnit = "ADDS",
+                BusinessUnit = businessUnit,
                 Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,

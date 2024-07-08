@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region Set DateTime Api
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
 
@@ -67,6 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
+        // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheDateTimeApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
@@ -86,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region ProductIdentifier Api
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithOutAzureB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData());
@@ -95,7 +96,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
@@ -105,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifierApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), accessToken: EssB2CCustomizedToken);
@@ -113,6 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
+        // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductIdentifiersApiWithAValidB2cToken_ThenACorrectResponseIsReturned()
@@ -131,7 +133,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         #region ProductVersion Api
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithOutB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new List<ProductVersionModel> { DataHelper.GetProductVersionModelData("DE416080", 9, 6) };
@@ -142,7 +144,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithInvalidB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             const string invalidB2CToken = "THIS-IS-NOT-A-HAPPY-TOKEN";
@@ -158,7 +160,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("SmokeTest-AIODisabled")]
+        [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithCustomB2cToken_ThenAnUnauthorisedResponseIsReturned()
         {
             List<ProductVersionModel> productVersionData = new List<ProductVersionModel>
@@ -171,6 +173,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
+        // PBI 140109 : ESS API : Add authorization to allow only UKHO people to create unencrypted ES 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheProductVersionApiWithAValidB2cToken_ThenTheCorrectResponseIsReturned()
@@ -181,7 +184,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             };
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, accessToken: EssB2CToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned, instead of the expected 200.");
+            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
@@ -199,7 +202,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 //Clean up batches from local foldar 
                 var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
-                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned for clean up batches, instead of the expected 200.");
             }
         }
     }

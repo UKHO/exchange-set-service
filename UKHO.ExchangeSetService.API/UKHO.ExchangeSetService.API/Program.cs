@@ -183,6 +183,9 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddSingleton<IWebJobsAccessKeyProvider>(s => new WebJobsAccessKeyProvider(builder.Configuration));
             builder.Services.AddScoped<UserIdentifier>();
             builder.Services.AddScoped<IFileSystem, FileSystem>();
+            builder.Services.AddScoped<BespokeExchangeSetAuthorizationFilterAttribute>();
+            builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
+            builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")

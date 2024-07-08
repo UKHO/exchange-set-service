@@ -1,0 +1,695 @@
+openapi: "3.0.0"
+info:
+  version: "0.3"
+  title: Exchange Set Service API
+  description: |
+    This API is for the Exchange Set Service.
+  contact:
+    name: Martin Rock-Evans
+    email: martin.rock-evans@ukho.gov.uk
+
+externalDocs:
+  url: https://github.com/UKHO/exchange-set-service
+
+servers:
+  - url: https://exchangeset.admiralty.co.uk/avcsData/[version]/
+
+security:
+  - jwtBearerAuth: []
+
+paths:
+  /productData/productIdentifiers:
+    post:
+      summary: Provide all the latest releasable baseline data for a specified set of ENCs.
+
+      operationId: postProductIdentifiers
+
+      description: |
+        Given a list of ENC name identifiers, return all the versions of the ENCs that are releasable and that are needed to bring the ENCs up to date, namely the base edition and any updates or re-issues applied to it.   
+
+        ## Business Rules:
+
+        Only ENCs that are releasable at the date of the request will be returned.
+
+        If valid ENCs are requested then ENC exchange set with baseline data including requested ENCs will be returned. If valid AIO is requested then AIO exchange set with baseline releasable data including requested AIO will be returned.
+
+        For cancellation updates, all the updates up to the cancellation need to be included. Cancellations will be included for 12 months after the cancellation, as per the S63 specification.
+
+        If an ENC has a re-issue, then the latest batch on the FSS will be used. 
+
+        If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
+
+        If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
+
+      parameters:
+        - $ref: "#/components/parameters/callbackUri"
+        - $ref: "#/components/parameters/exchangeSetStandard"
+
+      requestBody:
+        description: |
+          The JSON body containing product identifiers.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/productIdentifiers"
+            example: ["GB102505", "GB100160", "AU334550"]
+
+      responses:
+        "200":
+          description: A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/exchangeSetResponse"
+
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+      callbacks:
+        fulfilmentResponse:
+          $ref: "#/components/callbacks/fulfilmentResponse"
+
+  /productData/productVersions:
+    post:
+      summary: Given a set of ENC versions (e.g. Edition x Update y) provide any later releasable files.
+      description: |
+        Given a list of ENC name identifiers and their edition and update numbers, return all the versions of the ENCs that are releasable from that version onwards.
+
+        ## Business Rules:
+
+        If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
+
+        If none of the ENCs requested have an update, then a 'Not modified' response will be returned. If none of the ENCs requested exist, then status code 400 ('Bad Request') response will be returned.
+
+        The rules around cancellation, replacements, additional coverage and re-issues apply as defined in the previous section.
+
+        If none of the ENCs requested have an update, then ENC exchange set with releasable baseline data will be returned.
+
+        If none of the AIO requested have an update, then AIO exchange set with releasable baseline data will be returned.
+
+      operationId: postProductVersions
+
+      parameters:
+        - $ref: "#/components/parameters/callbackUri"
+        - $ref: "#/components/parameters/exchangeSetStandard"
+
+      requestBody:
+        description: |
+          The JSON body containing product versions.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/productVersions"
+
+      responses:
+        "200":
+          description: |
+            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
+
+            If there are no updates for any of the productVersions, then status code 200 ('OK') will be returned with an empty Exchange Set (containing just the latest PRODUCTS.TXT) and the exchangeSetCellCount will be 0.
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/exchangeSetResponse"
+
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+      callbacks:
+        fulfilmentResponse:
+          $ref: "#/components/callbacks/fulfilmentResponse"
+
+  /productData:
+    post:
+      summary: Provide all the releasable data after a datetime.
+      description: |
+        Given a datetime, build an Exchange Set of all the releasable ENC versions that have been issued since that datetime.
+        
+      operationId: getProducts
+
+      parameters:
+        - $ref: "#/components/parameters/sinceDateTime"
+        - $ref: "#/components/parameters/callbackUri"
+        - $ref: "#/components/parameters/exchangeSetStandard"
+
+      responses:
+        "200":
+          description: |
+            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
+
+            If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
+          headers:
+            Date:
+              description: Returns the current date and time on the server and should be used in subsequent requests this operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
+              schema:
+                $ref: "#/components/schemas/Date-Header"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/exchangeSetResponse"
+
+        "304":
+          description: Not modified.
+          headers:
+            Date:
+              schema:
+                $ref: "#/components/schemas/Date-Header"
+
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+      callbacks:
+        fulfilmentResponse:
+          $ref: "#/components/callbacks/fulfilmentResponse"
+
+  /auth/client_credentials:
+    post:
+      summary: Get token from AAD.
+      operationId: getESSTokenUsingClientCredentials
+      description: |
+        Returns a token direct from AAD using Client Credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                  description: The application ID that's assigned to the distributor's app. This will be provided to the distributor when they register their application.
+                client_secret:
+                  type: string
+                  description: The client secret that has been generated for the distributor's app when the app was registered. The client secret must be URL-encoded before being sent.
+      responses:
+        200:
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: string
+                  ext_expires_in:
+                    type: string
+                  access_token:
+                    type: string
+              example: |
+                {
+                  "token_type": "Bearer",
+                  "expires_in": 3599,
+                  "ext_expires_in": 3599,
+                  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Imwzc1EtNTBjQ0g0eEJWWkxIVEd3blNSNzY4MCJ9.eyJhdWQiOiI0ZTE1NGYyYi0wNWM2LTQwZDEtODdiNy0wYWYwNTI5ZTBhNTEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZTkyYzk4MWItZDY4OS00Y2MzLTgyNDUtMGQ3MTBlMjQ2YmNhL3YyLjAiLCJpYXQiOjE2MzI0NzU1OTAsIm5iZiI6MTYzMjQ3NTU5MCwiZXhwIjoxNjMyNDc5NDkwLCJhaW8iOiJFMlpnWUdpZTJhSmhQT0ZDWTdQR3NxYUhaWi9tQXdBPSIsImF6cCI6IjJmMzJmNmY3LTFmMmYtNDNjZS1hZmQ3LWYzM2Y5M2NiN2U2MSIsImF6cGFjciI6IjEiLCJvaWQiOiJkNmY4ZDg0My0zZTY1LTQ5YTAtODdkNy0zMTBkMGNiM2UzOGUiLCJyaCI6IjAuQVNJQUc1Z3M2WW5XdzB5Q1JRMXhEaVJyeXZmMk1pOHZIODVEcjlmelA1UExmbUVpQUFBLiIsInN1YiI6ImQ2ZjhkODQzLTNlNjUtNDlhMC04N2Q3LTMxMGQwY2IzZTM4ZSIsInRpZCI6ImU5MmM5ODFiLWQ2ODktNGNjMy04MjQ1LTBkNzEwZTI0NmJjYSIsInV0aSI6IlREVmtmenZuS2txVEdRUXNEWjItQUEiLCJ2ZXIiOiIyLjAifQ.W-TB97v6D56UuPCstaSrfLFbc9gE6W1VHD5t0RLo_EK-1LuaTvQ0aqJtaYCRnXnd6RmMIIml3ckHxFL0lZlYUoSjszIMFkb1w0aH5SxD-GOfY-dktvGKdMVxqtyjJJg1IV7V3Dv1BYI24RnGPfcJG73-af7vcTRjE5KFeW_kOMVAfCAcZOV9dJ7BJULfEdHlK8ZFUb2hEzFkoORGdlrpNIJ7-QEhB9Kcnxa9QtA4z8lMtWESx-q17N88fmlaz87kEKEjX3pIP7k2l_y5BNtNAxK0h995pZ9hHNe4-UBH-xjvfuDa6IbCsZD1J1IW7AO1bXCjGGvc31PtJqEc5FRdQQ"
+                }
+        400:
+          description: Bad request - Request missing client_id and/or client_secret.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+              example:
+                {
+                  "correlationId": "184ef711-b039-4c24-b81a-89081d8f324c",
+                  "errors": [
+                      {
+                        "source": "request",
+                        "description": "request missing client_id and/or client_secret"
+                      }
+                    ]
+                }
+        401:
+          $ref: "#/components/responses/unauthorised"
+        403:
+          $ref: "#/components/responses/forbidden"
+        429:
+          $ref: "#/components/responses/tooManyRequests"
+
+
+components:
+  ################################################################################
+  #                              Parameter Definitions                              #
+  ################################################################################
+
+  parameters:
+    sinceDateTime:
+      in: query
+      name: sinceDateTime
+      required: true
+      description: |
+        The date and time from which changes are requested. Any changes since the date will be returned. The value should be the value in the `Date` header returned by the last request to this operation. The date is in RFC 1123 format. The date and time must be within 28 days and cannot be in future.
+      schema:
+        type: string
+        format: date-time
+      example: Wed, 21 Oct 2015 07:28:00 GMT
+
+    callbackUri:
+      in: query
+      name: callbackUri
+      required: false
+      description: |
+        An optional callback URI that will be used to notify the requestor once the requested Exchange Set is ready to download from the File Share Service. 
+        The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request. 
+        If not specified, then no call back notification will be sent.
+      schema:
+        type: string
+
+    exchangeSetStandard:
+      in: query
+      name: exchangeSetStandard
+      required: false
+      description: |
+              An optional exchangeSetStandard parameter determines **the standard of the Exchange Set**. If the value is s63, the Exchange Set returned will be of s63 standard. If the value is s57, the Exchange Set returned will be of s57 standard.
+              The default value of exchangeSetStandard is s63, which means the Exchange Set returned will be of s63 standard by default.
+      schema:
+        type: string
+        example: false
+        enum: [ "s63", "s57"]
+
+  ################################################################################
+  #                          Common Response Definitions                         #
+  ################################################################################
+
+  responses:
+    unauthorised:
+      description: Unauthorised - either you have not provided any credentials, or your credentials are not recognised.
+
+    forbidden:
+      description: Forbidden - you have been authorised, but you are not allowed to access this resource.
+
+    tooManyRequests:
+      description: You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Specifies the time you should wait in seconds before retrying.
+
+    internalServerError:
+      description: Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DefaultErrorResponse"
+
+  ################################################################################
+  #                              Object Definitions                              #
+  ################################################################################
+
+  schemas:
+    ####################################
+    #      Request Objects      #
+    ####################################
+
+    href:
+      type: string
+      format: uri
+
+    link:
+      type: object
+      properties:
+        href:
+          $ref: "#/components/schemas/href"
+
+    productIdentifiers:
+      type: array
+      items:
+        type: string
+
+    productVersions:
+      type: array
+      items:
+        type: object
+        properties:
+          productName:
+            type: string
+            description: The unique product identifiers.
+          editionNumber:
+            type: integer
+            description: The edition number.
+          updateNumber:
+            type: integer
+            description: The update number, if applicable.
+      example:
+        [
+          { "productName": "CA276271", "editionNumber": 7, "updateNumber": 10 },
+          { "productName": "GB100160", "editionNumber": 36, "updateNumber": 0 },
+        ]
+
+    ####################################
+    #      Response Objects      #
+    ####################################
+
+    exchangeSetResponse:
+      type: object
+      required:
+        - "_links"
+        - "exchangeSetUrlExpiryDateTime"
+        - "exchangeSetCellCount"
+      properties:
+        _links:
+          type: object
+          required:
+            - "exchangeSetBatchStatusUri"
+            - "exchangeSetBatchDetailsUri"            
+          properties:
+            exchangeSetBatchStatusUri:
+              $ref: "#/components/schemas/link"
+            exchangeSetBatchDetailsUri:
+              $ref: "#/components/schemas/link"
+            exchangeSetFileUri:
+              $ref: "#/components/schemas/link"
+            aioExchangeSetFileUri:
+              $ref: "#/components/schemas/link"
+        exchangeSetUrlExpiryDateTime:
+          type: string
+          format: date-time
+          description: Custom exchange sets are only available on the File Share Service for a limited time. After this time the file will expire and will no longer be available to download.
+        requestedProductCount:
+          type: integer
+          description: Number of products explicitly requested.
+        exchangeSetCellCount:
+          type: integer
+          description: Number of products that have data included in the produced Exchange Set.
+        requestedProductsAlreadyUpToDateCount:
+          type: integer
+        requestedAioProductCount:
+          type: integer
+        aioExchangeSetCellCount:
+          type: integer
+        requestedAioProductsAlreadyUpToDateCount:
+          type: integer
+        requestedProductsNotInExchangeSet:
+          type: array
+          description: |
+            Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
+            *	productWithdrawn (the product has been withdrawn from the AVCS service)
+            *	invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
+            *	noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the Exchange Set)
+          items:
+            type: object
+            required:
+              - "productName"
+              - "reason"
+            properties:
+              productName:
+                type: string
+              reason:
+                type: string
+                enum: [productWithdrawn, invalidProduct, noDataAvailableForCancelledProduct]
+        fssBatchId:
+          type: string
+          description: The BatchId is required to retrieve the files from the file share service. 
+      example:
+        _links:
+          exchangeSetBatchStatusUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+          exchangeSetBatchDetailsUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+          exchangeSetFileUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+          aioExchangeSetFileUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip"
+        exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+        requestedProductCount: 22
+        exchangeSetCellCount: 15
+        requestedProductsAlreadyUpToDateCount: 5
+        requestedAioProductCount: 2
+        aioExchangeSetCellCount: 1
+        requestedAioProductsAlreadyUpToDateCount: 1
+        requestedProductsNotInExchangeSet:
+          [
+            { productName: "GB123456", reason: "productWithdrawn" },
+            { productName: "GB123789", reason: "invalidProduct" },
+          ]
+        fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+
+    Last-Modified:
+      type: string
+      format: date-time
+      description: Returns the date and time the file was last modified. The date format is in RFC 1123 format.
+      example: Wed, 21 Oct 2015 07:28:00 GMT
+
+    Date-Header:
+      type: string
+      format: date-time
+      description: Returns the current date and time on the server and should be used in subsequent requests to the productData operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
+      example: Wed, 21 Oct 2015 07:28:00 GMT
+
+    ####################################
+    #      Error Response Objects      #
+    ####################################
+
+    DefaultErrorResponse:
+      type: object
+      title: Error
+      properties:
+        correlationId:
+          type: string
+        detail:
+          type: string
+
+    errorDescription:
+      type: object
+      properties:
+        correlationId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/fieldError"
+
+    fieldError:
+      type: object
+      properties:
+        source:
+          type: string
+        description:
+          type: string
+
+    cloudEvent:
+      description: For the full specification, see https://github.com/cloudevents/spec/blob/v1.0/spec.md.
+      externalDocs:
+        description: Event publishing based on Cloud Events.
+        url: https://github.com/cloudevents/spec/blob/v1.0/spec.md
+      required:
+        - id
+        - source
+        - specversion
+        - type
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifies the event. Producers MUST ensure that source + id is unique for each distinct event. If a duplicate event is re-sent (e.g. due to a network error) it MAY have the same id. Consumers MAY assume that events with identical source and id are duplicates. Examples include an event counter maintained by the producer or A UUID.
+        source:
+          type: string
+          format: uri
+          description: |
+            Identifies the context in which an event happened. Often this will include information such as the type of the event source, the organization publishing the event or the process that produced the event. The exact syntax and semantics behind the data encoded in the URI is defined by the event producer.
+
+            Producers MUST ensure that source + id is unique for each distinct event.
+
+            An application MAY assign a unique source to each distinct producer that makes it easy to produce unique IDs since no other producer will have the same source. The application MAY use UUIDs, URNs, DNS authorities or an application-specific scheme to create unique source identifiers.
+
+            A source MAY include more than one producer. In that case the producers MUST collaborate to ensure that source + id is unique for each distinct event.
+
+            Constraints
+              * REQUIRED
+              * MUST be a non-empty URI-reference
+              * An absolute URI is RECOMMENDED
+
+            examples
+              * Internet-wide unique URI with a DNS authority
+              * https://github.com/cloudevents
+              * mailto:cncf-wg-serverless@lists.cncf.io
+              * Universally-unique URN with a UUID:
+              * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+              * Application-specific identifiers
+              * /cloudevents/spec/pull/123
+              * /sensors/tn-1234567/alerts
+              * 1-555-123-4567
+        specversion:
+          type: string
+          description: The version of the CloudEvents specification that the event uses. This enables the interpretation of the context. Compliant event producers MUST use a value of `1.0` when referring to this version of the specification.
+        "type":
+          type: string
+          description: |
+            This attribute contains a value describing the type of event related to the originating occurrence. Often this attribute is used for routing, observability or policy enforcement. The format of this is producer defined and might include information such as the version of the type - see Versioning of Attributes in the Primer for more information.
+
+            Constraints
+              * REQUIRED
+              * MUST be a non-empty string
+              * SHOULD be prefixed with a reverse-DNS name (uk.gov.ukho). The prefixed domain dictates the organization which defines the semantics of this event type.
+
+            Examples
+              * uk.gov.ukho.encpublishing.newedition
+              * uk.gov.ukho.ordering.neworder
+        datacontenttype:
+          type: string
+          format: RFC 2046
+          description: |
+            Content type of data value. This attribute enables data to carry any type of content, whereby format and encoding might differ from that of the chosen event format. For example, an event rendered using the JSON envelope format might carry an XML payload in data, and the consumer is informed by this attribute being set to "application/xml". The rules for how data content is rendered for different datacontenttype values are defined in the event format specifications; for example, the JSON event format defines the relationship in section 3.1.
+            For some binary mode protocol bindings, this field is directly mapped to the respective protocol's content-type metadata property. Normative rules for the binary mode and the content-type metadata mapping can be found in the respective protocol.
+            In some event formats the datacontenttype attribute MAY be omitted. For example, if a JSON format event has no datacontenttype attribute, then it is implied that the data is a JSON value conforming to the "application/json" media type. In other words; a JSON-format event with no datacontenttype is exactly equivalent to one with datacontenttype="application/json".
+            When translating an event message with no datacontenttype attribute to a different format or protocol binding, the target datacontenttype SHOULD be set explicitly to the implied datacontenttype of the source.
+                        
+            Constraints
+              * If present, MUST adhere to the format specified in RFC 2046 https://tools.ietf.org/html/rfc2046.
+
+            Examples
+              * For Media Type examples see IANA Media Types http://www.iana.org/assignments/media-types/media-types.xhtml.
+        dataschema:
+          type: string
+          format: URI
+          description: |
+            Identifies the schema that data adheres to. Incompatible changes to the schema SHOULD be reflected by a different URI. See Versioning of Attributes in the Primer for more information.
+
+            Constraints
+              * If present, MUST be a non-empty URI.
+        subject:
+          type: string
+          description: |
+            This describes the subject of the event in the context of the event producer (identified by source). In publish-subscribe scenarios, a subscriber will typically subscribe to events emitted by a source, but the source identifier alone might not be sufficient as a qualifier for any specific event if the source context has internal sub-structure.
+
+            Identifying the subject of the event in context metadata (opposed to only in the data payload) is particularly helpful in generic subscription filtering scenarios where middleware is unable to interpret the data content. In the above example, the subscriber might only be interested in blobs with names ending with '.jpg' or '.jpeg' and the subject attribute allows for constructing a simple and efficient string-suffix filter for that subset of events.
+
+            Constraints
+              * If present, MUST be a non-empty string
+
+            Example
+              * A subscriber might register interest for when new blobs are created inside a blob-storage container. In this case, the event source identifies the subscription scope (storage container), the type identifies the "blob created" event, and the id uniquely identifies the event instance to distinguish separate occurrences of a same-named blob having been created; the name of the newly created blob is carried in subject.
+              
+                source: https://example.com/storage/tenant/container
+                subject: mynewfile.jpg
+        time:
+          type: string
+          format: date-time
+          description: |
+            Timestamp of when the occurrence happened. If the time of the occurrence cannot be determined then this attribute MAY be set to some other time (such as the current time) by the CloudEvents producer, however all producers for the same source MUST be consistent in this respect. In other words, either they all use the actual time of the occurrence or they all use the same algorithm to determine the value used.
+        data:
+          type: object
+          description: |
+            The event payload. This specification does not place any restriction on the type of this information. It is encoded into a media format which is specified by the datacontenttype attribute (e.g. application/json), and adheres to the dataschema format when those respective attributes are present.
+
+            The `uk.co.admiralty.avcsData.exchangeSetCreated.v1` event payload is described by "#/components/schemas/exchangeSetResponse".
+          allOf:
+            - $ref: "#/components/schemas/exchangeSetResponse"
+      example:
+        specversion: "1.0"
+        type: "uk.co.admiralty.avcsData.exchangeSetCreated.v1"
+        source: " https://exchangeset.admiralty.co.uk/avcsData"
+        id: "2f03a25f-28b3-46ea-b009-5943250a9a41"
+        time: "2021-02-17T14:04:04.4880776Z"
+        subject: "Requested AVCS Exchange Set Created"
+        datacontenttype: "application/json"
+        data:
+          _links:
+            exchangeSetBatchStatusUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+            exchangeSetBatchDetailsUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+            exchangeSetFileUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+            aioExchangeSetFileUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip"
+            errorFileUri:
+              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/error.txt"
+          exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+          requestedProductCount: 22
+          exchangeSetCellCount: 15
+          requestedProductsAlreadyUpToDateCount: 5
+          requestedAioProductCount: 2
+          aioExchangeSetCellCount: 1
+          requestedAioProductsAlreadyUpToDateCount: 1
+          requestedProductsNotInExchangeSet:
+            [
+              { productName: "GB123456", reason: "productWithdrawn" },
+              { productName: "GB123789", reason: "invalidProduct" },
+            ]
+          fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+
+    ####################################
+    #      Security Objects      #
+    ####################################
+
+  securitySchemes:
+    jwtBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+    ######################
+    #      callbacks     #
+    ######################
+
+  callbacks:
+    fulfilmentResponse:
+      '{$request.query.callbackUri}':
+        post:
+          summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
+          description: |
+            Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
+
+            ## Data:
+
+            The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
+
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/cloudEvent"
+          responses:
+            "200":
+              description: The service will ignore all response from the callback.

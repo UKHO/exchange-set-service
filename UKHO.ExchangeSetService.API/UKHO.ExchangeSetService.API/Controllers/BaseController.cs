@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Security.Claims;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 
 namespace UKHO.ExchangeSetService.API.Controllers
@@ -33,8 +35,19 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         protected string GetCurrentCorrelationId()
         {
-            return httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
+            var correlationId = httpContextAccessor.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
+            if (Guid.TryParse(correlationId, out Guid correlationIdGuid))
+            {
+                correlationId = correlationIdGuid.ToString();
+            }
+            else
+            {
+                correlationId = Guid.Empty.ToString();
+                Logger.LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid :{correlationId}", correlationId);
+            }
+            return correlationId;
         }
+
         protected IActionResult BuildBadRequestErrorResponse(List<Error> errors)
         {
             LogError(EventIds.BadRequest.ToEventId(), errors, "BadRequest", GetCurrentCorrelationId());
@@ -94,7 +107,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     return BuildInternalServerErrorResponse();
             }
         }
-       
+
         private IActionResult BuildNotModifiedResponse(ExchangeSetServiceResponse model)
         {
             LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
@@ -123,6 +136,41 @@ namespace UKHO.ExchangeSetService.API.Controllers
         private void LogInfo(EventId eventId, string infoType, string correlationId)
         {
             Logger.LogInformation(eventId, $"{HttpContext.Request.Path} - {infoType} - for CorrelationId - {{correlationId}}", correlationId);
+        }
+        protected IActionResult GetScsResponse(SalesCatalogueResponse model, List<Error> errors = null)
+        {
+            switch (model.ResponseCode)
+            {
+                case HttpStatusCode.OK:
+                    return BuildOkScsResponse(model);
+
+                case HttpStatusCode.InternalServerError:
+                    return BuildInternalServerErrorResponse();
+
+                case HttpStatusCode.BadRequest:
+                    return BuildBadRequestErrorResponse(errors);
+
+                case HttpStatusCode.NotModified:
+                    return BuildNotModifiedScsResponse(model);
+
+                default:
+                    return BuildInternalServerErrorResponse();
+            }
+        }
+
+        private IActionResult BuildOkScsResponse(SalesCatalogueResponse model)
+        {
+            if (model.LastModified != null)
+                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified.ToString());
+            return Ok(model.ResponseBody);
+        }
+
+        private IActionResult BuildNotModifiedScsResponse(SalesCatalogueResponse model)
+        {
+            LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
+            if (model.LastModified != null)
+                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified.ToString());
+            return new StatusCodeResult(StatusCodes.Status304NotModified);
         }
     }
 }
