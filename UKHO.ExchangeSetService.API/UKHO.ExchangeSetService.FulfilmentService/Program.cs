@@ -136,6 +136,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              {
                  var buildServiceProvider = services.BuildServiceProvider();
 
+                 
                  services.AddScoped<IRedisCache, RedisCache>();
                  var redisConnectionString = ConfigurationBuilder["CacheConnectionString"];
                  services.AddSingleton<IConnectionMultiplexer>(provider => ConnectionMultiplexer.Connect(redisConnectionString));
