@@ -41,3 +41,11 @@ variable "subnet_id" {
 variable "agent_subnet" {
   type = string
 }
+
+variable "agent_2204_subnet" {
+  type = string
+}
+
+variable "agent_prd_subnet" {
+  type = string
+}
