@@ -520,4 +520,10 @@
    ]]></notes>
    <cve>CVE-2024-35255</cve>
 </suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: System.Text.Json:7.0.0
+   ]]></notes>
+   <vulnerabilityName>CVE-2024-30105</vulnerabilityName>
+</suppress>
 </suppressions>
