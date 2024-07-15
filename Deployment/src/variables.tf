@@ -95,3 +95,11 @@ variable "suffix" {
 variable "storage_suffix" {
   default     = ""
 }
+
+variable "agent_2204_subnet" {
+  type = string
+}
+
+variable "agent_prd_subnet" {
+  type = string
+}
