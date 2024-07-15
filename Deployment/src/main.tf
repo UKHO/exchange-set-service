@@ -139,7 +139,7 @@ module "key_vault" {
   location            = azurerm_resource_group.rg.location
   allowed_ips         = var.allowed_ips  
   subnet_id           = data.azurerm_subnet.main_subnet.id
-  agent_subnet        = data.azurerm_subnet.agent_subnet.id
+  # agent_subnet        = data.azurerm_subnet.agent_subnet.id
   agent_2204_subnet   = var.agent_2204_subnet
   agent_prd_subnet    = var.agent_prd_subnet
   read_access_objects = {
