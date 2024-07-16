@@ -12,7 +12,12 @@ terraform --version
 
 Write-output "Executing terraform scripts for APIM deployment in $workSpace environment..."
 
-$backendConfigKey = $useNewTfplanName ? "terraform.deployment.apim.ess.tfplan" : "terraform.ess.apim.deployment.tfplan"
+if ($useNewTfplanName) {
+    $backendConfigKey = "terraform.deployment.apim.ess.tfplan"
+} else {
+    $backendConfigKey = "terraform.ess.apim.deployment.tfplan"
+}
+
 Write-output "Using plan $backendConfigKey"
 terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=$backendConfigKey"
 if ( !$? ) { echo "Something went wrong during terraform initialization"; throw "Error" }
@@ -30,7 +35,7 @@ Write-output "Validating terraform..."
 terraform validate
 if ( !$? ) { echo "Something went wrong during terraform validation" ; throw "Error" }
 
-Write-output "Execute Terraform plan..."
+$totalDestroyLines=(Get-Content -Path terraform_output.txt | Select-String -Pattern "destroy" -CaseSensitive |  Where-Object {$_ -ne ""}).length
 terraform plan -out "$backendConfigKey" -var suffix="" -var pathsuffix="" | tee terraform_output.txt
 if ( !$? ) { echo "Something went wrong during terraform plan" ; throw "Error" }
 

@@ -31,6 +31,8 @@ steps:
       TF_VAR_agent_rg: $(agentRG)
       TF_VAR_agent_vnet_name: $(agentVnetName)
       TF_VAR_agent_subnet_name: $(agentSubnetName)
+      TF_VAR_agent_2204_subnet: $(agent2204SubnetId)
+      TF_VAR_agent_prd_subnet: $(agentprdSubnetId)
       TF_VAR_agent_subscription_id: $(agentSubscriptionId)
 
   - task: FileTransform@2
