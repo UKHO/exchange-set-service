@@ -138,8 +138,8 @@ variable "pathsuffix" {
 }
 
 locals {
-  env_name				= lower(terraform.workspace)
-  service_name			= "ess"
+  env_name				      = lower(terraform.workspace)
+  service_name			    = "ess"
   group_name            = local.env_name == "prod" ? "${var.group_name}${var.suffix}" : "${var.group_name} ${var.env_suffix[local.env_name]}${var.suffix}"
   product_name          = local.env_name == "prod" ? "${var.product_name}${var.suffix}" : "${var.product_name} ${var.env_suffix[local.env_name]}${var.suffix}"
   ui_product_name       = local.env_name == "prod" ? "${var.ui_product_name}${var.suffix}" : "${var.ui_product_name} ${var.env_suffix[local.env_name]}${var.suffix}"
