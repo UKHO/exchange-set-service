@@ -1,6 +1,7 @@
 ﻿using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Storage;
@@ -23,6 +25,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IOptions<CacheConfiguration> cacheConfiguration;
         private readonly ILogger<EssWebhookService> logger;
         private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
+        private readonly IFileShareServiceCache fileShareServiceCache;
 
         public EssWebhookService(IAzureTableStorageClient azureTableStorageClient,
             ISalesCatalogueStorageService azureStorageService,
@@ -30,7 +33,8 @@ namespace UKHO.ExchangeSetService.API.Services
             IEnterpriseEventCacheDataRequestValidator enterpriseEventCacheDataRequestValidator,
             IOptions<CacheConfiguration> cacheConfiguration,
             ILogger<EssWebhookService> logger,
-            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig)
+            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig,
+            IFileShareServiceCache fileShareServiceCache)
         {
             this.azureTableStorageClient = azureTableStorageClient;
             this.azureStorageService = azureStorageService;
@@ -39,13 +43,14 @@ namespace UKHO.ExchangeSetService.API.Services
             this.cacheConfiguration = cacheConfiguration;
             this.logger = logger;
             this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
+            this.fileShareServiceCache = fileShareServiceCache;
         }
         public Task<ValidationResult> ValidateEventGridCacheDataRequest(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest)
         {
             return enterpriseEventCacheDataRequestValidator.Validate(enterpriseEventCacheDataRequest);
         }
 
-        public async Task DeleteSearchAndDownloadCacheData(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
+        public async Task UpsertSearchAndDownloadCacheData(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
         {
             var productCode = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "ProductCode").Select(a => a.Value).FirstOrDefault();
             var cellName = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
@@ -57,7 +62,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
                 var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(cellName, editionNumber + "|" + updateNumber + "|" + enterpriseEventCacheDataRequest.BusinessUnit.ToUpper(), cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
 
-                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventStart.ToEventId(), "Search and Download cache data deletion from table and Blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, correlationId);
+                logger.LogInformation(EventIds.UpsertSearchAndDownloadCacheDataEventStart.ToEventId(), "Search and Download cache data deletion from table and Blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, correlationId);
                 if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                 {
                     var cacheTableData = new CacheTableData
@@ -80,11 +85,28 @@ namespace UKHO.ExchangeSetService.API.Services
                 {
                     logger.LogInformation(EventIds.DeleteSearchDownloadCacheNoDataFoundEvent.ToEventId(), "No Matching Product found in Search and Download Cache table:{cacheConfiguration.Value.FssSearchCacheTableName} with ProductName:{cellName} and BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, cellName, enterpriseEventCacheDataRequest.BusinessUnit, correlationId);
                 }
-                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data deletion from table and Blob completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, correlationId);
+
+                var fssSearchResponseCache = new FssSearchResponseCache
+                {
+                    BatchId = enterpriseEventCacheDataRequest.BatchId,
+                    PartitionKey = cellName,
+                    RowKey = $"{editionNumber}|{updateNumber}",
+                    Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
+                };
+
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
+                    "File share service search response insert/merge request in azure table for cache for Product/CellName:{cellName}, EditionNumber:{editionNumber} and UpdateNumber:{updateNumber} with FSS BatchId:{cacheInfo.BatchId}",
+                    async () =>
+                    {
+                        await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
+                        return Task.CompletedTask;
+                    }, cellName, editionNumber, updateNumber, enterpriseEventCacheDataRequest.BatchId);
+
+                logger.LogInformation(EventIds.UpsertSearchAndDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data deletion from table and Blob completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, correlationId);
             }
             else
             {
-                logger.LogInformation(EventIds.DeleteSearchDownloadInvalidCacheDataFoundEvent.ToEventId(), "Invalid data found in Search and Download Cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                logger.LogInformation(EventIds.UpsertSearchAndDownloadInvalidCacheDataFoundEvent.ToEventId(), "Invalid data found in Search and Download Cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
             }
         }
 
@@ -96,5 +118,11 @@ namespace UKHO.ExchangeSetService.API.Services
                 && !string.IsNullOrWhiteSpace(editionNumber)
                 && !string.IsNullOrWhiteSpace(updateNumber));
         }
+
+        ////private async Task CacheFilesToBlob(fssSearchResponseCache)
+        ////{
+
+        ////}
+
     }
 }

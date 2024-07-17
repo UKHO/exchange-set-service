@@ -558,21 +558,21 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceUploadENCFilesToCacheCompleted = 805137,
         /// <summary>
-        /// 805138 - Request for clearing Search and Download Cache Data from ESS is started.
+        /// 805138 - Request for clearing and inserting Search and Download Cache Data from ESS is started.
         /// </summary>
-        ESSClearCacheSearchDownloadEventStart = 805138,
+        ESSUpsertSearchAndDownloadCacheEventStart = 805138,
         /// <summary>
-        /// 805139 - Request for clearing Search and Download Cache Data from ESS is completed.
+        /// 805139 - Request for clearing and inserting Search and Download Cache Data from ESS is completed.
         /// </summary>
-        ESSClearCacheSearchDownloadEventCompleted = 805139,
+        ESSUpsertSearchAndDownloadCacheEventCompleted = 805139,
         /// <summary>
         /// 805140 - Started Deleting Search and Download Cache Data from ESS Cache Table and Blob
         /// </summary>
-        DeleteSearchDownloadCacheDataEventStart = 805140,
+        UpsertSearchAndDownloadCacheDataEventStart = 805140,
         /// <summary>
         /// 805141 - Completed Deleting Search and Download Cache Data from ESS Cache Table and Blob
         /// </summary>
-        DeleteSearchDownloadCacheDataEventCompleted = 805141,
+        UpsertSearchAndDownloadCacheDataEventCompleted = 805141,
         /// <summary>
         /// 805142 - Started Deleting Search and Download Cache Data from ESS Cache Table
         /// </summary>
@@ -588,7 +588,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805145 - Invalid Request Data found in Caching Search and Download in ESS
         /// </summary>
-        DeleteSearchDownloadInvalidCacheDataFoundEvent = 805145,
+        UpsertSearchAndDownloadInvalidCacheDataFoundEvent = 805145,
         /// <summary>
         /// 805146 - Started Deleting Search and Download cache data from container in ESS
         /// </summary>
