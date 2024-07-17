@@ -50,8 +50,11 @@ variable "large_exchange_set_subnets" {
 variable "large_exchange_set_secrets" {
   type = map(string)
 }
+variable "agent_2204_subnet" {
+  type = string
+}
 
-variable "agent_subnet" {
+variable "agent_prd_subnet" {
   type = string
 }
 
