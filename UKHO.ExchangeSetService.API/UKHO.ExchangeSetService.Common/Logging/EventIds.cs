@@ -558,13 +558,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceUploadENCFilesToCacheCompleted = 805137,
         /// <summary>
-        /// 805138 - Request for clearing Search and Download Cache Data from ESS is started.
+        ///Request for clearing and inserting Search and Download Cache Data from ESS is completed.
         /// </summary>
-        ESSClearCacheSearchDownloadEventStart = 805138,
+        ESSUpsertSearchAndDownloadCacheEventStart = 805138,
         /// <summary>
-        /// 805139 - Request for clearing Search and Download Cache Data from ESS is completed.
+        /// 805139 - Request for clearing and inserting Search and Download Cache Data from ESS is completed.
         /// </summary>
-        ESSClearCacheSearchDownloadEventCompleted = 805139,
+        ESSUpsertSearchAndDownloadCacheEventCompleted = 805139,
         /// <summary>
         /// 805140 - Started Deleting Search and Download Cache Data from ESS Cache Table and Blob
         /// </summary>

@@ -379,6 +379,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Invalid data found in Search and Download Cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
         }
 
+        [Test]
+        public async Task WhenInsertSearchAndDownloadCacheDataCalled_ThenExecuteAzureStorageInsertOperations()
+        { 
+            string FakePayload = "fakePayload";
+            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            HttpResponseMessage responseMessage = GetResponse();
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(Task.FromResult(responseMessage));
+
+            await service.InsertSearchAndDownloadCacheData(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakePayload, FakeCorrelationId);
+                          
+            A.CallTo(() => fakeFileShareServiceCache.InsertOrMergeFssCacheDetail(A<FssSearchResponseCache>.Ignored)).MustHaveHappenedOnceExactly();
+
+        }
 
 
         private string GetStorageAccountConnectionString()
