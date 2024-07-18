@@ -138,12 +138,12 @@ namespace UKHO.ExchangeSetService.API.Services
                         logger.LogInformation(EventIds.InsertSearchDownloadCacheDataToBlobEvent.ToEventId(), "Search and Download cache data file inserted to Blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, fileName, correlationId);
                         if (serverValue == ServerHeaderValue)
                         {
-                            logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "Search and Download cache data download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, uri, enterpriseEventCacheDataRequest.BatchId, correlationId);
+                            logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "Search and Download cache data download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, requestUri, enterpriseEventCacheDataRequest.BatchId, correlationId);
                         }
                     }
                     else
                     {
-                        logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in Search and Download cache data while downloading ENC file:{fileName} with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, uri, httpResponse.StatusCode, enterpriseEventCacheDataRequest.BatchId, correlationId);
+                        logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in Search and Download cache data while downloading ENC file:{fileName} with uri:{uri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, uri, httpResponse.StatusCode, enterpriseEventCacheDataRequest.BatchId, correlationId);
                         throw new FulfilmentException(EventIds.DownloadENCFilesNonOkResponse.ToEventId());
                     }
                 }
