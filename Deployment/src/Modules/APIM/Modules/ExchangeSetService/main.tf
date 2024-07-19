@@ -208,9 +208,10 @@ resource "azurerm_api_management_product" "ess_ui_product" {
   product_id            = lower(replace(var.apim_ess_ui_product_name, " ", "-"))
   display_name          = title(var.apim_ess_ui_product_name)
   description           = "The Exchange Set Service provides APIs to request and download S57 ENC Exchange Sets using a UI."
-  subscription_required = false
-  approval_required     = false
+  subscription_required = true
+  approval_required     = true
   published             = true
+  subscriptions_limit   = 1
 }
 
 # ESS product-Group mapping
