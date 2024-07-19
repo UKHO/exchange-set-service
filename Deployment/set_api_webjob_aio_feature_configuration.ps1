@@ -8,8 +8,7 @@ param (
 
 $aiocellsconfiguration = $aiocells -join ','
 
-Write-Output "Set ESS API Configuration in appsetting to $aioenabled..."
-
+Write-Output "Set ESS API Configuration in appsetting..."
 az webapp config appsettings set -g $resourcegroup -n $webappname --settings AioConfiguration:AioEnabled=$aioenabled AioConfiguration:AioCells=$aiocellsconfiguration
 az webapp restart --name $webappname --resource-group $resourcegroup
 
