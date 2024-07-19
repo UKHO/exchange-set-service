@@ -526,4 +526,17 @@
    ]]></notes>
    <vulnerabilityName>CVE-2024-30105</vulnerabilityName>
 </suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Azure.Identity:1.10.3
+   ]]></notes>
+   <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
+</suppress>
+<suppress>
+   <notes><![CDATA[
+   file name: Azure.Identity:1.7.0
+   ]]></notes>
+   <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
+   <cve>CVE-2023-36414</cve>
+</suppress>
 </suppressions>
