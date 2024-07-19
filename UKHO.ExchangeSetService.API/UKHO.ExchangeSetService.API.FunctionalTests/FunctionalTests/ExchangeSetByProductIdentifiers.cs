@@ -36,6 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithOutAuthToken_ThenAnUnauthorisedResponseIsReturned()
         {
@@ -45,6 +46,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithTamperedToken_ThenAnUnauthorisedResponseIsReturned()
         {
@@ -55,6 +57,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithCustomToken_ThenAnUnauthorisedResponseIsReturned()
         {
@@ -64,6 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithNoRoleToken_ThenACorrectResponseIsReturned()
         {
@@ -77,6 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithAValidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
@@ -92,6 +97,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
@@ -111,10 +117,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.IsNotEmpty(apiResponseData.RequestedProductsNotInExchangeSet, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
             Assert.AreEqual("invalidProduct", apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason, $"Exchange set returned Reason {apiResponseData.RequestedProductsNotInExchangeSet.FirstOrDefault().Reason}, instead of expected Reason 'invalidProduct'");
-
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithDuplicateProductIdentifiers_ThenACorrectResponseIsReturned()
         {
@@ -133,6 +139,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithValidAndInvalidProductIdentifiers_ThenACorrectResponseIsReturned()
         {
@@ -154,6 +161,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithAValidProductIdentifierswithCallBackURI_ThenACorrectResponseIsReturned()
         {
@@ -166,6 +174,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithAnEmptyProductIdentifier_ThenABadRequestStatusIsReturned()
         {
@@ -180,6 +189,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithANullProductIdentifier_ThenABadRequestStatusIsReturned()
         {
@@ -198,6 +208,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [TestCase("ftp://fss.ukho.gov.uk", TestName = "Callback URL with ftp request")]
         [TestCase("https://", TestName = "Callback URL with only https request")]
         [TestCase("http://fss.ukho.gov.uk", TestName = "Callback URL with http request")]
+        [Category("QCOnlyTest")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallTheApiWithAInvalidCallbackURIWithProductIdentifier_ThenABadRequestResponseIsReturned(string callBackUrl)
         {
