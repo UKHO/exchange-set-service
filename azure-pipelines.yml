@@ -41,7 +41,7 @@ variables:
   - name: Container
     value: "ukhydrographicoffice/terraform-azure-powershell-unzip:1.7.2"
   - name: DeploymentPool
-    value: "UKHO Ubuntu 1804"
+    value: "Mare Nectaris"
   - name: SdkVersion
     value: "6.0.x"
   - name: WindowPool
