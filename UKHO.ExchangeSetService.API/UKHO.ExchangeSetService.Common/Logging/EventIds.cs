@@ -558,7 +558,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceUploadENCFilesToCacheCompleted = 805137,
         /// <summary>
-        ///Request for clearing and inserting Search and Download Cache Data from ESS is completed.
+        ///Request for clearing and inserting Search and Download Cache Data from ESS start.
         /// </summary>
         ESSInvalidateAndInsertCacheEventStart = 805138,
         /// <summary>
@@ -836,7 +836,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805207 - Cache Search and Download Data to ESS Azure Table and blob completed
         /// </summary>
-        CacheSearchAndDownloadDataDataCompleted = 805207,
+        CacheSearchAndDownloadDataCompleted = 805207,
         /// <summary>
         /// 805208 - Cache Search and Download files data missing
         /// </summary>
