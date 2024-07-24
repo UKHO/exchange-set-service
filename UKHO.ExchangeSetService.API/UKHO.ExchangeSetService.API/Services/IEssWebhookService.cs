@@ -7,7 +7,6 @@ namespace UKHO.ExchangeSetService.API.Services
     public interface IEssWebhookService
     {
         Task<ValidationResult> ValidateEventGridCacheDataRequest(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest);
-        Task DeleteSearchAndDownloadCacheData(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId);
-        Task InsertSearchAndDownloadCacheData(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string payloadJson, string correlationId);
+        Task InvalidateAndInsertCacheData(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId);
     }
 }

@@ -560,11 +560,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         ///Request for clearing and inserting Search and Download Cache Data from ESS is completed.
         /// </summary>
-        ESSUpsertSearchAndDownloadCacheEventStart = 805138,
+        ESSInvalidateAndInsertCacheEventStart = 805138,
         /// <summary>
         /// 805139 - Request for clearing and inserting Search and Download Cache Data from ESS is completed.
         /// </summary>
-        ESSUpsertSearchAndDownloadCacheEventCompleted = 805139,
+        ESSInvalidateAndInsertCacheEventCompleted = 805139,
         /// <summary>
         /// 805140 - Started Deleting Search and Download Cache Data from ESS Cache Table and Blob
         /// </summary>
@@ -588,7 +588,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805145 - Invalid Request Data found in Caching Search and Download in ESS
         /// </summary>
-        DeleteSearchDownloadInvalidCacheDataFoundEvent = 805145,
+        InvalidateAndInsertCacheInvalidDataFoundEvent = 805145,
         /// <summary>
         /// 805146 - Started Deleting Search and Download cache data from container in ESS
         /// </summary>
@@ -600,7 +600,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805148 - Request for validation event for clear Cache Search and Download in ESS
         /// </summary>
-        ESSClearCacheSearchDownloadValidationEvent = 805148,
+        ESSInvalidateAndInsertCacheDataValidationEvent = 805148,
         /// <summary>
         /// 805149 - Check if event triggered is by B2C or AdB2C user in ESS
         /// </summary>
@@ -826,21 +826,21 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         InvalidFssBusinessUnit = 805204,
         /// <summary>
-        /// 805205 - Invalid FSS business unit provided to fulfilment service
+        /// 805205 - Cache Search and Download Data to ESS Azure Table and blob started
         /// </summary>
-        InsertSearchDownloadInvalidCacheDataFoundEvent = 805205,
+        CacheSearchAndDownloadDataEventStart = 805205,
         /// <summary>
-        /// 805206 - Started Search and Download Cache Data to ESS Cache Table and Blob
+        /// 805206 - Cache Search and Download Data save files to Blob 
         /// </summary>
-        InsertSearchDownloadCacheDataEventStart = 805206,
+        CacheSearchAndDownloadDataToBlobEvent = 805206,
         /// <summary>
-        /// 805206 - Insert Search and Download Cache Data file to ESS Cache Blob 
+        /// 805207 - Cache Search and Download Data to ESS Azure Table and blob completed
         /// </summary>
-        InsertSearchDownloadCacheDataToBlobEvent = 805207,        
+        CacheSearchAndDownloadDataDataCompleted = 805207,
         /// <summary>
-        /// 805206 - Insert Search and Download Cache Data to ESS Cache Table and blob completed
+        /// 805208 - Cache Search and Download files data missing
         /// </summary>
-        InsertSearchDownloadCacheDataCompleted = 805208
+        CacheSearchAndDownloadInvalidData = 805208
 
     }
 
