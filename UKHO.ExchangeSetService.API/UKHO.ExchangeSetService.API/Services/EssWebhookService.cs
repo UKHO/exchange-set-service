@@ -178,7 +178,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return Task.CompletedTask;
             }, fssSearchResponse.PartitionKey, subsOfRowKeys[0], subsOfRowKeys[1], fssSearchResponse.BatchId);
 
-            logger.LogInformation(EventIds.CacheSearchAndDownloadDataDataCompleted.ToEventId(), "Cache search and download data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[1], fssSearchResponse.BatchId, correlationId);
+            logger.LogInformation(EventIds.CacheSearchAndDownloadDataCompleted.ToEventId(), "Cache search and download data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[1], fssSearchResponse.BatchId, correlationId);
         }
 
         private bool ValidateCacheAttributeData(string businessUnit, string productCode, string cellName, string editionNumber, string updateNumber)

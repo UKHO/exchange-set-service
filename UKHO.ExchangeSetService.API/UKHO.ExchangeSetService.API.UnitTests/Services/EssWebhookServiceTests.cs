@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInvalidRequestDataInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
+        public async Task WhenInvalidRequestData_ThenReturnResponseFalse()
         {
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
@@ -100,7 +100,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenNoS63CacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
+        public async Task WhenNoS63CacheDataExists_ThenReturnResponseFalse()
         {
             var cachingResponse = new FssSearchResponseCache() { };
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
@@ -128,7 +128,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenNoS57CacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseFalse()
+        public async Task WhenNoS57CacheDataExists_ThenReturnResponseFalse()
         {
             var cachingResponse = new FssSearchResponseCache() { };
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
@@ -156,7 +156,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenS63CacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseTrue()
+        public async Task WhenS63CacheDataExists_ThenReturnResponseTrue()
         {
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
@@ -193,7 +193,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenS57CacheDataExistsInDeleteSearchAndDownloadCache_ThenReturnResponseTrue()
+        public async Task WhenS57CacheDataExists_ThenReturnResponseTrue()
         {
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S57CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
@@ -230,7 +230,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenFileDataNotExistInRequestInsertSearchAndDownloadCacheData_ThenDataNotAddedToBlob()
+        public async Task WhenFileDataNotExistInRequestInvalidateAndInsertCacheData_ThenDataNotAddedToBlob()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S57CacheBusinessUnit));
@@ -252,7 +252,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenFileDataExistInRequestInsertSearchAndDownloadCacheData_ThenDataAddedToBlob()
+        public async Task WhenFileDataExistInRequestInvalidateAndInsertCacheData_ThenDataAddedToBlob()
         {
             HttpResponseMessage responseMessage = GetResponse();
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
@@ -288,7 +288,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public void WhenFssReturnBadRequestInsertSearchAndDownloadCacheData_ThenLogException()
+        public void WhenFssReturnBadRequestInvalidateAndInsertCacheData_ThenLogException()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             HttpResponseMessage responseMessage = new HttpResponseMessage
@@ -323,7 +323,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenFssServerHeaderAsWindowsAzureBlobInsertSearchAndDownloadCacheData_Then307RedirectResponse()
+        public async Task WhenFssServerHeaderAsWindowsAzureBlobInvalidateAndInsertCacheData_Then307RedirectResponse()
         {
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             HttpResponseMessage responseMessage = GetResponse();
@@ -364,7 +364,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
       }
 
         [Test]
-        public async Task WhenInsertSearchAndDownloadCacheDataCalled_ThenExecuteAzureStorageInsertOperations()
+        public async Task WhenInvalidateAndInsertCacheDataCalled_ThenExecuteAzureStorageInsertOperations()
         {
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());

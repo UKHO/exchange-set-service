@@ -147,7 +147,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenValidS63DataRequestedInNewFilesPublished_ThenDeleteS63DataFromStorage()
+        public async Task WhenValidS63DataRequestedInNewFilesPublished_ThenInvalidateCachedS63DataFromStorage()
         {
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenValidS57DataRequestedInNewFilesPublished_ThenDeleteS57DataFromStorage()
+        public async Task WhenValidS57DataRequestedInNewFilesPublished_ThenInvalidateCachedS57DataFromStorage()
         {
             var fakeCacheJson = JObject.Parse(@"{""Type"":""FilesPublished""}");
             fakeCacheJson["Source"] = "https://www.fakecacheorg.co.uk";
