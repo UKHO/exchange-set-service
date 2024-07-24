@@ -93,12 +93,12 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.CacheSearchAndDownloadInvalidData.ToEventId(), "Cache Search and Download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                    logger.LogInformation(EventIds.CacheSearchAndDownloadInvalidData.ToEventId(), "Cache search and download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
                 }
             }
             else
             {
-                logger.LogInformation(EventIds.InvalidateAndInsertCacheInvalidDataFoundEvent.ToEventId(), "Invalid data found in Search and Download Cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                logger.LogInformation(EventIds.InvalidateAndInsertCacheInvalidDataFoundEvent.ToEventId(), "Invalid data found in search and download cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
             }
         }
 
@@ -137,7 +137,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string[] subsOfRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
-            logger.LogInformation(EventIds.CacheSearchAndDownloadDataEventStart.ToEventId(), "Cache search and Download data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", correlationId);
+            logger.LogInformation(EventIds.CacheSearchAndDownloadDataEventStart.ToEventId(), "Cache search and download data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", correlationId);
 
             foreach (var item in files)
             {
@@ -159,7 +159,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
                 else
                 {
-                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in Cache search and download data while downloading ENC file:{fileName} with uri:{uri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, uri, httpResponse.StatusCode, fssSearchResponse.BatchId, correlationId);
+                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in search and download cache data while downloading ENC file:{fileName} with uri:{uri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, uri, httpResponse.StatusCode, fssSearchResponse.BatchId, correlationId);
                 }
             }
             var fssSearchResponseCache = new FssSearchResponseCache
