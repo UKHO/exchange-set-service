@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
+
 
 namespace UKHO.ExchangeSetService.API.Services
 {
@@ -89,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 await DeleteSearchAndDownloadCacheData(fssSearchResponse, storageConnectionString, correlationId);
                 if (enterpriseEventCacheDataRequest.Files.Count > 0 && enterpriseEventCacheDataRequest.Files != null)
                 {
-                    await CacheSearchAndDownloadData(fssSearchResponse, enterpriseEventCacheDataRequest.Files, correlationId);
+                    await CacheSearchAndDownloadData(fssSearchResponse, correlationId);
                 }
                 else
                 {
@@ -105,8 +107,9 @@ namespace UKHO.ExchangeSetService.API.Services
         private async Task DeleteSearchAndDownloadCacheData(FssSearchResponseCache fssSearchResponse, string storageConnectionString, string correlationId)
         {
             var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(fssSearchResponse.PartitionKey, fssSearchResponse.RowKey, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+            string[] subsOfRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
-            logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventStart.ToEventId(), "Search and Download cache data deletion from table and Blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", correlationId);
+            logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventStart.ToEventId(), "Search and Download cache data deletion from table and Blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], correlationId);
             if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
             {
                 var cacheTableData = new CacheTableData
@@ -117,41 +120,41 @@ namespace UKHO.ExchangeSetService.API.Services
                     ETag = "*"
                 };
 
-                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromTableStarted.ToEventId(), "Deletion started for Search and Download cache data from table:{cacheConfiguration.Value.FssSearchCacheTableName} for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheInfo.BatchId} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", cacheTableData.BatchId, correlationId);
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromTableStarted.ToEventId(), "Deletion started for Search and Download cache data from table:{cacheConfiguration.Value.FssSearchCacheTableName} for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheInfo.BatchId} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, fssSearchResponse.PartitionKey, subsOfRowKeys[2], cacheTableData.BatchId, correlationId);
                 await azureTableStorageClient.DeleteAsync(cacheTableData, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString, essFulfilmentStorageconfig.Value.StorageContainerName);
-                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromTableCompleted.ToEventId(), "Deletion completed for Search and Download cache data from table:{cacheConfiguration.Value.FssSearchCacheTableName} for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", cacheTableData.BatchId, correlationId);
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromTableCompleted.ToEventId(), "Deletion completed for Search and Download cache data from table:{cacheConfiguration.Value.FssSearchCacheTableName} for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, fssSearchResponse.PartitionKey, subsOfRowKeys[2], cacheTableData.BatchId, correlationId);
 
-                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerStarted.ToEventId(), "Deletion started for Search and Download cache data from Blob Container for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", cacheTableData.BatchId, correlationId);
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerStarted.ToEventId(), "Deletion started for Search and Download cache data from Blob Container for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], cacheTableData.BatchId, correlationId);
                 await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString, cacheTableData.BatchId);
-                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerCompleted.ToEventId(), "Deletion completed for Search and Download cache data from Blob Container for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", cacheTableData.BatchId, correlationId);
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerCompleted.ToEventId(), "Deletion completed for Search and Download cache data from Blob Container for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], cacheTableData.BatchId, correlationId);
             }
             else
             {
-                logger.LogInformation(EventIds.DeleteSearchDownloadCacheNoDataFoundEvent.ToEventId(), "No Matching Product found in Search and Download Cache table:{cacheConfiguration.Value.FssSearchCacheTableName} with ProductName:{cellName} and BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", correlationId);
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheNoDataFoundEvent.ToEventId(), "No Matching Product found in Search and Download Cache table:{cacheConfiguration.Value.FssSearchCacheTableName} with ProductName:{cellName} and BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, fssSearchResponse.PartitionKey, subsOfRowKeys[2], correlationId);
             }
-            logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data deletion from table and Blob completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", correlationId);
+            logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data deletion from table and Blob completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], correlationId);
         }
 
-        private async Task CacheSearchAndDownloadData(FssSearchResponseCache fssSearchResponse, List<CacheFile> files, string correlationId)
+        private async Task CacheSearchAndDownloadData(FssSearchResponseCache fssSearchResponse, string correlationId)
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            var cacheBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(fssSearchResponse.Response);
             string[] subsOfRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
-            logger.LogInformation(EventIds.CacheSearchAndDownloadDataEventStart.ToEventId(), "Cache search and download data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", correlationId);
+            logger.LogInformation(EventIds.CacheSearchAndDownloadDataEventStart.ToEventId(), "Cache search and download data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], correlationId);
 
-            foreach (var item in files)
+            foreach (var fileItem in cacheBatchDetail.Files?.Select(a => a.Links.Get.Href))
             {
-                var uri = item.Links.Get.Href;
-                var fileName = item.Links.Get.Href.Split("/");
-                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, String.Empty, accessToken, uri, CancellationToken.None, correlationId);
+                var fileName = fileItem.Split("/")[^1];
+                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, String.Empty, accessToken, fileItem, CancellationToken.None, correlationId);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
                     var serverValue = httpResponse.Headers.Server.ToString().Split('/');
                     byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
 
-                    await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName.LastOrDefault(), fssSearchResponse.BatchId);
-                    logger.LogInformation(EventIds.CacheSearchAndDownloadDataToBlobEvent.ToEventId(), "Cache search and download data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, "enterpriseEventCacheDataRequest.BusinessUnit", fileName, correlationId);
+                    await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, fssSearchResponse.BatchId);
+                    logger.LogInformation(EventIds.CacheSearchAndDownloadDataToBlobEvent.ToEventId(), "Cache search and download data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], fileName, correlationId);
                     if (serverValue[0] == ServerHeaderValue)
                     {
                         logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "Cache search and download data, download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, requestUri, fssSearchResponse.BatchId, correlationId);
@@ -159,7 +162,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
                 else
                 {
-                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in search and download cache data while downloading ENC file:{fileName} with uri:{uri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, uri, httpResponse.StatusCode, fssSearchResponse.BatchId, correlationId);
+                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in search and download cache data while downloading ENC file:{fileName} with uri:{uri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, fileItem, httpResponse.StatusCode, fssSearchResponse.BatchId, correlationId);
                 }
             }
             var fssSearchResponseCache = new FssSearchResponseCache
@@ -167,7 +170,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 BatchId = fssSearchResponse.BatchId,
                 PartitionKey = fssSearchResponse.PartitionKey,
                 RowKey = fssSearchResponse.RowKey,
-                Response = JsonConvert.SerializeObject(fssSearchResponse)
+                Response = JsonConvert.SerializeObject(cacheBatchDetail)
             };
 
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
