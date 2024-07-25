@@ -278,7 +278,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
              && call.GetArgument<LogLevel>(0) == LogLevel.Information
-             && call.GetArgument<EventId>(1) == EventIds.CacheSearchAndDownloadDataCompleted.ToEventId()
+             && call.GetArgument<EventId>(1) == EventIds.CacheSearchAndDownloadDataEventCompleted.ToEventId()
              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache search and download data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
@@ -321,7 +321,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
              && call.GetArgument<LogLevel>(0) == LogLevel.Information
-             && call.GetArgument<EventId>(1) == EventIds.CacheSearchAndDownloadDataCompleted.ToEventId()
+             && call.GetArgument<EventId>(1) == EventIds.CacheSearchAndDownloadDataEventCompleted.ToEventId()
              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache search and download data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
         }
 
@@ -363,7 +363,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
              && call.GetArgument<LogLevel>(0) == LogLevel.Information
-             && call.GetArgument<EventId>(1) == EventIds.CacheSearchAndDownloadDataCompleted.ToEventId()
+             && call.GetArgument<EventId>(1) == EventIds.CacheSearchAndDownloadDataEventCompleted.ToEventId()
              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache search and download data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
       }
 

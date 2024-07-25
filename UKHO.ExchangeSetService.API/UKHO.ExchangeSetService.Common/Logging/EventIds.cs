@@ -836,7 +836,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805207 - Cache Search and Download Data to ESS Azure Table and blob completed
         /// </summary>
-        CacheSearchAndDownloadDataCompleted = 805207,
+        CacheSearchAndDownloadDataEventCompleted = 805207,
         /// <summary>
         /// 805208 - Cache Search and Download files data missing
         /// </summary>
