@@ -174,7 +174,7 @@ namespace UKHO.ExchangeSetService.API.Services
             };
 
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
-            "File share service search response insert/merge request in azure table for cache for Product/CellName:{cellName}, EditionNumber:{editionNumber} and UpdateNumber:{updateNumber} with FSS BatchId:{cacheInfo.BatchId}  and _X-Correlation-ID:{CorrelationId}",
+            "File share service search response insert request in azure table for cache for Product/CellName:{cellName}, EditionNumber:{editionNumber} and UpdateNumber:{updateNumber} with FSS BatchId:{cacheInfo.BatchId}  and _X-Correlation-ID:{CorrelationId}",
             async () =>
             {
                 await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
