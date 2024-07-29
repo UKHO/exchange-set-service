@@ -43,14 +43,25 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             };
             GetUrl linkGet = new()
             {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip"
             };
+            GetUrl fileLink = new()
+            {
+                Href = @"/batch/35604ae5-7dc2-44cd-a819-01d4b1081978/files/DE216000.013"
+            };
+           
             LinksNew links = new()
             {
                 BatchDetails = linkBatchDetails,
                 BatchStatus = linkBatchStatus,
                 GetUrl = linkGet
             };
+
+            RefLink link = new()
+            {
+                Get = fileLink
+            };
+            
             return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
@@ -60,6 +71,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                            new Attribute { Key= "EditionNumber", Value= editionNumber.ToString() } ,
                                                            new Attribute { Key= "UpdateNumber", Value= "0" },
                                                            new Attribute { Key= "ProductCode", Value= "AVCS" }},
+
+                Files = new List<CacheFile>{new(){Filename = "DE216000.013", FileSize = 1520,
+                                                    MimeType = "application/s63", Hash = "mp25B4rDzWfCyPjqI2f+5Q==",
+                                                    Attributes = new List<Attribute>{new(){Key = "s57-CRC", Value = "CC362FA5" } },
+                                                    Links = link }},
+
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
                 BatchPublishedDate = DateTime.UtcNow
             };

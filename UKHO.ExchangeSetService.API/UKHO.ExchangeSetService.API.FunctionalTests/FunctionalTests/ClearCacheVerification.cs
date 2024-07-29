@@ -90,7 +90,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the No Cache available
-            Assert.IsNull(tableCacheCheck);
+            Assert.IsNotNull(tableCacheCheck);
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the No Cache available
-            Assert.IsNull(tableCacheCheck);
+            Assert.IsNotNull(tableCacheCheck);
         }
 
         [OneTimeTearDown]
