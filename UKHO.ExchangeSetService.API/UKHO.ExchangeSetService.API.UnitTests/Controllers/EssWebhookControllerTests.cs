@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheDataAsync(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
             Assert.AreEqual(200, result.StatusCode);
 
@@ -121,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
-            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheDataAsync(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
             Assert.AreEqual(200, result.StatusCode);
 
@@ -157,7 +157,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
-            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheDataAsync(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored));
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
@@ -190,7 +190,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
-            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored));
+            A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheDataAsync(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored));
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 

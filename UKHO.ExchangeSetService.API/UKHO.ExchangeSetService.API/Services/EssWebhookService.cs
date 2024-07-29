@@ -51,30 +51,30 @@ namespace UKHO.ExchangeSetService.API.Services
             IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
             IAuthFssTokenProvider authFssTokenProvider)
         {
-            this.azureTableStorageClient = azureTableStorageClient;
-            this.azureStorageService = azureStorageService;
-            this.azureBlobStorageClient = azureBlobStorageClient;
-            this.enterpriseEventCacheDataRequestValidator = enterpriseEventCacheDataRequestValidator;
-            this.cacheConfiguration = cacheConfiguration;
-            this.logger = logger;
-            this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
-            this.fileShareServiceCache = fileShareServiceCache;
-            this.fileShareServiceClient = fileShareServiceClient;
-            this.fileSystemHelper = fileSystemHelper;
-            this.fileShareServiceConfig = fileShareServiceConfig;
-            this.authFssTokenProvider = authFssTokenProvider;
+            this.azureTableStorageClient = azureTableStorageClient ?? throw new ArgumentNullException(nameof(azureTableStorageClient));
+            this.azureStorageService = azureStorageService ?? throw new ArgumentNullException(nameof(azureStorageService));
+            this.azureBlobStorageClient = azureBlobStorageClient ?? throw new ArgumentNullException(nameof(azureBlobStorageClient));
+            this.enterpriseEventCacheDataRequestValidator = enterpriseEventCacheDataRequestValidator ?? throw new ArgumentNullException(nameof(enterpriseEventCacheDataRequestValidator));
+            this.cacheConfiguration = cacheConfiguration ?? throw new ArgumentNullException(nameof(cacheConfiguration));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.essFulfilmentStorageconfig = essFulfilmentStorageconfig ?? throw new ArgumentNullException(nameof(essFulfilmentStorageconfig));
+            this.fileShareServiceCache = fileShareServiceCache ?? throw new ArgumentNullException(nameof(fileShareServiceCache));
+            this.fileShareServiceClient = fileShareServiceClient ?? throw new ArgumentNullException(nameof(fileShareServiceClient));
+            this.fileSystemHelper = fileSystemHelper ?? throw new ArgumentNullException(nameof(fileSystemHelper));
+            this.fileShareServiceConfig = fileShareServiceConfig ?? throw new ArgumentNullException(nameof(fileShareServiceConfig));
+            this.authFssTokenProvider = authFssTokenProvider ?? throw new ArgumentNullException(nameof(authFssTokenProvider));
         }
         public Task<ValidationResult> ValidateEventGridCacheDataRequest(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest)
         {
             return enterpriseEventCacheDataRequestValidator.Validate(enterpriseEventCacheDataRequest);
         }
 
-        public async Task InvalidateAndInsertCacheData(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
+        public async Task InvalidateAndInsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
         {
-            var productCode = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "ProductCode").Select(a => a.Value).FirstOrDefault();
-            var cellName = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
-            var editionNumber = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
-            var updateNumber = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
+            var productCode = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "ProductCode").Value;
+            var cellName = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "CellName").Value;
+            var editionNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "EditionNumber").Value;
+            var updateNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "UpdateNumber").Value;
 
             if (ValidateCacheAttributeData(enterpriseEventCacheDataRequest.BusinessUnit, productCode, cellName, editionNumber, updateNumber))
             {
@@ -88,14 +88,14 @@ namespace UKHO.ExchangeSetService.API.Services
                     Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
                 };
 
-                await DeleteSearchAndDownloadCacheData(fssSearchResponse, storageConnectionString, correlationId);
-                if (enterpriseEventCacheDataRequest.Files.Count > 0 && enterpriseEventCacheDataRequest.Files != null)
+                await DeleteSearchAndDownloadCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
+                if (enterpriseEventCacheDataRequest.Files != null && enterpriseEventCacheDataRequest.Files.Count > 0)
                 {
-                    await CacheSearchAndDownloadData(fssSearchResponse, correlationId);
+                    await CacheSearchAndDownloadDataAsync(fssSearchResponse, correlationId);
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.CacheSearchAndDownloadInvalidData.ToEventId(), "Cache search and download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                    logger.LogInformation(EventIds.CacheSearchAndDownloadMissingData.ToEventId(), "Cache search and download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
                 }
             }
             else
@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
         }
 
-        private async Task DeleteSearchAndDownloadCacheData(FssSearchResponseCache fssSearchResponse, string storageConnectionString, string correlationId)
+        private async Task DeleteSearchAndDownloadCacheDataAsync(FssSearchResponseCache fssSearchResponse, string storageConnectionString, string correlationId)
         {
             var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(fssSearchResponse.PartitionKey, fssSearchResponse.RowKey, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
             string[] subsOfRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
@@ -135,7 +135,7 @@ namespace UKHO.ExchangeSetService.API.Services
             logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data deletion from table and Blob completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], correlationId);
         }
 
-        private async Task CacheSearchAndDownloadData(FssSearchResponseCache fssSearchResponse, string correlationId)
+        private async Task CacheSearchAndDownloadDataAsync(FssSearchResponseCache fssSearchResponse, string correlationId)
         {
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var cacheBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(fssSearchResponse.Response);
@@ -146,7 +146,9 @@ namespace UKHO.ExchangeSetService.API.Services
             foreach (var fileItem in cacheBatchDetail.Files?.Select(a => a.Links.Get.Href))
             {
                 var fileName = fileItem.Split("/")[^1];
-                HttpResponseMessage httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, String.Empty, accessToken, fileItem, CancellationToken.None, correlationId);
+                            using var httpResponse =
+                                await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, String.Empty,
+                                    accessToken, fileItem, CancellationToken.None, correlationId);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);

@@ -558,7 +558,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceUploadENCFilesToCacheCompleted = 805137,
         /// <summary>
-        ///Request for clearing and inserting Search and Download Cache Data from ESS start.
+        /// 805138 - Request for clearing and inserting Search and Download Cache Data from ESS start.
         /// </summary>
         ESSInvalidateAndInsertCacheEventStart = 805138,
         /// <summary>
@@ -840,7 +840,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805208 - Cache Search and Download files data missing
         /// </summary>
-        CacheSearchAndDownloadInvalidData = 805208
+        CacheSearchAndDownloadMissingData = 805208
 
     }
 
