@@ -146,9 +146,7 @@ namespace UKHO.ExchangeSetService.API.Services
             foreach (var fileItem in cacheBatchDetail.Files?.Select(a => a.Links.Get.Href))
             {
                 var fileName = fileItem.Split("/")[^1];
-                            using var httpResponse =
-                                await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, String.Empty,
-                                    accessToken, fileItem, CancellationToken.None, correlationId);
+                using var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, String.Empty, accessToken, fileItem, CancellationToken.None, correlationId);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
@@ -156,8 +154,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
 
                     await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, fssSearchResponse.BatchId);
-                    logger.LogInformation(EventIds.CacheSearchAndDownloadDataToBlobEvent.ToEventId(), "Cache search and download data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, subsOfRowKeys[2], fileName, correlationId);
-                                    fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fileName, correlationId);
+                    logger.LogInformation(EventIds.CacheSearchAndDownloadDataToBlobEvent.ToEventId(), "Cache search and download data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fileName, correlationId);
                     if (serverValue[0] == ServerHeaderValue)
                     {
                         logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "Cache search and download data, download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, requestUri, fssSearchResponse.BatchId, correlationId);
