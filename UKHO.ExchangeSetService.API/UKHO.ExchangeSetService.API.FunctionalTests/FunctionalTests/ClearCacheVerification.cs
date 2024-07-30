@@ -5,7 +5,6 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Net.Http;
 using System.Collections.Generic;
-using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json.Linq;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
@@ -25,7 +24,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private HttpResponseMessage ApiEssResponse { get; set; }
         private readonly List<string> cleanUpBatchIdList = new();
         private ClearCacheHelper ClearCacheHelper { get; set; }
-        private readonly TableEntity cacheEntity = new();
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -90,9 +88,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Check caching info
             tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
-            cacheEntity.PartitionKey = partitionKey;
-            cacheEntity.RowKey = rowKey;
-            cacheEntity.ETag = "*";
 
             // Verify the No Cache available
             Assert.IsNotNull(tableCacheCheck);
@@ -163,8 +158,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
-
-            await ClearCacheHelper.ClearCacheTableAndBlob(cleanUpBatchIdList, cacheEntity, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
         }
     }
 }
