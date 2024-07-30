@@ -1,4 +1,3 @@
-﻿using Azure.Storage.Blobs;
 using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Collections.Generic;
@@ -30,17 +29,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var table = await GetAzureTable(tableName, storageAccountConnectionString);
             var tableResult = await table.ExecuteAsync(tableOperation);
             return tableResult.Result;
-        }
-        public async Task<ITableEntity> ClearCacheTableAndBlob(List<string> containerList, ITableEntity entity, string tableName, string storageAccountConnectionString)
-        {
-            foreach (var containerName in containerList)
-        {
-                BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
-                await container.DeleteIfExistsAsync();
-            }
-
-            var deleteOperation = TableOperation.Delete(entity);
-            return await ExecuteTableOperation(deleteOperation, tableName, storageAccountConnectionString) as ITableEntity;
         }
 
         public EnterpriseEventCacheDataRequest GetCacheRequestData(string businessUnit, string agency, string product, int editionNumber)
