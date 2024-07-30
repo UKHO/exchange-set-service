@@ -164,7 +164,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
 
-            await ClearCacheHelper.DeleteAsync(cacheEntity, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString) ;
+            await ClearCacheHelper.ClearCacheTableAndBlob(cleanUpBatchIdList, cacheEntity, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
         }
     }
 }
