@@ -165,7 +165,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static string CreateFssSearchQuery(string businessUnit, string productName, string editionNumber, string updateNumber)
         {
-            string searchQuery = $"$batch(businessUnit) eq '{businessUnit}' and $batch(ProductCode) eq 'AVCS' and $batch(cellname) eq '{productName}' and $batch(editionnumber) eq '{editionNumber}' and $batch(updatenumber) eq '{updateNumber}'";
+            string searchQuery = $"businessUnit eq '{businessUnit}' and $batch(ProductCode) eq 'AVCS' and $batch(cellname) eq '{productName}' and $batch(editionnumber) eq '{editionNumber}' and $batch(updatenumber) eq '{updateNumber}'";
             return searchQuery;
         }
 
