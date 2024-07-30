@@ -3,21 +3,20 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Storage;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Threading;
-using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 
 namespace UKHO.ExchangeSetService.API.Services
@@ -69,14 +68,18 @@ namespace UKHO.ExchangeSetService.API.Services
             return enterpriseEventCacheDataRequestValidator.Validate(enterpriseEventCacheDataRequest);
         }
 
-        public async Task InvalidateAndInsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
+        public async Task InsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
         {
             var productCode = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "ProductCode").Value;
             var cellName = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "CellName").Value;
             var editionNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "EditionNumber").Value;
             var updateNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "UpdateNumber").Value;
 
-            if (ValidateCacheAttributeData(enterpriseEventCacheDataRequest.BusinessUnit, productCode, cellName, editionNumber, updateNumber))
+            if (!ValidateCacheAttributeData(enterpriseEventCacheDataRequest.BusinessUnit, productCode, cellName, editionNumber, updateNumber))
+            {
+                logger.LogInformation(EventIds.InsertCacheInvalidDataFoundEvent.ToEventId(), "Invalid data found in search and download cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+            }
+            else
             {
                 var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
 
@@ -88,23 +91,19 @@ namespace UKHO.ExchangeSetService.API.Services
                     Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
                 };
 
-                await DeleteSearchAndDownloadCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
+                await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
                 if (enterpriseEventCacheDataRequest.Files != null && enterpriseEventCacheDataRequest.Files.Count > 0)
                 {
-                    await CacheSearchAndDownloadDataAsync(fssSearchResponse, correlationId);
+                    await UploadDataToCacheAsync(fssSearchResponse, correlationId);
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.CacheSearchAndDownloadMissingData.ToEventId(), "Cache search and download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                    logger.LogInformation(EventIds.InsertCacheMissingData.ToEventId(), "Cache search and download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
                 }
-            }
-            else
-            {
-                logger.LogInformation(EventIds.InvalidateAndInsertCacheInvalidDataFoundEvent.ToEventId(), "Invalid data found in search and download cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
             }
         }
 
-        private async Task DeleteSearchAndDownloadCacheDataAsync(FssSearchResponseCache fssSearchResponse, string storageConnectionString, string correlationId)
+        private async Task DeleteCacheDataAsync(FssSearchResponseCache fssSearchResponse, string storageConnectionString, string correlationId)
         {
             var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(fssSearchResponse.PartitionKey, fssSearchResponse.RowKey, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
             string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
@@ -135,18 +134,30 @@ namespace UKHO.ExchangeSetService.API.Services
             logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataEventCompleted.ToEventId(), "Search and Download cache data deletion from table and Blob completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], correlationId);
         }
 
-        private async Task CacheSearchAndDownloadDataAsync(FssSearchResponseCache fssSearchResponse, string correlationId)
+        private async Task UploadDataToCacheAsync(FssSearchResponseCache fssSearchResponse, string correlationId)
         {
-            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             var cacheBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(fssSearchResponse.Response);
             string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
-            logger.LogInformation(EventIds.CacheSearchAndDownloadDataEventStart.ToEventId(), "Cache search and download data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], correlationId);
+            logger.LogInformation(EventIds.UploadCacheDataEventStart.ToEventId(), "Upload Cache data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], correlationId);
+
+            await UploadDataToCacheBlobAsync(cacheBatchDetail, fssSearchResponse, correlationId);
+
+            await AddDataToCacheTableAsync(cacheBatchDetail, fssSearchResponse, correlationId);
+
+            logger.LogInformation(EventIds.UploadCacheDataEventCompleted.ToEventId(), "Upload Cache data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fssSearchResponse.BatchId, correlationId);
+        }
+
+        private async Task UploadDataToCacheBlobAsync(BatchDetail cacheBatchDetail, FssSearchResponseCache fssSearchResponse, string correlationId)
+        {
+            var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
+            string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
             foreach (var fileItem in cacheBatchDetail.Files?.Select(a => a.Links.Get.Href))
             {
                 var fileName = fileItem.Split("/")[^1];
-                using var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, String.Empty, accessToken, fileItem, CancellationToken.None, correlationId);
+                using var httpResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, string.Empty, accessToken, fileItem, CancellationToken.None, correlationId);
+
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
@@ -154,7 +165,8 @@ namespace UKHO.ExchangeSetService.API.Services
                     byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
 
                     await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, fssSearchResponse.BatchId);
-                    logger.LogInformation(EventIds.CacheSearchAndDownloadDataToBlobEvent.ToEventId(), "Cache search and download data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fileName, correlationId);
+
+                    logger.LogInformation(EventIds.UploadCacheDataToBlobEvent.ToEventId(), "Upload Cache data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fileName, correlationId);
                     if (serverValue[0] == ServerHeaderValue)
                     {
                         logger.LogInformation(EventIds.DownloadENCFiles307RedirectResponse.ToEventId(), "Cache search and download data, download ENC file:{fileName} redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", fileName, requestUri, fssSearchResponse.BatchId, correlationId);
@@ -165,6 +177,10 @@ namespace UKHO.ExchangeSetService.API.Services
                     logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "Error in search and download cache data while downloading ENC file:{fileName} with uri:{uri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{correlationId}", fileName, fileItem, httpResponse.StatusCode, fssSearchResponse.BatchId, correlationId);
                 }
             }
+        }
+        private async Task AddDataToCacheTableAsync(BatchDetail cacheBatchDetail, FssSearchResponseCache fssSearchResponse, string correlationId)
+        {
+            string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
             var fssSearchResponseCache = new FssSearchResponseCache
             {
                 BatchId = fssSearchResponse.BatchId,
@@ -181,9 +197,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return Task.CompletedTask;
             }, fssSearchResponse.PartitionKey, cacheTableRowKeys[0], cacheTableRowKeys[1], cacheTableRowKeys[2], fssSearchResponse.BatchId, correlationId);
 
-            logger.LogInformation(EventIds.CacheSearchAndDownloadDataEventCompleted.ToEventId(), "Cache search and download data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fssSearchResponse.BatchId, correlationId);
         }
-
         private bool ValidateCacheAttributeData(string businessUnit, string productCode, string cellName, string editionNumber, string updateNumber)
         {
             return ((string.Equals(businessUnit, cacheConfiguration.Value.S63CacheBusinessUnit, StringComparison.OrdinalIgnoreCase) || string.Equals(businessUnit, cacheConfiguration.Value.S57CacheBusinessUnit, StringComparison.OrdinalIgnoreCase))
