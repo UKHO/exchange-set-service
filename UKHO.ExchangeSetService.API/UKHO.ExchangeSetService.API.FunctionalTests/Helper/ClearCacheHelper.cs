@@ -45,11 +45,22 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip"
             };
-            GetUrl fileLink = new()
+            GetUrl fileLink1 = new()
             {
-                Href = @"/batch/35604ae5-7dc2-44cd-a819-01d4b1081978/files/DE216000.013"
+                Href = @"/batch/35604ae5-7dc2-44cd-a819-01d4b1081979/files/DE290001.013"
             };
-           
+            GetUrl fileLink2 = new()
+            {
+                Href = @"/batch/35604ae5-7dc2-44cd-a819-01d4b1081979/files/DE290001.014"
+            };
+            RefLink link1 = new()
+            {
+                Get = fileLink1,
+            };
+            RefLink link2 = new()
+            {
+                Get = fileLink2,
+            };
             LinksNew links = new()
             {
                 BatchDetails = linkBatchDetails,
@@ -57,11 +68,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 GetUrl = linkGet
             };
 
-            RefLink link = new()
-            {
-                Get = fileLink
-            };
-            
             return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
@@ -72,10 +78,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                            new Attribute { Key= "UpdateNumber", Value= "0" },
                                                            new Attribute { Key= "ProductCode", Value= "AVCS" }},
 
-                Files = new List<CacheFile>{new(){Filename = "DE216000.013", FileSize = 1520,
-                                                    MimeType = "application/s63", Hash = "mp25B4rDzWfCyPjqI2f+5Q==",
-                                                    Attributes = new List<Attribute>{new(){Key = "s57-CRC", Value = "CC362FA5" } },
-                                                    Links = link }},
+                Files = new List<CacheFile>{new(){Filename = "DE290001.013", FileSize = 874,
+                                                    MimeType = "text/plain", Hash = "rijY0LV7Ebpirybo4RYAiQ==",
+                                                    Attributes = new List<Attribute>{},
+                                                    Links = link1 },
+                                            new(){Filename = "DE290001.014", FileSize = 1520, 
+                                                 MimeType = "application/s63", Hash = "mp25B4rDzWfCyPjqI2f+5Q==",
+                                                 Attributes = new List<Attribute>{new(){Key = "s57-CRC", Value = "CC362FA5" } },
+                                                 Links = link2 }},
 
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
                 BatchPublishedDate = DateTime.UtcNow
