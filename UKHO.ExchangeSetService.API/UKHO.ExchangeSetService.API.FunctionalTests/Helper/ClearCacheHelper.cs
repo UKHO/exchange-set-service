@@ -30,6 +30,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var tableResult = await table.ExecuteAsync(tableOperation);
             return tableResult.Result;
         }
+        public async Task<ITableEntity> DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString)
+        {
+            var deleteOperation = TableOperation.Delete(entity);
+            return await ExecuteTableOperation(deleteOperation, tableName, storageAccountConnectionString) as ITableEntity;
+        }
 
         public EnterpriseEventCacheDataRequest GetCacheRequestData(string businessUnit, string agency, string product, int editionNumber)
         {
