@@ -86,7 +86,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
             if ((int)apiClearCacheResponse.StatusCode == 500)
             {
-                //NewFilePublished API take minimum 30 seconds to delete previous container and create new one with same batch Id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
+                //Azure blob container takes minimum 30 seconds to delete previous container and create new one with same batch Id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
                 await Task.Delay(40000);
                 apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
             }
