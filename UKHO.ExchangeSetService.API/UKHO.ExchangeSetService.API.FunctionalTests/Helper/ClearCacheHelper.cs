@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                  Attributes = new List<Attribute>{new(){Key = "s57-CRC", Value = "CC362FA5" } },
                                                  Links = link2 }},
 
-                BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
+                BatchId = Guid.NewGuid().ToString(),
                 BatchPublishedDate = DateTime.UtcNow
             };
         }
