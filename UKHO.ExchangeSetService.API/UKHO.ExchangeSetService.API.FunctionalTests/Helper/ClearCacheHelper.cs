@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -43,7 +43,23 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             };
             GetUrl linkGet = new()
             {
-                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip"
+            };
+            GetUrl fileLink1 = new()
+            {
+                Href = @"/batch/35604ae5-7dc2-44cd-a819-01d4b1081979/files/DE290001.013"
+            };
+            GetUrl fileLink2 = new()
+            {
+                Href = @"/batch/35604ae5-7dc2-44cd-a819-01d4b1081979/files/DE290001.014"
+            };
+            RefLink link1 = new()
+            {
+                Get = fileLink1,
+            };
+            RefLink link2 = new()
+            {
+                Get = fileLink2,
             };
             LinksNew links = new()
             {
@@ -51,6 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 BatchStatus = linkBatchStatus,
                 GetUrl = linkGet
             };
+
             return new EnterpriseEventCacheDataRequest
             {
                 Links = links,
@@ -60,7 +77,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                            new Attribute { Key= "EditionNumber", Value= editionNumber.ToString() } ,
                                                            new Attribute { Key= "UpdateNumber", Value= "0" },
                                                            new Attribute { Key= "ProductCode", Value= "AVCS" }},
-                BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
+
+                Files = new List<CacheFile>{new(){Filename = "DE290001.013", FileSize = 874,
+                                                    MimeType = "text/plain", Hash = "rijY0LV7Ebpirybo4RYAiQ==",
+                                                    Attributes = new List<Attribute>{},
+                                                    Links = link1 },
+                                            new(){Filename = "DE290001.014", FileSize = 1520, 
+                                                 MimeType = "application/s63", Hash = "mp25B4rDzWfCyPjqI2f+5Q==",
+                                                 Attributes = new List<Attribute>{new(){Key = "s57-CRC", Value = "CC362FA5" } },
+                                                 Links = link2 }},
+
+                BatchId = Guid.NewGuid().ToString(),
                 BatchPublishedDate = DateTime.UtcNow
             };
         }

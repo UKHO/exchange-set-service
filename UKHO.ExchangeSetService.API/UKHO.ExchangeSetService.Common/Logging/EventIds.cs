@@ -558,13 +558,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceUploadENCFilesToCacheCompleted = 805137,
         /// <summary>
-        /// 805138 - Request for clearing Search and Download Cache Data from ESS is started.
+        /// 805138 - Request for inserting Search and Download Cache Data from ESS start.
         /// </summary>
-        ESSClearCacheSearchDownloadEventStart = 805138,
+        ESSInsertCacheDataEventStart = 805138,
         /// <summary>
-        /// 805139 - Request for clearing Search and Download Cache Data from ESS is completed.
+        /// 805139 - Request for inserting Search and Download Cache Data from ESS is completed.
         /// </summary>
-        ESSClearCacheSearchDownloadEventCompleted = 805139,
+        ESSInsertCacheDataEventCompleted = 805139,
         /// <summary>
         /// 805140 - Started Deleting Search and Download Cache Data from ESS Cache Table and Blob
         /// </summary>
@@ -588,7 +588,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805145 - Invalid Request Data found in Caching Search and Download in ESS
         /// </summary>
-        DeleteSearchDownloadInvalidCacheDataFoundEvent = 805145,
+        InsertCacheInvalidDataFoundEvent = 805145,
         /// <summary>
         /// 805146 - Started Deleting Search and Download cache data from container in ESS
         /// </summary>
@@ -598,9 +598,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         DeleteSearchDownloadCacheDataFromContainerCompleted = 805147,
         /// <summary>
-        /// 805148 - Request for validation event for clear Cache Search and Download in ESS
+        /// 805148 - Request for validation event for inserting Cache Search and Download in ESS
         /// </summary>
-        ESSClearCacheSearchDownloadValidationEvent = 805148,
+        ESSInsertCacheDataValidationEvent = 805148,
         /// <summary>
         /// 805149 - Check if event triggered is by B2C or AdB2C user in ESS
         /// </summary>
@@ -824,7 +824,24 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805204 - Invalid FSS business unit provided to fulfilment service
         /// </summary>
-        InvalidFssBusinessUnit = 805204
+        InvalidFssBusinessUnit = 805204,
+        /// <summary>
+        /// 805205 - Upload Cache Search and Download Data to ESS Azure Table and blob started
+        /// </summary>
+        UploadCacheDataEventStart = 805205,
+        /// <summary>
+        /// 805206 - Upload Cache Search and Download Data save files to Blob 
+        /// </summary>
+        UploadCacheDataToBlobEvent = 805206,
+        /// <summary>
+        /// 805207 - Upload Cache Search and Download Data to ESS Azure Table and blob completed
+        /// </summary>
+        UploadCacheDataEventCompleted = 805207,
+        /// <summary>
+        /// 805208 - Cache Search and Download files data missing
+        /// </summary>
+        InsertCacheMissingData = 805208
+
     }
 
     public static class EventIdExtensions
