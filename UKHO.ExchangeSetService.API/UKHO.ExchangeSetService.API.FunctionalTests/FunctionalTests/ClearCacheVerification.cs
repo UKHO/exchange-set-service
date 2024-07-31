@@ -84,6 +84,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestData(Config.BESSConfig.S63BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
+            if ((int)apiClearCacheResponse.StatusCode == 500)
+            {
+                //NewFilePublished API take minimum 30 seconds to delete previous container and create new one with same batch Id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
+                await Task.Delay(40000);
+                apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
+            }
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             //Check caching info
