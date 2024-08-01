@@ -81,6 +81,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 return GetCacheResponse();
             }
 
+
             await essWebhookService.InsertCacheDataAsync(data, GetCurrentCorrelationId());
 
             Logger.LogInformation(EventIds.ESSInsertCacheDataEventCompleted.ToEventId(), "ESS Insert Cache Data Event completed for ProductName:{productName} of BusinessUnit:{businessUnit} with OK response and _X-Correlation-ID:{correlationId}", productName, data.BusinessUnit, GetCurrentCorrelationId());
