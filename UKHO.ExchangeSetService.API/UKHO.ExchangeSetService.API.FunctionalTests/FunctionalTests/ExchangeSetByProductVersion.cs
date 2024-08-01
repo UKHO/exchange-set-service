@@ -178,9 +178,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             CleanUpBatchIdList.Add(batchId);
         }
 
-        //[TestCase("DE416080", 15, 1, TestName = "EditionNumber Unavailable")]
-        //[TestCase("DE416080", 13, 2, TestName = "UpdateNumber Unavailable")]
-        //[Category("SmokeTest-AIODisabled")]
         [TestCase("DE416080", 10, 6, TestName = "EditionNumber Unavailable")]
         [TestCase("DE416080", 9, 10, TestName = "UpdateNumber Unavailable")]
         [Category("QCOnlyTest-AIODisabled")]
