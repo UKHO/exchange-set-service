@@ -840,6 +840,7 @@ stages:
                   displayName: "Run Functional tests AIOEnabled"
                   inputs:
                     command: "test"
+                    arguments: '--filter Category=QCOnlyTest-AIOEnabled'
                     projects: |
                       **/*FunctionalTest*.dll
                       !**/*TestAdapter.dll
@@ -860,6 +861,7 @@ stages:
                   displayName: "Run Functional tests AIODisabled"
                   inputs:
                     command: "test"
+                    arguments: '--filter Category=QCOnlyTest-AIODisabled'
                     projects: |
                       **/*FunctionalTest*.dll
                       !**/*TestAdapter.dll
