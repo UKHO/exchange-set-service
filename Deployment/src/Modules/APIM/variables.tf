@@ -145,8 +145,8 @@ locals {
   ui_product_name       = local.env_name == "prod" ? "${var.ui_product_name}${var.suffix}" : "${var.ui_product_name} ${var.env_suffix[local.env_name]}${var.suffix}"
   api_name              = local.env_name == "prod" ? "${var.api_name}${var.suffix}" : "${var.api_name} ${var.env_suffix[local.env_name]}${var.suffix}"
   apim_api_path         = local.env_name == "prod" ? "${local.service_name}${var.pathsuffix}" : "${local.service_name}-${local.env_name}${var.pathsuffix}"
-  ui_api_name           = local.env_name == "prod" ? "${var.ui_api_name}${var.suffix}" : "${var.ui_api_name} ${var.env_suffix[local.env_name]}"
-  apim_ui_api_path      = local.env_name == "prod" ? "${local.service_name}-ui${var.suffix}" : "${local.service_name}-ui-${local.env_name}"
+  ui_api_name           = local.env_name == "prod" ? "${var.ui_api_name}${var.suffix}" : "${var.ui_api_name} ${var.env_suffix[local.env_name]}${var.suffix}"
+  apim_ui_api_path      = local.env_name == "prod" ? "${local.service_name}-ui${var.suffix}" : "${local.service_name}-ui-${local.env_name}${var.pathsuffix}"
 
   apim_api_openapi      = file("${path.module}/exchangeSetService_OpenApi_definition.yaml")
   apim_ui_openapi       = file("${path.module}/exchangeSetService_Ui_OpenApi_definition.yaml")
