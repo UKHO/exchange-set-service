@@ -41,12 +41,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiersForLargeMedia()
         {
-            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "1U50354A", "CA172005", "1U318210", "NZ300661", "KR676D03" };
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US1GC09M", "CA172005", "DE2NO000", "NZ300661", "KR676D03" };
         }
 
         public List<string> GetProductIdentifiersForLargeMediaAndAio()
         {
-            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "1U50354A", "CA172005", "1U318210", "NZ300661", "KR676D03", "GB800001" };
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US1GC09M", "CA172005", "DE2NO000", "NZ300661", "KR676D03", "GB800001" };
         }
 
         public List<string> GetProductIdentifiersForEncAndAio()
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiersForLargeMediaAndAioNotPresent()
         {
-            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "1U50354A", "CA172005", "1U318210", "NZ300661", "KR676D03", "GZ800112" };
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "US1GC09M", "CA172005", "DE2NO000", "NZ300661", "KR676D03", "GZ800112" };
         }
 
         public List<string> GetAioProductIdentifierData()

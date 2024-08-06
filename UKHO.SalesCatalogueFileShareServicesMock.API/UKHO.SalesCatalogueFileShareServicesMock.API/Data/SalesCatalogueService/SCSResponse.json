@@ -1036,7 +1036,7 @@
     }
   },
   {
-    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US5CN13M-CA172005-DE521900-NZ300661-KR676D03",
+    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US1GC09M-CA172005-DE2NO000-NZ300661-KR676D03",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 10,
@@ -1046,23 +1046,21 @@
       },
       "products": [
         {
-          "editionNumber": 12,
-          "productName": "DE521900",
+          "editionNumber": 4,
+          "productName": "DE2NO000",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2017-01-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-04-12T00:00:00Z",
+              "issueDate": "2024-04-12T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 4
-          },
-          "fileSize": 193039,
+          "cancellation": null,
+          "fileSize": 521525,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -1092,23 +1090,21 @@
           ]
         },
         {
-          "editionNumber": 12,
-          "productName": "US5CN13M",
+          "editionNumber": 65,
+          "productName": "US1GC09M",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2021-04-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-06-06T00:00:00Z",
+              "issueDate": "2024-06-06T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 1
-          },
-          "fileSize": 68919,
+          "cancellation": null,
+          "fileSize": 1381096,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -1267,7 +1263,7 @@
     }
   },
   {
-    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US5CN13M-CA172005-DE521900-NZ300661-KR676D03-ABCDEFGH",
+    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US1GC09M-CA172005-DE2NO000-NZ300661-KR676D03-ABCDEFGH",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 11,
@@ -1282,23 +1278,21 @@
       },
       "products": [
         {
-          "editionNumber": 12,
-          "productName": "DE521900",
+          "editionNumber": 4,
+          "productName": "DE2NO000",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2017-01-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-04-12T00:00:00Z",
+              "issueDate": "2024-04-12T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 4
-          },
-          "fileSize": 193039,
+          "cancellation": null,
+          "fileSize": 521525,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -1329,22 +1323,20 @@
         },
         {
           "editionNumber": 12,
-          "productName": "US5CN13M",
+          "productName": "US1GC09M",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2021-04-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-06-06T00:00:00Z",
+              "issueDate": "2024-06-06T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 1
-          },
-          "fileSize": 68919,
+          "cancellation": null,
+          "fileSize": 1381096,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -1503,7 +1495,7 @@
     }
   },
   {
-    "id": "productIdentifier-DE521900",
+    "id": "productIdentifier-DE2NO000",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 1,
@@ -1513,26 +1505,24 @@
       },
       "products": [
         {
-          "editionNumber": 12,
-          "productName": "DE521900",
+          "editionNumber": 4,
+          "productName": "DE2NO000",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2017-01-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-04-12T00:00:00Z",
+              "issueDate": "2024-04-12T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 4
-          },
-          "fileSize": 193039,
+          "cancellation": null,
+          "fileSize": 521525,
+          "ignoreCache": false,
           "bundle": [
             {
-              "bundleType": "ABC",
+              "bundleType": "DVD",
               "location": "M2;B8"
             }
           ]
@@ -1879,7 +1869,7 @@
     }
   },
   {
-    "id": "productIdentifier-US5CN13M",
+    "id": "productIdentifier-US1GC09M",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 1,
@@ -1890,26 +1880,24 @@
       "products": [
         {
           "editionNumber": 12,
-          "productName": "US5CN13M",
+          "productName": "US1GC09M",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2021-04-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-06-06T00:00:00Z",
+              "issueDate": "2024-06-06T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 1
-          },
-          "fileSize": 68919,
+          "cancellation": null,
+          "fileSize": 1381096,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
-              "location": "M0;B5"
+              "location": "M1;B5"
             }
           ]
         }
@@ -2134,7 +2122,7 @@
     }
   },
   {
-    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US5CN13M-CA172005-DE521900-NZ300661-KR676D03-GB800001",
+    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US1GC09M-CA172005-DE2NO000-NZ300661-KR676D03-GB800001",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 11,
@@ -2250,22 +2238,20 @@
         },
         {
           "editionNumber": 12,
-          "productName": "US5CN13M",
+          "productName": "US1GC09M",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2021-04-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-06-06T00:00:00Z",
+              "issueDate": "2024-06-06T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 1
-          },
-          "fileSize": 68919,
+          "cancellation": null,
+          "fileSize": 1381096,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -2295,23 +2281,21 @@
           ]
         },
         {
-          "editionNumber": 12,
-          "productName": "DE521900",
+          "editionNumber": 4,
+          "productName": "DE2NO000",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2017-01-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-04-12T00:00:00Z",
+              "issueDate": "2024-04-12T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 4
-          },
-          "fileSize": 193039,
+          "cancellation": null,
+          "fileSize": 521525,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -2469,7 +2453,7 @@
     }
   },
   {
-    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US5CN13M-CA172005-DE521900-NZ300661-KR676D03-GZ800112",
+    "id": "productIdentifier-FR570300-SE6IIFE1-NO3B2020-GB20486A-RU3P0ZM0-US1GC09M-CA172005-DE2NO000-NZ300661-KR676D03-GZ800112",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 11,
@@ -2590,22 +2574,20 @@
         },
         {
           "editionNumber": 12,
-          "productName": "US5CN13M",
+          "productName": "US1GC09M",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2021-04-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-04-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-06-06T00:00:00Z",
+              "issueDate": "2024-06-06T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 1
-          },
-          "fileSize": 68919,
+          "cancellation": null,
+          "fileSize": 1381096,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -2635,23 +2617,21 @@
           ]
         },
         {
-          "editionNumber": 12,
-          "productName": "DE521900",
+          "editionNumber": 4,
+          "productName": "DE2NO000",
           "updateNumbers": [
             0
           ],
           "dates": [
             {
-              "issueDate": "2017-01-13T00:00:00.0000000Z",
-              "updateApplicationDate": "2017-01-13T00:00:00.0000000Z",
-              "updateNumber": 0
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-04-12T00:00:00Z",
+              "issueDate": "2024-04-12T00:00:00Z"
             }
           ],
-          "cancellation": {
-            "editionNumber": 0,
-            "updateNumber": 4
-          },
-          "fileSize": 193039,
+          "cancellation": null,
+          "fileSize": 521525,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
@@ -9295,11 +9275,13 @@
           "dates": [
             {
               "updateNumber": 0,
-              "updateApplicationDate": "2023-02-15T00:00:00Z",
-              "issueDate": "2023-02-15T00:00:00Z"
+              "updateApplicationDate": "2024-04-12T00:00:00Z",
+              "issueDate": "2024-04-12T00:00:00Z"
             }
           ],
-          "fileSize": 568698,
+          "cancellation": null,
+          "fileSize": 521525,
+          "ignoreCache": false,
           "bundle": [
             {
               "bundleType": "DVD",
