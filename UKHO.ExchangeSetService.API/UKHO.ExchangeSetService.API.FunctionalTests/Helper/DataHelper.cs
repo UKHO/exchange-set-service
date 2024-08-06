@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiersForLargeMediaAndAioNotPresent()
         {
-            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "1U50354A", "CA172005", "1U318210", "NZ300661", "KR676D03", "GB2A2182" };
+            return new List<string>() { "FR570300", "SE6IIFE1", "NO3B2020", "GB20486A", "RU3P0ZM0", "1U50354A", "CA172005", "1U318210", "NZ300661", "KR676D03", "GZ800112" };
         }
 
         public List<string> GetAioProductIdentifierData()
@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetAdditionalAioProductIdentifierData()
         {
-            return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080", "GB2A2182" };
+            return new List<string>() { "DE5NOBRK", "DE4NO18Q", "DE416080", "GZ800112" };
         }
 
         public List<string> GetProductIdentifiersForInvalidProduct()
@@ -92,12 +92,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiersForInvalidEncAndInValidAio()
         {
-            return new List<string>() { "AB1234GH", "GB2A2182" };
+            return new List<string>() { "AB1234GH", "GZ800112" };
         }
 
         public List<string> GetProductIdentifiersForInvalidAioCells()
         {
-            return new List<string>() { "GB2A2182" };
+            return new List<string>() { "GZ800112" };
         }
 
         public List<string> GetProductIdentifiersForInvalidProductAndValidAio()
@@ -107,12 +107,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public List<string> GetProductIdentifiersForInvalidEncAndValidAndInvalidAioCell()
         {
-            return new List<string>() { "AB1234GH", "GB2A2182", "GB800001", };
+            return new List<string>() { "AB1234GH", "GZ800112", "GB800001", };
         }
 
         public List<string> GetProductIdentifiersForValidAndInvalidAioCell()
         {
-            return new List<string>() { "GB800001", "GB2A2182" };
+            return new List<string>() { "GB800001", "GZ800112" };
         }
 
         public List<string> GetProductIdentifiersS57()
