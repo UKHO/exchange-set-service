@@ -444,7 +444,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(0, apiResponseData.RequestedProductsAlreadyUpToDateCount, $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
 
             // Verify ExchangeSetCellCount
-            Assert.AreEqual(11, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 3.");
+            Assert.AreEqual(11, apiResponseData.ExchangeSetCellCount, $"Response body returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount is 11.");
 
             //Verify requested AIO product count
             Assert.AreEqual(1, apiResponseData.RequestedAioProductCount, $"Response body returned RequestedProductCount {apiResponseData.RequestedAioProductCount}, Instead of expected count is 0.");
