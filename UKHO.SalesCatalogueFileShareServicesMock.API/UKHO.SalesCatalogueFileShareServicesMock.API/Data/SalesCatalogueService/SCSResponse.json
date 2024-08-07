@@ -11538,9 +11538,9 @@
         "requestedProductsNotReturned": []
       }
     }
-  }
+  },
   {
-    "id": "productVersion-DE416080-13-1-GB800001-32-28",
+    "id": "productVersion-DE416080-13-0-GB800001-32-28",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 2,
@@ -11580,7 +11580,7 @@
             {
               "issueDate": "2024-01-26T00:00:00Z",
               "updateApplicationDate": null,
-              "updateNumber": 1
+              "updateNumber": 0
             }
           ],
           "fileSize": 288077,
