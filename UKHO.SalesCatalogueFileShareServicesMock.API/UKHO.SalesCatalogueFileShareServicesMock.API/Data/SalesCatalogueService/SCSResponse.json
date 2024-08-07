@@ -11539,4 +11539,127 @@
       }
     }
   }
+  {
+    "id": "productVersion-DE416080-13-1-GB800001-32-28",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 2,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 32,
+          "productName": "GB800001",
+          "updateNumbers": [
+            28
+          ],
+          "dates": [
+            {
+              "issueDate": "2024-07-18T00:00:00Z",
+              "updateApplicationDate": null,
+              "updateNumber": 28
+            }
+          ],
+          "fileSize": 31668575,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B8"
+            }
+          ]
+        },
+        {
+          "editionNumber": 13,
+          "productName": "DE416080",
+          "updateNumbers": [
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2024-01-26T00:00:00Z",
+              "updateApplicationDate": null,
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 288077,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M2;B9"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "productVersion-DE416080-13-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 13,
+          "productName": "DE416080",
+          "updateNumbers": [
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "updateNumber": 0,
+              "updateApplicationDate": "2023-08-21T00:00:00Z",
+              "issueDate": "2023-08-21T00:00:00Z"
+            },
+            {
+              "updateNumber": 1,
+              "updateApplicationDate": null,
+              "issueDate": "2024-01-26T00:00:00Z"
+            }
+          ],
+          "fileSize": 288077
+        }
+      ]
+    }
+  },
+  {
+    "id": "productIdentifier-GB800001",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 32,
+          "productName": "GB800001",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "updateNumber": 0,
+              "updateApplicationDate": "2024-01-11T00:00:00Z",
+              "issueDate": "2024-01-11T00:00:00Z"
+            }
+          ],
+          "fileSize": 31668575,
+          "bundle": [
+            {
+              "bundleType": "DVD",
+              "location": "M1;B3"
+            }
+          ]
+        }
+      ]
+    }
+  }
 ]

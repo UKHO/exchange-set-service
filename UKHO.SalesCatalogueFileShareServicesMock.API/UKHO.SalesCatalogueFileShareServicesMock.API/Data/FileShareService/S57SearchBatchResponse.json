@@ -663,6 +663,171 @@
       ]
     },
     {
+      "batchId": "a59777ea-0b86-490e-a504-642e26191678",
+      "status": "Committed",
+      "allFilesZipSize": 732173,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "32"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "6ea71267-a0d0-419d-1293-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "6"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:16:37.47Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GBVESREP.TXT",
+          "fileSize": 87,
+          "mimeType": "text/plain",
+          "hash": "AAwwSt6KO41SIERngtV7Cg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBVESREP.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBPIPLNS.TXT",
+          "fileSize": 88,
+          "mimeType": "text/plain",
+          "hash": "51q6YPoJxYn2BCDbNhB/Vg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBPIPLNS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMOORIN.TXT",
+          "fileSize": 102,
+          "mimeType": "text/plain",
+          "hash": "1SgHBfUByhLBWIcYCOhchA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMOORIN.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBMILEAG.TXT",
+          "fileSize": 105,
+          "mimeType": "text/plain",
+          "hash": "sGNjm1k/sRcUfVAn8quing==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBMILEAG.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCABCAR.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "ViAu5pN0oiNXMI/hPesjyw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCABCAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTUNNEL.TXT",
+          "fileSize": 113,
+          "mimeType": "text/plain",
+          "hash": "pgGrHtHyhqSVykv9ltYBUA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTUNNEL.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBCHDEPS.TXT",
+          "fileSize": 136,
+          "mimeType": "text/plain",
+          "hash": "C9QQ/hbviSWNV91loEIxsg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBCHDEPS.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBANCHAR.TXT",
+          "fileSize": 376,
+          "mimeType": "text/plain",
+          "hash": "JylqKb/DN4D4jp9y0qSXCg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBANCHAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBTHABAR.TXT",
+          "fileSize": 896,
+          "mimeType": "text/plain",
+          "hash": "x0GNvNePoEgDi71s+b+2BQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GBTHABAR.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB6PL050.000",
+          "fileSize": 2288790,
+          "mimeType": "application/s57",
+          "hash": "nJ5R6rgW7KtDkBMpbZygjg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "8CA65C52"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33/files/GB6PL050.000"
+            }
+          }
+        }
+      ]
+    },
+    {
       "batchId": "e2b1bdf6-1c3e-4bbc-a866-1fabe675fc33",
       "status": "Committed",
       "allFilesZipSize": 732173,
