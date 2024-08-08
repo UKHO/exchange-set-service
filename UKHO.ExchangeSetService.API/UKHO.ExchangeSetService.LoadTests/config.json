@@ -11,8 +11,16 @@
   "FSS_CLIENT_SECRET": "",
   "FSS_RESOURCE": "",
   "FSS_SCOPES": "",
+  "IdentifierEndpoint": "/productData/productIdentifiers",
+  "VersionsEndpoint": "/productData/productVersions?",
+  "DateTimeEndpoint": "/productData?sinceDateTime=",
+  "FilesPublished": "/webhook/newfilespublished",
+  "FSSDetailURI": "/fss-qa",
+  "E2E_FSSDetailURI": "/fss-vne",
   "DownloadFile": {
     "MaxDownloadBlockSizeInBytes": "10485760",
     "DownloadFlag": true
-  }
+  },
+  "ESSToken": "<Token>",
+  "FSSToken": "<Token>"
 }
