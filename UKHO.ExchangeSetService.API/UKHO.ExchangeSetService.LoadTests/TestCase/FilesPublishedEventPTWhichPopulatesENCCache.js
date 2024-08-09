@@ -8,8 +8,8 @@ import { Trend } from 'k6/metrics';
 
 const publishEvent = new Trend('NewFilePublishEvent');
 const TestData = require('../scripts/CacheTestData.js');
-const config=JSON.parse(open('./config.json'));
-const publishEventLogsFile = JSON.parse(open('../TestData/encPublishRecords.json'));
+const config=JSON.parse(open('../config.json'));
+const newFilesPublishedLogFile = JSON.parse(open('../TestData/encPublishRecords.json')); //Add path of Json file containing Azure logs of NewFilePublish (peak load hour)
 
 export let options = {
 
@@ -49,7 +49,7 @@ export let options = {
             { target: 3, duration: '5s' },
             { target: 10, duration: '5s' },
             { target: 12, duration: '5s' },
-            { target: 2, duration: '5s' },
+            { target: 2, duration: '5s' }
         ]
     },
   },
@@ -68,7 +68,7 @@ export function teardown() {
 }
 
 export default function publishNewFile() {
-    let reqData = TestData.getNextRecord(publishEventLogsFile, scenario.iterationInTest % publishEventLogsFile.length);
+    let reqData = TestData.getNextNewFilePublishedRecord(newFilesPublishedLogFile, scenario.iterationInTest % newFilesPublishedLogFile.length);
     ReplayRequest(reqData);
 }
 
@@ -103,7 +103,7 @@ export function handleSummary(data) {
   return {
     ["ExecutionSummary/CachePublish-LiveDataTest-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".html"]: htmlReport(data),
     stdout: textSummary(data, { indent: " ", enableColors: true }),
-    ["ExecutionSummary/CachePublish-LiveDataTest-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".json"]: JSON.stringify(data),
+    ["ExecutionSummary/CachePublish-LiveDataTest-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".json"]: JSON.stringify(data)
   }
 }
 

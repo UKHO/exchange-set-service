@@ -4,11 +4,12 @@ import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
 const loadProfile = JSON.parse(open('../TestData/essLogs.json'));
-const publishEventLogsFile = JSON.parse(open('../TestData/essPublishLogs.json'));
+const publishEventLogsFile = JSON.parse(open('../TestData/encPublishRecords.json')); //Add path of Json file containing Azure logs of ESS (peak load hour) 
 const essAPI = require('../scripts/ReplayRequest.js');
 const logParser = require('../helper/LogParser.js');
 const testHelper = require('../helper/LoadStages.js');
 const testStages = testHelper.getLoadStages(loadProfile);
+const TestData = require('../scripts/CacheTestData.js');
 const StageTime = '1m';
 
 export const options = {
@@ -17,7 +18,7 @@ export const options = {
         exec:'LoadCache',
         executor: 'shared-iterations',
         vus: 100,
-        iterations: ESSPublishFile.length
+        iterations: publishEventLogsFile.length
       },
 
     'hardcoded-executor': {
@@ -98,8 +99,8 @@ export function setup() {
   const testStartTime = new Date();
   console.warn("Test Start Time:" + testStartTime.toLocaleTimeString('en-US'));
   console.warn("Test Start Time(UTC):" + testStartTime.toUTCString());
-  let delayMap = logParser.debugDelay(loadProfile);
-  return delayMap;
+  let requestDelayArr = logParser.getDelayFromTimeStamp(loadProfile);
+  return requestDelayArr;
 }
 
 export function teardown() {
@@ -108,21 +109,21 @@ export function teardown() {
   console.warn("Test End Time(UTC):" + testEndTime.toUTCString());
 }
 
-export default function main(delayMap) {
-    logIterator(delayMap);
+export default function testRunner(requestDelayArr) {
+    logIterator(requestDelayArr);
 }
 
-export function logIterator(delayMap) {
+export function logIterator(requestDelayArr) {
     let selectLoadProfile = logParser.getRequestDetailsFromLog(loadProfile, scenario.iterationInTest);
     let reqData = logParser.filterRequestType(selectLoadProfile);
-  let delay = delayMap[scenario.iterationInTest].toFixed(2);
+  let delay = requestDelayArr[scenario.iterationInTest].toFixed(2);
     sleep(delay);
   essAPI.ReplayRequest(reqData);
     sleep(StageTime);
 }
 
 export function LoadCache() {
-    let reqData = TestData.getNextRecord(publishEventLogsFile, scenario.iterationInTest);
+    let reqData = TestData.getNextNewFilePublishedRecord(publishEventLogsFile, scenario.iterationInTest);
     essAPI.ReplayRequest(reqData);
 }
 

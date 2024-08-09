@@ -12,7 +12,7 @@
   "FSS_RESOURCE": "",
   "FSS_SCOPES": "",
   "IdentifierEndpoint": "/productData/productIdentifiers",
-  "VersionsEndpoint": "/productData/productVersions?",
+  "VersionsEndpoint": "/productData/productVersions",
   "DateTimeEndpoint": "/productData?sinceDateTime=",
   "FilesPublished": "/webhook/newfilespublished",
   "FSSDetailURI": "/fss-qa",

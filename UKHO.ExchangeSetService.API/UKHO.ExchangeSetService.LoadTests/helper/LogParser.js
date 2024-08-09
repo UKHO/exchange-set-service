@@ -7,7 +7,7 @@ const productVersionsObj = {};
 const sinceDateTimeObj = {};
 const healthObj = {};
 const newfilespublishedObj = {};
-const unmactchedObj = {};
+const unmatchedObj = {};
 const reqByNameObj = {};
 
 /**
@@ -64,11 +64,11 @@ export function filterRequestType(reqObject) {
         return newfilespublishedObj;
     }
 
-    console.warn("Unmached Request type:" + reqObject.url)
-    unmactchedObj.url = reqObject.url;
-    unmactchedObj.requestBodyText = reqObject.requestBodyText;
-    unmactchedObj.requestMethod = reqObject.requestMethod;
-    return unmactchedObj;
+    console.warn("Unmatched Request type:" + reqObject.url)
+    unmatchedObj.url = reqObject.url;
+    unmatchedObj.requestBodyText = reqObject.requestBodyText;
+    unmatchedObj.requestMethod = reqObject.requestMethod;
+    return unmatchedObj;
 }
 
 export function filterByURLContent(reqObject, reqName) {
@@ -79,45 +79,6 @@ export function filterByURLContent(reqObject, reqName) {
         return reqByNameObj;
     }
     return null;
-}
-
-export function filterByDate(reqObject, reqName) {
-    if (reqObject.url.includes(reqName)) {
-        let date = GetNormalizedSinceDateTimeDate(reqObject.url);
-        let sinceDateURI = encodeURI(config.Base_URL + config.DateTimeEndpoint + date);
-        sinceDateTimeObj.url = sinceDateURI;
-        sinceDateTimeObj.requestBodyText = null;
-        sinceDateTimeObj.requestMethod = reqObject.requestMethod;
-        return sinceDateTimeObj;
-    }
-    return null;
-}
-
-export function getStartTime(timeStamp, index) {
-    const deplayPerVU = new Map();
-    const ts = Date.parse(timeStamp);
-    const myTS = new Date(ts);
-    var min = myTS.getUTCMinutes();
-    var sec = myTS.getUTCSeconds();
-    var ms = myTS.getUTCMilliseconds();
-    var reqTimeInSec = ((min * 60) + sec + (ms / 1000));
-    if (deplayPerVU.size == 1) {
-        deplayPerVU.set(index, reqTimeInSec)
-        console.warn("Delay Inserted at: " + index + " value:" + reqTimeInSec);
-        return deplayPerVU.get(index);
-    }
-
-    else if (deplayPerVU.size == 2) {
-        deplayPerVU.set(index, reqTimeInSec)
-        console.warn("Delay Inserted at: " + index + " value:" + reqTimeInSec);
-        return deplayPerVU.get(index);
-    }
-    else {
-        deplayPerVU.set(index, reqTimeInSec);
-        console.log("Thead:" + index, "Delay Time:" + deplayPerVU.get[index], "Last Req:" + deplayPerVU.get[index - 1]);
-        return deplayPerVU.get(index);
-    }
-
 }
 
 export function GetSinceDateTimeData() {
@@ -141,8 +102,8 @@ export function GetNormalizedSinceDateTimeDate(logDate) {
     else if (differenceDays > 21) {
         const currentTime = new Date();
         const newSinceDate = new Date(currentTime);
-        let normalziedSinceDateTime = newSinceDate.setDate(currentTime.getDate() - randomIntBetween(2, 20));
-        return new Date(normalziedSinceDateTime).toUTCString();
+        let normalizedSinceDateTime = newSinceDate.setDate(currentTime.getDate() - randomIntBetween(2, 20));
+        return new Date(normalizedSinceDateTime).toUTCString();
     }
     else {
         return new Date(sinceDate).toUTCString();
@@ -163,48 +124,7 @@ function parseRFC1123Date(dateString) {
     return new Date(Date.UTC(year, month, day, hours, minutes, seconds));
 }
 
-export function SetDelayTime(DelayLogFile) { // Add check for matching Req. type
-    let timeStampArr = [];
-    let index = 0;
-    let recordsCount = Object.keys(DelayLogFile).length;
-
-    for (index = 0; index < recordsCount; index++) {
-        if (index == recordsCount - 1) {
-            timeStampArr[index] = 0;
-        }
-
-        else {
-
-            let currentTimeStamp = DelayLogFile[index].Timestamp;
-            let nextTimeStamp = DelayLogFile[index + 1].Timestamp;
-
-            let timeCurrentReq = new Date(currentTimeStamp);
-            let timeNextReq = new Date(nextTimeStamp);
-
-            let delayTimeMillSec = (timeNextReq.getTime() - timeCurrentReq.getTime());
-            let delayTimeReq = delayTimeMillSec / 1000;
-
-            timeStampArr[index] = delayTimeReq;
-        }
-    }
-    return timeStampArr;
-}
-
-export function printDelay(DelayLogFile) {
-    let timeStampArr = [];
-    let recordsCount = Object.keys(DelayLogFile).length;
-    timeStampArr[0] = new Date(DelayLogFile[0].Timestamp).getSeconds();
-    for (let index = 1; index < recordsCount - 2; index++) {
-        let currentTimeStamp = new Date(DelayLogFile[index].Timestamp);
-        let nextTimeStamp = new Date(DelayLogFile[index + 1].Timestamp);
-        let diffTimeStamp = (nextTimeStamp.getTime() - currentTimeStamp.getTime());
-        let delayInSec = parseFloat(diffTimeStamp) / 1000;
-        timeStampArr[index] = delayInSec;
-    };
-    return timeStampArr;
-}
-
-export function debugDelay(DelayLogFile) {
+export function getDelayFromTimeStamp(DelayLogFile) {
     let timeStampArr = [];
     let recordsCount = Object.keys(DelayLogFile).length;
     console.log("Total Requests:" + recordsCount);

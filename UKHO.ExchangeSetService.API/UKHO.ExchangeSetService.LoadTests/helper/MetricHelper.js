@@ -34,7 +34,7 @@ const sinceDateTimeCounter = new Counter('Counts_SD');
 const newfilespublishedCounter = new Counter('Counts_Publish');
 const healthCounter = new Counter('Counts_Health');
 
-export function SmallESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime) {
+export function SmallESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime) {
         s63SmallEssProductCount.add(prodCount);
         s63SmallEssSizeRange.add(fileSizeInMB);
         s63SmallEssCreationTime.add(ESSReponseTime, true);
@@ -43,7 +43,7 @@ export function SmallESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatc
         s63SmallEssE2E.add(((ESSReponseTime + FSSBatchResponseTime + FSSBatchResponseTime) / 60000).toFixed(2), true);
 }
 
-export function MediumESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime) {
+export function MediumESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime) {
         s63MediumEssProductCount.add(prodCount);
         s63MediumEssSizeRange.add(fileSizeInMB);
         s63MediumEssCreationTime.add(ESSReponseTime, true);
@@ -52,7 +52,7 @@ export function MediumESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBat
         s63MediumEssE2E.add(((ESSReponseTime + FSSBatchResponseTime + FSSBatchResponseTime) / 60000).toFixed(2), true);
 }
 
-export function LargeESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime) {
+export function LargeESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime) {
         s63LargeEssProductCount.add(prodCount);
         s63LargeEssSizeRange.add(fileSizeInMB);
         s63LargeEssCreationTime.add(ESSReponseTime, true);

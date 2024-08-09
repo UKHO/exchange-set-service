@@ -1,4 +1,3 @@
-const testData = JSON.parse(open('../TestData/encPublishRecords.json'));
 const logParser = require('../helper/LogParser.js');
 function generateGUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -7,9 +6,9 @@ function generateGUID() {
     });
 }
 
-export function getNextRecord(fileName, index) {
-    for (let i = index; index < fileName.length; i++) {
-        let requestObj = logParser.getRequestDetailsFromLog(fileName, i);
+export function getNextNewFilePublishedRecord(logFileName, index) {
+    for (let i = index; index < logFileName.length; i++) {
+        let requestObj = logParser.getRequestDetailsFromLog(logFileName, i);
         let filterData = logParser.filterByURLContent(requestObj, "/webhook/newfilespublished");
         if (filterData != null) {
             let requestBodyText = JSON.parse(filterData.requestBodyText);

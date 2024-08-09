@@ -2,7 +2,7 @@ const productsAsyncAPI = require('./ProductAPIAsync.js');
 const report = require('../helper/MetricHelper.js');
 
 /**
- * @param {Object} ObjectReq The object of the request retrived from log json struct:{url,requestBodyText,reqType}
+ * @param {Object} ObjectReq The object of the request retrieved from log json struct:{url,requestBodyText,reqType}
 */
 export function ReplayRequest(ObjectReq) {
     switch (ObjectReq.requestMethod) {
