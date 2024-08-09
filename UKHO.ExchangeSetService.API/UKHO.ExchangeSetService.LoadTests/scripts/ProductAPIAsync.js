@@ -5,7 +5,7 @@ import exec from 'k6/execution';
 const config = JSON.parse(open('../config.json'));
 const report = require('../helper/MetricHelper.js');
 
-var ESSReponseTime, FSSDownloadTime, FSSBatchResponseTime = 0;
+var FSSDownloadTime, FSSBatchResponseTime = 0;
 
 /**
  * @param {Object} requestURL The set of Product IDs to create Exchange Set 
@@ -19,8 +19,7 @@ export async function createExchangeSetAsync(requestURL, requestBody) {
     if (check(essRes, {
         'HTTP Response Code': (essRes) => ess.status = 200,
     })) {
-        // return JSON.stringify(essRes['fssBatchId']);
-        console.log("Batch ID:" + JSON.stringify(essRes['fssBatchId']))
+        console.log("Batch ID:" + JSON.stringify(essRes['fssBatchId']));
     }
 }
 
@@ -34,8 +33,8 @@ export function resendRequest(requestURL, requestBody) {
         { headers: { Authorization: `Bearer ${config.ESSToken}`, "Content-Type": "application/json" } });
 
     if (essRes.status == 401) {
-        console.error("Bearer token expired!")
-        exec.test.abort("Please update token, Execution Stopped!")
+        console.error("Bearer token expired!");
+        exec.test.abort("Please update token, Execution Stopped!");
     }
 
     check(essRes, {
@@ -45,7 +44,7 @@ export function resendRequest(requestURL, requestBody) {
     if (essRes.status == 200) {
         try {
             if (essRes.body != null && typeof essRes.json().fssBatchId === 'undefined') {
-                console.log("Response:" + JSON.stringify(essRes.body, null, 2))
+                console.log("Response:" + JSON.stringify(essRes.body, null, 2));
                 console.log("Correlation-Id:" + essRes.headers['X-Correlation-Id']);
             }
             else {
@@ -53,13 +52,13 @@ export function resendRequest(requestURL, requestBody) {
                 console.log("Correlation-Id:" + essRes.headers['X-Correlation-Id']);
             }
         } catch (e) {
-            console.log(essRes.body)
+            console.log(essRes.body);
         }
     }
 
     if (essRes.status != 200) {
-        console.error("URL:" + requestURL, "Body:" + requestBody)
-        console.error("Response:" + JSON.stringify(requestBody, null, 2))
+        console.error("URL:" + requestURL, "Body:" + requestBody);
+        console.error("Response:" + JSON.stringify(requestBody, null, 2));
         console.error("Correlation-Id:" + essRes.headers['X-Correlation-Id']);
         console.error("Response Code:" + essRes.status);
     }
@@ -100,7 +99,6 @@ export async function CreateESSFromProdIDs(essURL, requestBodyText, reqTypeName)
     */
     if (config.DownloadFile.DownloadFlag == true) {
         var group_duration = report.GetGroupDuration(reqTypeName + "_download", () => {
-            // if(fssCommitStatus=== "Committed" && config.DownloadFile.DownloadFlag){
             let fssDetailsResponse = GetFSSApiDetailsResponse(JSON.parse(batchDetailsUri));
             let filename = fssDetailsResponse['files'][0]['filename'];
             if (filename.endsWith(".zip") == false) {
@@ -114,15 +112,15 @@ export async function CreateESSFromProdIDs(essURL, requestBodyText, reqTypeName)
             FSSDownloadTime = fssResponse.timings.duration;
 
             if (fileSizeInMB < 50) {
-                report.SmallESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime)
+                report.SmallESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime);
             }
 
             if (fileSizeInMB > 50 && fileSizeInMB < 300) {
-                report.MediumESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime)
+                report.MediumESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime);
             }
 
             if (fileSizeInMB > 300) {
-                report.LargeESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime)
+                report.LargeESSMetrics(prodCount, fileSizeInMB, ESSReponseTime, FSSBatchResponseTime, FSSDownloadTime);
             }
 
             check(fssResponse, { 'is ESS Downloaded': (r) => r.status == 200 });
@@ -161,7 +159,7 @@ export function replayGetRequest(url) {
             'is Healthy': (getRes) => getRes.status === 200,
         });
     });
-    report.manageDuration(group_duration, "health")
+    report.manageDuration(group_duration, "health");
 }
 
 export function getRequestTypeName(url) {

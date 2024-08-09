@@ -3,15 +3,23 @@ import { scenario } from 'k6/execution';
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
-const loadProfile = JSON.parse(open('../LiveLogs/filtered.json'));
+const loadProfile = JSON.parse(open('../TestData/essLogs.json'));
+const publishEventLogsFile = JSON.parse(open('../TestData/essPublishLogs.json'));
 const essAPI = require('../scripts/ReplayRequest.js');
 const logParser = require('../helper/LogParser.js');
 const testHelper = require('../helper/LoadStages.js');
 const testStages = testHelper.getLoadStages(loadProfile);
-const StageTime = '1m'
+const StageTime = '1m';
 
 export const options = {
-  scenarios: {
+    scenarios: {
+     'Load-Cache-ESS':{
+        exec:'LoadCache',
+        executor: 'shared-iterations',
+        vus: 100,
+        iterations: ESSPublishFile.length
+      },
+
     'hardcoded-executor': {
       executor: 'ramping-arrival-rate',
       preAllocatedVUs: 180,
@@ -80,7 +88,7 @@ export const options = {
         { duration: StageTime, target: testStages[52] },
         { duration: StageTime, target: testStages[53] },
         { duration: StageTime, target: testStages[54] },
-        { duration: StageTime, target: testStages[55] },
+        { duration: StageTime, target: testStages[55] }
       ],
     },
   },
@@ -101,16 +109,21 @@ export function teardown() {
 }
 
 export default function main(delayMap) {
-  logIterator(delayMap)
+    logIterator(delayMap);
 }
 
 export function logIterator(delayMap) {
-  let selectLoadProfile = logParser.getRequestDetailsFromLog(loadProfile, scenario.iterationInTest)
-  let reqData = logParser.filterRequestType(selectLoadProfile)
+    let selectLoadProfile = logParser.getRequestDetailsFromLog(loadProfile, scenario.iterationInTest);
+    let reqData = logParser.filterRequestType(selectLoadProfile);
   let delay = delayMap[scenario.iterationInTest].toFixed(2);
-  sleep(delay)
+    sleep(delay);
   essAPI.ReplayRequest(reqData);
-  sleep(StageTime)
+    sleep(StageTime);
+}
+
+export function LoadCache() {
+    let reqData = TestData.getNextRecord(publishEventLogsFile, scenario.iterationInTest);
+    essAPI.ReplayRequest(reqData);
 }
 
 export function handleSummary(data) {

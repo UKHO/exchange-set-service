@@ -1,5 +1,4 @@
 const productsAsyncAPI = require('./ProductAPIAsync.js');
-const productsAPI = require('./ProductAPI.js');
 const report = require('../helper/MetricHelper.js');
 
 /**
@@ -7,15 +6,15 @@ const report = require('../helper/MetricHelper.js');
 */
 export function ReplayRequest(ObjectReq) {
     switch (ObjectReq.requestMethod) {
-        case 'POST': //Call helper for execution & reporting
-            let reqTypeName = productsAPI.getRequestTypeName(ObjectReq.url);
+        case 'POST': //Hit Post request
+            let reqTypeName = productsAsyncAPI.getRequestTypeName(ObjectReq.url);
             var group_duration = report.GetGroupDuration(reqTypeName, () => {
                 productsAsyncAPI.resendRequest(ObjectReq.url, ObjectReq.requestBodyText);
             });
             report.manageDuration(group_duration, reqTypeName);
             break;
 
-        case 'GET': // Call helper for execution & reporting
+        case 'GET': // Hit Get request
             productsAPI.replayGetRequest(ObjectReq.url);
             break;
     }

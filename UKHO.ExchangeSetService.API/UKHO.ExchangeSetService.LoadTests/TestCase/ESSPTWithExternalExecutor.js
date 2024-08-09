@@ -1,12 +1,11 @@
-import http from 'k6/http';
-import { sleep, metrics, output } from 'k6';
-import { vu, scenario, exec, instance } from 'k6/execution';
+import { sleep } from 'k6';
+import { scenario} from 'k6/execution';
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 import { Counter } from 'k6/metrics';
 
 const logParser = require('../helper/LogParser.js');
-const loadProfile = JSON.parse(open('./LiveLogs/filtered.json'));
+const loadProfile = JSON.parse(open('../TestData/essLogs.json'));
 const essAPI = require('../scripts/ReplayRequest.js');
 let logsCount = new Counter("http_reqs")
 
@@ -18,7 +17,7 @@ export let options = {
       executor: 'shared-iterations',
       vus: 10,
       iterations: loadProfile.length,
-      maxDuration: '1h',
+      maxDuration: '1h'
     },
   },
 };
@@ -30,7 +29,7 @@ export function setup() {
 
   const RPM = logParser.requestRatePerMinute(loadProfile)
 
-  console.log(Object.keys(RPM).length)
+    console.log(Object.keys(RPM).length);
 
   let delayMap = logParser.debugDelay(loadProfile);
   return delayMap;
@@ -43,11 +42,11 @@ export function teardown() {
 }
 
 export function simulateProdTrafficOnGivenDate(delayMap) {
-  let selectLoadProfile = logParser.getRequestDetailsFromLog(loadProfile, scenario.iterationInTest)
-  let reqData = logParser.filterRequestType(selectLoadProfile)
+    let selectLoadProfile = logParser.getRequestDetailsFromLog(loadProfile, scenario.iterationInTest);
+    let reqData = logParser.filterRequestType(selectLoadProfile);
   let LogsDelayProfile = delayMap[logsCount].toFixed(2);
-  console.log("Iteration:" + scenario.iterationInTest, "VU:" + LogsDelayProfile)
-  sleep(LogsDelayProfile)
+    console.log("Iteration:" + scenario.iterationInTest, "VU:" + LogsDelayProfile);
+    sleep(LogsDelayProfile);
   essAPI.ReplayRequest(reqData);
 }
 

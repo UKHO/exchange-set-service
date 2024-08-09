@@ -8,8 +8,3 @@ export function getLoadStages(LogFile) {
     const testStages = Object.values(reqRate);
     return testStages;
 }
-
-export default function myMain() {
-    let stages = getLoadStages(6125)
-    console.log(stages)
-}

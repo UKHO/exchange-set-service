@@ -15,10 +15,9 @@ const reqByNameObj = {};
  * @param {Number} Index Index to be searched by user
 */
 export function getRequestDetailsFromLog(logFile, index) {
-    //Logic to replay Logs from start
     let recordsCount = Object.keys(logFile).length;
     if (index > recordsCount) {
-        console.error("File index out of bounds")
+        console.error("File index out of bounds");
     }
     reqObject.url = logFile[index].Properties.Url;
     reqObject.requestMethod = logFile[index].Properties.requestMethod;
@@ -37,7 +36,7 @@ export function filterRequestType(reqObject) {
 
     else if (reqObject.url.includes('productVersions')) {
         productVersionsObj.url = config.Base_URL + config.VersionsEndpoint;
-        productVersionsObj.requestBodyText = reqObject.requestBodyText
+        productVersionsObj.requestBodyText = reqObject.requestBodyText;
         productVersionsObj.requestMethod = reqObject.requestMethod;
         return productVersionsObj;
     }
@@ -95,27 +94,25 @@ export function filterByDate(reqObject, reqName) {
 }
 
 export function getStartTime(timeStamp, index) {
-    const deplayPerVU = new Map(); //IterationInTest,DelayTime
+    const deplayPerVU = new Map();
     const ts = Date.parse(timeStamp);
     const myTS = new Date(ts);
-    // console.log(myTS.getUTCHours()); // Logs should be in Hourly duration
     var min = myTS.getUTCMinutes();
     var sec = myTS.getUTCSeconds();
     var ms = myTS.getUTCMilliseconds();
     var reqTimeInSec = ((min * 60) + sec + (ms / 1000));
     if (deplayPerVU.size == 1) {
         deplayPerVU.set(index, reqTimeInSec)
-        console.warn("Delay Inserted at: " + index + " value:" + reqTimeInSec)
+        console.warn("Delay Inserted at: " + index + " value:" + reqTimeInSec);
         return deplayPerVU.get(index);
     }
 
     else if (deplayPerVU.size == 2) {
         deplayPerVU.set(index, reqTimeInSec)
-        console.warn("Delay Inserted at: " + index + " value:" + reqTimeInSec)
+        console.warn("Delay Inserted at: " + index + " value:" + reqTimeInSec);
         return deplayPerVU.get(index);
     }
     else {
-        // reqTime=reqTime.toFixed(2);
         deplayPerVU.set(index, reqTimeInSec);
         console.log("Thead:" + index, "Delay Time:" + deplayPerVU.get[index], "Last Req:" + deplayPerVU.get[index - 1]);
         return deplayPerVU.get(index);
@@ -131,7 +128,7 @@ export function GetSinceDateTimeData() {
 
 export function GetNormalizedSinceDateTimeDate(logDate) {
     let sinceDateText = logDate.substring(logDate.lastIndexOf('sinceDateTime=') + 14, logDate.lastIndexOf('GMT') + 3);
-    sinceDateText = decodeURI(sinceDateText) //RFC 1123 format
+    sinceDateText = decodeURI(sinceDateText); //RFC 1123 format
 
     const sinceDate = parseRFC1123Date(sinceDateText); // Native method - Invalid date format
 
@@ -154,7 +151,6 @@ export function GetNormalizedSinceDateTimeDate(logDate) {
 
 function parseRFC1123Date(dateString) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
     const parts = dateString.split(' ');
     const day = parseInt(parts[1], 10);
     const month = months.indexOf(parts[2]);
@@ -166,7 +162,6 @@ function parseRFC1123Date(dateString) {
 
     return new Date(Date.UTC(year, month, day, hours, minutes, seconds));
 }
-
 
 export function SetDelayTime(DelayLogFile) { // Add check for matching Req. type
     let timeStampArr = [];
@@ -198,14 +193,13 @@ export function SetDelayTime(DelayLogFile) { // Add check for matching Req. type
 export function printDelay(DelayLogFile) {
     let timeStampArr = [];
     let recordsCount = Object.keys(DelayLogFile).length;
-    timeStampArr[0] = new Date(DelayLogFile[0].Timestamp).getSeconds()
+    timeStampArr[0] = new Date(DelayLogFile[0].Timestamp).getSeconds();
     for (let index = 1; index < recordsCount - 2; index++) {
         let currentTimeStamp = new Date(DelayLogFile[index].Timestamp);
         let nextTimeStamp = new Date(DelayLogFile[index + 1].Timestamp);
         let diffTimeStamp = (nextTimeStamp.getTime() - currentTimeStamp.getTime());
         let delayInSec = parseFloat(diffTimeStamp) / 1000;
         timeStampArr[index] = delayInSec;
-        // console.log(DelayLogFile[index+1].Timestamp,DelayLogFile[index].Timestamp,delayInSec)
     };
     return timeStampArr;
 }
@@ -213,17 +207,16 @@ export function printDelay(DelayLogFile) {
 export function debugDelay(DelayLogFile) {
     let timeStampArr = [];
     let recordsCount = Object.keys(DelayLogFile).length;
-    console.log("Total Requests:" + recordsCount)
-    let startMin = new Date(DelayLogFile[0].Timestamp).getUTCMinutes()
-    let startSec = new Date(DelayLogFile[0].Timestamp).getSeconds()
-    timeStampArr[0] = (startMin * 60) + startSec
+    console.log("Total Requests:" + recordsCount);
+    let startMin = new Date(DelayLogFile[0].Timestamp).getUTCMinutes();
+    let startSec = new Date(DelayLogFile[0].Timestamp).getSeconds();
+    timeStampArr[0] = (startMin * 60) + startSec;
     for (let index = 1; index < recordsCount; index++) {
         let currentTimeStamp = new Date(DelayLogFile[index - 1].Timestamp);
         let nextTimeStamp = new Date(DelayLogFile[index].Timestamp);
         let diffTimeStamp = (nextTimeStamp.getTime() - currentTimeStamp.getTime());
         let delayInSec = parseFloat(diffTimeStamp) / 1000;
         timeStampArr[index] = delayInSec;
-        // console.log(DelayLogFile[index+1].Timestamp,DelayLogFile[index].Timestamp,delayInSec)
     };
     return timeStampArr;
 }
@@ -233,10 +226,8 @@ export function requestRatePerMinute(logFile) {
 
     logFile.forEach(log => {
         const timeStamp = new Date(log.Timestamp);
-
         const minute = timeStamp.getUTCMinutes();
         const hour = timeStamp.getUTCHours();
-
         const minKey = `${hour}:${minute}`;
         countsPerMinute[minKey] = (countsPerMinute[minKey] || 0) + 1;
     });
@@ -259,9 +250,4 @@ export function replaceInJson(jsonObject, search, replacement) {
     } else {
         return jsonObject;
     }
-}
-
-export default function main() {
-    let newDate = GetNormalizedSinceDateTimeDate("https://ess-prod-webapp.azurewebsites.net/productData?sinceDateTime=Fri,%2029%20Mar%202024%2008:28:18%20GMT")
-    console.log(decodeURI(newDate))
 }
