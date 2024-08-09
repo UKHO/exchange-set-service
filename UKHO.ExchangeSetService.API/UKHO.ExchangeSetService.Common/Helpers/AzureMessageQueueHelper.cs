@@ -28,9 +28,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var queue = string.Format(essFulfilmentStorageconfig.Value.DynamicQueueName, instanceNumber);
             // Create the queue client.
             QueueClient queueClient = new QueueClient(storageAccountConnectionString, queue);
-
+            queueClient.CreateIfNotExists();
             // convert message to base64string          
-            var messageBase64String = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(message));
+            var messageBase64String = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(message));
             // Send a message to the queue
             await queueClient.SendMessageAsync(messageBase64String);
             logger.LogInformation(EventIds.AddedMessageInQueue.ToEventId(), "Added message in Queue:{queue} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", queue, batchId, correlationId);
