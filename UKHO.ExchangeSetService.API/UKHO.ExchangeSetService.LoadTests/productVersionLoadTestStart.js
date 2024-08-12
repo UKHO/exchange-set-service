@@ -1,11 +1,11 @@
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
-import { authenticateUsingAzure } from './oauth/azure.js';
+import { authenticateUsingAzure } from './Oauth/Azure.js';
 import { sleep, group } from 'k6';
 
-const runTestProductVersion = require('./scripts/LoadTestForProductVersions.js');
+const runTestProductVersion = require('./Scripts/LoadTestForProductVersions.js');
 const config = JSON.parse(open('./config.json'));
-const dataHelper = require('./helper/dataHelper.js');
+const dataHelper = require('./Helper/DataHelper.js');
 const productVersionData_Small = dataHelper.GetProductVersionDataforSmallExchangeSet();
 const productVersionData_Medium = dataHelper.GetProductVersionDataforMediumExchangeSet();
 const productVersionData_Large = dataHelper.GetProductVersionDataforLargeExchangeSet()

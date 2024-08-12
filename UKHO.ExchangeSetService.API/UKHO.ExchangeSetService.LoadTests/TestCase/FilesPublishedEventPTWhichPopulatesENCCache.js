@@ -7,7 +7,7 @@ import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 import { Trend } from 'k6/metrics';
 
 const publishEvent = new Trend('NewFilePublishEvent');
-const TestData = require('../scripts/CacheTestData.js');
+const testData = require('../Scripts/CacheTestData.js');
 const config=JSON.parse(open('../config.json'));
 const newFilesPublishedLogFile = JSON.parse(open('../TestData/encPublishRecords.json')); //Add path of Json file containing Azure logs of NewFilePublish (peak load hour)
 
@@ -68,12 +68,12 @@ export function teardown() {
 }
 
 export default function publishNewFile() {
-    let reqData = TestData.getNextNewFilePublishedRecord(newFilesPublishedLogFile, scenario.iterationInTest % newFilesPublishedLogFile.length);
-    ReplayRequest(reqData);
+    let reqData = testData.getNextNewFilePublishedRecord(newFilesPublishedLogFile, scenario.iterationInTest % newFilesPublishedLogFile.length);
+    replayRequest(reqData);
 }
 
 
-export function ReplayRequest(reqData){
+export function replayRequest(reqData){
     let essRes =  http.post(reqData.url,reqData.requestBodyText, 
     { headers: { Authorization: `Bearer ${config.ESSToken}`, "Content-Type": "application/json" } });
 

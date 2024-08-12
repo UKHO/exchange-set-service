@@ -3,19 +3,19 @@ import { scenario } from 'k6/execution';
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
-const loadProfile = JSON.parse(open('../TestData/essLogs.json'));
-const publishEventLogsFile = JSON.parse(open('../TestData/encPublishRecords.json')); //Add path of Json file containing Azure logs of ESS (peak load hour) 
-const essAPI = require('../scripts/ReplayRequest.js');
-const logParser = require('../helper/LogParser.js');
-const testHelper = require('../helper/LoadStages.js');
-const testStages = testHelper.getLoadStages(loadProfile);
-const TestData = require('../scripts/CacheTestData.js');
-const StageTime = '1m';
+const essLogsFile = JSON.parse(open('../TestData/essLogs.json')); //Add path of Json file containing Azure logs of ESS (peak load hour) 
+const publishEventLogsFile = JSON.parse(open('../TestData/encPublishRecords.json')); //Add path of Json file containing Azure logs of NewFilePublish event (atleast 400 records) 
+const essAPI = require('../Scripts/ReplayRequest.js');
+const logParser = require('../Helper/LogParser.js');
+const testHelper = require('../Helper/LoadStages.js');
+const testStages = testHelper.getLoadStages(essLogsFile);
+const testData = require('../Scripts/CacheTestData.js');
+const stageTime = '1m';
 
 export const options = {
     scenarios: {
      'Load-Cache-ESS':{
-        exec:'LoadCache',
+        exec:'prepopulateCache',
         executor: 'shared-iterations',
         vus: 100,
         iterations: publishEventLogsFile.length
@@ -26,70 +26,70 @@ export const options = {
       preAllocatedVUs: 180,
       timeUnit: '1m',
       stages: [
-        { duration: StageTime, target: testStages[0] },
-        { duration: StageTime, target: testStages[1] },
-        { duration: StageTime, target: 0 },
-        { duration: StageTime, target: 0 },
-        { duration: StageTime, target: 0 },
-        { duration: StageTime, target: testStages[2] },
-        { duration: StageTime, target: testStages[3] },
-        { duration: StageTime, target: testStages[4] },
-        { duration: StageTime, target: testStages[5] },
-        { duration: StageTime, target: testStages[6] },
+        { duration: stageTime, target: testStages[0] },
+        { duration: stageTime, target: testStages[1] },
+        { duration: stageTime, target: 0 },
+        { duration: stageTime, target: 0 },
+        { duration: stageTime, target: 0 },
+        { duration: stageTime, target: testStages[2] },
+        { duration: stageTime, target: testStages[3] },
+        { duration: stageTime, target: testStages[4] },
+        { duration: stageTime, target: testStages[5] },
+        { duration: stageTime, target: testStages[6] },
 
-        { duration: StageTime, target: testStages[7] },
-        { duration: StageTime, target: testStages[8] },
-        { duration: StageTime, target: testStages[9] },
-        { duration: StageTime, target: testStages[10] },
-        { duration: StageTime, target: testStages[11] },
-        { duration: StageTime, target: testStages[12] },
-        { duration: StageTime, target: testStages[13] },
-        { duration: StageTime, target: testStages[14] },
-        { duration: StageTime, target: testStages[15] },
-        { duration: StageTime, target: testStages[16] },
+        { duration: stageTime, target: testStages[7] },
+        { duration: stageTime, target: testStages[8] },
+        { duration: stageTime, target: testStages[9] },
+        { duration: stageTime, target: testStages[10] },
+        { duration: stageTime, target: testStages[11] },
+        { duration: stageTime, target: testStages[12] },
+        { duration: stageTime, target: testStages[13] },
+        { duration: stageTime, target: testStages[14] },
+        { duration: stageTime, target: testStages[15] },
+        { duration: stageTime, target: testStages[16] },
 
-        { duration: StageTime, target: testStages[17] },
-        { duration: StageTime, target: testStages[18] },
-        { duration: StageTime, target: testStages[19] },
-        { duration: StageTime, target: testStages[20] },
-        { duration: StageTime, target: testStages[21] },
-        { duration: StageTime, target: testStages[22] },
-        { duration: StageTime, target: testStages[23] },
-        { duration: StageTime, target: testStages[24] },
-        { duration: StageTime, target: testStages[25] },
-        { duration: StageTime, target: testStages[26] },
+        { duration: stageTime, target: testStages[17] },
+        { duration: stageTime, target: testStages[18] },
+        { duration: stageTime, target: testStages[19] },
+        { duration: stageTime, target: testStages[20] },
+        { duration: stageTime, target: testStages[21] },
+        { duration: stageTime, target: testStages[22] },
+        { duration: stageTime, target: testStages[23] },
+        { duration: stageTime, target: testStages[24] },
+        { duration: stageTime, target: testStages[25] },
+        { duration: stageTime, target: testStages[26] },
 
-        { duration: StageTime, target: testStages[27] },
-        { duration: StageTime, target: testStages[28] },
-        { duration: StageTime, target: testStages[29] },
-        { duration: StageTime, target: testStages[30] },
-        { duration: StageTime, target: testStages[31] },
-        { duration: StageTime, target: testStages[32] },
-        { duration: StageTime, target: testStages[33] },
-        { duration: StageTime, target: testStages[34] },
-        { duration: StageTime, target: testStages[35] },
-        { duration: StageTime, target: testStages[36] },
+        { duration: stageTime, target: testStages[27] },
+        { duration: stageTime, target: testStages[28] },
+        { duration: stageTime, target: testStages[29] },
+        { duration: stageTime, target: testStages[30] },
+        { duration: stageTime, target: testStages[31] },
+        { duration: stageTime, target: testStages[32] },
+        { duration: stageTime, target: testStages[33] },
+        { duration: stageTime, target: testStages[34] },
+        { duration: stageTime, target: testStages[35] },
+        { duration: stageTime, target: testStages[36] },
 
-        { duration: StageTime, target: testStages[37] },
-        { duration: StageTime, target: testStages[38] },
-        { duration: StageTime, target: testStages[39] },
-        { duration: StageTime, target: testStages[40] },
-        { duration: StageTime, target: testStages[41] },
-        { duration: StageTime, target: testStages[42] },
-        { duration: StageTime, target: testStages[43] },
-        { duration: StageTime, target: testStages[44] },
-        { duration: StageTime, target: testStages[45] },
-        { duration: StageTime, target: testStages[46] },
+        { duration: stageTime, target: testStages[37] },
+        { duration: stageTime, target: testStages[38] },
+        { duration: stageTime, target: testStages[39] },
+        { duration: stageTime, target: testStages[40] },
+        { duration: stageTime, target: testStages[41] },
+        { duration: stageTime, target: testStages[42] },
+        { duration: stageTime, target: testStages[43] },
+        { duration: stageTime, target: testStages[44] },
+        { duration: stageTime, target: testStages[45] },
+        { duration: stageTime, target: testStages[46] },
 
-        { duration: StageTime, target: testStages[47] },
-        { duration: StageTime, target: testStages[48] },
-        { duration: StageTime, target: testStages[49] },
-        { duration: StageTime, target: testStages[50] },
-        { duration: StageTime, target: testStages[51] },
-        { duration: StageTime, target: testStages[52] },
-        { duration: StageTime, target: testStages[53] },
-        { duration: StageTime, target: testStages[54] },
-        { duration: StageTime, target: testStages[55] }
+        { duration: stageTime, target: testStages[47] },
+        { duration: stageTime, target: testStages[48] },
+        { duration: stageTime, target: testStages[49] },
+        { duration: stageTime, target: testStages[50] },
+        { duration: stageTime, target: testStages[51] },
+        { duration: stageTime, target: testStages[52] },
+        { duration: stageTime, target: testStages[53] },
+        { duration: stageTime, target: testStages[54] },
+        { duration: stageTime, target: testStages[55] }
       ],
     },
   },
@@ -99,7 +99,7 @@ export function setup() {
   const testStartTime = new Date();
   console.warn("Test Start Time:" + testStartTime.toLocaleTimeString('en-US'));
   console.warn("Test Start Time(UTC):" + testStartTime.toUTCString());
-  let requestDelayArr = logParser.getDelayFromTimeStamp(loadProfile);
+  let requestDelayArr = logParser.getDelayFromTimeStamp(essLogsFile);
   return requestDelayArr;
 }
 
@@ -114,17 +114,17 @@ export default function testRunner(requestDelayArr) {
 }
 
 export function logIterator(requestDelayArr) {
-    let selectLoadProfile = logParser.getRequestDetailsFromLog(loadProfile, scenario.iterationInTest);
+    let selectLoadProfile = logParser.getRequestDetailsFromLog(essLogsFile, scenario.iterationInTest);
     let reqData = logParser.filterRequestType(selectLoadProfile);
   let delay = requestDelayArr[scenario.iterationInTest].toFixed(2);
     sleep(delay);
-  essAPI.ReplayRequest(reqData);
-    sleep(StageTime);
+  essAPI.replayRequest(reqData);
+    sleep(stageTime);
 }
 
-export function LoadCache() {
-    let reqData = TestData.getNextNewFilePublishedRecord(publishEventLogsFile, scenario.iterationInTest);
-    essAPI.ReplayRequest(reqData);
+export function prepopulateCache() {
+    let reqData = testData.getNextNewFilePublishedRecord(publishEventLogsFile, scenario.iterationInTest);
+    essAPI.replayRequest(reqData);
 }
 
 export function handleSummary(data) {

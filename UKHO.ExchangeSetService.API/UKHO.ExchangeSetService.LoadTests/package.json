@@ -4,11 +4,11 @@
   "description": "contains k6 code for Exchange Set performance testing",
   "main": "ESSPT.js",
   "directories": {
-    "test": "test"
+    "test": "TestCase"
   },
   "devDependencies": {},
   "scripts": {
-    "ess": "k6 run ./TestCase/ESSPTUsingLiveLogWithCache.js",
+    "ess": "k6 run ./TestCase/ESSPTUsingLiveLogWithCache.js"
   },
   "keywords": [
     "ESS",

@@ -1,11 +1,11 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 import exec from 'k6/execution';
 
 const config = JSON.parse(open('../config.json'));
-const report = require('../helper/MetricHelper.js');
+const report = require('../Helper/MetricHelper.js');
 
-var FSSDownloadTime, FSSBatchResponseTime = 0;
+var FSSBatchResponseTime;
 
 /**
  * @param {Object} requestURL The set of Product IDs to create Exchange Set 
@@ -47,7 +47,7 @@ export function resendRequest(requestURL, requestBody) {
     }
 }
 
-export async function GetFSSApiResponse(url) {
+export async function getFSSApiResponse(url) {
     var urlPortion = url.split(config.FSSDetailURI); //Hard coded for environment
     let fssResponse = await http.asyncRequest('GET', `${config.FSS_URL}${urlPortion[1]}`, { headers: { Authorization: `Bearer ${config.FSSToken}`, "Content-Type": "application/json" } });
     FSSBatchResponseTime = FSSBatchResponseTime + fssResponse.timings.duration;
@@ -56,7 +56,7 @@ export async function GetFSSApiResponse(url) {
     return fssCommitStatus;
 };
 
-export async function GetFSSApiDetailsResponse(url) {
+export async function getFSSApiDetailsResponse(url) {
     var urlPortion = url.split(config.FSSDetailURI); //Hard coded for environment
     let fssResponse = await http.asyncRequest('GET', `${config.FSS_URL}${urlPortion[1]}`, { headers: { Authorization: `Bearer ${config.FSSToken}`, "Content-Type": "application/json" } });
     let jsonResponse = JSON.parse(fssResponse.body);

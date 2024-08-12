@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, group, sleep } from 'k6';
 
-const apiClient = require('../helper/clientHelper.js');
+const apiClient = require('../Helper/ClientHelper.js');
 export function ESSCreation(clientAuthResp, productIdentifierData, exchangeSetType) {
     let fssCommitStatus, batchDetailsUri, batchStatusUrl, fssDetailsResponse, filename;
     group('ESS Creation', () => {

@@ -42,7 +42,7 @@ export function filterRequestType(reqObject) {
     }
 
     else if (reqObject.url.includes('sinceDateTime')) {
-        let date = GetNormalizedSinceDateTimeDate(reqObject.url);
+        let date = getNormalizedSinceDateTimeDate(reqObject.url);
         let sinceDateURI = encodeURI(config.Base_URL + config.DateTimeEndpoint + date);
         sinceDateTimeObj.url = sinceDateURI;
         sinceDateTimeObj.requestBodyText = {};
@@ -81,13 +81,13 @@ export function filterByURLContent(reqObject, reqName) {
     return null;
 }
 
-export function GetSinceDateTimeData() {
+export function getSinceDateTimeData() {
     const currentDateTime = new Date();
     currentDateTime.setDate(currentDateTime.getDate() - randomIntBetween(2, 20));
     return encodeURI(currentDateTime.toUTCString());
 }
 
-export function GetNormalizedSinceDateTimeDate(logDate) {
+export function getNormalizedSinceDateTimeDate(logDate) {
     let sinceDateText = logDate.substring(logDate.lastIndexOf('sinceDateTime=') + 14, logDate.lastIndexOf('GMT') + 3);
     sinceDateText = decodeURI(sinceDateText); //RFC 1123 format
 
