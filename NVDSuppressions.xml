@@ -527,9 +527,9 @@
    <vulnerabilityName>CVE-2024-30105</vulnerabilityName>
 </suppress>
 <suppress>
-	<notes><![CDATA[
-    file name: SonarAnalyzer.CSharp.dll
-    ]]></notes>
-	<cve>CVE-2024-38460</cve>
+   <notes><![CDATA[
+   file name: SonarAnalyzer.CSharp.dll
+   ]]></notes>
+   <cve>CVE-2024-38460</cve>
 </suppress>
 </suppressions>
