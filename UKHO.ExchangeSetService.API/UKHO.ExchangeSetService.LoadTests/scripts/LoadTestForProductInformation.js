@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { group, check } from 'k6';
 import { Trend } from 'k6/metrics';
 
-const logFile = require('../logging/captureLogs.js');
+const logFile = require('../Logging/CaptureLogs.js');
 const config = JSON.parse(open('../config.json'));
 
 let SmallExchangeSetTrend = new Trend('SmallEssApiResponseTime');
@@ -22,7 +22,7 @@ export function ESSCreation(clientAuthResp, sinceDateTime, exchangeSetType) {
         'is ESS status 200': (essResponse) => essResponse.status === 200,
     });
     
-    logFile.ESSConsoleLog(essResponse);
+    logFile.essConsoleLog(essResponse);
 
     switch (exchangeSetType) {
         case "Small": SmallExchangeSetTrend.add(essResponse.timings.duration); break;

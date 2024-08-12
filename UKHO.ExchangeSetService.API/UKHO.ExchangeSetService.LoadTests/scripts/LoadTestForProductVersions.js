@@ -3,7 +3,7 @@ import http from 'k6/http';
 import { Trend } from 'k6/metrics';
 
 const config = JSON.parse(open('../config.json'));
-const logFile = require('../logging/captureLogs.js');
+const logFile = require('../Logging/CaptureLogs.js');
 
 let SmallExchangeSetTrend = new Trend('SmallEssApiResponsetime');
 let LargeExchangeSetTrend = new Trend('LargeEssApiResponsetime');
@@ -21,7 +21,7 @@ export function ESSCreation(clientAuthResp, productVersionData, exchangeSetType)
         'is ESS status 200': (essResponse) => essResponse.status === 200,
     });
 
-    logFile.ESSConsoleLog(essResponse);
+    logFile.essConsoleLog(essResponse);
 
     switch (exchangeSetType) {
         case "Small": SmallExchangeSetTrend.add(essResponse.timings.waiting); break;
