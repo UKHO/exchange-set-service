@@ -13,5 +13,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task<string> DownloadTextAsync(CloudBlockBlob cloudBlockBlob);
         Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName);
         Task DeleteCacheContainer(string storageAccountConnectionString, string containerName);
+        CloudBlockBlob GetExistingCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName);
     }
 }

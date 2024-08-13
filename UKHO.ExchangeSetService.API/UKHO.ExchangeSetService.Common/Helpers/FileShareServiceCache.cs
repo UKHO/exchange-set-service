@@ -231,5 +231,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
         }
+
+        public async Task<Stream> DownloadFileFromCache(string fileName, string containerName)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+
+            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetExistingCloudBlockBlob(fileName, storageConnectionString, containerName);
+
+            if (await cloudBlockBlob.ExistsAsync())
+            {
+                await cloudBlockBlob.DownloadToStreamAsync(memoryStream);
+            }
+            return memoryStream;
+        }
     }
 }

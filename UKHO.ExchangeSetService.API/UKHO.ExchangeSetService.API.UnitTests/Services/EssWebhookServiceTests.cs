@@ -61,6 +61,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeFileShareServiceClient = A.Fake<IFileShareServiceClient>();
             fakeFileSystemHelper = A.Fake<FileSystemHelper>();
             fakeFileShareServiceConfig = A.Fake<IOptions<FileShareServiceConfiguration>>();
+            fakeFileShareServiceConfig.Value.ReadMeFileName = "README.TXT";
             fakeAuthFssTokenProvider = A.Fake<IAuthFssTokenProvider>();
 
             service = new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider);
@@ -365,7 +366,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
              && call.GetArgument<LogLevel>(0) == LogLevel.Information
              && call.GetArgument<EventId>(1) == EventIds.UploadCacheDataEventCompleted.ToEventId()
              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Upload Cache data to blob container and table completed for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{enterpriseEventCacheDataRequest.BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-      }
+        }
 
         [Test]
         public async Task WhenInvalidateAndInsertCacheDataCalled_ThenExecuteAzureStorageInsertOperations()
@@ -412,6 +413,55 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
         }
 
+        [Test]
+        public async Task WhenReadmeFileWithValidDataExistInRequestInsertCacheData_ThenDataInvalidatedFromCache()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
+
+            await service.InsertCacheDataAsync(GetReadmeFileCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+             && call.GetArgument<LogLevel>(0) == LogLevel.Information
+             && call.GetArgument<EventId>(1) == EventIds.DeleteSearchDownloadCacheDataFromContainerStarted.ToEventId()
+             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Deletion started for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.DeleteSearchDownloadCacheDataFromContainerCompleted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Deletion completed for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+             && call.GetArgument<LogLevel>(0) == LogLevel.Information
+             && call.GetArgument<EventId>(1) == EventIds.InsertCacheInvalidDataFoundEvent.ToEventId()
+             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Invalid data found in search and download cache Request for readme.txt BusinessUnit:{businessUnit} and ProductCode:{productType} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenReadmeFileWithInvalidDataExistInRequestInsertCacheData_ThenDataNotInvalidatedFromCache()
+        {
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
+
+            await service.InsertCacheDataAsync(GetInvalidReadmeFileCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+
+            A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+             && call.GetArgument<LogLevel>(0) == LogLevel.Information
+             && call.GetArgument<EventId>(1) == EventIds.DeleteSearchDownloadCacheDataFromContainerStarted.ToEventId()
+             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Deletion started for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+              && call.GetArgument<LogLevel>(0) == LogLevel.Information
+              && call.GetArgument<EventId>(1) == EventIds.DeleteSearchDownloadCacheDataFromContainerCompleted.ToEventId()
+              && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Deletion completed for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+             && call.GetArgument<LogLevel>(0) == LogLevel.Information
+             && call.GetArgument<EventId>(1) == EventIds.InsertCacheInvalidDataFoundEvent.ToEventId()
+             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Invalid data found in search and download cache Request for readme.txt BusinessUnit:{businessUnit} and ProductCode:{productType} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        }
 
         private string GetStorageAccountConnectionString()
         {
@@ -504,7 +554,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,
                                                            new Attribute { Key= "UpdateNumber", Value= "0" },
                                                            new Attribute { Key= "ProductCode", Value= "DEF" }},
-                Files = {},
+                Files = { },
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
                 BatchPublishedDate = DateTime.UtcNow
             };
@@ -555,6 +605,95 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
 
                 BatchId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e",
+                BatchPublishedDate = DateTime.UtcNow,
+                Files = cacheFiles
+            };
+        }
+        private EnterpriseEventCacheDataRequest GetReadmeFileCacheRequestData(string businessUnit)
+        {
+            List<CacheFile> cacheFiles = new List<CacheFile>();
+            Get fileLink = new Get()
+            {
+                Href = @"/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/README.TXT",
+            };
+            cacheFiles.Add(new CacheFile
+            {
+                Filename = "README.TXT",
+                MimeType = "text/plain",
+                Attributes = new List<Attribute>(),
+                Links = new CacheLinks() { Get = fileLink }
+            });
+            BatchDetails linkBatchDetails = new BatchDetails()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272"
+            };
+            BatchStatus linkBatchStatus = new BatchStatus()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/status"
+            };
+            Get linkGet = new Get()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
+            };
+            CacheLinks links = new CacheLinks()
+            {
+                BatchDetails = linkBatchDetails,
+                BatchStatus = linkBatchStatus,
+                Get = linkGet
+            };
+            return new EnterpriseEventCacheDataRequest
+            {
+                Links = links,
+                BusinessUnit = businessUnit,
+                Attributes = new List<Attribute>
+                {
+                    new Attribute { Key= "Product Type", Value= "AVCS" }
+                },
+                BatchId = "7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272",
+                BatchPublishedDate = DateTime.UtcNow,
+                Files = cacheFiles
+            };
+        }
+
+        private EnterpriseEventCacheDataRequest GetInvalidReadmeFileCacheRequestData(string businessUnit)
+        {
+            List<CacheFile> cacheFiles = new List<CacheFile>();
+            Get fileLink = new Get()
+            {
+                Href = @"/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/README.TXT",
+            };
+            cacheFiles.Add(new CacheFile
+            {
+                Filename = "README.TXT",
+                MimeType = "text/plain",
+                Attributes = new List<Attribute>(),
+                Links = new CacheLinks() { Get = fileLink }
+            });
+
+            BatchDetails linkBatchDetails = new BatchDetails()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272"
+            };
+            BatchStatus linkBatchStatus = new BatchStatus()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/status"
+            };
+            Get linkGet = new Get()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip",
+            };
+            CacheLinks links = new CacheLinks()
+            {
+                BatchDetails = linkBatchDetails,
+                BatchStatus = linkBatchStatus,
+                Get = linkGet
+            };
+            return new EnterpriseEventCacheDataRequest
+            {
+                Links = links,
+                BusinessUnit = businessUnit,
+                Attributes = new List<Attribute>(),                
+                BatchId = "7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272",
                 BatchPublishedDate = DateTime.UtcNow,
                 Files = cacheFiles
             };

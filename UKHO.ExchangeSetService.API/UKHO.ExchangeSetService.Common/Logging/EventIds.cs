@@ -840,7 +840,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805208 - Cache Search and Download files data missing
         /// </summary>
-        InsertCacheMissingData = 805208
+        InsertCacheMissingData = 805208,
+        /// <summary>
+        /// 805209 - Cache Search and Download readme.txt file started
+        /// </summary>
+        SearchDownloadReadmeCacheEventStart = 805209,
+        /// <summary>
+        /// 805210 - Cache Search and Download readme.txt file completed
+        /// </summary>
+        SearchDownloadReadmeCacheEventCompleted = 805210
 
     }
 

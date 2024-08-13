@@ -427,7 +427,40 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.AreEqual(0, response.Count);
         }
+        #endregion
 
+        #region DownloadFileFromCache
+        [Test]
+        public async Task WhenFileExistInStorageDownloadFileFromCache_ThenCalledDownloadToStreamAsync()
+        {
+            string filename = "README.TXT";
+            string containerName = "readme";            
+            var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
+            var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetExistingCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cloudBlob);
+            A.CallTo(() => cloudBlob.ExistsAsync()).Returns(true);
+
+            await fileShareServiceCache.DownloadFileFromCache(filename, containerName);
+
+            A.CallTo(() => cloudBlob.DownloadToStreamAsync(A<Stream>.Ignored)).MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public async Task WhenFileNotExistInStorageDownloadFileFromCache_ThenDoesNotCalledDownloadToStreamAsync()
+        {
+            string filename = "README.TXT";
+            string containerName = "readme";
+            var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
+            var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
+            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetExistingCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cloudBlob);
+            A.CallTo(() => cloudBlob.ExistsAsync()).Returns(false);
+
+            await fileShareServiceCache.DownloadFileFromCache(filename, containerName);
+
+            A.CallTo(() => cloudBlob.DownloadToStreamAsync(A<Stream>.Ignored)).MustNotHaveHappened();
+        }
         #endregion
     }
 }

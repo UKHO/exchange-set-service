@@ -53,5 +53,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
             await container.DeleteIfExistsAsync();
         }
+
+        public CloudBlockBlob GetExistingCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
+        {
+            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
+            CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
+            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
+            CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
+            return cloudBlockBlob;
+        }
     }
 }

@@ -873,7 +873,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
             A.CallTo(() => fakeFileSystemHelper.DownloadReadmeFile(A<string>.Ignored, A<Stream>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var response = await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null);
+            var response = await fileShareService.DownloadReadMeFileFromFss(readMeFilePath, batchId, exchangeSetRootPath, null);
 
             Assert.AreEqual(true, response);
         }
@@ -912,7 +912,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.DownloadReadMeFile(readMeFilePath, batchId, exchangeSetRootPath, null); });
+                 async delegate { await fileShareService.DownloadReadMeFileFromFss(readMeFilePath, batchId, exchangeSetRootPath, null); });
         }
         #endregion
 
