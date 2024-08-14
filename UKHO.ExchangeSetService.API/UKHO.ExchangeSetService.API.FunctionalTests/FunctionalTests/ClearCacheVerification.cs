@@ -142,8 +142,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check caching info
             tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
-            // Verify the No Cache available
+            // Verify the Cache available
             Assert.IsNotNull(tableCacheCheck);
+
+
+
         }
 
         [OneTimeTearDown]
