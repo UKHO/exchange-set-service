@@ -1,6 +1,6 @@
 {
-  "count": 54,
-  "total": 54,
+  "count": 0,
+  "total": 0,
   "entries": [
     {
       "batchId": "a07537ff-ffa2-4565-8f0e-96e61e70a9fc",
@@ -320,6 +320,70 @@
         {
           "key": "UpdateNumber",
           "value": "11"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-11T11:36:16.607Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEL16080.011",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "kDCOLao5w204mVT6z7QHgQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/455ad033-6191-48bd-9d4d-036cce9d9f2a/files/DEL16080.011"
+            }
+          }
+        },
+        {
+          "filename": "DE416080.011",
+          "fileSize": 1472,
+          "mimeType": "application/s63",
+          "hash": "dZT408EbWUwQj2nTBcM6Hg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "30664F01"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/455ad033-6191-48bd-9d4d-036cce9d9f2a/files/DE416080.011"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "955ad033-6191-48bd-9d4d-036cce9d9f2a",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE416080"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "13"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "899d2ea3-86bd-4e7b-9aa4-ab21300bdbfe"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "2"
         }
       ],
       "businessUnit": "ADDS",
@@ -696,6 +760,10 @@
         {
           "key": "ProductCode",
           "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "e59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
         },
         {
           "key": "UpdateNumber",
@@ -3286,6 +3354,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "q59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "3"
         }
@@ -3588,6 +3660,10 @@
         {
           "key": "ProductCode",
           "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "j59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
         },
         {
           "key": "UpdateNumber",
@@ -4976,6 +5052,10 @@
         {
           "key": "ProductCode",
           "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "g89b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
         },
         {
           "key": "UpdateNumber",
@@ -7270,6 +7350,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "f11b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "0"
         }
@@ -8470,6 +8554,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "f77b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "5"
         }
@@ -8528,6 +8616,10 @@
         {
           "key": "ProductCode",
           "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "f09b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
         },
         {
           "key": "UpdateNumber",
@@ -10834,6 +10926,70 @@
       ]
     },
     {
+      "batchId": "79c47f77-6192-4182-85d8-633ab0fea98c",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE416080"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "13"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7dc27c78-d209-4ee2-8ff5-33837062625d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-08-10T12:13:03.703Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEL16080.002",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "KKnIJfXpv8W0eHhnmiYlxw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/69c47f77-6192-4182-85d8-633ab0fea98c/files/DEL16080.002"
+            }
+          }
+        },
+        {
+          "filename": "DE416080.002",
+          "fileSize": 1848,
+          "mimeType": "application/s63",
+          "hash": "SjlDI/0n0ZtCR6m4o8Nh9A==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "6DBD1A83"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/69c47f77-6192-4182-85d8-633ab0fea98c/files/DE416080.002"
+            }
+          }
+        }
+      ]
+    },
+    {
       "batchId": "a78a07a9-892f-4e90-abbc-639fade7353d",
       "status": "Committed",
       "attributes": [
@@ -11630,8 +11786,244 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "a69b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:22:41.433Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEMIN01E.TXT",
+          "fileSize": 173,
+          "mimeType": "text/plain",
+          "hash": "1pvcONw3J8dN+RHxbbVoKg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEMIN01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFIS04E.TXT",
+          "fileSize": 196,
+          "mimeType": "text/plain",
+          "hash": "Vd2DN/Et7MZBVgBKJ7r9eg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEFIS04E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESTN01E.TXT",
+          "fileSize": 207,
+          "mimeType": "text/plain",
+          "hash": "9YwfbUvjcV3zOmbfPps3jA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DESTN01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEMIN01D.TXT",
+          "fileSize": 213,
+          "mimeType": "text/plain",
+          "hash": "7hszSGwMA7xijezX655I+A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEMIN01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DESTN01D.TXT",
+          "fileSize": 213,
+          "mimeType": "text/plain",
+          "hash": "91wt0NwHbi40tTRkIt5VQQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DESTN01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFIS04D.TXT",
+          "fileSize": 217,
+          "mimeType": "text/plain",
+          "hash": "13u/kfZdTSpS9P5mNoqLsw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEFIS04D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFIS06D.TXT",
+          "fileSize": 253,
+          "mimeType": "text/plain",
+          "hash": "BzEsfVsGAPjaDn5acj/isQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEFIS06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEADM01D.TXT",
+          "fileSize": 257,
+          "mimeType": "text/plain",
+          "hash": "v6iX8ElNLIxrimOEfNsLoA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEADM01D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEADM01E.TXT",
+          "fileSize": 262,
+          "mimeType": "text/plain",
+          "hash": "2zTyi88NcoHPk5pTlVCPww==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEADM01E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEFIS06E.TXT",
+          "fileSize": 294,
+          "mimeType": "text/plain",
+          "hash": "EUsBUYwwWtq0CUseJAbvgw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEFIS06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DENSG11E.TXT",
+          "fileSize": 345,
+          "mimeType": "text/plain",
+          "hash": "8IN2ahwNPk52JR652n/kjQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DENSG11E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DENSG11D.TXT",
+          "fileSize": 394,
+          "mimeType": "text/plain",
+          "hash": "AH/QZ31aCfUxxFjGNyPxfQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DENSG11D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEWRN06D.TXT",
+          "fileSize": 712,
+          "mimeType": "text/plain",
+          "hash": "o36gNUX8xbAbYXtEVX/iZg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEWRN06D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEWRN06E.TXT",
+          "fileSize": 753,
+          "mimeType": "text/plain",
+          "hash": "nqqk8R4u7TX5a2T35688LQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEWRN06E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEL16080.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "uLfBu4uw+eurnVmrCJuVmw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DEL16080.000"
+            }
+          }
+        },
+        {
+          "filename": "DE416080.000",
+          "fileSize": 760392,
+          "mimeType": "application/s63",
+          "hash": "oooCFbxyg4ULn8SC4yhEPg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "122DD455"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/0840d5fe-e382-40e4-ab92-6c588223c34b/files/DE416080.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "9840d5fe-e382-40e4-ab92-6c588223c34b",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE416080"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "8"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "a69b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "6"
         }
       ],
       "businessUnit": "ADDS",
@@ -12702,6 +13094,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "f65b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "4"
         }
@@ -13640,6 +14036,10 @@
         {
           "key": "ProductCode",
           "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "f23b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
         },
         {
           "key": "UpdateNumber",
@@ -15064,6 +15464,10 @@
         {
           "key": "ProductCode",
           "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "z59b9fbb-335e-4f6f-8b23-ad27f3a9f8fd"
         },
         {
           "key": "UpdateNumber",
@@ -17106,6 +17510,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "f71b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "4"
         }
@@ -18084,6 +18492,10 @@
         {
           "key": "ProductCode",
           "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "l59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
         },
         {
           "key": "UpdateNumber",
@@ -21174,6 +21586,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "m59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "3"
         }
@@ -22770,6 +23186,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "x59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "6"
         }
@@ -24346,6 +24766,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "z39b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "2"
         }
@@ -24780,6 +25204,70 @@
           "links": {
             "get": {
               "href": "/batch/98fbc17f-23db-4aed-9639-e7caa5ff0df3/files/DE4NO18Q.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "68fbc17f-23db-4aed-9639-e7caa5ff0df3",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE4NO18Q"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "57dd09b9-122f-40c3-9b39-c2051285b862"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "2"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:36:28.317Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DELNO18Q.001",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "BD0mT6mRwTP7y39zjdYNpg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/68fbc17f-23db-4aed-9639-e7caa5ff0df3/files/DELNO18Q.001"
+            }
+          }
+        },
+        {
+          "filename": "DE4NO18Q.001",
+          "fileSize": 1416,
+          "mimeType": "application/s63",
+          "hash": "nm+S5lh1rKr0MA+sTEaGFA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "6F2AFB26"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/68fbc17f-23db-4aed-9639-e7caa5ff0df3/files/DE4NO18Q.001"
             }
           }
         }
@@ -25268,6 +25756,70 @@
           "links": {
             "get": {
               "href": "/batch/d89c7024-fce0-410f-859f-eabbef20a16b/files/US2WC06M.007"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "c89c7024-fce0-410f-859f-eabbef20a16b",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "US"
+        },
+        {
+          "key": "CellName",
+          "value": "US2ARCGD"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "10"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7fee029b-e43f-4d2e-a0ca-4ac06f79b73d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "7"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T09:23:33.353Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US2ARCGD.007",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "sk7KNnmMrPTtnNfrcYGXCA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/c89c7024-fce0-410f-859f-eabbef20a16b/files/US2ARCGD.007"
+            }
+          }
+        },
+        {
+          "filename": "US2ARCGD.007",
+          "fileSize": 1384,
+          "mimeType": "application/s63",
+          "hash": "XlNwHLIg23UEbD9U0S82Kg==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "CB6BE874"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/c89c7024-fce0-410f-859f-eabbef20a16b/files/US2ARCGD.007"
             }
           }
         }
@@ -27224,6 +27776,198 @@
           "links": {
             "get": {
               "href": "/batch/856b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "956b648a-48c7-4de5-be4f-bc8a53ce66d2",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE360010"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "7"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7904db4f-f9f7-472c-b313-85fcced1e11d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "7"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:30:00.27Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEK60010.007",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "xuv2dK+a9q7mx6DcSC5DnA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/956b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DEK60010.007"
+            }
+          }
+        },
+        {
+          "filename": "DE360010.007",
+          "fileSize": 53968,
+          "mimeType": "application/s63",
+          "hash": "uaErgJclsEoAVSepRfWyNA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "3FA55F3C"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/956b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.007"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "756b648a-48c7-4de5-be4f-bc8a53ce66d2",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE360010"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "7"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7904db4f-f9f7-472c-b313-85fcced1e11d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "8"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:30:00.27Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEK60010.008",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "xuv2dK+a9q7mx6DcSC5DnA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/756b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DEK60010.008"
+            }
+          }
+        },
+        {
+          "filename": "DE360010.008",
+          "fileSize": 53968,
+          "mimeType": "application/s63",
+          "hash": "uaErgJclsEoAVSepRfWyNA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "3FA55F3C"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/756b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.008"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "556b648a-48c7-4de5-be4f-bc8a53ce66d2",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE360010"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "7"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7904db4f-f9f7-472c-b313-85fcced1e11d"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "9"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-09-09T07:30:00.27Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "DEK60010.009",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "xuv2dK+a9q7mx6DcSC5DnA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/556b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DEK60010.009"
+            }
+          }
+        },
+        {
+          "filename": "DE360010.009",
+          "fileSize": 53968,
+          "mimeType": "application/s63",
+          "hash": "uaErgJclsEoAVSepRfWyNA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "3FA55F3C"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/556b648a-48c7-4de5-be4f-bc8a53ce66d2/files/DE360010.009"
             }
           }
         }
@@ -29302,6 +30046,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "h59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "0"
         }
@@ -29362,6 +30110,10 @@
           "value": "AVCS"
         },
         {
+          "key": "TraceId",
+          "value": "d09b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
           "key": "UpdateNumber",
           "value": "1"
         }
@@ -29384,6 +30136,1162 @@
           "links": {
             "get": {
               "href": "/batch/db4be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "8c574222-682c-4b40-89bc-e3b2b11a3656",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "31"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "a29b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "6"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:24:38.737Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB800001.001",
+          "fileSize": 8208,
+          "mimeType": "application/s63",
+          "hash": "x3BKBRQUy2NBCnWxI8ywUw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "56346F59"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/db4be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "db4be5f8-7791-4b4f-aebf-01b55c3d6975",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "31"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "s59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "2"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:24:38.737Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB800001.001",
+          "fileSize": 8208,
+          "mimeType": "application/s63",
+          "hash": "x3BKBRQUy2NBCnWxI8ywUw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "56346F59"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/db4be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "5b4be5f8-7791-4b4f-aebf-01b55c3d6975",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "s59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:24:38.737Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB800001.001",
+          "fileSize": 8208,
+          "mimeType": "application/s63",
+          "hash": "x3BKBRQUy2NBCnWxI8ywUw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "56346F59"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/5b4be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "6b4be5f8-7791-4b4f-aebf-01b55c3d6975",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB800001"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "s59b8fbb-335e-4f6f-8b23-ad27f3a9f8fd"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2021-04-23T12:24:38.737Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB800001.001",
+          "fileSize": 8208,
+          "mimeType": "application/s63",
+          "hash": "x3BKBRQUy2NBCnWxI8ywUw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "56346F59"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/64be5f8-7791-4b4f-aebf-01b55c3d6975/files/GB800001.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "08196fc7-10b3-4e96-8be6-07c1c41d124d",
+      "status": "Committed",
+      "allFilesZipSize": 4007,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB602571"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "3"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:40.977Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.003",
+          "fileSize": 13821,
+          "mimeType": "application/s57",
+          "hash": "zTnS1uAaXs7l5iQtmElHSQ==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "29BEA443"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/08196fc7-10b3-4e96-8be6-07c1c41d124d/files/GB602571.003"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "e78c617a-6807-477d-b47b-18c1d137fdcd",
+      "status": "Committed",
+      "allFilesZipSize": 1872,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB602571"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "2"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:39.09Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.002",
+          "fileSize": 4637,
+          "mimeType": "application/s57",
+          "hash": "7TLiU1kK5DIYzL7gD3DLNQ==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "DE6E5FF6"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/e78c617a-6807-477d-b47b-18c1d137fdcd/files/GB602571.002"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2e8525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB602571"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB602571.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/2e8525dd-36a7-4588-a767-d3e071ab31e2/files/GB602571.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "218525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA473456"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "CA473456.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/218525dd-36a7-4588-a767-d3e071ab31e2/files/CA473456.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "118525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA473483"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "CA473483.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/118525dd-36a7-4588-a767-d3e071ab31e2/files/CA473483.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "518525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA476069"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "CA476069.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/518525dd-36a7-4588-a767-d3e071ab31e2/files/CA476069.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "618525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA476189"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "CA476189.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/618525dd-36a7-4588-a767-d3e071ab31e2/files/CA476189.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "718525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6MI71M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US6MI71M.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/718525dd-36a7-4588-a767-d3e071ab31e2/files/US6MI71M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "818525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6MI07M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US6MI07M.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/818525dd-36a7-4588-a767-d3e071ab31e2/files/US6MI07M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e2",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6NY33M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "5"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US6NY33M.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e2/files/US6NY33M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e3",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6NY27M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US6NY27M.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e3/files/US6NY27M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e4",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6OH05M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US6OH05M.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e4/files/US6OH05M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e5",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6OH08M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "4"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US6OH08M.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e5/files/US6OH08M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e6",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "US6WI01M"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "US6WI01M.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e6/files/US6WI01M.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "918525dd-36a7-4588-a767-d3e071ab31e7",
+      "status": "Committed",
+      "allFilesZipSize": 2063,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "CA"
+        },
+        {
+          "key": "CellName",
+          "value": "CA270388"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:36.687Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "CA270388.001",
+          "fileSize": 5175,
+          "mimeType": "application/s57",
+          "hash": "+7u7DoPSi21gWMKIn3Catw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "89109772"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/918525dd-36a7-4588-a767-d3e071ab31e/files/CA270388.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "0726242e-49d7-4cb0-9d3b-75aa221b837a",
+      "status": "Committed",
+      "allFilesZipSize": 12338,
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB602571"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "3"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "Source",
+          "value": "Penrose-BackFill"
+        },
+        {
+          "key": "TraceId",
+          "value": "485e8c33-9021-4e11-1258-08dc21d36ab5"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS-S57",
+      "batchPublishedDate": "2024-03-08T18:09:34.827Z",
+      "expiryDate": null,
+      "files": [
+        {
+          "filename": "GB1B0096.TXT",
+          "fileSize": 96,
+          "mimeType": "text/plain",
+          "hash": "N5pHk3YhXx+OS4rQl1D2Fg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0726242e-49d7-4cb0-9d3b-75aa221b837a/files/GB1B0096.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB1B0097.TXT",
+          "fileSize": 105,
+          "mimeType": "text/plain",
+          "hash": "n4XnEhZXBhXiI0MhFBbGDA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0726242e-49d7-4cb0-9d3b-75aa221b837a/files/GB1B0097.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB1B0095.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "aTXCTjRjF9ulahtF8gFKAQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/0726242e-49d7-4cb0-9d3b-75aa221b837a/files/GB1B0095.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB602571.000",
+          "fileSize": 43062,
+          "mimeType": "application/s57",
+          "hash": "Q17ll9yZA6anM5sdGD48UQ==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "4E644B91"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/0726242e-49d7-4cb0-9d3b-75aa221b837a/files/GB602571.000"
             }
           }
         }

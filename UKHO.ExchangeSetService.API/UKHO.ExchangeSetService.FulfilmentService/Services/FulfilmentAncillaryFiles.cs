@@ -214,7 +214,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
+        //encryption = true only for S63 AIO and Large Media Exchange Set
+        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, bool encryption = true) 
         {
             if (salesCatalogueDataResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -231,7 +232,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     {
                         ProductName = product.ProductName + fileShareServiceConfig.Value.BaseCellExtension,
                         Compression = product.Compression,
-                        Encryption = product.Encryption,
+                        Encryption = encryption,
                         BaseCellIssueDate = product.BaseCellIssueDate,
                         BaseCellEdition = product.BaseCellEditionNumber,
                         IssueDateLatestUpdate = product.IssueDateLatestUpdate,

@@ -3,7 +3,7 @@ import { group, check } from 'k6';
 import { Trend } from 'k6/metrics';
 
 const logFile = require('../logging/captureLogs.js');
-
+const config = JSON.parse(open('../config.json'));
 let SmallExchangeSetTrend = new Trend('SmallEssApiResponseTime');
 let LargeExchangeSetTrend = new Trend('LargeEssApiResponseTime');
 let MediumExchangeSetTrend = new Trend('MediumEssApiResponseTime');

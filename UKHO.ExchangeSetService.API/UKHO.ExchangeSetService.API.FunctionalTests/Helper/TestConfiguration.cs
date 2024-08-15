@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -13,20 +14,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string EssStorageAccountConnectionString;
         public string ExchangeSetProductFile;
         public string ExchangeSetProductFilePath;
-        public string ScsBaseAddress;
         public string ExchangeSetProductType;
         public string ExchangeSetCatalogueType;
         public string ExchangeSetEncRootFolder;
         public string ExchangeSetCatalogueFile;
-        public string DirectoryPath;
-        public int FileDownloadWaitTime { get; set; }
-        public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new EssAuthorizationTokenConfiguration();
-        public FileShareService FssConfig = new FileShareService();
-        public AzureAdB2CConfiguration AzureAdB2CConfig = new AzureAdB2CConfiguration();
-        public SalesCatalogue ScsAuthConfig = new SalesCatalogue();
-        public CacheConfiguration ClearCacheConfig = new CacheConfiguration();
-        public PeriodicOutputServiceConfiguration POSConfig = new PeriodicOutputServiceConfiguration();
-        public AioConfiguration AIOConfig = new AioConfiguration();
+       
+        public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new();
+        public FileShareService FssConfig = new();
+        public AzureAdB2CConfiguration AzureAdB2CConfig = new();
+        public SalesCatalogue ScsAuthConfig = new();
+        public CacheConfiguration ClearCacheConfig = new();
+        public PeriodicOutputServiceConfiguration POSConfig = new();
+        public AioConfiguration AIOConfig = new();
+        public BessConfiguration BESSConfig = new();
 
         public class EssAuthorizationTokenConfiguration
         {
@@ -62,7 +62,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         }
         public class AzureAdB2CConfiguration
         {
-
             public string ClientId { get; set; }
             public string Scope { get; set; }
             public string TenantId { get; set; }
@@ -80,7 +79,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public string LargeExchangeSetMediaFileName { get; set; }
             public string LargeExchangeSetAdcFolderName { get; set; }
             public string LargeExchangeSetInfoFolderName { get; set; }
-            public string DirectoryPath { get; set; }
             public string ErrorFileName { get; set; }
             public string InfoFolderAvcsUserGuide { get; set; }
             public string InfoFolderEnctandPnmstatus { get; set; }
@@ -101,6 +99,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             public int EncUpdateNumber { get; set; }
             public string InvalidEncCellName { get; set; }
             public string InvalidAioCellName { get; set; }
+            public string NotModifiedCellName { get; set; }
+            public int NotModifiedCellEditionNumber { get; set; }
+            public int NotModifiedCellUpdateNumber { get; set; }
+        }
+
+        public class BessConfiguration
+        {
+            public List<string> S63ExchangeSetTestData { get; set; }
+            public List<string> S57ExchangeSetTestData { get; set; }
+            public List<string> InvalidExchangeSetTestData { get; set; }
+            public string TempFolderName { get; set; }
+            public string S57BusinessUnit { get; set; }
+            public string S63BusinessUnit { get; set; }
         }
 
         public TestConfiguration()
@@ -128,6 +139,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ConfigurationRoot.Bind("CacheConfiguration", ClearCacheConfig);
             ConfigurationRoot.Bind("PeriodicOutputServiceConfiguration", POSConfig);
             ConfigurationRoot.Bind("AioConfiguration", AIOConfig);
+            ConfigurationRoot.Bind("BessConfiguration", BESSConfig);
         }
     }
 }

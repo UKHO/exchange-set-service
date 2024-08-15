@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -26,6 +27,7 @@ namespace UKHO.ExchangeSetService.API.Services
     {
         private const string RFC1123Format = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
         private readonly IProductIdentifierValidator productIdentifierValidator;
+        private readonly IScsProductIdentifierValidator scsProductIdentifierValidator;
         private readonly IProductDataProductVersionsValidator productVersionsValidator;
         private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
         private readonly ISalesCatalogueService salesCatalogueService;
@@ -40,18 +42,22 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly AioConfiguration aioConfiguration;
         private bool isEmptyEncExchangeSet = false;
         private bool isEmptyAioExchangeSet = false;
+        private readonly IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator;
 
         public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
             IProductDataProductVersionsValidator productVersionsValidator,
+            IScsProductIdentifierValidator scsProductIdentifierValidator,
             IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
             ISalesCatalogueService salesCatalougeService,
             IMapper mapper,
             IFileShareService fileShareService,
             ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
             IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
-            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration)
+            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration,
+            IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator)
         {
             this.productIdentifierValidator = productIdentifierValidator;
+            this.scsProductIdentifierValidator = scsProductIdentifierValidator;
             this.productVersionsValidator = productVersionsValidator;
             this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
             this.salesCatalogueService = salesCatalougeService;
@@ -64,6 +70,7 @@ namespace UKHO.ExchangeSetService.API.Services
             this.userIdentifier = userIdentifier;
             this.azureAdB2CHelper = azureAdB2CHelper;
             this.aioConfiguration = aioConfiguration.Value;
+            this.scsDataSinceDateTimeValidator = scsDataSinceDateTimeValidator;
         }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
@@ -71,12 +78,19 @@ namespace UKHO.ExchangeSetService.API.Services
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
 
             IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest).ToList();
-            
+
             var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+
+                //check if exchangeSetStandard is S57                
+                var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productIdentifierRequest.ExchangeSetStandard);
+                if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkS57File;
+                }
                 bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, productIdentifierRequest.CorrelationId);
                 if (isAzureB2C)
                 {
@@ -99,7 +113,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             //Set Aio details on exchange set response
             SetExchangeSetAioDetails(response.ExchangeSetResponse, productIdentifierRequest.ProductIdentifier.ToList(), salesCatalogueResponse.ResponseBody.Products, aioCells, response.BatchId, productIdentifierRequest.CorrelationId);
-            
+
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
@@ -113,9 +127,15 @@ namespace UKHO.ExchangeSetService.API.Services
                 {
                     CheckEmptyExchangeSet(exchangeSetServiceResponse);
                 }
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.ExchangeSetStandard, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
             }
             return response;
+        }
+
+        public async Task<SalesCatalogueResponse> CreateProductDataByProductIdentifiers(ScsProductIdentifierRequest scsProductIdentifierRequest)
+        {
+            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);
+            return salesCatalogueResponse;
         }
 
         private ExchangeSetServiceResponse CheckIfExchangeSetTooLarge(long fileSize)
@@ -141,11 +161,37 @@ namespace UKHO.ExchangeSetService.API.Services
             }
         }
 
+        private ExchangeSetServiceResponse CheckIfS57ExchangeSetTooLarge(long fileSize, string exchangeSetStandard)
+        {
+            var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
+            if (exchangeSetStandard == ExchangeSetStandard.s57.ToString() && fileSizeInMB >= essFulfilmentStorageconfig.Value.S57ExchangeSetSizeInMB)
+            {
+                var exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    IsExchangeSetTooLarge = true
+                };
+                return exchangeSetResponse;
+            }
+            else
+            {
+                var exchangeSetResponse = new ExchangeSetServiceResponse
+                {
+                    HttpStatusCode = HttpStatusCode.OK,
+                    IsExchangeSetTooLarge = false
+                };
+                return exchangeSetResponse;
+            }
+        }
+
         public Task<ValidationResult> ValidateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest)
         {
             return productIdentifierValidator.Validate(productIdentifierRequest);
         }
-
+        public Task<ValidationResult> ValidateScsProductDataByProductIdentifiers(ScsProductIdentifierRequest scsProductIdentifierRequest)
+        {
+            return scsProductIdentifierValidator.Validate(scsProductIdentifierRequest);
+        }
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductVersions(ProductDataProductVersionsRequest request, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
@@ -157,6 +203,12 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                //check if exchangeSetStandard is S57                
+                var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, request.ExchangeSetStandard);
+                if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkS57File;
+                }
                 bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, request.CorrelationId);
                 if (isAzureB2C)
                 {
@@ -215,7 +267,7 @@ namespace UKHO.ExchangeSetService.API.Services
                     CheckEmptyExchangeSet(exchangeSetServiceResponse);
                 }
 
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.ExchangeSetStandard, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
             }
 
             return response;
@@ -234,6 +286,12 @@ namespace UKHO.ExchangeSetService.API.Services
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
                 fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                //check if exchangeSetStandard is S57                
+                var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productDataSinceDateTimeRequest.ExchangeSetStandard);
+                if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    return checkS57File;
+                }
                 bool isAzureB2C = azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, productDataSinceDateTimeRequest.CorrelationId);
                 if (isAzureB2C)
                 {
@@ -248,7 +306,7 @@ namespace UKHO.ExchangeSetService.API.Services
             monitorHelper.MonitorRequest("Sales Catalogue Service Since DateTime Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, productDataSinceDateTimeRequest.CorrelationId, null, null, fileSize, null);
 
             IEnumerable<string> aioCells = FilterAioCellsByProductData(salesCatalogueResponse.ResponseBody).ToList();
-            
+
             var response = SetExchangeSetResponse(salesCatalogueResponse, false);
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -257,7 +315,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             //Set Aio details on exchange set response
             SetExchangeSetAioDetailsSinceDateTime(response.ExchangeSetResponse, aioCells, response.BatchId, productDataSinceDateTimeRequest.CorrelationId);
-            
+
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productDataSinceDateTimeRequest.CorrelationId);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
@@ -267,7 +325,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.ExchangeSetStandard, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
             }
 
             return response;
@@ -276,6 +334,16 @@ namespace UKHO.ExchangeSetService.API.Services
         public Task<ValidationResult> ValidateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
             return productDataSinceDateTimeValidator.Validate(productDataSinceDateTimeRequest);
+        }
+        public async Task<SalesCatalogueResponse> GetProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        {
+            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
+            return salesCatalogueResponse;
+        }
+
+        public Task<ValidationResult> ValidateScsDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
+        {
+            return scsDataSinceDateTimeValidator.Validate(productDataSinceDateTimeRequest);
         }
 
         private ExchangeSetServiceResponse SetExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse, bool isNotModifiedToOk)
@@ -344,7 +412,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
                         ExchangeSetFileUri = hasExchangeSetFileUri ? new LinkSetFileUri { Href = createBatchResponse.ResponseBody.ExchangeSetFileUri } : null,
                         AioExchangeSetFileUri = hasAioExchangeSetFileUri ?
-                             new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null                            
+                             new LinkSetFileUri { Href = createBatchResponse.ResponseBody.AioExchangeSetFileUri } : null
                     };
 
                     exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime = Convert.ToDateTime(createBatchResponse.ResponseBody.BatchExpiryDateTime).ToUniversalTime();
@@ -368,18 +436,17 @@ namespace UKHO.ExchangeSetService.API.Services
             return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null;
         }
 
-        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
+        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSResponseStoreRequestStart,
                 EventIds.SCSResponseStoreRequestCompleted,
                 "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse);
+                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse);
 
                     return result;
                 }, batchId, correlationId);
-
         }
 
         private IEnumerable<string> FilterAioCellsByProductIdentifiers(ProductIdentifierRequest products)
@@ -418,7 +485,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             return aioCells;
         }
-      
+
         private IEnumerable<string> GetAioCells()
         {
             return !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',').Select(s => s.Trim())) : new List<string>();

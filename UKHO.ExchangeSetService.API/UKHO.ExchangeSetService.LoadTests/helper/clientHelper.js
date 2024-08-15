@@ -13,7 +13,13 @@ let LargeExchangeSetTrend = new Trend('LargeEssApiResponsetime');
 
 export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
     let essResponse;
-    var essUrl = `${config.Base_URL}/productData/${endPoint}`;
+    let essUrl;
+    if (endPoint == "productInformation/productIdentifiers") {
+        essUrl = `${config.Base_URL}/${endPoint}`;
+    }
+    else {
+        essUrl = `${config.Base_URL}/productData/${endPoint}`;
+    }     
 
     group('ESS Api Response', () => {
         essResponse = http.post(essUrl, JSON.stringify(data), { headers: { Authorization: `Bearer ${essToken}`, "Content-Type": "application/json" } });
@@ -37,8 +43,8 @@ export function GetESSApiResponse(endPoint, data, essToken, exchangeSetType) {
 };
 
 export function GetFSSApiResponse(url, fssToken) {
-    var urlPortion = url.split("/fss-qa"); 
-    let fssResponse = http.get(`${config.FSS_URL}${urlPortion[1]}`, { headers: { Authorization: `Bearer ${fssToken}`, "Content-Type": "application/json" } });
+    var urlPortion = url.split("/fss-vne"); 
+    let fssResponse = http.get(`${config.FSS_URL}/${urlPortion[1]}`, { headers: { Authorization: `Bearer ${fssToken}`, "Content-Type": "application/json" } });
     
     var batchStatusResponse = JSON.parse(fssResponse.body)
     let fssCommitStatus = JSON.parse(JSON.stringify(batchStatusResponse['status']));
@@ -46,7 +52,7 @@ export function GetFSSApiResponse(url, fssToken) {
 };
 
 export function GetFSSApiDetailsResponse(url, fssToken) {
-    var urlPortion = url.split("/fss-qa"); 
+    var urlPortion = url.split("/fss-vne"); 
     let fssResponse = http.get(`${config.FSS_URL}${urlPortion[1]}`, { headers: { Authorization: `Bearer ${fssToken}`, "Content-Type": "application/json" } });
     let jsonResponse = JSON.parse(fssResponse.body);
     return jsonResponse;

@@ -229,12 +229,42 @@ resource "azurerm_api_management_product_api" "ess_ui_product_api_mapping" {
   product_id          = azurerm_api_management_product.ess_ui_product.product_id
 }
 
+resource "azurerm_api_management_api" "ess_ui_api" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  name                = lower(replace(var.apim_ui_api_name, " ", "-"))
+  display_name        = var.apim_ui_api_name
+  description         = var.apim_ui_api_description
+  revision            = "1"
+  path                = var.apim_ui_api_path
+  protocols           = ["https"]
+  service_url         = var.apim_api_backend_url
+
+  subscription_key_parameter_names {
+    header = "Ocp-Apim-Subscription-Key"
+    query  = "subscription-key"
+  }
+
+  import {
+    content_format = "openapi"
+    content_value  = var.apim_ui_openapi
+  }
+}
+
+# Add ESS UI API to ESS Product
+resource "azurerm_api_management_product_api" "ess_product_ui_api_mapping" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  api_name            = azurerm_api_management_api.ess_ui_api.name
+  product_id          = azurerm_api_management_product.ess_ui_product.product_id
+}
+
 # ESS UI Product poliy
 resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
   resource_group_name = data.azurerm_resource_group.rg.name
   api_management_name = data.azurerm_api_management.apim_instance.name
   product_id          = azurerm_api_management_product.ess_ui_product.product_id
-  depends_on          = [azurerm_api_management_product.ess_ui_product, azurerm_api_management_product_api.ess_ui_product_api_mapping]
+  depends_on          = [azurerm_api_management_product.ess_ui_product, azurerm_api_management_product_api.ess_ui_product_api_mapping, azurerm_api_management_product_api.ess_product_ui_api_mapping]
 
   xml_content = <<XML
 	<policies>
