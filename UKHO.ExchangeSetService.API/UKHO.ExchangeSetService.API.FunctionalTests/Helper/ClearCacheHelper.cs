@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var retrieveOperation = TableOperation.Retrieve<TElement>(partitionKey, rowKey);
             return await ExecuteTableOperation(retrieveOperation, tableName, storageAccountConnectionString) as ITableEntity;
         }
-
+        
         private async Task<CloudTable> GetAzureTable(string tableName, string storageAccountConnectionString)
         {
             var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
@@ -86,6 +86,54 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                  MimeType = "application/s63", Hash = "mp25B4rDzWfCyPjqI2f+5Q==",
                                                  Attributes = new List<Attribute>{new(){Key = "s57-CRC", Value = "CC362FA5" } },
                                                  Links = link2 }},
+
+                BatchId = Guid.NewGuid().ToString(),
+                BatchPublishedDate = DateTime.UtcNow
+            };
+        }
+
+        public EnterpriseEventCacheDataRequest GetCacheRequestDataForReadMeFile(string businessUnit)
+        {
+            BatchDetails linkBatchDetails = new()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272"
+            };
+            BatchStatus linkBatchStatus = new()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/status"
+            };
+            GetUrl linkGet = new()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip"
+            };
+            GetUrl fileLink = new()
+            {
+                Href = @"/batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT"
+            };
+
+            RefLink link = new()
+            {
+                Get = fileLink,
+            };
+
+            LinksNew links = new()
+            {
+                BatchDetails = linkBatchDetails,
+                BatchStatus = linkBatchStatus,
+                GetUrl = linkGet
+            };
+
+            return new EnterpriseEventCacheDataRequest
+            {
+                Links = links,
+                BusinessUnit = businessUnit,
+                Attributes = new List<Attribute> { new() { Key = "Product Type", Value = "AVCS" } },
+
+                Files = new List<CacheFile>{new(){Filename = "README.TXT", FileSize = 44788,
+                        MimeType = "text/plain", Hash = "SuWvMzKMj+fkeEFzWf7nlw==",
+                        Attributes = new List<Attribute>{},
+                        Links = link },
+                },
 
                 BatchId = Guid.NewGuid().ToString(),
                 BatchPublishedDate = DateTime.UtcNow

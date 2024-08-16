@@ -5,7 +5,12 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Net.Http;
 using System.Collections.Generic;
+
+using Azure.Storage.Blobs;
 using Newtonsoft.Json.Linq;
+using System;
+
+
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -24,6 +29,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         private HttpResponseMessage ApiEssResponse { get; set; }
         private readonly List<string> cleanUpBatchIdList = new();
         private ClearCacheHelper ClearCacheHelper { get; set; }
+        private BlobServiceClient BlobServiceClient { get; set; }
+     
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -42,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallExchangeSetApiWithProductIdentifiersForExchangeSetStandards63_AndCalledClearCache_ThenItClearsTheCache()
+        public async Task WhenICallExchangeSetApiWithProductIdentifiersForExchangeSetStandards63_AndCalledClearCache_ThenCacheIsAvailable()
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
             //Get the BatchId
@@ -89,13 +96,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check caching info
             tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
-            // Verify the No Cache available
+            // Verify the Cache available
             Assert.IsNotNull(tableCacheCheck);
         }
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallExchangeSetApiWithProductIdentifiersForExchangeSetStandards57_AndCalledClearCache_ThenItClearsTheCache()
+        public async Task WhenICallExchangeSetApiWithProductIdentifiersForExchangeSetStandards57_AndCalledClearCache_ThenCacheIsAvailable()
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersS57(), null, EssJwtToken, "s57");
             //Get the BatchId
@@ -144,9 +151,30 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             // Verify the Cache available
             Assert.IsNotNull(tableCacheCheck);
+        }
 
+        [Test]
+        [Category("QCOnlyTest-AIODisabled")]
+        public async Task WhenICallNewFilePublishedEventForReadMeTxtFileWithDetailsPresentInEventPayload_ThenExistingReadMeFileDeletedFromContainer()
+        {
+            var readmeContainer = "readme";
 
+            //ProductIdentifiers hit
+            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
+            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,5000);
+            Assert.IsTrue(containerExists);
 
+            // newfile publish hit
+            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
+            essCacheJson["Source"] = "AcceptanceTest";
+            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestDataForReadMeFile(Config.BESSConfig.S63BusinessUnit));
+            var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
+            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
+
+            // Verify the no Cache available for readme
+            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,5000);
+            Assert.IsFalse(containerExists);
         }
 
         [OneTimeTearDown]

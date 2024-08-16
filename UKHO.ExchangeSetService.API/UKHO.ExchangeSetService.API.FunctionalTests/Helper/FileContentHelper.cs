@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs;
+using Azure;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
@@ -485,6 +488,26 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
             Assert.AreEqual(dateAndCdType, $"{currentDate}UPDATE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
             Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+        }
+
+        public static async Task<bool> WaitForContainerAsync(BlobServiceClient blobServiceClient, string containerName, int maxAttempts, int delayMilliseconds)
+        {
+            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+            for (var attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                try
+                {
+                    await containerClient.GetPropertiesAsync();
+                    return true;
+                }
+                catch (RequestFailedException ex) when (ex.ErrorCode == BlobErrorCode.ContainerNotFound)
+                {
+                    await Task.Delay(delayMilliseconds);
+                }
+            }
+
+            return false;
         }
     }
 }
