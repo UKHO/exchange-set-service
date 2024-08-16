@@ -45,6 +45,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ScsApiClient = new SalesCatalogueApiClient(Config.ScsAuthConfig.BaseUrl);
             ScsJwtToken = await authTokenProvider.GetScsToken();
             ClearCacheHelper = new ClearCacheHelper();
+            BlobServiceClient = new BlobServiceClient(Config.ClearCacheConfig.CacheStorageConnectionString);
         }
 
         [Test]
