@@ -174,9 +174,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsFalse(containerExists);
 
             //Azure blob Container takes 30 seconds to recreate container with same id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
-            await Task.Delay(30000);
+            await Task.Delay(40000);
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
-
+            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 5000);
+            Assert.IsTrue(containerExists);
         }
 
         [OneTimeTearDown]
