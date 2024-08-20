@@ -155,7 +155,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Ignore("New FT")]
         [Category("QCOnlyTest-AIODisabled")]
         public async Task WhenICallNewFilePublishedEventForReadMeTxtFileWithDetailsPresentInEventPayload_ThenExistingReadMeFileDeletedFromContainer()
         {
@@ -177,6 +176,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             // Verify the no Cache available for readme
             containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,5000);
             Assert.IsFalse(containerExists);
+
+            //Azure blob Container takes 30 seconds to recreate container with same id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
+            await Task.Delay(30000);
+            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
+
         }
 
         [OneTimeTearDown]
