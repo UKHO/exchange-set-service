@@ -5,12 +5,8 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using System.Net.Http;
 using System.Collections.Generic;
-
 using Azure.Storage.Blobs;
 using Newtonsoft.Json.Linq;
-using System;
-
-
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
