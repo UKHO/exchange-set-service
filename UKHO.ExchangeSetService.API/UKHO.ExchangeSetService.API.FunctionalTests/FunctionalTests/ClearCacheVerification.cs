@@ -158,7 +158,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //ProductIdentifiers hit
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
-            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,5000);
+            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,7000);
             Assert.IsTrue(containerExists);
 
             // newfile publish hit
@@ -170,13 +170,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             // Verify the no Cache available for readme
-            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,5000);
+            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,7000);
             Assert.IsFalse(containerExists);
 
             //Azure blob Container takes 30 seconds to recreate container with same id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
             await Task.Delay(40000);
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
-            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 5000);
+            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 7000);
             Assert.IsTrue(containerExists);
         }
 
