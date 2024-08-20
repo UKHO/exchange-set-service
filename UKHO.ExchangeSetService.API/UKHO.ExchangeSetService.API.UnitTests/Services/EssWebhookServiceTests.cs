@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.InsertCacheDataAsync(GetInvalidCacheRequestData(), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetInvalidCacheRequestData(), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -107,7 +107,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.InsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S63CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S63CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -135,7 +135,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cachingResponse);
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.InsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -162,7 +162,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S63CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.InsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S63CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S63CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -199,7 +199,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S57CacheBusinessUnit));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.InsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureTableStorageClient.DeleteAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -236,7 +236,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S57CacheBusinessUnit));
 
-            await service.InsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeFileShareServiceCache.CopyFileToBlob(A<MemoryStream>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -262,7 +262,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(Task.FromResult(responseMessage));
 
-            await service.InsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeFileShareServiceCache.CopyFileToBlob(A<MemoryStream>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -300,7 +300,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S57CacheBusinessUnit));
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(Task.FromResult(responseMessage));
 
-            await service.InsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileShareServiceCache.CopyFileToBlob(A<MemoryStream>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -337,7 +337,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetCacheResponse(fakeCacheConfiguration.Value.S57CacheBusinessUnit));
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(Task.FromResult(responseMessage));
 
-            await service.InsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileShareServiceCache.CopyFileToBlob(A<MemoryStream>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -377,7 +377,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             HttpResponseMessage responseMessage = GetResponse();
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(Task.FromResult(responseMessage));
 
-            await service.InsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetCacheRequestDataWithFiles(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeFileShareServiceCache.InsertOrMergeFssCacheDetail(A<FssSearchResponseCache>.Ignored)).MustHaveHappenedOnceExactly();
 
@@ -419,7 +419,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.InsertCacheDataAsync(GetReadmeFileCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetReadmeFileCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
@@ -444,7 +444,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionString());
 
-            await service.InsertCacheDataAsync(GetInvalidReadmeFileCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
+            await service.InvalidateAndInsertCacheDataAsync(GetInvalidReadmeFileCacheRequestData(fakeCacheConfiguration.Value.S57CacheBusinessUnit), FakeCorrelationId);
 
             A.CallTo(() => fakeAzureBlobStorageClient.DeleteCacheContainer(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"

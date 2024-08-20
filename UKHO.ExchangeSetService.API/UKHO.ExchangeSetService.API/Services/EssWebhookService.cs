@@ -69,10 +69,10 @@ namespace UKHO.ExchangeSetService.API.Services
             return enterpriseEventCacheDataRequestValidator.Validate(enterpriseEventCacheDataRequest);
         }
 
-        public async Task InsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
+        public async Task InvalidateAndInsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
-            var ReadMeFileExist = enterpriseEventCacheDataRequest.Files?.Any(x => x.Filename?.ToUpper() == fileShareServiceConfig.Value.ReadMeFileName);
+            var ReadMeFileExist = enterpriseEventCacheDataRequest.Files?.Exists(x => x.Filename?.ToUpper() == fileShareServiceConfig.Value.ReadMeFileName);
             if (ReadMeFileExist == true)
             {
                 var productType = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "Product Type")?.Value;
