@@ -80,10 +80,10 @@ namespace UKHO.ExchangeSetService.API.Services
             }
             else
             {
-                var productCode = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "ProductCode").Value;
-                var cellName = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "CellName").Value;
-                var editionNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "EditionNumber").Value;
-                var updateNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "UpdateNumber").Value;
+                var productCode = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "ProductCode").Select(a => a.Value).FirstOrDefault();
+                var cellName = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
+                var editionNumber = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
+                var updateNumber = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
 
                 if (!ValidateCacheAttributeData(enterpriseEventCacheDataRequest.BusinessUnit, productCode, cellName, editionNumber, updateNumber))
                 {
