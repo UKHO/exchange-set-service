@@ -1,4 +1,7 @@
+using Azure.Storage.Blobs;
 using Microsoft.Azure.Cosmos.Table;
+using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,6 +32,24 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var table = await GetAzureTable(tableName, storageAccountConnectionString);
             var tableResult = await table.ExecuteAsync(tableOperation);
             return tableResult.Result;
+        }
+
+        public async Task<bool> GetProductIdentifier(string essJwtToken, string essBaseAddress, string readmeContainer, string connectionString)
+        {
+            ExchangeSetApiClient ExchangeSetApiClient = new ExchangeSetApiClient(essBaseAddress);
+            BlobServiceClient BlobServiceClient = new BlobServiceClient(connectionString);
+            await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" },null, essJwtToken, "s63");
+            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 7000);
+            Assert.IsTrue(containerExists);
+            return containerExists;
+        }
+
+        public JObject GetDataForPayload(string source, string id)
+        {
+            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
+            essCacheJson["Source"] = source;
+            essCacheJson["Id"] = id;
+            return essCacheJson;
         }
 
         public EnterpriseEventCacheDataRequest GetCacheRequestData(string businessUnit, string agency, string product, int editionNumber)

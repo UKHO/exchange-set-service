@@ -82,9 +82,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsNotNull(tableCacheCheck);
             Assert.IsNotEmpty(tableCacheCheck.Response);
 
-            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
-            essCacheJson["Source"] = "AcceptanceTest";
-            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            var essCacheJson = ClearCacheHelper.GetDataForPayload(Config.ClearCacheConfig.Source, Config.ClearCacheConfig.Id);
             essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestData(Config.BESSConfig.S63BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
@@ -135,9 +133,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.IsNotNull(tableCacheCheck);
             Assert.IsNotEmpty(tableCacheCheck.Response);
 
-            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
-            essCacheJson["Source"] = "AcceptanceTest";
-            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            var essCacheJson = ClearCacheHelper.GetDataForPayload(Config.ClearCacheConfig.Source, Config.ClearCacheConfig.Id );
             essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestData(Config.BESSConfig.S57BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
@@ -157,27 +153,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var readmeContainer = "readme";
 
             //ProductIdentifiers hit
-            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
-            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,7000);
-            Assert.IsTrue(containerExists);
+            await ClearCacheHelper.GetProductIdentifier(EssJwtToken, Config.EssBaseAddress, readmeContainer, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // newfile publish hit
-            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
-            essCacheJson["Source"] = "AcceptanceTest";
-            essCacheJson["Id"] = "25d6c6c1-418b-40f9-bb76-f6dfc0f133bc";
+            var essCacheJson = ClearCacheHelper.GetDataForPayload(Config.ClearCacheConfig.Source, Config.ClearCacheConfig.Id);
             essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestDataForReadMeFile(Config.BESSConfig.S63BusinessUnit));
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             // Verify the no Cache available for readme
-            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,7000);
+            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,7000);
             Assert.IsFalse(containerExists);
 
             //Azure blob Container takes 30 seconds to recreate container with same id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
             await Task.Delay(40000);
-            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
-            containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 7000);
-            Assert.IsTrue(containerExists);
+            await ClearCacheHelper.GetProductIdentifier(EssJwtToken, Config.EssBaseAddress, readmeContainer, Config.ClearCacheConfig.CacheStorageConnectionString);
         }
 
         [OneTimeTearDown]
