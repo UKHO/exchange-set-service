@@ -153,7 +153,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var readmeContainer = "readme";
 
             //ProductIdentifiers hit
-            await ClearCacheHelper.GetProductIdentifier(EssJwtToken, Config.EssBaseAddress, readmeContainer, Config.ClearCacheConfig.CacheStorageConnectionString);
+            await ClearCacheHelper.GetProductIdentifierAsync(EssJwtToken, Config.EssBaseAddress, readmeContainer, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // newfile publish hit
             var essCacheJson = ClearCacheHelper.GetDataForPayload(Config.ClearCacheConfig.Source, Config.ClearCacheConfig.Id);
@@ -162,12 +162,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             // Verify the no Cache available for readme
-            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer,3,7000);
+            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 7000);
             Assert.IsFalse(containerExists);
 
             //Azure blob Container takes 30 seconds to recreate container with same id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
             await Task.Delay(40000);
-            await ClearCacheHelper.GetProductIdentifier(EssJwtToken, Config.EssBaseAddress, readmeContainer, Config.ClearCacheConfig.CacheStorageConnectionString);
+            await ClearCacheHelper.GetProductIdentifierAsync(EssJwtToken, Config.EssBaseAddress, readmeContainer, Config.ClearCacheConfig.CacheStorageConnectionString);
         }
 
         [OneTimeTearDown]

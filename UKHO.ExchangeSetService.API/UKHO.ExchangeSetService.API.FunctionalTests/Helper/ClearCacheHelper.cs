@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             return tableResult.Result;
         }
 
-        public async Task<bool> GetProductIdentifier(string essJwtToken, string essBaseAddress, string readmeContainer, string connectionString)
+        public async Task<bool> GetProductIdentifierAsync(string essJwtToken, string essBaseAddress, string readmeContainer, string connectionString)
         {
             ExchangeSetApiClient ExchangeSetApiClient = new ExchangeSetApiClient(essBaseAddress);
             BlobServiceClient BlobServiceClient = new BlobServiceClient(connectionString);
