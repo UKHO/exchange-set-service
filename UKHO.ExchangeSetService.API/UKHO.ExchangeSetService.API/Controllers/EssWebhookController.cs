@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             var validationResult = await essWebhookService.ValidateEventGridCacheDataRequest(data);
 
-            var productName = data.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
+            var productName = data.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault() ?? "NA";
 
             if (!validationResult.IsValid)
             {
