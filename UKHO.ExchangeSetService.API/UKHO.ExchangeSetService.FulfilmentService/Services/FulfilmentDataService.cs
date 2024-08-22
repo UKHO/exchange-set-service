@@ -282,7 +282,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
 
                 if (!isDownloadReadMeFileSuccess)
+                {
                     logger.LogError(EventIds.ErrorInDownloadReadMeFile.ToEventId(), "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                }                    
             }
             catch (Exception ex)
             {
