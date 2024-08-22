@@ -55,6 +55,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
             await container.DeleteIfExistsAsync();
-        }        
+        }
     }
 }

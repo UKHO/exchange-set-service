@@ -255,11 +255,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime, encryption);
             await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
-            await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+            await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }
 
-        public async Task<bool> DownloadReadMeFile(string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadReadMeFileAsync(string batchId, string exchangeSetRootPath, string correlationId)
         {
             bool isDownloadReadMeFileSuccess = false;
             DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
@@ -268,7 +268,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             try
             {
-                isDownloadReadMeFileSuccess = await fulfilmentFileShareService.DownloadReadMeFileFromCache(batchId, exchangeSetRootPath, correlationId);
+                isDownloadReadMeFileSuccess = await fulfilmentFileShareService.DownloadReadMeFileFromCacheAsync(batchId, exchangeSetRootPath, correlationId);
                 if (isDownloadReadMeFileSuccess)
                 {
                     logger.LogInformation(EventIds.SearchDownloadReadmeCacheEventCompleted.ToEventId(), "Cache Search and Download readme.txt file completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
@@ -278,10 +278,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 else
                 {
                     logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Cache Search and Download readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                    isDownloadReadMeFileSuccess = await DownloadReadMeFileFromFss(batchId, exchangeSetRootPath, correlationId);
+                    isDownloadReadMeFileSuccess = await DownloadReadMeFileFromFssAsync(batchId, exchangeSetRootPath, correlationId);
                 }
 
-                if(!isDownloadReadMeFileSuccess)
+                if (!isDownloadReadMeFileSuccess)
                     logger.LogError(EventIds.ErrorInDownloadReadMeFile.ToEventId(), "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
             }
             catch (Exception ex)
@@ -291,17 +291,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isDownloadReadMeFileSuccess;
         }
 
-        private async Task<bool> DownloadReadMeFileFromFss(string batchId, string exchangeSetRootPath, string correlationId)
+        private async Task<bool> DownloadReadMeFileFromFssAsync(string batchId, string exchangeSetRootPath, string correlationId)
         {
             bool isDownloadReadMeFileSuccess = false;
             string readMeFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
-                      EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
-                      "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                      async () =>
-                      {
-                          return await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
-                      },
-                   batchId, correlationId);
+                EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
+                "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    return await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
+                },
+                batchId, correlationId);
 
             if (!string.IsNullOrWhiteSpace(readMeFilePath))
             {
@@ -311,7 +311,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                    "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                    async () =>
                    {
-                       return await fulfilmentFileShareService.DownloadReadMeFileFromFss(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
+                       return await fulfilmentFileShareService.DownloadReadMeFileFromFssAsync(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
                    },
                 batchId, correlationId);
 
@@ -593,7 +593,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             Parallel.ForEach(encFolderList, encFolder =>
             {
-                ParallelCreateFolderTasks.Add(DownloadReadMeFile(batchId, encFolder, correlationId));
+                ParallelCreateFolderTasks.Add(DownloadReadMeFileAsync(batchId, encFolder, correlationId));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             ParallelCreateFolderTasks.Clear();
@@ -887,7 +887,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetInfoPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.Info);
 
             return
-            await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId) &&
+            await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId) &&
             await DownloadIhoCrtFile(batchId, exchangeSetRootPath, correlationId) &&
             await DownloadIhoPubFile(batchId, exchangeSetRootPath, correlationId) &&
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse) &&

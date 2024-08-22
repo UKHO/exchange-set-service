@@ -11,7 +11,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public Task<CreateBatchResponse> CreateBatch(string userOid, string correlationId);
         Task<SearchBatchResponse> GetBatchInfoBasedOnProducts(List<Products> products, SalesCatalogueServiceResponseQueueMessage message, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string exchangeSetRootPath, string businessUnit);
         Task<bool> DownloadBatchFiles(BatchDetail entry, IEnumerable<string> uri, string downloadPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken);
-        Task<bool> DownloadReadMeFileFromFss(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId);
+        Task<bool> DownloadReadMeFileFromFssAsync(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId);
         Task<string> SearchReadMeFilePath(string batchId, string correlationId);
         Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId);
         Task<bool> UploadFileToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string fileName);
@@ -24,6 +24,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task<string> SearchIhoCrtFilePath(string batchId, string correlationId);
         Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string exchangeSetRootPath, string correlationId);
         Task<bool> DownloadIhoPubFile(string ihoPubFilePath, string batchId, string exchangeSetRootPath, string correlationId);
-        Task<bool> DownloadReadMeFileFromCache(string batchId, string exchangeSetRootPath, string correlationId);
+        Task<bool> DownloadReadMeFileFromCacheAsync(string batchId, string exchangeSetRootPath, string correlationId);
     }
 }

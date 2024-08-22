@@ -350,7 +350,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CommitExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -444,7 +444,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
@@ -477,7 +477,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime, A<bool>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -539,7 +539,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime, A<bool>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -599,7 +599,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime, A<bool>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -631,7 +631,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
@@ -686,14 +686,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenReadmeFileExistInCacheDataDownloadReadMeFile_ThenFileDownloadedFromCache()
+        public async Task WhenReadmeFileExistInCacheData_ThenFileDownloadedFromCache()
         {
             string correlationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string exchangeSetRootPath = @"C:\\HOME";
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCache(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCacheAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var result = await fulfilmentDataService.DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -715,17 +715,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
 
         [Test]
-        public async Task WhenReadmeFileNotExistInCacheDataDownloadReadMeFile_ThenFileDownloadedFromFSS()
+        public async Task WhenReadmeFileNotExistInCacheData_ThenFileDownloadedFromFss()
         {
             string correlationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string exchangeSetRootPath = @"C:\\HOME";
             string readmeFilePath = "/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/README.txt";
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCache(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCacheAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var result = await fulfilmentDataService.DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -746,17 +746,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenReadmeFileNotExistInCacheDataAndFssDownloadReadMeFile_ThenLoggedErrorMessage()
+        public async Task WhenReadmeFileNotExistInCacheDataAndFss_ThenLoggedErrorMessage()
         {
             string correlationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string exchangeSetRootPath = @"C:\\HOME";
             string readmeFilePath = "/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/README.txt";
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCache(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCacheAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
-            var result = await fulfilmentDataService.DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -782,17 +782,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenExceptionOccuredDownloadReadMeFile_ThenLoggedErrorMessage()
+        public async Task WhenExceptionOccuredInDownloadReadMeFile_ThenLoggedErrorMessage()
         {
             string correlationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string exchangeSetRootPath = @"C:\\HOME";
             string readmeFilePath = "/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/README.txt";
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCache(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCacheAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Throws<ApplicationException>().Once();
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Throws<ApplicationException>().Once();
 
-            var result = await fulfilmentDataService.DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -844,7 +844,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -924,7 +924,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CommitExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -981,7 +981,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -1046,7 +1046,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.UploadZipFileForExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CommitExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -1120,7 +1120,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -1193,7 +1193,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -1277,7 +1277,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -1347,7 +1347,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -1399,7 +1399,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -1483,7 +1483,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeQueryFssService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);

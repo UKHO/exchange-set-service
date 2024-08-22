@@ -232,7 +232,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
         }
 
-        public async Task<Stream> DownloadFileFromCache(string fileName, string containerName)
+        public async Task<Stream> DownloadFileFromCacheAsync(string fileName, string containerName)
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, containerName,true);

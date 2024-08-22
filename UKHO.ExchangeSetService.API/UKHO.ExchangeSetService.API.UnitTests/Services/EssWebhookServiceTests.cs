@@ -692,7 +692,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             {
                 Links = links,
                 BusinessUnit = businessUnit,
-                Attributes = new List<Attribute>(),                
+                Attributes = new List<Attribute>(),
                 BatchId = "7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272",
                 BatchPublishedDate = DateTime.UtcNow,
                 Files = cacheFiles

@@ -543,7 +543,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public async Task<bool> DownloadReadMeFileFromFss(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadReadMeFileFromFssAsync(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
@@ -576,14 +576,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public async Task<bool> DownloadReadMeFileFromCache(string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadReadMeFileFromCacheAsync(string batchId, string exchangeSetRootPath, string correlationId)
         {
             bool isReadMeFileDownloaded = false;
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
             string filePath = Path.Combine(exchangeSetRootPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
-            using (Stream readmeStream = await fileShareServiceCache.DownloadFileFromCache(fileName, ReadMeContainerName))
+            using (Stream readmeStream = await fileShareServiceCache.DownloadFileFromCacheAsync(fileName, ReadMeContainerName))
             {
                 if (readmeStream != null && readmeStream?.Length > 0)
                 {
