@@ -277,7 +277,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Cache Search and Download readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Cache Search and Download readme.txt file not found in blob cache for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
                     isDownloadReadMeFileSuccess = await DownloadReadMeFileFromFssAsync(batchId, exchangeSetRootPath, correlationId);
                 }
 
