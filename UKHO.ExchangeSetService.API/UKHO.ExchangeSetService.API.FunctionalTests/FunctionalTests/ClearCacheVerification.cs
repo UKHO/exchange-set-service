@@ -148,7 +148,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
-        public async Task WhenICallNewFilePublishedEventForReadMeTxtFileWithDetailsPresentInEventPayload_ThenExistingReadMeFileDeletedFromContainer()
+        public async Task WhenICallNewFilePublishedEventForReadMeTxtFileWithDetailsPresentInEventPayload_ThenExistingReadMeFileContainerDeleted()
         {
             var readmeContainer = "readme";
 

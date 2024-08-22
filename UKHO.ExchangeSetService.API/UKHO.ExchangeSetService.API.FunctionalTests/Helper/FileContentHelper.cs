@@ -490,7 +490,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
-        public static async Task<bool> WaitForContainerAsync(BlobServiceClient blobServiceClient, string containerName, int maxAttempts, int delayInMilliseconds)
+        public static async Task<bool> WaitForContainerAsync(BlobServiceClient blobServiceClient, string containerName, int maxAttempts, int delayInMilliSeconds)
         {
             var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
@@ -503,7 +503,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 }
                 catch (RequestFailedException ex) when (ex.ErrorCode == BlobErrorCode.ContainerNotFound)
                 {
-                    await Task.Delay(delayInMilliseconds);
+                    await Task.Delay(delayInMilliSeconds);
                 }
             }
 
