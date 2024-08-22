@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             if (stream != null)
             {
-                stream.Position= 0;
+                stream.Position = 0;
                 var extendedAsciiEncoding = Encoding.GetEncoding("iso-8859-1");
                 CreateFileCopy(filePath, stream);
                 var text = File.ReadAllText(filePath, extendedAsciiEncoding);
@@ -237,7 +237,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 var file = _fileSystem.File.Create(filePath);
                 file.Close();
-            }    
+            }
         }
 
         public IDirectoryInfo[] GetSubDirectories(string folderPath)

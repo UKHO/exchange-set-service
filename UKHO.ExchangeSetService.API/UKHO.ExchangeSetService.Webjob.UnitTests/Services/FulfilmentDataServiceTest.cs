@@ -745,6 +745,78 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.AreEqual(true, result);
         }
 
+        [Test]
+        public async Task WhenReadmeFileNotExistInCacheDataAndFssDownloadReadMeFile_ThenLoggedErrorMessage()
+        {
+            string correlationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"C:\\HOME";
+            string readmeFilePath = "/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/README.txt";
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCache(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+
+            var result = await fulfilmentDataService.DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SearchDownloadReadmeCacheEventStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SearchDownloadReadmeCacheEventCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache Search and Download readme.txt file completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ReadMeTextFileNotFound.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache Search and Download readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ErrorInDownloadReadMeFile.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            Assert.AreEqual(false, result);
+        }
+
+        [Test]
+        public async Task WhenExceptionOccuredDownloadReadMeFile_ThenLoggedErrorMessage()
+        {
+            string correlationId = "d6cd4d37-4d89-470d-9a33-82b3d7f54b6e";
+            string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+            string exchangeSetRootPath = @"C:\\HOME";
+            string readmeFilePath = "/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/README.txt";
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCache(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
+            A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
+            A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFss(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Throws<ApplicationException>().Once();
+
+            var result = await fulfilmentDataService.DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId);
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SearchDownloadReadmeCacheEventStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SearchDownloadReadmeCacheEventCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache Search and Download readme.txt file completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustNotHaveHappened();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ReadMeTextFileNotFound.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Cache Search and Download readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+
+            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ErrorInDownloadReadMeFile.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}").MustHaveHappenedOnceExactly();
+
+            Assert.AreEqual(false, result);
+        }
+
 
         #region AIO
 

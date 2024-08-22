@@ -234,11 +234,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<Stream> DownloadFileFromCache(string fileName, string containerName)
         {
-            MemoryStream memoryStream = new MemoryStream();
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, containerName,true);
 
-            CloudBlockBlob cloudBlockBlob = azureBlobStorageClient.GetExistingCloudBlockBlob(fileName, storageConnectionString, containerName);
-
+            MemoryStream memoryStream = new MemoryStream();
             if (await cloudBlockBlob.ExistsAsync())
             {
                 await cloudBlockBlob.DownloadToStreamAsync(memoryStream);

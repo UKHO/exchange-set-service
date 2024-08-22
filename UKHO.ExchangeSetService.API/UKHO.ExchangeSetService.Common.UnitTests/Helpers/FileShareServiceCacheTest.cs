@@ -195,7 +195,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
             CommonHelper.IsPeriodicOutputService = false;
 
@@ -228,7 +228,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
             var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId)).Returns(cloudBlob);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId,false)).Returns(cloudBlob);
             A.CallTo(() => cloudBlob.ExistsAsync()).Returns(false);
             await fileShareServiceCache.CopyFileToBlob(stream, fileName, batchId);
             A.CallTo(() => cloudBlob.UploadFromStreamAsync(stream)).MustHaveHappenedOnceExactly();
@@ -243,7 +243,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
             var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId)).Returns(cloudBlob);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(fileName, storageConnectionString, batchId,false)).Returns(cloudBlob);
             A.CallTo(() => cloudBlob.ExistsAsync()).Returns(true);
             await fileShareServiceCache.CopyFileToBlob(stream, fileName, batchId);
             A.CallTo(() => cloudBlob.UploadFromStreamAsync(stream)).MustNotHaveHappened();
@@ -285,7 +285,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored)).Throws(new Microsoft.WindowsAzure.Storage.StorageException("The specified blob does not exist"));
             CommonHelper.IsPeriodicOutputService = false;
 
@@ -323,7 +323,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetEmptyResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
 
             string blobResponse = JsonConvert.SerializeObject(GetBatchDetail(), Formatting.None);
@@ -343,7 +343,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             const string exchangeSetRootPath = @"C:\\HOME";
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored)).Throws(new Microsoft.WindowsAzure.Storage.StorageException());
             CommonHelper.IsPeriodicOutputService = false;
 
@@ -381,7 +381,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
             var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cloudBlob);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(cloudBlob);
             A.CallTo(() => cloudBlob.ExistsAsync()).Returns(false);
             A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
 
@@ -400,7 +400,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
             CommonHelper.IsPeriodicOutputService = true;
 
@@ -419,7 +419,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache()).Once().Then.Returns(GetResponseCacheForAioProduct());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new CloudBlockBlob(new Uri("http://tempuri.org/blob")));
             A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<CloudBlockBlob>.Ignored, A<string>.Ignored));
             CommonHelper.IsPeriodicOutputService = true;
 
@@ -438,7 +438,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
             var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.GetExistingCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cloudBlob);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(cloudBlob);
             A.CallTo(() => cloudBlob.ExistsAsync()).Returns(true);
 
             await fileShareServiceCache.DownloadFileFromCache(filename, containerName);
@@ -454,7 +454,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
             var cloudBlob = A.Fake<CloudBlockBlob>(o => o.WithArgumentsForConstructor(() => new CloudBlockBlob(new Uri("http://tempuri.org/blob"))));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.GetExistingCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(cloudBlob);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(cloudBlob);
             A.CallTo(() => cloudBlob.ExistsAsync()).Returns(false);
 
             await fileShareServiceCache.DownloadFileFromCache(filename, containerName);

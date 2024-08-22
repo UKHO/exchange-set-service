@@ -12,12 +12,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     [ExcludeFromCodeCoverage]
     public class AzureBlobStorageClient : IAzureBlobStorageClient
     {
-        public async Task<CloudBlockBlob> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
+        public async Task<CloudBlockBlob> GetCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName, bool isExistingBlob = false)
         {
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
             CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
             CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
-            await cloudBlobContainer.CreateIfNotExistsAsync();
+            if (!isExistingBlob)
+            {
+                await cloudBlobContainer.CreateIfNotExistsAsync();
+            }
             CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
             return cloudBlockBlob;
         }
@@ -52,15 +55,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             BlobContainerClient container = new BlobContainerClient(storageAccountConnectionString, containerName);
             await container.DeleteIfExistsAsync();
-        }
-
-        public CloudBlockBlob GetExistingCloudBlockBlob(string fileName, string storageAccountConnectionString, string containerName)
-        {
-            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
-            CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(fileName);
-            return cloudBlockBlob;
-        }
+        }        
     }
 }

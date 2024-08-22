@@ -848,7 +848,12 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805210 - Cache Search and Download readme.txt file completed
         /// </summary>
-        SearchDownloadReadmeCacheEventCompleted = 805210
+        SearchDownloadReadmeCacheEventCompleted = 805210,
+        /// <summary>
+        /// 805211 - Download readme.txt file is failed.
+        /// </summary>
+        ErrorInDownloadReadMeFile = 805211
+
 
     }
 

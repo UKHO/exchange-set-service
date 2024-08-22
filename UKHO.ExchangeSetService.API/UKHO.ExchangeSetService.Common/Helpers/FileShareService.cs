@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly AioConfiguration aioConfiguration;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
         private const string ZIPFILE = "zip";
-        private const string ReadMeContainerName = "readme";       
+        private const string ReadMeContainerName = "readme";
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthFssTokenProvider authFssTokenProvider,
@@ -578,19 +578,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<bool> DownloadReadMeFileFromCache(string batchId, string exchangeSetRootPath, string correlationId)
         {
-            bool isReadMeFileDownloade = false;
+            bool isReadMeFileDownloaded = false;
             string fileName = fileShareServiceConfig.Value.ReadMeFileName;
             string filePath = Path.Combine(exchangeSetRootPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
-            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));            
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             using (Stream readmeStream = await fileShareServiceCache.DownloadFileFromCache(fileName, ReadMeContainerName))
             {
-                if (readmeStream.Length > 0)
+                if (readmeStream != null && readmeStream?.Length > 0)
                 {
-                    isReadMeFileDownloade= fileSystemHelper.DownloadReadmeFile(filePath, readmeStream, lineToWrite);
-                }                
+                    isReadMeFileDownloaded = fileSystemHelper.DownloadReadmeFile(filePath, readmeStream, lineToWrite);
+                }
             }
-            return isReadMeFileDownloade;
+            return isReadMeFileDownloaded;
         }
 
         public async Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string exchangeSetRootPath, string correlationId)

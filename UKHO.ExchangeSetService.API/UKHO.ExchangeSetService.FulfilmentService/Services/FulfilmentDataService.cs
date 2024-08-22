@@ -266,19 +266,28 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             logger.LogInformation(EventIds.SearchDownloadReadmeCacheEventStart.ToEventId(), "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
 
-            isDownloadReadMeFileSuccess = await fulfilmentFileShareService.DownloadReadMeFileFromCache(batchId, exchangeSetRootPath, correlationId);
-            if (isDownloadReadMeFileSuccess)
+            try
             {
-                logger.LogInformation(EventIds.SearchDownloadReadmeCacheEventCompleted.ToEventId(), "Cache Search and Download readme.txt file completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-            else
-            {
-                logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Cache Search and Download readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                isDownloadReadMeFileSuccess = await DownloadReadMeFileFromFss(batchId, exchangeSetRootPath, correlationId);
-            }
+                isDownloadReadMeFileSuccess = await fulfilmentFileShareService.DownloadReadMeFileFromCache(batchId, exchangeSetRootPath, correlationId);
+                if (isDownloadReadMeFileSuccess)
+                {
+                    logger.LogInformation(EventIds.SearchDownloadReadmeCacheEventCompleted.ToEventId(), "Cache Search and Download readme.txt file completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
+                    monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                }
+                else
+                {
+                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Cache Search and Download readme.txt file not found for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+                    isDownloadReadMeFileSuccess = await DownloadReadMeFileFromFss(batchId, exchangeSetRootPath, correlationId);
+                }
 
+                if(!isDownloadReadMeFileSuccess)
+                    logger.LogError(EventIds.ErrorInDownloadReadMeFile.ToEventId(), "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIds.ErrorInDownloadReadMeFile.ToEventId(), ex, "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", batchId, correlationId, ex.Message);
+            }
             return isDownloadReadMeFileSuccess;
         }
 
