@@ -30,14 +30,10 @@ export function resendRequest(requestURL, requestBody) {
                 console.log("Response:" + JSON.stringify(essRes.body, null, 2));
                 console.log("Correlation-Id:" + essRes.headers['X-Correlation-Id']);
             }
-            else if(essRes.body === null){
-                console.log("Status Code:200, Response Body: null, Request:"+essRes.request.url)
-            }
             else {
                 console.log("Batch ID:" + JSON.stringify(essRes.json().fssBatchId), "File URL:" + JSON.stringify(essRes.json()._links.exchangeSetFileUri.href));
                 console.log("Correlation-Id:" + essRes.headers['X-Correlation-Id']);
             }
-  
         } catch (e) {
             console.log(essRes.body);
         }
