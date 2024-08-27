@@ -1,4 +1,4 @@
-export function ESSConsoleLog(essResponse){
+export function essConsoleLog(essResponse){
     if ( essResponse.status === 200)
     {
         let jsonResponse = JSON.parse(essResponse.body);
