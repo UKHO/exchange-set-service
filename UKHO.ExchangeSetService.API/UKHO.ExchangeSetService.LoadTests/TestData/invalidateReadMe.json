@@ -1,0 +1,27 @@
+{
+    "Data": {
+      "BusinessUnit": "ADDS",
+      "attributes": [
+                  {
+                      "key": "Product Type",
+                      "value": "AVCS"
+                  }
+              ],
+      "files": [
+                  {
+                      "filename": "README.txt",
+                      "fileSize": 55092,
+                      "mimeType": "text/plain",
+                      "hash": "C2DI95LYetdIO6q1baIHBA==",
+                      "attributes": [],
+                      "links": {
+                          "get": {
+                              "href": "/batch/ab4a692d-6e3b-48a3-bd37-d232c60dd75d/files/README.txt"
+                          }
+                      }
+                  }
+              ],
+      "BatchId": "ab4a692d-6e3b-48a3-bd37-d232c60dd75d",
+      "BatchPublishedDate": "2024-04-11T09:01:18.027Z"
+    }
+  }
