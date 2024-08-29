@@ -714,7 +714,7 @@ stages:
   - stage: QAdeploy
     dependsOn:
     - Devdeploy
-    - QCdeploy         
+    - QCdeploy   
     displayName: QAdeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), eq(variables['Build.SourceBranch'], 'refs/heads/performance'), startsWith(variables['Build.SourceBranch'], 'refs/heads/perf/')))
     jobs:
