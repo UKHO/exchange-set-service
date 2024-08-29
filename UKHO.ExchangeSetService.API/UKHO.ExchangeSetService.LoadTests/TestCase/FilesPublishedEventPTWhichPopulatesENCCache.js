@@ -101,9 +101,9 @@ export function replayRequest(reqData){
 
 export function handleSummary(data) {
   return {
-    ["ExecutionSummary/CachePublish-LiveDataTest-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".html"]: htmlReport(data),
+      ["ExecutionSummary/FilesPublishedEventPTWhichPopulatesENCCache-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".html"]: htmlReport(data),
     stdout: textSummary(data, { indent: " ", enableColors: true }),
-    ["ExecutionSummary/CachePublish-LiveDataTest-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".json"]: JSON.stringify(data)
+      ["ExecutionSummary/FilesPublishedEventPTWhichPopulatesENCCache-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".json"]: JSON.stringify(data)
   }
 }
 

@@ -129,8 +129,8 @@ export function prepopulateCache() {
 
 export function handleSummary(data) {
   return {
-    ["ExecutionSummary/ESSPT-Baseline-LiveDataTest-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".html"]: htmlReport(data),
+      ["ExecutionSummary/ESSPTUsingLiveLogWithCache-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".html"]: htmlReport(data),
     stdout: textSummary(data, { indent: " ", enableColors: true }),
-    ["ExecutionSummary/ESSPT-Baseline-LiveDataTest-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".json"]: JSON.stringify(data),
+      ["ExecutionSummary/ESSPTUsingLiveLogWithCache-" + new Date().toISOString().substr(0, 19).replace(/(:|-)/g, "").replace("T", "_") + ".json"]: JSON.stringify(data),
   }
 }
