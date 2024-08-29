@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public string ExchangeSetCatalogueType;
         public string ExchangeSetEncRootFolder;
         public string ExchangeSetCatalogueFile;
-       
+        
         public EssAuthorizationTokenConfiguration EssAuthorizationConfig = new();
         public FileShareService FssConfig = new();
         public AzureAdB2CConfiguration AzureAdB2CConfig = new();
@@ -51,6 +51,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         {
             public string CacheStorageConnectionString { get; set; }
             public string FssSearchCacheTableName { get; set; }
+            public string Source { get; set; }
+            public string Id { get; set; }
         }
 
         public class FileShareService
