@@ -88,7 +88,7 @@ export const options = {
       },
       'invalidate-ReadMe':{
         exec:'invalidateReadMeCache',
-        executor: 'shared-iterations',
+        executor: 'per-vu-iterations',
         vus: 1,
         iterations: 1,
         maxDuration: '1m',
