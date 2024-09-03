@@ -64,10 +64,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 return GetCacheResponse();
             }
 
-            var eventGridEvent = new CustomEventGridEvent();
-            JsonConvert.PopulateObject(request.ToString(), eventGridEvent);
-            var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
-
+            //var eventGridEvent = new CustomEventGridEvent();
+            //JsonConvert.PopulateObject(request.ToString(), eventGridEvent);
+            //var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
+            var data = new CustomEventGridEvent(request).Data;
+            var data2 = EnterpriseEventCacheDataRequestFactory.CreateRequest(request);
             Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), GetCurrentCorrelationId());
 
             var validationResult = await essWebhookService.ValidateEventGridCacheDataRequest(data);
