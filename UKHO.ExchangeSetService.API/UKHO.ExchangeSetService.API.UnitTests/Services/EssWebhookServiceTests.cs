@@ -1,6 +1,6 @@
 ﻿using FakeItEasy;
 using FluentValidation.Results;
-using Microsoft.Azure.Cosmos.Table;
+using Azure.Data.Tables;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;

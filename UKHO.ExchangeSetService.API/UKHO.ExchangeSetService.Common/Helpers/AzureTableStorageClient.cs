@@ -14,17 +14,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return operation.Value;
         }
 
-        public async Task InsertOrMergeIntoTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString)
+        public async Task<ITableEntity> InsertOrMergeIntoTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString) 
         {
             var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
-            await tableClient.UpsertEntityAsync(entity);
+            var result = await tableClient.UpsertEntityAsync(entity);
+            return result as ITableEntity;
         }
 
 
-        public async Task DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString, string containerName)
+        public async Task<ITableEntity> DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString, string containerName)
         {
             var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
-            await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey, entity.ETag);
+            var result = await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey, entity.ETag);
+            return result as ITableEntity;
         }
 
 

@@ -6,7 +6,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public interface IAzureTableStorageClient
     {
         Task<TElement> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement :class, ITableEntity;
-        Task InsertOrMergeIntoTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString);
-        Task DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString, string containerName);
+        Task<ITableEntity> InsertOrMergeIntoTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString);
+        Task<ITableEntity> DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString, string containerName);
     }
 }
