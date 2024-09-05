@@ -13,7 +13,7 @@ resource "azurerm_key_vault" "kv" {
     default_action             = "Deny"
     bypass                     = "AzureServices"
     ip_rules                   = var.allowed_ips
-    virtual_network_subnet_ids = [var.subnet_id,var.agent_subnet]
+    virtual_network_subnet_ids = [var.subnet_id, var.agent_2204_subnet, var.agent_prd_subnet]
   }
 
   tags = var.tags

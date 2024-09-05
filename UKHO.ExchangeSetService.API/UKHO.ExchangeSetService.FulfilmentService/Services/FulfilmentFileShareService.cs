@@ -135,9 +135,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return await fileShareService.DownloadIhoPubFile(filePath, batchId, exchangeSetRootPath, correlationId);
         }
 
-        public async Task<bool> DownloadIhoCrtFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadIhoCrtFile(string filePath, string batchId, string aioExchangeSetPath, string correlationId)
         {
-            return await fileShareService.DownloadIhoCrtFile(filePath, batchId, exchangeSetRootPath, correlationId);
+            return await fileShareService.DownloadIhoCrtFile(filePath, batchId, aioExchangeSetPath, correlationId);
         }
 
         public async Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)

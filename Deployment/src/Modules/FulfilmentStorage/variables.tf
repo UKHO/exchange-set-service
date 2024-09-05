@@ -39,7 +39,11 @@ variable "medium_exchange_set_subnets" {
 variable "large_exchange_set_subnets" {
 }
 
-variable "agent_subnet" {
+variable "agent_2204_subnet" {
+  type = string
+}
+
+variable "agent_prd_subnet" {
   type = string
 }
 

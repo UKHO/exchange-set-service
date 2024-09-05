@@ -4,13 +4,6 @@ data "azurerm_subnet" "main_subnet" {
   resource_group_name  = var.spoke_rg
 }
 
-data "azurerm_subnet" "agent_subnet" {
-  provider             = azurerm.build_agent
-  name                 = var.agent_subnet_name
-  virtual_network_name = var.agent_vnet_name
-  resource_group_name  = var.agent_rg
-}
-
 data "azurerm_subnet" "small_exchange_set_subnet" {
   count                = local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance
   name                 = "ess-fulfilment-service-s-${sum([1,count.index])}"
@@ -57,9 +50,10 @@ module "eventhub" {
   logstashStorageName = lower("${local.service_name}logstash${local.env_name}${var.storage_suffix}")
   suffix              = var.suffix
   m_spoke_subnet      = data.azurerm_subnet.main_subnet.id
-  agent_subnet        = data.azurerm_subnet.agent_subnet.id
   allowed_ips         = var.allowed_ips  
   tags                = local.tags
+  agent_2204_subnet   = var.agent_2204_subnet
+  agent_prd_subnet    = var.agent_prd_subnet
 }
 
 module "webapp_service" {
@@ -124,10 +118,11 @@ module "fulfilment_storage" {
   large_exchange_set_subnets            = data.azurerm_subnet.large_exchange_set_subnet[*].id
   suffix                                = var.storage_suffix
   m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
-  agent_subnet                          = data.azurerm_subnet.agent_subnet.id
   exchange_set_config                   = local.config_data.ESSFulfilmentConfiguration
   env_name                              = local.env_name
   service_name                          = local.service_name
+  agent_2204_subnet                     = var.agent_2204_subnet
+  agent_prd_subnet                      = var.agent_prd_subnet
 }
 
 module "key_vault" {
@@ -139,7 +134,8 @@ module "key_vault" {
   location            = azurerm_resource_group.rg.location
   allowed_ips         = var.allowed_ips  
   subnet_id           = data.azurerm_subnet.main_subnet.id
-  agent_subnet        = data.azurerm_subnet.agent_subnet.id
+  agent_2204_subnet   = var.agent_2204_subnet
+  agent_prd_subnet    = var.agent_prd_subnet
   read_access_objects = {
     "ess_service_identity" = module.user_identity.ess_service_identity_principal_id   
   }
@@ -177,7 +173,8 @@ module "fulfilment_keyvaults" {
   small_exchange_set_subnets                = data.azurerm_subnet.small_exchange_set_subnet[*].id
   medium_exchange_set_subnets               = data.azurerm_subnet.medium_exchange_set_subnet[*].id
   large_exchange_set_subnets                = data.azurerm_subnet.large_exchange_set_subnet[*].id
-  agent_subnet                              = data.azurerm_subnet.agent_subnet.id
+  agent_2204_subnet                         = var.agent_2204_subnet
+  agent_prd_subnet                          = var.agent_prd_subnet
     read_access_objects = {
         "ess_service_identity" = module.user_identity.ess_service_identity_principal_id
   }
@@ -231,6 +228,7 @@ module "cache_storage" {
   medium_exchange_set_subnets           = data.azurerm_subnet.medium_exchange_set_subnet[*].id
   large_exchange_set_subnets            = data.azurerm_subnet.large_exchange_set_subnet[*].id
   m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
-  agent_subnet                          = data.azurerm_subnet.agent_subnet.id
   service_name                          = local.service_name
+  agent_2204_subnet                     = var.agent_2204_subnet
+  agent_prd_subnet                      = var.agent_prd_subnet
 }

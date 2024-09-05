@@ -64,8 +64,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             var catBuilder = new Catalog031BuilderFactory().Create();
             var readMeFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.ReadMeFileName);
-            var ihoCrtFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.IhoCrtFileName);
-            var ihoPubFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.IhoPubFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fileShareServiceConfig.Value.CatalogFileName);
 
             if (fileSystemHelper.CheckFileExists(readMeFileName))
@@ -76,25 +74,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     Implementation = "TXT"
                 });
             }
-
-            if (fileSystemHelper.CheckFileExists(ihoCrtFileName))
-            {
-                catBuilder.Add(new CatalogEntry()
-                {
-                    FileLocation = fileShareServiceConfig.Value.IhoCrtFileName,
-                    Implementation = "CRT"
-                });
-            }
-
-            if (fileSystemHelper.CheckFileExists(ihoPubFileName))
-            {
-                catBuilder.Add(new CatalogEntry()
-                {
-                    FileLocation = fileShareServiceConfig.Value.IhoPubFileName,
-                    Implementation = "PUB"
-                });
-            }
-
+            
             if (listFulfilmentData != null && listFulfilmentData.Any())
             {
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();

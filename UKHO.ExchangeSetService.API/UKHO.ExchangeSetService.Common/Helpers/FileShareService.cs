@@ -574,13 +574,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public async Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string aioExchangeSetPath, string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string fileName = fileShareServiceConfig.Value.IhoCrtFileName;
-            string filePath = Path.Combine(exchangeSetRootPath, fileName);
-            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            string filePath = Path.Combine(aioExchangeSetPath, fileName);
+            fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             HttpResponseMessage httpIhoCrtFileResponse;
             httpIhoCrtFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, ihoCrtFilePath, CancellationToken.None, correlationId);
@@ -607,13 +607,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
 
-        public async Task<bool> DownloadIhoPubFile(string ihoPubFilePath, string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadIhoPubFile(string ihoPubFilePath, string batchId, string aioExchangeSetPath, string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
             string fileName = fileShareServiceConfig.Value.IhoPubFileName;
-            string filePath = Path.Combine(exchangeSetRootPath, fileName);
-            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            string filePath = Path.Combine(aioExchangeSetPath, fileName);
+            fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
             string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             HttpResponseMessage httpIhoPubFileResponse;
             httpIhoPubFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, ihoPubFilePath, CancellationToken.None, correlationId);
