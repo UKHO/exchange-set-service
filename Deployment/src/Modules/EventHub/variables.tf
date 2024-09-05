@@ -14,7 +14,11 @@ variable "logstashStorageName"{
   type=string
 }
 
-variable "agent_subnet" {
+variable "agent_2204_subnet" {
+  type = string
+}
+
+variable "agent_prd_subnet" {
   type = string
 }
 
@@ -28,4 +32,8 @@ variable "allowed_ips" {
 
 variable "tags" {
 
+}
+
+variable "suffix" {
+  default     = ""
 }

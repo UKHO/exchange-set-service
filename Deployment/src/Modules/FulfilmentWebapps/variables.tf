@@ -49,3 +49,7 @@ locals {
 	medium_exchange_set_name = "${var.service_name}-${var.env_name}-mxs"
 	large_exchange_set_name = "${var.service_name}-${var.env_name}-lxs"
 }
+
+variable "suffix" {
+  default     = ""
+}

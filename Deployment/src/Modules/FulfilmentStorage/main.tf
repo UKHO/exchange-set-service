@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "small_exchange_set_storage" {
-  name = lower("${var.service_name}${var.env_name}sxsstorageukho")
+  name = lower("${var.service_name}${var.env_name}sxsstorageukho${var.suffix}")
   resource_group_name = var.resource_group_name
   location = var.location
   account_tier = "Standard"
@@ -10,7 +10,7 @@ resource "azurerm_storage_account" "small_exchange_set_storage" {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
     bypass                     = ["Logging", "Metrics", "AzureServices"]
-    virtual_network_subnet_ids = concat(var.small_exchange_set_subnets,[var.m_spoke_subnet,var.agent_subnet])
+    virtual_network_subnet_ids = concat(var.small_exchange_set_subnets,[var.m_spoke_subnet, var.agent_2204_subnet, var.agent_prd_subnet])
   }
 
   tags = var.tags
@@ -30,7 +30,7 @@ resource "azurerm_storage_queue" "small_exchange_set_storage_queue" {
 #Medium exchange set storage
 
 resource "azurerm_storage_account" "medium_exchange_set_storage" {
-  name = lower("${var.service_name}${var.env_name}mxsstorageukho")
+  name = lower("${var.service_name}${var.env_name}mxsstorageukho${var.suffix}")
   resource_group_name = var.resource_group_name
   location = var.location
   account_tier = "Standard"
@@ -41,7 +41,7 @@ resource "azurerm_storage_account" "medium_exchange_set_storage" {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
     bypass                     = ["Logging", "Metrics", "AzureServices"]
-    virtual_network_subnet_ids = concat(var.medium_exchange_set_subnets,[var.m_spoke_subnet,var.agent_subnet])
+    virtual_network_subnet_ids = concat(var.medium_exchange_set_subnets,[var.m_spoke_subnet, var.agent_2204_subnet, var.agent_prd_subnet])
   }
 
   tags = var.tags
@@ -61,7 +61,7 @@ resource "azurerm_storage_queue" "medium_exchange_set_storage_queue" {
 #Large exchange set storage
 
 resource "azurerm_storage_account" "large_exchange_set_storage" {
-  name = lower("${var.service_name}${var.env_name}lxsstorageukho")
+  name = lower("${var.service_name}${var.env_name}lxsstorageukho${var.suffix}")
   resource_group_name = var.resource_group_name
   location = var.location
   account_tier = "Standard"
@@ -72,7 +72,7 @@ resource "azurerm_storage_account" "large_exchange_set_storage" {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
     bypass                     = ["Logging", "Metrics", "AzureServices"]
-    virtual_network_subnet_ids = concat(var.large_exchange_set_subnets,[var.m_spoke_subnet,var.agent_subnet])
+    virtual_network_subnet_ids = concat(var.large_exchange_set_subnets,[var.m_spoke_subnet, var.agent_2204_subnet, var.agent_prd_subnet])
   }
 
   tags = var.tags

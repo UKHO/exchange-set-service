@@ -6,10 +6,6 @@ variable "location" {
   type = string
 }
 
-variable "env_name" {
-  type  = string
-}
-
 variable "tags" {
 }
 
@@ -25,7 +21,11 @@ variable "m_spoke_subnet" {
   type = string
 }
 
-variable "agent_subnet" {
+variable "agent_2204_subnet" {
+  type = string
+}
+
+variable "agent_prd_subnet" {
   type = string
 }
 
@@ -36,4 +36,7 @@ variable "medium_exchange_set_subnets" {
 }
 
 variable "large_exchange_set_subnets" {
-} 
+}
+
+variable name {
+}

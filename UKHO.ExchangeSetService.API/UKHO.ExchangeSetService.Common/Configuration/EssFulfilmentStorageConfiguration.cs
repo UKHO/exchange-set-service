@@ -23,6 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         public double SmallExchangeSetSizeInMB { get; set; }
         public string ExchangeSetTypes { get; set; }
         public double LargeMediaExchangeSetSizeInMB { get; set; }
+        public string WebAppVersion { get; set; }
         public double S57ExchangeSetSizeInMB { get; set; }
     }
 }

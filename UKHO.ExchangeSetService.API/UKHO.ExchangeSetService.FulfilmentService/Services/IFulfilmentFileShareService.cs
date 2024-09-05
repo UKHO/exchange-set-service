@@ -22,6 +22,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         Task<string> SearchIhoPubFilePath(string batchId, string correlationId);
         Task<string> SearchIhoCrtFilePath(string batchId, string correlationId);
         Task<bool> DownloadIhoPubFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
-        Task<bool> DownloadIhoCrtFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId);
+        Task<bool> DownloadIhoCrtFile(string filePath, string batchId, string aioExchangeSetPath, string correlationId);
     }
 }

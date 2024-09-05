@@ -14,11 +14,10 @@ steps:
       jsonTargetFiles: '**/appsettings.json'
 
   - task: PowerShell@2
-    displayName: "terraform devdeploy"
-    name: terraformdevdeploy
+    displayName: "terraform devdeploy for FSSUI"
     inputs:
       targetType: filePath
-      filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run.ps1'
+      filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_v2.ps1'
       arguments: '-deploymentResourceGroupName $(DeploymentResourceGroupName) -deploymentStorageAccountName $(DeploymentStorageAccountName) -workSpace $(Environment) -continueEvenIfResourcesAreGettingDestroyed $${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }} -terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -elasticApmServerUrl $(ElasticAPM.ServerURL) -elasticApmApiKey $(ElasticAPM.ApiKey)'
     env:
       ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
@@ -65,7 +64,7 @@ steps:
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       appType: webApp
-      appName: "$(terraformdevdeploy.WEB_APP_NAME)"
+      appName: "$(WEB_APP_NAME)"
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
       deployToSlotOrASE: true
       slotName: $(WEB_APP_SLOT_NAME)
@@ -74,8 +73,8 @@ steps:
     displayName: "Swap with production slot"
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $(terraformdevdeploy.RESOURCE_GROUP_NAME)
-      webAppName: $(terraformdevdeploy.WEB_APP_NAME)
+      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      webAppName: $(WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
       sourceSlot: $(WEB_APP_SLOT_NAME)  
@@ -92,8 +91,8 @@ steps:
     condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $(terraformdevdeploy.RESOURCE_GROUP_NAME)
-      webAppName: $(terraformdevdeploy.WEB_APP_NAME)
+      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      webAppName: $(WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
       sourceSlot: $(WEB_APP_SLOT_NAME)  

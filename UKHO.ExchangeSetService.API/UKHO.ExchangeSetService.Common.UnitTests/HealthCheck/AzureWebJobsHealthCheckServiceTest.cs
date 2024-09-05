@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [SetUp]
         public void Setup()
         {
-            this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() { ExchangeSetTypes = "sxs,mxs,lxs" });
+            this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() { ExchangeSetTypes = "sxs,mxs,lxs", WebAppVersion = ""});
             this.fakeWebJobsAccessKeyProvider = A.Fake<IWebJobsAccessKeyProvider>();
             this.fakeWebHostEnvironment = A.Fake<IWebHostEnvironment>();
             this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
@@ -51,6 +51,34 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
             A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
                .Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
+
+            var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
+
+            Assert.AreEqual(HealthStatus.Healthy, response.Status);
+        }
+
+        [Test]
+        public async Task WhenAzureWebJobStatusIsNotRunningForV2_ThenReturnUnhealthy()
+        {
+            this.fakeEssFulfilmentStorageConfiguration.Value.WebAppVersion = "v2";
+
+            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
+                .Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy"));
+
+            var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
+
+            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+        }
+
+        [Test]
+        public async Task WhenAzureWebJobStatusIsRunningForV2_ThenReturnHealthy()
+        {
+            this.fakeEssFulfilmentStorageConfiguration.Value.WebAppVersion = "v2";
+
+            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
+                .Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
 
             var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
 

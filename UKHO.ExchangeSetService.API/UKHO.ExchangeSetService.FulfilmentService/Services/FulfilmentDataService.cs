@@ -290,7 +290,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return isDownloadReadMeFileSuccess;
         }
 
-        public async Task<bool> DownloadIhoCrtFile(string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadIhoCrtFile(string batchId, string aioExchangeSetPath, string correlationId)
         {
             bool isDownloadIhoCrtFileSuccess = false;
             string ihoCrtFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceIhoCrtFileRequestStart,
@@ -310,7 +310,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
-                        return await fulfilmentFileShareService.DownloadIhoCrtFile(ihoCrtFilePath, batchId, exchangeSetRootPath, correlationId);
+                        return await fulfilmentFileShareService.DownloadIhoCrtFile(ihoCrtFilePath, batchId, aioExchangeSetPath, correlationId);
                     },
                     batchId, correlationId);
 
@@ -856,8 +856,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             return
             await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId) &&
-            await DownloadIhoCrtFile(batchId, exchangeSetRootPath, correlationId) &&
-            await DownloadIhoPubFile(batchId, exchangeSetRootPath, correlationId) &&
+            await DownloadIhoCrtFile(batchId, aioExchangeSetPath, correlationId) &&
+            await DownloadIhoPubFile(batchId, aioExchangeSetPath, correlationId) &&
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse) &&
             await CreateProductFileForAio(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime) &&
             await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId, listFulfilmentAioData, salesCatalogueDataResponse, salesCatalogueProductResponse);
