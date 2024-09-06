@@ -1390,3 +1390,17 @@ stages:
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+
+  - stage: IatDeploy
+    dependsOn: 
+    #- Devdeploy
+    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    displayName: IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+    jobs:
+      - template: Deployment/templates/Deploy.yml
+        parameters:
+          Environment: "iat"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-IAT-A.011.08"
+          Container: ${{variables.Container}} 
