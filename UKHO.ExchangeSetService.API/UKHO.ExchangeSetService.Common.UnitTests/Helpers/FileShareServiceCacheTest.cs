@@ -384,7 +384,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var blobClient = A.Fake<BlobClient>(o => o.WithArgumentsForConstructor(() => new BlobClient(new Uri("http://tempuri.org/blob"), null)));
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
             A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(blobClient);
-            A.CallTo(() => blobClient.ExistsAsync(default)).Returns(Response.FromValue(true, default));
+            A.CallTo(() => blobClient.ExistsAsync(default)).Returns(Response.FromValue(false, default));
             A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
 
             await fileShareServiceCache.InsertOrMergeFssCacheDetail(fssSearchResponseCache);
