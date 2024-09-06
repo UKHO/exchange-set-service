@@ -63,7 +63,7 @@ variable "app_service_sku" {
       tier = "PremiumV3"
       size = "P1v3"
         }
-    "preprod"  = {
+    "pre"  = {
 	    tier = "PremiumV3"
 	    size = "P1v3"
         }
