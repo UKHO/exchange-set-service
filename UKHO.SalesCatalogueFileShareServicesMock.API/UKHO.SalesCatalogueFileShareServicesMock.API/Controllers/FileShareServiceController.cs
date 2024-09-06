@@ -255,13 +255,6 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
         private static List<string> ValidateBatchIds(IEnumerable<string> batchIds)
         {
-            // This is the optimised version of the code below but snyk still reports it as a vulnerability
-            //return batchIds
-            //    .Select(ValidateBatchId)
-            //    .Where(validationResult => validationResult.Item1)
-            //    .Select(validationResult => validationResult.Item2)
-            //    .ToList();
-
             var validatedBatchIds = new List<string>();
             foreach (var batchId in batchIds)
             {
