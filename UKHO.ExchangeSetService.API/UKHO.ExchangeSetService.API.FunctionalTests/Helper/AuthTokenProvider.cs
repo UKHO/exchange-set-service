@@ -98,7 +98,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                     //Acquiring token through user interaction
                     AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
-                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
+                                                            //.WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
+                                                            .WithTenantId(EssauthConfig.TenantId)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
@@ -143,7 +144,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
                     //Acquiring token through user interaction
                     AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
-                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
+                                                            //.WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
+                                                            .WithTenantId(EssauthConfig.TenantId)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
