@@ -532,4 +532,13 @@
    ]]></notes>
    <cve>CVE-2024-38460</cve>
 </suppress>
+<suppress>
+	<notes>
+		<![CDATA[
+file name: Azure.Identity:1.7.0
+]]>
+	</notes>
+	<packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+	<cve>CVE-2023-36414</cve>
+</suppress>	
 </suppressions>
