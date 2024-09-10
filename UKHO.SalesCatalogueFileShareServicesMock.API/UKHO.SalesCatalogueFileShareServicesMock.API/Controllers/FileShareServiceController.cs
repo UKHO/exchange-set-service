@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -25,6 +26,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsAddFileinBatch { get; set; }
         protected IConfiguration configuration;
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration;
+        private readonly string homeDirectoryPath;
 
         public FileShareServiceController(IHttpContextAccessor httpContextAccessor, FileShareService fileShareService, IConfiguration configuration, IOptions<FileShareServiceConfiguration> fileShareServiceConfiguration) : base(httpContextAccessor)
         {
@@ -51,6 +53,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             };
             this.configuration = configuration;
             this.fileShareServiceConfiguration = fileShareServiceConfiguration;
+
+            homeDirectoryPath = configuration["HOME"];
         }
 
         [HttpPost]
@@ -59,7 +63,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (batchRequest != null && !string.IsNullOrEmpty(batchRequest.BusinessUnit))
             {
-                var response = fileShareService.CreateBatch(configuration["HOME"]);
+                var response = fileShareService.CreateBatch(homeDirectoryPath);
                 if (response != null)
                 {
                     return Created(string.Empty, response);
@@ -89,14 +93,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             byte[] bytes = null;
 
+             (bool validated, string validatedBatchId) = ValidateBatchId(batchId);
+
             if (fileName == "DE260001.000")
             {
                 HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
                 return StatusCode(StatusCodes.Status307TemporaryRedirect);
             }
-            if (!string.IsNullOrEmpty(fileName))
+            if (validated && !string.IsNullOrEmpty(fileName) && !Path.IsPathRooted(fileName))
             {
-                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
+                bytes = fileShareService.GetFileData(homeDirectoryPath, validatedBatchId, Path.GetFileName(fileName));
             }
 
             return File(bytes, "application/octet-stream", fileName);
@@ -113,9 +119,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                                 [FromHeader(Name = "Content-Type"), SwaggerSchema(Format = "MIME"), SwaggerParameter(Required = true)] string contentType,
                                                 [FromBody] object data )
         {
-            if (!string.IsNullOrEmpty(batchId) && data != null && !string.IsNullOrEmpty(blockId) && !string.IsNullOrEmpty(contentMD5) && !string.IsNullOrEmpty(contentType))
+            (bool validated, string validatedBatchId) = ValidateBatchId(batchId);
+
+            if (validated && !Path.IsPathRooted(fileName) && data != null && !string.IsNullOrEmpty(blockId) && !string.IsNullOrEmpty(contentMD5) && !string.IsNullOrEmpty(contentType))
             {
-                var response = fileShareService.UploadBlockOfFile(batchId, fileName, data, configuration["HOME"]);
+                var response = fileShareService.UploadBlockOfFile(validatedBatchId, Path.GetFileName(fileName), data, homeDirectoryPath);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.Created);
@@ -132,9 +140,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                              [FromRoute, SwaggerParameter(Required = true)] string fileName,
                                              [FromBody, SwaggerParameter(Required = true)] FileCommitPayload payload)
         {
-            if (!string.IsNullOrEmpty(batchId) && !string.IsNullOrEmpty(fileName) && payload != null)
+            (bool validated, string validatedBatchId) = ValidateBatchId(batchId);
+
+            if (validated && !string.IsNullOrEmpty(fileName) && !Path.IsPathRooted(fileName) && payload != null)
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, fileName, configuration["HOME"]);
+                var response = fileShareService.CheckBatchWithZipFileExist(validatedBatchId, Path.GetFileName(fileName), homeDirectoryPath);
                 if (response)
                 {
                     return StatusCode((int)HttpStatusCode.NoContent);
@@ -149,9 +159,13 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Produces("application/json")]
         public IActionResult CommitBatch([FromRoute] string batchId, [FromBody] List<BatchCommitRequest> body)
         {
-            if (!string.IsNullOrEmpty(batchId) && body != null)
+            (bool validated, string validatedBatchId) = ValidateBatchId(batchId);
+
+            string fileName = body?.Select(a => a.FileName).FirstOrDefault();
+
+            if (validated && !string.IsNullOrEmpty(fileName) && !Path.IsPathRooted(fileName))
             {
-                var response = fileShareService.CheckBatchWithZipFileExist(batchId, body.Select(a => a.FileName).FirstOrDefault(), configuration["HOME"]);
+                var response = fileShareService.CheckBatchWithZipFileExist(validatedBatchId, Path.GetFileName(fileName), homeDirectoryPath);
                 if (response)
                 {
                     return Accepted(new BatchCommitResponse() { Status = new Status { URI = $"/batch/{batchId}/status" } });
@@ -171,9 +185,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                                             [FromHeader(Name = "X-Content-Size"), SwaggerSchema(Format = ""), SwaggerParameter(Required = true)] long? xContentSize,
                                             [FromBody] FileRequest attributes)
         {
-            if (!string.IsNullOrEmpty(batchId))
+            (bool validated, string validatedBatchId) = ValidateBatchId(batchId);
+
+            if (validated)
             {
-                var response = fileShareService.CheckBatchFolderExists(batchId, configuration["HOME"]);
+                var response = fileShareService.CheckBatchFolderExists(validatedBatchId, homeDirectoryPath);
                 if (response)
                 {
                     return StatusCode(StatusCodes.Status201Created);
@@ -187,9 +203,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Produces("application/json")]
         public IActionResult GetBatchStatus([FromRoute, Required] string batchId)
         {
-            if (!string.IsNullOrEmpty(batchId))
+            (bool validated, string validatedBatchId) = ValidateBatchId(batchId);
+
+            if (validated)
             {
-                BatchStatusResponse batchStatusResponse = fileShareService.GetBatchStatus(batchId, configuration["HOME"]);
+                BatchStatusResponse batchStatusResponse = fileShareService.GetBatchStatus(validatedBatchId, homeDirectoryPath);
                 if (batchStatusResponse.Status == "Committed")
                 {
                     return new OkObjectResult(batchStatusResponse);
@@ -202,9 +220,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("/cleanUp")]
         public IActionResult CleanUp([FromBody] List<string> batchId)
         {
-            if (batchId != null && batchId.Count > 0)
+            var validatedBatchIds = ValidateBatchIds(batchId);
+            if (validatedBatchIds.Count > 0)
             {
-                var response = fileShareService.CleanUp(batchId, configuration["HOME"]);
+                var response = fileShareService.CleanUp(validatedBatchIds, homeDirectoryPath);
                 if (response)
                 {
                     return Ok();
@@ -217,13 +236,36 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public ActionResult RedirectDownloadFile(string batchId, string fileName)
         {
             byte[] bytes = null;
-            if (!string.IsNullOrEmpty(fileName))
+            (bool validated, string validatedBatchId) = ValidateBatchId(batchId);
+
+            if (validated && !string.IsNullOrEmpty(fileName) && !Path.IsPathRooted(fileName))
             {
-                bytes = fileShareService.GetFileData(configuration["HOME"], batchId, fileName);
+                bytes = fileShareService.GetFileData(homeDirectoryPath, validatedBatchId, Path.GetFileName(fileName));
                 HttpContext.Response.Headers.Add("x-redirect-status", "true");
             }
 
             return File(bytes, "application/octet-stream", fileName);
+        }
+
+        private static (bool, string) ValidateBatchId(string batchId)
+        {
+            var validated = Guid.TryParse(batchId, out var result);
+            return (validated, result.ToString());
+        }
+
+        private static List<string> ValidateBatchIds(IEnumerable<string> batchIds)
+        {
+            var validatedBatchIds = new List<string>();
+            foreach (var batchId in batchIds)
+            {
+                var (validated, validatedBatchId) = ValidateBatchId(batchId);
+                if (validated)
+                {
+                    validatedBatchIds.Add(validatedBatchId);
+                }
+            }
+
+            return validatedBatchIds;
         }
     }
 }
