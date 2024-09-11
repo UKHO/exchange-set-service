@@ -54,8 +54,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.Item2);
 
             var storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient Data FileName:{uploadFileName}, ContainerName:{containerName} ", uploadFileName, containerName);
             var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
-            await blobClient.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
+            if (blobClient is null)
+            {
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(),"Error Blob is null");
+            }
+            else
+            {
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient URI:{blobClient.Uri}", blobClient.Uri);
+            }
+            await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
 
             await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
