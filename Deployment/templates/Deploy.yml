@@ -167,7 +167,7 @@ jobs:
                 **/*FunctionalTest*.dll
                 !**/*TestAdapter.dll
                 !**/obj/**
-              arguments: '--filter Category=SmokeTest-AIOEnabled'
+              arguments: '--filter Category=QCOnlyTest-AIOEnabled'
               testRunTitle: "${{parameters.Environment}}-AutomationTests"
               workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
