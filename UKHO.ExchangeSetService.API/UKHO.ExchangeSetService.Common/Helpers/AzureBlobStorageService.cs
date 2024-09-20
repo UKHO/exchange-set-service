@@ -55,14 +55,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
             logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient Data FileName:{uploadFileName}, ContainerName:{containerName} ", uploadFileName, containerName);
+            // rhz the following returns a blob client with uri, 
             var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
             if (blobClient is null)
             {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(),"Error Blob is null");
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(),"Error Blob is null"); //rhz
             }
             else
             {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient URI:{blobClient.Uri}", blobClient.Uri);
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient URI:{blobClient.Uri}", blobClient.Uri); //rhz
             }
             await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
 
@@ -83,11 +84,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
         {
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Upload to blob"); //rhz
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
-
             using var ms = new MemoryStream();
             LoadStreamWithJson(ms, serializeJsonObject);
-            await azureBlobStorageClient.UploadFromStreamAsync(blobClient, ms);
+            ////await azureBlobStorageClient.UploadFromStreamAsync(blobClient, ms);
+            try
+            {
+                await blobClient.UploadAsync(ms);
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "stream upload failed: {message} stream source {sjo} ",ex.Message, serializeJsonObject);
+            }
+            
         }
 
         private SalesCatalogueServiceResponseQueueMessage GetSalesCatalogueServiceResponseQueueMessage(string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, BlobClient blobClient, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)

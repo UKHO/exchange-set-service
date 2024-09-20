@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         }
 
         public async Task UploadFromStreamAsync(BlobClient blobClient, MemoryStream ms)
-        {
+        {  
             await blobClient.UploadAsync(ms);
         }
 
