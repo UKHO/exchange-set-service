@@ -57,15 +57,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient Data FileName:{uploadFileName}, ContainerName:{containerName} ", uploadFileName, containerName);
             // rhz the following returns a blob client with uri, 
             var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
-            if (blobClient is null)
+            
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic get BlobClient URI:{blobClient.Uri}", blobClient.Uri); //rhz
+
+            try
             {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(),"Error Blob is null"); //rhz
+                await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
             }
-            else
+            catch (Exception ex)
             {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient URI:{blobClient.Uri}", blobClient.Uri); //rhz
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders failed :{errorMessage}", ex.Message); //rhz
             }
-            await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
 
             await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
@@ -84,7 +86,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
         {
-            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Upload to blob"); //rhz
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic Upload to blob"); //rhz
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
             using var ms = new MemoryStream();
             LoadStreamWithJson(ms, serializeJsonObject);
@@ -95,7 +97,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             catch (Exception ex)
             {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "stream upload failed: {message} stream source {sjo} ",ex.Message, serializeJsonObject);
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic stream upload failed: {message} stream source {sjo} ",ex.Message, serializeJsonObject);
             }
             
         }
