@@ -372,18 +372,6 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Scrutor:3.3.0
-   These vunerabilities are in reference to Drupal, which we do not use.
-   ]]>
-    </notes>
-    <cve>CVE-2014-9152</cve>
-    <cve>CVE-2013-2158</cve>
-    <cve>CVE-2015-4393</cve>
-    <cve>CVE-2015-4394</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
    file name: System.Threading.Tasks.Dataflow.dll
    Vunerability due to permissions on VoiceCommandActivity application component, no applicable.
    ]]>
@@ -491,45 +479,31 @@
     <vulnerabilityName>CVE-2024-35255</vulnerabilityName>
   </suppress>
   <suppress>
-   <notes><![CDATA[
+    <notes>
+      <![CDATA[
    file name: Azure.Identity.dll
-   ]]></notes>
-   <cve>CVE-2024-35255</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
    file name: Microsoft.Identity.Client.Extensions.Msal.dll
-   ]]></notes>
-   <cve>CVE-2024-35255</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
    file name: Microsoft.Identity.Client.dll
-   ]]></notes>
-   <cve>CVE-2024-35255</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
    file name: Microsoft.IdentityModel.Clients.ActiveDirectory.dll
-   ]]></notes>
-   <cve>CVE-2024-35255</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
    file name: Microsoft.Kiota.Authentication.Azure.dll
-   ]]></notes>
-   <cve>CVE-2024-35255</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
+   ]]>
+    </notes>
+    <cve>CVE-2024-35255</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: System.Text.Json:7.0.0
-   ]]></notes>
-   <vulnerabilityName>CVE-2024-30105</vulnerabilityName>
-</suppress>
-<suppress>
-   <notes><![CDATA[
+   ]]>
+    </notes>
+    <vulnerabilityName>CVE-2024-30105</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: SonarAnalyzer.CSharp.dll
-   ]]></notes>
-   <cve>CVE-2024-38460</cve>
-</suppress>
+   ]]>
+    </notes>
+    <cve>CVE-2024-38460</cve>
+  </suppress>
 </suppressions>
