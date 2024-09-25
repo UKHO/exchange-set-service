@@ -1,11 +1,11 @@
-﻿using JWT;
-using JWT.Algorithms;
-using JWT.Serializers;
-using Microsoft.Identity.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using JWT;
+using JWT.Algorithms;
+using JWT.Serializers;
+using Microsoft.Identity.Client;
 using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
@@ -54,11 +54,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 if (FssAuthConfig.IsRunningOnLocalMachine)
                 {
                     IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(FssAuthConfig.ResourceId).
-                                                        WithRedirectUri("http://localhost").Build();
+                                                        WithRedirectUri("http://localhost").WithTenantId(EssauthConfig.TenantId).Build();
 
                     //Acquiring token through user interaction
                     AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
-                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
@@ -93,11 +92,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 if (EssauthConfig.IsRunningOnLocalMachine)
                 {
                     IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(EssauthConfig.EssClientId).
-                                                        WithRedirectUri("http://localhost").Build();
+                                                        WithRedirectUri("http://localhost").WithTenantId(EssauthConfig.TenantId).Build();
 
                     //Acquiring token through user interaction
                     AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
-                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
@@ -138,11 +136,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 if (ScsAuthConfig.IsRunningOnLocalMachine)
                 {
                     IPublicClientApplication debugApp = PublicClientApplicationBuilder.Create(ScsAuthConfig.ResourceId).
-                                                        WithRedirectUri("http://localhost").Build();
+                                                        WithRedirectUri("http://localhost").WithTenantId(EssauthConfig.TenantId).Build();
 
                     //Acquiring token through user interaction
                     AuthenticationResult tokenTask = await debugApp.AcquireTokenInteractive(scopes)
-                                                            .WithAuthority($"{EssauthConfig.MicrosoftOnlineLoginUrl}{EssauthConfig.TenantId}", true)
                                                             .ExecuteAsync();
                     Token = tokenTask.AccessToken;
                 }
@@ -160,7 +157,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             return Token;
         }
-       
+
         /// <summary>
         /// Generate custom signature verified Auth Token
         /// </summary>
