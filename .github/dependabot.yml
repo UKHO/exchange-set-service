@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "nuget"
     directory: "/UKHO.ExchangeSetService.API"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     ignore:
       - dependency-name: "Azure.Identity"
       - dependency-name: "*"
@@ -15,7 +15,7 @@ updates:
   - package-ecosystem: "nuget"
     directory: "/UKHO.SalesCatalogueFileShareServicesMock.API"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
