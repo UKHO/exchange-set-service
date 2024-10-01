@@ -62,7 +62,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             try
             {
-                await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
+                if (blobClient?.Exists())
+                {
+                    logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders blob exists"); //rhz
+                    await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken); 
+                }
             }
             catch (Exception ex)
             {
