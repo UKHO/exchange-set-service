@@ -54,12 +54,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.Item2);
 
             var storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
-            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic GetBlobClient Data FileName:{uploadFileName}, ContainerName:{containerName} ", uploadFileName, containerName);
-            // rhz the following returns a blob client with uri, 
+             
             var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
-            
-            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic get BlobClient URI:{blobClient.Uri}", blobClient.Uri); //rhz
 
+            // Code in the following try/catch block is possibly not needed, it seems to work without it
+            // the Exists() seems to return false, therefore nothing in the block is executed
             try
             {
                 if (blobClient?.Exists())
@@ -90,7 +89,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
         {
-            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic Upload to blob"); //rhz
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
             using var ms = new MemoryStream();
             LoadStreamWithJson(ms, serializeJsonObject);
