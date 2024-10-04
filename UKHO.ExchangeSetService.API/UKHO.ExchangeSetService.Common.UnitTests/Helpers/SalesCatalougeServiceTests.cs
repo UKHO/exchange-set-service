@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
             var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString(), string.Empty);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
-            Assert.IsNull(response.ResponseBody);
+            Assert.That(response.ResponseBody,Is.Null);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
             var response = await salesCatalogueService.GetProductsFromSpecificDateAsync(DateTime.UtcNow.ToString(), string.Empty);
             Assert.AreEqual(HttpStatusCode.NotModified, response.ResponseCode, $"Expected {HttpStatusCode.NotModified} got {response.ResponseCode}");
-            Assert.AreEqual(lastModified.UtcDateTime, response.LastModified);
+            Assert.That(lastModified.UtcDateTime, Is.EqualTo(response.LastModified));
         }
 
         [Test]

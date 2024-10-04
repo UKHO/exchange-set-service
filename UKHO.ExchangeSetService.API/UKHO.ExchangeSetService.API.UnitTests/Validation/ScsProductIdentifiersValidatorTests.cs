@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                 ProductIdentifier = productIdentifiers,
             };
             var result = validator.TestValidate(model);
-            Assert.AreEqual(0, result.Errors.Count);
+            Assert.That(0, Is.EqualTo(result.Errors.Count));
         }
         #endregion
     }

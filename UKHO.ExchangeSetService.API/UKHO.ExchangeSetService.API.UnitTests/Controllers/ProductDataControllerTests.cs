@@ -117,8 +117,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString().ToString());
             var errors = (ErrorDescription)result.Value;
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("Product Identifiers cannot be null or empty.", errors.Errors.Single().Description);
+            Assert.That(400, Is.EqualTo(result.StatusCode));
+            Assert.That("Product Identifiers cannot be null or empty.", Is.EqualTo(errors.Errors.Single().Description));
         }
 
         [Test]
@@ -144,8 +144,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null, exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
+            Assert.That(400, Is.EqualTo(result.StatusCode));
+            Assert.That("Either body is null or malformed.", Is.EqualTo(errors.Errors.Single().Description));
         }
 
         [Test]
@@ -174,9 +174,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("requestBody", errors.Errors.Single().Source);
-            Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
+            Assert.That(400, Is.EqualTo(result.StatusCode));
+            Assert.That("requestBody", Is.EqualTo(errors.Errors.Single().Source));
+            Assert.That("Either body is null or malformed.", Is.EqualTo(errors.Errors.Single().Description));
         }
 
         [Test]
@@ -205,7 +205,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
-            Assert.AreEqual(500, result.StatusCode);
+            Assert.That(500, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string callbackUri = string.Empty;
 
             var result = (StatusCodeResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
-            Assert.AreEqual(304, result.StatusCode);
+            Assert.That(304, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -327,7 +327,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
 
-            Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
+            Assert.That(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, Is.EqualTo(((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -367,8 +367,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var errors = (ErrorDescription)result.Value;
 
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("productName cannot be blank or null.", errors.Errors.Single().Description);
+            Assert.That(400, Is.EqualTo(result.StatusCode));
+            Assert.That("productName cannot be blank or null.", Is.EqualTo(errors.Errors.Single().Description));
         }
 
         [Test]
@@ -397,9 +397,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>(), "", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("requestBody", errors.Errors.Single().Source);
-            Assert.AreEqual("Either body is null or malformed.", errors.Errors.Single().Description);
+            Assert.That(400, Is.EqualTo(result.StatusCode));
+            Assert.That("requestBody", Is.EqualTo(errors.Errors.Single().Source));
+            Assert.That("Either body is null or malformed.", Is.EqualTo(errors.Errors.Single().Description));
         }
 
         [Test]
@@ -427,7 +427,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                             { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
-            Assert.AreEqual(500, result.StatusCode);
+            Assert.That(500, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -453,7 +453,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (StatusCodeResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
-            Assert.AreEqual(304, result.StatusCode);
+            Assert.That(304, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -579,9 +579,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.AreEqual(400, result.StatusCode);
-            Assert.AreEqual("sinceDateTime", errors.Errors.Single().Source);
-            Assert.AreEqual("Query parameter 'sinceDateTime' is required.", errors.Errors.Single().Description);
+            Assert.That(400, Is.EqualTo(result.StatusCode));
+            Assert.That("sinceDateTime", Is.EqualTo(errors.Errors.Single().Source));
+            Assert.That("Query parameter 'sinceDateTime' is required.", Is.EqualTo(errors.Errors.Single().Description));
         }
 
         [Test]
@@ -608,7 +608,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
 
             Assert.AreSame("Internal Server Error", ((UKHO.ExchangeSetService.Common.Models.Response.InternalServerError)result.Value).Detail);
-            Assert.AreEqual(500, result.StatusCode);
+            Assert.That(500, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -633,7 +633,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                .Returns(exchangeSetServiceResponse);
 
             var result = (StatusCodeResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
-            Assert.AreEqual(304, result.StatusCode);
+            Assert.That(304, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -718,8 +718,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
 
-            Assert.AreEqual(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount);
-            Assert.AreEqual(200, result.StatusCode);
+            Assert.That(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount, Is.EqualTo(((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount));
+            Assert.That(200, Is.EqualTo(result.StatusCode));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information

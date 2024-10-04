@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                 CallbackUri = callbackUri
             };
             var result = validator.TestValidate(model);
-            Assert.IsTrue(result.Errors.Count == 0);
+            Assert.That(result.Errors.Count == 0);
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                 CallbackUri = callbackUri
             };
             var result = validator.TestValidate(model);
-            Assert.AreEqual(0, result.Errors.Count);
+            Assert.That(0, Is.EqualTo(result.Errors.Count));
         }
         #endregion
     }

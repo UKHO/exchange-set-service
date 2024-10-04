@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)fakeWebHookController.NewFilesPublishedOptions();
 
-            Assert.AreEqual(200, result.StatusCode);
+            Assert.That(200, Is.EqualTo(result.StatusCode));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -65,8 +65,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
               && call.GetArgument<EventId>(1) == EventIds.NewFilesPublishedWebhookOptionsCallCompleted.ToEventId()
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Completed processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => responseHeaders.Add("WebHook-Allowed-Rate", "*")).MustHaveHappened();
-            A.CallTo(() => responseHeaders.Add("WebHook-Allowed-Origin", "test.com")).MustHaveHappened();
+            A.CallTo(() => responseHeaders.Append("WebHook-Allowed-Rate", "*")).MustHaveHappened();
+            A.CallTo(() => responseHeaders.Append("WebHook-Allowed-Origin", "test.com")).MustHaveHappened();
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
-            Assert.AreEqual(200, result.StatusCode);
+            Assert.That(200, Is.EqualTo(result.StatusCode));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             A.CallTo(() => fakeEssWebhookService.DeleteSearchAndDownloadCacheData(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
-            Assert.AreEqual(200, result.StatusCode);
+            Assert.That(200, Is.EqualTo(result.StatusCode));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
