@@ -518,4 +518,108 @@
     <cve>CVE-2023-36414</cve>
     <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2019-7611</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2023-46674</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2023-31418</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2019-7617</cve>
+  </suppress>
+  <suppress>
+   <notes><![CDATA[
+   file name: Elastic.Apm.EntityFrameworkCore.dll
+   ]]></notes>
+   <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.EntityFrameworkCore@.*$</packageUrl>
+   <cve>CVE-2019-7617</cve>
+</suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2020-7019</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2021-22144</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2019-7614</cve>
+  </suppress>
+  <suppress>
+   <notes><![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]></notes>
+   <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+   <cve>CVE-2021-22135</cve>
+</suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2021-22137</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2020-7021</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2020-7020</cve>
+  </suppress>
 </suppressions>
