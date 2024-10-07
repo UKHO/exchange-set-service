@@ -622,4 +622,76 @@
     <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
     <cve>CVE-2020-7020</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.GrpcClient.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
+    <cve>CVE-2023-33953</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.GrpcClient.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
+    <cve>CVE-2023-44487</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.GrpcClient.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
+    <cve>CVE-2023-4785</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.GrpcClient.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
+    <cve>CVE-2023-32732</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.MongoDb.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
+    <cve>CVE-2012-6619</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.MongoDb.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
+    <cve>CVE-2013-1892</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.MongoDb.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
+    <cve>CVE-2014-8180</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.MongoDb.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
+    <cve>CVE-2016-6494</cve>
+  </suppress>
 </suppressions>
