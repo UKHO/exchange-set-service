@@ -521,177 +521,49 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
+   file name: Elastic.Apm.AspNetCore.dll
    ]]>
     </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2019-7611</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2023-46674</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2023-31418</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.AspNetCore@.*$</packageUrl>
+    <cpe>cpe:/a:asp-project:asp-project</cpe>
+    <cpe>cpe:/a:elastic:apm_.net_agent</cpe>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cpe>cpe:/a:elastic:elastic_agent</cpe>
     <cve>CVE-2019-7617</cve>
   </suppress>
   <suppress>
-   <notes><![CDATA[
-   file name: Elastic.Apm.EntityFrameworkCore.dll
-   ]]></notes>
-   <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.EntityFrameworkCore@.*$</packageUrl>
-   <cve>CVE-2019-7617</cve>
-</suppress>
-  <suppress>
     <notes>
       <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
+   file name: Elastic.Apm.Extensions.Hosting.dll
    ]]>
     </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2020-7019</cve>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Hosting@.*$</packageUrl>
+    <cpe>cpe:/a:elastic:apm_.net_agent</cpe>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cpe>cpe:/a:elastic:elastic_agent</cpe>
+    <cve>CVE-2019-7617</cve>
   </suppress>
   <suppress>
     <notes>
       <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
+   file name: Elastic.Apm.Extensions.Logging.dll
    ]]>
     </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2021-22144</cve>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Extensions\.Logging@.*$</packageUrl>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cpe>cpe:/a:elastic:elastic_agent</cpe>
+    <cve>CVE-2019-7617</cve>
   </suppress>
   <suppress>
     <notes>
       <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
+   file name: Elastic.Apm.dll
    ]]>
     </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2019-7614</cve>
-  </suppress>
-  <suppress>
-   <notes><![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
-   ]]></notes>
-   <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-   <cve>CVE-2021-22135</cve>
-</suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2021-22137</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2020-7021</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.Elasticsearch.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
-    <cve>CVE-2020-7020</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.GrpcClient.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
-    <cve>CVE-2023-33953</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.GrpcClient.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
-    <cve>CVE-2023-44487</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.GrpcClient.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
-    <cve>CVE-2023-4785</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.GrpcClient.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
-    <cve>CVE-2023-32732</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.MongoDb.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
-    <cve>CVE-2012-6619</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.MongoDb.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
-    <cve>CVE-2013-1892</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.MongoDb.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
-    <cve>CVE-2014-8180</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Elastic.Apm.MongoDb.dll
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
-    <cve>CVE-2016-6494</cve>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm@.*$</packageUrl>
+    <cpe>cpe:/a:elastic:apm_.net_agent</cpe>
+    <cpe>cpe:/a:elastic:apm_agent</cpe>
+    <cpe>cpe:/a:elastic:elastic_agent</cpe>
+    <cve>CVE-2019-7617</cve>
   </suppress>
 </suppressions>
