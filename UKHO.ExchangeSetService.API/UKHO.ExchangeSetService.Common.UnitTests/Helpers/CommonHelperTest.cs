@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.False(_isRetryCalled);
+            Assert.That(_isRetryCalled, Is.False);
             Assert.That(HttpStatusCode.TooManyRequests, Is.EqualTo(result.StatusCode));
         }
 
