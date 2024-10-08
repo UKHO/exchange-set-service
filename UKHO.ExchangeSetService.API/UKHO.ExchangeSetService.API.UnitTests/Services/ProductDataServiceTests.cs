@@ -1916,7 +1916,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());// ADB2C Token with File size less than 300 mb
 
-            Assert.That(result.ExchangeSetResponse, Is.True);
+            Assert.That(result.ExchangeSetResponse, Is.Null);
             Assert.That(HttpStatusCode.InternalServerError, Is.EqualTo(result.HttpStatusCode));
         }
 

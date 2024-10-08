@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public void WhenValidHeaderRequestedInNewFilesPublishedOptions_ThenReturnsOkResponse()
         {
-            var responseHeaders = A.Fake<IHeaderDictionary>();
+            var responseHeaders = new HeaderDictionary();
             var httpContext = A.Fake<HttpContext>();
 
             A.CallTo(() => httpContext.Response.Headers).Returns(responseHeaders);
@@ -65,8 +65,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
               && call.GetArgument<EventId>(1) == EventIds.NewFilesPublishedWebhookOptionsCallCompleted.ToEventId()
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Completed processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => responseHeaders.Append("WebHook-Allowed-Rate", "*")).MustHaveHappened();
-            A.CallTo(() => responseHeaders.Append("WebHook-Allowed-Origin", "test.com")).MustHaveHappened();
+            Assert.That(responseHeaders["WebHook-Allowed-Rate"], Is.EqualTo("*"));
+            Assert.That(responseHeaders["WebHook-Allowed-Origin"], Is.EqualTo("test.com"));
         }
 
         [Test]
