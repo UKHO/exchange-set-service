@@ -269,8 +269,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        /// rhz
-        /// Not sure if this is a valid test, the assertion will always be true
+        /// rhz Not sure if this is a valid test, the assertion will always be true
         /// so unless the awaited method throws an exception, the test will always pass
         public async Task WhenInsertOrMergeFssCacheDetail_ThenReturnTrue()
         {

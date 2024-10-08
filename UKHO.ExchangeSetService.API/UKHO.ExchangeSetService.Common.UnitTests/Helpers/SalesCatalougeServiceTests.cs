@@ -165,7 +165,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             //Test
             Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Get));
-            /// rhz Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}", uriParam);
+            Assert.That(uriParam,Is.EqualTo($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}"));
             Assert.That(postBodyParam, Is.Null);
             Assert.That(accessTokenParam, Is.EqualTo(actualAccessToken));
         }
@@ -248,7 +248,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             //Test
             Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Post));
-            /// rhz Assert.AreEqual(uriParam, $"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productVersions");
+            Assert.That($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productVersions", Is.EqualTo(uriParam));
             Assert.That(postBodyParam, Is.EqualTo(JsonConvert.SerializeObject(requestBody)));
             Assert.That(actualAccessToken, Is.EqualTo(accessTokenParam));
         }
@@ -331,7 +331,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             //Test
             Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Post));
-            /// rhz Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productIdentifiers", uriParam);
+            Assert.That(uriParam, Is.EqualTo($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/products/productIdentifiers"));
             Assert.That(postBodyParam, Is.EqualTo(JsonConvert.SerializeObject(requestBody)));
             Assert.That(actualAccessToken, Is.EqualTo(accessTokenParam));
         }
@@ -401,7 +401,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             //Test
             Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Get));
-            /// rhz Assert.AreEqual($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/catalogue/{fakeSaleCatalogueConfig.Value.CatalogueType}", uriParam);
+            Assert.That(uriParam, Is.EqualTo($"/{fakeSaleCatalogueConfig.Value.Version}/productData/{fakeSaleCatalogueConfig.Value.ProductType}/catalogue/{fakeSaleCatalogueConfig.Value.CatalogueType}"));
             Assert.That(accessTokenParam, Is.EqualTo(actualAccessToken));
         }
         #endregion GetSalesCatalogueDataResponse

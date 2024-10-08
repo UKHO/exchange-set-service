@@ -140,12 +140,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public void CheckValueIsNumeric()
+        public void CheckIsNumericReturnsTrueForNumbers()
         {
             bool isNum = CommonHelper.IsNumeric(1234);
             Assert.That(isNum,Is.True);
+        }
 
-            // rhz : Should also test for non-numeric values
+        [Test]
+        public void CheckIsNumericReturnsFalseForNonNumericValue()
+        {
+            bool isNum = CommonHelper.IsNumeric("1234a");
+            Assert.That(isNum, Is.False);
         }
     }
 }

@@ -292,16 +292,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.Created) , $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.That(createBatchResponse.BatchId, Is.EqualTo(response.ResponseBody.BatchId));
 
-            Assert.That(createBatchResponse.BatchStatusUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
             //assert the mocked API response returned to CreateBatch contains the internal BaseUrl
             Assert.That(createBatchResponse.BatchStatusUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
             Assert.That(createBatchResponse.ExchangeSetBatchDetailsUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
             Assert.That(createBatchResponse.ExchangeSetFileUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
 
             //assert FileShareService.CreateBatch() is correctly replacing the internal BaseUrl with PublicUrl
-            /// rhz Assert.AreEqual(createBatchResponse.BatchStatusUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.BatchStatusUri);
-            /// rhz Assert.AreEqual(createBatchResponse.ExchangeSetBatchDetailsUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.ExchangeSetBatchDetailsUri);
-            /// rhz Assert.AreEqual(createBatchResponse.ExchangeSetFileUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.ExchangeSetFileUri);
+            Assert.That(response.ResponseBody.BatchStatusUri,Is.EqualTo(createBatchResponse.BatchStatusUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
+            Assert.That(response.ResponseBody.ExchangeSetBatchDetailsUri, Is.EqualTo(createBatchResponse.ExchangeSetBatchDetailsUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
+            Assert.That(response.ResponseBody.ExchangeSetFileUri, Is.EqualTo(createBatchResponse.ExchangeSetFileUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
         }
 
         [Test]
