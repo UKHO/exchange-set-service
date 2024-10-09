@@ -69,8 +69,7 @@ stages:
           displayName: 'Use .NET SDK'
           inputs:
             packageType: sdk
-            useGlobalJson: true
-            workingDirectory: '$(Build.SourcesDirectory)'
+            version: $(SdkVersion)
 
         - task: UseDotNet@2
           displayName: 'Use .NET SDK for Stryker'
@@ -120,8 +119,7 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore non test projects only"
@@ -166,8 +164,7 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore test projects only"
@@ -218,8 +215,7 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -299,8 +295,7 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -386,8 +381,7 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -566,8 +560,7 @@ stages:
                   displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    useGlobalJson: true
-                    workingDirectory: '$(Build.SourcesDirectory)'
+                    version: $(SdkVersion)
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
@@ -735,8 +728,7 @@ stages:
                   displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    useGlobalJson: true
-                    workingDirectory: '$(Build.SourcesDirectory)'
+                    version: $(SdkVersion)
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
@@ -930,8 +922,7 @@ stages:
                   displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    useGlobalJson: true
-                    workingDirectory: '$(Build.SourcesDirectory)'
+                    version: $(SdkVersion)
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
