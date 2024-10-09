@@ -2,9 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Storage;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -21,7 +19,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public class AzureBlobStorageService : IAzureBlobStorageService
     {
         private readonly ISalesCatalogueStorageService scsStorageService;
-        private const string CONTENT_TYPE = "application/json";
+        /// rhz private const string CONTENT_TYPE = "application/json";
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly IAzureMessageQueueHelper azureMessageQueueHelper;
         private readonly ILogger<AzureBlobStorageService> logger;
