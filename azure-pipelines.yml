@@ -796,7 +796,7 @@ stages:
     - Devdeploy
     - QCdeploy
     displayName: QAdeploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), eq(variables['Build.SourceBranch'], 'refs/heads/performance'), startsWith(variables['Build.SourceBranch'], 'refs/heads/perf/')))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))
     jobs:
       - deployment: QADeployApimSolas
         displayName: "QA - deploy SOLAS APIM"
