@@ -36,6 +36,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
         private readonly IAuthFssTokenProvider authFssTokenProvider;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
+        private const string ReadMeContainerName = "readme";
 
         public EssWebhookService(IAzureTableStorageClient azureTableStorageClient,
             ISalesCatalogueStorageService azureStorageService,
@@ -68,37 +69,45 @@ namespace UKHO.ExchangeSetService.API.Services
             return enterpriseEventCacheDataRequestValidator.Validate(enterpriseEventCacheDataRequest);
         }
 
-        public async Task InsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
+        public async Task InvalidateAndInsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
         {
-            var productCode = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "ProductCode").Value;
-            var cellName = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "CellName").Value;
-            var editionNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "EditionNumber").Value;
-            var updateNumber = enterpriseEventCacheDataRequest.Attributes.Find(a => a.Key == "UpdateNumber").Value;
-
-            if (!ValidateCacheAttributeData(enterpriseEventCacheDataRequest.BusinessUnit, productCode, cellName, editionNumber, updateNumber))
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
+            var readMeFileExist = enterpriseEventCacheDataRequest.Files?.Exists(x => x.Filename?.ToUpper() == fileShareServiceConfig.Value.ReadMeFileName);
+            if (readMeFileExist == true)
             {
-                logger.LogInformation(EventIds.InsertCacheInvalidDataFoundEvent.ToEventId(), "Invalid data found in search and download cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                var productType = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "Product Type").Select(a => a.Value).FirstOrDefault();
+                await InvalidateReadMeFileCacheDataAsync(storageConnectionString, enterpriseEventCacheDataRequest.BusinessUnit, enterpriseEventCacheDataRequest.BatchId, productType, correlationId);
             }
             else
             {
-                var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
+                var productCode = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "ProductCode").Select(a => a.Value).FirstOrDefault();
+                var cellName = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
+                var editionNumber = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "EditionNumber").Select(a => a.Value).FirstOrDefault();
+                var updateNumber = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "UpdateNumber").Select(a => a.Value).FirstOrDefault();
 
-                var fssSearchResponse = new FssSearchResponseCache
+                if (!ValidateCacheAttributeData(enterpriseEventCacheDataRequest.BusinessUnit, productCode, cellName, editionNumber, updateNumber))
                 {
-                    BatchId = enterpriseEventCacheDataRequest.BatchId,
-                    PartitionKey = cellName,
-                    RowKey = $"{editionNumber}|{updateNumber}|{enterpriseEventCacheDataRequest.BusinessUnit.ToUpper()}",
-                    Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
-                };
-
-                await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
-                if (enterpriseEventCacheDataRequest.Files != null && enterpriseEventCacheDataRequest.Files.Count > 0)
-                {
-                    await UploadDataToCacheAsync(fssSearchResponse, correlationId);
+                    logger.LogInformation(EventIds.InsertCacheInvalidDataFoundEvent.ToEventId(), "Invalid data found in search and download cache Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
                 }
                 else
                 {
-                    logger.LogInformation(EventIds.InsertCacheMissingData.ToEventId(), "Cache search and download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                    var fssSearchResponse = new FssSearchResponseCache
+                    {
+                        BatchId = enterpriseEventCacheDataRequest.BatchId,
+                        PartitionKey = cellName,
+                        RowKey = $"{editionNumber}|{updateNumber}|{enterpriseEventCacheDataRequest.BusinessUnit.ToUpper()}",
+                        Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
+                    };
+
+                    await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
+                    if (enterpriseEventCacheDataRequest.Files != null && enterpriseEventCacheDataRequest.Files.Count > 0)
+                    {
+                        await UploadDataToCacheAsync(fssSearchResponse, correlationId);
+                    }
+                    else
+                    {
+                        logger.LogInformation(EventIds.InsertCacheMissingData.ToEventId(), "Cache search and download files data missing in Request for ProductName:{cellName}, BusinessUnit:{businessUnit} and ProductCode:{productCode} and _X-Correlation-ID:{CorrelationId}", cellName, enterpriseEventCacheDataRequest.BusinessUnit, productCode, correlationId);
+                    }
                 }
             }
         }
@@ -205,6 +214,24 @@ namespace UKHO.ExchangeSetService.API.Services
                 && !string.IsNullOrWhiteSpace(cellName)
                 && !string.IsNullOrWhiteSpace(editionNumber)
                 && !string.IsNullOrWhiteSpace(updateNumber));
+        }
+        private async Task InvalidateReadMeFileCacheDataAsync(string storageConnectionString, string businessUnit, string batchId, string productType, string correlationId)
+        {
+            if (!ValidateCacheAttributeDataForReadMeFile(businessUnit, productType))
+            {
+                logger.LogInformation(EventIds.InsertCacheInvalidDataFoundEvent.ToEventId(), "Invalid data found in search and download cache Request for readme.txt BusinessUnit:{businessUnit} and ProductCode:{productType} and _X-Correlation-ID:{CorrelationId}", businessUnit, productType, correlationId);
+            }
+            else
+            {
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerStarted.ToEventId(), "Deletion started for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", businessUnit, batchId, correlationId);
+                await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString, ReadMeContainerName);
+                logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerCompleted.ToEventId(), "Deletion completed for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", businessUnit, batchId, correlationId);
+            }
+        }
+        private bool ValidateCacheAttributeDataForReadMeFile(string businessUnit, string productType)
+        {
+            return ((string.Equals(businessUnit, cacheConfiguration.Value.S63CacheBusinessUnit, StringComparison.OrdinalIgnoreCase) || string.Equals(businessUnit, cacheConfiguration.Value.S57CacheBusinessUnit, StringComparison.OrdinalIgnoreCase))
+                && productType == cacheConfiguration.Value.CacheProductCode);
         }
     }
 }

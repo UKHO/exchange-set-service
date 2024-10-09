@@ -558,13 +558,13 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         FileShareServiceUploadENCFilesToCacheCompleted = 805137,
         /// <summary>
-        /// 805138 - Request for inserting Search and Download Cache Data from ESS start.
+        /// 805138 - Request for invalidating and inserting Search and Download Cache Data from ESS start.
         /// </summary>
-        ESSInsertCacheDataEventStart = 805138,
+        ESSInvalidateAndInsertCacheDataEventStart = 805138,
         /// <summary>
-        /// 805139 - Request for inserting Search and Download Cache Data from ESS is completed.
+        /// 805139 - Request for invalidating and inserting Search and Download Cache Data from ESS is completed.
         /// </summary>
-        ESSInsertCacheDataEventCompleted = 805139,
+        ESSInvalidateAndInsertCacheDataEventCompleted = 805139,
         /// <summary>
         /// 805140 - Started Deleting Search and Download Cache Data from ESS Cache Table and Blob
         /// </summary>
@@ -600,7 +600,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805148 - Request for validation event for inserting Cache Search and Download in ESS
         /// </summary>
-        ESSInsertCacheDataValidationEvent = 805148,
+        ESSInvalidateAndInsertCacheDataValidationEvent = 805148,
         /// <summary>
         /// 805149 - Check if event triggered is by B2C or AdB2C user in ESS
         /// </summary>
@@ -840,7 +840,20 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805208 - Cache Search and Download files data missing
         /// </summary>
-        InsertCacheMissingData = 805208
+        InsertCacheMissingData = 805208,
+        /// <summary>
+        /// 805209 - Cache Search and Download readme.txt file started
+        /// </summary>
+        SearchDownloadReadmeCacheEventStart = 805209,
+        /// <summary>
+        /// 805210 - Cache Search and Download readme.txt file completed
+        /// </summary>
+        SearchDownloadReadmeCacheEventCompleted = 805210,
+        /// <summary>
+        /// 805211 - Download readme.txt file is failed.
+        /// </summary>
+        ErrorInDownloadReadMeFile = 805211
+
 
     }
 

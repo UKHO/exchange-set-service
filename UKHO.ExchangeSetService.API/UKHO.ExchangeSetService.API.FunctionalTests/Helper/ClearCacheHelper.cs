@@ -1,4 +1,7 @@
+using Azure.Storage.Blobs;
 using Microsoft.Azure.Cosmos.Table;
+using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,7 +17,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var retrieveOperation = TableOperation.Retrieve<TElement>(partitionKey, rowKey);
             return await ExecuteTableOperation(retrieveOperation, tableName, storageAccountConnectionString) as ITableEntity;
         }
-
+        
         private async Task<CloudTable> GetAzureTable(string tableName, string storageAccountConnectionString)
         {
             var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
@@ -29,6 +32,24 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var table = await GetAzureTable(tableName, storageAccountConnectionString);
             var tableResult = await table.ExecuteAsync(tableOperation);
             return tableResult.Result;
+        }
+
+        public async Task<bool> GetProductIdentifierAsync(string essJwtToken, string essBaseAddress, string readmeContainer, string connectionString)
+        {
+            ExchangeSetApiClient ExchangeSetApiClient = new ExchangeSetApiClient(essBaseAddress);
+            BlobServiceClient BlobServiceClient = new BlobServiceClient(connectionString);
+            await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" },null, essJwtToken, "s63");
+            bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 7000);
+            Assert.IsTrue(containerExists);
+            return containerExists;
+        }
+
+        public JObject GetDataForPayload(string source, string id)
+        {
+            var essCacheJson = JObject.Parse(@"{""Type"":""uk.gov.UKHO.FileShareService.NewFilesPublished.v1""}");
+            essCacheJson["Source"] = source;
+            essCacheJson["Id"] = id;
+            return essCacheJson;
         }
 
         public EnterpriseEventCacheDataRequest GetCacheRequestData(string businessUnit, string agency, string product, int editionNumber)
@@ -86,6 +107,54 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                                                  MimeType = "application/s63", Hash = "mp25B4rDzWfCyPjqI2f+5Q==",
                                                  Attributes = new List<Attribute>{new(){Key = "s57-CRC", Value = "CC362FA5" } },
                                                  Links = link2 }},
+
+                BatchId = Guid.NewGuid().ToString(),
+                BatchPublishedDate = DateTime.UtcNow
+            };
+        }
+
+        public EnterpriseEventCacheDataRequest GetCacheRequestDataForReadMeFile(string businessUnit)
+        {
+            BatchDetails linkBatchDetails = new()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272"
+            };
+            BatchStatus linkBatchStatus = new()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/status"
+            };
+            GetUrl linkGet = new()
+            {
+                Href = @"http://tempuri.org.uk/batch/7b4cdb10-ddfd-4ed6-b2be-d1543d8b7272/files/exchangeset123.zip"
+            };
+            GetUrl fileLink = new()
+            {
+                Href = @"/batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT"
+            };
+
+            RefLink link = new()
+            {
+                Get = fileLink,
+            };
+
+            LinksNew links = new()
+            {
+                BatchDetails = linkBatchDetails,
+                BatchStatus = linkBatchStatus,
+                GetUrl = linkGet
+            };
+
+            return new EnterpriseEventCacheDataRequest
+            {
+                Links = links,
+                BusinessUnit = businessUnit,
+                Attributes = new List<Attribute> { new() { Key = "Product Type", Value = "AVCS" } },
+
+                Files = new List<CacheFile>{new(){Filename = "README.TXT", FileSize = 44788,
+                        MimeType = "text/plain", Hash = "SuWvMzKMj+fkeEFzWf7nlw==",
+                        Attributes = new List<Attribute>{},
+                        Links = link },
+                },
 
                 BatchId = Guid.NewGuid().ToString(),
                 BatchPublishedDate = DateTime.UtcNow
