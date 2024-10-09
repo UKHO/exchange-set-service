@@ -889,7 +889,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetInfoPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.Info);
 
             return
-            await DownloadReadMeFile(batchId, exchangeSetRootPath, correlationId) &&
+            await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId) &&
             await DownloadIhoCrtFile(batchId, aioExchangeSetPath, correlationId) &&
             await DownloadIhoPubFile(batchId, aioExchangeSetPath, correlationId) &&
             await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse) &&
