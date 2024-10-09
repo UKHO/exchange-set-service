@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         Task<bool> CommitBatchToFss(string batchId, string correlationId, string exchangeSetZipPath, string fileName = "zip");
         Task<string> SearchIhoPubFilePath(string batchId, string correlationId);
         Task<string> SearchIhoCrtFilePath(string batchId, string correlationId);
-        Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string exchangeSetRootPath, string correlationId);
+        Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string aioExchangeSetPath, string correlationId);
         Task<bool> DownloadIhoPubFile(string ihoPubFilePath, string batchId, string exchangeSetRootPath, string correlationId);
         Task<bool> DownloadReadMeFileFromCacheAsync(string batchId, string exchangeSetRootPath, string correlationId);
     }
