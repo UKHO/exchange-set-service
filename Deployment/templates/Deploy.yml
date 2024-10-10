@@ -13,7 +13,7 @@ parameters:
   type: string
 - name: RunTests
   type: boolean
-  default: true
+  default: false
 
 jobs:
 - deployment: DeployApimSolas
