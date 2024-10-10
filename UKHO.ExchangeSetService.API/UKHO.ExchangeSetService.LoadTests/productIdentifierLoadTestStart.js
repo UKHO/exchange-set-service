@@ -1,16 +1,16 @@
 import http from "k6/http";
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
-import { authenticateUsingAzure } from './oauth/azure.js';
+import { authenticateUsingAzure } from './Oauth/Azure.js';
 import { sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
-const runTestProductIdentifier = require('./scripts/LoadTestForProductIdentifier.js');
+const runTestProductIdentifier = require('./Scripts/LoadTestForProductIdentifier.js');
 const config = JSON.parse(open('./config.json'));
-const dataHelper = require('./helper/dataHelper.js');
-const apiClient = require('./helper/clientHelper.js');
+const dataHelper = require('./Helper/DataHelper.js');
+const apiClient = require('./Helper/ClientHelper.js');
 
-const apiDownloadClient = require('./scripts/DownloadFileScript.js');
+const apiDownloadClient = require('./Scripts/DownloadFileScript.js');
 
 const productIdentifierData_Small_25MB = dataHelper.GetProductIdentifierDataforSmallExchangeSet_25MB();
 const productIdentifierData_Small_50MB = dataHelper.GetProductIdentifierDataforSmallExchangeSet_50MB();

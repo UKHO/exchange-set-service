@@ -2,8 +2,7 @@ param (
     [Parameter(Mandatory = $true)] [string] $deploymentResourceGroupName,
     [Parameter(Mandatory = $true)] [string] $deploymentStorageAccountName,
     [Parameter(Mandatory = $true)] [string] $workSpace,
-    [Parameter(Mandatory = $true)] [boolean] $continueEvenIfResourcesAreGettingDestroyed,
-    [Parameter(Mandatory = $true)] [boolean] $useNewTfplanName
+    [Parameter(Mandatory = $true)] [boolean] $continueEvenIfResourcesAreGettingDestroyed
 )
 
 cd $env:AGENT_BUILDDIRECTORY/terraformartifact/src/Modules/APIM/
@@ -12,7 +11,7 @@ terraform --version
 
 Write-output "Executing terraform scripts for APIM deployment in $workSpace environment..."
 
-$backendConfigKey = $useNewTfplanName ? "terraform.deployment.apim.ess.tfplan" : "terraform.ess.apim.deployment.tfplan"
+$backendConfigKey = "terraform.deployment.apim.ess.tfplan"
 Write-output "Using plan $backendConfigKey"
 terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=$backendConfigKey"
 if ( !$? ) { echo "Something went wrong during terraform initialization"; throw "Error" }

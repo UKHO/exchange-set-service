@@ -29,7 +29,4 @@ module "exchange_set_service" {
   ess_b2c_token_issuer               = var.b2c_token_issuer
   ess_b2c_client_id                  = var.b2c_client_id
   cors_origins                       = local.cors_origins
-  
-  policy_rewrite_from_gateway        = var.policy_rewrite_from_gateway
-  policy_rewrite_to_gateway          = var.policy_rewrite_to_gateway
 }

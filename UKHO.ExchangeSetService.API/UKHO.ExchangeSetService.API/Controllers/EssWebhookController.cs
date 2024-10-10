@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [Route("/webhook/newfilespublished")]
         public virtual async Task<IActionResult> NewFilesPublished([FromBody] JObject request)
         {
-            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Clear Cache Event started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+            Logger.LogInformation(EventIds.ESSInvalidateAndInsertCacheDataEventStart.ToEventId(), "ESS Invalidate and Insert Cache Data Event started for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
             var azureAdB2C = new AzureAdB2C
             {
                 AudToken = TokenAudience,
@@ -59,8 +59,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             if (azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, GetCurrentCorrelationId()))
             {
-                Logger.LogInformation(EventIds.ESSB2CUserValidationEvent.ToEventId(), "Event was triggered with invalid Azure AD token from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed as Azure AD Authentication failed with OK response and _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+                Logger.LogInformation(EventIds.ESSB2CUserValidationEvent.ToEventId(), "Event was triggered with invalid Azure AD token from Enterprise event for ESS Invalidate and Insert Cache Event for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+                Logger.LogInformation(EventIds.ESSInvalidateAndInsertCacheDataEventCompleted.ToEventId(), "ESS Invalidate and Insert Cache Data Event completed as Azure AD Authentication failed with OK response and _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
                 return GetCacheResponse();
             }
 
@@ -68,22 +68,23 @@ namespace UKHO.ExchangeSetService.API.Controllers
             JsonConvert.PopulateObject(request.ToString(), eventGridEvent);
             var data = (eventGridEvent.Data as JObject).ToObject<EnterpriseEventCacheDataRequest>();
 
-            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventStart.ToEventId(), "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), GetCurrentCorrelationId());
+            Logger.LogInformation(EventIds.ESSInvalidateAndInsertCacheDataEventStart.ToEventId(), "Enterprise Event data deserialized in ESS and Data:{data} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(data), GetCurrentCorrelationId());
 
             var validationResult = await essWebhookService.ValidateEventGridCacheDataRequest(data);
 
-            var productName = data.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault();
+            var productName = data.Attributes.Where(a => a.Key == "CellName").Select(a => a.Value).FirstOrDefault() ?? "NA";
 
             if (!validationResult.IsValid)
             {
-                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadValidationEvent.ToEventId(), "Required attributes missing in event data from Enterprise event for Clear Cache Search and Download Event for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-                Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{productName} as required data was missing in payload with OK response and _X-Correlation-ID:{correlationId}", productName, GetCurrentCorrelationId());
+                Logger.LogInformation(EventIds.ESSInvalidateAndInsertCacheDataValidationEvent.ToEventId(), "Required attributes missing in event data from Enterprise event for ESS Invalidate and Insert Cache Event for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
+                Logger.LogInformation(EventIds.ESSInvalidateAndInsertCacheDataEventCompleted.ToEventId(), "ESS Invalidate and Insert Cache Data Event completed for ProductName:{productName} as required data was missing in payload with OK response and _X-Correlation-ID:{correlationId}", productName, GetCurrentCorrelationId());
                 return GetCacheResponse();
             }
 
-            await essWebhookService.DeleteSearchAndDownloadCacheData(data, GetCurrentCorrelationId());
 
-            Logger.LogInformation(EventIds.ESSClearCacheSearchDownloadEventCompleted.ToEventId(), "Clear Cache Event completed for ProductName:{productName} of BusinessUnit:{businessUnit} with OK response and _X-Correlation-ID:{correlationId}", productName, data.BusinessUnit, GetCurrentCorrelationId());
+            await essWebhookService.InvalidateAndInsertCacheDataAsync(data, GetCurrentCorrelationId());
+
+            Logger.LogInformation(EventIds.ESSInvalidateAndInsertCacheDataEventCompleted.ToEventId(), "ESS Invalidate and Insert Cache Data Event completed for ProductName:{productName} of BusinessUnit:{businessUnit} with OK response and _X-Correlation-ID:{correlationId}", productName, data.BusinessUnit, GetCurrentCorrelationId());
 
             return GetCacheResponse();
         }

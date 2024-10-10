@@ -36,6 +36,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly AioConfiguration aioConfiguration;
         private const string ServerHeaderValue = "Windows-Azure-Blob";
         private const string ZIPFILE = "zip";
+        private const string ReadMeContainerName = "readme";
 
         public FileShareService(IFileShareServiceClient fileShareServiceClient,
                                 IAuthFssTokenProvider authFssTokenProvider,
@@ -542,7 +543,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public async Task<bool> DownloadReadMeFile(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadReadMeFileFromFssAsync(string readMeFilePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
             string payloadJson = string.Empty;
             var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
@@ -564,6 +565,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         logger.LogInformation(EventIds.DownloadReadmeFile307RedirectResponse.ToEventId(), "File share service download readme.txt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
                     }
+                    await fileShareServiceCache.CopyFileToBlob(stream, fileName, ReadMeContainerName);
                     return fileSystemHelper.DownloadReadmeFile(filePath, stream, lineToWrite);
                 }
             }
@@ -572,6 +574,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 logger.LogError(EventIds.DownloadReadMeFileNonOkResponse.ToEventId(), "Error in file share service while downloading readme.txt file with uri:{requestUri} responded with {StatusCode} and BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ", requestUri, httpReadMeFileResponse.StatusCode, batchId, correlationId);
                 throw new FulfilmentException(EventIds.DownloadReadMeFileNonOkResponse.ToEventId());
             }
+        }
+
+        public async Task<bool> DownloadReadMeFileFromCacheAsync(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            bool isReadMeFileDownloaded = false;
+            string fileName = fileShareServiceConfig.Value.ReadMeFileName;
+            string filePath = Path.Combine(exchangeSetRootPath, fileName);
+            fileSystemHelper.CheckAndCreateFolder(exchangeSetRootPath);
+            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
+            using (Stream readmeStream = await fileShareServiceCache.DownloadFileFromCacheAsync(fileName, ReadMeContainerName))
+            {
+                if (readmeStream != null && readmeStream?.Length > 0)
+                {
+                    isReadMeFileDownloaded = fileSystemHelper.DownloadReadmeFile(filePath, readmeStream, lineToWrite);
+                }
+            }
+            return isReadMeFileDownloaded;
         }
 
         public async Task<bool> DownloadIhoCrtFile(string ihoCrtFilePath, string batchId, string aioExchangeSetPath, string correlationId)

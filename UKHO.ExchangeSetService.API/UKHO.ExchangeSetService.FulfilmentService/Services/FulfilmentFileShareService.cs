@@ -111,9 +111,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             return listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
         }
-        public async Task<bool> DownloadReadMeFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
+        public async Task<bool> DownloadReadMeFileFromFssAsync(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
-            return await fileShareService.DownloadReadMeFile(filePath, batchId, exchangeSetRootPath, correlationId);
+            return await fileShareService.DownloadReadMeFileFromFssAsync(filePath, batchId, exchangeSetRootPath, correlationId);
         }
 
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
@@ -183,6 +183,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         public async Task<bool> CommitExchangeSet(string batchId, string correlationId, string exchangeSetZipPath)
         {
             return await fileShareService.CommitBatchToFss(batchId, correlationId, exchangeSetZipPath);
+        }
+
+        public async Task<bool> DownloadReadMeFileFromCacheAsync(string batchId, string exchangeSetRootPath, string correlationId)
+        {
+            return await fileShareService.DownloadReadMeFileFromCacheAsync(batchId,exchangeSetRootPath,correlationId);
         }
     }
 }
