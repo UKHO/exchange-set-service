@@ -20,6 +20,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
         public GetUrl GetUrl { get; set; }
     }
 
+    public class RefLink
+    {
+        public GetUrl Get { get; set; }
+    }
+
     public class Attribute
     {
         public string Key { get; set; }
@@ -33,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
 
     public class CacheFile
     {
-        public LinksNew Links { get; set; }
+        public RefLink Links { get; set; }
         public string Hash { get; set; }
         public int FileSize { get; set; }
         public string MimeType { get; set; }

@@ -1,17 +1,20 @@
 {
-  "name": "essk6",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "ess-pt-utility",
+  "version": "1.1.0",
+  "description": "contains k6 code for Exchange Set performance testing",
+  "main": "ESSPT.js",
+  "directories": {
+    "test": "TestCase"
+  },
+  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ess": "k6 run ./TestCase/ESSPTUsingLiveLogWithCache.js"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "k6": "0.0.0"
-  },
-  "devDependencies": {
-    "@types/k6": "^0.32.1"
-  }
+  "keywords": [
+    "ESS",
+    "performance",
+    "utility"
+  ],
+  "author": "UKHO",
+  "license": "UNLICENSED"
 }
