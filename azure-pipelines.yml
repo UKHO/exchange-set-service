@@ -1161,7 +1161,7 @@ stages:
         parameters:
           Environment: "vnextiat"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNextIAT-A.011.08"
+          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
           Container: ${{variables.Container}}
 
   - stage: vnexte2eDeploy
@@ -1174,7 +1174,7 @@ stages:
         parameters:
           Environment: "vnexte2e"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNextE2E-A.011.08"
+          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
           Container: ${{variables.Container}}
 
   - stage: IatDeploy
