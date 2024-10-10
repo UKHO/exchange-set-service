@@ -1159,7 +1159,7 @@ stages:
     jobs:
       - template: Deployment/templates/Deploy.yml
         parameters:
-          Environment: "Ess-vnextiat"
+          Environment: "vnextiat"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-vNextIAT-A.011.08"
           Container: ${{variables.Container}}
@@ -1172,7 +1172,7 @@ stages:
     jobs:
       - template: Deployment/templates/Deploy.yml
         parameters:
-          Environment: "Ess-vnexte2e"
+          Environment: "vnexte2e"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-vNextE2E-A.011.08"
           Container: ${{variables.Container}}
