@@ -60,6 +60,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             // the Exists() seems to return false, therefore nothing in the block is executed
             try
             {
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic ContainerName for Blob is {containerName}", containerName);
                 if (await blobClient?.ExistsAsync())
                 {
                     logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders blob exists");
