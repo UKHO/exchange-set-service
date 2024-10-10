@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -20,7 +19,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public class AzureBlobStorageService : IAzureBlobStorageService
     {
         private readonly ISalesCatalogueStorageService scsStorageService;
-        private const string CONTENT_TYPE = "application/json";
+        //// rhz private const string CONTENT_TYPE = "application/json";
         private readonly IOptions<EssFulfilmentStorageConfiguration> storageConfig;
         private readonly IAzureMessageQueueHelper azureMessageQueueHelper;
         private readonly ILogger<AzureBlobStorageService> logger;
@@ -54,23 +53,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
              
-            var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, batchId);
+            var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
 
             // rhz Code in the following try/catch block is possibly not needed, it seems to work without it
             // the Exists() seems to return false, therefore nothing in the block is executed
-            try
-            {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic ContainerName and batchId for Blob is {containerName}, {batchId}", containerName, batchId);
-                if (await blobClient?.ExistsAsync())
-                {
-                    logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders blob exists");
-                    await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders failed :{errorMessage}", ex.Message);
-            }
+            // Note: A similar expression to await blobClient?.SetHttpHeadersAsync.. exists in FileShareServiceCache.CopyFileToBlob method
+            ////try
+            ////{
+            ////    if (await blobClient?.ExistsAsync())
+            ////    {
+            ////        logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders blob exists");
+            ////        await blobClient?.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE }, cancellationToken: cancellationToken);
+            ////    }
+            ////}
+            ////catch (Exception ex)
+            ////{
+            ////    logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders failed :{errorMessage}", ex.Message);
+            ////}
 
             await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
