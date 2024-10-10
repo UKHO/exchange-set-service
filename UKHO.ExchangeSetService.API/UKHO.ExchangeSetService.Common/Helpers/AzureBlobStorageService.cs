@@ -54,13 +54,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             var storageAccountConnectionString = scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
              
-            var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, containerName);
+            var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, storageAccountConnectionString, batchId);
 
             // rhz Code in the following try/catch block is possibly not needed, it seems to work without it
             // the Exists() seems to return false, therefore nothing in the block is executed
             try
             {
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic ContainerName for Blob is {containerName}", containerName);
+                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic ContainerName and batchId for Blob is {containerName}, {batchId}", containerName, batchId);
                 if (await blobClient?.ExistsAsync())
                 {
                     logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic set HttpHeaders blob exists");
