@@ -431,64 +431,11 @@ stages:
               ArtifactName: mockapiterraformartifact              
               
   - stage: Devdeploy
+    dependsOn:
+    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
-      - deployment: DevDeployApimSolas
-        displayName: "Dev - deploy SOLAS APIM"
-        environment: "Ess-Dev"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-DEV"
-          - group: "ESS-Dev-Variables"
-          - group: "ESS-Dev-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
-      - deployment: DevDeployApimSolas2
-        displayName: "Dev - deploy SOLAS APIM for FSS UI"
-        environment: "Ess-Dev"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-DEV"
-          - group: "ESS-Dev2-Variables"
-          - group: "ESS-Dev-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim-v2.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
       - deployment: DevDeployApp
-        dependsOn: [DevDeployApimSolas]
         timeoutInMinutes: 75
         displayName: "Dev - deploy terraform and dotnet App"
         environment: "Ess-Dev"
@@ -532,11 +479,10 @@ stages:
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Fleet Manager Dev/Test"
+                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                     
                 - task: DownloadBuildArtifacts@0
@@ -604,7 +550,6 @@ stages:
       - deployment: DevDeployApp2
         dependsOn:
         - DevDeployApp
-        - DevDeployApimSolas2
         timeoutInMinutes: 75
         displayName: "Dev - deploy terraform and dotnet App for FSS UI"
         environment: "Ess-Dev"
@@ -648,11 +593,10 @@ stages:
                 - template: Deployment/templates/continuous-deployment-apim-v2.yml
                   parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Fleet Manager Dev/Test"
+                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
   - stage: QCdeploy
@@ -798,62 +742,7 @@ stages:
     displayName: QAdeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
-      - deployment: QADeployApimSolas
-        displayName: "QA - deploy SOLAS APIM"
-        environment: "Ess-Qa"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-QA"
-          - group: "ESS-QA-Variables"
-          - group: "ESS-QA-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
-      - deployment: QADeployApimSolas2
-        displayName: "QA - deploy SOLAS APIM for FSS UI"
-        environment: "Ess-Qa"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-QA"
-          - group: "ESS-QA2-Variables"
-          - group: "ESS-QA-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim-v2.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
       - deployment: QADeployApp
-        dependsOn: [QADeployApimSolas]
         displayName: QA - deploy terraform and dotnet App
         environment: "Ess-Qa"
         pool: $(DeploymentPool)
@@ -896,11 +785,10 @@ stages:
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "Fleet Manager Dev/Test"
+                     AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
                      TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                      APIMServiceInstance: $(APIM_SERVICE_NAME)
-                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                      
                 - task: DownloadBuildArtifacts@0
@@ -946,7 +834,6 @@ stages:
       - deployment: QADeployApp2
         dependsOn:
         - QADeployApp
-        - QADeployApimSolas2
         displayName: "QA - deploy terraform and dotnet App for FSS UI"
         environment: "Ess-Qa"
         pool: $(DeploymentPool)
@@ -989,11 +876,10 @@ stages:
                 - template: Deployment/templates/continuous-deployment-apim-v2.yml
                   parameters:
                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "Fleet Manager Dev/Test"
+                     AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
                      TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                      APIMServiceInstance: $(APIM_SERVICE_NAME)
-                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
       - job: Run_ADDS_E2E_tests
@@ -1018,62 +904,7 @@ stages:
     displayName: Livedeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
-      - deployment: LiveDeployApimSolas
-        displayName: "Live - deploy SOLAS APIM"
-        environment: "Ess-Live"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-LIVE"
-          - group: "ESS-Live-Variables"
-          - group: "ESS-Live-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-Live"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
-      - deployment: LiveDeployApimSolas2
-        displayName: "Live - deploy SOLAS APIM for FSS UI"
-        environment: "Ess-Live"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-LIVE"
-          - group: "ESS-Live2-Variables"
-          - group: "ESS-Live-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim-v2.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-Live"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
       - deployment: LiveDeployApp
-        dependsOn: [LiveDeployApimSolas]
         displayName: Live - deploy terraform and dotnet App
         environment: "Ess-Live"
         pool: $(DeploymentPool)
@@ -1099,17 +930,15 @@ stages:
               - template: Deployment/templates/continuous-deployment-apim.yml
                 parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-Live"
+                    AzureSubscription: "UKHO-APIM-SOLAS-Live"
                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
       - deployment: LiveDeployApp2
         dependsOn:
         - LiveDeployApp
-        - LiveDeployApimSolas2
         displayName: "Live - deploy terraform and dotnet App for FSS UI"
         environment: "Ess-Live"
         pool: $(DeploymentPool)
@@ -1135,11 +964,10 @@ stages:
               - template: Deployment/templates/continuous-deployment-apim-v2.yml
                 parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-Live"
+                    AzureSubscription: "UKHO-APIM-SOLAS-Live"
                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
       - job: PostDeploymentActions
@@ -1157,35 +985,7 @@ stages:
     displayName: vNext IAT Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
-      - deployment: vnextiatDeployApimSolas
-        displayName: "vNext IAT - deploy SOLAS APIM"
-        environment: "Ess-vnextiat"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-vNextIAT"
-          - group: "ESS-vNextIAT-Variables"
-          - group: "ESS-vNextIAT-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
       - deployment: vnextiatDeploy
-        dependsOn: [vnextiatDeployApimSolas]
         displayName: VnexT IAT - deploy terraform and dotnet App
         environment: "Ess-vnextiat"
         pool: $(DeploymentPool)
@@ -1225,11 +1025,10 @@ stages:
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
                       ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                      AzureSubscription: "Fleet Manager Dev/Test"
+                      AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
                       TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                       APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                       APIMServiceInstance: $(APIM_SERVICE_NAME)
-                      tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                       tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                       
                 - task: DownloadBuildArtifacts@0
@@ -1277,35 +1076,7 @@ stages:
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
     jobs:
-      - deployment: vnexte2eDeployApimSolas
-        displayName: "vNext E2E - deploy SOLAS APIM"
-        environment: "Ess-vnexte2e"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-vNextE2E"
-          - group: "ESS-vNextE2E-Variables"
-          - group: "ESS-vNextE2E-APIM-SOLAS-Variables"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                    TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-                    tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-                    tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-                    SetLinkRewriteNewToOld: false
-                    UseNewTfplanName: true
-
       - deployment: E2EDeploy
-        dependsOn: [vnexte2eDeployApimSolas]
         displayName: vnexte2e - deploy terraform and dotnet App
         environment: "Ess-vnexte2e"
         pool: $(DeploymentPool)
@@ -1345,11 +1116,10 @@ stages:
                 - template: Deployment/templates/continuous-deployment-apim.yml
                   parameters:
                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "Fleet Manager Dev/Test"
+                     AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
                      TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
                      APIMServiceInstance: $(APIM_SERVICE_NAME)
-                     tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
                      
                 - task: DownloadBuildArtifacts@0
