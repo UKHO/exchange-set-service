@@ -24,7 +24,7 @@ parameters:
 jobs:
 - deployment: DeployApp
   timeoutInMinutes: 75
-  displayName: "${{parameters.Environment}}${{v2}} - deploy terraform and dotnet App"
+  displayName: "${{parameters.Environment}}${{parameters.v2}} - deploy terraform and dotnet App"
   environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
