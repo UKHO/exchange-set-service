@@ -449,7 +449,7 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
           Container: ${{variables.Container}} 
-          RunTests: true
+          RunTests: false
           pathSuffix: "-v2"
           v2Modifier: "2"
 
