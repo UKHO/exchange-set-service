@@ -14,17 +14,17 @@ parameters:
 - name: RunTests
   type: boolean
   default: false
-- name: v2
+- name: pathSuffix
   type: string
   default: ""
-- name: variableGroupV2Modifier
+- name: v2Modifier
   type: string
   default: ""
 
 jobs:
-- deployment: DeployApp${{parameters.v2}}
+- deployment: DeployApp${{parameters.v2Modifier}}
   timeoutInMinutes: 75
-  displayName: "${{parameters.Environment}}${{parameters.v2}} - deploy terraform and dotnet App"
+  displayName: "${{parameters.Environment}}${{parameters.pathSuffix}} - deploy terraform and dotnet App"
   environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
@@ -32,7 +32,7 @@ jobs:
     clean: all
   variables:
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
-    - group: "ESS-${{parameters.Environment}}${{parameters.variableGroupV2Modifier}}-Variables"
+    - group: "ESS-${{parameters.Environment}}${{parameters.v2Modifier}}-Variables"
     - name: "ESSAzureADConfiguration.ClientId"
       value: $(ESSClientId)
     - name: "ESSAzureADConfiguration.TenantId"
@@ -58,12 +58,12 @@ jobs:
           - checkout: self
             submodules: recursive
 
-          - template: continuous-deployment${{parameters.v2}}.yml
+          - template: continuous-deployment${{parameters.pathSuffix}}.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
               AzureSubscription: ${{parameters.AzureSubscription}}
 
-          - template: continuous-deployment-apim${{parameters.v2}}.yml
+          - template: continuous-deployment-apim${{parameters.pathSuffix}}.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
               AzureSubscription: "UKHO-APIM-SOLAS-$${parameters.LiveOrNonLive}"
@@ -72,7 +72,7 @@ jobs:
               APIMServiceInstance: $(APIM_SERVICE_NAME)
               tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
-- deployment: FunctionalTests${{parameters.v2}}
+- deployment: FunctionalTests${{parameters.v2Modifier}}
   dependsOn: DeployApp
   displayName: "Run Functional Tests"
   environment: "Ess-${{parameters.Environment}}"
