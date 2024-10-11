@@ -439,7 +439,7 @@ stages:
         parameters:
           Environment: "dev"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
+          AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
           Container: ${{variables.Container}} 
           RunTests: true
 
@@ -447,7 +447,7 @@ stages:
         parameters:
           Environment: "dev"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
+          AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
           Container: ${{variables.Container}} 
           RunTests: true
           pathSuffix: "-v2"
