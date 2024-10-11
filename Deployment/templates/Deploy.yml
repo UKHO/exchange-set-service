@@ -66,7 +66,7 @@ jobs:
           - template: continuous-deployment-apim${{parameters.pathSuffix}}.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: "UKHO-APIM-SOLAS-$${parameters.LiveOrNonLive}"
+              AzureSubscription: "UKHO-APIM-SOLAS-${{parameters.LiveOrNonLive}}"
               TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
               APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
               APIMServiceInstance: $(APIM_SERVICE_NAME)
