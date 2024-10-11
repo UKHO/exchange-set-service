@@ -6,8 +6,8 @@ import { sleep, group } from 'k6';
 import { Trend } from 'k6/metrics';
 
 const config = JSON.parse(open('./config.json'));
-const dataHelper = require('./helper/dataHelper.js');
-const apiClient = require('./helper/clientHelper.js');
+const dataHelper = require('./Helper/DataHelper.js');
+const apiClient = require('./Helper/ClientHelper.js');
 
 const productIdentifierData_Small_25MB = dataHelper.GetProductIdentifierDataforSmallExchangeSet_25MB();
 const productIdentifierData_Small_50MB = dataHelper.GetProductIdentifierDataforSmallExchangeSet_50MB();

@@ -16,35 +16,7 @@ parameters:
   default: false
 
 jobs:
-- deployment: DeployApimSolas
-  displayName: "${{parameters.Environment}} - deploy SOLAS APIM"
-  environment: "Ess-${{parameters.Environment}}"
-  pool: $(DeploymentPool)
-  container: ${{parameters.Container}}
-  workspace:
-    clean: all
-  variables:
-    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
-    - group: "ESS-${{parameters.Environment}}-Variables"
-    - group: "ESS-${{parameters.Environment}}-APIM-SOLAS-Variables"
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-          - template: continuous-deployment-apim.yml
-            parameters:
-              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: "UKHO-APIM-SOLAS-${{parameters.LiveOrNonLive}}"
-              TerraformKeyVault: $(APIM_SOLAS_TERRAFORM_KEYVAULT)
-              APIMResourceGroup: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-              APIMServiceInstance: $(APIM_SOLAS_SERVICE_NAME)
-              tfstateStorageAccountRG: $(APIM_SOLAS_RESOURCE_GROUP_NAME)
-              tfstateStorageAccountName: $(APIM_SOLAS_TFSTATE_STORAGE_ACCOUNT_NAME)
-              SetLinkRewriteNewToOld: false
-              UseNewTfplanName: true
-
 - deployment: DeployApp
-  dependsOn: DeployApimSolas
   timeoutInMinutes: 75
   displayName: "${{parameters.Environment}} - deploy terraform and dotnet App"
   environment: "Ess-${{parameters.Environment}}"
@@ -88,11 +60,10 @@ jobs:
           - template: continuous-deployment-apim.yml
             parameters:
               ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-              AzureSubscription: "Fleet Manager dev/Test"
+              AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
               TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
               APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
               APIMServiceInstance: $(APIM_SERVICE_NAME)
-              tfstateStorageAccountRG: $(APIM_TFSTATE_STORAGE_ACCOUNT_RG)
               tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
 - deployment: FunctionalTests
