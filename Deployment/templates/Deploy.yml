@@ -74,7 +74,7 @@ jobs:
 
 - deployment: FunctionalTests${{parameters.v2Modifier}}
   dependsOn: DeployApp${{parameters.v2Modifier}}
-  displayName: "Run Functional Tests"
+  displayName: "Run Functional Tests ${{parameters.pathSuffix}}"
   environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
