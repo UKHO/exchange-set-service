@@ -80,8 +80,14 @@ jobs:
   container: ${{parameters.Container}}
   condition: ${{parameters.RunTests}}
   variables:
-    - group: "ESS-${{parameters.Environment}}-Variables"
+    - group: "ESS-${{parameters.Environment}}${{parameters.v2Modifier}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+    - name: "ESSAzureADConfiguration.ClientId"
+      value: $(ESSClientId)
+    - name: "ESSAzureADConfiguration.TenantId"
+      value: $(TenantId)
+    - name: "EssAuthorizationConfiguration.TenantId"
+      value: $(TenantId)
     - name: "EssAuthorizationConfiguration.AutoTestClientId"
       value: $(AutoTestClientId_Authed)
     - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
