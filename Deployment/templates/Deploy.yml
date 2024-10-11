@@ -82,6 +82,18 @@ jobs:
   variables:
     - group: "ESS-${{parameters.Environment}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+    - name: "EssAuthorizationConfiguration.AutoTestClientId"
+      value: $(AutoTestClientId_Authed)
+    - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+      value: $(AutoTestClientSecret_Authed)
+    - name: "EssAuthorizationConfiguration.EssClientId"
+      value: $(ESSClientId)
+    - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+      value: $(AutoTestClientId_NoAuth)
+    - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+      value: $(AutoTestClientSecret_NoAuth)
+    - name: "AzureAdB2CTestConfiguration.ClientSecret"
+      value: $(AUTOTEST-ESS-SECRET)
   strategy:
     runOnce:
       deploy:
