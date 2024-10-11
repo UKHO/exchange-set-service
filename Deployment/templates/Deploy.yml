@@ -22,7 +22,7 @@ parameters:
   default: ""
 
 jobs:
-- deployment: DeployApp
+- deployment: DeployApp${{parameters.v2}}
   timeoutInMinutes: 75
   displayName: "${{parameters.Environment}}${{parameters.v2}} - deploy terraform and dotnet App"
   environment: "Ess-${{parameters.Environment}}"
@@ -72,7 +72,7 @@ jobs:
               APIMServiceInstance: $(APIM_SERVICE_NAME)
               tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
-- deployment: FunctionalTests
+- deployment: FunctionalTests${{parameters.v2}}
   dependsOn: DeployApp
   displayName: "Run Functional Tests"
   environment: "Ess-${{parameters.Environment}}"
