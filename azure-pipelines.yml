@@ -450,7 +450,7 @@ stages:
           AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
           Container: ${{variables.Container}} 
           RunTests: true
-          v2: "v2"
+          v2: "-v2"
           variableGroupV2Modifier: "2"
 
       - deployment: DevDeployApp2
