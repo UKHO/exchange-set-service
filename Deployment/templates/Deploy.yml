@@ -100,11 +100,11 @@ jobs:
       value: $(AutoTestClientSecret_NoAuth)
     - name: "AzureAdB2CTestConfiguration.ClientSecret"
       value: $(AUTOTEST-ESS-SECRET)
-    - name: "EssApiUrl"
+    - name: EssApiUrl
       value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.EssApiUrl']  ]
-    - name: "WEB_APP_NAME"
+    - name: WEB_APP_NAME
       value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.web_app_name']  ]
-    - name: "RESOURCE_GROUP_NAME"
+    - name: RESOURCE_GROUP_NAME
       value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.web_app_resource_group']  ]
   strategy:
     runOnce:
