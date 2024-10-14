@@ -65,7 +65,7 @@ steps:
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       appType: webApp
-      appName: $[ dependencies.TerraformDeploy.outputs['TerraformDeploy.WEB_APP_NAME'] ]
+      appName: $(WEB_APP_NAME)
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
       deployToSlotOrASE: true
       slotName: $(WEB_APP_SLOT_NAME)
@@ -74,8 +74,8 @@ steps:
     displayName: "Swap with production slot"
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $[ dependencies.TerraformDeploy.outputs['TerraformDeploy.RESOURCE_GROUP_NAME'] ]
-      webAppName: $[ dependencies.TerraformDeploy.outputs['TerraformDeploy.WEB_APP_NAME'] ]
+      resourceGroupName:  $(RESOURCE_GROUP_NAME)
+      webAppName: $(WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
       sourceSlot: $(WEB_APP_SLOT_NAME)  
@@ -85,15 +85,15 @@ steps:
     inputs:
       targetType: filePath
       filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl $[ dependencies.TerraformDeploy.outputs['TerraformDeploy.EssApiUrl'] ])/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 1"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 1"
 
   - task: AzureAppServiceManage@0
     displayName: "Swap with production slot - Rollback"
     condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $[ dependencies.TerraformDeploy.outputs['TerraformDeploy.RESOURCE_GROUP_NAME'] ]
-      webAppName: $[ dependencies.TerraformDeploy.outputs['TerraformDeploy.WEB_APP_NAME'] ]
+      resourceGroupName: $(RESOURCE_GROUP_NAME)
+      webAppName: $(WEB_APP_NAME)
       action: "Swap Slots"
       swapWithProduction: true
       sourceSlot: $(WEB_APP_SLOT_NAME)  
@@ -104,4 +104,4 @@ steps:
     inputs:
       targetType: filePath
       filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl $[ dependencies.TerraformDeploy.outputs['TerraformDeploy.EssApiUrl'] ])/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 0"
+      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 0"

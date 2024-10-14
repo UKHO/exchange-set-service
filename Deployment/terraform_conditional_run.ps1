@@ -54,14 +54,17 @@ Write-output "Terraform output as json"
 $terraformOutput = terraform output -json | ConvertFrom-Json
 
 write-output "Set JSON output into pipeline variables"
-Write-Host "##vso[task.setvariable variable=WEB_APP_NAME;isOutput=true]$($terraformOutput.web_app_name.value)"
-Write-Host "##vso[task.setvariable variable=EssApiUrl;isOutput=true]$env:SERVICE_DNS_URL"
+Write-Host "##vso[task.setvariable variable=WEB_APP_NAME]$($terraformOutput.web_app_name.value)"
+Write-Host "##vso[task.setvariable variable=EssApiUrl]$env:SERVICE_DNS_URL"
 Write-Host "##vso[task.setvariable variable=KeyVaultSettings.ServiceUri]$($terraformOutput.keyvault_uri.value)"
 Write-Host "##vso[task.setvariable variable=EssStorageAccountConnectionString;issecret=true]$($terraformOutput.storage_connection_string.value)"
 Write-Host "##vso[task.setvariable variable=ESSManagedIdentity.ClientId]$($terraformOutput.ess_managed_user_identity_client_id.value)"
-Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME;isOutput=true]$($terraformOutput.web_app_resource_group.value)"
+Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME]$($terraformOutput.web_app_resource_group.value)"
 Write-Host "##vso[task.setvariable variable=WEB_APP_SLOT_NAME]$($terraformOutput.web_app_slot_name.value)"
 Write-Host "##vso[task.setvariable variable=WEB_APP_SLOT_HOST_NAME]$($terraformOutput.web_app_slot_default_site_hostname.value)"
+Write-Host "##vso[task.setvariable variable=RESOURCEGROUPNAME;isOutput=true]$($terraformOutput.web_app_resource_group.value)"
+Write-Host "##vso[task.setvariable variable=WEBAPPNAME;isOutput=true]$($terraformOutput.web_app_name.value)"
+Write-Host "##vso[task.setvariable variable=EssURL;isOutput=true]$env:SERVICE_DNS_URL"
 
 
 $terraformOutput | ConvertTo-Json -Depth 5 > $terraformJsonOutputFile
