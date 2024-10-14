@@ -2,9 +2,11 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Storage;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
@@ -49,10 +51,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
             var instanceCountAndType = GetInstanceCountBasedOnFileSize(fileSizeInMB);
-            var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.Item2);
+            var storageAccountWithKey = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.ExchangeSetType);
 
             string storageAccountConnectionString =
-                  scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Item1, storageAccountWithKey.Item2);
+                  scsStorageService.GetStorageAccountConnectionString(storageAccountWithKey.Name, storageAccountWithKey.Key);
             CloudBlockBlob cloudBlockBlob = await azureBlobStorageClient.GetCloudBlockBlob(uploadFileName, storageAccountConnectionString, containerName);
             cloudBlockBlob.Properties.ContentType = CONTENT_TYPE;
 
@@ -129,7 +131,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 scsResponseUri, batchId, correlationId);
         }
 
-        private (int, ExchangeSetType) GetInstanceCountBasedOnFileSize(double fileSizeInMB)
+        private (int InstanceNumber, ExchangeSetType ExchangeSetType) GetInstanceCountBasedOnFileSize(double fileSizeInMB)
         {
             if (fileSizeInMB <= storageConfig.Value.SmallExchangeSetSizeInMB)
             {
@@ -149,7 +151,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
-        public (string, string) GetStorageAccountNameAndKeyBasedOnExchangeSetType(ExchangeSetType exchangeSetType)
+        public (string Name, string Key) GetStorageAccountNameAndKeyBasedOnExchangeSetType(ExchangeSetType exchangeSetType)
         {
             return exchangeSetType switch
             {
