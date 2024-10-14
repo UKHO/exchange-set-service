@@ -103,9 +103,9 @@ jobs:
     - name: EssApiUrl
       value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.EssApiUrl']  ]
     - name: WEB_APP_NAME
-      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.web_app_name']  ]
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.WEB_APP_NAME']  ]
     - name: RESOURCE_GROUP_NAME
-      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.web_app_resource_group']  ]
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.RESOURCE_GROUP_NAME']  ]
   strategy:
     runOnce:
       deploy:
