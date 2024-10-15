@@ -127,6 +127,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
+            builder.Services.AddAllElasticApm();
 
             builder.Services.AddHeaderPropagation(options =>
             {
@@ -229,7 +230,7 @@ namespace UKHO.ExchangeSetService.API
             app.UseAuthorization();
             app.MapHealthChecks("/health");
             app.MapControllers();
-            app.UseElasticApm(builder.Configuration);
+            //app.UseElasticApm(builder.Configuration);
             app.Run();
 
             //=====================================
