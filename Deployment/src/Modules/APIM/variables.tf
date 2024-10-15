@@ -66,12 +66,12 @@ variable "b2c_client_id" {
 variable "env_suffix" {
   type = map(string)
   default = {
-    "dev"     = "Dev"
-    "qa"      = "QA"
-    "vne"     = "VNE"
-    "vni"     = "VNI"
-    "iat"     = "IAT"
-    "pre"     = "Pre"
+    "dev"         = "Dev"
+    "qa"          = "QA"
+    "vne"         = "VNE"
+    "vni"         = "VNI"
+    "iat"         = "IAT"
+    "preprod"     = "Pre"
   }
 }
 
