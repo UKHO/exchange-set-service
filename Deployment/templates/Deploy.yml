@@ -133,6 +133,12 @@ jobs:
               xmlTransformationRules:
               jsonTargetFiles: '**/appsettings.json'
 
+          - task: UseDotNet@2
+            displayName: 'Use .NET SDK'
+            inputs:
+              packageType: sdk
+              version: 6.0.x
+
           - task: AzureCLI@2
             displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
             condition: always()
