@@ -882,7 +882,7 @@ stages:
     jobs:
       - template: Deployment/templates/Deploy.yml
         parameters:
-          Environment: "preprod"
+          Environment: "pre"
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
           Container: ${{variables.Container}} 
