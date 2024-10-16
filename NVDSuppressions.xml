@@ -509,6 +509,18 @@
   <suppress>
     <notes>
       <![CDATA[
+   file name: Azure.Identity:1.7.0
+   There is no apparent reference to version 1.7.0 as version 1.12.0 is installed
+   but still showing as a vulnerability.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2023-36414</cve>
+    <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Elastic.Apm.Elasticsearch.dll
    https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
    ]]>
