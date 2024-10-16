@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
+//// rhz using System.Runtime.Serialization;
 
 namespace UKHO.ExchangeSetService.Common.Configuration
 {
@@ -19,8 +19,8 @@ namespace UKHO.ExchangeSetService.Common.Configuration
             EventId = eventId;
         }
 
-        protected FulfilmentException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+        //// rhz protected FulfilmentException(SerializationInfo info, StreamingContext context) : base(info, context)
+        ////{
+        ////}
     }
 }

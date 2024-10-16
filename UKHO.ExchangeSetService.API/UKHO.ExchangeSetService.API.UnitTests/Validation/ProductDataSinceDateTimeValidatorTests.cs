@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime cannot be a future date."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "Provided sinceDateTime cannot be a future date."));
         } 
 
         [Test]
@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var result = validator.TestValidate(model);
 
             result.ShouldHaveValidationErrorFor(fb => fb.CallbackUri);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         {
             var model = new ProductDataSinceDateTimeRequest { SinceDateTime = DateTime.UtcNow.AddDays(-7).ToString("R"), CallbackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234" };
             var result = validator.TestValidate(model);
-            Assert.IsTrue(result.Errors.Count == 0);
+            Assert.That(result.Errors.Count == 0);
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
 
             result.ShouldHaveValidationErrorFor(fb => fb.SinceDateTime);
             string errorMessage = "Provided sinceDateTime must be within last " + configuration.GetValue<string>("MaximumNumerOfDaysValidForSinceDateTimeEndpoint") + " days.";
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == errorMessage));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == errorMessage));
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         {
             var model = new ProductDataSinceDateTimeRequest { SinceDateTime = DateTime.UtcNow.AddDays(-1).ToString("R") };
             var result = validator.TestValidate(model);
-            Assert.IsTrue(result.Errors.Count == 0);
+            Assert.That(result.Errors.Count == 0);
         }
     }
 }

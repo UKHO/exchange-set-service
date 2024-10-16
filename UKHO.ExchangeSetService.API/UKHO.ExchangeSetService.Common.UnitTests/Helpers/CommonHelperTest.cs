@@ -68,15 +68,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var week26 = CommonHelper.GetCurrentWeekNumber(Convert.ToDateTime("2021/07/01"));
             var week53 = CommonHelper.GetCurrentWeekNumber(Convert.ToDateTime("2021/01/01"));
 
-            Assert.AreEqual(1, week1);
-            Assert.AreEqual(26, week26);
-            Assert.AreEqual(53, week53);
+            Assert.That(1, Is.EqualTo(week1));
+            Assert.That(26, Is.EqualTo(week26));
+            Assert.That(53, Is.EqualTo(week53));
         }
         [Test]
         public void CheckConversionOfBytesToMegabytes()
         {
             var fileSize = CommonHelper.ConvertBytesToMegabytes((long)4194304);
-            Assert.AreEqual(4, fileSize);
+            Assert.That(4, Is.EqualTo(fileSize));
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
-            Assert.AreEqual(500, fileSize);
+            Assert.That(500, Is.EqualTo(fileSize));
         }
 
         [Test]
@@ -109,8 +109,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.False(_isRetryCalled);
-            Assert.AreEqual(HttpStatusCode.TooManyRequests, result.StatusCode);
+            Assert.That(_isRetryCalled, Is.False);
+            Assert.That(HttpStatusCode.TooManyRequests, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -134,16 +134,23 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.False(_isRetryCalled);
-            Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
+            Assert.That(_isRetryCalled,Is.False);
+            Assert.That(HttpStatusCode.ServiceUnavailable, Is.EqualTo(result.StatusCode));
 
         }
 
         [Test]
-        public void CheckValueIsNumeric()
+        public void CheckIsNumericReturnsTrueForNumbers()
         {
             bool isNum = CommonHelper.IsNumeric(1234);
-            Assert.IsTrue(isNum);
+            Assert.That(isNum,Is.True);
+        }
+
+        [Test]
+        public void CheckIsNumericReturnsFalseForNonNumericValue()
+        {
+            bool isNum = CommonHelper.IsNumeric("1234a");
+            Assert.That(isNum, Is.False);
         }
     }
 }

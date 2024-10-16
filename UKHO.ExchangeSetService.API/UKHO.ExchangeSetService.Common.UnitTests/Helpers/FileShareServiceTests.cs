@@ -272,8 +272,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.ResponseCode, $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
-            Assert.IsNull(response.ResponseBody);
+            Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.BadRequest), $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
+            Assert.That(response.ResponseBody,Is.Null);
         }
 
         [Test]
@@ -289,18 +289,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
 
-            Assert.AreEqual(HttpStatusCode.Created, response.ResponseCode, $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
-            Assert.AreEqual(createBatchResponse.BatchId, response.ResponseBody.BatchId);
+            Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.Created) , $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
+            Assert.That(createBatchResponse.BatchId, Is.EqualTo(response.ResponseBody.BatchId));
 
             //assert the mocked API response returned to CreateBatch contains the internal BaseUrl
-            Assert.IsTrue(createBatchResponse.BatchStatusUri.Contains(fakeFileShareConfig.Value.BaseUrl));
-            Assert.IsTrue(createBatchResponse.ExchangeSetBatchDetailsUri.Contains(fakeFileShareConfig.Value.BaseUrl));
-            Assert.IsTrue(createBatchResponse.ExchangeSetFileUri.Contains(fakeFileShareConfig.Value.BaseUrl));
+            Assert.That(createBatchResponse.BatchStatusUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
+            Assert.That(createBatchResponse.ExchangeSetBatchDetailsUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
+            Assert.That(createBatchResponse.ExchangeSetFileUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
 
             //assert FileShareService.CreateBatch() is correctly replacing the internal BaseUrl with PublicUrl
-            Assert.AreEqual(createBatchResponse.BatchStatusUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.BatchStatusUri);
-            Assert.AreEqual(createBatchResponse.ExchangeSetBatchDetailsUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.ExchangeSetBatchDetailsUri);
-            Assert.AreEqual(createBatchResponse.ExchangeSetFileUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl), response.ResponseBody.ExchangeSetFileUri);
+            Assert.That(response.ResponseBody.BatchStatusUri,Is.EqualTo(createBatchResponse.BatchStatusUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
+            Assert.That(response.ResponseBody.ExchangeSetBatchDetailsUri, Is.EqualTo(createBatchResponse.ExchangeSetBatchDetailsUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
+            Assert.That(response.ResponseBody.ExchangeSetFileUri, Is.EqualTo(createBatchResponse.ExchangeSetFileUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
         }
 
         [Test]
@@ -337,9 +337,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.CreateBatch(userOID, correlationIdParam);
 
             //Test
-            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
-            Assert.AreEqual(HttpMethod.Post, httpMethodParam);
-            Assert.AreEqual(accessTokenParam, actualAccessToken);
+            Assert.That(HttpStatusCode.OK, Is.EqualTo(response.ResponseCode));
+            Assert.That(HttpMethod.Post, Is.EqualTo(httpMethodParam));
+            Assert.That(accessTokenParam, Is.EqualTo(actualAccessToken));
         }
 
         #endregion CreateBatch
@@ -400,9 +400,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
-            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
+            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
         }
 
         [Test]
@@ -535,10 +535,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
-            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
-            Assert.AreEqual("13d38bde-5191-4a59-82d5-aa22ca1cc6de", response.Entries[1].BatchId);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
+            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
+            Assert.That("13d38bde-5191-4a59-82d5-aa22ca1cc6de", Is.EqualTo(response.Entries[1].BatchId));
         }
 
         [Test]
@@ -633,8 +633,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(bool), response);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<bool>());
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -670,8 +670,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(bool), response);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<bool>());
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -835,8 +835,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.SearchReadMeFilePath(batchId, null);
             string expectedReadMeFilePath = @"batch/a07537ff-ffa2-4565-8f0e-96e61e70a9fc/files/README.TXT";
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedReadMeFilePath, searchReadMeFileName);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(expectedReadMeFilePath, Is.EqualTo(searchReadMeFileName));
         }
         #endregion SearchReadMeFilePath
 
@@ -875,7 +875,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.DownloadReadMeFileFromFssAsync(readMeFilePath, batchId, exchangeSetRootPath, null);
 
-            Assert.AreEqual(true, response);
+            Assert.That(true, Is.EqualTo(response));
         }
 
         [Test]
@@ -935,8 +935,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
             bool response = await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeZipFilepath, null);
-            Assert.IsNotNull(response);
-            Assert.AreEqual(true, response);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(true, Is.EqualTo(response));
         }
         #endregion CreateZipFile
 
@@ -1088,7 +1088,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             bool result = await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath, fakeFileShareConfig.Value.ErrorFileName);
 
-            Assert.True(result);
+            Assert.That(result,Is.True);
         }
 
         [Test]
@@ -1115,7 +1115,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
              .Returns(httpResponse);
 
             var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
-            Assert.AreEqual(true, response);
+            Assert.That(true, Is.EqualTo(response));
         }
 
         [Test]
@@ -1192,9 +1192,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
-            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
+            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
         }
 
         [Test]
@@ -1268,10 +1268,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
-            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
-            Assert.AreEqual("13d38bde-5191-4a59-82d5-aa22ca1cc6de", response.Entries[1].BatchId);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
+            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
+            Assert.That("13d38bde-5191-4a59-82d5-aa22ca1cc6de", Is.EqualTo(response.Entries[1].BatchId));
         }
 
         [Test]
@@ -1293,7 +1293,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
 
             var response = await fileShareService.UploadLargeMediaFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeLargeMediaZipFilePath);
-            Assert.AreEqual(true, response);
+            Assert.That(true, Is.EqualTo(response));
         }
 
         [Test]
@@ -1344,7 +1344,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null);
 
-            Assert.AreEqual(true, response);
+            Assert.That(true, Is.EqualTo(response));
         }
 
         [Test]
@@ -1429,8 +1429,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.SearchFolderDetails(batchId, correlationId, null);
             string expectedSearchFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedSearchFolderFilePath, searchFolderFileName);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(expectedSearchFolderFilePath, Is.EqualTo(searchFolderFileName));
         }
 
         [Test]
@@ -1512,8 +1512,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.DownloadFolderDetails(fakeBatchId, correlationidParam, batchFileList, fakeExchangeSetPath);
 
             var expectedFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
-            Assert.AreEqual(true, response);
-            Assert.AreEqual(expectedFolderFilePath, searchFolderFileName);
+            Assert.That(true, Is.EqualTo(response));
+            Assert.That(expectedFolderFilePath, Is.EqualTo(searchFolderFileName));
         }
 
         [Test]
@@ -1595,9 +1595,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
-            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
+            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
         }
 
         [Test]
@@ -1653,9 +1653,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf(typeof(SearchBatchResponse), response);
-            Assert.AreEqual("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", response.Entries[0].BatchId);
+            Assert.That(response, Is.Not.Null);
+
+            Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
+
+            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
         }
     }
 }

@@ -47,7 +47,7 @@ variables:
   - name: DeploymentPool
     value: "Mare Nectaris"
   - name: SdkVersion
-    value: "6.0.x"
+    value: "8.0.x"
   - name: WindowPool
     value: "NautilusBuild"
 

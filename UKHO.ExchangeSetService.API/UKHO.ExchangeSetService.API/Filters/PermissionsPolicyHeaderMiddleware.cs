@@ -17,7 +17,7 @@ namespace UKHO.ExchangeSetService.API.Filters
 
         public Task Invoke(HttpContext httpContext)
         {
-            httpContext.Response.Headers.Add("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
+            httpContext.Response.Headers.Append("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
             return _next(httpContext);
         }
     }
