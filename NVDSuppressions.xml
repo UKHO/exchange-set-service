@@ -506,4 +506,135 @@
     </notes>
     <cve>CVE-2024-38460</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.Elasticsearch.dll
+   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.Elasticsearch@.*$</packageUrl>
+    <cve>CVE-2019-7611</cve>
+    <cve>CVE-2023-46674</cve>
+    <cve>CVE-2023-31418</cve>
+    <cve>CVE-2019-7617</cve>
+    <cve>CVE-2020-7019</cve>
+    <cve>CVE-2021-22144</cve>
+    <cve>CVE-2019-7614</cve>
+    <cve>CVE-2021-22135</cve>
+    <cve>CVE-2021-22137</cve>
+    <cve>CVE-2020-7021</cve>
+    <cve>CVE-2020-7020</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.EntityFrameworkCore.dll
+   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.EntityFrameworkCore@.*$</packageUrl>
+    <cve>CVE-2019-7617</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.GrpcClient.dll
+   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.GrpcClient@.*$</packageUrl>
+    <cve>CVE-2023-33953</cve>
+    <cve>CVE-2023-44487</cve>
+    <cve>CVE-2023-4785</cve>
+    <cve>CVE-2023-32732</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.MongoDb.dll
+   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
+    <cve>CVE-2012-6619</cve>
+    <cve>CVE-2013-1892</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+    <cve>CVE-2015-1609</cve>
+    <cve>CVE-2013-2132</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elastic.Apm.NetCoreAll.dll
+   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.NetCoreAll@.*$</packageUrl>
+    <cve>CVE-2019-7617</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Elasticsearch.Net.dll
+   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elasticsearch\.Net@.*$</packageUrl>
+    <cve>CVE-2020-7009</cve>
+    <cve>CVE-2020-7014</cve>
+    <cve>CVE-2023-46674</cve>
+    <cve>CVE-2023-31418</cve>
+    <cve>CVE-2023-31419</cve>
+    <cve>CVE-2023-46673</cve>
+    <cve>CVE-2020-7019</cve>
+    <cve>CVE-2021-22144</cve>
+    <cve>CVE-2020-7021</cve>
+    <cve>CVE-2023-31417</cve>
+    <cve>CVE-2021-22134</cve>
+    <cve>CVE-2020-7020</cve>
+    <cve>CVE-2023-49921</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: MongoDB.Bson.dll
+   n/a - MongoDB
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/MongoDB\.Bson@.*$</packageUrl>
+    <cve>CVE-2015-4411</cve>
+    <cve>CVE-2021-32036</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: MongoDB.Driver.Core.dll
+   n/a - MongoDB
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/MongoDB\.Driver\.Core@.*$</packageUrl>
+    <cve>CVE-2021-32036</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: MongoDB.Libmongocrypt.dll
+   n/a - MongoDB
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/MongoDB\.Libmongocrypt@.*$</packageUrl>
+    <cve>CVE-2017-14227</cve>
+    <cve>CVE-2012-6619</cve>
+    <cve>CVE-2013-1892</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+    <cve>CVE-2015-1609</cve>
+    <cve>CVE-2013-2132</cve>
+  </suppress>
 </suppressions>
