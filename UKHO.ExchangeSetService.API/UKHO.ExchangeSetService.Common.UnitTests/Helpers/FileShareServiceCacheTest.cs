@@ -203,7 +203,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            Assert.AreEqual(0, response.Count);
+            Assert.That(response.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -217,8 +217,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), null, string.Empty, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(1, response.Count);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.Count,Is.EqualTo(1));
         }
 
         [Test]
@@ -271,11 +271,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [Test]
         public async Task WhenInsertOrMergeFssCacheDetail_ThenReturnTrue()
         {
+            /// rhz Not sure if this is a valid test, the assertion will always be true
+            /// so unless the awaited method throws an exception, the test will always pass
             A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
             await fileShareServiceCache.InsertOrMergeFssCacheDetail(GetResponseCache());
 
-            Assert.IsNotNull(true);
+            Assert.That(true, Is.Not.Null);
         }
 
         [Test]
@@ -293,7 +295,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            Assert.AreEqual(1, nonCachedProduct.Count);
+            Assert.That(nonCachedProduct.Count, Is.EqualTo(1));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -334,7 +336,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            Assert.AreEqual(0, nonCachedProduct.Count);
+            Assert.That(nonCachedProduct.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -411,7 +413,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            Assert.AreEqual(0, response.Count);
+            Assert.That(response.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -430,7 +432,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetailsForEncAndAioProduct(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            Assert.AreEqual(0, response.Count);
+            Assert.That(response.Count, Is.EqualTo(0));
         }
         #endregion
 

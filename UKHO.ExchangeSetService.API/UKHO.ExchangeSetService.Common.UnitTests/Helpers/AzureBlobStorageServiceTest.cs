@@ -126,7 +126,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
             var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard.ToString(), correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
-            Assert.IsTrue(response);
+            Assert.That(response, Is.True);
         }
 
         #endregion StoreSaleCatalogueServiceResponseAsync
@@ -162,10 +162,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
             var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null);
 
-            Assert.IsInstanceOf<SalesCatalogueProductResponse>(response);
-            Assert.AreEqual("DE5NOBRK", response.Products[0].ProductName);
-            Assert.AreEqual(1, response.Products[0].EditionNumber);
-            Assert.AreEqual(0, response.Products[0].UpdateNumbers[0].Value);
+            Assert.That(response, Is.InstanceOf<SalesCatalogueProductResponse>());
+            Assert.That(response.Products[0].ProductName,Is.EqualTo("DE5NOBRK"));
+            Assert.That(response.Products[0].EditionNumber, Is.EqualTo(1));
+            Assert.That(response.Products[0].UpdateNumbers[0].Value, Is.EqualTo(0));
         }
 
         #endregion DownloadSalesCatalogueResponse
