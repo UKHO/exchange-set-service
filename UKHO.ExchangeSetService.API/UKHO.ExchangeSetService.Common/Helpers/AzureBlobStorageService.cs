@@ -54,6 +54,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var connectionString = scsStorageService.GetStorageAccountConnectionString(saName, saKey);
             var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, connectionString, containerName);
 
+            //// rhz settings check
+            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic removed header settings ");
+
             await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 

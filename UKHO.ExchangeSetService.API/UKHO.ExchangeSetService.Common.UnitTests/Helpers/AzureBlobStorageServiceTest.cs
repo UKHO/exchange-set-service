@@ -138,11 +138,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
             string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
-              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
+            A.CallTo(() => fakeScsStorageService.GetStorageSharedKeyCredentials())
+              .Throws(new KeyNotFoundException("Storage account credentials missing from config"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
-                   .And.Message.EqualTo("Storage account accesskey not found")
+                   .And.Message.EqualTo("Storage account credentials missing from config")
                     , async delegate { await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null); });
         }
 
