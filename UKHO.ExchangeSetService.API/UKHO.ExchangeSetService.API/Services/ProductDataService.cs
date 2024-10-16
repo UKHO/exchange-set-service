@@ -83,7 +83,8 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                //// rhz fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
 
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productIdentifierRequest.ExchangeSetStandard);
@@ -202,7 +203,8 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                //// rhz fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, request.ExchangeSetStandard);
                 if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
@@ -285,7 +287,8 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                //// rhz fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productDataSinceDateTimeRequest.ExchangeSetStandard);
                 if (checkS57File.HttpStatusCode != HttpStatusCode.OK)

@@ -134,26 +134,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         private (int InstanceNumber, ExchangeSetType ExchangeSetType) GetInstanceCountBasedOnFileSize(double fileSizeInMB)
         {
-            //// rhz possibly improve on this in D8
-            if (fileSizeInMB <= storageConfig.Value.SmallExchangeSetSizeInMB)
+            var storageCfg = storageConfig.Value;
+            return fileSizeInMB switch
             {
-                return (smallExchangeSetInstance.GetInstanceNumber(storageConfig.Value.SmallExchangeSetInstance), ExchangeSetType.sxs);
-            }
-            else if (fileSizeInMB > storageConfig.Value.SmallExchangeSetSizeInMB && fileSizeInMB <= storageConfig.Value.LargeExchangeSetSizeInMB)
-            {
-                return (mediumExchangeSetInstance.GetInstanceNumber(storageConfig.Value.MediumExchangeSetInstance), ExchangeSetType.mxs);
-            }
-            else if (fileSizeInMB > storageConfig.Value.LargeExchangeSetSizeInMB && fileSizeInMB <= storageConfig.Value.LargeMediaExchangeSetSizeInMB)
-            {
-                return (largeExchangeSetInstance.GetInstanceNumber(storageConfig.Value.LargeExchangeSetInstance), ExchangeSetType.lxs);
-            }
-            else
-            {
-                return (largeExchangeSetInstance.GetInstanceNumber(1), ExchangeSetType.lxs);
-            }
+                var fs when fs <= storageCfg.SmallExchangeSetSizeInMB =>
+                    (smallExchangeSetInstance.GetInstanceNumber(storageCfg.SmallExchangeSetInstance), ExchangeSetType.sxs),
+                var fs when fs > storageCfg.SmallExchangeSetSizeInMB && fs <= storageCfg.LargeExchangeSetSizeInMB =>
+                    (mediumExchangeSetInstance.GetInstanceNumber(storageCfg.MediumExchangeSetInstance), ExchangeSetType.mxs),
+                var fs when fs > storageCfg.LargeExchangeSetSizeInMB && fs <= storageCfg.LargeMediaExchangeSetSizeInMB =>
+                    (largeExchangeSetInstance.GetInstanceNumber(storageCfg.LargeExchangeSetInstance), ExchangeSetType.lxs),
+                _ => (largeExchangeSetInstance.GetInstanceNumber(1), ExchangeSetType.lxs),
+
+            };
         }
-
-
 
         public (string Name, string Key) GetStorageAccountNameAndKeyBasedOnExchangeSetType(ExchangeSetType exchangeSetType)
         {
