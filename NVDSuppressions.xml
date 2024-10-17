@@ -658,5 +658,13 @@
     <packageUrl regex="true">^pkg:generic/Azure\.Core@.*$</packageUrl>
     <cve>CVE-2024-43591</cve>
   </suppress>
-  
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Core:1.44.1
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Core@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
 </suppressions>
