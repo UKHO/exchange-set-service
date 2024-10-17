@@ -506,4 +506,18 @@
     </notes>
     <cve>CVE-2024-38460</cve>
   </suppress>
+  <suppress>
+   <notes><![CDATA[
+   file names:
+   Microsoft.Azure.Services.AppAuthentication:1.0.3
+   Microsoft.Azure.DocumentDB.Core.dll
+   Microsoft.Azure.Cosmos.Table.dll
+   Azure.Identity:1.12.0
+   Azure.Core.dll
+   System.ClientModel.dll
+   Microsoft.Extensions.Azure:1.6.3
+   Microsoft.Extensions.Azure.dll
+   ]]></notes>
+   <cve>CVE-2024-43591</cve>
+</suppress>
 </suppressions>
