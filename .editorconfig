@@ -35,6 +35,13 @@ dotnet_style_prefer_simplified_interpolation = true:suggestion
 dotnet_style_prefer_collection_expression = when_types_exactly_match:suggestion
 dotnet_style_namespace_match_folder = true:suggestion
 
+# JSON files
+[*.json]
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+
 # C# files
 [*.cs]
 
