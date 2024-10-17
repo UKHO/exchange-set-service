@@ -649,4 +649,14 @@
     <cve>CVE-2015-1609</cve>
     <cve>CVE-2013-2132</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Core.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Azure\.Core@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  
 </suppressions>
