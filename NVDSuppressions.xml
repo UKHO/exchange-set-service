@@ -516,7 +516,32 @@
     </notes>
     <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
     <cve>CVE-2023-36414</cve>
+    <cve>CVE-2024-43591</cve>
     <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.13.0
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Extensions.Azure.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Microsoft\.Extensions\.Azure@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_sdk_for_.net</cpe>
   </suppress>
   <suppress>
     <notes>
