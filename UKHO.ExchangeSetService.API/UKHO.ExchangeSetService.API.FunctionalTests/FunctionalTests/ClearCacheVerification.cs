@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the product details form sales catalogue service
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, new List<string>() { "DE290001" }, ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponse.StatusCode,Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
@@ -79,20 +79,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache is generated
-            Assert.IsNotNull(tableCacheCheck);
-            Assert.IsNotEmpty(tableCacheCheck.Response);
+            Assert.That(tableCacheCheck, Is.Not.Null);
+            Assert.That(tableCacheCheck.Response, Is.Not.Empty);
 
             var essCacheJson = ClearCacheHelper.GetDataForPayload(Config.ClearCacheConfig.Source, Config.ClearCacheConfig.Id);
             essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestData(Config.BESSConfig.S63BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiClearCacheResponse.StatusCode,Is.EqualTo(200), $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             //Check caching info
             tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache available
-            Assert.IsNotNull(tableCacheCheck);
+            Assert.That(tableCacheCheck, Is.Not.Null);
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the product details form sales catalogue service
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersS57(), ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
@@ -130,20 +130,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache is generated
-            Assert.IsNotNull(tableCacheCheck);
-            Assert.IsNotEmpty(tableCacheCheck.Response);
+            Assert.That(tableCacheCheck, Is.Not.Null);
+            Assert.That(tableCacheCheck.Response, Is.Not.Empty);
 
             var essCacheJson = ClearCacheHelper.GetDataForPayload(Config.ClearCacheConfig.Source, Config.ClearCacheConfig.Id );
             essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestData(Config.BESSConfig.S57BusinessUnit, partitionKey.Substring(0, 2), partitionKey, apiScsResponseData.Products[0].EditionNumber));
 
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiClearCacheResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             //Check caching info
             tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache available
-            Assert.IsNotNull(tableCacheCheck);
+            Assert.That(tableCacheCheck, Is.Not.Null);
         }
 
         [Test]
@@ -159,11 +159,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var essCacheJson = ClearCacheHelper.GetDataForPayload(Config.ClearCacheConfig.Source, Config.ClearCacheConfig.Id);
             essCacheJson["Data"] = JObject.FromObject(ClearCacheHelper.GetCacheRequestDataForReadMeFile(Config.BESSConfig.S63BusinessUnit));
             var apiClearCacheResponse = await ExchangeSetApiClient.PostNewFilesPublishedAsync(essCacheJson, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiClearCacheResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             // Verify the no Cache available for readme
             bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 7000);
-            Assert.IsFalse(containerExists);
+            Assert.That(containerExists, Is.False);
 
             //Azure blob Container takes 30 seconds to recreate container with same id, therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
             await Task.Delay(40000);
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 //Clean up batches from local folder 
                 var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, cleanUpBatchIdList, FssJwtToken);
-                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+                Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
         }
     }

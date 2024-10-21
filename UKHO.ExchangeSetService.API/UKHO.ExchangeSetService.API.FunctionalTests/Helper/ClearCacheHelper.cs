@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             BlobServiceClient BlobServiceClient = new BlobServiceClient(connectionString);
             await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" },null, essJwtToken, "s63");
             bool containerExists = await FileContentHelper.WaitForContainerAsync(BlobServiceClient, readmeContainer, 3, 7000);
-            Assert.IsTrue(containerExists);
+            Assert.That(containerExists, Is.True);
             return containerExists;
         }
 
