@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             fakeAzureAdB2CConfiguration.Value.Instance = "https://azureAdB2CInstance/";
             fakeAzureAdB2CConfiguration.Value.TenantId = "azure-ad2c-tenant";
             fakeAzureAdConfig.Value.MicrosoftOnlineLoginUrl = "https://login.microsoftonline.com/";
-            this.fakeConfiguration["AdminDomains"] = "abc.com";
+            fakeConfiguration["PrivilegedUserDomains"] = "abc.com";
             httpContext = new DefaultHttpContext();
 
             bespokeFilterAttribute = new BespokeExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig, fakeConfiguration, fakeAzureAdB2CHelper, fakelogger);
