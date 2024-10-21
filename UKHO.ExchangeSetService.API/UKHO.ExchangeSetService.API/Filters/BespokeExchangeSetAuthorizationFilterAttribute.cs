@@ -90,10 +90,10 @@ namespace UKHO.ExchangeSetService.API.Filters
 
                 if (azureAdB2CHelper.IsAzureB2CUser(azureAdB2C, correlationId))
                 {
-                    var adminDomains = !string.IsNullOrEmpty(this.configuration["AdminDomains"]) ? new(this.configuration["AdminDomains"].Split(',').Select(s => s.Trim())) : new List<string>();
+                    var privilegedUserDomains = !string.IsNullOrEmpty(configuration["PrivilegedUserDomains"]) ? new(configuration["PrivilegedUserDomains"].Split(',').Select(s => s.Trim())) : new List<string>();
                     var userEmail = context.HttpContext.User.FindFirstValue(ClaimTypes.Email);
 
-                    if (userEmail == null || !adminDomains.Any(x => userEmail.EndsWith(x, StringComparison.InvariantCultureIgnoreCase)))
+                    if (userEmail == null || !privilegedUserDomains.Any(x => userEmail.EndsWith(x, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                         return;
