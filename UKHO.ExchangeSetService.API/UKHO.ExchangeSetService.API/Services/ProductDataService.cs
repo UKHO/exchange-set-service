@@ -83,7 +83,6 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                //// rhz fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
                 fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
 
                 //check if exchangeSetStandard is S57                
@@ -203,7 +202,6 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                //// rhz fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
                 fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, request.ExchangeSetStandard);
@@ -287,7 +285,6 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                //// rhz fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
                 fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productDataSinceDateTimeRequest.ExchangeSetStandard);

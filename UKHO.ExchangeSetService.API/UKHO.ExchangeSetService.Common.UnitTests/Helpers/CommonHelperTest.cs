@@ -3,12 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;
-//// rhz using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Helpers;
-////rhz using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -27,41 +25,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeLogger = A.Fake<ILogger<FileShareService>>();
         }
 
-        #region SalesCatalogueResponse
-        //// rhz
-        ////private SalesCatalogueResponse GetSalesCatalogueFileSizeResponse()
-        ////{
-        ////    return new SalesCatalogueResponse
-        ////    {
-        ////        ResponseCode = HttpStatusCode.OK,
-        ////        ResponseBody = new SalesCatalogueProductResponse
-        ////        {
-        ////            ProductCounts = new ProductCounts
-        ////            {
-        ////                RequestedProductCount = 6,
-        ////                RequestedProductsAlreadyUpToDateCount = 8,
-        ////                ReturnedProductCount = 2,
-        ////                RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
-        ////                        new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
-        ////                        new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
-        ////                    }
-        ////            },
-        ////            Products = new List<Products> {
-        ////                    new Products {
-        ////                        ProductName = "productName",
-        ////                        EditionNumber = 2,
-        ////                        UpdateNumbers = new List<int?> { 3, 4 },
-        ////                        Cancellation = new Cancellation {
-        ////                            EditionNumber = 4,
-        ////                            UpdateNumber = 6
-        ////                        },
-        ////                        FileSize = 500
-        ////                    }
-        ////                }
-        ////        }
-        ////    };
-        ////}
-        #endregion SalesCatalogueResponse
+        
         [Test]
         public void CheckMethodReturns_CorrectWeekNumer()
         {
@@ -80,14 +44,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.That(4, Is.EqualTo(fileSize));
         }
 
-        //// rhz 
-        ////[Test]
-        ////public void CheckGetFileSize()
-        ////{
-        ////    SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
-        ////    long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
-        ////    Assert.That(500, Is.EqualTo(fileSize));
-        ////}
 
         [Test]
         public async Task WhenTooManyRequests_GetRetryPolicy()

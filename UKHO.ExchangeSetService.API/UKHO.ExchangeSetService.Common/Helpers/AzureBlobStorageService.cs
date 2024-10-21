@@ -42,7 +42,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.mediumExchangeSetInstance = mediumExchangeSetInstance;
             this.largeExchangeSetInstance = largeExchangeSetInstance;
         }
-
+        /// <summary>
+        /// StoreSaleCatalogueServiceResponseAsync will never return false it will throw exception if any error occurs
+        /// or return true if everything is successful
+        /// </summary>
+        /// <param name="containerName"></param>
+        /// <param name="batchId"></param>
+        /// <param name="salesCatalogueResponse"></param>
+        /// <param name="callBackUri"></param>
+        /// <param name="exchangeSetStandard"></param>
+        /// <param name="correlationId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="expiryDate"></param>
+        /// <param name="scsRequestDateTime"></param>
+        /// <param name="isEmptyEncExchangeSet"></param>
+        /// <param name="isEmptyAioExchangeSet"></param>
+        /// <param name="exchangeSetResponse"></param>
+        /// <returns></returns>
         public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
             var uploadFileName = string.Concat(batchId, ".json");
@@ -54,10 +70,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var connectionString = scsStorageService.GetStorageAccountConnectionString(saName, saKey);
             var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, connectionString, containerName);
 
-            //// rhz settings check
-            logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic removed header settings ");
-
             await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
+            // rhz: UploadSalesCatalogueServiceResponseToBlobAsync should return a boolean value to indicate the success or failure of the operation
+            //      if the upload is not successful we should exit returning false.  
             logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
@@ -88,6 +103,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await azureMessageQueueHelper.AddMessage(message.BatchId, instanceNumber, storageAccountConnectionString, scsResponseQueueMessageJSON, message.CorrelationId);
         }
 
+        /// <summary>
+        /// UploadSalesCatalogueServiceResponseToBlobAsync should return a boolean value to indicate the success or failure of the operation
+        /// </summary>
+        /// <param name="blobClient"></param>
+        /// <param name="salesCatalogueResponse"></param>
+        /// <returns></returns>
         public async Task UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
@@ -100,8 +121,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             catch (Exception ex)
             {
-                //// rhz - probably log the exception and the serialized JSON object, may need a new event id.
-                logger.LogInformation(EventIds.SCSResponseStoreRequestStart.ToEventId(), "Diagnostic stream upload failed: {message} stream source {sjo} ", ex.Message, serializeJsonObject);
+                logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Critical Error, stream upload failed: {message} stream source {sjo} ", ex.Message, serializeJsonObject);
             }
         }
         
