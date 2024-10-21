@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0] + "|" + Config.BESSConfig.S63BusinessUnit;
 
             //Check caching info
-            var tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+            var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache is generated
             Assert.IsNotNull(tableCacheCheck);
@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             //Check caching info
-            tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+            tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache available
             Assert.IsNotNull(tableCacheCheck);
@@ -127,7 +127,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0] + "|" + Config.BESSConfig.S57BusinessUnit;
 
             //Check caching info
-            var tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+            var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache is generated
             Assert.IsNotNull(tableCacheCheck);
@@ -140,7 +140,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Assert.AreEqual(200, (int)apiClearCacheResponse.StatusCode, $"Incorrect status code is returned for clear cache endpoint {apiClearCacheResponse.StatusCode}, instead of the expected status 200.");
 
             //Check caching info
-            tableCacheCheck = (FssSearchResponseCache)await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+            tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache available
             Assert.IsNotNull(tableCacheCheck);

@@ -1,5 +1,5 @@
 using Azure.Storage.Blobs;
-using Microsoft.Azure.Cosmos.Table;
+using Azure.Data.Tables;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
@@ -12,27 +12,38 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
     public class ClearCacheHelper
     {
-        public async Task<ITableEntity> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement : ITableEntity
+        public async Task<TElement> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement :class, ITableEntity
         {
-            var retrieveOperation = TableOperation.Retrieve<TElement>(partitionKey, rowKey);
-            return await ExecuteTableOperation(retrieveOperation, tableName, storageAccountConnectionString) as ITableEntity;
+            // rhz: commented out the following code block
+            ////var retrieveOperation = TableOperation.Retrieve<TElement>(partitionKey, rowKey);
+            ////return await ExecuteTableOperation(retrieveOperation, tableName, storageAccountConnectionString) as ITableEntity;
+
+            var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
+            var operation = await tableClient.GetEntityAsync<TElement>(partitionKey, rowKey);
+            return operation.Value;
+
         }
         
-        private async Task<CloudTable> GetAzureTable(string tableName, string storageAccountConnectionString)
+        private async Task<TableClient> GetAzureTable(string tableName, string storageAccountConnectionString)
         {
-            var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
-            var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
-            var table = tableClient.GetTableReference(tableName);
-            await table.CreateIfNotExistsAsync();
-            return table;
+            // rhz: commented out the following code block
+            ////var storageAccount = CloudStorageAccount.Parse(storageAccountConnectionString);
+            ////var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
+            ////var table = tableClient.GetTableReference(tableName);
+            ////await table.CreateIfNotExistsAsync();
+            ////return table;
+            var serviceClient = new TableServiceClient(storageAccountConnectionString);
+            var tableClient = serviceClient.GetTableClient(tableName);
+            await tableClient.CreateIfNotExistsAsync();
+            return tableClient;
         }
 
-        private async Task<object> ExecuteTableOperation(TableOperation tableOperation, string tableName, string storageAccountConnectionString)
-        {
-            var table = await GetAzureTable(tableName, storageAccountConnectionString);
-            var tableResult = await table.ExecuteAsync(tableOperation);
-            return tableResult.Result;
-        }
+        ////private async Task<object> ExecuteTableOperation(TableOperation tableOperation, string tableName, string storageAccountConnectionString)
+        ////{
+        ////    var table = await GetAzureTable(tableName, storageAccountConnectionString);
+        ////    var tableResult = await table.ExecuteAsync(tableOperation);
+        ////    return tableResult.Result;
+        ////}
 
         public async Task<bool> GetProductIdentifierAsync(string essJwtToken, string essBaseAddress, string readmeContainer, string connectionString)
         {
