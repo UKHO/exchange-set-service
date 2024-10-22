@@ -73,7 +73,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
             // rhz: UploadSalesCatalogueServiceResponseToBlobAsync should return a boolean value to indicate the success or failure of the operation
             //      if the upload is not successful we should exit returning false.  
-            logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
+            logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Rhz: Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
             var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
             {
