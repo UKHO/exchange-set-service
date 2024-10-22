@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(ProductIdentifierModel.ProductIdentifier, accessToken: EssJwtToken);
 
             var response = await FileContentHelper.CreateErrorFileValidation(ApiEssResponse, FssJwtToken);
-            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code for creation of Error.txt: {response.StatusCode}, instead of the expected 200.");
+            Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code for creation of Error.txt: {response.StatusCode}, instead of the expected 200.");
 
             ProductIdentifierModel.ProductIdentifier.Clear();
         }

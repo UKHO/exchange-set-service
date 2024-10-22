@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace UKHO.ExchangeSetService.Common.Configuration
 {
-    [Serializable]
     [ExcludeFromCodeCoverage]
     public class FulfilmentException : Exception
     {
