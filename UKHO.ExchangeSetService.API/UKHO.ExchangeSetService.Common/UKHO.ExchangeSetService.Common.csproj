@@ -29,6 +29,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
     <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="UKHO.Logging.EventHubLogProvider" Version="1.24163.8" />
   </ItemGroup>
 
