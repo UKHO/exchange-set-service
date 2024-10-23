@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Storage;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -105,6 +108,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [TestCase(ExchangeSetStandard.s57)]
         public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(ExchangeSetStandard exchangeSetStandard)
         {
+            BlobClient fakeBlobClient = A.Fake<BlobClient>();
+
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string containerName = "testContainer";
             string callBackUri = "https://essTest/myCallback?secret=test&po=1234";
@@ -121,9 +126,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeBlobClient);
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
+
+            A.CallTo(() => fakeBlobClient.Uri).Returns(new Uri("http://tempuri.org/blob"));
+
+            A.CallTo(() => fakeBlobClient.UploadAsync(A<MemoryStream>.Ignored)).Returns(Task.FromResult(A.Dummy<Response<BlobContentInfo>>()));
+
             var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard.ToString(), correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
             Assert.That(response, Is.True);
