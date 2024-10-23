@@ -97,7 +97,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
 
             if (fileName == "DE260001.000")
             {
-                HttpContext.Response.Headers.Add("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
+                HttpContext.Response.Headers.Append("Location", fileShareServiceConfiguration.Value.DownloadENCFiles307ResponseUri);
                 return StatusCode(StatusCodes.Status307TemporaryRedirect);
             }
             if (validated && !string.IsNullOrEmpty(fileName) && !Path.IsPathRooted(fileName))
@@ -241,7 +241,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             if (validated && !string.IsNullOrEmpty(fileName) && !Path.IsPathRooted(fileName))
             {
                 bytes = fileShareService.GetFileData(homeDirectoryPath, validatedBatchId, Path.GetFileName(fileName));
-                HttpContext.Response.Headers.Add("x-redirect-status", "true");
+                HttpContext.Response.Headers.Append("x-redirect-status", "true");
             }
 
             return File(bytes, "application/octet-stream", fileName);
