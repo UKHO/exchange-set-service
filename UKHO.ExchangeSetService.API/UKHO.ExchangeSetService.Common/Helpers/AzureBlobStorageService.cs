@@ -42,23 +42,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.mediumExchangeSetInstance = mediumExchangeSetInstance;
             this.largeExchangeSetInstance = largeExchangeSetInstance;
         }
-        /// <summary>
-        /// StoreSaleCatalogueServiceResponseAsync will never return false it will throw exception if any error occurs
-        /// or return true if everything is successful
-        /// </summary>
-        /// <param name="containerName"></param>
-        /// <param name="batchId"></param>
-        /// <param name="salesCatalogueResponse"></param>
-        /// <param name="callBackUri"></param>
-        /// <param name="exchangeSetStandard"></param>
-        /// <param name="correlationId"></param>
-        /// <param name="cancellationToken"></param>
-        /// <param name="expiryDate"></param>
-        /// <param name="scsRequestDateTime"></param>
-        /// <param name="isEmptyEncExchangeSet"></param>
-        /// <param name="isEmptyAioExchangeSet"></param>
-        /// <param name="exchangeSetResponse"></param>
-        /// <returns></returns>
+        
         public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
             var uploadFileName = string.Concat(batchId, ".json");
@@ -70,31 +54,36 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var connectionString = scsStorageService.GetStorageAccountConnectionString(saName, saKey);
             var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, connectionString, containerName);
 
-            await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
-            // rhz: UploadSalesCatalogueServiceResponseToBlobAsync should return a boolean value to indicate the success or failure of the operation
-            //      if the upload is not successful we should exit returning false.  
-            logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Rhz: Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
+            var scsStorageSuccessful = await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
 
-            var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
+            if (scsStorageSuccessful)
             {
-                BatchId = batchId,
-                ScsResponseUri = blobClient.Uri.AbsoluteUri,
-                FileSize = fileSize,
-                CallbackUri = callBackUri ?? string.Empty,
-                ExchangeSetStandard = exchangeSetStandard,
-                CorrelationId = correlationId,
-                ExchangeSetUrlExpiryDate = expiryDate,
-                ScsRequestDateTime = scsRequestDateTime,
-                IsEmptyEncExchangeSet = isEmptyEncExchangeSet,
-                IsEmptyAioExchangeSet = isEmptyAioExchangeSet,
-                RequestedProductCount = exchangeSetResponse?.RequestedProductCount ?? 0,
-                RequestedAioProductCount = exchangeSetResponse?.RequestedAioProductCount ?? 0,
-                RequestedProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedProductsAlreadyUpToDateCount ?? 0,
-                RequestedAioProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedAioProductsAlreadyUpToDateCount ?? 0
-            };
+                logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
-            await AddQueueMessage(scsResponseQueueMessage, instanceCountAndType.InstanceNumber, connectionString);
-            return true;
+                var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
+                {
+                    BatchId = batchId,
+                    ScsResponseUri = blobClient.Uri.AbsoluteUri,
+                    FileSize = fileSize,
+                    CallbackUri = callBackUri ?? string.Empty,
+                    ExchangeSetStandard = exchangeSetStandard,
+                    CorrelationId = correlationId,
+                    ExchangeSetUrlExpiryDate = expiryDate,
+                    ScsRequestDateTime = scsRequestDateTime,
+                    IsEmptyEncExchangeSet = isEmptyEncExchangeSet,
+                    IsEmptyAioExchangeSet = isEmptyAioExchangeSet,
+                    RequestedProductCount = exchangeSetResponse?.RequestedProductCount ?? 0,
+                    RequestedAioProductCount = exchangeSetResponse?.RequestedAioProductCount ?? 0,
+                    RequestedProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedProductsAlreadyUpToDateCount ?? 0,
+                    RequestedAioProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedAioProductsAlreadyUpToDateCount ?? 0
+                };
+
+                await AddQueueMessage(scsResponseQueueMessage, instanceCountAndType.InstanceNumber, connectionString); 
+            } else
+            {
+                logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Critical error, Sales catalogue service response not stored to blob storage for  fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
+            }
+            return scsStorageSuccessful;
         }
 
         public async Task AddQueueMessage(SalesCatalogueServiceResponseQueueMessage message,int instanceNumber,string storageAccountConnectionString)
@@ -103,26 +92,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             await azureMessageQueueHelper.AddMessage(message.BatchId, instanceNumber, storageAccountConnectionString, scsResponseQueueMessageJSON, message.CorrelationId);
         }
 
-        /// <summary>
-        /// UploadSalesCatalogueServiceResponseToBlobAsync should return a boolean value to indicate the success or failure of the operation
-        /// </summary>
-        /// <param name="blobClient"></param>
-        /// <param name="salesCatalogueResponse"></param>
-        /// <returns></returns>
-        public async Task UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
+        public async Task<bool> UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
         {
+            var uploadSuccess = false;
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
-
+            
             using var ms = new MemoryStream();
             LoadStreamWithJson(ms, serializeJsonObject);
             try
             {
                 await blobClient.UploadAsync(ms);
+                uploadSuccess = true;
             }
             catch (Exception ex)
             {
                 logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Critical Error, stream upload failed: {message} stream source {sjo} ", ex.Message, serializeJsonObject);
             }
+            return uploadSuccess;
         }
         
 
