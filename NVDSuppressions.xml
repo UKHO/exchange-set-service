@@ -186,33 +186,6 @@
   <suppress>
     <notes>
       <![CDATA[
-	file name: System.Net.WebSockets.Client:4.0.0
-	For details on these CVEs see:
-		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0247
-		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0249
-		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0256
-	This is a temporary suppression pending a fix being available.
-	Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=58195
-	]]>
-    </notes>
-    <cve>CVE-2017-0247</cve>
-    <cve>CVE-2017-0249</cve>
-    <cve>CVE-2017-0256</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-     vulnerability: DOS
-     Affects >Net >= 6.0.0, < 6.0.12. 
-	 Currently running Net 6.0.13,  sdk 6.0.405
-   ]]>
-    </notes>
-    <cve>CVE-2023-21538</cve>
-    <cve>CVE-2022-24464</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
      vulnerability: .NET Framework Information Disclosure
      Affects .Net 4.x.x
 	 Currently running Net 6.0.13,  sdk 6.0.405
@@ -233,29 +206,11 @@
   <suppress>
     <notes>
       <![CDATA[
-     vulnerability:  Information disclosure  
-     Affects Active directory up to 2021-11-02
-   ]]>
-    </notes>
-    <cve>CVE-2021-42306</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
      vulnerability:  Elevation of Privilege   
      Affects Azure Open Management Infrastructure (OMI) version <= 1.6.9-0 (VMs running Linux)
    ]]>
     </notes>
     <cve>CVE-2022-29149</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: System.Security.Cryptography.X509Certificates:4.1.0
-   This part of .NetCoreApp. Either waiting on fix through .net sdk to fix, or update to .net core 8 when available.
-   ]]>
-    </notes>
-    <cve>CVE-2017-11770</cve>
   </suppress>
   <suppress>
     <notes>
@@ -318,26 +273,6 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Azure.Identity.dll
-   Applies to Azure.Identity < 1.10.2
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Azure\.Identity@.*$</packageUrl>
-    <cve>CVE-2023-36415</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Azure.Identity:various
-   Applies to Azure.Identity < 1.10.2
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
-    <cve>CVE-2023-36415</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
    file name: GetDocument.Insider.dll
    CVE-2023-44487 applies to .NET < 6.0.23
    CVE-2023-36558 applies to .NET < 6.0.25
@@ -390,44 +325,6 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Microsoft.IdentityModel.JsonWebTokens:Various
-   Fixed in SDK >= 6.0.418
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Microsoft\.IdentityModel\.JsonWebTokens@.*$</packageUrl>
-    <vulnerabilityName>CVE-2024-21319</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Microsoft.IdentityModel.Tokens:Various
-   Fixed in SDK >= 6.0.418
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Microsoft\.IdentityModel\.Tokens@.*$</packageUrl>
-    <vulnerabilityName>CVE-2024-21319</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: System.IdentityModel.Tokens.Jwt:Various
-   Fixed in SDK >= 6.0.418
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/System\.IdentityModel\.Tokens\.Jwt@.*$</packageUrl>
-    <vulnerabilityName>CVE-2024-21319</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Microsoft.IdentityModel.Abstractions.dll
-   ]]>
-    </notes>
-    <cve>CVE-2024-21319</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
    file name: Newtonsoft.Json.Bson.dll
    ]]>
     </notes>
@@ -460,47 +357,6 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Azure.Identity
-   Temp suppression until package is updated.
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
-    <vulnerabilityName>CVE-2024-35255</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Microsoft.Identity.Client:4.57.0
-   Temp suppression until package is updated.
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
-    <cve>CVE-2024-27086</cve>
-    <vulnerabilityName>CVE-2024-35255</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Azure.Identity.dll
-   file name: Microsoft.Identity.Client.Extensions.Msal.dll
-   file name: Microsoft.Identity.Client.dll
-   file name: Microsoft.IdentityModel.Clients.ActiveDirectory.dll
-   file name: Microsoft.Kiota.Authentication.Azure.dll
-   ]]>
-    </notes>
-    <cve>CVE-2024-35255</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: System.Text.Json:7.0.0
-   ]]>
-    </notes>
-    <vulnerabilityName>CVE-2024-30105</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
    file name: System.Text.Json:6.0.9
    This is a false positive as this project is using version 8.0.5
    ]]>
@@ -526,21 +382,7 @@
     </notes>
     <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
     <cve>CVE-2023-36414</cve>
-    <cve>CVE-2024-43591</cve>
     <vulnerabilityName>CVE-2024-29992</vulnerabilityName>
-    <cpe>cpe:/a:microsoft:azure_cli</cpe>
-    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Azure.Identity:1.13.0
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
-    <cve>CVE-2024-43591</cve>
-    <cpe>cpe:/a:microsoft:azure_cli</cpe>
-    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
   </suppress>
   <suppress>
     <notes>
@@ -549,39 +391,7 @@
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:generic/Microsoft\.Extensions\.Azure@.*$</packageUrl>
-    <cve>CVE-2024-43591</cve>
-    <cpe>cpe:/a:microsoft:azure_cli</cpe>
     <cpe>cpe:/a:microsoft:azure_sdk_for_.net</cpe>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Microsoft.Extensions.Azure:1.6.3
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
-    <cve>CVE-2024-43591</cve>
-    <cpe>cpe:/a:microsoft:azure_cli</cpe>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Microsoft.Extensions.Azure:1.7.1
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
-    <cve>CVE-2024-43591</cve>
-    <cpe>cpe:/a:microsoft:azure_cli</cpe>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: Microsoft.Extensions.Azure:1.7.4
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
-    <cve>CVE-2024-43591</cve>
-    <cpe>cpe:/a:microsoft:azure_cli</cpe>
   </suppress>
   <suppress>
     <notes>
@@ -590,8 +400,6 @@
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:generic/System\.ClientModel@.*$</packageUrl>
-    <cve>CVE-2024-43591</cve>
-    <cpe>cpe:/a:microsoft:azure_cli</cpe>
     <cpe>cpe:/a:microsoft:azure_sdk_for_.net</cpe>
   </suppress>
   <suppress>
@@ -640,21 +448,6 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Elastic.Apm.MongoDb.dll
-   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
-    <cve>CVE-2012-6619</cve>
-    <cve>CVE-2013-1892</cve>
-    <cve>CVE-2014-8180</cve>
-    <cve>CVE-2016-6494</cve>
-    <cve>CVE-2015-1609</cve>
-    <cve>CVE-2013-2132</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
    file name: Elastic.Apm.NetCoreAll.dll
    https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
    ]]>
@@ -693,37 +486,6 @@
     </notes>
     <packageUrl regex="true">^pkg:generic/MongoDB\.Bson@.*$</packageUrl>
     <cve>CVE-2015-4411</cve>
-    <cve>CVE-2021-32036</cve>
-    <cve>CVE-2014-8180</cve>
-    <cve>CVE-2016-6494</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: MongoDB.Driver.Core.dll
-   n/a - MongoDB
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/MongoDB\.Driver\.Core@.*$</packageUrl>
-    <cve>CVE-2021-32036</cve>
-    <cve>CVE-2014-8180</cve>
-    <cve>CVE-2016-6494</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
-   file name: MongoDB.Libmongocrypt.dll
-   n/a - MongoDB
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/MongoDB\.Libmongocrypt@.*$</packageUrl>
-    <cve>CVE-2017-14227</cve>
-    <cve>CVE-2012-6619</cve>
-    <cve>CVE-2013-1892</cve>
-    <cve>CVE-2014-8180</cve>
-    <cve>CVE-2016-6494</cve>
-    <cve>CVE-2015-1609</cve>
-    <cve>CVE-2013-2132</cve>
   </suppress>
   <suppress>
     <notes>
