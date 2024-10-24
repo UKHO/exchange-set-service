@@ -283,12 +283,56 @@
   <suppress>
     <notes>
       <![CDATA[
+   file name: Azure.Identity:1.10.3
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Azure.Identity:various
    Applies to Azure.Identity < 1.10.2
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
     <cve>CVE-2023-36415</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.11.4
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.12.0
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.13.0
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
   </suppress>
   <suppress>
     <notes>
@@ -444,7 +488,47 @@
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:generic/Microsoft\.Extensions\.Azure@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
     <cpe>cpe:/a:microsoft:azure_sdk_for_.net</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Extensions.Azure:1.7.1
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Extensions.Azure:1.7.6
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.IdentityModel.Abstractions.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Microsoft\.IdentityModel\.Abstractions@.*$</packageUrl>
+    <cve>CVE-2024-21319</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.IdentityModel.Abstractions:6.22.0
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.IdentityModel\.Abstractions@.*$</packageUrl>
+    <cve>CVE-2024-21319</cve>
   </suppress>
   <suppress>
     <notes>
@@ -501,6 +585,21 @@
   <suppress>
     <notes>
       <![CDATA[
+      file name: Elastic.Apm.MongoDb.dll
+   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
+    <cve>CVE-2012-6619</cve>
+    <cve>CVE-2013-1892</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+    <cve>CVE-2015-1609</cve>
+    <cve>CVE-2013-2132</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Elastic.Apm.NetCoreAll.dll
    https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
    ]]>
@@ -539,6 +638,37 @@
     </notes>
     <packageUrl regex="true">^pkg:generic/MongoDB\.Bson@.*$</packageUrl>
     <cve>CVE-2015-4411</cve>
+    <cve>CVE-2021-32036</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: MongoDB.Driver.Core.dll
+   n/a - MongoDB
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/MongoDB\.Driver\.Core@.*$</packageUrl>
+    <cve>CVE-2021-32036</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: MongoDB.Libmongocrypt.dll
+   n/a - MongoDB
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/MongoDB\.Libmongocrypt@.*$</packageUrl>
+    <cve>CVE-2017-14227</cve>
+    <cve>CVE-2012-6619</cve>
+    <cve>CVE-2013-1892</cve>
+    <cve>CVE-2014-8180</cve>
+    <cve>CVE-2016-6494</cve>
+    <cve>CVE-2015-1609</cve>
+    <cve>CVE-2013-2132</cve>
   </suppress>
   <suppress>
     <notes>
