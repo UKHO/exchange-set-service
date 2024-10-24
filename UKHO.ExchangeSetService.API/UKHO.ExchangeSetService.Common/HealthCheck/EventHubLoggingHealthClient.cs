@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.EventHubs;
+﻿using Azure.Messaging.EventHubs;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,27 +12,22 @@ using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.Logging.EventHubLogProvider;
+using Azure.Messaging.EventHubs.Producer;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
     [ExcludeFromCodeCoverage]
     public class EventHubLoggingHealthClient : IEventHubLoggingHealthClient
     {
-        private readonly IOptions<EventHubLoggingConfiguration> eventHubLoggingConfiguration;
+        private readonly IOptions<EventHubLoggingConfiguration> _eventHubLoggingConfiguration;
 
         public EventHubLoggingHealthClient(IOptions<EventHubLoggingConfiguration> eventHubLoggingConfiguration)
         {
-            this.eventHubLoggingConfiguration = eventHubLoggingConfiguration;
+            this._eventHubLoggingConfiguration = eventHubLoggingConfiguration;
         }
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var connectionStringBuilder = new EventHubsConnectionStringBuilder(eventHubLoggingConfiguration.Value.ConnectionString)
-            {
-                EntityPath = eventHubLoggingConfiguration.Value.EntityPath
-            };
-
-            EventHubClient eventHubClient = EventHubClient.CreateFromConnectionString(connectionStringBuilder.ToString());
-
+            var eventHubProducerClient = new EventHubProducerClient(_eventHubLoggingConfiguration.Value.ConnectionString, _eventHubLoggingConfiguration.Value.EntityPath);
             try
             {
                 var logEntry = new LogEntry
@@ -42,18 +37,26 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     MessageTemplate = "Event Hub Logging Event Data For Health Check",
                     LogProperties = new Dictionary<string, object>
                     {
-                        { "_Environment", eventHubLoggingConfiguration.Value.Environment },
-                        { "_System",      eventHubLoggingConfiguration.Value.System },
-                        { "_Service",     eventHubLoggingConfiguration.Value.Service },
-                        { "_NodeName",    eventHubLoggingConfiguration.Value.NodeName }
+                        { "_Environment", _eventHubLoggingConfiguration.Value.Environment },
+                        { "_System",      _eventHubLoggingConfiguration.Value.System },
+                        { "_Service",     _eventHubLoggingConfiguration.Value.Service },
+                        { "_NodeName",    _eventHubLoggingConfiguration.Value.NodeName }
                     },
                     EventId = EventIds.EventHubLoggingEventDataForHealthCheck.ToEventId()
                 };
                 var jsonLogEntry = JsonConvert.SerializeObject(logEntry);
 
-                await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(jsonLogEntry)));
+                using EventDataBatch eventBatch = await eventHubProducerClient.CreateBatchAsync(cancellationToken);
 
-                return HealthCheckResult.Healthy("Event hub is healthy");
+                if (eventBatch.TryAdd(new EventData(Encoding.UTF8.GetBytes(jsonLogEntry))))
+                {
+                    await eventHubProducerClient.SendAsync(eventBatch, cancellationToken);
+                    return HealthCheckResult.Healthy("Event hub is healthy");
+                }
+                else
+                {
+                    return HealthCheckResult.Unhealthy("Event hub is unhealthy,unable to add event data to batch.");
+                }
             }
             catch (Exception ex)
             {
@@ -61,7 +64,8 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             }
             finally
             {
-                await eventHubClient.CloseAsync();
+                await eventHubProducerClient.CloseAsync(cancellationToken);
+                await eventHubProducerClient.DisposeAsync();
             }
         }
     }

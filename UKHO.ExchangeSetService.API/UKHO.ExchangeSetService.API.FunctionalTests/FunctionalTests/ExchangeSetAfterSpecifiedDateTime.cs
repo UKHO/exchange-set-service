@@ -41,7 +41,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime);
 
-            Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
+            Assert.That((int)apiResponse.StatusCode,Is.EqualTo(401), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             string tamperedEssJwtToken = EssJwtToken.Remove(EssJwtToken.Length - 2);
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: tamperedEssJwtToken);
 
-            Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(401), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssJwtCustomizedToken);
 
-            Assert.AreEqual(401, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(401), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 401.");
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssJwtTokenNoRole);
 
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithAValidRFC1123DateTime_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
             //verify model structure
             await apiResponse.CheckModelStructureForSuccessResponse();
@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithAValidDateWithCallBackUri_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, "https://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272", accessToken: EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 200.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 200.");
 
             //Get the BatchId
             var batchId = await apiResponse.GetBatchId();
@@ -112,11 +112,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             string sinceDatetime = DateTime.Now.AddDays(days).AddHours(1).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, accessToken: EssJwtToken);
-            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400. For given date {sinceDatetime}");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400. For given date {sinceDatetime}");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided sinceDateTime cannot be a future date."));
+            Assert.That(errorMessage.Errors.Any(e => e.Source == "sinceDateTime"), Is.True);
+            Assert.That(errorMessage.Errors.Any(e => e.Description == "Provided sinceDateTime cannot be a future date."), Is.True);
         }
 
 
@@ -127,11 +127,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithInValidRFC1123DateTime_ThenABadRequestStatusIsReturned(string sinceDatetime)
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, accessToken: EssJwtToken);
-            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
+            Assert.That(errorMessage.Errors.Any(e => e.Source == "sinceDateTime"), Is.True);
+            Assert.That(errorMessage.Errors.Any(e => e.Description == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."), Is.True);
         }
 
 
@@ -141,11 +141,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithANullDateTime_ThenABadRequestStatusIsReturned(string sinceDatetime)
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDatetime, accessToken: EssJwtToken);
-            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "sinceDateTime"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Query parameter 'sinceDateTime' is required."));
+            Assert.That(errorMessage.Errors.Any(e => e.Source == "sinceDateTime"), Is.True);
+            Assert.That(errorMessage.Errors.Any(e => e.Description == "Query parameter 'sinceDateTime' is required."), Is.True);
         }
 
         [TestCase("fss.ukho.gov.uk", TestName = "Callback URL without https")]
@@ -157,11 +157,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallTheApiWithInvalidCallbackURI_ThenABadRequestResponseIsReturned(string callBackUrl)
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, callBackUrl, accessToken: EssJwtToken);
-            Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Exchange Set for datetime is returned {apiResponse.StatusCode}, instead of the expected 400.");
 
             var errorMessage = await apiResponse.ReadAsTypeAsync<ErrorDescriptionResponseModel>();
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Source == "callbackUri"));
-            Assert.IsTrue(errorMessage.Errors.Any(e => e.Description == "Invalid callbackUri format."));
+            Assert.That(errorMessage.Errors.Any(e => e.Source == "callbackUri"), Is.True);
+            Assert.That(errorMessage.Errors.Any(e => e.Description == "Invalid callbackUri format."), Is.True);
         }
 
         [OneTimeTearDown]
@@ -171,7 +171,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 //Clean up batches from local foldar 
                 var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
-                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
+                Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code {apiResponse.StatusCode}  is  returned for clean up batches, instead of the expected 200.");
             }
         }
     }

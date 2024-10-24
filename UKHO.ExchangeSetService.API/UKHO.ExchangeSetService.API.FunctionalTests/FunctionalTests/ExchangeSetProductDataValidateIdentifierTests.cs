@@ -30,10 +30,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             var payload = DataHelper.GetProductIdentifierData();
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetProductIdentifiersAsync(EssJwtToken, payload);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode);
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200));
             var responseContent = await apiResponse.Content.ReadFromJsonAsync<ExchangeSetProductIdentifierResponse>();
             var productNames = responseContent.Products.Select(r => r.ProductName).ToList();
-            Assert.IsTrue(productNames.All(r => payload.Contains(r)));
+            Assert.That(productNames.All(r => payload.Contains(r)),Is.True);
         }
     }
 }

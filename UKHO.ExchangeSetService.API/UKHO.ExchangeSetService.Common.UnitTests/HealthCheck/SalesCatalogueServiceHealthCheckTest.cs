@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.AreEqual(HealthStatus.Healthy, response.Status);
+            Assert.That(HealthStatus.Healthy, Is.EqualTo(response.Status));
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.AreEqual(HealthStatus.Unhealthy, response.Status);
+            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
         }
     }
 }

@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             foreach (string folderPath in DownloadedFolderPath)
             {
                 bool checkFile = FssBatchHelper.CheckforFileExist(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName);
-                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path :");
+                Assert.That(checkFile,Is.True, $"File not Exist in the specified folder path :");
 
                 FileContentHelper.CheckMediaTxtFileContent(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetMediaFileName), mediaNumber);
                 mediaNumber++;
@@ -67,12 +67,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 //To verify the INFO folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName);
-                Assert.IsTrue(checkFolder, $"{folderPath} not Exist in the specified path");
+                Assert.That(checkFolder,Is.True, $"{folderPath} not Exist in the specified path");
 
                 //To verify the files under INFO folder exists
                 foreach (string infoFile in infoFolderFiles)
                 {
-                    Assert.IsTrue(File.Exists(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, infoFile)));
+                    Assert.That(File.Exists(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, infoFile)),Is.True);
                 }
             }
         }
@@ -85,11 +85,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 //To verify the ADC folder exists
                 bool checkFolder = FssBatchHelper.CheckforFolderExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.POSConfig.LargeExchangeSetAdcFolderName);
-                Assert.IsTrue(checkFolder, $"{folderPath} does not exist in the specified path.");
+                Assert.That(checkFolder, Is.True, $"{folderPath} does not exist in the specified path.");
 
                 //To verify that the files exists under ADC folder
                 int fileCount = Directory.GetFiles(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName, Config.POSConfig.LargeExchangeSetAdcFolderName),"*.*",SearchOption.TopDirectoryOnly).Length;
-                Assert.IsTrue(fileCount > 0, $"File count is {fileCount} in the specified folder path.");
+                Assert.That(fileCount > 0,Is.True, $"File count is {fileCount} in the specified folder path.");
             }
         }
 
@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 do
                 {
                     bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeReadMeFile);
-                    Assert.IsTrue(checkFile, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
+                    Assert.That(checkFile, Is.True, $"{Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
 
                     //Verify README.TXT file content
                     FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder, Config.ExchangeReadMeFile));
@@ -127,7 +127,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 do
                 {
                     bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}"), Config.ExchangeSetSerialEncFile);
-                    Assert.IsTrue(checkFile, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {Path.Combine(folderPath, $"B{baseNumber}")}");
+                    Assert.That(checkFile, Is.True, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {Path.Combine(folderPath, $"B{baseNumber}")}");
 
                     //Verify Serial.ENC file content
                     FileContentHelper.CheckSerialEncFileContentForLargeMediaExchangeSet(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetSerialEncFile), baseNumber);
@@ -181,11 +181,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 do
                 {
                     bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, $"B{baseNumber}", Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-                    Assert.IsTrue(checkFile, $"{Config.ExchangeSetCatalogueFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
+                    Assert.That(checkFile, Is.True, $"{Config.ExchangeSetCatalogueFile} File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetEncRootFolder)}");
 
                     //Verify Catalog file content
                     var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForLargeMedia(), ScsJwtToken);
-                    Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+                    Assert.That((int)apiScsResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
                     var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
@@ -205,7 +205,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             foreach (string folderPath in DownloadedFolderPath)
             {
                 bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(folderPath, Config.POSConfig.LargeExchangeSetInfoFolderName), Config.ExchangeSetProductFile);
-                Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetProductFilePath)}");
+                Assert.That(checkFile, Is.True, $"File not Exist in the specified folder path : {Path.Combine(folderPath, Config.ExchangeSetProductFilePath)}");
 
                 FileContentHelper.CheckProductFileContentLargeFile(Path.Combine(folderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile));
             }
@@ -225,7 +225,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             {
                 //Clean up batches from FSS
                 var apiResponse = await FssApiClient.CleanUpBatchesAsync(Config.FssConfig.BaseUrl, CleanUpBatchIdList, FssJwtToken);
-                Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned for clean up batches, instead of the expected 200.");
+                Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code {apiResponse.StatusCode} is returned for clean up batches, instead of the expected 200.");
             }
         }
     }

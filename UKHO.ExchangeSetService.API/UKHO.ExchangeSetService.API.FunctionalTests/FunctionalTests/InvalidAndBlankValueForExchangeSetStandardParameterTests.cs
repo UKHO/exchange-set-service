@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {
                 var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(sinceDateTime, null, EssJwtToken, exchangeSetStandard);
-                Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
+                Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
             }
         }
         #endregion
@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             foreach (var exchangeSetStandard in Config.BESSConfig.InvalidExchangeSetTestData)
             {
                 var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifierData(), null, EssJwtToken, exchangeSetStandard);
-                Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
+                Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
             }
         }
 
@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task WhenICallProductIdentifiersApiWithInvalidkeyExchangeSetStandardParameter_ThenABadRequestIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataWithIncorrectOptionalParameterAsync(DataHelper.GetProductIdentifierData(), null, EssJwtToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
         }
         #endregion
 
@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 };
 
                 var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(productVersionData, null, EssJwtToken, exchangeSetStandard);
-                Assert.AreEqual(400, (int)apiResponse.StatusCode, $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
+                Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 400.");
             }
         }
         #endregion

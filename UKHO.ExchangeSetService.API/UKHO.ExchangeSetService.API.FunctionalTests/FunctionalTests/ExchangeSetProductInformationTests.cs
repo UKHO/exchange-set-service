@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             var date = DateTime.Now.AddDays(-10).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'");
             var apiResponse = await ExchangeSetApiClient.GetProductInformationByDateTimeAsync(EssJwtToken, date);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode);
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200));
         }
     }
 }
