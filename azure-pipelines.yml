@@ -135,7 +135,7 @@ stages:
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
               packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
 
-          - task: CmdLine@2
+          - task: CmdLine@1
             displayName: "Run OWASP Dependency Checker"
             inputs:
               filename: 'dependency-check.bat'
