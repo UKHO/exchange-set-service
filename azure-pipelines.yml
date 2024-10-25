@@ -57,9 +57,9 @@ stages:
     displayName: "Stryker Mutator"
     condition: ${{ eq(parameters.disableStryker, false) }}
     dependsOn: []
-    variables:
-    - name: StrykerDotNetVersion
-      value: 8.0.x
+    ##variables:
+    ##- name: StrykerDotNetVersion
+    ##  value: 8.0.x
     jobs:
     - job: Stryker
       workspace:
@@ -75,7 +75,7 @@ stages:
           displayName: 'Use .NET SDK for Stryker'
           inputs:
             packageType: sdk
-            version: $(StrykerDotNetVersion)
+            version: $(SdkVersion)
 
         # rhz - 2021-09-29 - Commented out as global.json is not required for Stryker
         # - task: PowerShell@1
@@ -139,8 +139,6 @@ stages:
             displayName: "Run OWASP Dependency Checker"
             inputs:
               script: 'dependency-check.bat --project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
-              ##filename: 'dependency-check.bat'
-              ##arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
 
           - task: PublishBuildArtifacts@1
             displayName: "Publish Artifact: OWASP Dependency Checker Report"
