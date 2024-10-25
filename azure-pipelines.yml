@@ -57,9 +57,6 @@ stages:
     displayName: "Stryker Mutator"
     condition: ${{ eq(parameters.disableStryker, false) }}
     dependsOn: []
-    ##variables:
-    ##- name: StrykerDotNetVersion
-    ##  value: 8.0.x
     jobs:
     - job: Stryker
       workspace:
@@ -77,15 +74,6 @@ stages:
             packageType: sdk
             version: $(SdkVersion)
 
-        # rhz - 2021-09-29 - Commented out as global.json is not required for Stryker
-        # - task: PowerShell@1
-        #   displayName: "Create global.json for .NET"
-        #   inputs:
-        #     scriptType: inlineScript
-        #     workingFolder: $(Agent.TempDirectory)
-        #     inlineScript: |
-        #       dotnet new globaljson --sdk-version $(StrykerDotNetVersion)
-
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
           inputs:
@@ -102,7 +90,7 @@ stages:
             pwsh: true
             script: $(Agent.BuildDirectory)/tools/dotnet-stryker
 
-        - task: PublishMutationReport@0
+        - task: PublishMutationReport@1
           displayName: 'Publish Stryker Mutator Report'
           inputs:
             reportPattern: '**/mutation-report.html'
