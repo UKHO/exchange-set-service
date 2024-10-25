@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             //Get the product details form sales catalogue service
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersForEncAndAio(), ScsJwtToken);
-            Assert.That((int)apiScsResponse.StatusCode, Is.Not.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
