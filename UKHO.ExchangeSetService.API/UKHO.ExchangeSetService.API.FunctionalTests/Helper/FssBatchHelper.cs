@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;
@@ -52,12 +53,18 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             if (!Directory.Exists(tempFilePath))
             {
                 Directory.CreateDirectory(tempFilePath);
+                // rhz debug start
+                Console.WriteLine($"Temp File Directory: {tempFilePath}");
+                // rhz debug end
             }
 
             string batchFolderPath = Path.Combine(tempFilePath, batchId);
             if (!Directory.Exists(batchFolderPath))
             {
                 Directory.CreateDirectory(batchFolderPath);
+                // rhz debug start
+                Console.WriteLine($"Temp Batch Directory: {batchFolderPath}");
+                // rhz debug end
             }
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
@@ -74,6 +81,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string extractPath = Path.Combine(batchFolderPath, RenameFolder(zipPath)); 
 
             ZipFile.ExtractToDirectory(zipPath, extractPath);
+
+            // rhz debug start
+            Console.WriteLine($"Files In {extractPath}");
+            var files = Directory.GetFiles(extractPath);
+            files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
+            // rhz debug end
 
             return extractPath;
         }
