@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -102,6 +103,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 uri += $"?exchangeSetStandard={exchangeSetStandard}";
             }
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
+
+            // rhz debug start
+            Console.WriteLine("Rhz Get Product Identifier check");
+            Console.WriteLine("uri: " + uri);
+            Console.WriteLine("callbackUri: " + callbackUri);
+            var payloadJsonData = JsonConvert.SerializeObject(productIdentifierModel, Formatting.Indented);
+            Console.WriteLine("State of ProductIdentifierModel payload: " + payloadJsonData);
+            // rhz debug end
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };

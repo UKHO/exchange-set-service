@@ -10,6 +10,7 @@ using Azure.Storage.Blobs;
 using Azure;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using Newtonsoft.Json;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -25,6 +26,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That((int)apiEssResponse.StatusCode,Is.EqualTo(200), $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
+
+            // rhz debug start
+            Console.WriteLine("Rhz Status check");
+            string apiScsResponseDataJson = JsonConvert.SerializeObject(apiResponseData, Formatting.Indented);
+            Console.WriteLine("State of ExchangeSetResponseModel: " + apiScsResponseDataJson);
+            // rhz debug end
 
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
             var batchId = batchStatusUrl.Split('/')[5];

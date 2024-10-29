@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -38,6 +39,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task VerifyEmptyExchangeSetForProductIdentifier(List<string> product)
         {
+            // rhz debug start
+            Console.WriteLine("Rhz ObjectStorage check");
+            var objectStorageData = JsonConvert.SerializeObject(objStorage, Formatting.Indented);
+            Console.WriteLine("State of Object Storage: " + objectStorageData);
+            // rhz debug end
+
+
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(product, accessToken: objStorage.EssJwtToken);
             Assert.That((int)ApiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {ApiEssResponse.StatusCode}, instead of the expected status 200.");
 
