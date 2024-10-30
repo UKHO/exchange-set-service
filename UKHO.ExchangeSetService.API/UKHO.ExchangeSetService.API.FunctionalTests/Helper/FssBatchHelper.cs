@@ -178,22 +178,19 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
-            try
-            {
+           
+            // rhz debug start
+            Console.WriteLine($"About extract AIO data from {zipPath}");
+            // rhz debug end
 
-                ZipFile.ExtractToDirectory(zipPath, extractPath);
+            ZipFile.ExtractToDirectory(zipPath, extractPath);
 
-                // rhz debug start
-                Console.WriteLine($"Files In {extractPath}");
-                var files = Directory.GetFiles(extractPath);
-                files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
-                // rhz debug end
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine($"Error {ex.Message}");
-            }
+            // rhz debug start
+            Console.WriteLine($"Files In {extractPath}");
+            var files = Directory.GetFiles(extractPath);
+            files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
+            // rhz debug end
+            
 
             return extractPath;
         }
