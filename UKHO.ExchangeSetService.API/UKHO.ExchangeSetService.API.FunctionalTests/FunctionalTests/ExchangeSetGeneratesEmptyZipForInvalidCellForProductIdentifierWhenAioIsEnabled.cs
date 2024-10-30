@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
@@ -63,6 +64,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //// Download File
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, objStorage.FssJwtToken);
+
+            // rhz debug start
+            var testPath = Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder);
+            Console.WriteLine($"Files In {testPath}");
+            var files = Directory.GetFiles(testPath);
+            files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
+            // rhz debug end
 
             //// ENC_ROOT >>> ReadmeTxtFile
             bool checkFileReadme = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
