@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -107,6 +108,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenCatalog031IsAvailable()
         {
+            // rhz debug start
+            var testPath = Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder);
+            Console.WriteLine($"Files In {testPath} **");
+            var files = Directory.GetFiles(testPath);
+            foreach (var file in files)
+            {
+                Console.WriteLine(Path.GetFileName(file));
+            }
+            // rhz debug end
+
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
             Assert.That(checkFile,Is.True, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
 

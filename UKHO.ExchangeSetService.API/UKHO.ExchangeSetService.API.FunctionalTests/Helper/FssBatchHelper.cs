@@ -155,6 +155,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             await Task.Delay(40000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.AIOConfig.AioExchangeSetFileName);
 
+            // rhz debug start
+            Console.WriteLine($"AIO Temp file is {tempFilePath} for {downloadFileUrl} data ");
+            // rhz debug end
+
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
             Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
@@ -165,10 +169,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 stream.CopyTo(outputFileStream);
             }
 
+            // rhz debug start
+            var fi = new FileInfo(tempFilePath);
+            Console.WriteLine($"Size of {tempFilePath} is {fi.Length}");
+            // rhz debug end
+
+
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
-            ZipFile.ExtractToDirectory(zipPath, extractPath);
+            try
+            {
+
+                ZipFile.ExtractToDirectory(zipPath, extractPath);
+
+                // rhz debug start
+                Console.WriteLine($"Files In {extractPath}");
+                var files = Directory.GetFiles(extractPath);
+                files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
+                // rhz debug end
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Error {ex.Message}");
+            }
 
             return extractPath;
         }

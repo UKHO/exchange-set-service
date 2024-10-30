@@ -91,6 +91,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenCatalog031IsAvailable()
         {
+            // rhz debug start
+            var testPath = Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder);
+            Console.WriteLine($"Files In {testPath} **");
+            var files = Directory.GetFiles(testPath);
+            foreach (var file in files)
+            {
+                Console.WriteLine(Path.GetFileName(file));
+            }
+            // rhz debug end
+
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeSetCatalogueFile);
             Assert.That(checkFile, Is.True, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetCatalogueFile)}");
         }

@@ -436,6 +436,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(batchStatus, Is.EqualTo("Committed"), $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
             var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
+            // rhz debug start
+            Console.WriteLine( $"AIO One time setup for {downloadFileUrl} " );
+            // rhz debug end
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedAioFolder(downloadFileUrl.ToString(), FssJwtToken);
 
