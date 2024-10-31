@@ -72,6 +72,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
+            // rhz debug start
+            var testData = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Zip Source");
+            Console.WriteLine(testData);
+            Console.WriteLine("Zip Source End");
+            // rhz debug end
+
             using (FileStream outputFileStream = new(Path.Combine(batchFolderPath, fileName), FileMode.Create))
             {
                 stream.CopyTo(outputFileStream);

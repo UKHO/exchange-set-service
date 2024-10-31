@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             // rhz debug end
 
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-            Assert.That(checkFile, Is.True, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
+            Assert.That(checkFile, Is.True, $"{Config.ExchangeSetCatalogueFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder)}");
 
             //Product Backlog Item 71658: Add content to CATALOG.031 file
             //Verify Catalog file content
