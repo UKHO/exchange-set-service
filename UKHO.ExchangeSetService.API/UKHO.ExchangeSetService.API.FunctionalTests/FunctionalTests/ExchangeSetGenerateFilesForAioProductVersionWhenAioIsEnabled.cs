@@ -113,7 +113,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             // rhz debug start
             var testPath = Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder);
-            Console.WriteLine($"Files In {testPath} **");
+            Console.WriteLine($"AIO Files In {testPath} **");
             var files = Directory.GetFiles(testPath);
             foreach (var file in files)
             {

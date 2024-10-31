@@ -424,6 +424,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> DownloadAndExtractAioZip(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
+            // rhz debug start
+            Console.WriteLine($"One time setup, AIO section startd ");
+            // rhz debug end
+
             Assert.That((int)apiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -437,12 +441,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
             // rhz debug start
-            Console.WriteLine( $"AIO One time setup for {downloadFileUrl} " );
+            Console.WriteLine( $"AIO download file url {downloadFileUrl} " );
             // rhz debug end
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedAioFolder(downloadFileUrl.ToString(), FssJwtToken);
 
             var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+
+            // rhz debug start
+            Console.WriteLine($"AIO download folder {downloadFolder} ");
+            // rhz debug end
+
             return Path.Combine(Path.GetTempPath(), downloadFolder);
 
         }

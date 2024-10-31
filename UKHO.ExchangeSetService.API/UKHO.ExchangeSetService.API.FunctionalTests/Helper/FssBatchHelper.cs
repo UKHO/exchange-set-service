@@ -72,13 +72,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
-            // rhz debug start
-            var testData = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("Zip Source");
-            Console.WriteLine(testData);
-            Console.WriteLine("Zip Source End");
-            // rhz debug end
-
             using (FileStream outputFileStream = new(Path.Combine(batchFolderPath, fileName), FileMode.Create))
             {
                 stream.CopyTo(outputFileStream);
@@ -90,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             // rhz debug start
-            Console.WriteLine($"Files In {extractPath}");
+            Console.WriteLine($"Downloaded  Zip Files In {extractPath}");
             var files = Directory.GetFiles(extractPath);
             files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
             // rhz debug end
@@ -193,7 +186,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             // rhz debug start
-            Console.WriteLine($"Files In {extractPath}");
+            Console.WriteLine($"Downloaded AIO Zip Files In {extractPath}");
             var files = Directory.GetFiles(extractPath);
             files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
             // rhz debug end
