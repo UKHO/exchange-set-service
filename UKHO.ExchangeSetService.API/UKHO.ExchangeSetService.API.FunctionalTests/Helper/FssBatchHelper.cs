@@ -25,6 +25,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> CheckBatchIsCommitted(string batchStatusUri, string jwtToken)
         {
+            // rhz debug start
+            Console.WriteLine($"Status Uri: {batchStatusUri}");
+            // rhz debug end
+
             string batchStatus = "";
             var startTime = DateTime.UtcNow;
             while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.BatchCommitWaitTime))
@@ -45,6 +49,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> ExtractDownloadedFolder(string downloadFileUrl, string jwtToken)
         {
+            // rhz debug start
+            Console.WriteLine($"File Download Uri: {downloadFileUrl}");
+            //rhz debug end
+
             //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
             await Task.Delay(40000);
             string batchId = downloadFileUrl.Split('/')[4];

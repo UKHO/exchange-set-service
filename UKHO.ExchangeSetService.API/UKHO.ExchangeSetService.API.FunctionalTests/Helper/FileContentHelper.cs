@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
             // rhz debug start
-            Console.WriteLine("Rhz Status check");
+            Console.WriteLine("Exchange set response check");
             string apiScsResponseDataJson = JsonConvert.SerializeObject(apiResponseData, Formatting.Indented);
             Console.WriteLine("State of ExchangeSetResponseModel: " + apiScsResponseDataJson);
             // rhz debug end

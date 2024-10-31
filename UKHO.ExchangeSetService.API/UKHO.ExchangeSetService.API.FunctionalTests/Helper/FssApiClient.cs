@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -40,7 +41,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetFileDownloadAsync(string uri, string fileRangeHeader = null, string accessToken = null)
         {
-
+            // rhz debug start
+            Console.WriteLine($"Create Download Uri: {uri}");
+            // rhz debug end
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
             {
                 if (fileRangeHeader != null)

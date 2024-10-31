@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
             // rhz debug start
-            Console.WriteLine("Rhz Get Product Identifier check");
+            Console.WriteLine("Get Product Identifier check");
             Console.WriteLine("uri: " + uri);
             Console.WriteLine("callbackUri: " + callbackUri);
             var payloadJsonData = JsonConvert.SerializeObject(productIdentifierModel, Formatting.Indented);
