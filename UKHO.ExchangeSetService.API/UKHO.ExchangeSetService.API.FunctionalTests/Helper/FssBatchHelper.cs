@@ -78,16 +78,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
             Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
-            ////Stream stream = await response.Content.ReadAsStreamAsync();
+            Stream stream = await response.Content.ReadAsStreamAsync();
 
-            ////using (FileStream outputFileStream = new(Path.Combine(batchFolderPath, fileName), FileMode.Create))
-            ////{
-            ////    stream.CopyTo(outputFileStream);
-            ////}
+            using (FileStream outputFileStream = new(Path.Combine(batchFolderPath, fileName), FileMode.Create))
+            {
+                stream.CopyTo(outputFileStream);
+            }
             // rhz new version of above
-            await using var stream = await response.Content.ReadAsStreamAsync();
-            await using var fileStream = new FileStream(Path.Combine(batchFolderPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-            await stream.CopyToAsync(fileStream);
+            ////await using var stream = await response.Content.ReadAsStreamAsync();
+            ////await using var fileStream = new FileStream(Path.Combine(batchFolderPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
+            ////await stream.CopyToAsync(fileStream);
 
             string zipPath = Path.Combine(batchFolderPath, fileName);
             string extractPath = Path.Combine(batchFolderPath, Path.GetFileNameWithoutExtension(zipPath)); 
