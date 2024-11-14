@@ -25,10 +25,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> CheckBatchIsCommitted(string batchStatusUri, string jwtToken)
         {
-            // rhz debug start
-            Console.WriteLine($"Status Uri: {batchStatusUri}");
-            // rhz debug end
-
             string batchStatus = "";
             var startTime = DateTime.UtcNow;
             while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.BatchCommitWaitTime))
@@ -49,10 +45,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> ExtractDownloadedFolder(string downloadFileUrl, string jwtToken)
         {
-            // rhz debug start
-            Console.WriteLine($"File Download Uri: {downloadFileUrl}");
-            //rhz debug end
-
             //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
             await Task.Delay(40000);
             string batchId = downloadFileUrl.Split('/')[4];
@@ -61,18 +53,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             if (!Directory.Exists(tempFilePath))
             {
                 Directory.CreateDirectory(tempFilePath);
-                // rhz debug start
-                Console.WriteLine($"Temp File Directory: {tempFilePath}");
-                // rhz debug end
             }
 
             string batchFolderPath = Path.Combine(tempFilePath, batchId);
             if (!Directory.Exists(batchFolderPath))
             {
                 Directory.CreateDirectory(batchFolderPath);
-                // rhz debug start
-                Console.WriteLine($"Temp Batch Directory: {batchFolderPath}");
-                // rhz debug end
             }
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
@@ -84,21 +70,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 stream.CopyTo(outputFileStream);
             }
-            // rhz new version of above
-            ////await using var stream = await response.Content.ReadAsStreamAsync();
-            ////await using var fileStream = new FileStream(Path.Combine(batchFolderPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-            ////await stream.CopyToAsync(fileStream);
 
             string zipPath = Path.Combine(batchFolderPath, fileName);
             string extractPath = Path.Combine(batchFolderPath, Path.GetFileNameWithoutExtension(zipPath)); 
 
             ZipFile.ExtractToDirectory(zipPath, extractPath);
-
-            // rhz debug start
-            Console.WriteLine($"Downloaded  Zip Files In {extractPath}");
-            var files = Directory.GetFiles(extractPath);
-            files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
-            // rhz debug end
 
             return extractPath;
         }
@@ -167,10 +143,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             await Task.Delay(40000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.AIOConfig.AioExchangeSetFileName);
 
-            // rhz debug start
-            Console.WriteLine($"AIO Temp file is {tempFilePath} for {downloadFileUrl} data ");
-            // rhz debug end
-
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
             Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
@@ -181,28 +153,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 stream.CopyTo(outputFileStream);
             }
 
-            // rhz debug start
-            var fi = new FileInfo(tempFilePath);
-            Console.WriteLine($"Size of {tempFilePath} is {fi.Length}");
-            // rhz debug end
-
 
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
            
-            // rhz debug start
-            Console.WriteLine($"About extract AIO data from {zipPath}");
-            // rhz debug end
-
             ZipFile.ExtractToDirectory(zipPath, extractPath);
-
-            // rhz debug start
-            Console.WriteLine($"Downloaded AIO Zip Files In {extractPath}");
-            var files = Directory.GetFiles(extractPath);
-            files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
-            // rhz debug end
-            
 
             return extractPath;
         }

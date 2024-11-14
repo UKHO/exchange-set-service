@@ -40,13 +40,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task VerifyEmptyExchangeSetForProductIdentifier(List<string> product)
         {
-            // rhz debug start
-            Console.WriteLine("Rhz ObjectStorage check");
-            var objectStorageData = JsonConvert.SerializeObject(objStorage, Formatting.Indented);
-            Console.WriteLine("State of Object Storage: " + objectStorageData);
-            // rhz debug end
-
-
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(product, accessToken: objStorage.EssJwtToken);
             Assert.That((int)ApiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {ApiEssResponse.StatusCode}, instead of the expected status 200.");
 
@@ -64,13 +57,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //// Download File
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, objStorage.FssJwtToken);
-
-            // rhz debug start
-            var testPath = Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder);
-            Console.WriteLine($"AIO Files In {testPath}");
-            var files = Directory.GetFiles(testPath);
-            files.Select(f => Path.GetFileName(f)).ToList().ForEach(Console.WriteLine);
-            // rhz debug end
 
             //// ENC_ROOT >>> ReadmeTxtFile
             bool checkFileReadme = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);

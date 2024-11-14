@@ -27,12 +27,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
-            // rhz debug start
-            Console.WriteLine("Exchange set response check");
-            string apiScsResponseDataJson = JsonConvert.SerializeObject(apiResponseData, Formatting.Indented);
-            Console.WriteLine("State of ExchangeSetResponseModel: " + apiScsResponseDataJson);
-            // rhz debug end
-
             var batchStatusUrl = apiResponseData.Links.ExchangeSetBatchStatusUri.Href;
             var batchId = batchStatusUrl.Split('/')[5];
 
@@ -424,10 +418,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> DownloadAndExtractAioZip(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
-            // rhz debug start
-            Console.WriteLine($"One time setup, AIO section startd ");
-            // rhz debug end
-
             Assert.That((int)apiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
@@ -440,17 +430,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(batchStatus, Is.EqualTo("Committed"), $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
             var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
-            // rhz debug start
-            Console.WriteLine( $"AIO download file url {downloadFileUrl} " );
-            // rhz debug end
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedAioFolder(downloadFileUrl.ToString(), FssJwtToken);
 
             var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
-
-            // rhz debug start
-            Console.WriteLine($"AIO download folder {downloadFolder} ");
-            // rhz debug end
 
             return Path.Combine(Path.GetTempPath(), downloadFolder);
 

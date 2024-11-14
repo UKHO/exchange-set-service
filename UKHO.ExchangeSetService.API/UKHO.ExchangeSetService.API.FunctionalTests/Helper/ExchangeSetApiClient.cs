@@ -104,14 +104,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
-            // rhz debug start
-            Console.WriteLine("Get Product Identifier check");
-            Console.WriteLine("uri: " + uri);
-            Console.WriteLine("callbackUri: " + callbackUri);
-            var payloadJsonData = JsonConvert.SerializeObject(productIdentifierModel, Formatting.Indented);
-            Console.WriteLine("State of ProductIdentifierModel payload: " + payloadJsonData);
-            // rhz debug end
-
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
             if (accessToken != null)
