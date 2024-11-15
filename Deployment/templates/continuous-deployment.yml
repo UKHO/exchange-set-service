@@ -10,7 +10,7 @@ steps:
     displayName: "File Transform: Ess Config" #Replace exchange set instance value from pipeline 
     inputs:
       folderPath: '$(Pipeline.Workspace)/terraformartifact/src'
-      xmlTransformationRules:
+      enableXmlTransform: false
       jsonTargetFiles: '**/appsettings.json'
 
   - task: PowerShell@2
@@ -39,7 +39,7 @@ steps:
     displayName: "File Transform: WebJob"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
-      xmlTransformationRules:
+      enableXmlTransform: false
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2
@@ -56,7 +56,7 @@ steps:
     displayName: "File Transform: WebAppSettings"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
-      xmlTransformationRules:
+      enableXmlTransform: false
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureWebApp@1
