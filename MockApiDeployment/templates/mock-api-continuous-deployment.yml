@@ -19,14 +19,14 @@ steps:
     displayName: "File Transform: WebAppSettings"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
-      xmlTransformationRules:
+      enableXmlTransform: false
       jsonTargetFiles: '**/appsettings.json'
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
-      xmlTransformationRules:
+      enableXmlTransform: false
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2

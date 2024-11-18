@@ -505,7 +505,7 @@ stages:
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    xmlTransformationRules:
+                    enableXmlTransform: false
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
@@ -672,7 +672,7 @@ stages:
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    xmlTransformationRules:
+                    enableXmlTransform: false
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
@@ -811,7 +811,7 @@ stages:
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    xmlTransformationRules:
+                    enableXmlTransform: false
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
@@ -1051,7 +1051,7 @@ stages:
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    xmlTransformationRules:
+                    enableXmlTransform: false
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
@@ -1142,7 +1142,7 @@ stages:
                   displayName: "File Transform: functionaltests"
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    xmlTransformationRules:
+                    enableXmlTransform: false
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
