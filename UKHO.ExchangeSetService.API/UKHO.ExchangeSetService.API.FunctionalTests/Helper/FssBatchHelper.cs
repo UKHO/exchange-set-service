@@ -3,7 +3,6 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 using static UKHO.ExchangeSetService.API.FunctionalTests.Helper.TestConfiguration;

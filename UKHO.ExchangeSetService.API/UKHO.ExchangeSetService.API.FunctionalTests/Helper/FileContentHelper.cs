@@ -10,7 +10,6 @@ using Azure.Storage.Blobs;
 using Azure;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
-using Newtonsoft.Json;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
