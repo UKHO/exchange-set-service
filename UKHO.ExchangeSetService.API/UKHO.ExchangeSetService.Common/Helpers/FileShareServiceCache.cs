@@ -205,7 +205,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, batchId);
-            await blobClient.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE });
+            // rhz disabled await blobClient.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = CONTENT_TYPE });
 
             if (!await blobClient.ExistsAsync())
             {
