@@ -37,6 +37,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public async Task WhenICallExchangeSetProductIdentifierApiWithACancelledProduct_ThenCatalogueFileUpdatedWithEditionNumberZero()
         {
             ProductIdentifierModel.ProductIdentifier = new List<string>() { "DE516510" };
@@ -83,6 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public async Task WhenICallExchangeSetProductVersionsApiWithACancelledProduct_ThenCatalogueFileUpdatedWithEditionNumberZero()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();

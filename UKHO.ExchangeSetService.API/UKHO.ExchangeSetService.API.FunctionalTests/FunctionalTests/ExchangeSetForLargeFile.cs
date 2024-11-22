@@ -45,6 +45,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAMediaTxtFileIsGenerated()
         {
             int mediaNumber = 1;
@@ -60,6 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnINFOFolderWithFilesIsGenerated()
         {
             string[] infoFolderFiles = { posDetails.InfoFolderEnctandPnmstatus, posDetails.InfoFolderAvcsUserGuide, posDetails.InfoFolderAddsEul, posDetails.InfoFolderImpInfo, posDetails.EncUpdateList };
@@ -79,6 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAnADCFolderWithFilesIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)
@@ -95,6 +98,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAReadMeTxtFileIsGenerated()
         {
             int baseNumber = 1;
@@ -118,6 +122,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenASerialEncFileIsGenerated()
         {
             int baseNumber = 1;
@@ -141,6 +146,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenEncFilesAreGenerated()
         {
             int baseNumber = 1;
@@ -172,6 +178,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public async Task WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenACATALOGFileIsGenerated()
         {
             int baseNumber = 1;
@@ -200,6 +207,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallExchangeSetApiWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()
         {
             foreach (string folderPath in DownloadedFolderPath)

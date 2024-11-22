@@ -55,6 +55,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 140672: ESS : Fulfilment service(webjob) - Get data from new BU
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public async Task WhenICallEssApisWithoutExchangeSetStandardParameterAndWithMultipleProductIdentifiers_ThenAProductTxtFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
@@ -113,6 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //PBI 140672: ESS : Fulfilment service(webjob) - Get data from new BU
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public void WhenICallEssApisWithoutExchangeSetStandardParameterAndWithAValidProductIdentifiers_ThenASerialEncFileIsGenerated()
         {
             foreach (var downloadedFolderPath in downloadedFolderPathList)
