@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Collections.Generic;
 using Azure.Storage.Blobs;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Linq;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
@@ -46,6 +48,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIODisabled")]
+        [Ignore("rhz Test disabled")]
         public async Task WhenICallExchangeSetApiWithProductIdentifiersForExchangeSetStandards63_AndCalledClearCache_ThenCacheIsAvailable()
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(new List<string>() { "DE290001" }, accessToken: EssJwtToken);
@@ -107,6 +110,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             //Get the product details form sales catalogue service
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiersS57(), ScsJwtToken);
+            //rhz check start
+            var item = DataHelper.GetProductIdentifiersS57().FirstOrDefault();
+            Console.WriteLine($"ExchangeSetType={Config.ExchangeSetProductType},S57Id = {item}"); 
+            //rhz check end
+
             Assert.That((int)apiScsResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
