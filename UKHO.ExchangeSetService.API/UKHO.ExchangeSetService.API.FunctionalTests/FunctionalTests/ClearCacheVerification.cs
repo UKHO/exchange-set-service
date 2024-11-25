@@ -137,6 +137,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Check caching info
             // rhz check start
             Console.WriteLine($"Search for:- pKey = {partitionKey} rKey = {rowKey} table = {Config.ClearCacheConfig.FssSearchCacheTableName}");
+            Console.WriteLine($"ConnectionString = {Config.ClearCacheConfig.CacheStorageConnectionString}");
             // rhz check end
             var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
