@@ -135,6 +135,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0] + "|" + Config.BESSConfig.S57BusinessUnit;
 
             //Check caching info
+            // rhz check start
+            Console.WriteLine($"Search for:- pKey = {partitionKey} rKey = {rowKey} table = {Config.ClearCacheConfig.FssSearchCacheTableName}");
+            // rhz check end
             var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache is generated

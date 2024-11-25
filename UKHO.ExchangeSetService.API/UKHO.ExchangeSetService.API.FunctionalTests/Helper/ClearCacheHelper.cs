@@ -14,13 +14,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     {
         public async Task<TElement> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement :class, ITableEntity
         {
-            var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
+            var tableClient = await GetAzureTableAsync(tableName, storageAccountConnectionString);
             var operation = await tableClient.GetEntityAsync<TElement>(partitionKey, rowKey);
             return operation.Value;
 
         }
         
-        private async Task<TableClient> GetAzureTable(string tableName, string storageAccountConnectionString)
+        private async Task<TableClient> GetAzureTableAsync(string tableName, string storageAccountConnectionString)
         {
             var serviceClient = new TableServiceClient(storageAccountConnectionString);
             var tableClient = serviceClient.GetTableClient(tableName);

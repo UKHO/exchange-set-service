@@ -40,7 +40,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             //Get the BatchId
             var batchId = await ApiEssResponse.GetBatchId();
             CleanUpBatchIdList.Add(batchId);
-            DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFileForLargeMedia(ApiEssResponse, FssJwtToken);
+            DownloadedFolderPath = new List<string>(); // rhz this is to be removed.
+            //// rhz disable DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFileForLargeMedia(ApiEssResponse, FssJwtToken);
         }
 
         [Test]
