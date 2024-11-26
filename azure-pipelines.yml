@@ -886,3 +886,13 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
           Container: ${{variables.Container}} 
+
+      - template: Deployment/templates/Deploy.yml
+        parameters:
+          Environment: "preprod"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
+          Container: ${{variables.Container}} 
+          RunTests: false
+          pathSuffix: "-v2"
+          v2Modifier: "2"
