@@ -132,7 +132,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 }
             }
             var partitionKey = apiScsResponseData.Products[0].ProductName;
-            var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0] + "|" + Config.BESSConfig.S57BusinessUnit;
+            var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0] + "|" + Config.BESSConfig.S63BusinessUnit;  // rhz was 57
 
             //Check caching info
             // rhz check start
