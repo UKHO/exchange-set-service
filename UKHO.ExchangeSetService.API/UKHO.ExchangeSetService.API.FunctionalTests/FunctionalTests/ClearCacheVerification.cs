@@ -132,12 +132,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
                 }
             }
             var partitionKey = apiScsResponseData.Products[0].ProductName;
-            var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0] + "|" + Config.BESSConfig.S63BusinessUnit;  // rhz was 57
+            var rowKey = apiScsResponseData.Products[0].EditionNumber + "|" + apiScsResponseData.Products[0].UpdateNumbers[0] + "|" + Config.BESSConfig.S57BusinessUnit;
 
             //Check caching info
             // rhz check start
             Console.WriteLine($"Search for:- pKey = {partitionKey} rKey = {rowKey} table = {Config.ClearCacheConfig.FssSearchCacheTableName}");
-            Console.WriteLine($"ConnectionString = {Config.ClearCacheConfig.CacheStorageConnectionString}");
             // rhz check end
             var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
