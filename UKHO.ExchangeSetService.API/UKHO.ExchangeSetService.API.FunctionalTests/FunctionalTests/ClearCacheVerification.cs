@@ -139,8 +139,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             Console.WriteLine($"Search for:- pKey = {partitionKey} rKey = {rowKey} table = {Config.ClearCacheConfig.FssSearchCacheTableName}");
             partitionKey = "GB602571";
             rowKey = "3|0|ADDS";
+            var tableName = "FssSearchResponseCache";
+            var conData = Config.ClearCacheConfig.CacheStorageConnectionString.Split(";");
+            Console.WriteLine($"Connection Data:- {conData[0]} {conData[1]} {conData[2]}");
             // rhz check end
-            var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, Config.ClearCacheConfig.FssSearchCacheTableName, Config.ClearCacheConfig.CacheStorageConnectionString);
+            var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, tableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
             // Verify the Cache is generated
             Assert.That(tableCacheCheck, Is.Not.Null);
