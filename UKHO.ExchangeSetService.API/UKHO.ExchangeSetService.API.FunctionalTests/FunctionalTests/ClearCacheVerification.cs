@@ -141,7 +141,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             rowKey = "3|0|ADDS";
             var tableName = "FssSearchResponseCache";
             var conData = Config.ClearCacheConfig.CacheStorageConnectionString.Split(";");
-            Console.WriteLine($"Connection Data:- {conData[0]} {conData[1]} {conData[2]}");
+            Console.WriteLine($"Connection Data 1:- {conData[0]}");
+            Console.WriteLine($"Connection Data 2:- {conData[1]}");
+            Console.WriteLine($"Connection Data 3:- {conData[2]}");
             // rhz check end
             var tableCacheCheck = await ClearCacheHelper.RetrieveFromTableStorageAsync<FssSearchResponseCache>(partitionKey, rowKey, tableName, Config.ClearCacheConfig.CacheStorageConnectionString);
 
