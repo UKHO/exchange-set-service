@@ -674,17 +674,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
-                # - task: DotNetCoreCLI@2
-                #   displayName: "Run Functional tests AIOEnabled"
-                #   inputs:
-                #     command: "test"
-                #     projects: |
-                #       **/*FunctionalTest*.dll
-                #       !**/*TestAdapter.dll
-                #       !**/obj/**
-                #     arguments: '--filter Category=QCOnlyTest-AIOEnabled'
-                #     testRunTitle: "QC-AutomationTests"
-                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIOEnabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=QCOnlyTest-AIOEnabled'
+                    testRunTitle: "QC-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
@@ -695,17 +695,17 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
-                - task: DotNetCoreCLI@2
-                  displayName: "Run Functional tests AIODisabled"
-                  inputs:
-                    command: "test"
-                    projects: |
-                      **/*FunctionalTest*.dll
-                      !**/*TestAdapter.dll
-                      !**/obj/**
-                    arguments: '--filter Category=QCOnlyTest-AIODisabled'
-                    testRunTitle: "QC-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                # - task: DotNetCoreCLI@2
+                #   displayName: "Run Functional tests AIODisabled"
+                #   inputs:
+                #     command: "test"
+                #     projects: |
+                #       **/*FunctionalTest*.dll
+                #       !**/*TestAdapter.dll
+                #       !**/obj/**
+                #     arguments: '--filter Category=QCOnlyTest-AIODisabled'
+                #     testRunTitle: "QC-AutomationTests"
+                #     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
