@@ -83,7 +83,8 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
+                // rhz replaced fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => p.FileSize) ?? 0;
+                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
 
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productIdentifierRequest.ExchangeSetStandard);
