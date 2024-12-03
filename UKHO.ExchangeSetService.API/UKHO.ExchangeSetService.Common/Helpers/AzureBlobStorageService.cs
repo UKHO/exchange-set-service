@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
         {
             var uploadFileName = string.Concat(batchId, ".json");
-            long fileSize = salesCatalogueResponse.Products?.Sum(p => p.FileSize) ?? 0;
+            long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse);
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
             var instanceCountAndType = GetInstanceCountBasedOnFileSize(fileSizeInMB);
             var (saName,saKey) = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.ExchangeSetType);
