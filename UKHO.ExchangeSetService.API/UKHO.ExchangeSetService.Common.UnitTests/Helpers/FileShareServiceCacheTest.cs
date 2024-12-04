@@ -268,17 +268,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumbers:[{UpdateNumbers}]. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
-        [Test]
-        public async Task WhenInsertOrMergeFssCacheDetail_ThenReturnTrue()
-        {
-            /// rhz Not sure if this is a valid test, the assertion will always be true
-            /// so unless the awaited method throws an exception, the test will always pass
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.InsertOrMergeIntoTableStorageAsync(A<TableEntity>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            await fileShareServiceCache.InsertOrMergeFssCacheDetail(GetResponseCache());
-
-            Assert.That(true, Is.Not.Null);
-        }
 
         [Test]
         [TestCase("ADDS")]
