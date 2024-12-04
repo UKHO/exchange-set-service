@@ -229,7 +229,6 @@ namespace UKHO.ExchangeSetService.API
             app.UseAuthorization();
             app.MapHealthChecks("/health");
             app.MapControllers();
-            //app.UseElasticApm(builder.Configuration);
             app.Run();
 
             //=====================================
