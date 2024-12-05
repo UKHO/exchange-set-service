@@ -52,7 +52,6 @@ variables:
     value: "NautilusBuild"
 
 stages:
-
   - stage: Stryker_Mutator
     displayName: "Stryker Mutator"
     condition: ${{ eq(parameters.disableStryker, false) }}
@@ -123,26 +122,12 @@ stages:
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
               packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
 
-          - task: CmdLine@2
-            displayName: "Run OWASP Dependency Checker"
-            inputs:
-              script: 'dependency-check.bat --project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
-
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Artifact: OWASP Dependency Checker Report"
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)\DCReport'
-              ArtifactName: "OWASP Dependency Checker Report"
-
-          - task: PowerShell@1
-            displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
-            inputs:
-              scriptType: inlineScript
-              arguments: '-ReportLocation $(Build.ArtifactStagingDirectory)\DCReport\*'
-              inlineScript: |
-                param($ReportLocation)
-                Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
-
+          - template: dependency-checker/windows-dependency-checker.yaml@UKHOTemplates
+            parameters:
+              scanName: 'External-Notification-Service - $(Build.SourceBranchName)'
+              scanPath: '$(Build.SourcesDirectory)\UKHO.ExternalNotificationService.API'
+              suppressionPath: '$(Build.SourcesDirectory)\NVDSuppressions.xml'
+ 
       - job: UnitTestsAndCodeCoverage
         workspace:
           clean: all
