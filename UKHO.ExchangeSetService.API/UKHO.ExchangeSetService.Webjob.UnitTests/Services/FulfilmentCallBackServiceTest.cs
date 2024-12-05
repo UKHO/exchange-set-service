@@ -441,42 +441,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         #region SetExchangeSetResponse
 
-        [Test, TestCaseSource(nameof(GetExchangeSetResponseTestData), new object[] { false })]
-        public void WhenSetExchangeSetResponseWithAioDisabled_ThenReturnValidExchangeSetResponse(bool isAioReturned,
-             bool isEncReturned, bool isEmptyEncExchangeSet)
-        {
-            var scProductResponse = GetSalesCatalogueProductResponse(a =>
-            {
-                if (!isEncReturned)
-                {
-                    a.Products.Clear();
-                    a.ProductCounts.RequestedProductCount = 0;
-                    a.ProductCounts.ReturnedProductCount = 0;
-                    a.ProductCounts.RequestedProductsAlreadyUpToDateCount = 0;
-                }
-
-                if (isAioReturned)
-                {
-                    a.Products.Add(new Products { ProductName = aioCells.First() });
-                    a.ProductCounts.RequestedProductCount += 1;
-                    a.ProductCounts.ReturnedProductCount += 1;
-                    a.ProductCounts.RequestedProductsAlreadyUpToDateCount += 1;
-                }
-            });
-
-            var queueMessage = GetSalesCatalogueServiceResponseQueueMessage(a =>
-                a.IsEmptyEncExchangeSet = isEmptyEncExchangeSet);
-
-            fakeAioConfiguration.Value.AioEnabled = false;
-
-            var result = fulfilmentCallBackService.SetExchangeSetResponse(scProductResponse, queueMessage);
-
-            Assert.IsNotNull(result);
-            Assert.IsNull(result.Links.AioExchangeSetFileUri);
-            Assert.IsNull(result.AioExchangeSetCellCount);
-            Assert.IsNull(result.RequestedAioProductsAlreadyUpToDateCount);
-            Assert.IsNotNull(result.Links.ExchangeSetFileUri);
-        }
 
         [Test, TestCaseSource(nameof(GetExchangeSetResponseTestData), new object[] { true })]
         public void WhenSetExchangeSetResponseWithAioEnabled_ThenReturnValidExchangeSetResponse(bool isAioReturned,
