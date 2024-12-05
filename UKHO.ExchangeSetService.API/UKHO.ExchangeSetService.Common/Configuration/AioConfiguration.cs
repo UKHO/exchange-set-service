@@ -12,11 +12,11 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         {
             get
             {
-                return Convert.ToBoolean(AioEnabled.HasValue ? AioEnabled : false);
+                return true;
             }
-            set
+            private set
             {
-                AioEnabled = value;
+                //AioEnabled = true;
             }
         }
     }
