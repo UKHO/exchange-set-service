@@ -10,6 +10,11 @@ parameters:
     type: boolean
     default: false
 
+  - name: DisableDependencyCheck
+    displayName: "Disable OWASP dependency checking"
+    type: boolean
+    default: false
+
 trigger:
   - main
   - release/*
