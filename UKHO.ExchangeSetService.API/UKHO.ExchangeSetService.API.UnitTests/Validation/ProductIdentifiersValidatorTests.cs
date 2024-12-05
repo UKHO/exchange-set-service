@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             var model = new ProductIdentifierRequest { CallbackUri = "demo uri" };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.CallbackUri);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "Invalid callbackUri format."));
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                 CallbackUri = callbackUri
             };
             var result = validator.TestValidate(model);
-            Assert.IsTrue(result.Errors.Count == 0);
+            Assert.That(result.Errors.Count == 0);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             };
             var result = validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
-            Assert.IsTrue(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
+            Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                 CallbackUri = callbackUri
             };
             var result = validator.TestValidate(model);
-            Assert.AreEqual(0, result.Errors.Count);
+            Assert.That(0, Is.EqualTo(result.Errors.Count));
         }
         #endregion
     }
