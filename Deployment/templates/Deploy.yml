@@ -143,12 +143,12 @@ jobs:
               xmlTransformationRules: ''
               jsonTargetFiles: '**/appsettings.json'
 
-          - task: UseDotNet@2
-            displayName: 'Use .NET SDK'
-            inputs:
-              packageType: sdk
-              useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)'
+          # - task: UseDotNet@2
+          #   displayName: 'Use .NET SDK'
+          #   inputs:
+          #     packageType: sdk
+          #     useGlobalJson: true
+          #     workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: AzureCLI@2
             displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
