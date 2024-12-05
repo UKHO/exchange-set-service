@@ -6,7 +6,7 @@ parameters:
 
 - name: DotNetVersion
   type: string
-  default: '8.0.x'
+  default: '6.0.x'
 
 jobs:
 - job: Dependencychecker
