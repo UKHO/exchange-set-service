@@ -286,6 +286,10 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         CreateProductFileRequestCompleted = 805069,
         /// <summary>
+        /// 805900 - Create Product Data request failed.
+        /// </summary>
+        CreateProductDataError = 805900,
+        /// <summary>
         /// 805070 - Request for sales catalogue service catalogue endpoint is started.
         /// </summary>
         SCSGetSalesCatalogueDataRequestStart = 805070,

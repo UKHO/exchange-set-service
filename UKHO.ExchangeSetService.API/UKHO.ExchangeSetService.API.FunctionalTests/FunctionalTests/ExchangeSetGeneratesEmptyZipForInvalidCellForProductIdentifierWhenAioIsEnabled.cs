@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public async Task VerifyEmptyExchangeSetForProductIdentifier(List<string> product)
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(product, accessToken: objStorage.EssJwtToken);
-            Assert.AreEqual(200, (int)ApiEssResponse.StatusCode, $"Incorrect status code is returned {ApiEssResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)ApiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {ApiEssResponse.StatusCode}, instead of the expected status 200.");
 
             //// Check Download file URL
             batchId = await ApiEssResponse.GetBatchId();
@@ -48,26 +49,26 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
+            Assert.That(batchStatus, Is.EqualTo("Committed"), $"Incorrect batch status is returned {batchStatus}, instead of the expected status Committed.");
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: objStorage.FssJwtToken);
-            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
+            Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 404.");
 
             //// Download File
             DownloadedFolderPath = await FileContentHelper.CreateExchangeSetFile(ApiEssResponse, objStorage.FssJwtToken);
 
             //// ENC_ROOT >>> ReadmeTxtFile
             bool checkFileReadme = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFileReadme, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");
+            Assert.That(checkFileReadme,Is.True, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder, objStorage.Config.ExchangeReadMeFile));
 
             //// ENC_ROOT >> Catalog.031
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
+            Assert.That(checkFile,Is.True, $"File not Exist in the specified folder path : {Path.Combine(DownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
 
             //Verify Catalog file content
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
@@ -75,21 +76,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ////SERIAL.ENC 
             bool checkFileSerial = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, objStorage.Config.ExchangeSetSerialEncFile);
-            Assert.IsTrue(checkFileSerial, $"{objStorage.Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            Assert.That(checkFileSerial, Is.True, $"{objStorage.Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
             FileContentHelper.CheckSerialEncFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetSerialEncFile));
 
             //Verify Serial.Enc file content
             FileContentHelper.CheckSerialEncFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetSerialEncFile));
 
             //// No ENC Available
-            Assert.IsFalse(Directory.Exists(Path.Combine(DownloadedFolderPath, "ENC_ROOT\\AB")));
+            Assert.That(Directory.Exists(Path.Combine(DownloadedFolderPath, "ENC_ROOT\\AB")),Is.False);
 
             //// INFO >> PRODUCT.TXT
             bool checkFileProductTxt = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
-            Assert.IsTrue(checkFileProductTxt, $"{objStorage.Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            Assert.That(checkFileProductTxt, Is.True, $"{objStorage.Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
 
             var apiScsResponseProductTxt = await ScsApiClient.GetScsCatalogueAsync(objStorage.Config.ExchangeSetProductType, objStorage.Config.ExchangeSetCatalogueType, objStorage.ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponseProductTxt.StatusCode, $"Incorrect status code is returned {apiScsResponseProductTxt.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponseProductTxt.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponseProductTxt.StatusCode}, instead of the expected status 200.");
             var apiResponseDetails = await apiScsResponseProductTxt.ReadAsStringAsync();
             dynamic apiScsResponseDataProductTXT = JsonConvert.DeserializeObject(apiResponseDetails);
 

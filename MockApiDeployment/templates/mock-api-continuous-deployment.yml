@@ -20,6 +20,7 @@ steps:
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
       enableXmlTransform: false
+      xmlTransformationRules: ''
       jsonTargetFiles: '**/appsettings.json'
 
   - task: FileTransform@2
@@ -27,6 +28,7 @@ steps:
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
       enableXmlTransform: false
+      xmlTransformationRules: ''
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2

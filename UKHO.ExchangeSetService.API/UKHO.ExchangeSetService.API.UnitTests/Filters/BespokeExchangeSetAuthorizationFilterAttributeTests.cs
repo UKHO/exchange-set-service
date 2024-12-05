@@ -347,7 +347,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             var correlationId = "305ae767-35c3-41f7-9f57-f25b019d30c5";
 
             httpContext.Request.Query = new QueryCollection(dictionary);
-            httpContext.Request.Headers.Add(XCorrelationIdHeaderKey, correlationId);
+            httpContext.Request.Headers.Append(XCorrelationIdHeaderKey, correlationId);
 
             var claims = new List<Claim>()
             {
@@ -405,7 +405,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             var correlationId = "305ae767-35c3-f25b019d30c5";
 
             httpContext.Request.Query = new QueryCollection(dictionary);
-            httpContext.Request.Headers.Add(XCorrelationIdHeaderKey, correlationId);
+            httpContext.Request.Headers.Append(XCorrelationIdHeaderKey, correlationId);
 
             var claims = new List<Claim>()
             {
