@@ -118,7 +118,7 @@ stages:
  
   - stage: Devdeploy
     dependsOn:
-    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    - BuildTestPublish
     displayName: "Devdeploy (inc terraform, webapp deploy)"
     jobs:
       - template: Deployment/templates/app-deploy.yml
@@ -141,7 +141,7 @@ stages:
 
   - stage: QCdeploy
     dependsOn:
-    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    - BuildTestPublish
     displayName: "QCdeploy (inc terraform, mock webapp deploy)"
     jobs:
       - deployment: QCDeployApp
@@ -527,7 +527,7 @@ stages:
   - stage: IatDeploy
     dependsOn: 
     #- Devdeploy
-    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    - BuildTestPublish
     displayName: IAT Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
@@ -541,7 +541,7 @@ stages:
   - stage: PreProdDeploy
     dependsOn: 
     #- Devdeploy
-    - PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
+    - BuildTestPublish
     displayName: PreProd Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
