@@ -145,7 +145,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Validation
         {
             var result = _validator.TestValidate(GetProducts());
 
-            Assert.That(result.Errors.Count, Is.EqualTo(0));
+            Assert.That(result.Errors, Has.Count.EqualTo(0));
         }
 
         #endregion
