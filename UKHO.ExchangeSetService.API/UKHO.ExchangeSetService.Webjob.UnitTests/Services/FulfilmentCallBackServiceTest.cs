@@ -473,7 +473,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 a.IsEmptyAioExchangeSet = isEmptyAioExchangeSet;
             });
 
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
 
             var result = fulfilmentCallBackService.SetExchangeSetResponse(scProductResponse, queueMessage);
 

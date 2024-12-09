@@ -409,7 +409,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSetWhenAioToggleIsOn()
         {
             string exchangeSetRootPath = @"C:\\HOME";
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
             string businessUnit = "ADDS";
 

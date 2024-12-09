@@ -1590,7 +1590,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
             CommonHelper.IsPeriodicOutputService = true;
-            fakeAioConfiguration.Value.AioEnabled = false;
+            // AioEnabled is now private, however setting the value makes no difference whatever the value.
+            //// rhz fakeAioConfiguration.Value.AioEnabled = false;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
@@ -1648,7 +1649,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
             CommonHelper.IsPeriodicOutputService = true;
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);

@@ -831,7 +831,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
@@ -914,7 +914,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = null;
 
             var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
@@ -973,7 +973,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ProductCounts = new(),
                 Products = new List<Products>()
             };
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
@@ -1040,7 +1040,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 ProductCounts = new(),
                 Products = new List<Products>()
             };
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = null;
 
             string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
@@ -1107,7 +1107,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponse();
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
@@ -1188,7 +1188,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
@@ -1272,7 +1272,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
@@ -1342,7 +1342,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = null;
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
@@ -1386,7 +1386,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
             SalesCatalogueProductResponse salesCatalogueProductResponse = GetSalesCatalogueResponseForAio();
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var fulfilmentDataResponse = new List<FulfilmentDataResponse>() {
@@ -1478,7 +1478,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             SalesCatalogueDataResponse salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
             IEnumerable<BatchFile> batchFiles = GetFiles();
 
-            fakeAioConfiguration.Value.AioEnabled = true;
+            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueResponse());
