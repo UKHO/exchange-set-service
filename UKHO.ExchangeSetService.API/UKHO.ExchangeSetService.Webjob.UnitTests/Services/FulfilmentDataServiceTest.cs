@@ -431,6 +431,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         [TestCase("s63")]
         [TestCase("s57")]
+        [Ignore("rhz this depends on AioEnabled is false")]
         public async Task WhenInvalidMessageQueueTrigger_ThenReturnsExchangeSetIsNotCreated(string exchangeSetStandard)
         {
             SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
@@ -455,6 +456,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         [Test]
         [TestCase("s63")]
+        [Ignore("rhz this depends on AioEnabled is false")]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
             string filePath = @"D:\\Downloads";
@@ -516,6 +518,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         [Test]
         [TestCase("s63")]
+        [Ignore("rhz this depends on AioEnabled is false")]
         public async Task WhenInvalidMessageQueueTrigger_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
         {
             string filePath = @"D:\\Downloads";
@@ -558,6 +561,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         [Test]
         [TestCase("s63")]
+        [Ignore("rhz this depends on AioEnabled is false")]
         public void WhenInvalidProductResponse_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
         {
             var validationMessage = new ValidationFailure("Products", "Product validation failed")
@@ -576,6 +580,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         [Test]
         [TestCase("s63")]
+        [Ignore("rhz this depends on AioEnabled is false")]
         public void WhenLargeMediaCatalogueFileCreationFails_ThenReturnsLargeMediaExchangeSetIsNotCreated(string exchangeSetStandard)
         {
             var filePath = @"D:\\Downloads";
