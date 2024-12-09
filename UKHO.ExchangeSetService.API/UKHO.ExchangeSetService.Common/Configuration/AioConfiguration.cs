@@ -16,7 +16,7 @@ namespace UKHO.ExchangeSetService.Common.Configuration
             }
             private set
             {
-                //AioEnabled = true;
+                
             }
         }
     }

@@ -691,7 +691,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550", "US2ARCGD" };
-            //// rhz fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
@@ -1319,7 +1318,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 FileSize = 400
             });
             var azureAdToken = GetAzureADToken();
-            //// rhz fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
@@ -1729,7 +1727,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
-            //// rhz fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;

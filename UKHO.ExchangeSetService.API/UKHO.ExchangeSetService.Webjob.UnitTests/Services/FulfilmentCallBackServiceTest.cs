@@ -114,24 +114,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         #endregion
 
-        [Test]
-        [Ignore("rhz this depends on AioEnabled is false")]
-        public async Task WhenIncorrectCallBackPayloadInRequest_ThenCallBackApiIsNotCalled()
-        {
-            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
-
-            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri) =>
-               {
-                   uriParam = uri;
-                   httpMethodParam = method;
-                   postBodyParam = postBody;
-               });
-
-            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
-
-            Assert.IsFalse(response);
-        }
+        
 
         [Test]
         public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackResponseReturnsFalse()
@@ -173,24 +156,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.IsTrue(response);
         }
 
-        [Test]
-        [Ignore("rhz this depends on AioEnabled is false")]
-        public async Task WhenIncorrectCallBackPayloadErrorInRequest_ThenCallBackApiIsNotCalled()
-        {
-            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
-
-            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri) =>
-               {
-                   uriParam = uri;
-                   httpMethodParam = method;
-                   postBodyParam = postBody;
-               });
-
-            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
-
-            Assert.IsFalse(response);
-        }
 
         [Test]
         public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsFalse()
@@ -473,7 +438,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 a.IsEmptyAioExchangeSet = isEmptyAioExchangeSet;
             });
 
-            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
 
             var result = fulfilmentCallBackService.SetExchangeSetResponse(scProductResponse, queueMessage);
 

@@ -1649,7 +1649,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
             CommonHelper.IsPeriodicOutputService = true;
-            //// rhz fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
