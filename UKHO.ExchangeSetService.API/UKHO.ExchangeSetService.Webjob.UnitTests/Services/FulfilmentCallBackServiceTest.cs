@@ -454,7 +454,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 Assert.That(result.RequestedAioProductsAlreadyUpToDateCount, Is.Not.Null);
             });
 
-            if (isEncReturned || isEmptyEncExchangeSet || result.RequestedProductsNotInExchangeSet.Any())
+            if (isEncReturned || isEmptyEncExchangeSet || result.RequestedProductsNotInExchangeSet.Count != 0)
             {
                 Assert.That(result.Links.ExchangeSetFileUri, Is.Not.Null);
             }
