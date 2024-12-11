@@ -600,7 +600,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string fileName = fileShareServiceConfig.Value.IhoCrtFileName;
             string filePath = Path.Combine(aioExchangeSetPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
-            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
+           // string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             HttpResponseMessage httpIhoCrtFileResponse;
             httpIhoCrtFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, ihoCrtFilePath, CancellationToken.None, correlationId);
 
@@ -615,7 +615,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         logger.LogInformation(EventIds.DownloadIhoCrtFile307RedirectResponse.ToEventId(), "File share service download IHO.crt redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
                     }
-                    return fileSystemHelper.DownloadIhoCrtFile(filePath, stream, lineToWrite);
+                    return fileSystemHelper.DownloadFile(filePath, stream);
                 }
             }
             else
@@ -633,7 +633,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string fileName = fileShareServiceConfig.Value.IhoPubFileName;
             string filePath = Path.Combine(aioExchangeSetPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
-            string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             HttpResponseMessage httpIhoPubFileResponse;
             httpIhoPubFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, ihoPubFilePath, CancellationToken.None, correlationId);
 
@@ -648,7 +647,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     {
                         logger.LogInformation(EventIds.DownloadIhoPubFile307RedirectResponse.ToEventId(), "File share service download IHO.pub redirected with uri:{requestUri} responded with 307 code for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", requestUri, batchId, correlationId);
                     }
-                    return fileSystemHelper.DownloadFile(filePath, stream, lineToWrite);
+                    return fileSystemHelper.DownloadFile(filePath, stream);
                 }
             }
             else
