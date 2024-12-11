@@ -505,22 +505,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ExchangeSetStandard = exchangeSetStandard.ToString()
                 }, azureAdToken);
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
-
             Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -564,20 +549,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureB2CToken); // AzureB2C Token but file size is less than 300 Mb
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
             Assert.That(result.LastModified, Is.Not.Null);
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
-
+            
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
@@ -695,10 +670,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
                 }, azureAdToken);
 
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -713,82 +684,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
         }
 
-        [Test]
-        public async Task WhenValidProductIdentifierRequest_And_AIOToggleIsOff_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
-        {
-            A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>()));
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550", "US2ARCGD" };
-            fakeAioConfiguration.Value.IsAioEnabled = false;
-            fakeAioConfiguration.Value.AioCells = "US2ARCGD";
-            string callbackUri = string.Empty;
-            var salesCatalogueResponse = GetSalesCatalogueResponse();
-            var azureAdToken = GetAzureADToken();
-
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
-                .Returns(salesCatalogueResponse);
-            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
-
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-
-            var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
-            string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
-            string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
-
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-            A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
-
-            var result = await service.CreateProductDataByProductIdentifiers(
-                new ProductIdentifierRequest()
-                {
-                    ProductIdentifier = productIdentifiers,
-                    CallbackUri = callbackUri,
-                    ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
-                }, azureAdToken);
-
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
-            exchangeSetResponseAioToggleOff.RequestedProductCount += 1; //one aio cell passed
-
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
-            //Aio cell details
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsNotInExchangeSet.Count, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-        }
-
+        
         [Test]
         public async Task WhenValidProductIdentifierRequest_And_AIOToggleIsOn_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550", "US2ARCGD" };
-            fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
@@ -922,23 +824,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
                 }, GetAzureADToken());
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             result.Should().BeOfType<ExchangeSetServiceResponse>();
             result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
-            result.ExchangeSetResponse.ExchangeSetCellCount.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetCellCount);
-            result.ExchangeSetResponse.RequestedProductCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductCount);
-            result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href);
-            result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime);
-            result.BatchId.Should().Be(exchangeSetResponseAioToggleOff.BatchId);
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1079,13 +967,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ExchangeSetStandard = exchangeSetStandard.ToString()
             }, azureAdToken);
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1097,10 +980,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -1340,86 +1219,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
-        [Test]
-        public async Task WhenValidProductVersionRequest_And_AIOToggleIsOff_ThenCreateProductDataByProductVersionsReturnsOkrequest()
-        {
-            A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>()));
-            var salesCatalogueResponse = GetSalesCatalogueResponse();
-            var azureAdToken = GetAzureADToken();
-            fakeAioConfiguration.Value.IsAioEnabled = false;
-            fakeAioConfiguration.Value.AioCells = "US2ARCGD";
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
-                .Returns(salesCatalogueResponse);
-
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
-
-            var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
-
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-
-            var result = await service.CreateProductDataByProductVersions(new ProductDataProductVersionsRequest()
-            {
-                ProductVersions = new List<ProductVersionRequest>() {
-                    new ProductVersionRequest {
-                            ProductName = "GB123456", EditionNumber = 6, UpdateNumber = 3
-                    },new ProductVersionRequest {
-                            ProductName = "GB160060", EditionNumber = 2, UpdateNumber = 4
-                    },new ProductVersionRequest {
-                            ProductName = "AU334550", EditionNumber = 8, UpdateNumber = 1
-                    },
-                    new ProductVersionRequest {
-                            ProductName = "US2ARCGD", EditionNumber = 4, UpdateNumber = 6
-                    }
-                },
-                CallbackUri = "",
-                ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
-            }, azureAdToken);
-
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
-            exchangeSetResponseAioToggleOff.RequestedProductCount += 1; //one aio cell passed
-
-            Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
-            //Aio cell details
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsNotInExchangeSet.Count, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
-        }
-
+        
         [Test]
         public async Task WhenValidProductVersionRequestWithExchangeSetStandardS57_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductVersionsReturnsBadRequest()
         {
@@ -1481,23 +1283,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ExchangeSetStandard = ExchangeSetStandard.s63.ToString()
             }, GetAzureADToken());
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             result.Should().BeOfType<ExchangeSetServiceResponse>();
             result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
-            result.ExchangeSetResponse.ExchangeSetCellCount.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetCellCount);
-            result.ExchangeSetResponse.RequestedProductCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductCount);
-            result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href);
-            result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime);
-            result.BatchId.Should().Be(exchangeSetResponseAioToggleOff.BatchId);
 
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1529,7 +1318,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 FileSize = 400
             });
             var azureAdToken = GetAzureADToken();
-            fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
@@ -1757,23 +1545,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             result.Should().BeOfType<ExchangeSetServiceResponse>();
             result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
-            result.ExchangeSetResponse.ExchangeSetCellCount.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetCellCount);
-            result.ExchangeSetResponse.RequestedProductCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductCount);
-            result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href);
-            result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime);
-            result.BatchId.Should().Be(exchangeSetResponseAioToggleOff.BatchId);
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1869,18 +1644,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
             Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
+            
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1892,10 +1659,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -1956,84 +1719,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
-        [Test]
-        public async Task WhenValidateProductDataSinceDateTimeInRequest_And_AIOToggleIsOff_ThenCreateProductDataSinceDateTimeReturnOk()
-        {
-            A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure>()));
-            fakeAioConfiguration.Value.IsAioEnabled = false;
-            fakeAioConfiguration.Value.AioCells = "US2ARCGD";
-            var salesCatalogueResponse = GetSalesCatalogueResponse();
-            salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
-            salesCatalogueResponse.LastModified = DateTime.UtcNow;
-            salesCatalogueResponse.ResponseBody.Products.Add(new Products
-            {
-                ProductName = "US2ARCGD",
-                EditionNumber = 2,
-                UpdateNumbers = new List<int?> { 3, 4 },
-                Cancellation = new Cancellation
-                {
-                    EditionNumber = 4,
-                    UpdateNumber = 6
-                },
-                FileSize = 400
-            });
-            var exchangeSetResponse = GetExchangeSetResponse();
-            var CreateBatchResponseModel = CreateBatchResponse();
-            CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
-
-            A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
-                .Returns(salesCatalogueResponse);
-            A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-            A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
-
-            var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
-
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
-
-            Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsNotInExchangeSet.Count, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSResponseStoreRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
-        }
-
+        
         [Test]
         public async Task WhenValidateProductDataSinceDateTimeInRequest_And_AIOToggleIsON_ThenCreateProductDataSinceDateTimeReturnOk()
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
-            fakeAioConfiguration.Value.IsAioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "US2ARCGD";
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
@@ -2150,23 +1843,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
-            var exchangeSetResponseAioToggleOff = GetExchangeSetResponseAioToggleOff();
 
             result.Should().BeOfType<ExchangeSetServiceResponse>();
             result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
-            result.ExchangeSetResponse.ExchangeSetCellCount.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetCellCount);
-            result.ExchangeSetResponse.RequestedProductCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductCount);
-            result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount.Should().Be(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchStatusUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetBatchDetailsUri.Href);
-            result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href.Should().Be(exchangeSetResponseAioToggleOff.Links.ExchangeSetFileUri.Href);
-            result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime.Should().Be(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime);
-            result.BatchId.Should().Be(exchangeSetResponseAioToggleOff.BatchId);
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOff.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is Off, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
