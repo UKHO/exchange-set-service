@@ -88,14 +88,14 @@ paths:
         fulfilmentResponse:
           $ref: "#/components/callbacks/fulfilmentResponse"
      
-  /v2/exchangeSet/s100/productIdentifiers:
+  /v2/exchangeSet/s100/productNames:
     post:
       summary: Provide all the latest releasable baseline data for a specified set of Products.
 
-      operationId: postS100ProductIdentifiers
+      operationId: postS100ProductNames
 
       description: |
-        Given a list of Product name identifiers and their edition and update numbers, return all the versions of the Products that are releasable from that version onwards.
+        Given a list of Product names, return all the products that are releasable.
  
         ## Business Rules:
  
@@ -115,11 +115,11 @@ paths:
         
       requestBody:
         description: |
-          The JSON body containing product identifiers.
+          The JSON body containing product names.
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/productIdentifiers"
+              $ref: "#/components/schemas/productNames"
             example: ["101GB40079ABCDEFG", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600", "111US00_ches_dcf8_20190703T00Z"]
 
       responses:
@@ -571,6 +571,11 @@ components:
           $ref: "#/components/schemas/href"
 
     productIdentifiers:
+      type: array
+      items:
+        type: string
+      
+    productNames:
       type: array
       items:
         type: string
