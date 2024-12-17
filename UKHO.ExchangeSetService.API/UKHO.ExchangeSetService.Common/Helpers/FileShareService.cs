@@ -600,7 +600,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string fileName = fileShareServiceConfig.Value.IhoCrtFileName;
             string filePath = Path.Combine(aioExchangeSetPath, fileName);
             fileSystemHelper.CheckAndCreateFolder(aioExchangeSetPath);
-           // string lineToWrite = string.Concat("File date: ", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ssZ", CultureInfo.InvariantCulture));
             HttpResponseMessage httpIhoCrtFileResponse;
             httpIhoCrtFileResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, ihoCrtFilePath, CancellationToken.None, correlationId);
 
