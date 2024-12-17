@@ -5,6 +5,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using UKHO.ExchangeSetService.API.Services;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
@@ -12,10 +13,16 @@ namespace UKHO.ExchangeSetService.API.Controllers
     public class ExchangeSetController : ExchangeSetControllerBase<ExchangeSetController>
     {
         private readonly ILogger<ExchangeSetController> _logger;
+        private readonly IExchangeSetService _exchangeSetService;
 
-        public ExchangeSetController(IHttpContextAccessor httpContextAccessor,ILogger<ExchangeSetController> logger) : base(httpContextAccessor)
+        public ExchangeSetController(
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<ExchangeSetController> logger,
+            IExchangeSetService exchangeSetService
+            ) : base(httpContextAccessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _exchangeSetService = exchangeSetService;
         }
     }
 }
