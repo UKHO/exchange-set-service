@@ -12,7 +12,7 @@ externalDocs:
   url: https://github.com/UKHO/exchange-set-service
 
 servers:
-  - url: https://exchangeset.admiralty.co.uk/avcsData/[version]/
+  - url: https://exchangeset.admiralty.co.uk
 
 security:
   - jwtBearerAuth: []
@@ -123,7 +123,7 @@ paths:
             example: ["101GB40079ABCDEFG", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600", "111US00_ches_dcf8_20190703T00Z"]
 
       responses:
-        "200":
+        "202":
           description: A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
           
           content:
@@ -254,7 +254,7 @@ paths:
               $ref: "#/components/schemas/s100ProductVersions"
 
       responses:
-        "200":
+        "202":
           description: |
             A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
 
@@ -363,9 +363,9 @@ paths:
         - $ref: "#/components/parameters/s100ProductType"
 
       responses:
-        "200":
+        "202":
           description: |
-            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of produscts in that Exchange Set.
+            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
 
             If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
@@ -377,14 +377,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/s100ExchangeSetResponse"
-
-        "304":
-          description: Not modified.
-          headers:
-            Date:
-              schema:
-                $ref: "#/components/schemas/Date-Header"
-
         "400":
           description: Bad request.
           content:
@@ -748,7 +740,7 @@ components:
           description: |
             Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
             *  productWithdrawn (the product has been withdrawn from the S-100 Service)
-            *  invalidProduct (the product is not part of the S-100 Service Service, i.e. is an invalid or unknown ENC)
+            *  invalidProduct (the product is not part of the S-100 Service, i.e. is an invalid or unknown ENC)
             *  noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled products within the retention period will be returned with the cancellation data in the Exchange Set)
           items:
             type: object
