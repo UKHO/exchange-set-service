@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             var azureADToken = GetAzureADToken();
             var result = fakeAzureAdB2CHelper.IsAzureB2CUser(azureADToken, null);
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             var azureAdB2CToken = GetAzureAdB2CToken();
             var result = fakeAzureAdB2CHelper.IsAzureB2CUser(azureAdB2CToken, null);
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             var azureB2CToken = GetAzureB2CToken();
             var result = fakeAzureAdB2CHelper.IsAzureB2CUser(azureB2CToken, null);
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }        
 
         private AzureAdB2C GetAzureADToken()
