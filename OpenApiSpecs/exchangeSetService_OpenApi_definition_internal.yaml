@@ -258,7 +258,7 @@ paths:
           description: |
             A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
 
-            If there are no updates for any of the productVersions, then status code 200 ('OK') will be returned with an empty Exchange Set and the exchangeSetProductCount will be 0.
+            If there are no updates for any of the productVersions, then status code 202 ('Accepted') will be returned with an empty Exchange Set and the exchangeSetProductCount will be 0.
             
             The rules around cancellation and replacements apply as defined in the previous section.
  
@@ -360,7 +360,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/sinceDateTime"
         - $ref: "#/components/parameters/callbackUri"
-        - $ref: "#/components/parameters/s100ProductType"
+        - $ref: "#/components/parameters/s100ProductIdentifier"
 
       responses:
         "202":
@@ -507,13 +507,13 @@ components:
         example: false
         enum: [ "s63", "s57"]
       
-    s100ProductType:
+    s100ProductIdentifier:
       in: query
-      name: s100ProductType
+      name: s100ProductIdentifier
       required: false
       description: |
-              An optional productType parameter determines **the product type of S-100 Exchange Set**. If the value is s101, the S-100 Exchange Set will give updates specific to s101 products only.
-              The default value of productType is s100, which means the S-100 Exchange Set will give updated for all product types.
+              An optional identifier parameter determines **the product identifier of S-100 Exchange Set**. If the value is s101, the S-100 Exchange Set will give updates specific to s101 products only.
+              The default value of identifier is s100, which means the S-100 Exchange Set will give updated for all product identifier.
       schema:
         type: string
         example: false
