@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 
 namespace UKHO.ExchangeSetService.Common.Configuration
 {
-    [Serializable]
     [ExcludeFromCodeCoverage]
     public class FulfilmentException : Exception
     {
@@ -17,10 +15,6 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         public FulfilmentException(EventId eventId) : base(message)
         {
             EventId = eventId;
-        }
-
-        protected FulfilmentException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
         }
     }
 }

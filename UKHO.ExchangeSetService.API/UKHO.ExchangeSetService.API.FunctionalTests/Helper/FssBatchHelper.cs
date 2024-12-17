@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 await Task.Delay(5000);
                 var batchStatusResponse = await FssApiClient.GetBatchStatusAsync(batchStatusUri, jwtToken);
-                Assert.AreEqual(200, (int)batchStatusResponse.StatusCode, $"Incorrect status code is returned {batchStatusResponse.StatusCode}, instead of the expected status 200 for url {batchStatusUri}.");
+                Assert.That((int)batchStatusResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {batchStatusResponse.StatusCode}, instead of the expected status 200 for url {batchStatusUri}.");
 
                 var batchStatusResponseObj = JsonConvert.DeserializeObject<ResponseBatchStatusModel>(await batchStatusResponse.Content.ReadAsStringAsync());
                 batchStatus = batchStatusResponseObj.Status;
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
-            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
+            Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             }
 
             string zipPath = Path.Combine(batchFolderPath, fileName);
-            string extractPath = Path.Combine(batchFolderPath, RenameFolder(zipPath)); 
+            string extractPath = Path.Combine(batchFolderPath, Path.GetFileNameWithoutExtension(zipPath)); 
 
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string tempFilePath = Path.Combine(Path.GetTempPath(), LargeFolderName);
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
-            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
+            Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
@@ -143,7 +143,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.AIOConfig.AioExchangeSetFileName);
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);
-            Assert.AreEqual(200, (int)response.StatusCode, $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
+            Assert.That((int)response.StatusCode, Is.EqualTo(200), $"Incorrect status code File Download api returned {response.StatusCode} for the url {downloadFileUrl}, instead of the expected 200.");
 
             Stream stream = await response.Content.ReadAsStreamAsync();
 
@@ -152,9 +152,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 stream.CopyTo(outputFileStream);
             }
 
+
             string zipPath = tempFilePath;
             string extractPath = Path.GetTempPath() + RenameFolder(tempFilePath);
 
+           
             ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             return extractPath;

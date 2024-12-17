@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var expectedAccessKey = configuration.GetValue<string>("webjob1key");
 
-            Assert.AreEqual(expectedAccessKey, webJobsAccessKey);
+            Assert.That(expectedAccessKey, Is.EqualTo(webJobsAccessKey));
 
         }
 
@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         {
             var actualAccessKey = webJobsAccessKeyProvider.GetWebJobsAccessKey("nonexistingkey");
 
-            Assert.AreEqual(null, actualAccessKey);
+            Assert.That(null, Is.EqualTo(actualAccessKey));
         }
     }
 }
