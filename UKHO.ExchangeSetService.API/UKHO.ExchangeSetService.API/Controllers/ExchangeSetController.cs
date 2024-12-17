@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             ) : base(httpContextAccessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _exchangeSetService = exchangeSetService;
+            _exchangeSetService = exchangeSetService ?? throw new ArgumentNullException(nameof(exchangeSetService));
         }
     }
 }
