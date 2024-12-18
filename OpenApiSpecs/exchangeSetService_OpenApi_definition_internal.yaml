@@ -356,18 +356,24 @@ paths:
 
       tags:
          - s100
-         
+        
       parameters:
-        - $ref: "#/components/parameters/sinceDateTime"
         - $ref: "#/components/parameters/callbackUri"
         - $ref: "#/components/parameters/s100ProductIdentifier"
 
+      requestBody:
+        description: |
+          The JSON body containing sinceDateTime.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/s100SinceDateTime"
       responses:
         "202":
           description: |
             A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
 
-            If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
+            If there are no updates since the sinceDateTime attribute, then a 'Not modified' response will be returned.
           headers:
             Date:
               description: Returns the current date and time on the server and should be used in subsequent requests this operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
@@ -509,7 +515,7 @@ components:
       
     s100ProductIdentifier:
       in: query
-      name: s100ProductIdentifier
+      name: productIdentifier
       required: false
       description: |
               An optional identifier parameter determines **the product identifier of S-100 Exchange Set**. If the value is s101, the S-100 Exchange Set will give updates specific to s101 products only.
@@ -615,6 +621,18 @@ components:
           { "productName": "104US00_CHES_TYPE1_20210630_0600", "editionNumber": 7, "updateNumber": 10 },
           { "productName": "111US00_ches_dcf8_20190703T00Z", "editionNumber": 36, "updateNumber": 0 }
         ]
+
+    s100SinceDateTime:
+      type: object
+      required:
+        - "sinceDateTime"
+      properties:
+        sinceDateTime:
+          type: string
+          format: date-time
+          description: The since date time.
+      example:
+        {"sinceDateTime":"2015-10-21T07:28:00.000Z"}
 
     ####################################
     #      Response Objects      #
