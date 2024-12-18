@@ -2,10 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Extensions;
+using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
@@ -23,6 +29,32 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _exchangeSetService = exchangeSetService ?? throw new ArgumentNullException(nameof(exchangeSetService));
+        }
+
+        [HttpPost]
+        [Route("{exchangeSetStandard}/productVersions")]
+        public Task<IActionResult> PostProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, [FromQuery] string callbackUri, string exchangeSetStandard)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
+                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
+                async () =>
+                {
+                    var exchangeSetProductVersionsRequest = new ProductDataProductVersionsRequest
+                    {
+                        ProductVersions = productVersionsRequest,
+                        CallbackUri = callbackUri,
+                        CorrelationId = GetCorrelationId()
+                    };
+
+                    var result = await _exchangeSetService.CreateExchangeSetByProductVersions(exchangeSetProductVersionsRequest);
+
+                    return result.StatusCode switch
+                    {
+                        HttpStatusCode.OK => StatusCode((int)HttpStatusCode.Accepted, result.Value),
+                        HttpStatusCode.BadRequest => BadRequest(result.ErrorDescription.Errors),
+                        _ => (IActionResult)StatusCode((int)result.StatusCode)
+                    };
+                }, GetCorrelationId(), exchangeSetStandard);
         }
     }
 }
