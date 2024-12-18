@@ -7,13 +7,17 @@ namespace UKHO.ExchangeSetService.Common.Models
     {
         public new ErrorDescription ErrorDescription { get; }
 
-        private ServiceResponseResult(T value, HttpStatusCode statusCode, ErrorDescription errorDescription = null)
+        private ServiceResponseResult(T value,
+            HttpStatusCode statusCode,
+            ErrorDescription errorDescription = null)
             : base(value, statusCode, errorDescription)
         {
             ErrorDescription = errorDescription;
         }
 
         public static ServiceResponseResult<T> Success(T value) => new(value, HttpStatusCode.Accepted);
+
+        public static ServiceResponseResult<T> Accepted(T value) => new(value, HttpStatusCode.Accepted);
 
         public static ServiceResponseResult<T> NoContent() => new(default, HttpStatusCode.NoContent);
 

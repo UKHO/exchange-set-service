@@ -16,6 +16,6 @@ namespace UKHO.ExchangeSetService.Common.Models
             ErrorDescription = errorDescription;
         }
 
-        public bool IsSuccess => StatusCode == HttpStatusCode.OK;
+        public bool IsSuccess => StatusCode == HttpStatusCode.OK || StatusCode == HttpStatusCode.Accepted;
     }
 }
