@@ -1,30 +1,28 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-using System.Net;
+﻿using System.Net;
+using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.Common.Models
 {
     public class ServiceResponseResult<T> : Result<T>
     {
-        public new ErrorResponse ErrorResponse { get; }
+        public new ErrorDescription ErrorDescription { get; }
 
-        private ServiceResponseResult(T value, HttpStatusCode statusCode, ErrorResponse errorResponse = null)
-            : base(value, statusCode, errorResponse)
+        private ServiceResponseResult(T value, HttpStatusCode statusCode, ErrorDescription errorDescription = null)
+            : base(value, statusCode, errorDescription)
         {
-            ErrorResponse = errorResponse;
+            ErrorDescription = errorDescription;
         }
 
-        public static ServiceResponseResult<T> Success(T value) => new(value, HttpStatusCode.OK);
+        public static ServiceResponseResult<T> Success(T value) => new(value, HttpStatusCode.Accepted);
 
         public static ServiceResponseResult<T> NoContent() => new(default, HttpStatusCode.NoContent);
 
         public static ServiceResponseResult<T> NotModified() => new(default, HttpStatusCode.NotModified);
 
-        public static ServiceResponseResult<T> NotFound(ErrorResponse errorResponse) => new(default, HttpStatusCode.NotFound, errorResponse);
+        public static ServiceResponseResult<T> NotFound(ErrorDescription errorDescription) => new(default, HttpStatusCode.NotFound, errorDescription);
 
-        public static ServiceResponseResult<T> BadRequest(ErrorResponse errorResponse) => new(default, HttpStatusCode.BadRequest, errorResponse);
+        public static ServiceResponseResult<T> BadRequest(ErrorDescription errorDescription) => new(default, HttpStatusCode.BadRequest, errorDescription);
 
-        public static ServiceResponseResult<T> NotAcceptable(ErrorResponse errorResponse) => new(default, HttpStatusCode.NotAcceptable, errorResponse);
+        public static ServiceResponseResult<T> NotAcceptable(ErrorDescription errorDescription) => new(default, HttpStatusCode.NotAcceptable, errorDescription);
     }
 }
