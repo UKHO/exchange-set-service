@@ -1,6 +1,6 @@
 ﻿namespace UKHO.ExchangeSetService.API.Services
 {
-    public interface IExchangeSetService
+    public class ExchangeSetAPIService : IExchangeSetService
     {
     }
 }

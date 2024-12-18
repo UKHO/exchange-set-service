@@ -186,6 +186,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<BespokeExchangeSetAuthorizationFilterAttribute>();
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
+            builder.Services.AddScoped<IExchangeSetService, ExchangeSetAPIService>();
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
