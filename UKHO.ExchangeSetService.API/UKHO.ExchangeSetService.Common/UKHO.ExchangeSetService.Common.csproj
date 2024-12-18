@@ -33,4 +33,8 @@
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 
+   <ItemGroup>
+     <Folder Include="Models\V2\Response\" />
+   </ItemGroup>
+
 </Project>
