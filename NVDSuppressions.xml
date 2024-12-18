@@ -596,4 +596,14 @@
     <packageUrl regex="true">^pkg:generic/System\.ClientModel@.*$</packageUrl>
     <cve>CVE-2024-43591</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Text.Json:6.0.0
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/System\.Text\.Json@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-43485</vulnerabilityName>
+  </suppress>
 </suppressions>

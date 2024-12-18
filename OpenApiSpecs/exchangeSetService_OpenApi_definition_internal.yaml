@@ -1,18 +1,18 @@
 openapi: "3.0.0"
 info:
-  version: "0.3"
+  version: "2.0"
   title: Exchange Set Service API
   description: |
     This API is for the Exchange Set Service.
   contact:
-    name: Martin Rock-Evans
-    email: martin.rock-evans@ukho.gov.uk
+    name: Abzu Delivery Team
+    email: Abzudeliveryteam@UKHO.gov.uk
 
 externalDocs:
   url: https://github.com/UKHO/exchange-set-service
 
 servers:
-  - url: https://exchangeset.admiralty.co.uk/avcsData/[version]/
+  - url: https://exchangeset.admiralty.co.uk
 
 security:
   - jwtBearerAuth: []
@@ -40,6 +40,9 @@ paths:
         If a requested ENC has been cancelled and replaced or additional coverage provided, then the replacement or additional coverage ENC will not be included in the response payload. Only the specific ENCs requested will be returned. The current UKHO services (Planning Station/Gateway) are the same, they only give the user the data they ask for (i.e. if they ask for a cell that is cancelled, they only get the data for the cell that was cancelled).
 
         If none of the ENCs and AIO requested exist then ENC exchange set with baseline releasable data without requested AIO and ENCs will be returned.
+
+      tags:
+         - s57/63
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
@@ -84,6 +87,72 @@ paths:
       callbacks:
         fulfilmentResponse:
           $ref: "#/components/callbacks/fulfilmentResponse"
+     
+  /v2/exchangeSet/s100/productNames:
+    post:
+      summary: Provide all the latest releasable baseline data for a specified set of Products.
+
+      operationId: postS100ProductNames
+
+      description: |
+        Given a list of Product names, return all the products that are releasable.
+ 
+        ## Business Rules:
+ 
+        Only Products that are releasable at the date of the request will be returned.
+
+        If valid Products are requested then Product exchange set with baseline data including requested Products will be returned.
+        
+        If a requested Product has been cancelled or replaced, then the replacement Product will not be included in the response payload. Only the specific Products requested will be returned.
+
+        If none of the Products requested exist then exchange set with baseline releasable data without requested Products will be returned
+        
+      tags:
+         - s100
+         
+      parameters:
+        - $ref: "#/components/parameters/callbackUri"
+        
+      requestBody:
+        description: |
+          The JSON body containing product names.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/productNames"
+            example: ["101GB40079ABCDEFG", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600", "111US00_ches_dcf8_20190703T00Z"]
+
+      responses:
+        "202":
+          description: Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set
+          
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/s100ExchangeSetResponse"
+
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+      callbacks:
+        s100FulfilmentResponse:
+          $ref: "#/components/callbacks/s100FulfilmentResponse"
 
   /productData/productVersions:
     post:
@@ -104,6 +173,9 @@ paths:
         If none of the AIO requested have an update, then AIO exchange set with releasable baseline data will be returned.
 
       operationId: postProductVersions
+
+      tags:
+         - s57/63
 
       parameters:
         - $ref: "#/components/parameters/callbackUri"
@@ -152,6 +224,74 @@ paths:
         fulfilmentResponse:
           $ref: "#/components/callbacks/fulfilmentResponse"
 
+  
+  /v2/exchangeSet/s100/productVersions:
+    post:
+      summary: Given a set of Product versions (e.g. Edition x Update y) provide any later releasable files.
+      description: |
+        Given a list of Product name identifiers and their edition and update numbers, return all the versions of the Products that are releasable from that version onwards.
+
+        ## Business Rules:
+
+        If none of the Products exist then Product exchange set with baseline releasable data Products will be returned.
+ 
+        If none of the Products requested have an update, then a 'Not modified' response will be returned. If none of the Products requested exist, then status code 400 ('Bad Request') response will be returned.
+
+      operationId: postS100ProductVersions
+
+      tags:
+         - s100
+         
+      parameters:
+        - $ref: "#/components/parameters/callbackUri"
+
+      requestBody:
+        description: |
+          The JSON body containing product versions.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/s100ProductVersions"
+
+      responses:
+        "202":
+          description: |
+            Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
+
+            If there are no updates for any of the productVersions, then status code 202 ('Accepted') will be returned with an empty Exchange Set and the exchangeSetProductCount will be 0.
+            
+            The rules around cancellation and replacements apply as defined in the previous section.
+ 
+            If none of the Products requested have an update, then exchange set with releasable baseline data will be returned.
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/s100ExchangeSetResponse"
+
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+      callbacks:
+        s100FulfilmentResponse:
+          $ref: "#/components/callbacks/s100FulfilmentResponse"
+
   /productData:
     post:
       summary: Provide all the releasable data after a datetime.
@@ -160,6 +300,8 @@ paths:
         
       operationId: getProducts
 
+      tags:
+        - s57/63
       parameters:
         - $ref: "#/components/parameters/sinceDateTime"
         - $ref: "#/components/parameters/callbackUri"
@@ -180,13 +322,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/exchangeSetResponse"
-
-        "304":
-          description: Not modified.
-          headers:
-            Date:
-              schema:
-                $ref: "#/components/schemas/Date-Header"
 
         "400":
           description: Bad request.
@@ -210,11 +345,73 @@ paths:
       callbacks:
         fulfilmentResponse:
           $ref: "#/components/callbacks/fulfilmentResponse"
+          
+  /v2/exchangeSet/s100/updatesSince:
+    post:
+      summary: Provide all the releasable data after a datetime.
+      description: |
+        Given a datetime, build an Exchange Set of all the releasable Product versions that have been issued since that datetime.
+        
+      operationId: getS100Products
+
+      tags:
+         - s100
+        
+      parameters:
+        - $ref: "#/components/parameters/callbackUri"
+        - $ref: "#/components/parameters/s100ProductIdentifier"
+
+      requestBody:
+        description: |
+          The JSON body containing sinceDateTime.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/s100SinceDateTime"
+      responses:
+        "202":
+          description: |
+            Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set
+
+            If there are no updates since the sinceDateTime attribute, then a 'Not modified' response will be returned.
+          headers:
+            Date:
+              description: Returns the current date and time on the server and should be used in subsequent requests this operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
+              schema:
+                $ref: "#/components/schemas/Date-Header"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/s100ExchangeSetResponse"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDescription"
+
+        "401":
+          $ref: "#/components/responses/unauthorised"
+
+        "403":
+          $ref: "#/components/responses/forbidden"
+
+        "429":
+          $ref: "#/components/responses/tooManyRequests"
+
+        "500":
+          $ref: "#/components/responses/internalServerError"
+
+      callbacks:
+        s100FulfilmentResponse:
+          $ref: "#/components/callbacks/s100FulfilmentResponse"
 
   /auth/client_credentials:
     post:
       summary: Get token from AAD.
       operationId: getESSTokenUsingClientCredentials
+      tags:
+         - auth
       description: |
         Returns a token direct from AAD using Client Credentials
       requestBody:
@@ -250,7 +447,7 @@ paths:
                   "token_type": "Bearer",
                   "expires_in": 3599,
                   "ext_expires_in": 3599,
-                  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Imwzc1EtNTBjQ0g0eEJWWkxIVEd3blNSNzY4MCJ9.eyJhdWQiOiI0ZTE1NGYyYi0wNWM2LTQwZDEtODdiNy0wYWYwNTI5ZTBhNTEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZTkyYzk4MWItZDY4OS00Y2MzLTgyNDUtMGQ3MTBlMjQ2YmNhL3YyLjAiLCJpYXQiOjE2MzI0NzU1OTAsIm5iZiI6MTYzMjQ3NTU5MCwiZXhwIjoxNjMyNDc5NDkwLCJhaW8iOiJFMlpnWUdpZTJhSmhQT0ZDWTdQR3NxYUhaWi9tQXdBPSIsImF6cCI6IjJmMzJmNmY3LTFmMmYtNDNjZS1hZmQ3LWYzM2Y5M2NiN2U2MSIsImF6cGFjciI6IjEiLCJvaWQiOiJkNmY4ZDg0My0zZTY1LTQ5YTAtODdkNy0zMTBkMGNiM2UzOGUiLCJyaCI6IjAuQVNJQUc1Z3M2WW5XdzB5Q1JRMXhEaVJyeXZmMk1pOHZIODVEcjlmelA1UExmbUVpQUFBLiIsInN1YiI6ImQ2ZjhkODQzLTNlNjUtNDlhMC04N2Q3LTMxMGQwY2IzZTM4ZSIsInRpZCI6ImU5MmM5ODFiLWQ2ODktNGNjMy04MjQ1LTBkNzEwZTI0NmJjYSIsInV0aSI6IlREVmtmenZuS2txVEdRUXNEWjItQUEiLCJ2ZXIiOiIyLjAifQ.W-TB97v6D56UuPCstaSrfLFbc9gE6W1VHD5t0RLo_EK-1LuaTvQ0aqJtaYCRnXnd6RmMIIml3ckHxFL0lZlYUoSjszIMFkb1w0aH5SxD-GOfY-dktvGKdMVxqtyjJJg1IV7V3Dv1BYI24RnGPfcJG73-af7vcTRjE5KFeW_kOMVAfCAcZOV9dJ7BJULfEdHlK8ZFUb2hEzFkoORGdlrpNIJ7-QEhB9Kcnxa9QtA4z8lMtWESx-q17N88fmlaz87kEKEjX3pIP7k2l_y5BNtNAxK0h995pZ9hHNe4-UBH-xjvfuDa6IbCsZD1J1IW7AO1bXCjGGvc31PtJqEc5FRdQQ"
+                  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSU"
                 }
         400:
           description: Bad request - Request missing client_id and/or client_secret.
@@ -303,7 +500,7 @@ components:
         If not specified, then no call back notification will be sent.
       schema:
         type: string
-
+    
     exchangeSetStandard:
       in: query
       name: exchangeSetStandard
@@ -315,6 +512,18 @@ components:
         type: string
         example: false
         enum: [ "s63", "s57"]
+      
+    s100ProductIdentifier:
+      in: query
+      name: productIdentifier
+      required: false
+      description: |
+              An optional identifier parameter determines **the product identifier of S-100 Exchange Set**. If the value is s101, the S-100 Exchange Set will give updates specific to s101 products only.
+              The default value of identifier is s100, which means the S-100 Exchange Set will give updated for all product identifier.
+      schema:
+        type: string
+        example: false
+        enum: [ "s101", "s102", "s104", "s111"]
 
   ################################################################################
   #                          Common Response Definitions                         #
@@ -365,6 +574,11 @@ components:
       type: array
       items:
         type: string
+      
+    productNames:
+      type: array
+      items:
+        type: string
 
     productVersions:
       type: array
@@ -385,6 +599,40 @@ components:
           { "productName": "CA276271", "editionNumber": 7, "updateNumber": 10 },
           { "productName": "GB100160", "editionNumber": 36, "updateNumber": 0 },
         ]
+
+    s100ProductVersions:
+      type: array
+      items:
+        type: object
+        properties:
+          productName:
+            type: string
+            description: The unique product identifiers.
+          editionNumber:
+            type: integer
+            description: The edition number.
+          updateNumber:
+            type: integer
+            description: The update number, if applicable.
+      example:
+        [
+          { "productName": "101GB40079ABCDEFG", "editionNumber": 7, "updateNumber": 10 },
+          { "productName": "102NO32904820801012", "editionNumber": 36, "updateNumber": 0 },
+          { "productName": "104US00_CHES_TYPE1_20210630_0600", "editionNumber": 7, "updateNumber": 10 },
+          { "productName": "111US00_ches_dcf8_20190703T00Z", "editionNumber": 36, "updateNumber": 0 }
+        ]
+
+    s100SinceDateTime:
+      type: object
+      required:
+        - "sinceDateTime"
+      properties:
+        sinceDateTime:
+          type: string
+          format: date-time
+          description: The since date time.
+      example:
+        {"sinceDateTime":"2015-10-21T07:28:00.000Z"}
 
     ####################################
     #      Response Objects      #
@@ -433,9 +681,9 @@ components:
           type: array
           description: |
             Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
-            *	productWithdrawn (the product has been withdrawn from the AVCS service)
-            *	invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)
-            *	noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the Exchange Set)
+            *  productWithdrawn (the product has been withdrawn from the AVCS service)
+            *  invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown Product)
+            *  noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the Exchange Set)
           items:
             type: object
             required:
@@ -473,6 +721,76 @@ components:
             { productName: "GB123789", reason: "invalidProduct" },
           ]
         fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+        
+    s100ExchangeSetResponse:
+      type: object
+      required:
+        - "_links"
+        - "exchangeSetUrlExpiryDateTime"
+        - "exchangeSetCellCount"
+      properties:
+        _links:
+          type: object
+          required:
+            - "exchangeSetBatchStatusUri"
+            - "exchangeSetBatchDetailsUri"            
+          properties:
+            exchangeSetBatchStatusUri:
+              $ref: "#/components/schemas/link"
+            exchangeSetBatchDetailsUri:
+              $ref: "#/components/schemas/link"
+            exchangeSetFileUri:
+              $ref: "#/components/schemas/link"
+        exchangeSetUrlExpiryDateTime:
+          type: string
+          format: date-time
+          description: Custom exchange sets are only available on the File Share Service for a limited time. After this time the file will expire and will no longer be available to download.
+        requestedProductCount:
+          type: integer
+          description: Number of products explicitly requested.
+        exchangeSetProductCount:
+          type: integer
+          description: Number of products that have data included in the produced Exchange Set.
+        requestedProductsAlreadyUpToDateCount:
+          type: integer
+        requestedProductsNotInExchangeSet:
+          type: array
+          description: |
+            Where a requested productIdentifier is not included in the returned Exchange Set, the productIdentifier will be listed in the requestedProductIdentifiersNotInExchangeSet portion of the response along with a reason. The reason will be one of:
+            *  productWithdrawn (the product has been withdrawn from the S-100 Service)
+            *  invalidProduct (the product is not part of the S-100 Service, i.e. is an invalid or unknown ENC)
+            *  noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled products within the retention period will be returned with the cancellation data in the Exchange Set)
+          items:
+            type: object
+            required:
+              - "productName"
+              - "reason"
+            properties:
+              productName:
+                type: string
+              reason:
+                type: string
+                enum: [productWithdrawn, invalidProduct, noDataAvailableForCancelledProduct]
+        fssBatchId:
+          type: string
+          description: The BatchId is required to retrieve the files from the file share service. 
+      example:
+        _links:
+          exchangeSetBatchStatusUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+          exchangeSetBatchDetailsUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+          exchangeSetFileUri:
+            href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+        exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+        requestedProductCount: 4
+        exchangeSetProductCount: 3
+        requestedProductsAlreadyUpToDateCount: 0
+        requestedProductsNotInExchangeSet:
+          [
+            { productName: "101GB40079ABCDEFG", reason: "invalidProduct" },
+          ]
+        fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"    
 
     Last-Modified:
       type: string
@@ -623,41 +941,11 @@ components:
             The event payload. This specification does not place any restriction on the type of this information. It is encoded into a media format which is specified by the datacontenttype attribute (e.g. application/json), and adheres to the dataschema format when those respective attributes are present.
 
             The `uk.co.admiralty.avcsData.exchangeSetCreated.v1` event payload is described by "#/components/schemas/exchangeSetResponse".
-          allOf:
+
+            The `uk.co.admiralty.s100Data.exchangeSetCreated.v1` event payload is described by "#/components/schemas/s100ExchangeSetResponse".
+          oneOf:
             - $ref: "#/components/schemas/exchangeSetResponse"
-      example:
-        specversion: "1.0"
-        type: "uk.co.admiralty.avcsData.exchangeSetCreated.v1"
-        source: " https://exchangeset.admiralty.co.uk/avcsData"
-        id: "2f03a25f-28b3-46ea-b009-5943250a9a41"
-        time: "2021-02-17T14:04:04.4880776Z"
-        subject: "Requested AVCS Exchange Set Created"
-        datacontenttype: "application/json"
-        data:
-          _links:
-            exchangeSetBatchStatusUri:
-              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
-            exchangeSetBatchDetailsUri:
-              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
-            exchangeSetFileUri:
-              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
-            aioExchangeSetFileUri:
-              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip"
-            errorFileUri:
-              href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/error.txt"
-          exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
-          requestedProductCount: 22
-          exchangeSetCellCount: 15
-          requestedProductsAlreadyUpToDateCount: 5
-          requestedAioProductCount: 2
-          aioExchangeSetCellCount: 1
-          requestedAioProductsAlreadyUpToDateCount: 1
-          requestedProductsNotInExchangeSet:
-            [
-              { productName: "GB123456", reason: "productWithdrawn" },
-              { productName: "GB123789", reason: "invalidProduct" },
-            ]
-          fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+            - $ref: "#/components/schemas/s100ExchangeSetResponse"
 
     ####################################
     #      Security Objects      #
@@ -683,13 +971,96 @@ components:
 
             ## Data:
 
-            The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request.
+            The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same Exchange Set data as the response to the original API request ( $ref: "#/components/schemas/exchangeSetResponse" ).
 
           requestBody:
             content:
               application/json:
                 schema:
                   $ref: "#/components/schemas/cloudEvent"
+                example:
+                  specversion: "1.0"
+                  type: "uk.co.admiralty.avcsData.exchangeSetCreated.v1"
+                  source: " https://exchangeset.admiralty.co.uk/avcsData"
+                  id: "2f03a25f-28b3-46ea-b009-5943250a9a41"
+                  time: "2021-02-17T14:04:04.4880776Z"
+                  subject: "Requested AVCS Exchange Set Created"
+                  datacontenttype: "application/json"
+                  data:
+                    _links:
+                      exchangeSetBatchStatusUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+                      exchangeSetBatchDetailsUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+                      exchangeSetFileUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+                      aioExchangeSetFileUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip"
+                      errorFileUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/error.txt"
+                    exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+                    requestedProductCount: 22
+                    exchangeSetCellCount: 15
+                    requestedProductsAlreadyUpToDateCount: 5
+                    requestedAioProductCount: 2
+                    aioExchangeSetCellCount: 1
+                    requestedAioProductsAlreadyUpToDateCount: 1
+                    requestedProductsNotInExchangeSet:
+                      [
+                        { productName: "GB123456", reason: "productWithdrawn" },
+                        { productName: "GB123789", reason: "invalidProduct" },
+                      ]
+                    fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
           responses:
             "200":
               description: The service will ignore all response from the callback.
+    
+    s100FulfilmentResponse:
+      '{$request.query.callbackUri}':
+        post:
+          summary: Notify the Exchange Set requestor that this is now ready to download on the File Share Service.
+          description: |
+            Once the Exchange Set has been committed on File Share Service, a notification will be sent to the callbackURI (if specified).  
+
+            ## Data:
+
+            The data for the notification will follow the CloudEvents 1.0 standard, with the data portion containing the same S-100 Exchange Set data as the response to the original API request ( $ref: "#/components/schemas/s100ExchangeSetResponse" ).
+
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/cloudEvent"
+                example:
+                  specversion: "1.0"
+                  type: "uk.co.admiralty.s100Data.exchangeSetCreated.v1"
+                  source: " https://exchangeset.admiralty.co.uk/s100Data"
+                  id: "2f03a25f-28b3-46ea-b009-5943250a9a41"
+                  time: "2021-02-17T14:04:04.4880776Z"
+                  subject: "Requested S-100 Exchange Set Created"
+                  datacontenttype: "application/json"
+                  data:
+                    _links:
+                      exchangeSetBatchStatusUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+                      exchangeSetBatchDetailsUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+                      exchangeSetFileUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip"
+                      errorFileUri:
+                        href: "http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/error.txt"
+                    exchangeSetUrlExpiryDateTime: "2021-02-17T16:19:32.269Z"
+                    requestedProductCount: 4
+                    exchangeSetProductCount: 1
+                    requestedProductsAlreadyUpToDateCount: 0
+                    requestedProductsNotInExchangeSet:
+                      [
+                        {
+                          productName: "101GB40079ABCDEFG",
+                          reason: "invalidProduct",
+                        },
+                      ]
+                    fssBatchId: "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+          responses:
+            "200":
+              description: The service will ignore all response from the callback
