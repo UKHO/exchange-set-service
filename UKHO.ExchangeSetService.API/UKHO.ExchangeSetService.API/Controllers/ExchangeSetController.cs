@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
@@ -37,12 +37,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 {
                     var result = await _exchangeSetService.CreateProductDataByProductNames(productNames, callbackUri, GetCorrelationId());
 
-                    return result.StatusCode switch
-                    {
-                        HttpStatusCode.Accepted => Accepted(result.Value),
-                        HttpStatusCode.BadRequest => BadRequest(result.ErrorDescription),
-                        _ => StatusCode((int)result.StatusCode)
-                    };
+                    return result.ToActionResult();
                 },
                 GetCorrelationId());
         }
