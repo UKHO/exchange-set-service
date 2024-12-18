@@ -124,7 +124,7 @@ paths:
 
       responses:
         "202":
-          description: A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
+          description: Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set
           
           content:
             application/json:
@@ -256,7 +256,7 @@ paths:
       responses:
         "202":
           description: |
-            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
+            Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
 
             If there are no updates for any of the productVersions, then status code 202 ('Accepted') will be returned with an empty Exchange Set and the exchangeSetProductCount will be 0.
             
@@ -371,7 +371,7 @@ paths:
       responses:
         "202":
           description: |
-            A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
+            Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set
 
             If there are no updates since the sinceDateTime attribute, then a 'Not modified' response will be returned.
           headers:
