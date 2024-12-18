@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Validation;
@@ -19,16 +20,16 @@ namespace UKHO.ExchangeSetService.API.Services
             _updatesSinceValidator = updatesSinceValidator;
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateUpdateSince(UpdatesSinceRequest updatesSinceRequest)
+        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateUpdateSince(UpdatesSinceRequest updatesSinceRequest, string CorrelationId, CancellationToken cancellationToken)
         {
             var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
 
             if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
             {
-                return ServiceResponseResult<ExchangeSetResponse>.BadRequest(new ErrorDescription { CorrelationId = updatesSinceRequest.CorrelationId, Errors = errors });
+                return ServiceResponseResult<ExchangeSetResponse>.BadRequest(new ErrorDescription { CorrelationId = CorrelationId, Errors = errors });
             }
 
-            return ServiceResponseResult<ExchangeSetResponse>.Success(new ExchangeSetResponse()); // This is a placeholder, the actual implementation is not provided
+            return ServiceResponseResult<ExchangeSetResponse>.Accepted(new ExchangeSetResponse()); // This is a placeholder, the actual implementation is not provided
         }
     }
 }

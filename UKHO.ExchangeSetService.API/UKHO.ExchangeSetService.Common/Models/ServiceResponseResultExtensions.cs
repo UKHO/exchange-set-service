@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.Common.Models
         {
             return result.StatusCode switch
             {
-                HttpStatusCode.OK => new ObjectResult(result.Value) { StatusCode = (int)HttpStatusCode.OK },
+                HttpStatusCode.OK => new OkObjectResult(result.Value) { StatusCode = (int)HttpStatusCode.OK},
                 HttpStatusCode.Accepted => new ObjectResult(result.Value) { StatusCode = (int)HttpStatusCode.Accepted },
                 HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription.Errors),
                 HttpStatusCode.NotFound => new NotFoundObjectResult(result.ErrorDescription.Errors),
