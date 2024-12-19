@@ -11,16 +11,16 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public class ExchangeSetService : IExchangeSetService
+    public class ExchangeSetStandardService : IExchangeSetStandardService
     {
         private readonly IUpdatesSinceValidator _updatesSinceValidator;
 
-        public ExchangeSetService(IUpdatesSinceValidator updatesSinceValidator)
+        public ExchangeSetStandardService(IUpdatesSinceValidator updatesSinceValidator)
         {
             _updatesSinceValidator = updatesSinceValidator;
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateUpdateSince(UpdatesSinceRequest updatesSinceRequest, string CorrelationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string CorrelationId, CancellationToken cancellationToken)
         {
             var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
 

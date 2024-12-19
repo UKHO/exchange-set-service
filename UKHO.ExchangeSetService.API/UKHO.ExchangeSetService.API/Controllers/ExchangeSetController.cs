@@ -9,21 +9,20 @@ using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
     [Route("v2/exchangeSet")]
-    public class ExchangeSetController : ExchangeSetControllerBase<ExchangeSetController>
+    public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
         private readonly ILogger<ExchangeSetController> _logger;
-        private readonly IExchangeSetService _exchangeSetService;
+        private readonly IExchangeSetStandardService _exchangeSetService;
 
         public ExchangeSetController(
             IHttpContextAccessor httpContextAccessor,
             ILogger<ExchangeSetController> logger,
-            IExchangeSetService exchangeSetService
+            IExchangeSetStandardService exchangeSetService
             ) : base(httpContextAccessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,7 +39,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     updatesSinceRequest.ProductIdentifier = productIdentifier;
                     updatesSinceRequest.CallbackUri = callbackUri;
 
-                    var result = await _exchangeSetService.CreateUpdateSince(updatesSinceRequest, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetService.CreateUpdatesSince(updatesSinceRequest, GetCorrelationId(), GetRequestCancellationToken());
 
                     return result.ToActionResult();
 

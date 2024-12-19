@@ -9,8 +9,8 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public interface IExchangeSetService
+    public interface IExchangeSetStandardService
     {
-        Task<ServiceResponseResult<ExchangeSetResponse>> CreateUpdateSince(UpdatesSinceRequest updatesSinceRequest, string CorrelationId, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<ExchangeSetResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string CorrelationId, CancellationToken cancellationToken);
     }
 }

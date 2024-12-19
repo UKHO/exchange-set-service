@@ -12,7 +12,7 @@ using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
-namespace UKHO.ExchangeSetService.API.Validation
+namespace UKHO.ExchangeSetService.API.Validation.V2
 {
     public class UpdatesSinceValidator : AbstractValidator<UpdatesSinceRequest>, IUpdatesSinceValidator
     {
@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.API.Validation
 
             RuleFor(x => x.SinceDateTime)
                 .Must(x => x.IsValidRfc1123Format(out _sinceDateTime))
-                .WithMessage($"Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').")
+                .WithMessage("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .DependentRules(() =>
                 {

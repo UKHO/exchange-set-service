@@ -32,6 +32,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
 using Elastic.Apm.AspNetCore;
+using UKHO.ExchangeSetService.API.Validation.V2;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -125,7 +126,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             builder.Services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
-            builder.Services.AddScoped<IExchangeSetService, Services.ExchangeSetService>();
+            builder.Services.AddScoped<IExchangeSetStandardService, ExchangeSetStandardService>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
 
