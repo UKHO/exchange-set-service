@@ -856,7 +856,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
-        ErrorInDownloadReadMeFile = 805211
+        ErrorInDownloadReadMeFile = 805211,
+        /// <summary>
+        /// 805909 - Code tracking marker
+        /// </summary>
+        CodeTrackingMarker = 805909
 
 
     }

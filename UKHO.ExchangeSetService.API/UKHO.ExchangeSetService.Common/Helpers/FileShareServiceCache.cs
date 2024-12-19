@@ -83,7 +83,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     if (!productList.Contains(compareProducts))
                     {
                         var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        logger.LogError(EventIds.CodeTrackingMarker.ToEventId(), "Code tracking marker about to call RetrieveFromTableStorageAsync");
                         var cacheInfo = await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value + "|" + businessUnit, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+                        logger.LogError(EventIds.CodeTrackingMarker.ToEventId(), "Code tracking marker completed call to RetrieveFromTableStorageAsync for batchId : {batchId}", cacheInfo?.BatchId);
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
                         {
