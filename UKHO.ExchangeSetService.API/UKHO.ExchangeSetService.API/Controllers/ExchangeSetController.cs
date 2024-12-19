@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         [HttpPost]
         [Route("{exchangeSetStandard}/productVersions")]
-        public Task<IActionResult> PostProductVersions([FromBody] List<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri, string exchangeSetStandard)
+        public Task<IActionResult> PostProductVersions([FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri, string exchangeSetStandard)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
