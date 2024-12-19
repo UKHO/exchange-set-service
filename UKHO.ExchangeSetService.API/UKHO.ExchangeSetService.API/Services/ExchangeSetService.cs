@@ -5,22 +5,22 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
-using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Models;
-using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
     public class ExchangeSetService : IExchangeSetService
     {
-        private readonly IProductDataProductVersionsValidator _productVersionsValidator;
+        private readonly IProductVersionsValidator _productVersionsValidator;
 
-        public ExchangeSetService(IProductDataProductVersionsValidator productVersionsValidator)
+        public ExchangeSetService(IProductVersionsValidator productVersionsValidator)
         {
             _productVersionsValidator = productVersionsValidator ?? throw new ArgumentNullException(nameof(productVersionsValidator));
         }
-        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateExchangeSetByProductVersions(ProductDataProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateExchangeSetByProductVersions(ProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken)
         {
             var validationResult = await _productVersionsValidator.Validate(productVersionsRequest);
 

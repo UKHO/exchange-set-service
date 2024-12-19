@@ -32,6 +32,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
 using Elastic.Apm.AspNetCore;
+using UKHO.ExchangeSetService.API.Validation.V2;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -187,6 +188,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
             builder.Services.AddScoped<IExchangeSetService, Services.ExchangeSetService>();
+            builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")

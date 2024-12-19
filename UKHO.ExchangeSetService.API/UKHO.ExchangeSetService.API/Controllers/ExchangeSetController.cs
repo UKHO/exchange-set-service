@@ -11,8 +11,7 @@ using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Models;
-using UKHO.ExchangeSetService.Common.Models.Request;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
@@ -34,20 +33,20 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         [HttpPost]
         [Route("{exchangeSetStandard}/productVersions")]
-        public Task<IActionResult> PostProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, [FromQuery] string callbackUri, string exchangeSetStandard)
+        public Task<IActionResult> PostProductVersions([FromBody] List<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri, string exchangeSetStandard)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var exchangeSetProductVersionsRequest = new ProductDataProductVersionsRequest
+                    var productVersionsRequest = new ProductVersionsRequest
                     {
-                        ProductVersions = productVersionsRequest,
+                        ProductVersions = productVersionRequest,
                         CallbackUri = callbackUri,
                         CorrelationId = GetCorrelationId()
                     };
 
-                    var result = await _exchangeSetService.CreateExchangeSetByProductVersions(exchangeSetProductVersionsRequest, GetRequestCancellationToken());
+                    var result = await _exchangeSetService.CreateExchangeSetByProductVersions(productVersionsRequest, GetRequestCancellationToken());
                     return result.ToActionResult();
 
                 }, GetCorrelationId(), exchangeSetStandard);

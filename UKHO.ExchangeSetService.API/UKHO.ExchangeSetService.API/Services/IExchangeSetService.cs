@@ -4,13 +4,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models;
-using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
     public interface IExchangeSetService
     {
-        Task<ServiceResponseResult<ExchangeSetResponse>> CreateExchangeSetByProductVersions(ProductDataProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<ExchangeSetResponse>> CreateExchangeSetByProductVersions(ProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken);
     }
 }
