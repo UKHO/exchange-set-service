@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers
@@ -46,14 +47,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         CorrelationId = GetCorrelationId()
                     };
 
-                    var result = await _exchangeSetService.CreateExchangeSetByProductVersions(exchangeSetProductVersionsRequest);
+                    var result = await _exchangeSetService.CreateExchangeSetByProductVersions(exchangeSetProductVersionsRequest, GetRequestCancellationToken());
+                    return result.ToActionResult();
 
-                    return result.StatusCode switch
-                    {
-                        HttpStatusCode.OK => StatusCode((int)HttpStatusCode.Accepted, result.Value),
-                        HttpStatusCode.BadRequest => BadRequest(result.ErrorDescription.Errors),
-                        _ => (IActionResult)StatusCode((int)result.StatusCode)
-                    };
                 }, GetCorrelationId(), exchangeSetStandard);
         }
     }

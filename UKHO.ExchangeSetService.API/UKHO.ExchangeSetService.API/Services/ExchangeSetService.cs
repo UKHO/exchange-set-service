@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Validation;
@@ -19,7 +20,7 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             _productVersionsValidator = productVersionsValidator ?? throw new ArgumentNullException(nameof(productVersionsValidator));
         }
-        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateExchangeSetByProductVersions(ProductDataProductVersionsRequest productVersionsRequest)
+        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateExchangeSetByProductVersions(ProductDataProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken)
         {
             var validationResult = await _productVersionsValidator.Validate(productVersionsRequest);
 
@@ -28,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return ServiceResponseResult<ExchangeSetResponse>.BadRequest(new ErrorDescription { CorrelationId = productVersionsRequest.CorrelationId, Errors = errors });
             }
 
-            return ServiceResponseResult<ExchangeSetResponse>.Success(new ExchangeSetResponse()); // This is a placeholder, the actual implementation is not provided
+            return ServiceResponseResult<ExchangeSetResponse>.Accepted(new ExchangeSetResponse()); // This is a placeholder, the actual implementation is not provided
         }        
     }
 }
