@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
-    public abstract class ExchangeSetControllerBase<T> : ControllerBase
+    public abstract class ExchangeSetBaseController<T> : ControllerBase
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public const string XCorrelationIdHeaderKey = "X-Correlation-ID";
 
-        protected ExchangeSetControllerBase(IHttpContextAccessor httpContextAccessor)
+        protected ExchangeSetBaseController(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }

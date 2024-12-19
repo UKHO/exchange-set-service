@@ -17,7 +17,7 @@ using UKHO.ExchangeSetService.Common.Models.Request;
 namespace UKHO.ExchangeSetService.API.Controllers
 {
     [Route("v2/exchangeSet")]
-    public class ExchangeSetController : ExchangeSetControllerBase<ExchangeSetController>
+    public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
         private readonly ILogger<ExchangeSetController> _logger;
         private readonly IExchangeSetService _exchangeSetService;
