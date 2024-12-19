@@ -1,10 +1,10 @@
-﻿using FakeItEasy;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Helpers;
 using UKHO.ExchangeSetService.CleanUpJob.Services;
@@ -15,76 +15,80 @@ namespace UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.Services
 {
     public class ExchangeSetCleanUpServiceTest
     {
-        public IAzureFileSystemHelper fakeAzureFileSystemHelper;
-        public IOptions<EssFulfilmentStorageConfiguration> fakeStorageConfig;
-        public ISalesCatalogueStorageService fakeScsStorageService;
-        public IConfiguration fakeConfiguration;
-        public ILogger<ExchangeSetCleanUpService> fakeLogger;
-        public ExchangeSetCleanUpService exchangeSetCleanUpService;
-        public IOptions<CleanUpConfiguration> fakeCleanUpConfig;
-        public string fakeFilePath = @"D:\\Downloads";
-        public string fakeStorageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-        public int fakeNumberOfDays = 1;
+        private IAzureFileSystemHelper _fakeAzureFileSystemHelper;
+        private IOptions<EssFulfilmentStorageConfiguration> _fakeStorageConfig;
+        private ISalesCatalogueStorageService _fakeScsStorageService;
+        private IConfiguration _fakeConfiguration;
+        private ILogger<ExchangeSetCleanUpService> _fakeLogger;
+        private ExchangeSetCleanUpService _exchangeSetCleanUpService;
+        private IOptions<CleanUpConfiguration> _fakeCleanUpConfig;
+        private const string FakeFilePath = @"D:\\Downloads";
+        private const string FakeStorageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
+        private const int FakeNumberOfDays = 1;
 
         [SetUp]
         public void Setup()
         {
-            fakeAzureFileSystemHelper = A.Fake<IAzureFileSystemHelper>();
-            fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration()
-                                         { StorageContainerName ="Test"  });
-            fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
-            fakeConfiguration = A.Fake<IConfiguration>();
-            fakeLogger = A.Fake<ILogger<ExchangeSetCleanUpService>>();
-            fakeCleanUpConfig = Options.Create(new CleanUpConfiguration()
-            { NumberOfDays = 1 });
+            _fakeAzureFileSystemHelper = A.Fake<IAzureFileSystemHelper>();
+            _fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration { StorageContainerName = "Test" });
+            _fakeScsStorageService = A.Fake<ISalesCatalogueStorageService>();
+            _fakeConfiguration = A.Fake<IConfiguration>();
+            _fakeLogger = A.Fake<ILogger<ExchangeSetCleanUpService>>();
+            _fakeCleanUpConfig = Options.Create(new CleanUpConfiguration { NumberOfDays = 1 });
 
-            exchangeSetCleanUpService = new ExchangeSetCleanUpService(fakeAzureFileSystemHelper, fakeStorageConfig, fakeScsStorageService, fakeConfiguration, fakeLogger, fakeCleanUpConfig);
+            _exchangeSetCleanUpService = new ExchangeSetCleanUpService(_fakeAzureFileSystemHelper, _fakeStorageConfig, _fakeScsStorageService, _fakeConfiguration, _fakeLogger, _fakeCleanUpConfig);
         }
 
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotFound_ThenReturnKeyNotFoundException()
         {
-            FakeAzureFileHelper fakeAzureFileHelper = new FakeAzureFileHelper();
+            var fakeAzureFileHelper = new FakeAzureFileHelper();
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored))
               .Throws(new KeyNotFoundException("Storage account accesskey not found"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
                    .And.Message.EqualTo("Storage account accesskey not found")
-                    , async delegate { await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles(); });
+                    , async delegate { await _exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles(); });
 
-            Assert.AreEqual(false, fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled);
+            Assert.That(fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled, Is.EqualTo(false));
         }
 
         [Test]
         public async Task WhenHistoricFoldersAndFilesNotFound_ThenReturnFalseResponse()
         {
-            FakeAzureFileHelper fakeAzureFileHelper = new FakeAzureFileHelper();
+            var fakeAzureFileHelper = new FakeAzureFileHelper();
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(fakeStorageAccountConnectionString);
-            A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(false);
+            A.CallTo(() => _fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(FakeStorageAccountConnectionString);
+            A.CallTo(() => _fakeAzureFileSystemHelper.DeleteDirectoryAsync(_fakeCleanUpConfig.Value.NumberOfDays, FakeStorageAccountConnectionString, _fakeStorageConfig.Value.StorageContainerName, FakeFilePath)).Returns(false);
 
-            var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
+            var response = await _exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
-            Assert.AreEqual(false, response);
-            Assert.AreEqual(false, fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled);
+            Assert.Multiple(() =>
+            {
+                Assert.That(response, Is.EqualTo(false));
+                Assert.That(fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled, Is.EqualTo(false));
+            });
         }
 
         [Test]
         public async Task WhenHistoricFoldersAndFilesFound_ThenReturnTrueResponse()
         {
-            FakeAzureFileHelper fakeAzureFileHelper = new FakeAzureFileHelper();
-            fakeConfiguration["HOME"] = fakeFilePath;
+            var fakeAzureFileHelper = new FakeAzureFileHelper();
+            _fakeConfiguration["HOME"] = FakeFilePath;
 
-            await fakeAzureFileHelper.DeleteDirectoryAsync(fakeNumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath);
+            await fakeAzureFileHelper.DeleteDirectoryAsync(FakeNumberOfDays, FakeStorageAccountConnectionString, _fakeStorageConfig.Value.StorageContainerName, FakeFilePath);
 
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(fakeStorageAccountConnectionString);
-            A.CallTo(() => fakeAzureFileSystemHelper.DeleteDirectoryAsync(fakeCleanUpConfig.Value.NumberOfDays, fakeStorageAccountConnectionString, fakeStorageConfig.Value.StorageContainerName, fakeFilePath)).Returns(true);
+            A.CallTo(() => _fakeScsStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(FakeStorageAccountConnectionString);
+            A.CallTo(() => _fakeAzureFileSystemHelper.DeleteDirectoryAsync(_fakeCleanUpConfig.Value.NumberOfDays, FakeStorageAccountConnectionString, _fakeStorageConfig.Value.StorageContainerName, FakeFilePath)).Returns(true);
 
-            var response = await exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
+            var response = await _exchangeSetCleanUpService.DeleteHistoricFoldersAndFiles();
 
-            Assert.AreEqual(true, response);
-            Assert.AreEqual(true, fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled);
+            Assert.Multiple(() =>
+            {
+                Assert.That(response, Is.EqualTo(true));
+                Assert.That(fakeAzureFileHelper.DeleteDirectoryAsyncIsCalled, Is.EqualTo(true));
+            });
         }
     }
 }
