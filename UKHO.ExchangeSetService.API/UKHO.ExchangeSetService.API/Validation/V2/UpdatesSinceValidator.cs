@@ -24,8 +24,8 @@ namespace UKHO.ExchangeSetService.API.Validation.V2
             _configuration = configuration;
 
             RuleFor(x => x.SinceDateTime)
-                .Must(x => x.IsValidRfc1123Format(out _sinceDateTime))
-                .WithMessage("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').")
+                .Must(x => x.IsValidIso8601Format(out _sinceDateTime))
+                .WithMessage("Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .DependentRules(() =>
                 {
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.Validation.V2
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                     RuleFor(x => x.SinceDateTime)
                     .Must(x => DateTime.Compare(_sinceDateTime, DateTime.UtcNow.AddDays(-Convert.ToInt32(_configuration["MaximumNumerOfDaysValidForSinceDateTimeEndpoint"]))) > 0)
-                    .WithMessage("Provided sinceDateTime must be within last " + configuration["MaximumNumerOfDaysValidForSinceDateTimeEndpoint"] + " days.")
+                    .WithMessage($"Provided sinceDateTime must be within last {configuration["MaximumNumerOfDaysValidForSinceDateTimeEndpoint"]} days.")
                     .WithErrorCode(HttpStatusCode.BadRequest.ToString());
                 });
 

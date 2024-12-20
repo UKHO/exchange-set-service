@@ -17,6 +17,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
         private readonly ILogger<ExchangeSetController> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IExchangeSetStandardService _exchangeSetService;
 
         public ExchangeSetController(
@@ -25,6 +26,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             IExchangeSetStandardService exchangeSetService
             ) : base(httpContextAccessor)
         {
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _exchangeSetService = exchangeSetService ?? throw new ArgumentNullException(nameof(exchangeSetService));
         }
@@ -41,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
                     var result = await _exchangeSetService.CreateUpdatesSince(updatesSinceRequest, GetCorrelationId(), GetRequestCancellationToken());
 
-                    return result.ToActionResult();
+                    return result.ToActionResult(_httpContextAccessor);
 
                 }, GetCorrelationId(), exchangeSetStandard);
         }

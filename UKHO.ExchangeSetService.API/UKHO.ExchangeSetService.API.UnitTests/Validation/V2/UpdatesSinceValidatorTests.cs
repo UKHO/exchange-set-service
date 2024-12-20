@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -16,6 +17,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
     [TestFixture]
     public class UpdatesSinceValidatorTests
     {
+        private const string Iso8601DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
         private IConfiguration _fakeConfiguration;
         private UpdatesSinceValidator _validator;
 
@@ -33,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         {
             var request = new UpdatesSinceRequest
             {
-                SinceDateTime = DateTime.UtcNow.AddDays(-5).ToString("R")
+                SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture)
             };
 
             var result = await _validator.ValidateAsync(request);
@@ -53,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
             var result = await _validator.ValidateAsync(request);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().ContainSingle(e => e.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT').");
+            result.Errors.Should().ContainSingle(e => e.ErrorMessage == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').");
         }
 
         [Test]
@@ -61,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         {
             var request = new UpdatesSinceRequest
             {
-                SinceDateTime = DateTime.UtcNow.AddDays(1).ToString("R")
+                SinceDateTime = DateTime.UtcNow.AddDays(10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture)
             };
 
             var result = await _validator.ValidateAsync(request);
@@ -75,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         {
             var request = new UpdatesSinceRequest
             {
-                SinceDateTime = DateTime.UtcNow.AddDays(-30).ToString("R")
+                SinceDateTime = DateTime.UtcNow.AddDays(-40).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture)
             };
 
             var result = await _validator.ValidateAsync(request);
@@ -89,7 +91,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         {
             var request = new UpdatesSinceRequest
             {
-                SinceDateTime = DateTime.UtcNow.AddDays(-5).ToString("R"),
+                SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture),
                 CallbackUri = "https://valid.callback.uri"
             };
 
@@ -103,7 +105,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         {
             var request = new UpdatesSinceRequest
             {
-                SinceDateTime = "Wed, 21 Oct 2020 07:28:00 GMT",
+                SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture),
                 CallbackUri = "invalid-uri"
             };
 
@@ -118,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         {
             var request = new UpdatesSinceRequest
             {
-                SinceDateTime = DateTime.UtcNow.AddDays(-5).ToString("R"),
+                SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture),
                 ProductIdentifier = S100ProductType.s101.ToString()
             };
 
@@ -132,7 +134,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         {
             var request = new UpdatesSinceRequest
             {
-                SinceDateTime = "Wed, 21 Oct 2020 07:28:00 GMT",
+                SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture),
                 ProductIdentifier = "InvalidProduct"
             };
 

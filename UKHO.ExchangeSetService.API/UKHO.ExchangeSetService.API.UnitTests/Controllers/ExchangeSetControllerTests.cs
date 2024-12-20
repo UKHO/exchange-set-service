@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -10,15 +12,19 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
+using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
     [TestFixture]
     public class ExchangeSetControllerTests
     {
+        private const string Iso8601DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+
         private IHttpContextAccessor _fakeHttpContextAccessor;
         private ILogger<ExchangeSetController> _fakeLogger;
         private IExchangeSetStandardService _fakeExchangeSetStandardService;
@@ -38,6 +44,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
+            Action nullHttpContextAccessor = () => new ExchangeSetController(null, _fakeLogger, _fakeExchangeSetStandardService);
+            nullHttpContextAccessor.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("httpContextAccessor");
+
             Action nullLogger = () => new ExchangeSetController(_fakeHttpContextAccessor, null, _fakeExchangeSetStandardService);
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
@@ -48,14 +57,47 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenValidSinceDateTimeRequested_ThenPostUpdatesSince_Returns202Accepted()
         {
-            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = "Tue, 10 Dec 2024 05:46:00 GMT" };
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture) };
+
+            var exchangeSetServiceResponse = new ExchangeSetStandardServiceResponse()
+            {
+                ExchangeSetResponse = GetExchangeSetResponse()
+            };
 
             A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetResponse>.Accepted(new ExchangeSetResponse())));
+                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
             var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "s101", "http://callback.uri");
 
             result.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince Endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenValidSinceDateTimeAndEmptyProductIdentifierRequested_ThenPostUpdatesSince_Returns202Accepted()
+        {
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture) };
+
+            var exchangeSetServiceResponse = new ExchangeSetStandardServiceResponse()
+            {
+                ExchangeSetResponse = GetExchangeSetResponse()
+            };
+
+            A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
+
+            var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "", "http://callback.uri");
+
+            result.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince Endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
         }
 
         [Test]
@@ -64,11 +106,63 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = "" };
 
             A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = new List<Error> { new() { Source = "test", Description = "test error" } } })));
+                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = new List<Error> { new() { Source = "SinceDateTime", Description = "Provided sinceDateTime is either invalid or invalid format" } } }));
 
             var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "s101", "http://callback.uri");
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince Endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+        }
+
+        private ExchangeSetStandardResponse GetExchangeSetResponse()
+        {
+            LinkSetBatchStatusUri linkSetBatchStatusUri = new()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
+            };
+            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
+            };
+            LinkSetFileUri linkSetFileUri = new()
+            {
+                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
+            };
+            Links links = new()
+            {
+                ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
+                ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
+                ExchangeSetFileUri = linkSetFileUri
+            };
+
+            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new()
+            {
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123456",
+                    Reason = "productWithdrawn"
+                },
+                new RequestedProductsNotInExchangeSet()
+                {
+                    ProductName = "GB123789",
+                    Reason = "invalidProduct"
+                }
+            };
+
+            ExchangeSetStandardResponse exchangeSetStandardResponse = new()
+            {
+                Links = links,
+                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
+                RequestedProductCount = 22,
+                ExchangeSetCellCount = 15,
+                RequestedProductsAlreadyUpToDateCount = 5,
+                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet
+            };
+            return exchangeSetStandardResponse;
         }
     }
 }
