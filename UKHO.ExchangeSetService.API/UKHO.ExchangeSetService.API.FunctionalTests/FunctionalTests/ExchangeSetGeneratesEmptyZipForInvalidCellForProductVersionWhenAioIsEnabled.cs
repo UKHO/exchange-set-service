@@ -28,16 +28,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             //// ENC_ROOT >>> ReadmeTxtFile
             bool checkFileReadme = FssBatchHelper.CheckforFileExist(Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFileReadme, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");
+            Assert.That(checkFileReadme, Is.True, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder, objStorage.Config.ExchangeReadMeFile));
 
             //// ENC_ROOT >> Catalog.031
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(EncDownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(EncDownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
+            Assert.That(checkFile, Is.True, $"File not Exist in the specified folder path : {Path.Combine(EncDownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
 
             //Verify Catalog file content
             var apiScsResponse = await ScsApiClient.GetProductIdentifiersAsync(Config.ExchangeSetProductType, DataHelper.GetProductIdentifiers(), ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponse.StatusCode,Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
 
             var apiScsResponseData = await apiScsResponse.ReadAsTypeAsync<ScsProductResponseModel>();
 
@@ -45,21 +45,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             ////SERIAL.ENC 
             bool checkFileSerial = FssBatchHelper.CheckforFileExist(EncDownloadedFolderPath, objStorage.Config.ExchangeSetSerialEncFile);
-            Assert.IsTrue(checkFileSerial, $"{objStorage.Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {EncDownloadedFolderPath}");
+            Assert.That(checkFileSerial, Is.True, $"{objStorage.Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {EncDownloadedFolderPath}");
             FileContentHelper.CheckSerialEncFileContent(Path.Combine(EncDownloadedFolderPath, Config.ExchangeSetSerialEncFile));
 
             //Verify Serial.Enc file content
             FileContentHelper.CheckSerialEncFileContent(Path.Combine(EncDownloadedFolderPath, Config.ExchangeSetSerialEncFile));
 
             //// No ENC Available
-            Assert.IsFalse(Directory.Exists(Path.Combine(EncDownloadedFolderPath, "ENC_ROOT\\AB")));
+            Assert.That(Directory.Exists(Path.Combine(EncDownloadedFolderPath, "ENC_ROOT\\AB")),Is.False);
 
             //// INFO >> PRODUCT.TXT
             bool checkFileProductTxt = FssBatchHelper.CheckforFileExist(Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
-            Assert.IsTrue(checkFileProductTxt, $"{objStorage.Config.ExchangeSetProductFile} File not Exist in the specified folder path : {EncDownloadedFolderPath}");
+            Assert.That(checkFileProductTxt, Is.True, $"{objStorage.Config.ExchangeSetProductFile} File not Exist in the specified folder path : {EncDownloadedFolderPath}");
 
             var apiScsResponseProductTxt = await ScsApiClient.GetScsCatalogueAsync(objStorage.Config.ExchangeSetProductType, objStorage.Config.ExchangeSetCatalogueType, objStorage.ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponseProductTxt.StatusCode, $"Incorrect status code is returned {apiScsResponseProductTxt.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponseProductTxt.StatusCode,Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponseProductTxt.StatusCode}, instead of the expected status 200.");
             var apiResponseDetails = await apiScsResponseProductTxt.ReadAsStringAsync();
             dynamic apiScsResponseDataProductTXT = JsonConvert.DeserializeObject(apiResponseDetails);
 
@@ -72,31 +72,31 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         {
             //Verify Catalog file content
             var apiScsResponse = await ScsApiClient.GetProductVersionsAsync(objStorage.Config.ExchangeSetProductType, ProductVersionData, objStorage.ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponse.StatusCode, $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 304.");
+            Assert.That((int)apiScsResponse.StatusCode,Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 304.");
 
             //// ENC_ROOT >>> ReadmeTxtFile
             bool checkFileReadme = FssBatchHelper.CheckforFileExist(Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder), objStorage.Config.ExchangeReadMeFile);
-            Assert.IsTrue(checkFileReadme, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");
+            Assert.That(checkFileReadme, Is.True, $"{objStorage.Config.ExchangeReadMeFile} File not Exist in the specified folder path : {Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder)}");
             FileContentHelper.CheckReadMeTxtFileContent(Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetEncRootFolder, objStorage.Config.ExchangeReadMeFile));
 
             //// ENC_ROOT >> Catalog.031
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(AioDownloadedFolderPath, Config.ExchangeSetEncRootFolder), Config.ExchangeSetCatalogueFile);
-            Assert.IsTrue(checkFile, $"File not Exist in the specified folder path : {Path.Combine(AioDownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
+            Assert.That(checkFile, Is.True, $"File not Exist in the specified folder path : {Path.Combine(AioDownloadedFolderPath, Config.ExchangeSetCatalogueFile)}");
 
             ////SERIAL.AIO 
             bool checkFileSerial = FssBatchHelper.CheckforFileExist(AioDownloadedFolderPath, objStorage.Config.AIOConfig.ExchangeSetSerialAioFile);
-            Assert.IsTrue(checkFileSerial, $"{objStorage.Config.AIOConfig.ExchangeSetSerialAioFile} File not Exist in the specified folder path : {AioDownloadedFolderPath}");
+            Assert.That(checkFileSerial, Is.True, $"{objStorage.Config.AIOConfig.ExchangeSetSerialAioFile} File not Exist in the specified folder path : {AioDownloadedFolderPath}");
             FileContentHelper.CheckSerialAioFileContentForAioUpdate(Path.Combine(AioDownloadedFolderPath, objStorage.Config.AIOConfig.ExchangeSetSerialAioFile));
 
             //// No ENC Available
-            Assert.IsFalse(Directory.Exists(Path.Combine(AioDownloadedFolderPath, "ENC_ROOT\\GB")));
+            Assert.That(Directory.Exists(Path.Combine(AioDownloadedFolderPath, "ENC_ROOT\\GB")),Is.False);
 
             //// INFO >> PRODUCT.TXT
             bool checkFileProductTxt = FssBatchHelper.CheckforFileExist(Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
-            Assert.IsTrue(checkFileProductTxt, $"{objStorage.Config.ExchangeSetProductFile} File not Exist in the specified folder path : {AioDownloadedFolderPath}");
+            Assert.That(checkFileProductTxt, Is.True, $"{objStorage.Config.ExchangeSetProductFile} File not Exist in the specified folder path : {AioDownloadedFolderPath}");
 
             var apiScsResponseProductTxt = await ScsApiClient.GetScsCatalogueAsync(objStorage.Config.ExchangeSetProductType, objStorage.Config.ExchangeSetCatalogueType, objStorage.ScsJwtToken);
-            Assert.AreEqual(200, (int)apiScsResponseProductTxt.StatusCode, $"Incorrect status code is returned {apiScsResponseProductTxt.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiScsResponseProductTxt.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponseProductTxt.StatusCode}, instead of the expected status 200.");
             var apiResponseDetails = await apiScsResponseProductTxt.ReadAsStringAsync();
             dynamic apiScsResponseDataProductTXT = JsonConvert.DeserializeObject(apiResponseDetails);
 

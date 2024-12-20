@@ -31,7 +31,6 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
-using Elastic.Apm.AspNetCore;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -127,6 +126,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
+            builder.Services.AddAllElasticApm();
 
             builder.Services.AddHeaderPropagation(options =>
             {
@@ -229,7 +229,6 @@ namespace UKHO.ExchangeSetService.API
             app.UseAuthorization();
             app.MapHealthChecks("/health");
             app.MapControllers();
-            app.UseElasticApm(builder.Configuration);
             app.Run();
 
             //=====================================

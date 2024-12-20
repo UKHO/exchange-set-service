@@ -22,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private static FssApiClient FssApiClient = new();
         public static async Task<string> CreateExchangeSetFile(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiEssResponse.StatusCode,Is.EqualTo(200), $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
+            Assert.That( batchStatus,Is.EqualTo("Committed"), $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
 
             var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.ExchangeSetFileName}";
 
@@ -56,9 +56,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(dateAndCdType, $"{currentDate}UPDATE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00U01X01"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.That($"{currentDate}UPDATE", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.That(formatVersionAndExchangeSetNumber.StartsWith("02.00U01X01"),Is.True, $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
         public static void CheckProductFileContent(string inputFile, dynamic scsResponse, string exchangeSetStandard = "s63")
@@ -67,9 +67,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
-            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
-            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
+            Assert.That(fileContent[0].Contains(currentDate),Is.True, $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.That(fileContent[1].Contains("VERSION"), Is.True, $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.That(fileContent[3].Contains("ENC"), Is.True, $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
           
             int rowNumber = new Random().Next(4, fileContent.Length-1);
             var productData = fileContent[rowNumber].Split(",").Reverse();
@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     expectedEncryptionFlag = "0"; 
                 }
 
-            Assert.True(encryptionFlag.Equals(expectedEncryptionFlag), $"Product File returned {encryptionFlag}, which is not expected encryptionFlag.");
+            Assert.That(encryptionFlag.Equals(expectedEncryptionFlag), Is.True, $"Product File returned {encryptionFlag}, which is not expected encryptionFlag.");
         }
 
         public static void CheckReadMeTxtFileContent(string inputFile)
@@ -92,11 +92,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] fileContents = fileSecondLineContent.Split("File date:");
 
             //Verifying file contents - second line of the readme file
-            Assert.True(fileSecondLineContent.Contains(fileContents[0]), $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
+            Assert.That(fileSecondLineContent.Contains(fileContents[0]), Is.True, $"{fileSecondLineContent} does not contain the expected {fileContents[0]}.");
 
             var utcDateTime = fileContents[1].Remove(fileContents[1].Length - 1);
 
-            Assert.True(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second), $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
+            Assert.That(DateTime.Parse(utcDateTime) <= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, DateTime.UtcNow.Second),Is.True, $"Response body returned ExpiryDateTime {utcDateTime} , greater than the expected value.");
         }
 
         public static void CheckNoEncFilesDownloadedAsync(string folderPath, string productName)
@@ -108,7 +108,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             List<string> listUpdateNumberPath = GetDirectories(folderPath, countryCode);
             int folderCount = listUpdateNumberPath.Count;
 
-            Assert.AreEqual(0, folderCount, $"Downloaded Enc folder count {folderCount}, Instead of expected count 0");
+            Assert.That(folderCount, Is.EqualTo(0), $"Downloaded Enc folder count {folderCount}, Instead of expected count 0");
         }
 
         public static async Task GetDownloadedEncFilesAsync(string fssBaseUrl, string folderPath, string productName, int? editionNumber, int? updateNumber, string accessToken, string businessUnit = "ADDS")
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var searchQueryString = CreateFssSearchQuery(businessUnit, productName, editionNumber.ToString(), updateNumber.ToString());
 
             var apiResponse = await FssApiClient.SearchBatchesAsync(fssBaseUrl, searchQueryString, 100, 0, accessToken);
-            Assert.AreEqual(200, (int)apiResponse.StatusCode, $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected status 200.");
 
             var responseSearchDetails = await apiResponse.ReadAsTypeAsync<ResponseBatchSearchModel>();
             if (Directory.Exists(downloadedEncFolderPath) && responseSearchDetails.Entries.Count > 0)
@@ -133,16 +133,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 int fssFileCount = 0;
                 ResponseBatchDetailsModel responseBatchDetailsModel = new ResponseBatchDetailsModel();
                 ExtractEncFileCount(productName, editionNumber, updateNumber, responseSearchDetails, ref fssFileCount, ref responseBatchDetailsModel);
-                Assert.AreEqual(totalFileCount, fssFileCount, $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
+                Assert.That(fssFileCount, Is.EqualTo(totalFileCount), $"Downloaded Enc files count {totalFileCount}, Instead of expected count {fssFileCount}");
 
                 foreach (var fileName in fileNames)
                 {
-                    Assert.IsTrue(responseBatchDetailsModel.Files.Any(fn => fn.Filename.Contains(fileName)), $"The expected file name {fileName} does not exist.");
+                    Assert.That(responseBatchDetailsModel.Files.Any(fn => fn.Filename.Contains(fileName)), Is.True, $"The expected file name {fileName} does not exist.");
                 }
             }
             else
             {
-                Assert.AreEqual(totalFileCount, responseSearchDetails.Count, $"Downloaded Enc files count {responseSearchDetails.Count}, Instead of expected count {totalFileCount}");
+                Assert.That(responseSearchDetails.Count, Is.EqualTo(totalFileCount), $"Downloaded Enc files count {responseSearchDetails.Count}, Instead of expected count {totalFileCount}");
             }
         }
 
@@ -208,7 +208,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             foreach (var catalogueFilePath in scsCatalogueFilesPath)
             {
-                Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
+                Assert.That(catalogueFileContent.Contains(catalogueFilePath), Is.True, $"{catalogueFileContent} does not contain {catalogueFilePath}.");
             }
         }
 
@@ -217,7 +217,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string catalogueFileContent = File.ReadAllText(inputFile);
             foreach (var product in ProductVersionData)
             {
-                Assert.False(catalogueFileContent.Contains(product.ProductName), $"{catalogueFileContent} contains {product.ProductName}, which is incorrect.");
+                Assert.That(catalogueFileContent.Contains(product.ProductName), Is.False, $"{catalogueFileContent} contains {product.ProductName}, which is incorrect.");
             }
         }
 
@@ -263,9 +263,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string year = DateTime.UtcNow.ToString("yy");
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.AreEqual(formatVersionAndExchangeSetNumber, $"M0{folderNumber}X02", $"Expected format {formatVersionAndExchangeSetNumber}");
+            Assert.That($"GBWK{weekNumber}_{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.That($"{currentDate}BASE", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.That($"M0{folderNumber}X02",Is.EqualTo(formatVersionAndExchangeSetNumber), $"Expected format {formatVersionAndExchangeSetNumber}");
 
             //Store file content for the 2nd line of the Media.txt here
             string[] fileContent_1 = lines[1].Split(" ");
@@ -275,11 +275,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string baseContent = fileContent_1[3];
             string dvd_service = fileContent_1[4];
 
-            Assert.AreEqual(FolderInitial, $"M{folderNumber},'UKHO", $"Incorrect FolderInitial is returned '{FolderInitial}'.");
-            Assert.AreEqual(FileContent_avcs, Avcs, $"Incorrect file content is returned 'M{Avcs}'.");
-            Assert.AreEqual(WeekNumber_Year, $"Week{weekNumber}_{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(FileContent_base, baseContent, $"Incorrect file content is returned 'M{baseContent}'.");
-            Assert.AreEqual(FileContent_dvd, dvd_service, $"Incorrect file content is returned 'M{dvd_service}'.");
+            Assert.That($"M{folderNumber},'UKHO", Is.EqualTo(FolderInitial), $"Incorrect FolderInitial is returned '{FolderInitial}'.");
+            Assert.That(Avcs, Is.EqualTo(FileContent_avcs), $"Incorrect file content is returned 'M{Avcs}'.");
+            Assert.That($"Week{weekNumber}_{year}", Is.EqualTo(WeekNumber_Year), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.That(baseContent, Is.EqualTo(FileContent_base), $"Incorrect file content is returned 'M{baseContent}'.");
+            Assert.That(dvd_service, Is.EqualTo(FileContent_dvd), $"Incorrect file content is returned 'M{dvd_service}'.");
 
             //Verification of the lines describing folders and country code(s) of the Media.txt here
             string[] checkDirectories = FssBatchHelper.CheckforDirectories(Path.Combine(Path.GetTempPath(), $"M0{folderNumber}X02"));
@@ -302,8 +302,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                     countryCodes.Add(dirName);
                     countryCodes.Sort();
                 }
-
-                Assert.AreEqual($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,", actualfileContent);
+                Assert.That(actualfileContent, Is.EqualTo($"M{folderNumber};{baseFolderNumber},{currentDate},'AVCS Volume{count}','ENC data for producers {string.Join(", ", countryCodes)}',,"));
                 countryCodes.Clear();
                 lineNumber++;
             }
@@ -324,15 +323,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string year = DateTime.UtcNow.ToString("yy");
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.That($"{currentDate}BASE", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.That(formatVersionAndExchangeSetNumber.StartsWith($"02.00B0{baseNumber}X09"),Is.True, $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
         public static async Task<List<string>> CreateExchangeSetFileForLargeMedia(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
             List<string> downloadFolderPath = new List<string>();
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -342,7 +341,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
+            Assert.That(batchStatus, Is.EqualTo("Committed"), $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
             for (int mediaNumber = 1; mediaNumber <= 2; mediaNumber++)
             {
@@ -363,9 +362,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] fileContent = File.ReadAllLines(inputFile);
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
-            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
-            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
+            Assert.That(fileContent[0].Contains(currentDate), Is.True, $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.That(fileContent[1].Contains("VERSION"), Is.True, $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.That(fileContent[3].Contains("ENC"), Is.True, $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
         }
 
         public static void CheckCatalogueFileContentForLargeMedia(string inputFile, ScsProductResponseModel scsResponse)
@@ -391,13 +390,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             foreach (var catalogueFilePath in scsCatalogueFilesPath)
             {
-                Assert.True(catalogueFileContent.Contains(catalogueFilePath), $"{catalogueFileContent} does not contain {catalogueFilePath}.");
+                Assert.That(catalogueFileContent.Contains(catalogueFilePath), Is.True, $"{catalogueFileContent} does not contain {catalogueFilePath}.");
             }
         }
 
         public static async Task<HttpResponseMessage> CreateErrorFileValidation(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -407,7 +406,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
+            Assert.That(batchStatus, Is.EqualTo("Committed"), $"Incorrect batch status is returned {batchStatus} for url {batchStatusUrl}, instead of the expected status Committed.");
 
             var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.POSConfig.ErrorFileName}";
 
@@ -418,7 +417,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static async Task<string> DownloadAndExtractAioZip(HttpResponseMessage apiEssResponse, string FssJwtToken)
         {
-            Assert.AreEqual(200, (int)apiEssResponse.StatusCode, $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
+            Assert.That((int)apiEssResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiEssResponse.StatusCode}, instead of the expected status 200.");
 
             var apiResponseData = await apiEssResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
 
@@ -427,13 +426,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var finalBatchStatusUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/status";
 
             var batchStatus = await FssBatchHelper.CheckBatchIsCommitted(finalBatchStatusUrl, FssJwtToken);
-            Assert.AreEqual("Committed", batchStatus, $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
+            Assert.That(batchStatus, Is.EqualTo("Committed"), $"Incorrect batch status is returned {batchStatus} for url {finalBatchStatusUrl}, instead of the expected status Committed.");
 
             var downloadFileUrl = $"{Config.FssConfig.BaseUrl}/batch/{batchId}/files/{Config.AIOConfig.AioExchangeSetFileName}";
 
             var extractDownloadedFolder = await FssBatchHelper.ExtractDownloadedAioFolder(downloadFileUrl.ToString(), FssJwtToken);
 
             var downloadFolder = FssBatchHelper.RenameFolder(extractDownloadedFolder);
+
             return Path.Combine(Path.GetTempPath(), downloadFolder);
 
         }
@@ -444,10 +444,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.True(fileContent[0].Contains(currentDate), $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
-            Assert.True(fileContent[1].Contains("VERSION"), $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
-            Assert.True(fileContent[3].Contains("ENC"), $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
-            Assert.True(fileContent[4].Contains("GB800001"), $"Product File returned {fileContent[4]}, which does not contain expected GB800001.");
+            Assert.That(fileContent[0].Contains(currentDate), Is.True, $"Product File returned {fileContent[0]}, which does not contain expected {currentDate}");
+            Assert.That(fileContent[1].Contains("VERSION"), Is.True, $"Product File returned {fileContent[1]}, which does not contain expected VERSION.");
+            Assert.That(fileContent[3].Contains("ENC"), Is.True, $"Product File returned {fileContent[3]}, which does not contain expected ENC.");
+            Assert.That(fileContent[4].Contains("GB800001"), Is.True, $"Product File returned {fileContent[4]}, which does not contain expected GB800001.");
         }
 
         public static void CheckSerialAioFileContentForAioBase(string inputFile)
@@ -465,9 +465,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(dateAndCdType, $"{currentDate}BASE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.That($"{currentDate}BASE", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.That(formatVersionAndExchangeSetNumber.StartsWith("02.00"), Is.True, $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
         public static void CheckSerialAioFileContentForAioUpdate(string inputFile)
@@ -485,9 +485,9 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
             string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.AreEqual(dataServerAndWeek, $"GBWK{weekNumber}-{year}", $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.AreEqual(dateAndCdType, $"{currentDate}UPDATE", $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.IsTrue(formatVersionAndExchangeSetNumber.StartsWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+            Assert.That($"{currentDate}UPDATE", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+            Assert.That(formatVersionAndExchangeSetNumber.StartsWith("02.00"), Is.True, $"Expected format version {formatVersionAndExchangeSetNumber}");
         }
 
         public static async Task<bool> WaitForContainerAsync(BlobServiceClient blobServiceClient, string containerName, int maxAttempts, int delayInMilliSeconds)

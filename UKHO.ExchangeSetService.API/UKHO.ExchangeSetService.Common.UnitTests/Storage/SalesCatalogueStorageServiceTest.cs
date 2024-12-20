@@ -46,8 +46,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
             fakeStorageConfig.Value.StorageAccountKey = "Test";
             var response = salesCatalogueStorageService.GetStorageAccountConnectionString();
 
-            Assert.NotNull(response);
-            Assert.AreEqual("DefaultEndpointsProtocol=https;AccountName=test;AccountKey=Test;EndpointSuffix=core.windows.net", response);
+            Assert.That(response,Is.Not.Null);
+            Assert.That("DefaultEndpointsProtocol=https;AccountName=test;AccountKey=Test;EndpointSuffix=core.windows.net", Is.EqualTo(response));
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
 
             var ex = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageAccountConnectionString(null, null));
 
-            Assert.AreEqual(expectedErrorMessage, ex.Message);
+            Assert.That(expectedErrorMessage, Is.EqualTo(ex.Message));
         }
 
         #endregion
