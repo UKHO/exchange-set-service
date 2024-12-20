@@ -1552,6 +1552,53 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
         #endregion
 
+        [Test]
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProductAndAioToggleDisabled()
+        {
+            string postBodyParam = "This should be replace by actual value when param passed to api call";
+            string businessUnit = "ADDS";
+            //Test variable
+            string accessTokenParam = null;
+            string uriParam = null;
+            HttpMethod httpMethodParam = null;
+            string correlationIdParam = null;
+            var searchBatchResponse = GetSearchBatchResponse();
+            var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
+
+            var httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))),
+                RequestMessage = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri("http://test.com")
+                }
+            };
+
+            A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
+            A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored,
+                A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored,
+                A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(GetAioProductdetails());
+            A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
+               .Invokes((HttpMethod method, string postBody, string accessToken, string uri, CancellationToken cancellationToken, string correlationId) =>
+               {
+                   accessTokenParam = accessToken;
+                   uriParam = uri;
+                   httpMethodParam = method;
+                   postBodyParam = postBody;
+                   correlationIdParam = correlationId;
+               })
+               .Returns(httpResponse);
+            CommonHelper.IsPeriodicOutputService = true;
+            fakeAioConfiguration.Value.AioEnabled = false;
+            fakeAioConfiguration.Value.AioCells = "GB800001";
+
+            var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
+
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
+            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
+        }
 
         [Test]
         public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProductAndAioToggleEnabled()
@@ -1601,6 +1648,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                })
                .Returns(httpResponse);
             CommonHelper.IsPeriodicOutputService = true;
+            fakeAioConfiguration.Value.AioEnabled = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);

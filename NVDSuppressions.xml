@@ -282,7 +282,40 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Azure.Identity:Various
+   file name: Azure.Identity:1.10.3
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.11.4
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.12.0
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+    <cpe>cpe:/a:microsoft:azure_identity_sdk</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.13.0
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
@@ -387,6 +420,17 @@
   <suppress>
     <notes>
       <![CDATA[
+   file name: Microsoft.Identity.Client:4.57.0
+   Temp suppression until package is updated.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.Identity\.Client@.*$</packageUrl>
+    <cve>CVE-2024-27086</cve>
+    <vulnerabilityName>CVE-2024-35255</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    file name: Azure.Identity.dll
    file name: Microsoft.Identity.Client.Extensions.Msal.dll
    file name: Microsoft.Identity.Client.dll
@@ -395,6 +439,14 @@
    ]]>
     </notes>
     <cve>CVE-2024-35255</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Text.Json:7.0.0
+   ]]>
+    </notes>
+    <vulnerabilityName>CVE-2024-30105</vulnerabilityName>
   </suppress>
   <suppress>
     <notes>
@@ -432,7 +484,17 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Microsoft.Extensions.Azure:Various
+   file name: Microsoft.Extensions.Azure:1.7.1
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+    <cpe>cpe:/a:microsoft:azure_cli</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Extensions.Azure:1.7.6
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
@@ -611,10 +673,100 @@
   <suppress>
     <notes>
       <![CDATA[
-   file name: Azure.Core:Various
+   file name: Azure.Core:1.44.1
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:nuget/Azure\.Core@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Core.dll
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Azure\.Core@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Core:Various
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Core@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Azure.Identity:1.12.0
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Azure\.Identity@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Azure.Cosmos.Table.dll
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Microsoft\.Azure\.Cosmos\.Table@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Azure.DocumentDB.Core.dll
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Microsoft\.Azure\.DocumentDB\.Core@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Azure.Services.AppAuthentication:1.0.3
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.Azure\.Services\.AppAuthentication@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Extensions.Azure.dll
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Microsoft\.Extensions\.Azure@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Extensions.Azure:1.6.3
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Azure@.*$</packageUrl>
+    <cve>CVE-2024-43591</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.ClientModel.dll
+   Will be reviewed as part of .NET 8 update.
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/System\.ClientModel@.*$</packageUrl>
     <cve>CVE-2024-43591</cve>
   </suppress>
   <suppress>
