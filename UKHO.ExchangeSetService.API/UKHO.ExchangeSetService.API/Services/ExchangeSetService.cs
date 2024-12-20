@@ -2,20 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation.Results;
 using UKHO.ExchangeSetService.API.Extensions;
+using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Models;
-using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public class ExchangeSetAPIService : IExchangeSetService
+    public class ExchangeSetService : IExchangeSetService
     {
         private readonly IProductDataService _productDataService;
+        private readonly IProductNameValidator _productNameValidator;
 
-        public ExchangeSetAPIService(IProductDataService productDataService)
+
+        public ExchangeSetService(IProductDataService productDataService, IProductNameValidator productNameValidator)
         {
             _productDataService = productDataService ?? throw new ArgumentNullException(nameof(productDataService));
+            _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));
         }
 
         public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateProductDataByProductNames(string[] productNames, string callbackUri, string correlationId)
@@ -35,14 +40,14 @@ namespace UKHO.ExchangeSetService.API.Services
                 return ServiceResponseResult<ExchangeSetResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = error });
             }
 
-            var productNamesRequest = new ProductIdentifierRequest()
+            var productNamesRequest = new ProductNameRequest()
             {
                 ProductIdentifier = productNames,
                 CallbackUri = callbackUri,
                 CorrelationId = correlationId
             };
 
-            var validationResult = await _productDataService.ValidateProductDataByProductIdentifiers(productNamesRequest);
+            var validationResult = await ValidateProductDataByProductNames(productNamesRequest);
 
             if (!validationResult.IsValid)
             {
@@ -80,6 +85,11 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             return sanitizedIdentifiers.ToArray();
+        }
+
+        private Task<ValidationResult> ValidateProductDataByProductNames(ProductNameRequest productNameRequest)
+        {
+            return _productNameValidator.Validate(productNameRequest);
         }
     }
 }
