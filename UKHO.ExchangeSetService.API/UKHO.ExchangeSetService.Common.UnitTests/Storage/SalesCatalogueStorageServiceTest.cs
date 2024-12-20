@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System.Collections.Generic;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Storage;
 
@@ -9,13 +9,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
     [TestFixture]
     public class SalesCatalogueStorageServiceTest
     {
-        private IOptions<EssFulfilmentStorageConfiguration> fakeStorageConfig;
-        private SalesCatalogueStorageService salesCatalogueStorageService;
+        private IOptions<EssFulfilmentStorageConfiguration> _fakeStorageConfig;
+        private SalesCatalogueStorageService _salesCatalogueStorageService;
 
         [SetUp]
         public void Setup()
         {
-            fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration()
+            _fakeStorageConfig = Options.Create(new EssFulfilmentStorageConfiguration()
             {
                 QueueName = "",
                 StorageAccountKey = "",
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
                 SmallExchangeSetSizeInMB = 50
             });
 
-            salesCatalogueStorageService = new SalesCatalogueStorageService(fakeStorageConfig);
+            _salesCatalogueStorageService = new SalesCatalogueStorageService(_fakeStorageConfig);
         }
 
         #region GetStorageAccountConnectionString
@@ -43,19 +43,19 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
         [Test]
         public void WhenValidGetStorageAccountConnectionStringRequest_ThenReturnValidResponse()
         {
-            fakeStorageConfig.Value.StorageAccountKey = "Test";
-            var response = salesCatalogueStorageService.GetStorageAccountConnectionString();
+            _fakeStorageConfig.Value.StorageAccountKey = "Test";
+            var response = _salesCatalogueStorageService.GetStorageAccountConnectionString();
 
-            Assert.That(response,Is.Not.Null);
-            Assert.That("DefaultEndpointsProtocol=https;AccountName=test;AccountKey=Test;EndpointSuffix=core.windows.net", Is.EqualTo(response));
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response, Is.EqualTo("DefaultEndpointsProtocol=https;AccountName=test;AccountKey=Test;EndpointSuffix=core.windows.net"));
         }
 
         [Test]
         public void WhenScsStorageAccountAccessKeyValueNotfound_ThenGetStorageAccountConnectionStringReturnsKeyNotFoundException()
         {
-            string expectedErrorMessage = "Storage account accesskey not found";
+            var expectedErrorMessage = "Storage account accesskey not found";
 
-            var ex = Assert.Throws<KeyNotFoundException>(() => salesCatalogueStorageService.GetStorageAccountConnectionString(null, null));
+            var ex = Assert.Throws<KeyNotFoundException>(() => _salesCatalogueStorageService.GetStorageAccountConnectionString(null, null));
 
             Assert.That(expectedErrorMessage, Is.EqualTo(ex.Message));
         }

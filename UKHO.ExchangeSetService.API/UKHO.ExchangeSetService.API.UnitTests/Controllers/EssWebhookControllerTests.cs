@@ -65,8 +65,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
               && call.GetArgument<EventId>(1) == EventIds.NewFilesPublishedWebhookOptionsCallCompleted.ToEventId()
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Completed processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}").MustHaveHappenedOnceExactly();
 
-            Assert.That(responseHeaders["WebHook-Allowed-Rate"], Is.EqualTo("*"));
-            Assert.That(responseHeaders["WebHook-Allowed-Origin"], Is.EqualTo("test.com"));
+            Assert.That(responseHeaders.Count, Is.EqualTo(2));
+            Assert.That(responseHeaders["WebHook-Allowed-Rate"].ToString(), Is.EqualTo("*"));
+            Assert.That(responseHeaders["WebHook-Allowed-Origin"].ToString(), Is.EqualTo("test.com"));
         }
 
         [Test]
