@@ -13,5 +13,9 @@ namespace UKHO.ExchangeSetService.Common.Extensions
         {
             return DateTime.TryParseExact(data, "ddMMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime);
         }
+        public static bool IsValidIso8601Format(this string data, out DateTime dateTime)
+        {
+            return DateTime.TryParseExact(data, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime);
+        }
     }
 }
