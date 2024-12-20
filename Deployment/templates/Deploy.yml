@@ -151,7 +151,7 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
               scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
           - task: DotNetCoreCLI@2
             displayName: "Run Functional tests AIOEnabled"
@@ -172,7 +172,7 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
               scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+              arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
           - task: DotNetCoreCLI@2
             displayName: "Run Functional tests AIODisabled"
@@ -194,4 +194,4 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
               scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-              arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+              arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(SetPipelineVariable.RESOURCE_GROUP_NAME) -webappname $(SetPipelineVariable.WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
