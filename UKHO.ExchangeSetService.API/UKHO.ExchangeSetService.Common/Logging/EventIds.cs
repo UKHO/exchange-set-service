@@ -853,18 +853,31 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
         ErrorInDownloadReadMeFile = 805211,
+
+        #region V2
+
         /// <summary>
-        /// 805212 - Request for creating update since request is started.
+        /// 805212 - Request for updates since started.
         /// </summary>
-        CreateUpdateSinceRequestStarted = 805212,
+        PostUpdatesSinceRequestStarted = 805212,
         /// <summary>
-        /// 805213 - Request for creating update since request is completed.
+        /// 805213 - Request for updates since completed.
         /// </summary>
-        CreateUpdateSinceRequestCompleted = 805213,
+        PostUpdatesSinceRequestCompleted = 805213,
         /// <summary>
-        /// 805214 - Exception occurred for creating update since request.
+        /// 805214 - Creation of update since is started.
         /// </summary>
-        CreateUpdateSinceRequestException = 805214,
+        CreateUpdatesSinceStarted = 805214,
+        /// <summary>
+        /// 805215 - Creation of update since is completed.
+        /// </summary>
+        CreateUpdatesSinceCompleted = 805215,
+        /// <summary>
+        /// 805216 - Exception occurred for update since.
+        /// </summary>
+        CreateUpdatesSinceException = 805216,
+
+        #endregion
     }
 
     public static class EventIdExtensions

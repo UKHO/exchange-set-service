@@ -23,9 +23,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
     [TestFixture]
     public class ExchangeSetStandardServiceTests
     {
+        private readonly string _fakeCorrelationId = Guid.NewGuid().ToString();
+
         private ILogger<ExchangeSetStandardService> _fakeLogger;
         private IUpdatesSinceValidator _fakeUpdatesSinceValidator;
-        private readonly string _fakeCorrelationId = Guid.NewGuid().ToString();
 
         private ExchangeSetStandardService _service;
 
@@ -63,18 +64,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdateSinceRequestStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Request to create update since started | _X-Correlation-ID : {CorrelationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceStarted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since started | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdateSinceRequestCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Request to create update since completed | _X-Correlation-ID : {CorrelationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since completed | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdateSinceRequestException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Request to create update since exception occurred | _X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceException.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since exception occurred | X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
         }
 
         [Test]
@@ -100,18 +101,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdateSinceRequestStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Request to create update since started | _X-Correlation-ID : {CorrelationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceStarted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since started | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdateSinceRequestException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Request to create update since exception occurred | _X-Correlation-ID : {CorrelationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceException.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since exception occurred | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdateSinceRequestCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Request to create update since completed | _X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since completed | X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
         }
     }
 }

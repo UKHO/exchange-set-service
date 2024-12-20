@@ -5,7 +5,7 @@ namespace UKHO.ExchangeSetService.Common.Models.V2.Response
 {
     public class ExchangeSetStandardServiceResponse
     {
-        public ExchangeSetStandardResponse ExchangeSetResponse { get; set; }
+        public ExchangeSetStandardResponse ExchangeSetStandardResponse { get; set; }
 
         public string LastModified { get; set; }
 

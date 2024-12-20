@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var exchangeSetServiceResponse = new ExchangeSetStandardServiceResponse()
             {
-                ExchangeSetResponse = GetExchangeSetResponse()
+                ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
             A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
@@ -69,12 +69,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "s101", "http://callback.uri");
 
-            result.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+            result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince Endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.PostUpdatesSinceRequestStarted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.PostUpdatesSinceRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         [Test]
@@ -84,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var exchangeSetServiceResponse = new ExchangeSetStandardServiceResponse()
             {
-                ExchangeSetResponse = GetExchangeSetResponse()
+                ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
             A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
@@ -92,12 +97,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "", "http://callback.uri");
 
-            result.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+            result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince Endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.PostUpdatesSinceRequestStarted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.PostUpdatesSinceRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         [Test]
@@ -114,8 +124,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.ESSGetProductsFromSpecificDateRequestStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince Endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.PostUpdatesSinceRequestStarted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.PostUpdatesSinceRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         private ExchangeSetStandardResponse GetExchangeSetResponse()
@@ -158,7 +173,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 Links = links,
                 ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
                 RequestedProductCount = 22,
-                ExchangeSetCellCount = 15,
+                ExchangeSetProductCount = 15,
                 RequestedProductsAlreadyUpToDateCount = 5,
                 RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet
             };

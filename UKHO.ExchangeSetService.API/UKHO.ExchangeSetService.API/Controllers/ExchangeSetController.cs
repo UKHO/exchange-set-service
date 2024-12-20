@@ -34,8 +34,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [HttpPost("{exchangeSetStandard}/updatesSince")]
         public virtual Task<IActionResult> PostUpdatesSince(string exchangeSetStandard, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
         {
-            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
-                "UpdatesSince Endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
+            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.PostUpdatesSinceRequestStarted, EventIds.PostUpdatesSinceRequestCompleted,
+                "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
                 async () =>
                 {
                     updatesSinceRequest.ProductIdentifier = productIdentifier;

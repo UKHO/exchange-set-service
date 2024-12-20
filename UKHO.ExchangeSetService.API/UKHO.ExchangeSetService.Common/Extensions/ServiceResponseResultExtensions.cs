@@ -27,7 +27,8 @@ namespace UKHO.ExchangeSetService.Common.Extensions
             return result.StatusCode switch
             {
                 HttpStatusCode.OK => new OkObjectResult(result.Value) { StatusCode = (int)HttpStatusCode.OK },
-                HttpStatusCode.Accepted => new ObjectResult(exchangeSetServiceResponse.ExchangeSetResponse) { StatusCode = (int)HttpStatusCode.Accepted },
+                ////HttpStatusCode.Accepted => new ObjectResult(exchangeSetServiceResponse.ExchangeSetStandardResponse) { StatusCode = (int)HttpStatusCode.Accepted },
+                HttpStatusCode.Accepted => new StatusCodeResult(StatusCodes.Status202Accepted),
                 HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription.Errors),
                 HttpStatusCode.NotFound => new NotFoundObjectResult(result.ErrorDescription.Errors),
                 HttpStatusCode.NoContent => new NoContentResult(),

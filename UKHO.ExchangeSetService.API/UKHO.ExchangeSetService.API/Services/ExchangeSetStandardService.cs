@@ -28,13 +28,13 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string CorrelationId, CancellationToken cancellationToken)
         {
-            _logger.LogInformation(EventIds.CreateUpdateSinceRequestStarted.ToEventId(), "Request to create update since started | _X-Correlation-ID : {CorrelationId}", CorrelationId);
+            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Creation of update since started | X-Correlation-ID : {CorrelationId}", CorrelationId);
 
             var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
 
             if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
             {
-                _logger.LogError(EventIds.CreateUpdateSinceRequestException.ToEventId(), "Request to create update since exception occurred | _X-Correlation-ID : {CorrelationId}", CorrelationId);
+                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {CorrelationId}", CorrelationId);
 
                 return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = CorrelationId, Errors = errors });
             }
@@ -44,13 +44,13 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 BatchId = Guid.NewGuid().ToString(),
                 LastModified = DateTime.UtcNow.ToString("R"),
-                ExchangeSetResponse = new ExchangeSetStandardResponse()
+                ExchangeSetStandardResponse = new ExchangeSetStandardResponse()
                 {
                     BatchId = Guid.NewGuid().ToString()
                 }
             };
 
-            _logger.LogInformation(EventIds.CreateUpdateSinceRequestCompleted.ToEventId(), "Request to create update since completed | _X-Correlation-ID : {CorrelationId}", CorrelationId);
+            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Creation of update since completed | X-Correlation-ID : {CorrelationId}", CorrelationId);
 
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
         }

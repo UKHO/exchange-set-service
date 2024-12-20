@@ -12,7 +12,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public const string XCorrelationIdHeaderKey = "_X-Correlation-ID";
+        public const string XCorrelationIdHeaderKey = "X-Correlation-ID";
 
         protected ExchangeSetBaseController(IHttpContextAccessor httpContextAccessor)
         {

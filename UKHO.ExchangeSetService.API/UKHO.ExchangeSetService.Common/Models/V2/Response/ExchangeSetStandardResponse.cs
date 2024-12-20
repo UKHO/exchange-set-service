@@ -19,8 +19,8 @@ namespace UKHO.ExchangeSetService.Common.Models.V2.Response
         [JsonProperty("requestedProductCount")]
         public int RequestedProductCount { get; set; }
 
-        [JsonProperty("exchangeSetCellCount")]
-        public int ExchangeSetCellCount { get; set; }
+        [JsonProperty("exchangeSetProductCount")]
+        public int ExchangeSetProductCount { get; set; }
 
         [JsonProperty("requestedProductsAlreadyUpToDateCount")]
         public int RequestedProductsAlreadyUpToDateCount { get; set; }
