@@ -141,7 +141,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
             var result = await _validator.ValidateAsync(request);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().ContainSingle(e => e.ErrorMessage.Contains("productIdentifier must be valid value"));
+            result.Errors.Should().ContainSingle(e => e.ErrorMessage.Contains("ProductIdentifier must be valid value"));
         }
     }
 }

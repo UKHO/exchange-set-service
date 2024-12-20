@@ -44,12 +44,10 @@ namespace UKHO.ExchangeSetService.API.Validation.V2
                 .WithMessage("Invalid callbackUri format.")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
 
-            When(x => x.ProductIdentifier != null, () =>
-            {
-                RuleFor(x => x.ProductIdentifier).Must(x => Enum.IsDefined(typeof(S100ProductType), x))
-                .WithMessage($"productIdentifier must be valid value from {string.Join(",", Enum.GetValues(typeof(S100ProductType)).Cast<S100ProductType>().Select(e => e.ToString()))}")
+            RuleFor(x => x.ProductIdentifier)
+                .Must(x => Enum.IsDefined(typeof(S100ProductType), x)).When(x => !string.IsNullOrEmpty(x.ProductIdentifier))
+                .WithMessage($"ProductIdentifier must be valid value from {string.Join(",", Enum.GetValues(typeof(S100ProductType)).Cast<S100ProductType>().Select(e => e.ToString()))}")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
-            });
         }
 
         Task<ValidationResult> IUpdatesSinceValidator.Validate(UpdatesSinceRequest updatesSinceRequest)
