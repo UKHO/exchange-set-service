@@ -11,7 +11,6 @@ steps:
     inputs:
       folderPath: '$(Pipeline.Workspace)/terraformartifact/src'
       enableXmlTransform: false
-      xmlTransformationRules: ''
       jsonTargetFiles: '**/appsettings.json'
 
   - task: PowerShell@2
@@ -41,7 +40,6 @@ steps:
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
       enableXmlTransform: false
-      xmlTransformationRules: ''
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2
@@ -59,7 +57,6 @@ steps:
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
       enableXmlTransform: false
-      xmlTransformationRules: ''
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureWebApp@1

@@ -47,7 +47,7 @@ variables:
   - name: DeploymentPool
     value: "Mare Nectaris"
   - name: SdkVersion
-    value: "8.0.x"
+    value: "6.0.x"
   - name: WindowPool
     value: "NautilusBuild"
 
@@ -57,6 +57,9 @@ stages:
     displayName: "Stryker Mutator"
     condition: ${{ eq(parameters.disableStryker, false) }}
     dependsOn: []
+    variables:
+    - name: StrykerDotNetVersion
+      value: 8.0.x
     jobs:
     - job: Stryker
       workspace:
@@ -66,13 +69,22 @@ stages:
           displayName: 'Use .NET SDK'
           inputs:
             packageType: sdk
-            version: $(SdkVersion)
+            useGlobalJson: true
+            workingDirectory: '$(Build.SourcesDirectory)'
 
         - task: UseDotNet@2
           displayName: 'Use .NET SDK for Stryker'
           inputs:
             packageType: sdk
-            version: $(SdkVersion)
+            version: $(StrykerDotNetVersion)
+
+        - task: PowerShell@1
+          displayName: "Create global.json for .NET"
+          inputs:
+            scriptType: inlineScript
+            workingFolder: $(Agent.TempDirectory)
+            inlineScript: |
+              dotnet new globaljson --sdk-version $(StrykerDotNetVersion)
 
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
@@ -90,7 +102,7 @@ stages:
             pwsh: true
             script: $(Agent.BuildDirectory)/tools/dotnet-stryker
 
-        - task: PublishMutationReport@1
+        - task: PublishMutationReport@0
           displayName: 'Publish Stryker Mutator Report'
           inputs:
             reportPattern: '**/mutation-report.html'
@@ -108,7 +120,8 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore non test projects only"
@@ -123,10 +136,11 @@ stages:
               workingDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
               packagesDirectory: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API\packages'
 
-          - task: CmdLine@2
+          - task: CmdLine@1
             displayName: "Run OWASP Dependency Checker"
             inputs:
-              script: 'dependency-check.bat --project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
+              filename: 'dependency-check.bat'
+              arguments: '--project "Exchange-Set-Service - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API" --out "$(Build.ArtifactStagingDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
 
           - task: PublishBuildArtifacts@1
             displayName: "Publish Artifact: OWASP Dependency Checker Report"
@@ -152,7 +166,8 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore test projects only"
@@ -203,7 +218,8 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -283,7 +299,8 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -369,7 +386,8 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: $(SdkVersion)
+              useGlobalJson: true
+              workingDirectory: '$(Build.SourcesDirectory)'
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
@@ -488,14 +506,14 @@ stages:
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     enableXmlTransform: false
-                    xmlTransformationRules: ''
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
                   displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    version: $(SdkVersion)
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
@@ -505,7 +523,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional"
@@ -527,7 +545,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
       - deployment: DevDeployApp2
         dependsOn:
@@ -655,14 +673,14 @@ stages:
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     enableXmlTransform: false
-                    xmlTransformationRules: ''
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
                   displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    version: $(SdkVersion)
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
@@ -672,7 +690,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIOEnabled"
@@ -687,6 +705,27 @@ stages:
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 
                 - task: AzureCLI@2
+                  displayName: "Swap ESS API and ESS FulfilmentService Configuration AIODisabled"
+                  inputs:
+                    azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+                    scriptType: 'pscore'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "false" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+
+                - task: DotNetCoreCLI@2
+                  displayName: "Run Functional tests AIODisabled"
+                  inputs:
+                    command: "test"
+                    projects: |
+                      **/*FunctionalTest*.dll
+                      !**/*TestAdapter.dll
+                      !**/obj/**
+                    arguments: '--filter Category=QCOnlyTest-AIODisabled'
+                    testRunTitle: "QC-AutomationTests"
+                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+
+                - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
                   condition: always()
                   inputs:
@@ -694,7 +733,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
     dependsOn:
@@ -773,14 +812,14 @@ stages:
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     enableXmlTransform: false
-                    xmlTransformationRules: ''
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
                   displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    version: $(SdkVersion)
+                    useGlobalJson: true
+                    workingDirectory: '$(Build.SourcesDirectory)'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
@@ -790,7 +829,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
       - deployment: QADeployApp2
         dependsOn:
@@ -1013,7 +1052,6 @@ stages:
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     enableXmlTransform: false
-                    xmlTransformationRules: ''
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
@@ -1030,7 +1068,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
   - stage: vnexte2eDeploy
     dependsOn: 
@@ -1105,7 +1143,6 @@ stages:
                   inputs:
                     folderPath: '$(Build.SourcesDirectory)/functionaltests/'
                     enableXmlTransform: false
-                    xmlTransformationRules: ''
                     jsonTargetFiles: '**/appsettings.json'
 
                 - task: UseDotNet@2
@@ -1122,4 +1159,4 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
