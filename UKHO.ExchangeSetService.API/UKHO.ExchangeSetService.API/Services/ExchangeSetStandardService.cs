@@ -26,9 +26,30 @@ namespace UKHO.ExchangeSetService.API.Services
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string CorrelationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string CorrelationId, CancellationToken cancellationToken)
         {
             _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Creation of update since started | X-Correlation-ID : {CorrelationId}", CorrelationId);
+
+            if (updatesSinceRequest == null)
+            {
+                var errorDescription = new ErrorDescription
+                {
+                    CorrelationId = CorrelationId,
+                    Errors =
+                    [
+                        new Error
+                        {
+                            Source = "requestBody",
+                            Description = "Either body is null or malformed."
+                        }
+                    ]
+                };
+
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
+            }
+
+            updatesSinceRequest.ProductIdentifier = productIdentifier;
+            updatesSinceRequest.CallbackUri = callbackUri;
 
             var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
 
