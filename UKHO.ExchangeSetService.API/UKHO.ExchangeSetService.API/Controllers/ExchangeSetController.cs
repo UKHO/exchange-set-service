@@ -27,19 +27,19 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpPost("{exchangeSetStandard}/productNames")]
-        public Task<IActionResult> ProductNames([FromBody] string[] productNames, [FromQuery] string callbackUri)
+        public Task<IActionResult> PostProductNames(string exchangeSetStandard, [FromBody] string[] productNames, [FromQuery] string callbackUri)
         {
-            return _logger.LogStartEndAndElapsedTimeAsync<ExchangeSetController, IActionResult>(
-                EventIds.ESSPostProductIdentifiersRequestStart,
-                EventIds.ESSPostProductIdentifiersRequestCompleted,
-                "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}",
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.ESSPostProductNamesRequestStart,
+                EventIds.ESSPostProductNamesRequestCompleted,
+                "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
                     var result = await _exchangeSetService.CreateProductDataByProductNames(productNames, callbackUri, GetCorrelationId());
 
                     return result.ToActionResult();
                 },
-                GetCorrelationId());
+                GetCorrelationId(), exchangeSetStandard);
         }
     }
 }

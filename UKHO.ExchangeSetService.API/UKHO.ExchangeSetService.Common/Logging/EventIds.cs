@@ -856,8 +856,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
-        ErrorInDownloadReadMeFile = 805211
-
+        ErrorInDownloadReadMeFile = 805211,
+        /// <summary>
+        /// 805212 - Request for exchange set service product names endpoint is started.
+        /// </summary>
+        ESSPostProductNamesRequestStart = 805212,
+        /// <summary>
+        /// 805213 - Request for exchange set service product names endpoint is completed.
+        /// </summary>
+        ESSPostProductNamesRequestCompleted = 805213
 
     }
 
