@@ -9,7 +9,7 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public interface IExchangeSetService
+    public interface IExchangeSetStandardService
     {
         Task<ServiceResponseResult<ExchangeSetResponse>> CreateExchangeSetByProductVersions(ProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken);
     }

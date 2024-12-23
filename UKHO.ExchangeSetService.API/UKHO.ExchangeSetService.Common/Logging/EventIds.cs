@@ -852,9 +852,27 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
-        ErrorInDownloadReadMeFile = 805211
-
-
+        ErrorInDownloadReadMeFile = 805211,
+        /// <summary>
+        /// 805212 - Request for s100 for exchange set service product versions endpoint is started.
+        /// </summary>
+        PostProductVersionsRequestStart = 805212,
+        /// <summary>
+        /// 805213 - Request for s100 for exchange set service product versions endpoint is completed.
+        /// </summary>
+        PostProductVersionsRequestCompleted = 805213,
+        /// <summary>
+        /// 805214 - Exchange set creation for s100 for exchange set service product versions started.
+        /// </summary>
+        CreateExchangeSetByProductVersionsStart = 805214,
+        /// <summary>
+        /// 805215 - Exchange set creation for s100 for exchange set service product versions completed.
+        /// </summary>
+        CreateExchangeSetByProductVersionsCompleted = 805215,
+        /// <summary>
+        /// 805216 - Exchange set creation for s100 for exchange set service product versions failed.
+        /// </summary>
+        CreateExchangeSetByProductVersionsException = 805216
     }
 
     public static class EventIdExtensions
