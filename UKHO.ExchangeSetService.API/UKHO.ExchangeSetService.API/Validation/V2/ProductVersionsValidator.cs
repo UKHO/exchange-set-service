@@ -17,16 +17,9 @@ namespace UKHO.ExchangeSetService.API.Validation.V2
         public ProductVersionsValidator()
         {
             RuleFor(x => x.CallbackUri)
-                .NotEmpty().WithMessage("callbackUri cannot be null or empty.")
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .DependentRules(() =>
-                 {
-                     RuleFor(x => x.CallbackUri)
-                        .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
-                        .WithMessage("Invalid callbackUri format.")
-                        .WithErrorCode(HttpStatusCode.BadRequest.ToString());
-                 });
-
+               .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
+               .WithMessage("Invalid callbackUri format.")
+               .WithErrorCode(HttpStatusCode.BadRequest.ToString());
 
             RuleFor(v => v.ProductVersions).NotEmpty().NotNull()
                 .Must(productVersions => productVersions != null && productVersions.Any())

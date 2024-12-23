@@ -31,12 +31,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
             _exchangeSetService = exchangeSetService ?? throw new ArgumentNullException(nameof(exchangeSetService));
         }
 
-        [HttpPost]
-        [Route("{exchangeSetStandard}/productVersions")]
+        [HttpPost("{exchangeSetStandard}/productVersions")]
         public Task<IActionResult> PostProductVersions([FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri, string exchangeSetStandard)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
-                "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
+                "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
                     var productVersionsRequest = new ProductVersionsRequest
