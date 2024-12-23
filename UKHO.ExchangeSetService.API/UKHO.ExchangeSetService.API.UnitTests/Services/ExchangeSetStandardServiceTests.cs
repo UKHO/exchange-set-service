@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidSinceDateTimeRequested_ThenCreateUpdatesSince_Returns202Accepted()
+        public async Task WhenValidSinceDateTimeRequested_ThenCreateUpdatesSinceReturns202Accepted()
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
 
@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenInValidSinceDateTimeRequested_ThenCreateUpdatesSince_ReturnsBadRequest()
+        public async Task WhenInValidSinceDateTimeRequested_ThenCreateUpdatesSinceReturnsBadRequest()
         {
             var validationFailureMessage = "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').";
 

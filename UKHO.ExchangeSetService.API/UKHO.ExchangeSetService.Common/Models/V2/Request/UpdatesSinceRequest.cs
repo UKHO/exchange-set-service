@@ -12,6 +12,6 @@ namespace UKHO.ExchangeSetService.Common.Models.V2.Request
         [JsonProperty("sinceDateTime")]
         public string SinceDateTime { get; set; }
         public string CallbackUri { get; set; }
-        public string ProductIdentifier { get; set; } = null;
+        public string ProductIdentifier { get; set; }
     }
 }

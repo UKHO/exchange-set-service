@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenSinceDateTimeIsValid_ThenValidator_ReturnsTrue()
+        public async Task WhenSinceDateTimeIsValid_ThenValidatorReturnsTrue()
         {
             var request = new UpdatesSinceRequest
             {
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenSinceDateTimeIsInValid_ThenValidator_ReturnsFalse()
+        public async Task WhenSinceDateTimeIsInValid_ThenValidatorReturnsFalse()
         {
             var request = new UpdatesSinceRequest
             {
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenSinceDateTimeIsInFuture_ThenValidator_ReturnsFalse()
+        public async Task WhenSinceDateTimeIsInFuture_ThenValidatorReturnsFalse()
         {
             var request = new UpdatesSinceRequest
             {
@@ -73,7 +73,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenSinceDateTimeIsOlderThanMaximumDays_ThenValidator_ReturnsFalse()
+        public async Task WhenSinceDateTimeIsOlderThanMaximumDays_ThenValidatorReturnsFalse()
         {
             var request = new UpdatesSinceRequest
             {
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenCallbackUriIsValid_ThenValidator_ReturnsTrue()
+        public async Task WhenCallbackUriIsValid_ThenValidatorReturnsTrue()
         {
             var request = new UpdatesSinceRequest
             {
@@ -101,7 +101,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenCallbackUriIsInvalid_ThenValidator_ReturnsFalse()
+        public async Task WhenCallbackUriIsInvalid_ThenValidatorReturnsFalse()
         {
             var request = new UpdatesSinceRequest
             {
@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenProductIdentifierIsValid_ThenValidator_ReturnsTrue()
+        public async Task WhenProductIdentifierIsValid_ThenValidatorReturnsTrue()
         {
             var request = new UpdatesSinceRequest
             {
@@ -130,7 +130,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public async Task WhenProductIdentifierIsInvalid_ThenValidator_ReturnsFalse()
+        public async Task WhenProductIdentifierIsInvalid_ThenValidatorReturnsFalse()
         {
             var request = new UpdatesSinceRequest
             {

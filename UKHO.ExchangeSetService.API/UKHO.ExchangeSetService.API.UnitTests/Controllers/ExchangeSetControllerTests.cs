@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenValidSinceDateTimeRequested_ThenPostUpdatesSince_Returns202Accepted()
+        public async Task WhenValidSinceDateTimeRequested_ThenPostUpdatesSinceReturns202Accepted()
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture) };
 
@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenValidSinceDateTimeAndEmptyProductIdentifierRequested_ThenPostUpdatesSince_Returns202Accepted()
+        public async Task WhenValidSinceDateTimeAndEmptyProductIdentifierRequested_ThenPostUpdatesSinceReturns202Accepted()
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture) };
 
@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenInValidSinceDateTimeRequested_ThenPostUpdatesSince_ReturnsBadRequest()
+        public async Task WhenInValidSinceDateTimeRequested_ThenPostUpdatesSinceReturnsBadRequest()
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = "" };
 
@@ -159,7 +159,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new RequestedProductsNotInExchangeSet()
                 {
                     ProductName = "GB123456",
-                    Reason = "productWithdrawn"
+                    Reason = "invalidProduct"
                 },
                 new RequestedProductsNotInExchangeSet()
                 {
