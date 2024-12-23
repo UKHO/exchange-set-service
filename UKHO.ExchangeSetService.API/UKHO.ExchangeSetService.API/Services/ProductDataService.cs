@@ -83,7 +83,7 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => (long)p.FileSize) ?? 0;
 
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productIdentifierRequest.ExchangeSetStandard);
@@ -127,7 +127,11 @@ namespace UKHO.ExchangeSetService.API.Services
                 {
                     CheckEmptyExchangeSet(exchangeSetServiceResponse);
                 }
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.ExchangeSetStandard, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.ExchangeSetStandard, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                if (!successful)
+                {
+                    logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductIdentifiers failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", exchangeSetServiceResponse.BatchId, productIdentifierRequest.CorrelationId);
+                }
             }
             return response;
         }
@@ -202,7 +206,8 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => (long)p.FileSize) ?? 0;
+
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, request.ExchangeSetStandard);
                 if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
@@ -267,7 +272,12 @@ namespace UKHO.ExchangeSetService.API.Services
                     CheckEmptyExchangeSet(exchangeSetServiceResponse);
                 }
 
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.ExchangeSetStandard, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.ExchangeSetStandard, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                if (!successful)
+                {
+                    logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductVersions failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}",  exchangeSetServiceResponse.BatchId, request.CorrelationId);
+                }
+                
             }
 
             return response;
@@ -285,7 +295,8 @@ namespace UKHO.ExchangeSetService.API.Services
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
-                fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
+                fileSize = salesCatalogueResponse.ResponseBody.Products?.Sum(p => (long)p.FileSize) ?? 0;
+
                 //check if exchangeSetStandard is S57                
                 var checkS57File = CheckIfS57ExchangeSetTooLarge(fileSize, productDataSinceDateTimeRequest.ExchangeSetStandard);
                 if (checkS57File.HttpStatusCode != HttpStatusCode.OK)
@@ -325,7 +336,11 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.ExchangeSetStandard, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.ExchangeSetStandard, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                if (!successful)
+                {
+                    logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataSinceDateTime failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CorrelationId);
+                }
             }
 
             return response;
