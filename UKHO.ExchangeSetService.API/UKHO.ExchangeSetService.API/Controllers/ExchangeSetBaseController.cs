@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using UKHO.ExchangeSetService.Common.Extensions;
+using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
@@ -43,6 +46,24 @@ namespace UKHO.ExchangeSetService.API.Controllers
         protected CancellationToken GetRequestCancellationToken()
         {
             return _httpContextAccessor.HttpContext.RequestAborted;
+        }
+
+        protected IActionResult BadRequestErrorResponse()
+        {
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = GetCorrelationId(),
+                Errors =
+                [
+                    new Error
+                        {
+                            Source = "requestBody",
+                            Description = "Either body is null or malformed."
+                        }
+                ]
+            };
+
+            return ServiceResponseResult<IActionResult>.BadRequest(errorDescription).ToActionResult(_httpContextAccessor);
         }
     }
 }

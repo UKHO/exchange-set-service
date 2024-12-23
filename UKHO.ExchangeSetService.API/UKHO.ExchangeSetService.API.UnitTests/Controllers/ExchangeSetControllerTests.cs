@@ -111,14 +111,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenInValidSinceDateTimeRequested_ThenPostUpdatesSinceReturnsBadRequest()
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("  ")]
+        public async Task WhenInValidRequested_ThenPostUpdatesSinceReturnsBadRequest(string inValidData)
         {
-            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = "" };
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = inValidData };
 
             A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = new List<Error> { new() { Source = "SinceDateTime", Description = "Provided sinceDateTime is either invalid or invalid format" } } }));
+                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = [new() { Source = "SinceDateTime", Description = "Provided sinceDateTime is either invalid or invalid format" }] }));
 
-            var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "s101", "http://callback.uri");
+            var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, inValidData, inValidData);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 
@@ -154,8 +157,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetFileUri = linkSetFileUri
             };
 
-            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new()
-            {
+            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet =
+            [
                 new RequestedProductsNotInExchangeSet()
                 {
                     ProductName = "GB123456",
@@ -166,7 +169,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                     ProductName = "GB123789",
                     Reason = "invalidProduct"
                 }
-            };
+            ];
 
             ExchangeSetStandardResponse exchangeSetStandardResponse = new()
             {

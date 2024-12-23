@@ -31,7 +31,6 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
-using Elastic.Apm.AspNetCore;
 using UKHO.ExchangeSetService.API.Validation.V2;
 
 namespace UKHO.ExchangeSetService.API

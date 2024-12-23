@@ -38,6 +38,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
                 async () =>
                 {
+                    if (updatesSinceRequest == null)
+                    {
+                        return BadRequestErrorResponse();
+                    }
+
                     updatesSinceRequest.ProductIdentifier = productIdentifier;
                     updatesSinceRequest.CallbackUri = callbackUri;
 
