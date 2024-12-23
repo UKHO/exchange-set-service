@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             }
 
-            return ServiceResponseResult<ExchangeSetResponse>.Success(new ExchangeSetResponse()); // This is a placeholder, the actual implementation is not provided
+            return ServiceResponseResult<ExchangeSetResponse>.Success(null); // This is a placeholder, the actual implementation is not provided
         }
 
         private string[] SanitizeProductNames(string[] productNames)
