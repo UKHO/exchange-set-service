@@ -149,9 +149,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                     CorrelationId = Guid.NewGuid().ToString(),
                     Errors = [new() { Source = "SinceDateTime", Description = "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z')." },
                                   new() { Source = "ProductIdentifier", Description = "ProductIdentifier must be valid value" },
-                                  new() { Source = "CallbackUri", Description = "Invalid callbackUri format." }],
-
-
+                                  new() { Source = "CallbackUri", Description = "Invalid callbackUri format." }]
                 }));
 
             var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, inValidProductIdentifier, inValidCallBackUri);

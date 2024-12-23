@@ -84,7 +84,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await _service.CreateUpdatesSince(null, "s101", "https://callback.uri", _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            result.ErrorDescription.Should().NotBeNull();
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Either body is null or malformed.");
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
@@ -104,33 +103,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [TestCase("S101", "http:callback.uri")]
         public async Task WhenInValidDataRequested_ThenCreateUpdatesSinceReturnsBadRequest(string inValidProductIdentifier, string inValidCallBackUri)
         {
-            var validationFailureMessage = "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').";
-
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString() };
 
-            var validationMessage = new ValidationFailure("SinceDateTime", validationFailureMessage)
-            {
-                ErrorCode = HttpStatusCode.BadRequest.ToString()
-            };
-
-            var inValidProductIdentifierValidationMessage = new ValidationFailure("ProductIdentifier", "ProductIdentifier must be valid value")
-            {
-                ErrorCode = HttpStatusCode.BadRequest.ToString()
-            };
-
-            var inValidCallBackUriValidationMessage = new ValidationFailure("CallbackUri", "Invalid callbackUri format.")
-            {
-                ErrorCode = HttpStatusCode.BadRequest.ToString()
-            };
-
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
-                .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage, inValidProductIdentifierValidationMessage, inValidCallBackUriValidationMessage }));
+                .Returns(GetValidationResult());
 
             var result = await _service.CreateUpdatesSince(updatesSinceRequest, inValidProductIdentifier, inValidCallBackUri, _fakeCorrelationId, CancellationToken.None);
 
-            result.ErrorDescription.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == validationFailureMessage);
+            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').");
+            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "ProductIdentifier must be valid value");
+            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Invalid callbackUri format.");
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -146,6 +129,33 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceCompleted.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since completed | X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
+        }
+
+        private ValidationResult GetValidationResult()
+        {
+            return new ValidationResult(
+
+                new List<ValidationFailure>
+                {
+                    new()
+                    {
+                        ErrorCode = HttpStatusCode.BadRequest.ToString(),
+                        PropertyName = "SinceDateTime",
+                        ErrorMessage = "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').",
+                    },
+                    new()
+                    {
+                        ErrorCode = HttpStatusCode.BadRequest.ToString(),
+                        PropertyName = "ProductIdentifier",
+                        ErrorMessage = "ProductIdentifier must be valid value",
+                    },
+                    new()
+                    {
+                        ErrorCode = HttpStatusCode.BadRequest.ToString(),
+                        PropertyName = "CallbackUri",
+                        ErrorMessage = "Invalid callbackUri format.",
+                    }
+                });
         }
     }
 }
