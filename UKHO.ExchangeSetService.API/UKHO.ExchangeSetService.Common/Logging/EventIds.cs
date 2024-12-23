@@ -861,23 +861,23 @@ namespace UKHO.ExchangeSetService.Common.Logging
         #region V2
 
         /// <summary>
-        /// 805212 - Request for updates since started.
+        /// 805212 - Request for updatesSince endpoint started.
         /// </summary>
         PostUpdatesSinceRequestStarted = 805212,
         /// <summary>
-        /// 805213 - Request for updates since completed.
+        /// 805213 - Request for updatesSince endpoint completed.
         /// </summary>
         PostUpdatesSinceRequestCompleted = 805213,
         /// <summary>
-        /// 805214 - Creation of update since is started.
+        /// 805214 - Creation of updatesSince is started.
         /// </summary>
         CreateUpdatesSinceStarted = 805214,
         /// <summary>
-        /// 805215 - Creation of update since is completed.
+        /// 805215 - Creation of updatesSince is completed.
         /// </summary>
         CreateUpdatesSinceCompleted = 805215,
         /// <summary>
-        /// 805216 - Exception occurred for update since.
+        /// 805216 - Exception occurred for updatesSince.
         /// </summary>
         CreateUpdatesSinceException = 805216,
 

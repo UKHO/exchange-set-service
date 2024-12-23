@@ -26,26 +26,15 @@ namespace UKHO.ExchangeSetService.API.Services
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string CorrelationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Creation of update since started | X-Correlation-ID : {CorrelationId}", CorrelationId);
+            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Creation of update since started | X-Correlation-ID : {correlationId}", correlationId);
 
             if (updatesSinceRequest == null)
             {
-                var errorDescription = new ErrorDescription
-                {
-                    CorrelationId = CorrelationId,
-                    Errors =
-                    [
-                        new Error
-                        {
-                            Source = "requestBody",
-                            Description = "Either body is null or malformed."
-                        }
-                    ]
-                };
+                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
 
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
+                return BadRequestErrorResponse(correlationId);
             }
 
             updatesSinceRequest.ProductIdentifier = productIdentifier;
@@ -55,9 +44,9 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
             {
-                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {CorrelationId}", CorrelationId);
+                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
 
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = CorrelationId, Errors = errors });
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
             }
 
             // This is a placeholder, the actual implementation is not provided
@@ -71,9 +60,26 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             };
 
-            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Creation of update since completed | X-Correlation-ID : {CorrelationId}", CorrelationId);
+            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Creation of update since completed | X-Correlation-ID : {correlationId}", correlationId);
 
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
+        }
+
+        protected ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)
+        {
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = correlationId,
+                Errors =
+                [
+                    new Error
+                    {
+                        Source = "requestBody",
+                        Description = "Either body is null or malformed."
+                    }
+                ]
+            };
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
         }
     }
 }
