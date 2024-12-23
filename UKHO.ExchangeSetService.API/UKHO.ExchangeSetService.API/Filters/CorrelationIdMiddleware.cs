@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -19,10 +20,10 @@ namespace UKHO.ExchangeSetService.API.Filters
                 if (string.IsNullOrEmpty(correlationId))
                 {
                     correlationId = Guid.NewGuid().ToString();
-                    context.Request.Headers.Add(XCorrelationIdHeaderKey, correlationId);
+                    context.Request.Headers.Append(XCorrelationIdHeaderKey,correlationId);
                 }
 
-                context.Response.Headers.Add(XCorrelationIdHeaderKey, correlationId);
+                context.Response.Headers.Append(XCorrelationIdHeaderKey, correlationId);
 
                 await func();
             });

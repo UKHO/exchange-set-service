@@ -9,13 +9,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Logging
         [Test]
         public void WhenExtensionSetEventId_ThenValidateItIsEqualToActualValue()
         {
-            Assert.AreEqual((int)EventIds.SalesCatalogueServiceNonOkResponse, EventIds.SalesCatalogueServiceNonOkResponse.ToEventId().Id);
+            Assert.That((int)EventIds.SalesCatalogueServiceNonOkResponse, Is.EqualTo(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId().Id));
         }
 
         [Test]
         public void WhenExtensionSetEventName_ThenValidateItIsSameAsToString()
         {
-            Assert.AreEqual(EventIds.SCSPostProductVersionsRequestCompleted.ToEventId().Name, EventIds.SCSPostProductVersionsRequestCompleted.ToString());
+            Assert.That(EventIds.SCSPostProductVersionsRequestCompleted.ToEventId().Name, Is.EqualTo(EventIds.SCSPostProductVersionsRequestCompleted.ToString()));
         }
     }
 }

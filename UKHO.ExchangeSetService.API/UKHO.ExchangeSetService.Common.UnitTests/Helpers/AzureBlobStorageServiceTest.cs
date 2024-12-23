@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -104,6 +108,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         [TestCase(ExchangeSetStandard.s57)]
         public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(ExchangeSetStandard exchangeSetStandard)
         {
+            BlobClient fakeBlobClient = A.Fake<BlobClient>();
+
             string batchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
             string containerName = "testContainer";
             string callBackUri = "https://essTest/myCallback?secret=test&po=1234";
@@ -120,12 +126,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlob(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(fakeBlobClient);
 
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
+
+            A.CallTo(() => fakeBlobClient.Uri).Returns(new Uri("http://tempuri.org/blob"));
+
+            A.CallTo(() => fakeBlobClient.UploadAsync(A<MemoryStream>.Ignored)).Returns(Task.FromResult(A.Dummy<Response<BlobContentInfo>>()));
+
             var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard.ToString(), correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
 
-            Assert.IsTrue(response);
+            Assert.That(response, Is.True);
         }
 
         #endregion StoreSaleCatalogueServiceResponseAsync
@@ -137,11 +148,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             string scsResponseUri = "https://essTest/myCallback?secret=test&po=1234";
             string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-            A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null))
-              .Throws(new KeyNotFoundException("Storage account accesskey not found"));
+            A.CallTo(() => fakeScsStorageService.GetStorageSharedKeyCredentials())
+              .Throws(new KeyNotFoundException("Storage account credentials missing from config"));
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
-                   .And.Message.EqualTo("Storage account accesskey not found")
+                   .And.Message.EqualTo("Storage account credentials missing from config")
                     , async delegate { await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null); });
         }
 
@@ -154,16 +165,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString("StorageAccountName", "StorageAccountKey")).Returns(storageAccountConnectionString);
 
-            A.CallTo(() => fakeAzureBlobStorageClient.GetCloudBlockBlobByUri(A<string>.Ignored, A<string>.Ignored)).Returns(new CloudBlockBlob(new System.Uri("http://tempuri.org/blob")));
+            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClientByUri(A<string>.Ignored, A<StorageSharedKeyCredential>.Ignored)).Returns(new BlobClient(new System.Uri("http://tempuri.org/blob")));
 
-            A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<CloudBlockBlob>.Ignored)).Returns("{\"Products\":[{\"productName\":\"DE5NOBRK\",\"editionNumber\":1,\"updateNumbers\":[0,1],\"fileSize\":200}],\"ProductCounts\":{\"RequestedProductCount\":1,\"ReturnedProductCount\":1,\"RequestedProductsAlreadyUpToDateCount\":0,\"RequestedProductsNotReturned\":[]}}");
+            A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<BlobClient>.Ignored)).Returns("{\"Products\":[{\"productName\":\"DE5NOBRK\",\"editionNumber\":1,\"updateNumbers\":[0,1],\"fileSize\":200}],\"ProductCounts\":{\"RequestedProductCount\":1,\"ReturnedProductCount\":1,\"RequestedProductsAlreadyUpToDateCount\":0,\"RequestedProductsNotReturned\":[]}}");
+
             A.CallTo(() => fakeSmallExchangeSetInstance.GetInstanceNumber(1)).Returns(3);
             var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null);
 
-            Assert.IsInstanceOf<SalesCatalogueProductResponse>(response);
-            Assert.AreEqual("DE5NOBRK", response.Products[0].ProductName);
-            Assert.AreEqual(1, response.Products[0].EditionNumber);
-            Assert.AreEqual(0, response.Products[0].UpdateNumbers[0].Value);
+            Assert.That(response, Is.InstanceOf<SalesCatalogueProductResponse>());
+            Assert.That(response.Products[0].ProductName,Is.EqualTo("DE5NOBRK"));
+            Assert.That(response.Products[0].EditionNumber, Is.EqualTo(1));
+            Assert.That(response.Products[0].UpdateNumbers[0].Value, Is.EqualTo(0));
         }
 
         #endregion DownloadSalesCatalogueResponse
