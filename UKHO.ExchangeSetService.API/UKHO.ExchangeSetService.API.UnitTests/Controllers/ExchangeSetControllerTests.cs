@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var correlationId = "correlationId";
 
             A.CallTo(() => _fakeExchangeSetService.CreateProductDataByProductNames(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .Returns(ServiceResponseResult<ExchangeSetResponse>.Success(new ExchangeSetResponse()));
+                .Returns(ServiceResponseResult<ExchangeSetResponse>.Accepted(new ExchangeSetResponse()));
             A.CallTo(() => _fakeHttpContextAccessor.HttpContext.TraceIdentifier).Returns(correlationId);
 
             var response = await _controller.PostProductNames(exchangeSetStandard, productNames, callbackUri);

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation.V2;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
@@ -17,6 +20,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
     {
         private IProductDataService _fakeProductDataService;
         private IProductNameValidator _fakeProductNameValidator;
+        private ILogger<API.Services.ExchangeSetService> _fakeLogger;
         private API.Services.ExchangeSetService _exchangeSetService;
 
         [SetUp]
@@ -24,17 +28,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             _fakeProductDataService = A.Fake<IProductDataService>();
             _fakeProductNameValidator = A.Fake<IProductNameValidator>();
-            _exchangeSetService = new API.Services.ExchangeSetService(_fakeProductDataService, _fakeProductNameValidator);
+            _fakeLogger = A.Fake<ILogger<API.Services.ExchangeSetService>>();
+            _exchangeSetService = new API.Services.ExchangeSetService(_fakeProductDataService, _fakeProductNameValidator, _fakeLogger);
         }
 
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullProductDataService = () => new API.Services.ExchangeSetService(null, _fakeProductNameValidator);
+            Action nullProductDataService = () => new API.Services.ExchangeSetService(null, _fakeProductNameValidator, _fakeLogger);
             nullProductDataService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productDataService");
 
-            Action nullProductNameValidator = () => new API.Services.ExchangeSetService(_fakeProductDataService, null);
+            Action nullProductNameValidator = () => new API.Services.ExchangeSetService(_fakeProductDataService, null, _fakeLogger);
             nullProductNameValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productNameValidator");
+
+            Action nullLogger = () => new API.Services.ExchangeSetService(_fakeProductDataService, _fakeProductNameValidator,null);
+            nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
         [Test]
@@ -49,6 +57,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Either body is null or malformed.");
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+           && call.GetArgument<LogLevel>(0) == LogLevel.Information
+           && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -63,6 +81,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Either body is null or malformed.");
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+           && call.GetArgument<LogLevel>(0) == LogLevel.Information
+           && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -87,6 +115,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Invalid product identifier");
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+           && call.GetArgument<LogLevel>(0) == LogLevel.Information
+           && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.InvalidProductNames.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product name validation failed. | X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -104,6 +142,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+         && call.GetArgument<LogLevel>(0) == LogLevel.Information
+         && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
+         && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+         && call.GetArgument<LogLevel>(0) == LogLevel.Information
+         && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesCompleted.ToEventId()
+         && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data completed | X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
     }
 }

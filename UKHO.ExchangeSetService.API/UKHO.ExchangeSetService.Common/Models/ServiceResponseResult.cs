@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.Common.Models
             ErrorDescription = errorDescription;
         }
 
-        public static ServiceResponseResult<T> Success(T value) => new(value, HttpStatusCode.Accepted);
+        public static ServiceResponseResult<T> Success(T value) => new(value, HttpStatusCode.OK);
 
         public static ServiceResponseResult<T> Accepted(T value) => new(value, HttpStatusCode.Accepted);
 

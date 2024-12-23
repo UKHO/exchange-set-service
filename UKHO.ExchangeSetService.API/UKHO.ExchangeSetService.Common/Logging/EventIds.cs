@@ -864,7 +864,23 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805213 - Request for exchange set service product names endpoint is completed.
         /// </summary>
-        ESSPostProductNamesRequestCompleted = 805213
+        ESSPostProductNamesRequestCompleted = 805213,
+        /// <summary>
+        /// 805214 - Request for exchange set service call started.
+        /// </summary>
+        CreateProductDataByProductNamesStarted = 805214,
+        /// <summary>
+        /// 805215 - Request for exchange set service call completed.
+        /// </summary>
+        CreateProductDataByProductNamesCompleted = 805215,
+        /// <summary>
+        /// 805216 - Empty body error.
+        /// </summary>
+        EmptyBodyError = 805216,
+        /// <summary>
+        /// 805217 - Invalid Product names.
+        /// </summary>
+        InvalidProductNames = 805217
 
     }
 
