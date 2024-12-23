@@ -60,18 +60,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return (bytes / byteSize) / byteSize;
         }
 
-        public static long GetFileSize(SalesCatalogueProductResponse salesCatalogueResponse)
-        {
-            long fileSize = 0;
-            if (salesCatalogueResponse != null && salesCatalogueResponse.ProductCounts.ReturnedProductCount > 0)
-            {
-                foreach (var item in salesCatalogueResponse.Products)
-                {
-                    fileSize += item.FileSize.Value;
-                }
-            }
-            return fileSize;
-        }
 
         public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ILogger logger, string requestType, EventIds eventId, int retryCount, double sleepDuration)
         {

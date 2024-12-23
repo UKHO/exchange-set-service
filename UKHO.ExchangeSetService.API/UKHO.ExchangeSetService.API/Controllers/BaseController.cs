@@ -112,14 +112,14 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
             if (model.LastModified != null)
-                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+                httpContextAccessor.HttpContext.Response.Headers.Append(LastModifiedDateHeaderKey, model.LastModified);
             return new StatusCodeResult(StatusCodes.Status304NotModified);
         }
 
         private IActionResult BuildOkResponse(ExchangeSetServiceResponse model)
         {
             if (model.LastModified != null)
-                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified);
+                httpContextAccessor.HttpContext.Response.Headers.Append(LastModifiedDateHeaderKey, model.LastModified);
             return Ok(model.ExchangeSetResponse);
         }
 
@@ -161,7 +161,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         private IActionResult BuildOkScsResponse(SalesCatalogueResponse model)
         {
             if (model.LastModified != null)
-                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified.ToString());
+                httpContextAccessor.HttpContext.Response.Headers.Append(LastModifiedDateHeaderKey, model.LastModified.ToString());
             return Ok(model.ResponseBody);
         }
 
@@ -169,7 +169,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             LogInfo(EventIds.NotModified.ToEventId(), "NotModified", GetCurrentCorrelationId());
             if (model.LastModified != null)
-                httpContextAccessor.HttpContext.Response.Headers.Add(LastModifiedDateHeaderKey, model.LastModified.ToString());
+                httpContextAccessor.HttpContext.Response.Headers.Append(LastModifiedDateHeaderKey, model.LastModified.ToString());
             return new StatusCodeResult(StatusCodes.Status304NotModified);
         }
     }
