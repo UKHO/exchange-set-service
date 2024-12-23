@@ -28,6 +28,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
+        public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
+        {
+            Action nullProductDataService = () => new API.Services.ExchangeSetService(null, _fakeProductNameValidator);
+            nullProductDataService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productDataService");
+
+            Action nullProductNameValidator = () => new API.Services.ExchangeSetService(_fakeProductDataService, null);
+            nullProductNameValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productNameValidator");
+        }
+
+        [Test]
         public async Task WhenProductNamesAreNull_ThenShouldReturnBadRequest()
         {
             string[] productNames = null;

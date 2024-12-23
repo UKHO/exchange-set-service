@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             var productNamesRequest = new ProductNameRequest()
             {
-                ProductIdentifier = productNames,
+                ProductNames = productNames,
                 CallbackUri = callbackUri,
                 CorrelationId = correlationId
             };

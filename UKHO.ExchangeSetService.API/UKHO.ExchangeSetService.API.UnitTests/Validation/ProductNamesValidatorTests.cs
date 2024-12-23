@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             string callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
-                ProductIdentifier = productIdentifiers,
+                ProductNames = productIdentifiers,
                 CallbackUri = callbackUri
             };
             var result = _validator.TestValidate(model);
@@ -47,11 +47,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             string callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
-                ProductIdentifier = productIdentifiers,
+                ProductNames = productIdentifiers,
                 CallbackUri = callbackUri
             };
             var result = _validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductNames);
             Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
@@ -62,11 +62,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             string callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
-                ProductIdentifier = productIdentifiers,
+                ProductNames = productIdentifiers,
                 CallbackUri = callbackUri
             };
             var result = _validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductNames);
             Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
@@ -77,37 +77,37 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
             string callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
-                ProductIdentifier = productIdentifiers,
+                ProductNames = productIdentifiers,
                 CallbackUri = callbackUri
             };
             var result = _validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductNames);
             Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
-        public void WhenZeroProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        public void WhenZeroProductNamesInProductNamesRequest_ThenReturnBadRequest()
         {
-            string[] productIdentifiers = null;
+            string[] productNames = null;
             string callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
-                ProductIdentifier = productIdentifiers,
+                ProductNames = productNames,
                 CallbackUri = callbackUri
             };
             var result = _validator.TestValidate(model);
-            result.ShouldHaveValidationErrorFor(fb => fb.ProductIdentifier);
+            result.ShouldHaveValidationErrorFor(fb => fb.ProductNames);
             Assert.That(result.Errors.Any(x => x.ErrorMessage == "productIdentifiers cannot be null or empty."));
         }
 
         [Test]
-        public void WhenValidProductIdentifiersAndvalidCallBackuriInProductIdentifiersRequest_ThenReturnSuccess()
+        public void WhenValidProductNamesAndvalidCallBackuriInProductNamesRequest_ThenReturnSuccess()
         {
             string[] productIdentifiers = { "GB123456", "GB160060", "AU334550" };
             string callbackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             var model = new ProductNameRequest
             {
-                ProductIdentifier = productIdentifiers,
+                ProductNames = productIdentifiers,
                 CallbackUri = callbackUri
             };
             var result = _validator.TestValidate(model);
