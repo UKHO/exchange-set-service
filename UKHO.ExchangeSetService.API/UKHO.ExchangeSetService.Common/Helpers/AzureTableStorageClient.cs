@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
@@ -10,8 +11,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         public async Task<TElement> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement :class,ITableEntity
         {
             var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
-            var operation = await tableClient.GetEntityAsync<TElement>(partitionKey, rowKey);
-            return operation.Value;
+
+            try
+            {
+                var operation = await tableClient.GetEntityAsync<TElement>(partitionKey, rowKey);
+                return operation.Value;
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                // Entity not found
+                return null;
+            }
         }
 
         public async Task<ITableEntity> InsertOrMergeIntoTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString)
