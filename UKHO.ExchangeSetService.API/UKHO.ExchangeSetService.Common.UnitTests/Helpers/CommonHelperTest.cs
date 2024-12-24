@@ -3,12 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Helpers;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -27,40 +25,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeLogger = A.Fake<ILogger<FileShareService>>();
         }
 
-        #region SalesCatalogueResponse
-        private SalesCatalogueResponse GetSalesCatalogueFileSizeResponse()
-        {
-            return new SalesCatalogueResponse
-            {
-                ResponseCode = HttpStatusCode.OK,
-                ResponseBody = new SalesCatalogueProductResponse
-                {
-                    ProductCounts = new ProductCounts
-                    {
-                        RequestedProductCount = 6,
-                        RequestedProductsAlreadyUpToDateCount = 8,
-                        ReturnedProductCount = 2,
-                        RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
-                                new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
-                                new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
-                            }
-                    },
-                    Products = new List<Products> {
-                            new Products {
-                                ProductName = "productName",
-                                EditionNumber = 2,
-                                UpdateNumbers = new List<int?> { 3, 4 },
-                                Cancellation = new Cancellation {
-                                    EditionNumber = 4,
-                                    UpdateNumber = 6
-                                },
-                                FileSize = 500
-                            }
-                        }
-                }
-            };
-        }
-        #endregion SalesCatalogueResponse
+        
         [Test]
         public void CheckMethodReturns_CorrectWeekNumer()
         {
@@ -68,24 +33,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var week26 = CommonHelper.GetCurrentWeekNumber(Convert.ToDateTime("2021/07/01"));
             var week53 = CommonHelper.GetCurrentWeekNumber(Convert.ToDateTime("2021/01/01"));
 
-            Assert.AreEqual(1, week1);
-            Assert.AreEqual(26, week26);
-            Assert.AreEqual(53, week53);
+            Assert.That(1, Is.EqualTo(week1));
+            Assert.That(26, Is.EqualTo(week26));
+            Assert.That(53, Is.EqualTo(week53));
         }
         [Test]
         public void CheckConversionOfBytesToMegabytes()
         {
             var fileSize = CommonHelper.ConvertBytesToMegabytes((long)4194304);
-            Assert.AreEqual(4, fileSize);
+            Assert.That(4, Is.EqualTo(fileSize));
         }
 
-        [Test]
-        public void CheckGetFileSize()
-        {
-            SalesCatalogueResponse salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
-            long fileSize = CommonHelper.GetFileSize(salesCatalogueResponse.ResponseBody);
-            Assert.AreEqual(500, fileSize);
-        }
 
         [Test]
         public async Task WhenTooManyRequests_GetRetryPolicy()
@@ -109,8 +67,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.False(_isRetryCalled);
-            Assert.AreEqual(HttpStatusCode.TooManyRequests, result.StatusCode);
+            Assert.That(_isRetryCalled, Is.False);
+            Assert.That(HttpStatusCode.TooManyRequests, Is.EqualTo(result.StatusCode));
         }
 
         [Test]
@@ -134,16 +92,23 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.False(_isRetryCalled);
-            Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
+            Assert.That(_isRetryCalled,Is.False);
+            Assert.That(HttpStatusCode.ServiceUnavailable, Is.EqualTo(result.StatusCode));
 
         }
 
         [Test]
-        public void CheckValueIsNumeric()
+        public void CheckIsNumericReturnsTrueForNumbers()
         {
             bool isNum = CommonHelper.IsNumeric(1234);
-            Assert.IsTrue(isNum);
+            Assert.That(isNum,Is.True);
+        }
+
+        [Test]
+        public void CheckIsNumericReturnsFalseForNonNumericValue()
+        {
+            bool isNum = CommonHelper.IsNumeric("1234a");
+            Assert.That(isNum, Is.False);
         }
     }
 }

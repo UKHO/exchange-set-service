@@ -26,18 +26,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             for (int i = 0; i < (smallMaxInstanceCount + 1); i++)
             {
                 response = smallExchangeSetInstance.GetInstanceNumber(smallMaxInstanceCount);
-                Assert.IsInstanceOf(typeof(int), response);
-                Assert.AreEqual(smallExchangeSetInstance.GetCurrentInstanceNumber(), response);
+                Assert.That(response, Is.InstanceOf<int>());
+                Assert.That(smallExchangeSetInstance.GetCurrentInstanceNumber(), Is.EqualTo(response));
                 if (smallExchangeSetInstance.GetCurrentInstanceNumber() != smallMaxInstanceCount)
                 {
-                    Assert.AreNotEqual(smallMaxInstanceCount, response);
+                    Assert.That(smallMaxInstanceCount, Is.Not.EqualTo(response));
                 }
                 else
                 {
-                    Assert.AreEqual(smallMaxInstanceCount, response);
+                    Assert.That(smallMaxInstanceCount, Is.EqualTo(response));
                 }
             }
-            Assert.AreEqual(1, response);
+            Assert.That(1, Is.EqualTo(response));
         }
 
         [Test]
@@ -48,18 +48,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             for (int i = 0; i < (mediumMaxInstanceCount + 1); i++)
             {
                 response = mediumExchangeSetInstance.GetInstanceNumber(mediumMaxInstanceCount);
-                Assert.IsInstanceOf(typeof(int), response);
-                Assert.AreEqual(mediumExchangeSetInstance.GetCurrentInstanceNumber(), response);
+                Assert.That(response, Is.InstanceOf<int>());
+                Assert.That(mediumExchangeSetInstance.GetCurrentInstanceNumber(), Is.EqualTo(response));
                 if (mediumExchangeSetInstance.GetCurrentInstanceNumber() != mediumMaxInstanceCount)
                 {
-                    Assert.AreNotEqual(mediumMaxInstanceCount, response);
+                    Assert.That(mediumMaxInstanceCount, Is.Not.EqualTo(response));
                 }
                 else
                 {
-                    Assert.AreEqual(mediumMaxInstanceCount, response);
+                    Assert.That(mediumMaxInstanceCount, Is.EqualTo(response));
                 }
             }
-            Assert.AreEqual(1, response);
+            Assert.That(1, Is.EqualTo(response));
         }
 
         [Test]
@@ -70,18 +70,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             for (int i = 0; i < (largeMaxInstanceCount + 1); i++)
             {
                 response = largeExchangeSetInstance.GetInstanceNumber(largeMaxInstanceCount);
-                Assert.IsInstanceOf(typeof(int), response);
-                Assert.AreEqual(largeExchangeSetInstance.GetCurrentInstanceNumber(), response);
+                Assert.That(response, Is.InstanceOf<int>());
+                Assert.That(largeExchangeSetInstance.GetCurrentInstanceNumber(), Is.EqualTo(response));
                 if (largeExchangeSetInstance.GetCurrentInstanceNumber() != largeMaxInstanceCount)
                 {
-                    Assert.AreNotEqual(largeMaxInstanceCount, response);
+                    Assert.That(largeMaxInstanceCount, Is.Not.EqualTo(response));
                 }
                 else
                 {
-                    Assert.AreEqual(largeMaxInstanceCount, response);
+                    Assert.That(largeMaxInstanceCount, Is.EqualTo(response));
                 }
             }
-            Assert.AreEqual(1, response);
+            Assert.That(1, Is.EqualTo(response));
         }
 
         [Test]
@@ -97,47 +97,47 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             for (int i = 0; i < (maxInstanceCount + 1); i++)
             {
                 response1 = largeExchangeSetInstance.GetInstanceNumber(largeMaxInstanceCount);
-                Assert.IsInstanceOf(typeof(int), response1);
-                Assert.IsNotNull(response1);
-                Assert.AreEqual(largeExchangeSetInstance.GetCurrentInstanceNumber(), response1);
+                Assert.That(response1, Is.InstanceOf<int>());
+                Assert.That(response1, Is.Not.Null);
+                Assert.That(largeExchangeSetInstance.GetCurrentInstanceNumber(), Is.EqualTo(response1));
                 if (largeExchangeSetInstance.GetCurrentInstanceNumber() != largeMaxInstanceCount)
                 {
-                    Assert.AreNotEqual(largeMaxInstanceCount, response1);
+                    Assert.That(largeMaxInstanceCount, Is.Not.EqualTo(response1));
                 }
                 else
                 {
-                    Assert.AreEqual(largeMaxInstanceCount, response1);
+                    Assert.That(largeMaxInstanceCount, Is.EqualTo(response1));
                 }
 
                 response2 = mediumExchangeSetInstance.GetInstanceNumber(mediumMaxInstanceCount);
-                Assert.IsInstanceOf(typeof(int), response2);
-                Assert.IsNotNull(response2);
-                Assert.AreEqual(mediumExchangeSetInstance.GetCurrentInstanceNumber(), response2);
+                Assert.That(response2, Is.InstanceOf<int>());
+                Assert.That(response2,Is.Not.Null);
+                Assert.That(mediumExchangeSetInstance.GetCurrentInstanceNumber(), Is.EqualTo(response2));
                 if (mediumExchangeSetInstance.GetCurrentInstanceNumber() != mediumMaxInstanceCount)
                 {
-                    Assert.AreNotEqual(mediumMaxInstanceCount, response2);
+                    Assert.That(mediumMaxInstanceCount, Is.Not.EqualTo(response2));
                 }
                 else
                 {
-                    Assert.AreEqual(mediumMaxInstanceCount, response2);
+                    Assert.That(mediumMaxInstanceCount, Is.EqualTo(response2));
                 }
 
                 response3 = smallExchangeSetInstance.GetInstanceNumber(smallMaxInstanceCount);
-                Assert.IsInstanceOf(typeof(int), response3);
-                Assert.IsNotNull(response3);
-                Assert.AreEqual(smallExchangeSetInstance.GetCurrentInstanceNumber(), response3);
+                Assert.That(response3, Is.InstanceOf<int>());
+                Assert.That(response3, Is.Not.Null);
+                Assert.That(smallExchangeSetInstance.GetCurrentInstanceNumber(), Is.EqualTo(response3));
                 if (smallExchangeSetInstance.GetCurrentInstanceNumber() != smallMaxInstanceCount)
                 {
-                    Assert.AreNotEqual(smallMaxInstanceCount, response3);
+                    Assert.That(smallMaxInstanceCount, Is.Not.EqualTo(response3));
                 }
                 else
                 {
-                    Assert.AreEqual(smallMaxInstanceCount, response3);
+                    Assert.That(smallMaxInstanceCount, Is.EqualTo(response3));
                 }
             }
-            Assert.AreEqual(3, response1);
-            Assert.AreEqual(1, response2);
-            Assert.AreEqual(4, response3);
+            Assert.That(3, Is.EqualTo(response1));
+            Assert.That(1, Is.EqualTo(response2));
+            Assert.That(4, Is.EqualTo(response3));
         }
     }
 }

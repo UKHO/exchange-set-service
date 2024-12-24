@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(string scsResponseUri, string batchId, string correlationId);
 
-        (string, string) GetStorageAccountNameAndKeyBasedOnExchangeSetType(ExchangeSetType exchangeSetType);
+        (string Name , string Key) GetStorageAccountNameAndKeyBasedOnExchangeSetType(ExchangeSetType exchangeSetType);
 
         int GetInstanceCountBasedOnExchangeSetType(ExchangeSetType exchangeSetType);
     }

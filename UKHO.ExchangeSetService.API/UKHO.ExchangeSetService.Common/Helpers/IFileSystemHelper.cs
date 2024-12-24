@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob;
+﻿using Azure.Storage.Blobs;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
@@ -21,7 +21,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         bool DownloadReadmeFile(string filePath, Stream stream, string lineToWrite);
         void CreateFileCopy(string filePath, Stream stream);
         byte[] ConvertStreamToByteArray(Stream input);
-        Task DownloadToFileAsync(CloudBlockBlob cloudBlockBlob, string path);
+        Task DownloadToFileAsync(BlobClient blobClient, string path);
         IDirectoryInfo[] GetDirectoryInfo(string path);
         string[] GetDirectories(string path);
         IDirectoryInfo GetParent(string path);
@@ -32,7 +32,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CreateFile(string filePath);
         IDirectoryInfo[] GetSubDirectories(string folderPath);
         IFileInfo[] GetZipFiles(string folderPath);
-        bool DownloadFile(string filePath, Stream stream, string lineToWrite);
-        bool DownloadIhoCrtFile(string filePath, Stream stream, string lineToWrite);
+        bool DownloadFile(string filePath, Stream stream);
     }
 }
