@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UKHO.ExchangeSetService.Common.Models;
 
@@ -14,7 +15,7 @@ namespace UKHO.ExchangeSetService.Common.Extensions
             return result.StatusCode switch
             {
                 HttpStatusCode.OK => new OkObjectResult(result.Value) { StatusCode = (int)HttpStatusCode.OK },
-                HttpStatusCode.Accepted => new ObjectResult(result.Value) { StatusCode = (int)HttpStatusCode.Accepted },
+                HttpStatusCode.Accepted => new StatusCodeResult(StatusCodes.Status202Accepted),
                 HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription.Errors),
                 HttpStatusCode.NotFound => new NotFoundObjectResult(result.ErrorDescription.Errors),
                 HttpStatusCode.NoContent => new NoContentResult(),

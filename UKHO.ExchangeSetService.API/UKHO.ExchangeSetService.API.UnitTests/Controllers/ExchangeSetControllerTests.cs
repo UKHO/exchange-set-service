@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = await _controller.PostProductVersions(productVersionRequest, "https://callback.uri", "s100");
 
-            result.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+            result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
