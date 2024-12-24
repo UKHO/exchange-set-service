@@ -1,9 +1,13 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-namespace UKHO.ExchangeSetService.API.Services
+namespace UKHO.ExchangeSetService.Common.Models.Enums
 {
-    public class ExchangeSetService : IExchangeSetService
+    public enum S100ProductType
     {
+        s101,
+        s102,
+        s104,
+        s111
     }
 }
