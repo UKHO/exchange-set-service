@@ -3,9 +3,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -13,6 +15,8 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
+    [Authorize]
+    [ServiceFilter(typeof(ExchangeSetAuthorizationFilterAttribute))]
     [Route("v2/exchangeSet")]
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
