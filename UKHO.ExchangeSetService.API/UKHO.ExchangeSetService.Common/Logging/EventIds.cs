@@ -857,26 +857,53 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
         ErrorInDownloadReadMeFile = 805211,
+
+        #region V2
+
         /// <summary>
-        /// 805212 - Request for s100 for exchange set service product versions endpoint is started.
+        /// 805212 - Request for updatesSince endpoint started.
         /// </summary>
-        PostProductVersionsRequestStart = 805212,
+        PostUpdatesSinceRequestStarted = 805212,
         /// <summary>
-        /// 805213 - Request for s100 for exchange set service product versions endpoint is completed.
+        /// 805213 - Request for updatesSince endpoint completed.
         /// </summary>
-        PostProductVersionsRequestCompleted = 805213,
+        PostUpdatesSinceRequestCompleted = 805213,
         /// <summary>
-        /// 805214 - Exchange set creation for s100 for exchange set service product versions started.
+        /// 805214 - Creation of updatesSince is started.
         /// </summary>
-        CreateExchangeSetByProductVersionsStart = 805214,
+        CreateUpdatesSinceStarted = 805214,
         /// <summary>
-        /// 805215 - Exchange set creation for s100 for exchange set service product versions completed.
+        /// 805215 - Creation of updatesSince is completed.
         /// </summary>
-        CreateExchangeSetByProductVersionsCompleted = 805215,
+        CreateUpdatesSinceCompleted = 805215,
         /// <summary>
-        /// 805216 - Exchange set creation for s100 for exchange set service product versions failed.
+        /// 805216 - Exception occurred for updatesSince.
         /// </summary>
-        CreateExchangeSetByProductVersionsException = 805216
+        CreateUpdatesSinceException = 805216,
+
+        
+
+        /// <summary>
+        /// 805217 - Request for s100 for exchange set service product versions endpoint is started.
+        /// </summary>
+        PostProductVersionsRequestStart = 805217,
+        /// <summary>
+        /// 805218 - Request for s100 for exchange set service product versions endpoint is completed.
+        /// </summary>
+        PostProductVersionsRequestCompleted = 805218,
+        /// <summary>
+        /// 805219 - Exchange set creation for s100 for exchange set service product versions started.
+        /// </summary>
+        CreateExchangeSetByProductVersionsStart = 805219,
+        /// <summary>
+        /// 805220 - Exchange set creation for s100 for exchange set service product versions completed.
+        /// </summary>
+        CreateExchangeSetByProductVersionsCompleted = 805220,
+        /// <summary>
+        /// 805221 - Exchange set creation for s100 for exchange set service product versions failed.
+        /// </summary>
+        CreateExchangeSetByProductVersionsException = 805221
+        #endregion
     }
 
     public static class EventIdExtensions

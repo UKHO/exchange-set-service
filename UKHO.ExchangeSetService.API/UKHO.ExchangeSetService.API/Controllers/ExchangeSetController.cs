@@ -18,6 +18,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
         private readonly ILogger<ExchangeSetController> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IExchangeSetStandardService _exchangeSetStandardService;
 
         public ExchangeSetController(
@@ -26,8 +27,23 @@ namespace UKHO.ExchangeSetService.API.Controllers
             IExchangeSetStandardService exchangeSetStandardService
             ) : base(httpContextAccessor)
         {
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _exchangeSetStandardService = exchangeSetStandardService ?? throw new ArgumentNullException(nameof(exchangeSetStandardService));
+        }
+
+        [HttpPost("{exchangeSetStandard}/updatesSince")]
+        public virtual Task<IActionResult> PostUpdatesSince(string exchangeSetStandard, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.PostUpdatesSinceRequestStarted, EventIds.PostUpdatesSinceRequestCompleted,
+                "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
+                async () =>
+                {
+                    var result = await _exchangeSetStandardService.CreateUpdatesSince(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+
+                    return result.ToActionResult(_httpContextAccessor);
+
+                }, GetCorrelationId(), exchangeSetStandard);
         }
 
         [HttpPost("{exchangeSetStandard}/productVersions")]
@@ -45,7 +61,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     };
 
                     var result = await _exchangeSetStandardService.CreateExchangeSetByProductVersions(productVersionsRequest, GetRequestCancellationToken());
-                    return result.ToActionResult();
+                    return result.ToActionResult(_httpContextAccessor);
 
                 }, GetCorrelationId(), exchangeSetStandard);
         }
