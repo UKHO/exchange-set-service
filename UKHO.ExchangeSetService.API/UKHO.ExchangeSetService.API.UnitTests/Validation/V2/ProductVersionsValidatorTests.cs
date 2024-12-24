@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
                 CallbackUri = callbackUri,
                 ProductVersions = new List<ProductVersionRequest>
                 {
-                    new() { ProductName = "Product1", EditionNumber = 1, UpdateNumber = 1 }
+                    new() { ProductName = "104US00_CHES_TYPE1_20210630_0600", EditionNumber = 7, UpdateNumber = 10 }
                 }
             };
             var result = _validator.TestValidate(model);
@@ -35,14 +35,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
         }
 
         [Test]
-        public void WhenCallbackUriIsValidInProductVersionRequest_ThenReturnSuccesss()
+        public void WhenCallbackUriIsValidInProductVersionRequest_ThenReturnSuccess()
         {
             var model = new ProductVersionsRequest
             {
                 CallbackUri = "https://validuri.com",
                 ProductVersions = new List<ProductVersionRequest>
                 {
-                    new () { ProductName = "Product1", EditionNumber = 1, UpdateNumber = 1 }
+                    new () { ProductName = "111US00_ches_dcf8_20190703T00Z", EditionNumber = 36, UpdateNumber = 0 }
                 }
             };
             var result = _validator.TestValidate(model);
@@ -73,7 +73,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
             {
                 ProductVersions = new List<ProductVersionRequest>
                 {
-                    new () { ProductName = "Product1", EditionNumber = 1, UpdateNumber = 1 }
+                    new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 7, UpdateNumber = 10 }
                 }
             };
             var result = _validator.TestValidate(model);
@@ -98,13 +98,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
 
         [TestCase(null)]
         [TestCase(-1)]
-        public void WhenEditionNumberIsNullOrLessThan0InProductVersionsRequest_ThenReturnsBadRequest(int? editionNmer)
+        public void WhenEditionNumberIsNullOrLessThan0InProductVersionsRequest_ThenReturnsBadRequest(int? editionNumber)
         {
             var model = new ProductVersionsRequest
             {
                 ProductVersions = new List<ProductVersionRequest>
                 {
-                    new () { ProductName = "Product1", EditionNumber = editionNmer, UpdateNumber = 1 }
+                    new () { ProductName = "101GB40079ABCDEFG", EditionNumber = editionNumber, UpdateNumber = 1 }
                 }
             };
             var result = _validator.TestValidate(model);
@@ -119,7 +119,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
             {
                 ProductVersions = new List<ProductVersionRequest>
                 {
-                    new () { ProductName = "Product1", EditionNumber = 1, UpdateNumber = updateNumber }
+                    new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = updateNumber }
                 }
             };
             var result = _validator.TestValidate(model);

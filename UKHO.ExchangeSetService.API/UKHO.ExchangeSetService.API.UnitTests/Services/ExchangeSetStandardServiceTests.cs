@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = "https://validuri.com",
                 ProductVersions = new List<ProductVersionRequest>
                 {
-                    new () { ProductName = "Product1", EditionNumber = 1, UpdateNumber = 1 }
+                    new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 7, UpdateNumber = 10 }
                 }
             };
 
