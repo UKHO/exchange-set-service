@@ -192,12 +192,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             [
                 new RequestedProductsNotInExchangeSet()
                 {
-                    ProductName = "GB123456",
+                    ProductName = "101GB40079ABCDEFG",
                     Reason = "invalidProduct"
                 },
                 new RequestedProductsNotInExchangeSet()
                 {
-                    ProductName = "GB123789",
+                    ProductName = "102NO32904820801012",
                     Reason = "invalidProduct"
                 }
             ];
