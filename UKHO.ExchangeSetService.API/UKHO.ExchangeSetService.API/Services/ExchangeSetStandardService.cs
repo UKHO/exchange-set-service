@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateProductDataByProductNames(string[] productNames, string callbackUri, string correlationId)
         {
-            _logger.LogInformation(EventIds.CreateProductDataByProductNamesStarted.ToEventId(), "Creation of Product data started | X-Correlation-ID : {correlationId}", correlationId);
+            _logger.LogInformation(EventIds.CreateProductDataByProductNamesStarted.ToEventId(), "Creation of Product data for product Names started | X-Correlation-ID : {correlationId}", correlationId);
             productNames = SanitizeProductNames(productNames);
 
             if (productNames == null || productNames.Length == 0)
@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             }
 
-            _logger.LogInformation(EventIds.CreateProductDataByProductNamesCompleted.ToEventId(), "Creation of Product data completed | X-Correlation-ID : {correlationId}", correlationId);
+            _logger.LogInformation(EventIds.CreateProductDataByProductNamesCompleted.ToEventId(), "Creation of Product data for product Names completed | X-Correlation-ID : {correlationId}", correlationId);
             return ServiceResponseResult<ExchangeSetResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 

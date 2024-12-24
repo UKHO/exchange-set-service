@@ -5,7 +5,7 @@ using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
-namespace UKHO.ExchangeSetService.API.UnitTests.Validation
+namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
 {
     public class ProductNamesValidatorTests
     {
@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenInvalidCallBackUriInProductIdentifierRequest_ThenReturnBadRequest()
+        public void WhenInvalidCallBackUriInProductNamesRequest_ThenReturnBadRequest()
         {
             var model = new ProductNameRequest { CallbackUri = "demo uri" };
             var result = _validator.TestValidate(model);
@@ -27,10 +27,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenEmptyCallBackUriInProductDataProductIdentifierRequest_ThenReturnSuccess()
+        public void WhenEmptyCallBackUriInProductDataProductNamesRequest_ThenReturnSuccess()
         {
             string[] productIdentifiers = { "101GB40079ABCDEFG", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600" };
-            string callbackUri = string.Empty;
+            var callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
                 ProductNames = productIdentifiers,
@@ -41,10 +41,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenEmptyProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        public void WhenEmptyProductNamesInProductNamesRequest_ThenReturnBadRequest()
         {
             string[] productIdentifiers = { string.Empty };
-            string callbackUri = string.Empty;
+            var callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
                 ProductNames = productIdentifiers,
@@ -56,10 +56,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenNullProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        public void WhenNullProductNamesInProductNamesRequest_ThenReturnBadRequest()
         {
             string[] productIdentifiers = { null };
-            string callbackUri = string.Empty;
+            var callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
                 ProductNames = productIdentifiers,
@@ -71,10 +71,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenZeroLengthProductIdentifiersInProductIdentifiersRequest_ThenReturnBadRequest()
+        public void WhenZeroLengthProductNamesInProductNamesRequest_ThenReturnBadRequest()
         {
-            string[] productIdentifiers = Array.Empty<string>();
-            string callbackUri = string.Empty;
+            var productIdentifiers = Array.Empty<string>();
+            var callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
                 ProductNames = productIdentifiers,
@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         public void WhenZeroProductNamesInProductNamesRequest_ThenReturnBadRequest()
         {
             string[] productNames = null;
-            string callbackUri = string.Empty;
+            var callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
                 ProductNames = productNames,
@@ -104,7 +104,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         public void WhenValidProductNamesAndvalidCallBackUriInProductNamesRequest_ThenReturnSuccess()
         {
             string[] productIdentifiers = { "104US00_CHES_TYPE1_20210630_0600", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600" };
-            string callbackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
+            var callbackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             var model = new ProductNameRequest
             {
                 ProductNames = productIdentifiers,

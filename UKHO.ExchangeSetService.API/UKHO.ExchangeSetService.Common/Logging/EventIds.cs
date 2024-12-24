@@ -866,11 +866,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         ESSPostProductNamesRequestCompleted = 805213,
         /// <summary>
-        /// 805214 - Request for exchange set service call started.
+        /// 805214 - Request for exchange set service call by product names started.
         /// </summary>
         CreateProductDataByProductNamesStarted = 805214,
         /// <summary>
-        /// 805215 - Request for exchange set service call completed.
+        /// 805215 - Request for exchange set service call by product names completed.
         /// </summary>
         CreateProductDataByProductNamesCompleted = 805215,
         /// <summary>
