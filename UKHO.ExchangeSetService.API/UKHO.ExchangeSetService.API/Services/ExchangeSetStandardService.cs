@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -29,7 +30,7 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             _logger.LogInformation(EventIds.CreateExchangeSetByProductVersionsStart.ToEventId(), "Exchange set creation for product versions started | X-Correlation-ID : {CorrelationId}", productVersionsRequest?.CorrelationId);
 
-            if (productVersionsRequest == null)
+            if (productVersionsRequest?.ProductVersions == null || !productVersionsRequest.ProductVersions.Any() || productVersionsRequest.ProductVersions.Any(pv => pv == null))
             {
                 var error = new List<Error>
                         {
