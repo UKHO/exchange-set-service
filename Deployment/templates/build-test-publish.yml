@@ -36,8 +36,8 @@ jobs:
 
     - template: dependency-checker/windows-dependency-checker.yaml@UKHOTemplates
       parameters:
-        scanName: 'External-Notification-Service - $(Build.SourceBranchName)'
-        scanPath: '$(Build.SourcesDirectory)\UKHO.ExternalNotificationService.API'
+        scanName: 'Exchange-Set-Service - $(Build.SourceBranchName)'
+        scanPath: '$(Build.SourcesDirectory)\UKHO.ExchangeSetService.API'
         suppressionPath: '$(Build.SourcesDirectory)\NVDSuppressions.xml'
 
 - job: UnitTestsAndCodeCoverage
@@ -308,4 +308,3 @@ jobs:
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)\MockApiDeployment'
         ArtifactName: mockapiterraformartifact              
-        
