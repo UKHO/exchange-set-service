@@ -188,6 +188,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
             builder.Services.AddScoped<IExchangeSetStandardService, ExchangeSetStandardService>();
+            builder.Services.AddScoped<IUpdatesSinceValidator, UpdatesSinceValidator>();
             builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
 
             builder.Services.AddHealthChecks()
