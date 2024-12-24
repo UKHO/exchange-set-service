@@ -857,31 +857,54 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
         ErrorInDownloadReadMeFile = 805211,
-        /// <summary>
-        /// 805212 - Request for exchange set service product names endpoint is started.
-        /// </summary>
-        ESSPostProductNamesRequestStart = 805212,
-        /// <summary>
-        /// 805213 - Request for exchange set service product names endpoint is completed.
-        /// </summary>
-        ESSPostProductNamesRequestCompleted = 805213,
-        /// <summary>
-        /// 805214 - Request for exchange set service call by product names started.
-        /// </summary>
-        CreateProductDataByProductNamesStarted = 805214,
-        /// <summary>
-        /// 805215 - Request for exchange set service call by product names completed.
-        /// </summary>
-        CreateProductDataByProductNamesCompleted = 805215,
-        /// <summary>
-        /// 805216 - Empty body error.
-        /// </summary>
-        EmptyBodyError = 805216,
-        /// <summary>
-        /// 805217 - Invalid Product names.
-        /// </summary>
-        InvalidProductNames = 805217
 
+        #region V2
+        /// <summary>
+        /// 805212 - Request for updatesSince endpoint started.
+        /// </summary>
+        PostUpdatesSinceRequestStarted = 805212,
+        /// <summary>
+        /// 805213 - Request for updatesSince endpoint completed.
+        /// </summary>
+        PostUpdatesSinceRequestCompleted = 805213,
+        /// <summary>
+        /// 805214 - Creation of updatesSince is started.
+        /// </summary>
+        CreateUpdatesSinceStarted = 805214,
+        /// <summary>
+        /// 805215 - Creation of updatesSince is completed.
+        /// </summary>
+        CreateUpdatesSinceCompleted = 805215,
+        /// <summary>
+        /// 805216 - Exception occurred for updatesSince.
+        /// </summary>
+        CreateUpdatesSinceException = 805216,
+        /// <summary>
+        /// 805217 - Request for exchange set service product names endpoint is started.
+        /// </summary>
+        ESSPostProductNamesRequestStart = 805217,
+        /// <summary>
+        /// 805218 - Request for exchange set service product names endpoint is completed.
+        /// </summary>
+        ESSPostProductNamesRequestCompleted = 805218,
+        /// <summary>
+        /// 805219 - Request for exchange set service call by product names started.
+        /// </summary>
+        CreateProductDataByProductNamesStarted = 805219,
+        /// <summary>
+        /// 805220 - Request for exchange set service call by product names completed.
+        /// </summary>
+        CreateProductDataByProductNamesCompleted = 805220,
+        /// <summary>
+        /// 805221 - Empty body error.
+        /// </summary>
+        EmptyBodyError = 805221,
+        /// <summary>
+        /// 805222 - Invalid Product names.
+        /// </summary>
+        InvalidProductNames = 805222
+
+        #endregion
     }
 
     public static class EventIdExtensions
