@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
     public class ExchangeSetControllerTests
     {
         private IHttpContextAccessor _fakeHttpContextAccessor;
-        private IExchangeSetService _fakeExchangeSetService;
+        private IExchangeSetStandardService _fakeExchangeSetService;
         private ILogger<ExchangeSetController> _fakeLogger;
         private ExchangeSetController _controller;
 
@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         public void Setup()
         {
             _fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
-            _fakeExchangeSetService = A.Fake<IExchangeSetService>();
+            _fakeExchangeSetService = A.Fake<IExchangeSetStandardService>();
             _fakeLogger = A.Fake<ILogger<ExchangeSetController>>();
             _controller = new ExchangeSetController(_fakeHttpContextAccessor, _fakeLogger, _fakeExchangeSetService);
         }
@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
             Action nullExchangeSetService = () => new ExchangeSetController(_fakeHttpContextAccessor, _fakeLogger, null);
-            nullExchangeSetService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("exchangeSetService");
+            nullExchangeSetService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("exchangeSetStandardService");
         }
 
         [Test]

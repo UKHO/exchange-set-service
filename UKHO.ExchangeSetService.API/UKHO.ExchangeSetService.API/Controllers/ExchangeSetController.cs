@@ -14,16 +14,16 @@ namespace UKHO.ExchangeSetService.API.Controllers
     public class ExchangeSetController : ExchangeSetControllerBase<ExchangeSetController>
     {
         private readonly ILogger<ExchangeSetController> _logger;
-        private readonly IExchangeSetService _exchangeSetService;
+        private readonly IExchangeSetStandardService _exchangeSetStandardService;
 
         public ExchangeSetController(
             IHttpContextAccessor httpContextAccessor,
             ILogger<ExchangeSetController> logger,
-            IExchangeSetService exchangeSetService
+            IExchangeSetStandardService exchangeSetStandardService
             ) : base(httpContextAccessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _exchangeSetService = exchangeSetService ?? throw new ArgumentNullException(nameof(exchangeSetService));
+            _exchangeSetStandardService = exchangeSetStandardService ?? throw new ArgumentNullException(nameof(exchangeSetStandardService));
         }
 
         [HttpPost("{exchangeSetStandard}/productNames")]
@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetService.CreateProductDataByProductNames(productNames, callbackUri, GetCorrelationId());
+                    var result = await _exchangeSetStandardService.CreateProductDataByProductNames(productNames, callbackUri, GetCorrelationId());
 
                     return result.ToActionResult();
                 },

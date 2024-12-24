@@ -4,7 +4,7 @@ using UKHO.ExchangeSetService.Common.Models;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public interface IExchangeSetService
+    public interface IExchangeSetStandardService
     {
         Task<ServiceResponseResult<ExchangeSetResponse>> CreateProductDataByProductNames(string[] productNames, string callbackUri, string correlationId);
 

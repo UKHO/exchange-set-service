@@ -18,7 +18,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenInvalidCallbackuriInProductIdentifierRequest_ThenReturnBadRequest()
+        public void WhenInvalidCallBackUriInProductIdentifierRequest_ThenReturnBadRequest()
         {
             var model = new ProductNameRequest { CallbackUri = "demo uri" };
             var result = _validator.TestValidate(model);
@@ -27,9 +27,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenEmptyCallbackuriInProductDataProductIdentifierRequest_ThenReturnSuccess()
+        public void WhenEmptyCallBackUriInProductDataProductIdentifierRequest_ThenReturnSuccess()
         {
-            string[] productIdentifiers = { "GB123456", "GB160060", "AU334550" };
+            string[] productIdentifiers = { "101GB40079ABCDEFG", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600" };
             string callbackUri = string.Empty;
             var model = new ProductNameRequest
             {
@@ -101,9 +101,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
         }
 
         [Test]
-        public void WhenValidProductNamesAndvalidCallBackuriInProductNamesRequest_ThenReturnSuccess()
+        public void WhenValidProductNamesAndvalidCallBackUriInProductNamesRequest_ThenReturnSuccess()
         {
-            string[] productIdentifiers = { "GB123456", "GB160060", "AU334550" };
+            string[] productIdentifiers = { "104US00_CHES_TYPE1_20210630_0600", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600" };
             string callbackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             var model = new ProductNameRequest
             {

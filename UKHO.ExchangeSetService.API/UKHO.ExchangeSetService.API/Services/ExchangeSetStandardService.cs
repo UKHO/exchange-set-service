@@ -13,14 +13,14 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public class ExchangeSetService : IExchangeSetService
+    public class ExchangeSetStandardService : IExchangeSetStandardService
     {
         private readonly IProductDataService _productDataService;
         private readonly IProductNameValidator _productNameValidator;
-        private readonly ILogger<ExchangeSetService> _logger;
+        private readonly ILogger<ExchangeSetStandardService> _logger;
 
 
-        public ExchangeSetService(IProductDataService productDataService, IProductNameValidator productNameValidator, ILogger<ExchangeSetService> logger)
+        public ExchangeSetStandardService(IProductDataService productDataService, IProductNameValidator productNameValidator, ILogger<ExchangeSetStandardService> logger)
         {
             _productDataService = productDataService ?? throw new ArgumentNullException(nameof(productDataService));
             _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));

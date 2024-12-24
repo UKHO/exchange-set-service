@@ -16,32 +16,32 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
     [TestFixture]
-    public class ExchangeSetServiceTests
+    public class ExchangeSetStandardServiceTests
     {
         private IProductDataService _fakeProductDataService;
         private IProductNameValidator _fakeProductNameValidator;
-        private ILogger<API.Services.ExchangeSetService> _fakeLogger;
-        private API.Services.ExchangeSetService _exchangeSetService;
+        private ILogger<ExchangeSetStandardService> _fakeLogger;
+        private ExchangeSetStandardService _exchangeSetService;
 
         [SetUp]
         public void Setup()
         {
             _fakeProductDataService = A.Fake<IProductDataService>();
             _fakeProductNameValidator = A.Fake<IProductNameValidator>();
-            _fakeLogger = A.Fake<ILogger<API.Services.ExchangeSetService>>();
-            _exchangeSetService = new API.Services.ExchangeSetService(_fakeProductDataService, _fakeProductNameValidator, _fakeLogger);
+            _fakeLogger = A.Fake<ILogger<ExchangeSetStandardService>>();
+            _exchangeSetService = new ExchangeSetStandardService(_fakeProductDataService, _fakeProductNameValidator, _fakeLogger);
         }
 
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullProductDataService = () => new API.Services.ExchangeSetService(null, _fakeProductNameValidator, _fakeLogger);
+            Action nullProductDataService = () => new ExchangeSetStandardService(null, _fakeProductNameValidator, _fakeLogger);
             nullProductDataService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productDataService");
 
-            Action nullProductNameValidator = () => new API.Services.ExchangeSetService(_fakeProductDataService, null, _fakeLogger);
+            Action nullProductNameValidator = () => new ExchangeSetStandardService(_fakeProductDataService, null, _fakeLogger);
             nullProductNameValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productNameValidator");
 
-            Action nullLogger = () => new API.Services.ExchangeSetService(_fakeProductDataService, _fakeProductNameValidator,null);
+            Action nullLogger = () => new ExchangeSetStandardService(_fakeProductDataService, _fakeProductNameValidator,null);
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
