@@ -10,29 +10,19 @@ namespace UKHO.ExchangeSetService.API.Filters
     public class ExchangeSetAuthorizationFilterAttribute : ActionFilterAttribute
     {
         private const string ExchangeSetStandardKey = "exchangeSetStandard";
+
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (!TryGetExchangeSetStandard(context, out var exchangeSetStandard))
+            if (!TryGetExchangeSetStandard(context, out var exchangeSetStandard) ||
+                !TryParseExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum) ||
+                !IsValidExchangeSetStandard(parsedEnum))
             {
                 SetBadRequestResponse(context);
                 return;
             }
-
-            if (!TryParseExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum))
-            {
-                SetBadRequestResponse(context);
-                return;
-            }
-
-            if (!IsValidExchangeSetStandard(parsedEnum))
-            {
-                SetBadRequestResponse(context);
-                return;
-            }
-
             context.ActionArguments[ExchangeSetStandardKey] = parsedEnum.ToString();
             await next();
-        }        
+        }
 
         private static bool TryGetExchangeSetStandard(ActionExecutingContext context, out string exchangeSetStandard)
         {
@@ -64,7 +54,5 @@ namespace UKHO.ExchangeSetService.API.Filters
         {
             context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
-
-
     }
 }
