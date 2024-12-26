@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         CorrelationId = GetCorrelationId()
                     };
 
-                    var result = await _exchangeSetStandardService.CreateExchangeSetByProductVersions(productVersionsRequest, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionsRequest, GetRequestCancellationToken());
                     return result.ToActionResult(_httpContextAccessor);
 
                 }, GetCorrelationId(), exchangeSetStandard);

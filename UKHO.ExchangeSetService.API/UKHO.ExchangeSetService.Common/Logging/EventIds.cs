@@ -880,29 +880,22 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805216 - Exception occurred for updatesSince.
         /// </summary>
         CreateUpdatesSinceException = 805216,
-
-        
-
         /// <summary>
-        /// 805217 - Request for s100 for exchange set service product versions endpoint is started.
+        /// 805217 - Empty body error.
         /// </summary>
-        PostProductVersionsRequestStart = 805217,
+        EmptyBodyError = 805217,
         /// <summary>
-        /// 805218 - Request for s100 for exchange set service product versions endpoint is completed.
+        /// 805218 - Request for s100 for exchange set service product versions endpoint is started.
         /// </summary>
-        PostProductVersionsRequestCompleted = 805218,
+        PostProductVersionsRequestStart = 805218,
         /// <summary>
-        /// 805219 - Exchange set creation for s100 for exchange set service product versions started.
+        /// 805219 - Request for s100 for exchange set service product versions endpoint is completed.
         /// </summary>
-        CreateExchangeSetByProductVersionsStart = 805219,
+        PostProductVersionsRequestCompleted = 805219,        
         /// <summary>
-        /// 805220 - Exchange set creation for s100 for exchange set service product versions completed.
+        /// 805220 - Exchange set creation for s100 for exchange set service product versions validation failed.
         /// </summary>
-        CreateExchangeSetByProductVersionsCompleted = 805220,
-        /// <summary>
-        /// 805221 - Exchange set creation for s100 for exchange set service product versions failed.
-        /// </summary>
-        CreateExchangeSetByProductVersionsException = 805221
+        ProductVersionsValidationFailed = 805220
         #endregion
     }
 

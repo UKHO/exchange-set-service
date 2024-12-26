@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             _fakeLogger = A.Fake<ILogger<ExchangeSetStandardService>>();
             _fakeUpdatesSinceValidator = A.Fake<IUpdatesSinceValidator>();
-            _fakeProductVersionsValidator =A.Fake<IProductVersionsValidator>();
+            _fakeProductVersionsValidator = A.Fake<IProductVersionsValidator>();
 
             _service = new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator);
         }
@@ -157,36 +157,28 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            var result = await _service.CreateExchangeSetByProductVersions(productVersionsRequest, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequest(productVersionsRequest, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Value.Should().NotBeNull();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions started | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
-
-            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions completed | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
-
-            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions failed | X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.ProductVersionsValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product versions validation failed | X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
         }
 
         [Test]
-        public async Task WhenInvalidProductVersionsRequest_ThenCreateExchangeSetByProductVersionsReturnsBadRequest()
+        public async Task WhenProductNameIsBlankInProductVersionsRequest_ThenProcessProductVersionsReturnsBadRequest()
         {
-            var validationFailureMessage = "Either body is null or malformed.";
+            var validationFailureMessage = "productName cannot be blank or null.";
 
             var productVersionsRequest = new ProductVersionsRequest
             {
-                CallbackUri = "https://validuri.com",
-                ProductVersions = new List<ProductVersionRequest>()
+                ProductVersions = new List<ProductVersionRequest>
+                {
+                    new () { ProductName = "", EditionNumber = 7, UpdateNumber = 10 }
+                }
             };
 
             var validationMessage = new ValidationFailure("productVersions", validationFailureMessage)
@@ -197,53 +189,33 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            var result = await _service.CreateExchangeSetByProductVersions(productVersionsRequest, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequest(productVersionsRequest, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Should().NotBeNull();
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == validationFailureMessage);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions started | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
-
-            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions failed | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
-
-            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions completed | X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.ProductVersionsValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product versions validation failed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
-        public async Task WhenProductVersionsRequestIsNull_ThenCreateExchangeSetByProductVersionsReturnsBadRequest()
+        public async Task WhenProductVersionsRequestIsNull_ThenProcessProductVersionsReturnsBadRequest()
         {
             var error = "Either body is null or malformed.";
 
-            var result = await _service.CreateExchangeSetByProductVersions(null, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequest(null, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Should().NotBeNull();
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == error);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions started | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
-
-            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions failed | X-Correlation-ID : {CorrelationId}").MustHaveHappened();
-
-            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.CreateExchangeSetByProductVersionsCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exchange set creation for product versions completed | X-Correlation-ID : {CorrelationId}").MustNotHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         private ValidationResult GetValidationResult()

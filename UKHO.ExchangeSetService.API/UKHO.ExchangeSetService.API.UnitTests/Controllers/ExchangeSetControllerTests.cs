@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new () { ProductName = "102NO32904820801012", EditionNumber = 36, UpdateNumber = 0 },
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.CreateExchangeSetByProductVersions(A<ProductVersionsRequest>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<ProductVersionsRequest>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse())));
 
             var result = await _controller.PostProductVersions(productVersionRequest, "https://callback.uri", "s100");
@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new () { ProductName = "", EditionNumber = 10, UpdateNumber = 2 },
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.CreateExchangeSetByProductVersions(A<ProductVersionsRequest>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<ProductVersionsRequest>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = [new() { Source = "test", Description = "test error" }] })));
 
             var result = await _controller.PostProductVersions(productVersionRequest, "https://callback.uri", "s100");

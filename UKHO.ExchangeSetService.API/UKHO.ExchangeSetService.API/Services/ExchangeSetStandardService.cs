@@ -70,8 +70,38 @@ namespace UKHO.ExchangeSetService.API.Services
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
         }
 
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(ProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken)
+        {
+            if (productVersionsRequest?.ProductVersions == null || !productVersionsRequest.ProductVersions.Any() || productVersionsRequest.ProductVersions.Any(pv => pv == null))
+            {
+                return BadRequestErrorResponse(productVersionsRequest?.CorrelationId);
+            }
+
+            var validationResult = await ValidateProductVersionsRequest(productVersionsRequest, productVersionsRequest.CorrelationId);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse()); // This is a placeholder, the actual implementation is not provided
+        }
+
+        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateProductVersionsRequest(ProductVersionsRequest productVersionsRequest, string correlationId)
+        {
+            var validationResult = await _productVersionsValidator.Validate(productVersionsRequest);
+            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
+            {
+                _logger.LogError(EventIds.ProductVersionsValidationFailed.ToEventId(), "Product versions validation failed | _X-Correlation-ID : {correlationId}", correlationId);
+
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
+            }
+            return null;
+        }
+
         protected ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)
         {
+            _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
+
             var errorDescription = new ErrorDescription
             {
                 CorrelationId = correlationId,
@@ -85,40 +115,6 @@ namespace UKHO.ExchangeSetService.API.Services
                 ]
             };
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
-        }
-
-
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateExchangeSetByProductVersions(ProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation(EventIds.CreateExchangeSetByProductVersionsStart.ToEventId(), "Exchange set creation for product versions started | X-Correlation-ID : {CorrelationId}", productVersionsRequest?.CorrelationId);
-
-            if (productVersionsRequest?.ProductVersions == null || !productVersionsRequest.ProductVersions.Any() || productVersionsRequest.ProductVersions.Any(pv => pv == null))
-            {
-                var error = new List<Error>
-                        {
-                            new()
-                            {
-                                Source = "requestBody",
-                                Description = "Either body is null or malformed."
-                            }
-                        };
-
-                _logger.LogError(EventIds.CreateExchangeSetByProductVersionsException.ToEventId(), "Exchange set creation for product versions failed | X-Correlation-ID : {CorrelationId}", productVersionsRequest?.CorrelationId);
-
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = productVersionsRequest?.CorrelationId, Errors = error });
-            }
-
-            var validationResult = await _productVersionsValidator.Validate(productVersionsRequest);
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
-            {
-                _logger.LogError(EventIds.CreateExchangeSetByProductVersionsException.ToEventId(), "Exchange set creation for product versions failed | X-Correlation-ID : {CorrelationId}", productVersionsRequest.CorrelationId);
-
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = productVersionsRequest.CorrelationId, Errors = errors });
-            }
-
-            _logger.LogInformation(EventIds.CreateExchangeSetByProductVersionsCompleted.ToEventId(), "Exchange set creation for product versions completed | X-Correlation-ID : {CorrelationId}", productVersionsRequest.CorrelationId);
-
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse()); // This is a placeholder, the actual implementation is not provided
         }
     }
 }
