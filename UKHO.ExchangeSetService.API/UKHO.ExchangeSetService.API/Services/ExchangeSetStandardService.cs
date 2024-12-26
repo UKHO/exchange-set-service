@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Validation;
@@ -24,24 +23,22 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private readonly ILogger<ExchangeSetStandardService> _logger;
         private readonly IUpdatesSinceValidator _updatesSinceValidator;
-        private readonly IProductDataService _productDataService;
         private readonly IProductNameValidator _productNameValidator;
 
-        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger, IUpdatesSinceValidator updatesSinceValidator, IProductDataService productDataService, IProductNameValidator productNameValidator)
+        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger, IUpdatesSinceValidator updatesSinceValidator, IProductNameValidator productNameValidator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
-            _productDataService = productDataService ?? throw new ArgumentNullException(nameof(productDataService));
             _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Creation of update since started | X-Correlation-ID : {correlationId}", correlationId);
+            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Create update since started | _X-Correlation-ID : {correlationId}", correlationId);
 
             if (updatesSinceRequest == null)
             {
-                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
+                _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
 
                 return BadRequestErrorResponse(correlationId);
             }
@@ -49,13 +46,10 @@ namespace UKHO.ExchangeSetService.API.Services
             updatesSinceRequest.ProductIdentifier = productIdentifier;
             updatesSinceRequest.CallbackUri = callbackUri;
 
-            var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
-
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
+            var validationResult = await ValidateUpdatesSinceRequest(updatesSinceRequest, correlationId);
+            if (validationResult != null)
             {
-                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
-
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
+                return validationResult;
             }
 
             // This is a placeholder, the actual implementation is not provided
@@ -69,28 +63,20 @@ namespace UKHO.ExchangeSetService.API.Services
                 }
             };
 
-            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Creation of update since completed | X-Correlation-ID : {correlationId}", correlationId);
-
+            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Create update since completed | _X-Correlation-ID : {correlationId}", correlationId);
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetResponse>> CreateProductDataByProductNames(string[] productNames, string callbackUri, string correlationId)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateProductDataByProductNames(string[] productNames, string callbackUri, string correlationId)
         {
-            _logger.LogInformation(EventIds.CreateProductDataByProductNamesStarted.ToEventId(), "Creation of Product data for product Names started | X-Correlation-ID : {correlationId}", correlationId);
+            _logger.LogInformation(EventIds.CreateProductDataByProductNamesStarted.ToEventId(), "Create product data for product Names started | _X-Correlation-ID : {correlationId}", correlationId);
             productNames = SanitizeProductNames(productNames);
 
             if (productNames == null || productNames.Length == 0)
             {
-                var error = new List<Error>
-                        {
-                            new()
-                            {
-                                Source = "requestBody",
-                                Description = "Either body is null or malformed."
-                            }
-                        };
-                _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | X-Correlation-ID : {correlationId}", correlationId);
-                return ServiceResponseResult<ExchangeSetResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = error });
+                _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
+
+                return BadRequestErrorResponse(correlationId);
             }
 
             var productNamesRequest = new ProductNameRequest()
@@ -100,21 +86,14 @@ namespace UKHO.ExchangeSetService.API.Services
                 CorrelationId = correlationId
             };
 
-            var validationResult = await ValidateProductDataByProductNames(productNamesRequest);
-
-            if (!validationResult.IsValid)
+            var validationResult = await ValidateProductNamesRequest(productNamesRequest, correlationId);
+            if (validationResult != null)
             {
-                List<Error> errors;
-
-                if (validationResult.HasBadRequestErrors(out errors))
-                {
-                    _logger.LogError(EventIds.InvalidProductNames.ToEventId(), "Product name validation failed. | X-Correlation-ID : {correlationId}", correlationId);
-                    return ServiceResponseResult<ExchangeSetResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
-                }
+                return validationResult;
             }
 
-            _logger.LogInformation(EventIds.CreateProductDataByProductNamesCompleted.ToEventId(), "Creation of Product data for product Names completed | X-Correlation-ID : {correlationId}", correlationId);
-            return ServiceResponseResult<ExchangeSetResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            _logger.LogInformation(EventIds.CreateProductDataByProductNamesCompleted.ToEventId(), "Create Product data for product Names completed | _X-Correlation-ID : {correlationId}", correlationId);
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
         private string[] SanitizeProductNames(string[] productNames)
@@ -126,25 +105,46 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (productNames.Any(x => x == null))
             {
-                return new string[] { null };
+                return [null];
             }
 
-            List<string> sanitizedIdentifiers = new List<string>();
+            List<string> sanitizedIdentifiers = [];
             if (productNames.Length > 0)
             {
-                foreach (string identifier in productNames)
+                foreach (var identifier in productNames)
                 {
-                    string sanitizedIdentifier = identifier.Trim();
+                    var sanitizedIdentifier = identifier.Trim();
                     sanitizedIdentifiers.Add(sanitizedIdentifier);
                 }
             }
 
-            return sanitizedIdentifiers.ToArray();
+            return [.. sanitizedIdentifiers];
         }
 
-        private Task<ValidationResult> ValidateProductDataByProductNames(ProductNameRequest productNameRequest)
+        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string correlationId)
         {
-            return _productNameValidator.Validate(productNameRequest);
+            var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
+
+            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
+            {
+                _logger.LogError(EventIds.UpdatesSinceValidationFailed.ToEventId(), "Update since validation failed | _X-Correlation-ID : {correlationId}", correlationId);
+
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
+            }
+            return null;
+        }
+
+        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateProductNamesRequest(ProductNameRequest productNameRequest, string correlationId)
+        {
+            var validationResult = await _productNameValidator.Validate(productNameRequest);
+
+            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
+            {
+                _logger.LogError(EventIds.InvalidProductNames.ToEventId(), "Product name validation failed. | _X-Correlation-ID : {correlationId}", correlationId);
+
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
+            }
+            return null;
         }
 
         protected ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)

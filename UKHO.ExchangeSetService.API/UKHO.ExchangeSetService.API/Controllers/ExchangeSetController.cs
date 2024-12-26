@@ -32,8 +32,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public Task<IActionResult> PostProductNames(string exchangeSetStandard, [FromBody] string[] productNames, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
-                EventIds.ESSPostProductNamesRequestStart,
-                EventIds.ESSPostProductNamesRequestCompleted,
+                EventIds.PostProductNamesRequestStart,
+                EventIds.PostProductNamesRequestCompleted,
                 "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
@@ -45,10 +45,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpPost("{exchangeSetStandard}/updatesSince")]
-        public virtual Task<IActionResult> PostUpdatesSince(string exchangeSetStandard, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
+        public Task<IActionResult> PostUpdatesSince(string exchangeSetStandard, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
         {
-            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.PostUpdatesSinceRequestStarted, EventIds.PostUpdatesSinceRequestCompleted,
-                "UpdatesSince endpoint request for X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.PostUpdatesSinceRequestStarted,
+                EventIds.PostUpdatesSinceRequestCompleted,
+                "UpdatesSince endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
                 async () =>
                 {
                     var result = await _exchangeSetStandardService.CreateUpdatesSince(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());

@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.Common.Extensions
     [ExcludeFromCodeCoverage]
     public static class ServiceResponseResultExtensions
     {
-        public const string LastModifiedDateHeaderKey = "Last-Modified";
+        public const string LastModifiedDateHeaderKey = "Date";
 
         public static IActionResult ToActionResult<T>(this ServiceResponseResult<T> result, IHttpContextAccessor httpContextAccessor)
         {

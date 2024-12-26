@@ -878,15 +878,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805216 - Exception occurred for updatesSince.
         /// </summary>
-        CreateUpdatesSinceException = 805216,
+        UpdatesSinceValidationFailed = 805216,
         /// <summary>
         /// 805217 - Request for exchange set service product names endpoint is started.
         /// </summary>
-        ESSPostProductNamesRequestStart = 805217,
+        PostProductNamesRequestStart = 805217,
         /// <summary>
         /// 805218 - Request for exchange set service product names endpoint is completed.
         /// </summary>
-        ESSPostProductNamesRequestCompleted = 805218,
+        PostProductNamesRequestCompleted = 805218,
         /// <summary>
         /// 805219 - Request for exchange set service call by product names started.
         /// </summary>

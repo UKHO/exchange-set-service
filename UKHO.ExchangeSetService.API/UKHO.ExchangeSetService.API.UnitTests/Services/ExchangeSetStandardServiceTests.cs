@@ -24,9 +24,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
     [TestFixture]
     public class ExchangeSetStandardServiceTests
     {
-        private readonly string _fakeCorrelationId = Guid.NewGuid().ToString();
+        private readonly string _correlationId = Guid.NewGuid().ToString();
 
-        private IProductDataService _fakeProductDataService;
         private IProductNameValidator _fakeProductNameValidator;
         private ILogger<ExchangeSetStandardService> _fakeLogger;
         private IUpdatesSinceValidator _fakeUpdatesSinceValidator;
@@ -36,27 +35,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [SetUp]
         public void Setup()
         {
-            _fakeProductDataService = A.Fake<IProductDataService>();
             _fakeProductNameValidator = A.Fake<IProductNameValidator>();
             _fakeLogger = A.Fake<ILogger<ExchangeSetStandardService>>();
             _fakeUpdatesSinceValidator = A.Fake<IUpdatesSinceValidator>();
 
-            _service = new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductDataService, _fakeProductNameValidator);
+            _service = new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductNameValidator);
         }
 
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullLogger = () => new ExchangeSetStandardService(null, _fakeUpdatesSinceValidator, _fakeProductDataService, _fakeProductNameValidator);
+            Action nullLogger = () => new ExchangeSetStandardService(null, _fakeUpdatesSinceValidator, _fakeProductNameValidator);
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
-            Action nullProductDataService = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, null, _fakeProductNameValidator);
-            nullProductDataService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productDataService");
-
-            Action nullUpdatesSinceValidator = () => new ExchangeSetStandardService(_fakeLogger, null, _fakeProductDataService, _fakeProductNameValidator);
+            Action nullUpdatesSinceValidator = () => new ExchangeSetStandardService(_fakeLogger, null, _fakeProductNameValidator);
             nullUpdatesSinceValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("updatesSinceValidator");
 
-            Action nullProductNameValidator = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductDataService, null);
+            Action nullProductNameValidator = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, null);
             nullProductNameValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productNameValidator");
         }
 
@@ -68,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            var result = await _service.CreateUpdatesSince(updatesSinceRequest, "s101", "https://callback.uri", _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.CreateUpdatesSince(updatesSinceRequest, "s101", "https://callback.uri", _correlationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Value.Should().NotBeNull();
@@ -76,23 +71,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create update since started | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since completed | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create update since completed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since exception occurred | X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.UpdatesSinceValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create update since exception occurred | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
         }
 
         [Test]
         public async Task WhenNullOrEmptySinceDateTimeRequested_ThenCreateUpdatesSinceReturnsBadRequest()
         {
-            var result = await _service.CreateUpdatesSince(null, "s101", "https://callback.uri", _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.CreateUpdatesSince(null, "s101", "https://callback.uri", _correlationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -101,23 +96,24 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create update since started | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since exception occurred | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since completed | X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create update since completed | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
         }
 
         [Test]
         [TestCase("101", "http://callback.uri")]
         [TestCase("101s", "http//callback.uri")]
         [TestCase("S101", "http:callback.uri")]
+        [TestCase("s 101", "https:\\callback.uri")]
         public async Task WhenInValidDataRequested_ThenCreateUpdatesSinceReturnsBadRequest(string inValidProductIdentifier, string inValidCallBackUri)
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString() };
@@ -125,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(GetValidationResult());
 
-            var result = await _service.CreateUpdatesSince(updatesSinceRequest, inValidProductIdentifier, inValidCallBackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.CreateUpdatesSince(updatesSinceRequest, inValidProductIdentifier, inValidCallBackUri, _correlationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -136,17 +132,17 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create update since started | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since exception occurred | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.UpdatesSinceValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Update since validation failed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since completed | X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create update since completed | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
         }
 
         [Test]
@@ -154,9 +150,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             string[] productNames = null;
             string callbackUri = "http://callback.uri";
-            string correlationId = "correlationId";
 
-            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, correlationId);
+            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, _correlationId);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -165,12 +160,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
            && call.GetArgument<LogLevel>(0) == LogLevel.Information
            && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
-           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data for product Names started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create product data for product Names started | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -178,9 +173,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             string[] productNames = Array.Empty<string>();
             string callbackUri = "http://callback.uri";
-            string correlationId = "correlationId";
 
-            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, correlationId);
+            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, _correlationId);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -189,12 +183,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
            && call.GetArgument<LogLevel>(0) == LogLevel.Information
            && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
-           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data for product Names started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create product data for product Names started | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -202,7 +196,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             string[] productNames = new[] { "Product1" };
             string callbackUri = "http://callback.uri";
-            string correlationId = "correlationId";
 
             var validationResult = new ValidationResult(new List<ValidationFailure>
                 {
@@ -214,7 +207,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(Task.FromResult(validationResult));
 
-            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, correlationId);
+            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, _correlationId);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -223,26 +216,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
            && call.GetArgument<LogLevel>(0) == LogLevel.Information
            && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
-           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data for product Names started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+           && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create product data for product Names started | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.InvalidProductNames.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product name validation failed. | X-Correlation-ID : {correlationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product name validation failed. | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
         public async Task WhenValidationPasses_ThenShouldReturnSuccess()
         {
-            string[] productNames = new[] { "Product1" };
+            string[] productNames = ["Product1"];
             string callbackUri = "http://callback.uri";
-            string correlationId = "correlationId";
 
-            var validationResult = new ValidationResult();
+            A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
 
-            A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(Task.FromResult(validationResult));
-
-            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, correlationId);
+            var result = await _service.CreateProductDataByProductNames(productNames, callbackUri, _correlationId);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
@@ -250,12 +240,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
          && call.GetArgument<LogLevel>(0) == LogLevel.Information
          && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesStarted.ToEventId()
-         && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data for product Names started | X-Correlation-ID : {correlationId}").MustHaveHappened();
+         && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create product data for product Names started | _X-Correlation-ID : {correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
          && call.GetArgument<LogLevel>(0) == LogLevel.Information
          && call.GetArgument<EventId>(1) == EventIds.CreateProductDataByProductNamesCompleted.ToEventId()
-         && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of Product data for product Names completed | X-Correlation-ID : {correlationId}").MustHaveHappened();
+         && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Create Product data for product Names completed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         private ValidationResult GetValidationResult()
