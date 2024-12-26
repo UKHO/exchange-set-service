@@ -9,9 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
-using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
-using UKHO.ExchangeSetService.Common.Models.Enums;
 
 namespace UKHO.ExchangeSetService.API.Filters
 {
@@ -21,7 +18,6 @@ namespace UKHO.ExchangeSetService.API.Filters
         private const string ExchangeSetStandard = "exchangeSetStandard";
         private const string TokenIssuer = "iss";
         private const string TokenTenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
-        private const string standard = "s100";
         private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
         private readonly IConfiguration configuration;
         private readonly IAzureAdB2CHelper azureAdB2CHelper;
@@ -45,47 +41,24 @@ namespace UKHO.ExchangeSetService.API.Filters
             var tokenIssuer = context.HttpContext.User.FindFirstValue(TokenIssuer);
             var correlationId = context.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
 
-            if (!Guid.TryParse(correlationId, out Guid correlationIdGuid))
-            {
-                correlationId = Guid.Empty.ToString();
-                logger.LogError(EventIds.BadRequest.ToEventId(), null, "_X-Correlation-ID is invalid :{correlationId}", correlationId);
-            }
-
             if (!context.HttpContext.Request.RouteValues.TryGetValue(ExchangeSetStandard, out var queryStringValue))
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
             }
-
             var exchangeSetStandard = Convert.ToString(queryStringValue);
-            if (!ValidateExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum))
+            if (!ValidateExchangeSetStandard(exchangeSetStandard, out Common.Models.V2.Enums.ExchangeSetStandard parsedEnum))
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
             }
             context.ActionArguments[ExchangeSetStandard] = parsedEnum.ToString();
 
-            if (parsedEnum.ToString() != standard)
+            if (parsedEnum.ToString() != Common.Models.V2.Enums.ExchangeSetStandard.s100.ToString())
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
-            }
-
-            // If request is s100 exchange set and user is Non UKHO
-            if (string.Equals(exchangeSetStandard, Common.Models.Enums.ExchangeSetStandard.s100.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                if (azureAdTenantId == tokenTenantId && azureAdClientId != tokenAudience)
-                {
-                    context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return;
-                }
-
-                AzureAdB2C azureAdB2C = new AzureAdB2C
-                {
-                    AudToken = tokenAudience,
-                    IssToken = tokenIssuer,
-                };
-            }
+            }            
             await next();
         }
 

@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenExchangeSetStandardParameterIsNotSentAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
+        public async Task WhenExchangeSetStandardParameterIsNotSent_ThenReturnBadRequest()
         {
             var dictionary = new Dictionary<string, StringValues> { };
             httpContext.Request.RouteValues = new RouteValueDictionary(dictionary);
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenExchangeSetStandardParameterIss100AndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnNextRequest()
+        public async Task WhenExchangeSetStandardParameterIss100_ThenReturnNextRequest()
         {
             httpContext.Request.RouteValues.Add(ExchangeSetStandard, ExchangeSetStandardForUnitTests.s100.ToString());
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
@@ -104,24 +104,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         [Test]
         [TestCase("s57")]
         [TestCase("s63")]
-        public async Task WhenExchangeSetStandardParameterIss57Ors63AndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest(string exchangeSetStandard)
-        {
-            httpContext.Request.RouteValues.Add(ExchangeSetStandard, exchangeSetStandard);
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
-            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
-
-            await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().NotBe(ExchangeSetStandardForUnitTests.s100.ToString());
-        }
-
-        [Test]
         [TestCase(" s100 ")]
         [TestCase("")]
         [TestCase("s 100")]
-        public async Task WhenExchangeSetStandardParameterIsInvalidAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest(string exchangeSetStandard)
+        public async Task WhenExchangeSetStandardParameterIss57Ors63OrInvalid_ThenReturnBadRequest(string exchangeSetStandard)
         {
             httpContext.Request.RouteValues.Add(ExchangeSetStandard, exchangeSetStandard);
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
@@ -144,30 +130,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-        }
-
-        [Test]
-        public async Task WhenExchangeSetStandardParameterIss100AndUserIsNonUKHO_ReturnsStatus403Forbidden()
-        {
-            httpContext = new DefaultHttpContext();
-            httpContext.Request.RouteValues.Add(ExchangeSetStandard, ExchangeSetStandardForUnitTests.s100.ToString());
-            var claims = new List<Claim>()
-            {
-                new Claim("aud",  "some-audiance"),
-                new Claim("iss", "some-issuer"),
-                new Claim("http://schemas.microsoft.com/identity/claims/tenantid", fakeAzureAdConfig.Value.TenantId)
-            };
-
-            var identity = httpContext.User.Identities.FirstOrDefault();
-            identity.AddClaims(claims);
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
-            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
-
-            await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(ExchangeSetStandardForUnitTests.s100.ToString());
-        }
+        }        
     }
 }

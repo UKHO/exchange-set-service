@@ -3,7 +3,6 @@
     public enum ExchangeSetStandard
     {
         s63,
-        s57,
-        s100
+        s57
     }
 }
