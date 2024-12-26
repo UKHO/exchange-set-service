@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         }
 
         [Test]
-        public async Task WhenExchangeSetStandardParameterIss100_ThenReturnNextRequest()
+        public async Task WhenExchangeSetStandardParameterIsS100_ThenReturnNextRequest()
         {
             httpContext.Request.RouteValues.Add(ExchangeSetStandard, ExchangeSetStandardForUnitTests.s100.ToString());
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         [TestCase(" s100 ")]
         [TestCase("")]
         [TestCase("s 100")]
-        public async Task WhenExchangeSetStandardParameterIss57Ors63OrInvalid_ThenReturnBadRequest(string exchangeSetStandard)
+        public async Task WhenExchangeSetStandardParameterIsInvalid_ThenReturnBadRequest(string exchangeSetStandard)
         {
             httpContext.Request.RouteValues.Add(ExchangeSetStandard, exchangeSetStandard);
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
@@ -74,18 +74,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         }
-
-        [Test]
-        public async Task WhenExchangeSetStandardParameterIsGarbageValueAndAzureADClientIDIsEqualsWithTokenAudience_ThenReturnBadRequest()
-        {
-            httpContext.Request.RouteValues.Add(ExchangeSetStandard, ExchangeSetStandardForUnitTests.Test.ToString());
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
-            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
-
-            await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
-
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-        }        
+      
     }
 }
