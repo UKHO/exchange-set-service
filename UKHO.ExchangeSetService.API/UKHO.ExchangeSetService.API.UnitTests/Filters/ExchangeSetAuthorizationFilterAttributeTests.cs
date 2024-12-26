@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Filters;
-using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters
@@ -28,50 +19,15 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         private ExchangeSetAuthorizationFilterAttribute exchangeSetFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
-        private const string TokenAudience = "aud";
         private const string ExchangeSetStandard = "exchangeSetStandard";
-        private IOptions<AzureADConfiguration> fakeAzureAdConfig;
-        private IConfiguration fakeConfiguration;
         private HttpContext httpContext;
-        private IAzureAdB2CHelper fakeAzureAdB2CHelper;
-        private ILogger<ExchangeSetAuthorizationFilterAttribute> fakeLogger;
+
         [SetUp]
         public void Setup()
         {
-            fakeAzureAdConfig = A.Fake<IOptions<AzureADConfiguration>>();
-            fakeConfiguration = A.Fake<IConfiguration>();
-            fakeAzureAdB2CHelper = A.Fake<IAzureAdB2CHelper>();
-            fakeLogger = A.Fake<ILogger<ExchangeSetAuthorizationFilterAttribute>>();
-            fakeAzureAdConfig.Value.ClientId = "80a6c68b-59aa-49a4-939a-7968ff79d676";
-            fakeAzureAdConfig.Value.TenantId = "azure-ad-tenant";
-            fakeAzureAdConfig.Value.MicrosoftOnlineLoginUrl = "https://login.microsoftonline.com/";
             httpContext = new DefaultHttpContext();
-
-            exchangeSetFilterAttribute = new ExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig, fakeConfiguration, fakeAzureAdB2CHelper, fakeLogger);
-
-            var claims = new List<Claim>()
-            {
-                    new Claim(TokenAudience, fakeAzureAdConfig.Value.ClientId)
-            };
-            var identity = httpContext.User.Identities.FirstOrDefault();
-            identity.AddClaims(claims);
-        }
-
-        [Test]
-        public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
-        {
-            Action nullAzureAdConfigExchangeSetFilterAttribute = () => new ExchangeSetAuthorizationFilterAttribute(null, fakeConfiguration, fakeAzureAdB2CHelper, fakeLogger);
-            nullAzureAdConfigExchangeSetFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("azureAdConfiguration");
-
-            Action nullConfigurationExchangeSetFilterAttribute = () => new ExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig, null, fakeAzureAdB2CHelper, fakeLogger);
-            nullConfigurationExchangeSetFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("configuration");
-
-            Action nullAzureAdB2CConfigurationExchangeSetFilterAttribute = () => new ExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig, fakeConfiguration, null, fakeLogger);
-            nullAzureAdB2CConfigurationExchangeSetFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("azureAdB2CHelper");
-
-            Action nullLoggerExchangeSetFilterAttribute = () => new ExchangeSetAuthorizationFilterAttribute(fakeAzureAdConfig, fakeConfiguration, fakeAzureAdB2CHelper, null);
-            nullLoggerExchangeSetFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("ExchangeSetAuthorizationFilterAttribute");
-        }
+            exchangeSetFilterAttribute = new ExchangeSetAuthorizationFilterAttribute();            
+        }       
 
         [Test]
         public async Task WhenExchangeSetStandardParameterIsNotSent_ThenReturnBadRequest()

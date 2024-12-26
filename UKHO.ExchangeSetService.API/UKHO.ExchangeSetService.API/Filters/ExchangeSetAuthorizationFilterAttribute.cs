@@ -1,80 +1,70 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Enums;
 
 namespace UKHO.ExchangeSetService.API.Filters
 {
     public class ExchangeSetAuthorizationFilterAttribute : ActionFilterAttribute
     {
-        private const string TokenAudience = "aud";
-        private const string ExchangeSetStandard = "exchangeSetStandard";
-        private const string TokenIssuer = "iss";
-        private const string TokenTenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
-        private readonly IOptions<AzureADConfiguration> azureAdConfiguration;
-        private readonly IConfiguration configuration;
-        private readonly IAzureAdB2CHelper azureAdB2CHelper;
-        private readonly ILogger<ExchangeSetAuthorizationFilterAttribute> logger;
-
-        public ExchangeSetAuthorizationFilterAttribute(IOptions<AzureADConfiguration> azureAdConfiguration, IConfiguration configuration, IAzureAdB2CHelper azureAdB2CHelper, ILogger<ExchangeSetAuthorizationFilterAttribute> logger)
-        {
-            this.azureAdConfiguration = azureAdConfiguration ?? throw new ArgumentNullException(nameof(azureAdConfiguration));
-            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.azureAdB2CHelper = azureAdB2CHelper ?? throw new ArgumentNullException(nameof(azureAdB2CHelper));
-            this.logger = logger ?? throw new ArgumentNullException(nameof(ExchangeSetAuthorizationFilterAttribute));
-        }
-
+        private const string ExchangeSetStandardKey = "exchangeSetStandard";
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var azureAdClientId = azureAdConfiguration.Value.ClientId;
-            var azureAdTenantId = azureAdConfiguration.Value.TenantId;
-
-            var tokenAudience = context.HttpContext.User.FindFirstValue(TokenAudience);
-            var tokenTenantId = context.HttpContext.User.FindFirstValue(TokenTenantId);
-            var tokenIssuer = context.HttpContext.User.FindFirstValue(TokenIssuer);
-            var correlationId = context.HttpContext.Request.Headers[CorrelationIdMiddleware.XCorrelationIdHeaderKey].FirstOrDefault();
-
-            if (!context.HttpContext.Request.RouteValues.TryGetValue(ExchangeSetStandard, out var queryStringValue))
+            if (!TryGetExchangeSetStandard(context, out var exchangeSetStandard))
             {
-                context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                SetBadRequestResponse(context);
                 return;
             }
-            var exchangeSetStandard = Convert.ToString(queryStringValue);
-            if (!ValidateExchangeSetStandard(exchangeSetStandard, out Common.Models.V2.Enums.ExchangeSetStandard parsedEnum))
+
+            if (!TryParseExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum))
             {
-                context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                SetBadRequestResponse(context);
                 return;
             }
-            context.ActionArguments[ExchangeSetStandard] = parsedEnum.ToString();
 
-            if (parsedEnum.ToString() != Common.Models.V2.Enums.ExchangeSetStandard.s100.ToString())
+            if (!IsValidExchangeSetStandard(parsedEnum))
             {
-                context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                SetBadRequestResponse(context);
                 return;
-            }            
+            }
+
+            context.ActionArguments[ExchangeSetStandardKey] = parsedEnum.ToString();
             await next();
+        }        
+
+        private static bool TryGetExchangeSetStandard(ActionExecutingContext context, out string exchangeSetStandard)
+        {
+            exchangeSetStandard = null;
+            if (context.HttpContext.Request.RouteValues.TryGetValue(ExchangeSetStandardKey, out var queryStringValue))
+            {
+                exchangeSetStandard = Convert.ToString(queryStringValue);
+                return true;
+            }
+            return false;
         }
 
-        private static bool ValidateExchangeSetStandard<TEnum>(string exchangeSetStandard, out TEnum result) where TEnum : struct, Enum
+        private static bool TryParseExchangeSetStandard<TEnum>(string exchangeSetStandard, out TEnum result) where TEnum : struct, Enum
         {
             result = default;
-            if (string.IsNullOrEmpty(exchangeSetStandard))
+            if (string.IsNullOrEmpty(exchangeSetStandard) || exchangeSetStandard.Any(char.IsWhiteSpace))
             {
                 return false;
             }
-            if (exchangeSetStandard.Any(x => Char.IsWhiteSpace(x)))
-            {
-                return false;
-            }
-
             return Enum.TryParse(exchangeSetStandard, true, out result);
         }
+
+        private static bool IsValidExchangeSetStandard(ExchangeSetStandard exchangeSetStandard)
+        {
+            return exchangeSetStandard == ExchangeSetStandard.s100;
+        }
+
+        private static void SetBadRequestResponse(ActionExecutingContext context)
+        {
+            context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+
+
     }
 }
