@@ -5,15 +5,19 @@ param (
     [Parameter(Mandatory = $true)] [string] $mockApipackagePath,
     [Parameter(Mandatory = $true)] [string] $essFulfilmentWebAppname,
     [Parameter(Mandatory = $true)] [string] $essFulfilmentpackagePath,
+    [Parameter(Mandatory = $true)] [string] $wiremockWebAppName,
+    [Parameter(Mandatory = $true)] [string] $wiremockApipackagePath,
     [Parameter(Mandatory = $true)] [string] $webAppResourceGroup
 )
 
 echo "essApipackagePath : $essApipackagePath"
 echo "mockApipackagePath : $mockApipackagePath"
 echo "essFulfilmentpackagePath : $essFulfilmentpackagePath"
+echo "wiremockApipackagePath : $wiremockApipackagePath"
 echo "essWebAppName : $essWebAppName"
 echo "mockWebAppName : $mockWebAppName"
 echo "essFulfilmentWebAppname : $essFulfilmentWebAppname"
+echo "wiremockWebAppName : $wiremockWebAppName"
 echo "ResourceGroup : $webAppResourceGroup"
 
 function DeployWebApp($webAppName, $package, $webAppRGroup){
@@ -46,3 +50,10 @@ DeployWebApp $essFulfilmentWebAppname $essFulfilmentpackagePath $webAppResourceG
 if ( !$? ) { echo "Deploying ess fulfilment webjob" ; throw $_ }
 
 echo "Deploying ess fulfilment webjob done ..."
+
+echo "Deploying wiremock api ..."
+DeployWebApp $wiremockWebAppName $wiremockApipackagePath $webAppResourceGroup
+
+if ( !$? ) { echo "Error while deploying wiremock api webapp" ; throw $_ }
+
+echo "Deploying wiremock api done ..."
