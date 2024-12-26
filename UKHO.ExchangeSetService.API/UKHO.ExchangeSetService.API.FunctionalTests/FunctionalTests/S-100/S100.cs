@@ -11,8 +11,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
     {
         private readonly string SinceDateTime = DateTime.UtcNow.AddDays(-12).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
 
-
         [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100UpdatesSinceEndPointWithValidToken_ThenResponseCodeReturnedIs202Accepted()
         {
             UpdatesSinceModel SinceDateTimePayload = DataHelper.GetSinceDateTime(SinceDateTime);
@@ -21,6 +21,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         }
 
         [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100UpdatesSinceEndPointWithInValidToken_ThenResponseCodeReturnedIs401Unauthorized()
         {
             var InvalidEssJwtToken = "InvalidToken";
@@ -29,5 +30,4 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(401), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 401.");
         }
     }
-
 }
