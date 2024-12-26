@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.Services
             updatesSinceRequest.ProductIdentifier = productIdentifier;
             updatesSinceRequest.CallbackUri = callbackUri;
 
-            var validationResult = await ValidateUpdatesSinceRequest(updatesSinceRequest, correlationId);
+            var validationResult = await ValidateRequest(updatesSinceRequest, correlationId);
             if (validationResult != null)
             {
                 return validationResult;
@@ -60,14 +59,14 @@ namespace UKHO.ExchangeSetService.API.Services
                 return BadRequestErrorResponse(correlationId);
             }
 
-            var productNamesRequest = new ProductNameRequest()
+            var productNamesRequest = new ProductNameRequest
             {
                 ProductNames = productNames,
                 CallbackUri = callbackUri,
                 CorrelationId = correlationId
             };
 
-            var validationResult = await ValidateProductNamesRequest(productNamesRequest, correlationId);
+            var validationResult = await ValidateRequest(productNamesRequest, correlationId);
             if (validationResult != null)
             {
                 return validationResult;
@@ -78,45 +77,23 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private string[] SanitizeProductNames(string[] productNames)
         {
-            if (productNames == null || productNames.Length == 0)
-            {
-                return [];
-            }
-
-            var sanitizedIdentifiers = new List<string>();
-
-            foreach (var identifier in productNames)
-            {
-                if (identifier != null)
-                {
-                    sanitizedIdentifiers.Add(identifier.Trim());
-                }
-            }
-
-            return [.. sanitizedIdentifiers];
+            return productNames?.Where(name => !string.IsNullOrEmpty(name))
+                                .Select(name => name.Trim())
+                                .ToArray();
         }
 
-        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string correlationId)
+        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateRequest<T>(T request, string correlationId)
         {
-            var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
+            var validationResult = request switch
+            {
+                UpdatesSinceRequest updatesSinceRequest => await _updatesSinceValidator.Validate(updatesSinceRequest),
+                ProductNameRequest productNameRequest => await _productNameValidator.Validate(productNameRequest),
+                _ => throw new InvalidOperationException("Unsupported request type")
+            };
 
             if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
             {
-                _logger.LogError(EventIds.UpdatesSinceValidationFailed.ToEventId(), "Update since validation failed | _X-Correlation-ID : {correlationId}", correlationId);
-
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
-            }
-            return null;
-        }
-
-        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateProductNamesRequest(ProductNameRequest productNameRequest, string correlationId)
-        {
-            var validationResult = await _productNameValidator.Validate(productNameRequest);
-
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
-            {
-                _logger.LogError(EventIds.InvalidProductNames.ToEventId(), "Product name validation failed. | _X-Correlation-ID : {correlationId}", correlationId);
-
+                _logger.LogError(EventIds.ValidationFailed.ToEventId(), "Validation failed for {RequestType} | _X-Correlation-ID : {correlationId}", typeof(T).Name, correlationId);
                 return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
             }
             return null;

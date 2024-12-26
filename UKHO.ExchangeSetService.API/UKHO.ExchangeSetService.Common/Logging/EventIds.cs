@@ -869,9 +869,9 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         PostUpdatesSinceRequestCompleted = 805213,
         /// <summary>
-        /// 805214 - Exception occurred for updatesSince.
+        /// 805214 - Validation failed.
         /// </summary>
-        UpdatesSinceValidationFailed = 805214,
+        ValidationFailed = 805214,
         /// <summary>
         /// 805215 - Request for exchange set service product names endpoint is started.
         /// </summary>
@@ -883,11 +883,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805217 - Empty body error.
         /// </summary>
-        EmptyBodyError = 805217,
-        /// <summary>
-        /// 805218 - Invalid Product names.
-        /// </summary>
-        InvalidProductNames = 805218
+        EmptyBodyError = 805217
 
         #endregion
     }
