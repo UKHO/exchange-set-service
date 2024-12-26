@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.Services
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             productNames = SanitizeProductNames(productNames);
 
@@ -78,23 +78,18 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private string[] SanitizeProductNames(string[] productNames)
         {
-            if (productNames == null)
+            if (productNames == null || productNames.Length == 0)
             {
-                return null;
+                return [];
             }
 
-            if (productNames.Any(x => x == null))
-            {
-                return [null];
-            }
+            var sanitizedIdentifiers = new List<string>();
 
-            List<string> sanitizedIdentifiers = [];
-            if (productNames.Length > 0)
+            foreach (var identifier in productNames)
             {
-                foreach (var identifier in productNames)
+                if (identifier != null)
                 {
-                    var sanitizedIdentifier = identifier.Trim();
-                    sanitizedIdentifiers.Add(sanitizedIdentifier);
+                    sanitizedIdentifiers.Add(identifier.Trim());
                 }
             }
 
