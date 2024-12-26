@@ -47,20 +47,13 @@ namespace UKHO.ExchangeSetService.API.Controllers
         }
 
         [HttpPost("{exchangeSetStandard}/productVersions")]
-        public virtual Task<IActionResult> PostProductVersions([FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri, string exchangeSetStandard)
+        public Task<IActionResult> PostProductVersions(string exchangeSetStandard, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.PostProductVersionsRequestStart, EventIds.PostProductVersionsRequestCompleted,
                 "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var productVersionsRequest = new ProductVersionsRequest
-                    {
-                        ProductVersions = productVersionRequest,
-                        CallbackUri = callbackUri,
-                        CorrelationId = GetCorrelationId()
-                    };
-
-                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionsRequest, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
                     return result.ToActionResult(_httpContextAccessor);
 
                 }, GetCorrelationId(), exchangeSetStandard);

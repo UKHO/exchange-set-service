@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.API.Validation.V2;
@@ -70,29 +71,41 @@ namespace UKHO.ExchangeSetService.API.Services
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(ProductVersionsRequest productVersionsRequest, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            if (productVersionsRequest?.ProductVersions == null || !productVersionsRequest.ProductVersions.Any() || productVersionsRequest.ProductVersions.Any(pv => pv == null))
+            if (productVersionRequest == null || !productVersionRequest.Any() || productVersionRequest.Any(pv => pv == null))
             {
-                return BadRequestErrorResponse(productVersionsRequest?.CorrelationId);
+                return BadRequestErrorResponse(correlationId);
             }
 
-            var validationResult = await ValidateProductVersionsRequest(productVersionsRequest, productVersionsRequest.CorrelationId);
+            var productVersionsRequest = new ProductVersionsRequest
+            {
+                ProductVersions = productVersionRequest,
+                CallbackUri = callbackUri,
+                CorrelationId = correlationId
+            };
+
+            var validationResult = await ValidateRequest(productVersionsRequest, correlationId);
             if (validationResult != null)
             {
                 return validationResult;
             }
 
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse()); // This is a placeholder, the actual implementation is not provided
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
-        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateProductVersionsRequest(ProductVersionsRequest productVersionsRequest, string correlationId)
+        private async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ValidateRequest<T>(T request, string correlationId)
         {
-            var validationResult = await _productVersionsValidator.Validate(productVersionsRequest);
+            var validationResult = request switch
+            {
+                UpdatesSinceRequest updatesSinceRequest => await _updatesSinceValidator.Validate(updatesSinceRequest),
+                ProductVersionsRequest productVersionsRequest => await _productVersionsValidator.Validate(productVersionsRequest),
+                _ => throw new InvalidOperationException("Unsupported request type")
+            };
+
             if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
             {
-                _logger.LogError(EventIds.ProductVersionsValidationFailed.ToEventId(), "Product versions validation failed | _X-Correlation-ID : {correlationId}", correlationId);
-
+                _logger.LogError(EventIds.ValidationFailed.ToEventId(), "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}", typeof(T).Name, JsonConvert.SerializeObject(errors), correlationId);
                 return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
             }
             return null;

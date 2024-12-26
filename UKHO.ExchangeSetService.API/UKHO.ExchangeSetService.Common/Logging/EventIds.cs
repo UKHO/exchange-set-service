@@ -891,11 +891,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805219 - Request for s100 for exchange set service product versions endpoint is completed.
         /// </summary>
-        PostProductVersionsRequestCompleted = 805219,        
+        PostProductVersionsRequestCompleted = 805219,
         /// <summary>
-        /// 805220 - Exchange set creation for s100 for exchange set service product versions validation failed.
+        /// 805220 - Validation failed.
         /// </summary>
-        ProductVersionsValidationFailed = 805220
+        ValidationFailed = 805220
         #endregion
     }
 

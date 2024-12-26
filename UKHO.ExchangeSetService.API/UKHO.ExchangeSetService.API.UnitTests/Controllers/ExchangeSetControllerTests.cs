@@ -24,6 +24,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
     public class ExchangeSetControllerTests
     {
         private const string Iso8601DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+        private const string ExchangeSetStandard = "S100";
+        private readonly string _callbackUri = "https://callback.uri";
 
         private IHttpContextAccessor _fakeHttpContextAccessor;
         private ILogger<ExchangeSetController> _fakeLogger;
@@ -57,7 +59,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         #region ExchangeSetStandardProductVersions
 
         [Test]
-        public async Task WhenExchangeSetStandardProductVersionsRequested_ThenPostProductVersions_Returns202Accepted()
+        public async Task WhenValidProductVersionsIsPassed_ThenReturns202Accepted()
         {
             var productVersionRequest = new List<ProductVersionRequest>
             {
@@ -65,10 +67,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new () { ProductName = "102NO32904820801012", EditionNumber = 36, UpdateNumber = 0 },
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<ProductVersionsRequest>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse())));
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null)));
 
-            var result = await _controller.PostProductVersions(productVersionRequest, "https://callback.uri", "s100");
+            var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
 
             result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
@@ -84,7 +86,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenInvalidExchangeSetStandardProductVersionsRequested_ThenPostProductVersions_ReturnsBadRequest()
+        public async Task WhenInvalidProductVersionsIsPassed_ThenReturnsBadRequest()
         {
             var productVersionRequest = new List<ProductVersionRequest>
             {
@@ -92,10 +94,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new () { ProductName = "", EditionNumber = 10, UpdateNumber = 2 },
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<ProductVersionsRequest>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = [new() { Source = "test", Description = "test error" }] })));
 
-            var result = await _controller.PostProductVersions(productVersionRequest, "https://callback.uri", "s100");
+            var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 
