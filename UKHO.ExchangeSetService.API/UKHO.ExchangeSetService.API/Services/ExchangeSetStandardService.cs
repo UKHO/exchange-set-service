@@ -20,7 +20,6 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public class ExchangeSetStandardService : IExchangeSetStandardService
     {
-
         private readonly ILogger<ExchangeSetStandardService> _logger;
         private readonly IUpdatesSinceValidator _updatesSinceValidator;
         private readonly IProductNameValidator _productNameValidator;
@@ -38,8 +37,6 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (updatesSinceRequest == null)
             {
-                _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
-
                 return BadRequestErrorResponse(correlationId);
             }
 
@@ -149,6 +146,8 @@ namespace UKHO.ExchangeSetService.API.Services
 
         protected ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)
         {
+            _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
+
             var errorDescription = new ErrorDescription
             {
                 CorrelationId = correlationId,
