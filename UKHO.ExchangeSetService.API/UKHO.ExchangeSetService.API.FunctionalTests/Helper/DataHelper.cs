@@ -6,6 +6,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
     public class DataHelper
     {
         public ProductVersionModel ProductVersionModel { get; set; }
+        public UpdatesSinceModel UpdatesSinceModel { get; set; }
 
         public ProductVersionModel GetProductVersionModelData(string productName, int? editionNumber, int? updateNumber)
         {
@@ -118,6 +119,15 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public List<string> GetProductIdentifiersS57()
         {
             return new List<string>() { "GB602571" };
+        }
+
+        public UpdatesSinceModel GetSinceDateTime(string dateTime)
+        {
+            UpdatesSinceModel = new UpdatesSinceModel()
+            {
+                SinceDateTime = dateTime
+            };
+            return UpdatesSinceModel;
         }
     }
 }

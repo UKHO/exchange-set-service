@@ -24,28 +24,43 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Provide all the releasable data after a datetime. - POST /productData
         /// </summary>
+        /// <param name="updatesSinceModel"></param>
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63", UpdatesSinceModel updatesSinceModel = null)
         {
             var uri = $"{apiHost}/productData";
+            var payloadJson = string.Empty;
 
-            uri += $"?exchangeSetStandard={exchangeSetStandard}";
-
-            if (sincedateTime != null)
+            if (exchangeSetStandard == "s100")
             {
-                uri += $"&sinceDateTime={sincedateTime}";
+                uri = $"{apiHost}/v2/exchangeSet/s100/updatesSince";
+                payloadJson = JsonConvert.SerializeObject(updatesSinceModel);
             }
-            if (callbackUri != null)
+            else
+            {
+                uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                if (!string.IsNullOrEmpty(sincedateTime))
+                {
+                    uri += $"&sinceDateTime={sincedateTime}";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(callbackUri))
             {
                 uri += $"&callbackuri={callbackUri}";
             }
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri);
-            if (accessToken != null)
+            if (exchangeSetStandard == "s100")
+            {
+                httpRequestMessage.Content = new StringContent(payloadJson, Encoding.UTF8, "application/json");
+            }
+
+            if (!string.IsNullOrEmpty(accessToken))
             {
                 httpRequestMessage.SetBearerToken(accessToken);
             }
