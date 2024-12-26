@@ -34,3 +34,14 @@ output "default_site_hostname_ess" {
   value = azurerm_app_service.ess_webapp.default_site_hostname
 }
 
+output "wiremock_webapp" {
+  value = azurerm_app_service.wiremock_webapp.name
+}
+
+output "web_app_object_id_wiremock_webapp" {
+  value = azurerm_app_service.wiremock_webapp.identity.0.principal_id
+}
+
+output "default_site_hostname_wiremock_webapp" {
+  value = azurerm_app_service.wiremock_webapp.default_site_hostname
+}

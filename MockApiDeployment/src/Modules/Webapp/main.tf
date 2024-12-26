@@ -77,3 +77,26 @@ resource "azurerm_app_service" "ess_webapp" {
   }
 
 }
+
+resource "azurerm_app_service" "wiremock_webapp" {
+  name                = "${var.service_name}-${var.env_name}-wiremock-${random_string.unique_string.result}-webapp"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  app_service_plan_id = azurerm_app_service_plan.app_service_plan.id
+  tags                = var.tags
+
+  site_config {
+    windows_fx_version  =   "DOTNETCORE|6.0"
+    
+    always_on  = true
+    ftps_state = "Disabled"
+  }
+
+  app_settings = var.app_settings
+
+  identity {
+    type = "UserAssigned"
+    identity_ids = [var.user_assigned_identity]
+  }
+
+}

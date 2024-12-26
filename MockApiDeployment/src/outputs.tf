@@ -10,12 +10,20 @@ output "ess_fulfilment_webappname" {
 value = module.webapp_service.fulfillment_webapp
 }
 
+output "wiremock_webappname" {
+value = module.webapp_service.wiremock_webapp
+}
+
 output "ess_fulfillment_web_app_url" {
 value = "https://${module.webapp_service.default_site_hostname_fulfillment}"
 }
 
 output "scs_fss_mock_web_app_url" {
 value = "https://${module.webapp_service.default_site_hostname_scs_fss_mock}"
+}
+
+output "wiremock_web_app_url" {
+value = "https://${module.webapp_service.default_site_hostname_wiremock_webapp}"
 }
 
 output "ess_web_app_url" {
