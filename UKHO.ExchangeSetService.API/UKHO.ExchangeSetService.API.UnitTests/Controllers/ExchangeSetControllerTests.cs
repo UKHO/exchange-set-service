@@ -56,10 +56,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             nullExchangeSetService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("exchangeSetStandardService");
         }
 
-        #region ExchangeSetStandardProductVersions
-
         [Test]
-        public async Task WhenValidProductVersionsIsPassed_ThenReturns202Accepted()
+        public async Task WhenValidProductVersionsIsPassed_ThenPostProductVersionsReturns202Accepted()
         {
             var productVersionRequest = new List<ProductVersionRequest>
             {
@@ -68,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             };
 
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null)));
+             .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null));
 
             var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
 
@@ -86,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
 
         [Test]
-        public async Task WhenInvalidProductVersionsIsPassed_ThenReturnsBadRequest()
+        public async Task WhenInvalidProductVersionsIsPassed_ThenPostProductVersionsReturnsBadRequest()
         {
             var productVersionRequest = new List<ProductVersionRequest>
             {
@@ -95,7 +93,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             };
 
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(Task.FromResult(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = [new() { Source = "test", Description = "test error" }] })));
+                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = [new() { Source = "requestBody", Description = "Either body is null or malformed." }] }));
 
             var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
 
@@ -273,4 +271,3 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         }
     }
 }
-#endregion
