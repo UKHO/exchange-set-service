@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.API.Validation.V2;
@@ -93,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
             {
-                _logger.LogError(EventIds.ValidationFailed.ToEventId(), "Validation failed for {RequestType} | _X-Correlation-ID : {correlationId}", typeof(T).Name, correlationId);
+                _logger.LogError(EventIds.ValidationFailed.ToEventId(), "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}", typeof(T).Name, JsonConvert.SerializeObject(errors), correlationId);
                 return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
             }
             return null;
