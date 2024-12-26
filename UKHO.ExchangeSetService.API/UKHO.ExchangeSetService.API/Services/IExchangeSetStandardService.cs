@@ -11,8 +11,8 @@ namespace UKHO.ExchangeSetService.API.Services
 {
     public interface IExchangeSetStandardService
     {
-        Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateProductDataByProductNames(string[] productNames, string callbackUri, string correlationId);
+        Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId);
 
-        Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken);
     }
 }

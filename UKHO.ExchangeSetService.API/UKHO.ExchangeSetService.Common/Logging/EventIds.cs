@@ -859,6 +859,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         ErrorInDownloadReadMeFile = 805211,
 
         #region V2
+
         /// <summary>
         /// 805212 - Request for updatesSince endpoint started.
         /// </summary>
@@ -868,41 +869,25 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         PostUpdatesSinceRequestCompleted = 805213,
         /// <summary>
-        /// 805214 - Creation of updatesSince is started.
+        /// 805214 - Exception occurred for updatesSince.
         /// </summary>
-        CreateUpdatesSinceStarted = 805214,
+        UpdatesSinceValidationFailed = 805214,
         /// <summary>
-        /// 805215 - Creation of updatesSince is completed.
+        /// 805215 - Request for exchange set service product names endpoint is started.
         /// </summary>
-        CreateUpdatesSinceCompleted = 805215,
+        PostProductNamesRequestStart = 805215,
         /// <summary>
-        /// 805216 - Exception occurred for updatesSince.
+        /// 805216 - Request for exchange set service product names endpoint is completed.
         /// </summary>
-        UpdatesSinceValidationFailed = 805216,
+        PostProductNamesRequestCompleted = 805216,
         /// <summary>
-        /// 805217 - Request for exchange set service product names endpoint is started.
+        /// 805217 - Empty body error.
         /// </summary>
-        PostProductNamesRequestStart = 805217,
+        EmptyBodyError = 805217,
         /// <summary>
-        /// 805218 - Request for exchange set service product names endpoint is completed.
+        /// 805218 - Invalid Product names.
         /// </summary>
-        PostProductNamesRequestCompleted = 805218,
-        /// <summary>
-        /// 805219 - Request for exchange set service call by product names started.
-        /// </summary>
-        CreateProductDataByProductNamesStarted = 805219,
-        /// <summary>
-        /// 805220 - Request for exchange set service call by product names completed.
-        /// </summary>
-        CreateProductDataByProductNamesCompleted = 805220,
-        /// <summary>
-        /// 805221 - Empty body error.
-        /// </summary>
-        EmptyBodyError = 805221,
-        /// <summary>
-        /// 805222 - Invalid Product names.
-        /// </summary>
-        InvalidProductNames = 805222
+        InvalidProductNames = 805218
 
         #endregion
     }

@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.CreateProductDataByProductNames(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequest(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
             A.CallTo(() => _fakeHttpContextAccessor.HttpContext.TraceIdentifier).Returns(correlationId);
 
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
             var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "s101", "https://callback.uri");
@@ -116,7 +116,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
             var result = await _controller.PostUpdatesSince("s100", updatesSinceRequest, "", "https://callback.uri");
@@ -137,7 +137,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenNullOrEmptySinceDateTimeRequested_ThenPostUpdatesSinceReturnsBadRequest()
         {
-            A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription
                 {
                     CorrelationId = Guid.NewGuid().ToString(),
@@ -167,7 +167,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString() };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.CreateUpdatesSince(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription
                 {
                     CorrelationId = Guid.NewGuid().ToString(),

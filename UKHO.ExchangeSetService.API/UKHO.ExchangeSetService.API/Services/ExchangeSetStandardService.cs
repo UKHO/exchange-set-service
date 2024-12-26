@@ -31,10 +31,8 @@ namespace UKHO.ExchangeSetService.API.Services
             _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Create update since started | _X-Correlation-ID : {correlationId}", correlationId);
-
             if (updatesSinceRequest == null)
             {
                 return BadRequestErrorResponse(correlationId);
@@ -50,29 +48,15 @@ namespace UKHO.ExchangeSetService.API.Services
             }
 
             // This is a placeholder, the actual implementation is not provided
-            var exchangeSetServiceResponse = new ExchangeSetStandardServiceResponse
-            {
-                BatchId = Guid.NewGuid().ToString(),
-                LastModified = DateTime.UtcNow.ToString("R"),
-                ExchangeSetStandardResponse = new ExchangeSetStandardResponse()
-                {
-                    BatchId = Guid.NewGuid().ToString()
-                }
-            };
-
-            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Create update since completed | _X-Correlation-ID : {correlationId}", correlationId);
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateProductDataByProductNames(string[] productNames, string callbackUri, string correlationId)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId)
         {
-            _logger.LogInformation(EventIds.CreateProductDataByProductNamesStarted.ToEventId(), "Create product data for product Names started | _X-Correlation-ID : {correlationId}", correlationId);
             productNames = SanitizeProductNames(productNames);
 
             if (productNames == null || productNames.Length == 0)
             {
-                _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
-
                 return BadRequestErrorResponse(correlationId);
             }
 
@@ -89,7 +73,6 @@ namespace UKHO.ExchangeSetService.API.Services
                 return validationResult;
             }
 
-            _logger.LogInformation(EventIds.CreateProductDataByProductNamesCompleted.ToEventId(), "Create Product data for product Names completed | _X-Correlation-ID : {correlationId}", correlationId);
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 

@@ -37,7 +37,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.CreateProductDataByProductNames(productNames, callbackUri, GetCorrelationId());
+                    var result = await _exchangeSetStandardService.ProcessProductNamesRequest(productNames, callbackUri, GetCorrelationId());
 
                     return result.ToActionResult(_httpContextAccessor);
                 },
@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "UpdatesSince endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.CreateUpdatesSince(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor);
 
