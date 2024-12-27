@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -24,7 +23,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Provide all the releasable data after a datetime. - POST /productData
         /// </summary>
-        /// <param name="updatesSinceModel"></param>
+        /// <param name="updatesSinceModel">updatesSince Model,pass Null to skip the model</param>
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
@@ -35,18 +34,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var uri = $"{apiHost}/productData";
             var payloadJson = string.Empty;
 
-            if (exchangeSetStandard == "s100")
+            switch (exchangeSetStandard)
             {
-                uri = $"{apiHost}/v2/exchangeSet/s100/updatesSince";
-                payloadJson = JsonConvert.SerializeObject(updatesSinceModel);
-            }
-            else
-            {
-                uri += $"?exchangeSetStandard={exchangeSetStandard}";
-                if (!string.IsNullOrEmpty(sincedateTime))
-                {
-                    uri += $"&sinceDateTime={sincedateTime}";
-                }
+                case "s100":
+                    uri = $"{apiHost}/v2/exchangeSet/s100/updatesSince";
+                    payloadJson = JsonConvert.SerializeObject(updatesSinceModel);
+                    break;
+
+                default:
+                    uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                    if (!string.IsNullOrEmpty(sincedateTime))
+                    {
+                        uri += $"&sinceDateTime={sincedateTime}";
+                    }
+                    break;
             }
 
             if (!string.IsNullOrEmpty(callbackUri))
