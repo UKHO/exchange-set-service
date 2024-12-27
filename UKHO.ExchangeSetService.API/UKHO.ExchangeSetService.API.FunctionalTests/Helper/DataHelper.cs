@@ -129,5 +129,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             };
             return UpdatesSinceModel;
         }
+
+        public List<string> GetProductNamesForS100()
+        {
+            return new List<string>() { "101GB40079ABCDEFG", "102NO32904820801012", "104US00_CHES_TYPE1_20210630_0600", "111US00_ches_dcf8_20190703T00Z" };
+        }
     }
 }

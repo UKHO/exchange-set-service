@@ -80,13 +80,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData/productVersions";
+            switch (exchangeSetStandard)
+            {
+                case "s100":
+                    uri = $"{apiHost}/v2/exchangeSet/s100/productVersions";
+                    break;
+
+                default:
+                    uri += $"?exchangeSetStandard={exchangeSetStandard}";
+
+                    break;
+            }
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}&exchangeSetStandard={exchangeSetStandard}";
-            }
-            else
-            {
-                uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                uri += $"?callbackuri={callbackUri}";
             }
             var payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
@@ -110,13 +117,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData/productIdentifiers";
+            switch (exchangeSetStandard)
+            {
+                case "s100":
+                    uri = $"{apiHost}/v2/exchangeSet/s100/productNames";
+                    break;
+
+                default:
+                    uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                   
+                    break;
+            }
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}&exchangeSetStandard={exchangeSetStandard}";
-            }
-            else
-            {
-                uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                uri += $"?callbackuri={callbackUri}";
             }
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 
