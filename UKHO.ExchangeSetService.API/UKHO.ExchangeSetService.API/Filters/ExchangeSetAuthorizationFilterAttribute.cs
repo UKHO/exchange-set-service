@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using UKHO.ExchangeSetService.Common.Enums;
+using UKHO.ExchangeSetService.Common.Models.Enums.V2;
 
 namespace UKHO.ExchangeSetService.API.Filters
 {
