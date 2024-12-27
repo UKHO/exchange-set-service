@@ -190,10 +190,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-         && call.GetArgument<LogLevel>(0) == LogLevel.Error
-         && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
-         && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
-
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
         }
 
         private ValidationResult GetValidationResult()
