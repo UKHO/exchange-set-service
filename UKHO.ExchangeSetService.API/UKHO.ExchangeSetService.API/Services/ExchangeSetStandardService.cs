@@ -81,8 +81,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var productVersionsRequest = new ProductVersionsRequest
             {
                 ProductVersions = productVersionRequest,
-                CallbackUri = callbackUri,
-                CorrelationId = correlationId
+                CallbackUri = callbackUri
             };
 
             var validationResult = await ValidateRequest(productVersionsRequest, correlationId);
