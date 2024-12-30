@@ -125,7 +125,6 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             builder.Services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
-            builder.Services.AddScoped<IExchangeSetStandardService, ExchangeSetStandardService>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddAllElasticApm();
@@ -188,7 +187,9 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<BespokeExchangeSetAuthorizationFilterAttribute>();
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
+            builder.Services.AddScoped<IExchangeSetStandardService, ExchangeSetStandardService>();
             builder.Services.AddScoped<IUpdatesSinceValidator, UpdatesSinceValidator>();
+            builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")

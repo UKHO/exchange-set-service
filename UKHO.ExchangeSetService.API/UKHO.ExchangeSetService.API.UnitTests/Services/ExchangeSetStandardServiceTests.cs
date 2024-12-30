@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
@@ -24,9 +25,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
     public class ExchangeSetStandardServiceTests
     {
         private readonly string _fakeCorrelationId = Guid.NewGuid().ToString();
+        private readonly string _callbackUri = "https://callback.uri";
 
         private ILogger<ExchangeSetStandardService> _fakeLogger;
         private IUpdatesSinceValidator _fakeUpdatesSinceValidator;
+        private IProductVersionsValidator _fakeProductVersionsValidator;
 
         private ExchangeSetStandardService _service;
 
@@ -35,18 +38,22 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             _fakeLogger = A.Fake<ILogger<ExchangeSetStandardService>>();
             _fakeUpdatesSinceValidator = A.Fake<IUpdatesSinceValidator>();
+            _fakeProductVersionsValidator = A.Fake<IProductVersionsValidator>();
 
-            _service = new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator);
+            _service = new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator);
         }
 
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullLogger = () => new ExchangeSetStandardService(null, _fakeUpdatesSinceValidator);
+            Action nullLogger = () => new ExchangeSetStandardService(null, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator);
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
-            Action nullUpdatesSinceValidator = () => new ExchangeSetStandardService(_fakeLogger, null);
+            Action nullUpdatesSinceValidator = () => new ExchangeSetStandardService(_fakeLogger, null, _fakeProductVersionsValidator);
             nullUpdatesSinceValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("updatesSinceValidator");
+
+            Action nullProductVersionsValidator = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, null);
+            nullProductVersionsValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productVersionsValidator");
         }
 
         [Test]
@@ -134,6 +141,75 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.CreateUpdatesSinceCompleted.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Creation of update since completed | X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenValidProductVersionRequest_ThenProcessProductVersionsRequestReturns202Accepted()
+        {
+            var productVersions = new List<ProductVersionRequest>
+            {
+                new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 7, UpdateNumber = 10 }
+            };
+
+            A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            var result = await _service.ProcessProductVersionsRequest(productVersions, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            result.Should().NotBeNull();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenProductNameIsBlank_ThenProcessProductVersionsRequestShouldReturnBadRequest()
+        {
+            var validationFailureMessage = "productName cannot be blank or null.";
+
+            var productVersions = new List<ProductVersionRequest>
+                {
+                    new () { ProductName = "", EditionNumber = 7, UpdateNumber = 10 }
+                };
+
+            var validationMessage = new ValidationFailure("productVersions", validationFailureMessage)
+            {
+                ErrorCode = HttpStatusCode.BadRequest.ToString()
+            };
+
+            A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
+
+            var result = await _service.ProcessProductVersionsRequest(productVersions, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.ErrorDescription.Should().NotBeNull();
+            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == validationFailureMessage);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenProductVersionsRequestIsNull_ThenProcessProductVersionsRequestShouldReturnBadRequest()
+        {
+            var error = "Either body is null or malformed.";
+
+            var result = await _service.ProcessProductVersionsRequest(null, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.ErrorDescription.Should().NotBeNull();
+            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == error);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         private ValidationResult GetValidationResult()
