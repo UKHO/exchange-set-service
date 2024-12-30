@@ -34,63 +34,29 @@ namespace UKHO.ExchangeSetService.API.Services
             _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Creation of update since started | X-Correlation-ID : {correlationId}", correlationId);
+            productNames = SanitizeProductNames(productNames);
 
-            if (updatesSinceRequest == null)
+            if (productNames == null || productNames.Length == 0)
             {
-                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
-
                 return BadRequestErrorResponse(correlationId);
             }
 
-            updatesSinceRequest.ProductIdentifier = productIdentifier;
-            updatesSinceRequest.CallbackUri = callbackUri;
-
-            var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
-
-            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
+            var productNamesRequest = new ProductNameRequest
             {
-                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
-
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
-            }
-
-            // This is a placeholder, the actual implementation is not provided
-            var exchangeSetServiceResponse = new ExchangeSetStandardServiceResponse
-            {
-                BatchId = Guid.NewGuid().ToString(),
-                LastModified = DateTime.UtcNow.ToString("R"),
-                ExchangeSetStandardResponse = new ExchangeSetStandardResponse()
-                {
-                    BatchId = Guid.NewGuid().ToString()
-                }
+                ProductNames = productNames,
+                CallbackUri = callbackUri,
+                CorrelationId = correlationId
             };
 
-            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Creation of update since completed | X-Correlation-ID : {correlationId}", correlationId);
-
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
-        }
-
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
-        {
-            if (updatesSinceRequest == null)
-            {
-                return BadRequestErrorResponse(correlationId);
-            }
-
-            updatesSinceRequest.ProductIdentifier = productIdentifier;
-            updatesSinceRequest.CallbackUri = callbackUri;
-
-            var validationResult = await ValidateRequest(updatesSinceRequest, correlationId);
+            var validationResult = await ValidateRequest(productNamesRequest, correlationId);
             if (validationResult != null)
             {
                 return validationResult;
             }
 
-            // This is a placeholder, the actual implementation is not provided
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -115,29 +81,24 @@ namespace UKHO.ExchangeSetService.API.Services
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            productNames = SanitizeProductNames(productNames);
-
-            if (productNames == null || productNames.Length == 0)
+            if (updatesSinceRequest == null)
             {
                 return BadRequestErrorResponse(correlationId);
             }
 
-            var productNamesRequest = new ProductNameRequest
-            {
-                ProductNames = productNames,
-                CallbackUri = callbackUri,
-                CorrelationId = correlationId
-            };
+            updatesSinceRequest.ProductIdentifier = productIdentifier;
+            updatesSinceRequest.CallbackUri = callbackUri;
 
-            var validationResult = await ValidateRequest(productNamesRequest, correlationId);
+            var validationResult = await ValidateRequest(updatesSinceRequest, correlationId);
             if (validationResult != null)
             {
                 return validationResult;
             }
 
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            // This is a placeholder, the actual implementation is not provided
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
         }
 
         private string[] SanitizeProductNames(string[] productNames)
