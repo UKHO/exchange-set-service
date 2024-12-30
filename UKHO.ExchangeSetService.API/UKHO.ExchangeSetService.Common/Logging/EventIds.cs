@@ -895,7 +895,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805220 - Validation failed.
         /// </summary>
-        ValidationFailed = 805220
+        ValidationFailed = 805220,
+        /// <summary>
+        /// 805221 - Request for exchange set service product names endpoint is started.
+        /// </summary>
+        PostProductNamesRequestStart = 805221,
+        /// <summary>
+        /// 805222 - Request for exchange set service product names endpoint is completed.
+        /// </summary>
+        PostProductNamesRequestCompleted = 805222
         #endregion
     }
 
