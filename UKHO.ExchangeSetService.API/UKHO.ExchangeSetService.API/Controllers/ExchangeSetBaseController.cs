@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
+    [ExcludeFromCodeCoverage]
     public abstract class ExchangeSetBaseController<T> : ControllerBase
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

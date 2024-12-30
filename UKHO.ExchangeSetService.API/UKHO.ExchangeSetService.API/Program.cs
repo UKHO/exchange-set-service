@@ -1,3 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Security.Claims;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -12,26 +21,17 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Security.Claims;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
+using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
-using UKHO.ExchangeSetService.API.Validation.V2;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -125,7 +125,6 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             builder.Services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
-            builder.Services.AddScoped<IExchangeSetStandardService, ExchangeSetStandardService>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddAllElasticApm();
@@ -189,7 +188,10 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<ExchangeSetAuthorizationFilterAttribute>();
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
+            builder.Services.AddScoped<IExchangeSetStandardService, ExchangeSetStandardService>();
+            builder.Services.AddScoped<IProductNameValidator, ProductNameValidator>();
             builder.Services.AddScoped<IUpdatesSinceValidator, UpdatesSinceValidator>();
+            builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
