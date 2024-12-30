@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,13 +23,54 @@ namespace UKHO.ExchangeSetService.API.Services
     {
         private readonly ILogger<ExchangeSetStandardService> _logger;
         private readonly IUpdatesSinceValidator _updatesSinceValidator;
+        private readonly IProductVersionsValidator _productVersionsValidator;
         private readonly IProductNameValidator _productNameValidator;
 
-        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger, IUpdatesSinceValidator updatesSinceValidator, IProductNameValidator productNameValidator)
+        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger, IUpdatesSinceValidator updatesSinceValidator, IProductVersionsValidator productVersionsValidator, IProductNameValidator productNameValidator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
+            _productVersionsValidator = productVersionsValidator ?? throw new ArgumentNullException(nameof(productVersionsValidator));
             _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));
+        }
+
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> CreateUpdatesSince(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation(EventIds.CreateUpdatesSinceStarted.ToEventId(), "Creation of update since started | X-Correlation-ID : {correlationId}", correlationId);
+
+            if (updatesSinceRequest == null)
+            {
+                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
+
+                return BadRequestErrorResponse(correlationId);
+            }
+
+            updatesSinceRequest.ProductIdentifier = productIdentifier;
+            updatesSinceRequest.CallbackUri = callbackUri;
+
+            var validationResult = await _updatesSinceValidator.Validate(updatesSinceRequest);
+
+            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out var errors))
+            {
+                _logger.LogError(EventIds.CreateUpdatesSinceException.ToEventId(), "Creation of update since exception occurred | X-Correlation-ID : {correlationId}", correlationId);
+
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = correlationId, Errors = errors });
+            }
+
+            // This is a placeholder, the actual implementation is not provided
+            var exchangeSetServiceResponse = new ExchangeSetStandardServiceResponse
+            {
+                BatchId = Guid.NewGuid().ToString(),
+                LastModified = DateTime.UtcNow.ToString("R"),
+                ExchangeSetStandardResponse = new ExchangeSetStandardResponse()
+                {
+                    BatchId = Guid.NewGuid().ToString()
+                }
+            };
+
+            _logger.LogInformation(EventIds.CreateUpdatesSinceCompleted.ToEventId(), "Creation of update since completed | X-Correlation-ID : {correlationId}", correlationId);
+
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -49,6 +91,28 @@ namespace UKHO.ExchangeSetService.API.Services
 
             // This is a placeholder, the actual implementation is not provided
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
+        }
+
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        {
+            if (productVersionRequest == null || !productVersionRequest.Any() || productVersionRequest.Any(pv => pv == null))
+            {
+                return BadRequestErrorResponse(correlationId);
+            }
+
+            var productVersionsRequest = new ProductVersionsRequest
+            {
+                ProductVersions = productVersionRequest,
+                CallbackUri = callbackUri
+            };
+
+            var validationResult = await ValidateRequest(productVersionsRequest, correlationId);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -89,6 +153,7 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 UpdatesSinceRequest updatesSinceRequest => await _updatesSinceValidator.Validate(updatesSinceRequest),
                 ProductNameRequest productNameRequest => await _productNameValidator.Validate(productNameRequest),
+                ProductVersionsRequest productVersionsRequest => await _productVersionsValidator.Validate(productVersionsRequest),
                 _ => throw new InvalidOperationException("Unsupported request type")
             };
 

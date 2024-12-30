@@ -869,22 +869,41 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         PostUpdatesSinceRequestCompleted = 805213,
         /// <summary>
-        /// 805214 - Validation failed.
+        /// 805214 - Creation of updatesSince is started.
         /// </summary>
-        ValidationFailed = 805214,
+        CreateUpdatesSinceStarted = 805214,
         /// <summary>
-        /// 805215 - Request for exchange set service product names endpoint is started.
+        /// 805215 - Creation of updatesSince is completed.
         /// </summary>
-        PostProductNamesRequestStart = 805215,
+        CreateUpdatesSinceCompleted = 805215,
         /// <summary>
-        /// 805216 - Request for exchange set service product names endpoint is completed.
+        /// 805216 - Exception occurred for updatesSince.
         /// </summary>
-        PostProductNamesRequestCompleted = 805216,
+        CreateUpdatesSinceException = 805216,
         /// <summary>
         /// 805217 - Empty body error.
         /// </summary>
-        EmptyBodyError = 805217
-
+        EmptyBodyError = 805217,
+        /// <summary>
+        /// 805218 - Request for s100 for exchange set service product versions endpoint is started.
+        /// </summary>
+        PostProductVersionsRequestStart = 805218,
+        /// <summary>
+        /// 805219 - Request for s100 for exchange set service product versions endpoint is completed.
+        /// </summary>
+        PostProductVersionsRequestCompleted = 805219,
+        /// <summary>
+        /// 805220 - Validation failed.
+        /// </summary>
+        ValidationFailed = 805220,
+        /// <summary>
+        /// 805221 - Request for exchange set service product names endpoint is started.
+        /// </summary>
+        PostProductNamesRequestStart = 805221,
+        /// <summary>
+        /// 805222 - Request for exchange set service product names endpoint is completed.
+        /// </summary>
+        PostProductNamesRequestCompleted = 805222
         #endregion
     }
 

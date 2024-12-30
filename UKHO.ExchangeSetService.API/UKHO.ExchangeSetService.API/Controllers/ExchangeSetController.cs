@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -53,8 +54,21 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "UpdatesSince endpoint request for _X-Correlation-ID : {correlationId} and ExchangeSetStandard : {exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.CreateUpdatesSince(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
 
+                    return result.ToActionResult(_httpContextAccessor);
+
+                }, GetCorrelationId(), exchangeSetStandard);
+        }
+
+        [HttpPost("{exchangeSetStandard}/productVersions")]
+        public Task<IActionResult> PostProductVersions(string exchangeSetStandard, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.PostProductVersionsRequestStart, EventIds.PostProductVersionsRequestCompleted,
+                "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
+                async () =>
+                {
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
                     return result.ToActionResult(_httpContextAccessor);
 
                 }, GetCorrelationId(), exchangeSetStandard);
