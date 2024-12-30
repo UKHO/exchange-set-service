@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -24,28 +23,45 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Provide all the releasable data after a datetime. - POST /productData
         /// </summary>
+        /// <param name="updatesSinceModel">updatesSince Model,pass Null to skip the model</param>
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63", UpdatesSinceModel updatesSinceModel = null)
         {
             var uri = $"{apiHost}/productData";
+            var payloadJson = string.Empty;
 
-            uri += $"?exchangeSetStandard={exchangeSetStandard}";
-
-            if (sincedateTime != null)
+            switch (exchangeSetStandard)
             {
-                uri += $"&sinceDateTime={sincedateTime}";
+                case "s100":
+                    uri = $"{apiHost}/v2/exchangeSet/s100/updatesSince";
+                    payloadJson = JsonConvert.SerializeObject(updatesSinceModel);
+                    break;
+
+                default:
+                    uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                    if (!string.IsNullOrEmpty(sincedateTime))
+                    {
+                        uri += $"&sinceDateTime={sincedateTime}";
+                    }
+                    break;
             }
-            if (callbackUri != null)
+
+            if (!string.IsNullOrEmpty(callbackUri))
             {
                 uri += $"&callbackuri={callbackUri}";
             }
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, uri);
-            if (accessToken != null)
+            if (exchangeSetStandard == "s100")
+            {
+                httpRequestMessage.Content = new StringContent(payloadJson, Encoding.UTF8, "application/json");
+            }
+
+            if (!string.IsNullOrEmpty(accessToken))
             {
                 httpRequestMessage.SetBearerToken(accessToken);
             }
@@ -56,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Get latest baseline data for a specified set of ENCs. - POST /productData/productVersions
         /// </summary>
-        /// <param name="productVersionModel"></param>
+        /// <param name="productVersionModel">product version Model,pass Null to skip the model</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
@@ -64,13 +80,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public async Task<HttpResponseMessage> GetProductVersionsAsync(List<ProductVersionModel> productVersionModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData/productVersions";
+            switch (exchangeSetStandard)
+            {
+                case "s100":
+                    uri = $"{apiHost}/v2/exchangeSet/s100/productVersions";
+                    break;
+
+                default:
+                    uri += $"?exchangeSetStandard={exchangeSetStandard}";
+
+                    break;
+            }
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}&exchangeSetStandard={exchangeSetStandard}";
-            }
-            else
-            {
-                uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                uri += $"?callbackuri={callbackUri}";
             }
             var payloadJson = JsonConvert.SerializeObject(productVersionModel);
 
@@ -86,7 +109,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Get latest baseline data for a specified set of ENCs. with exchangeSetStandard parameter - POST /productData/productIdentifiers
         /// </summary>
-        /// <param name="productIdentifierModel"></param>
+        /// <param name="productIdentifierModel">productIdentifier Model,pass Null to skip the model</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
@@ -94,13 +117,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public async Task<HttpResponseMessage> GetProductIdentifiersDataAsync(List<string> productIdentifierModel, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63")
         {
             var uri = $"{apiHost}/productData/productIdentifiers";
+            switch (exchangeSetStandard)
+            {
+                case "s100":
+                    uri = $"{apiHost}/v2/exchangeSet/s100/productNames";
+                    break;
+
+                default:
+                    uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                   
+                    break;
+            }
             if (callbackUri != null)
             {
-                uri += $"?callbackuri={callbackUri}&exchangeSetStandard={exchangeSetStandard}";
-            }
-            else
-            {
-                uri += $"?exchangeSetStandard={exchangeSetStandard}";
+                uri += $"?callbackuri={callbackUri}";
             }
             var payloadJson = JsonConvert.SerializeObject(productIdentifierModel);
 

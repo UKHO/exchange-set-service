@@ -185,6 +185,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<UserIdentifier>();
             builder.Services.AddScoped<IFileSystem, FileSystem>();
             builder.Services.AddScoped<BespokeExchangeSetAuthorizationFilterAttribute>();
+            builder.Services.AddScoped<ExchangeSetAuthorizationFilterAttribute>();
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
             builder.Services.AddScoped<IExchangeSetStandardService, ExchangeSetStandardService>();
