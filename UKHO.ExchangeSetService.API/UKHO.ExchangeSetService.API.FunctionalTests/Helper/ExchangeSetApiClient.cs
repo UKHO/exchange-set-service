@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Get latest baseline data for a specified set of ENCs. - POST /productData/productVersions
         /// </summary>
-        /// <param name="productVersionModel"></param>
+        /// <param name="productVersionModel">product version Model,pass Null to skip the model</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <summary>
         /// Get latest baseline data for a specified set of ENCs. with exchangeSetStandard parameter - POST /productData/productIdentifiers
         /// </summary>
-        /// <param name="productIdentifierModel"></param>
+        /// <param name="productIdentifierModel">productIdentifier Model,pass Null to skip the model</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
