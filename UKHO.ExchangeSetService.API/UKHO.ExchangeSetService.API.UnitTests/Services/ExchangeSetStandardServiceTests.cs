@@ -14,7 +14,6 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Services;
-using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
