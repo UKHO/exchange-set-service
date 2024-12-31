@@ -25,6 +25,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         protected string DownloadedFolderPath;
         protected string AioDownloadedFolderPath;
         protected string EncDownloadedFolderPath;
+        protected UpdatesSinceModel UpdatesSinceModel { get; set; }
 
         public ObjectStorage()
         {
@@ -39,6 +40,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             ScsJwtToken = authTokenProvider.GetScsToken().Result;
             FssApiClient = new FssApiClient();
             ProductVersionData = new List<ProductVersionModel>();
+            UpdatesSinceModel = new UpdatesSinceModel();
         }
     }
 }

@@ -1,0 +1,79 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
+using NUnit.Framework;
+using UKHO.ExchangeSetService.API.Filters;
+using UKHO.ExchangeSetService.Common.Models.Enums;
+
+namespace UKHO.ExchangeSetService.API.UnitTests.Filters
+{
+    [TestFixture]
+    public class ExchangeSetAuthorizationFilterAttributeTests
+    {
+        private ExchangeSetAuthorizationFilterAttribute exchangeSetFilterAttribute;
+        private ActionExecutingContext actionExecutingContext;
+        private ActionExecutedContext actionExecutedContext;
+        private const string ExchangeSetStandard = "exchangeSetStandard";
+        private HttpContext httpContext;
+
+        [SetUp]
+        public void Setup()
+        {
+            httpContext = new DefaultHttpContext();
+            exchangeSetFilterAttribute = new ExchangeSetAuthorizationFilterAttribute();            
+        }       
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIsNotSent_ThenReturnBadRequest()
+        {
+            var dictionary = new Dictionary<string, StringValues> { };
+            httpContext.Request.RouteValues = new RouteValueDictionary(dictionary);
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
+
+            await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        }
+
+        [Test]
+        public async Task WhenExchangeSetStandardParameterIsS100_ThenReturnNextRequest()
+        {
+            httpContext.Request.RouteValues.Add(ExchangeSetStandard, ExchangeSetStandardForUnitTests.s100.ToString());
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
+
+            await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(ExchangeSetStandardForUnitTests.s100.ToString());
+        }
+
+        [Test]
+        [TestCase("s57")]
+        [TestCase("s63")]
+        [TestCase(" s100 ")]
+        [TestCase("")]
+        [TestCase("s 100")]
+        public async Task WhenExchangeSetStandardParameterIsInvalid_ThenReturnBadRequest(string exchangeSetStandard)
+        {
+            httpContext.Request.RouteValues.Add(ExchangeSetStandard, exchangeSetStandard);
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
+            actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
+
+            await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
+
+            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        }
+      
+    }
+}

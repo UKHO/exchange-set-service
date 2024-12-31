@@ -7,11 +7,7 @@ using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation.V2
-{
-    public interface IProductVersionsValidator
-    {
-        Task<ValidationResult> Validate(ProductVersionsRequest request);
-    }
+{   
     public class ProductVersionsValidator : AbstractValidator<ProductVersionsRequest>, IProductVersionsValidator
     {
         public ProductVersionsValidator()
