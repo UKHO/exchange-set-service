@@ -711,5 +711,14 @@
    ]]>
     </notes>
     <cve>CVE-2014-9152</cve>
-  </suppress>  
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: YamlDotNet.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/YamlDotNet@.*$</packageUrl>
+    <cve>CVE-2018-1000210</cve>
+  </suppress>
 </suppressions>
