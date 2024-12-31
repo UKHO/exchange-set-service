@@ -29,9 +29,12 @@ using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
+using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogueService;
+using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.ISalesCatalogueService;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -126,6 +129,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             builder.Services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
+            builder.Services.AddScoped<IUriHelper, UriHelper>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddAllElasticApm();
