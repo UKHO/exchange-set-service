@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-
 using System;
 using System.IO;
 using System.Net;
@@ -38,7 +37,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.WireMock.Stubs
                .WithHeader("Authorization", "Bearer *", MatchBehaviour.AcceptOnMatch))
                .RespondWith(Response.Create()
                .WithStatusCode(HttpStatusCode.Accepted)
-                .WithBodyFromFile(Path.Combine(_responseFileDirectoryPath, "response-200.json")));            
+                .WithBodyFromFile(Path.Combine(_responseFileDirectoryPath, "response-200.json")));
+
+       //     server.Given(Request.Create().WithPath(ScsUrl).UsingGet())
+     //.RespondWith(Response.Create().WithStatusCode(200).WithBody("OK"));
         }
     }
 }
