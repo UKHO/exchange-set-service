@@ -7,6 +7,9 @@ using Microsoft.Extensions.Hosting;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Filters;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Wiremock.StubSetup;
+using UKHO.SalesCatalogueFileShareServicesMock.API.WireMock.StubSetup;
+using WireMock.Settings;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API
 {
@@ -34,6 +37,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
             services.AddScoped<FileShareService>();
             services.Configure<SalesCatalogueConfiguration>(Configuration.GetSection("SalesCatalogue"));
             services.Configure<FileShareServiceConfiguration>(Configuration.GetSection("FileShareService"));
+
+            services.Configure<WireMockServerSettings>(Configuration.GetSection("WireMockServerSettings"));
+            services.AddSingleton<StubFactory>();
+            services.AddHostedService<StubManagerHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

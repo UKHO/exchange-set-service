@@ -8,6 +8,9 @@
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="8.0.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
+    <PackageReference Include="WireMock.Net" Version="1.6.10" />
+    <PackageReference Include="WireMock.Net.Abstractions" Version="1.6.10" />
+    <PackageReference Include="WireMock.Org.Abstractions" Version="1.6.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -395,5 +398,9 @@
     <None Update="Data\FileShareService\Readme\README.TXT">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="WireMock\StubData\SCS\" />
   </ItemGroup>
 </Project>
