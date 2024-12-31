@@ -903,7 +903,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805222 - Request for exchange set service product names endpoint is completed.
         /// </summary>
-        PostProductNamesRequestCompleted = 805222
+        PostProductNamesRequestCompleted = 805222,
+        /// <summary>
+        /// 805223 - Request for sales catalogue service V2 product versions endpoint is started.
+        /// </summary>
+        SCSPostProductVersionsV2RequestStarted = 805223,
+        /// <summary>
+        /// 805224 - Request for sales catalogue service V2 product versions endpoint is completed.
+        /// </summary>
+        SCSPostProductVersionsV2RequestCompleted = 805224
         #endregion
     }
 

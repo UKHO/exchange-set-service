@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, exchangeSetStandard, GetCorrelationId(), GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor);
 
