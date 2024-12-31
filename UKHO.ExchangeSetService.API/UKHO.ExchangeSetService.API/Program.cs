@@ -118,6 +118,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
             builder.Services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
             builder.Services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
+            builder.Services.AddScoped<Common.Helpers.V2.ISalesCatalogueService, Common.Helpers.V2.SalesCatalogueService>(); // Version V2
             builder.Services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
             builder.Services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
             builder.Services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
@@ -135,6 +136,7 @@ namespace UKHO.ExchangeSetService.API
             });
 
             builder.Services.Configure<SalesCatalogueConfiguration>(builder.Configuration.GetSection("SalesCatalogue"));
+            builder.Services.Configure<Common.Configuration.V2.SalesCatalogueConfiguration>(builder.Configuration.GetSection("SalesCatalogueV2"));
 
             var retryCount = Convert.ToInt32(builder.Configuration["RetryConfiguration:RetryCount"]);
             var sleepDuration = Convert.ToDouble(builder.Configuration["RetryConfiguration:SleepDuration"]);
