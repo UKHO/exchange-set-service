@@ -617,40 +617,99 @@
     <packageUrl regex="true">^pkg:nuget/Azure\.Core@.*$</packageUrl>
     <cve>CVE-2024-43591</cve>
   </suppress>
-<suppress>
-		<notes>
-			<![CDATA[
+  <suppress>
+    <notes>
+      <![CDATA[
+   As this vulnerability is due to string input and this service will be run locally with no outside requests, this vulnerability is not applicable
+   file name: Handlebars.Net.Helpers.dll
+   ]]>
+    </notes>
+    <cve>CVE-2020-7661</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   As this vulnerability is due to string input and this service will be run locally with no outside requests, this vulnerability is not applicable
+   file name: Handlebars.Net.Helpers.dll
+   file name: System.Security.Cryptography.X509Certificates:4.3.0
+   ]]>
+    </notes>
+    <cve>CVE-2022-21195</cve>
+    <cve>CVE-2017-11770</cve>
+    <cve>CVE-2019-0820</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+ Not applicable for our use
+   file name: NJsonSchema.Extensions.dll
+   ]]>
+    </notes>
+    <cve>CVE-2021-3918</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+      As this vulnerability is due to string input and json has an integer overflow and out-of-bounds write via a large JSON file,Buffer overflow allows remote attackers to cause a denial of service via unspecified vectors.
+   ]]>
+    </notes>
+    <cve>CVE-2020-12762</cve>
+    <cve>CVE-2013-6370</cve>
+    <cve>CVE-2013-6371</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    False positive, vulnerability is for package "wire" not wire mock
    file name: WireMock.Net.dll,WireMock.Org.Abstractions.dll,WireMock.Org.Abstractions.dll
    ]]>
-		</notes>
-		<cve>CVE-2020-27853</cve>
-		<cve>CVE-2021-41093</cve>
-		<cve>CVE-2021-41100</cve>
-		<cve>CVE-2022-23610</cve>
-		<cve>CVE-2022-31122</cve>
-		<cve>CVE-2020-15258</cve>
-		<cve>CVE-2018-8909</cve>
-		<cve>CVE-2021-41119</cve>
-		<cve>CVE-2021-32665</cve>
-		<cve>CVE-2021-32666</cve>
-		<cve>CVE-2022-23625</cve>
-		<cve>CVE-2022-31009</cve>
-		<cve>CVE-2023-22737</cve>
-		<cve>CVE-2021-41101</cve>
-		<cve>CVE-2022-43673</cve>
-		<cve>CVE-2021-21301</cve>
-		<cve>CVE-2021-32755</cve>
-	</suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
+    </notes>
+    <cve>CVE-2020-27853</cve>
+    <cve>CVE-2021-41093</cve>
+    <cve>CVE-2021-41100</cve>
+    <cve>CVE-2022-23610</cve>
+    <cve>CVE-2022-31122</cve>
+    <cve>CVE-2020-15258</cve>
+    <cve>CVE-2018-8909</cve>
+    <cve>CVE-2021-41119</cve>
+    <cve>CVE-2021-32665</cve>
+    <cve>CVE-2021-32666</cve>
+    <cve>CVE-2022-23625</cve>
+    <cve>CVE-2022-31009</cve>
+    <cve>CVE-2023-22737</cve>
+    <cve>CVE-2021-41101</cve>
+    <cve>CVE-2022-43673</cve>
+    <cve>CVE-2021-21301</cve>
+    <cve>CVE-2021-32755</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
    False positive, vulnerability is for package "wire" not wire mock
    file name: WireMock.Org.Abstractions.dll
    ]]>
-		</notes>		
-		<cve>CVE-2018-9116</cve>
-		<cve>CVE-2023-41329</cve>
-		<cve>CVE-2018-9117</cve>
-	</suppress>
+    </notes>
+    <cve>CVE-2018-9116</cve>
+    <cve>CVE-2023-41329</cve>
+    <cve>CVE-2018-9117</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   .NET Framework Information Disclosure Vulnerability
+   file name: Microsoft.CSharp:4.3.0
+   ]]>
+    </notes>
+    <cve>CVE-2022-41064</cve>
+    <cve>CVE-2022-30184</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: System.Runtime.InteropServices.dll
+   These vunerabilities are in reference to Drupal, which we do not use
+   ]]>
+    </notes>
+    <cve>CVE-2014-9152</cve>
+  </suppress>  
 </suppressions>
