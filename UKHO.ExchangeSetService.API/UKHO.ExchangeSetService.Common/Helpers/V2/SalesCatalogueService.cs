@@ -34,10 +34,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                                      IUriHelper uriHelper)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger)); ;
-            _authScsTokenProvider = authScsTokenProvider ?? throw new ArgumentNullException(nameof(authScsTokenProvider)); ;
-            _salesCatalogueClient = salesCatalogueClient ?? throw new ArgumentNullException(nameof(salesCatalogueClient)); ;
-            _salesCatalogueConfig = salesCatalogueConfig ?? throw new ArgumentNullException(nameof(salesCatalogueConfig)); ;
-            _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper)); ;
+            _authScsTokenProvider = authScsTokenProvider ?? throw new ArgumentNullException(nameof(authScsTokenProvider));
+            _salesCatalogueClient = salesCatalogueClient ?? throw new ArgumentNullException(nameof(salesCatalogueClient));
+            _salesCatalogueConfig = salesCatalogueConfig ?? throw new ArgumentNullException(nameof(salesCatalogueConfig));
+            _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper));
         }
 
         public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(string exchangeSetStandard, string sinceDateTime, string correlationId)

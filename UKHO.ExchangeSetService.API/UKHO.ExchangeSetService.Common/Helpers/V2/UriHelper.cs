@@ -9,8 +9,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
     {
         public Uri CreateUri(string baseUrl, string endpointFormat, params object[] args)
         {
-            var formattedEndpoint = string.Format(endpointFormat, args);
-            return new Uri(new Uri(baseUrl), formattedEndpoint);
+            try
+            {
+                var formattedEndpoint = string.Format(endpointFormat, args);
+                return new Uri(new Uri(baseUrl), formattedEndpoint);
+            }
+            catch (FormatException)
+            {
+                throw;
+            }
         }
     }
 }
