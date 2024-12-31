@@ -12,18 +12,17 @@ using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
 
-
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.WireMock.Stubs
 {
-    public class ProductNamesStub : IStub
+    public class SalesCatalogueServiceStub : IStub
     {
-        private const string ResponseFileDirectory = @"WireMock\StubData\ProductNames";
-        public const string exchangeSetStandard = "/productNames";
+        private const string ResponseFileDirectory = @"WireMock\StubData\SalesCatalogue";
+        public const string productNameEndpoint = "/productNames";
 
         private readonly string _responseFileDirectoryPath = Path.Combine(Environment.CurrentDirectory, ResponseFileDirectory);
         private readonly IOptions<SalesCatalogueServiceConfiguration> _salesCatalogueServiceConfiguration;
 
-        public ProductNamesStub(IOptions<SalesCatalogueServiceConfiguration> salesCatalogueServiceConfiguration)
+        public SalesCatalogueServiceStub(IOptions<SalesCatalogueServiceConfiguration> salesCatalogueServiceConfiguration)
         {
             _salesCatalogueServiceConfiguration = salesCatalogueServiceConfiguration ?? throw new ArgumentNullException(nameof(salesCatalogueServiceConfiguration));
         }
@@ -32,12 +31,12 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.WireMock.Stubs
         {
             server //200
                .Given(Request.Create()
-               .WithPath(new WildcardMatcher(_salesCatalogueServiceConfiguration.Value.Url + exchangeSetStandard, true))
+               .WithPath(new WildcardMatcher(_salesCatalogueServiceConfiguration.Value.Url + productNameEndpoint, true))
                .UsingPost() //need to add request body here              
                .WithHeader("Authorization", "Bearer *", MatchBehaviour.AcceptOnMatch))
                .RespondWith(Response.Create()
                .WithStatusCode(HttpStatusCode.Accepted)
-                .WithBodyFromFile(Path.Combine(_responseFileDirectoryPath, "response-200.json")));
+                .WithBodyFromFile(Path.Combine(_responseFileDirectoryPath, "productNamesResponse-200.json")));
 
        //     server.Given(Request.Create().WithPath(ScsUrl).UsingGet())
      //.RespondWith(Response.Create().WithStatusCode(200).WithBody("OK"));

@@ -617,4 +617,40 @@
     <packageUrl regex="true">^pkg:nuget/Azure\.Core@.*$</packageUrl>
     <cve>CVE-2024-43591</cve>
   </suppress>
+<suppress>
+		<notes>
+			<![CDATA[
+   False positive, vulnerability is for package "wire" not wire mock
+   file name: WireMock.Net.dll,WireMock.Org.Abstractions.dll,WireMock.Org.Abstractions.dll
+   ]]>
+		</notes>
+		<cve>CVE-2020-27853</cve>
+		<cve>CVE-2021-41093</cve>
+		<cve>CVE-2021-41100</cve>
+		<cve>CVE-2022-23610</cve>
+		<cve>CVE-2022-31122</cve>
+		<cve>CVE-2020-15258</cve>
+		<cve>CVE-2018-8909</cve>
+		<cve>CVE-2021-41119</cve>
+		<cve>CVE-2021-32665</cve>
+		<cve>CVE-2021-32666</cve>
+		<cve>CVE-2022-23625</cve>
+		<cve>CVE-2022-31009</cve>
+		<cve>CVE-2023-22737</cve>
+		<cve>CVE-2021-41101</cve>
+		<cve>CVE-2022-43673</cve>
+		<cve>CVE-2021-21301</cve>
+		<cve>CVE-2021-32755</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   False positive, vulnerability is for package "wire" not wire mock
+   file name: WireMock.Org.Abstractions.dll
+   ]]>
+		</notes>		
+		<cve>CVE-2018-9116</cve>
+		<cve>CVE-2023-41329</cve>
+		<cve>CVE-2018-9117</cve>
+	</suppress>
 </suppressions>

@@ -18,7 +18,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.WireMock.StubSetup
         }
         public IStub CreateSCSStub()
         {
-            return new ProductNamesStub(_salesCatalogueServiceConfiguration);
+            return new SalesCatalogueServiceStub(_salesCatalogueServiceConfiguration);
         }
     }
 }
