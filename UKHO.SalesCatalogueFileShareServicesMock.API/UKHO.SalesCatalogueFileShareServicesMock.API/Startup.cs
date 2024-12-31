@@ -8,6 +8,7 @@ using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Filters;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Wiremock.StubSetup;
+using UKHO.SalesCatalogueFileShareServicesMock.API.WireMock.Configuration;
 using UKHO.SalesCatalogueFileShareServicesMock.API.WireMock.StubSetup;
 using WireMock.Settings;
 
@@ -39,6 +40,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API
             services.Configure<FileShareServiceConfiguration>(Configuration.GetSection("FileShareService"));
 
             services.Configure<WireMockServerSettings>(Configuration.GetSection("WireMockServerSettings"));
+            services.Configure<SalesCatalogueServiceConfiguration>(Configuration.GetSection("SalesCatalagoueServiceConfiguration"));
             services.AddSingleton<StubFactory>();
             services.AddHostedService<StubManagerHostedService>();
         }

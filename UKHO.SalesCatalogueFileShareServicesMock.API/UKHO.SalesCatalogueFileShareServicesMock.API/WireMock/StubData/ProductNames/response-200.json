@@ -1,0 +1,34 @@
+{
+  "productCounts": {
+    "requestedProductCount": 2,
+    "returnedProductCount": 1,
+    "requestedProductsAlreadyUpToDateCount": 0,
+    "requestedProductsNotReturned": [
+      {
+        "productName": "102NO32904820801012",
+        "reason": "productWithdrawn"
+      }
+    ]
+  },
+  "products": [
+    {
+      "productName": "101GB40079ABCDEFG",
+      "editionNumber": 0,
+      "updateNumbers": [
+        0
+      ],
+      "dates": [
+        {
+          "updateNumber": 0,
+          "updateApplicationDate": "2019-10-27T00:00:00Z",
+          "issueDate": "2019-10-27T00:00:00Z"
+        }
+      ],
+      "cancellation": {
+        "editionNumber": 0,
+        "updateNumber": 8
+      },
+      "fileSize": 0
+    }
+  ]
+}

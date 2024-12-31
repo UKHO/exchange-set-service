@@ -11,6 +11,7 @@
     <PackageReference Include="WireMock.Net" Version="1.6.10" />
     <PackageReference Include="WireMock.Net.Abstractions" Version="1.6.10" />
     <PackageReference Include="WireMock.Org.Abstractions" Version="1.6.10" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -398,9 +399,5 @@
     <None Update="Data\FileShareService\Readme\README.TXT">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="WireMock\StubData\SCS\" />
   </ItemGroup>
 </Project>
