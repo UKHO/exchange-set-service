@@ -18,6 +18,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
     [Route("v2/exchangeSet")]
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
+        private readonly string _correlationId;
         private readonly ILogger<ExchangeSetController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IExchangeSetStandardService _exchangeSetStandardService;
@@ -31,6 +32,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _exchangeSetStandardService = exchangeSetStandardService ?? throw new ArgumentNullException(nameof(exchangeSetStandardService));
+            _correlationId = GetCorrelationId();
         }
 
         [HttpPost("{exchangeSetStandard}/productNames")]
@@ -42,25 +44,27 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductNamesRequest(productNames, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductNamesRequest(productNames, callbackUri, _correlationId, GetRequestCancellationToken());
 
-                    return result.ToActionResult(_httpContextAccessor);
+                    return result.ToActionResult(_httpContextAccessor, _correlationId);
                 },
-                GetCorrelationId(), exchangeSetStandard);
+                _correlationId, exchangeSetStandard);
         }
 
         [HttpPost("{exchangeSetStandard}/productVersions")]
         public Task<IActionResult> PostProductVersions(string exchangeSetStandard, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
         {
-            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.PostProductVersionsRequestStart, EventIds.PostProductVersionsRequestCompleted,
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.PostProductVersionsRequestStart,
+                EventIds.PostProductVersionsRequestCompleted,
                 "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, exchangeSetStandard, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, exchangeSetStandard, _correlationId, GetRequestCancellationToken());
 
-                    return result.ToActionResult(_httpContextAccessor);
+                    return result.ToActionResult(_httpContextAccessor, _correlationId);
 
-                }, GetCorrelationId(), exchangeSetStandard);
+                }, _correlationId, exchangeSetStandard);
         }
 
         [HttpPost("{exchangeSetStandard}/updatesSince")]
@@ -72,11 +76,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "UpdatesSince endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
 
-                    return result.ToActionResult(_httpContextAccessor);
+                    return result.ToActionResult(_httpContextAccessor, _correlationId);
 
-                }, GetCorrelationId(), exchangeSetStandard);
+                }, _correlationId, exchangeSetStandard);
         }
     }
 }
