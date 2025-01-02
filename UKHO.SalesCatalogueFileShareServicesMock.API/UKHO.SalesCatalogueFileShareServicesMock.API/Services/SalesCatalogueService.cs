@@ -4,6 +4,7 @@ using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response.V2;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 {
@@ -45,6 +46,13 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
         {
             var responseData = FileHelper.ReadJsonFile<SalesCatalogueDataResponse>(salesCatalogueConfiguration.Value.FileDirectoryPath + salesCatalogueConfiguration.Value.ScsCatalogueResponseFile);
             return responseData; 
+        }
+
+        public SalesCatalogueV2Response GetProductNames(string productNames)
+        {
+            var responseData = FileHelper.ReadJsonFile<List<SalesCatalogueV2Response>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var selectedProductNames = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productNames.ToLowerInvariant());
+            return selectedProductNames;
         }
     }
 }
