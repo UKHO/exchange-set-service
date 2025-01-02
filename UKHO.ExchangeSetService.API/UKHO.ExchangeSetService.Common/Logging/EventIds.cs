@@ -905,13 +905,19 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         PostProductNamesRequestCompleted = 805222,
         /// <summary>
-        /// 805223 - Request for sales catalogue service V2 product versions endpoint is started.
+        /// 805223 - Uri exception occurred.
         /// </summary>
-        SCSPostProductVersionsV2RequestStarted = 805223,
+        UriException = 805223,
         /// <summary>
-        /// 805224 - Request for sales catalogue service V2 product versions endpoint is completed.
+        /// 805224 - Request for sales catalogue service V2 product versions endpoint is started.
         /// </summary>
-        SCSPostProductVersionsV2RequestCompleted = 805224
+        SCSPostProductVersionsV2RequestStarted = 805224,
+        /// <summary>
+        /// 805225 - Request for sales catalogue service V2 product versions endpoint is completed.
+        /// </summary>
+        SCSPostProductVersionsV2RequestCompleted = 805225
+
+
         #endregion
     }
 

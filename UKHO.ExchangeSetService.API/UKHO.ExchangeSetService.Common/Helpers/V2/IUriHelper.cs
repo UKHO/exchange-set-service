@@ -7,6 +7,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public interface IUriHelper
     {
-        Uri CreateUri(string baseUrl, string endpointFormat, params object[] args);
+        Uri CreateUri(string baseUrl, string endpointFormat, string correlationId, params object[] args);
     }
 }

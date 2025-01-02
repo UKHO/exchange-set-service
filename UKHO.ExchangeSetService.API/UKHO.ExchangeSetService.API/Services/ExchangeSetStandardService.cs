@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId);
 
-            return SetExchangeSetStandardResponse(salesCatalogServiceResponse);
+            return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
 
         private string[] SanitizeProductNames(string[] productNames)
@@ -158,27 +158,41 @@ namespace UKHO.ExchangeSetService.API.Services
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
         }
 
-        private ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse(ServiceResponseResult<SalesCatalogueResponse> serviceResponseResult)
+        private ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<T>(T request, ServiceResponseResult<SalesCatalogueResponse> serviceResponseResult)
         {
             return serviceResponseResult.StatusCode switch
             {
-                HttpStatusCode.OK or HttpStatusCode.NotModified => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(MapExchangeSetResponse(serviceResponseResult.StatusCode, serviceResponseResult.Value)),
+                HttpStatusCode.OK or HttpStatusCode.NotModified when request is ProductVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(MapExchangeSetResponse(request, serviceResponseResult.StatusCode, serviceResponseResult.Value)),
+                HttpStatusCode.NotModified when request is UpdatesSinceRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotModified(MapExchangeSetResponse(request, serviceResponseResult.StatusCode, serviceResponseResult.Value)),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
         }
 
-        private ExchangeSetStandardServiceResponse MapExchangeSetResponse(HttpStatusCode httpStatusCode, SalesCatalogueResponse salesCatalogueResponse)
+        private ExchangeSetStandardServiceResponse MapExchangeSetResponse<T>(T request, HttpStatusCode httpStatusCode, SalesCatalogueResponse salesCatalogueResponse)
         {
-            return new ExchangeSetStandardServiceResponse
+            return httpStatusCode switch
             {
-                ExchangeSetStandardResponse = new ExchangeSetStandardResponse
+                HttpStatusCode.OK => new ExchangeSetStandardServiceResponse
                 {
-                    RequestedProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount,
-                    ExchangeSetProductCount = httpStatusCode == HttpStatusCode.NotModified ? 0 : (int)salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount,
-                    RequestedProductsAlreadyUpToDateCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount,
-                    RequestedProductsNotInExchangeSet = salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason }).ToList(),
+                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse
+                    {
+                        RequestedProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount,
+                        ExchangeSetProductCount = httpStatusCode == HttpStatusCode.NotModified ? 0 : (int)salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount,
+                        RequestedProductsAlreadyUpToDateCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount,
+                        RequestedProductsNotInExchangeSet = salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason }).ToList(),
+                    },
                 },
-                LastModified = salesCatalogueResponse.LastModified?.ToString("R"),
+                HttpStatusCode.NotModified when request is ProductVersionsRequest => new ExchangeSetStandardServiceResponse
+                {
+                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
+                    LastModified = salesCatalogueResponse.LastModified?.ToString("R"),
+                },
+                HttpStatusCode.NotModified when request is UpdatesSinceRequest => new ExchangeSetStandardServiceResponse
+                {
+                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
+                    LastModified = salesCatalogueResponse.LastModified?.ToString("R"),
+                },
+                _ => new ExchangeSetStandardServiceResponse()
             };
         }
     }
