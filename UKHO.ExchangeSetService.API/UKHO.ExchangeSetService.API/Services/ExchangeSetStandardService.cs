@@ -86,11 +86,9 @@ namespace UKHO.ExchangeSetService.API.Services
                 return validationResult;
             }
 
-            var salesCatalogueResponse = await _salesCatalogueService.PostProductVersionsAsync(productVersionsRequest.ProductVersions, exchangeSetStandard, correlationId);
-            
-            //monitorHelper.MonitorRequest("Sales Catalogue Service Product Version Request", salesCatalogueServiceRequestStartedAt, salesCatalogueServiceRequestCompletedAt, correlationId, null, null, null, null);
+            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(productVersionsRequest.ProductVersions, exchangeSetStandard, correlationId);
+            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse);
 
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
