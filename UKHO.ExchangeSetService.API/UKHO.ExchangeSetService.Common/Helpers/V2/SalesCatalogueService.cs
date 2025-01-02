@@ -4,11 +4,13 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Enums;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
@@ -18,7 +20,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public class SalesCatalogueService : ISalesCatalogueService
     {
-        private const string SaleCatalogueServiceProductVersion = "v2";
         private readonly ILogger<SalesCatalogueService> _logger;
         private readonly IAuthScsTokenProvider _authScsTokenProvider;
         private readonly ISalesCatalogueClient _salesCatalogueClient;
@@ -40,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper));
         }
 
-        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(string exchangeSetStandard, string sinceDateTime, string correlationId)
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSGetProductsFromSpecificDateRequestStart,
@@ -51,20 +52,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                                                      SCSUpdateSinceURL,
                                                      correlationId,
-                                                     SaleCatalogueServiceProductVersion,
+                                                     ApiVersion.V2,
                                                      exchangeSetStandard,
                                                      sinceDateTime);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
 
-                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri);
+                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
 
-                    return await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId);
                 },
                 correlationId);
         }
 
-        private async Task<ServiceResponseResult<SalesCatalogueResponse>> CreateSalesCatalogueServiceResponse(HttpResponseMessage httpResponse, string correlationId)
+        private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId)
         {
             var body = await httpResponse.Content.ReadAsStringAsync();
             var response = new SalesCatalogueResponse

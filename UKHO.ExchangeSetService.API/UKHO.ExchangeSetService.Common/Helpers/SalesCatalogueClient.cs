@@ -17,7 +17,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> CallSalesCatalogueServiceApi(HttpMethod method, string requestBody, string authToken, string uri, string correlationId = "")
+        public async Task<HttpResponseMessage> CallSalesCatalogueServiceApi(HttpMethod method, string requestBody, string authToken, string uri, string correlationId = "", CancellationToken cancellationToken = default)
         {
             HttpContent content = null;
 
@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
 
             httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-            var response = await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
+            var response = await httpClient.SendAsync(httpRequestMessage, cancellationToken);
             return response;
         }
     }

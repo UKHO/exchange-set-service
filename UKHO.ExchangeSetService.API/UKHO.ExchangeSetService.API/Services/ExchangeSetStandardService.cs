@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId);
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId, cancellationToken);
 
             return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
