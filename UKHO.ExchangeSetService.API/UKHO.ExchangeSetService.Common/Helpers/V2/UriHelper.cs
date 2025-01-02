@@ -15,6 +15,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
         public Uri CreateUri(string baseUrl, string endpointFormat, string correlationId, params object[] args)
         {
             try

@@ -29,7 +29,7 @@ namespace UKHO.ExchangeSetService.Common.Extensions
             return result.StatusCode switch
             {
                 HttpStatusCode.OK => new OkObjectResult(result.Value) { StatusCode = StatusCodes.Status200OK },
-                HttpStatusCode.Accepted => new ObjectResult(exchangeSetServiceResponse.ExchangeSetStandardResponse) { StatusCode = StatusCodes.Status202Accepted },
+                HttpStatusCode.Accepted => new AcceptedResult(string.Empty, exchangeSetServiceResponse.ExchangeSetStandardResponse) { StatusCode = StatusCodes.Status202Accepted },
                 HttpStatusCode.NoContent => new NoContentResult(),
                 HttpStatusCode.NotModified => new StatusCodeResult(StatusCodes.Status304NotModified),
                 HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription.Errors),
