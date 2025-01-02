@@ -28,6 +28,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IProductVersionsValidator _productVersionsValidator;
         private readonly IProductNameValidator _productNameValidator;
         private readonly ISalesCatalogueService _salesCatalogueService;
+
         public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger,
                                           IUpdatesSinceValidator updatesSinceValidator,
                                           IProductVersionsValidator productVersionsValidator,
@@ -106,7 +107,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId);
 
-            return SetExchangeSetStandardResponse(salesCatalogServiceResponse);            
+            return SetExchangeSetStandardResponse(salesCatalogServiceResponse);
         }
 
         private string[] SanitizeProductNames(string[] productNames)

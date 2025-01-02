@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private IOptions<SalesCatalogueConfiguration> _fakeSalesCatalogueConfig;
         private IUriHelper _fakeUriHelper;
 
-        private SalesCatalogueService _salesCatalogueService;
+        ////private SalesCatalogueService _salesCatalogueService;
 
         [SetUp]
         public void SetUp()
@@ -34,7 +34,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             _fakeSalesCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { BaseUrl = "https://test.com", Version = "v2", ResourceId = "testResource" });
             _fakeUriHelper = A.Fake<IUriHelper>();
 
-            _salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+          //// _salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
         }
 
         [Test]
