@@ -28,13 +28,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
         private const string FakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
         private const string FakeCorrelationId = "48f53a95-0bd2-4c0c-a6ba-afded2bdffac";
-        private string _fakeExchangeSetPath = string.Empty;
+        private string fakeExchangeSetPath = string.Empty;
         private const string FakeExchangeSetRootPath = @"F:\\HOME";
         private const string FakeFileName = "test.txt";
-        private readonly FakeFileHelper _fakeFileHelper = new();
+        private readonly FakeFileHelper fakeFileHelper = new();
         private const string FakeExchangeSetInfoPath = @"C:\\HOME";
         private const string FulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
-        private readonly DateTime _fakeScsRequestDateTime = DateTime.UtcNow;
+        private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
 
         [SetUp]
         public void Setup()
@@ -202,7 +202,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateSerialEncFileRequest_ThenReturnFulfilmentException()
         {
-            _fakeExchangeSetPath = @"C:\\HOME";
+            fakeExchangeSetPath = @"C:\\HOME";
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
@@ -214,12 +214,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateSerialEncFileRequest_ThenReturnTrueResponse()
         {
-            _fakeExchangeSetPath = @"C:\\HOME";
+            fakeExchangeSetPath = @"C:\\HOME";
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchId, _fakeExchangeSetPath, null);
+            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchId, fakeExchangeSetPath, null);
 
             Assert.That(response, Is.EqualTo(true));
         }
@@ -232,7 +232,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, _fakeScsRequestDateTime); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -247,14 +247,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, _fakeScsRequestDateTime); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.ProductFileIsNotCreated.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating sales catalogue data product.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} ").MustHaveHappenedOnceExactly();
 
-            Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
+            Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
         }
 
         [Test]
@@ -263,17 +263,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidCreateProductFileRequest_ThenReturnTrueResponseAsync(bool encryption)
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            _fakeFileHelper.CheckAndCreateFolder(FakeExchangeSetInfoPath);
+            fakeFileHelper.CheckAndCreateFolder(FakeExchangeSetInfoPath);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, _fakeScsRequestDateTime, encryption);
+            var response = await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime, encryption);
 
             Assert.Multiple(() =>
             {
                 Assert.That(response, Is.EqualTo(true));
-                Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(true));
+                Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(true));
             });
         }
 
@@ -292,8 +292,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files= GetFiles() }
             };
 
-            _fakeFileHelper.CheckAndCreateFolder(FakeExchangeSetRootPath);
-            _fakeFileHelper.CreateFileContentWithBytes(FakeFileName, byteContent);
+            fakeFileHelper.CheckAndCreateFolder(FakeExchangeSetRootPath);
+            fakeFileHelper.CreateFileContentWithBytes(FakeFileName, byteContent);
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
@@ -303,9 +303,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(response, Is.EqualTo(true));
-                Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(true));
-                Assert.That(_fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(true));
-                Assert.That(_fakeFileHelper.ReadAllBytes(FakeFileName), Is.EqualTo(byteContent));
+                Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(true));
+                Assert.That(fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(true));
+                Assert.That(fakeFileHelper.ReadAllBytes(FakeFileName), Is.EqualTo(byteContent));
             });
         }
 
@@ -318,8 +318,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                   async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, null, null, null); });
             Assert.Multiple(() =>
             {
-                Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
-                Assert.That(_fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(false));
+                Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
+                Assert.That(fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(false));
             });
         }
 
@@ -398,8 +398,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             var byteContent = new byte[100];
 
-            _fakeFileHelper.CheckAndCreateFolder(FakeExchangeSetRootPath);
-            _fakeFileHelper.CreateFileContentWithBytes(FakeFileName, byteContent);
+            fakeFileHelper.CheckAndCreateFolder(FakeExchangeSetRootPath);
+            fakeFileHelper.CreateFileContentWithBytes(FakeFileName, byteContent);
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
@@ -409,9 +409,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(response, Is.EqualTo(true));
-                Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(true));
-                Assert.That(_fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(true));
-                Assert.That(_fakeFileHelper.ReadAllBytes(FakeFileName), Is.EqualTo(byteContent));
+                Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(true));
+                Assert.That(fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(true));
+                Assert.That(fakeFileHelper.ReadAllBytes(FakeFileName), Is.EqualTo(byteContent));
             });
         }
 
@@ -431,8 +431,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                   async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse); });
             Assert.Multiple(() =>
             {
-                Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
-                Assert.That(_fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(false));
+                Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
+                Assert.That(fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(false));
             });
         }
 
@@ -443,8 +443,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                   async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, null, null, null); });
             Assert.Multiple(() =>
             {
-                Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
-                Assert.That(_fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(false));
+                Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
+                Assert.That(fakeFileHelper.CreateFileContentWithBytesIsCalled, Is.EqualTo(false));
             });
         }
 
@@ -544,7 +544,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.Multiple(() =>
             {
                 Assert.That(checkAioSerialFileCreated, Is.False);
-                Assert.That(_fakeFileHelper.CheckAndCreateFolderIsCalled, Is.False);
+                Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.False);
             });
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustNotHaveHappened();
