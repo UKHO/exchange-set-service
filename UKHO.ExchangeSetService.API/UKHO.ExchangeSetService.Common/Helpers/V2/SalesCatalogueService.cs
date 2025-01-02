@@ -83,9 +83,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     return ServiceResponseResult<SalesCatalogueResponse>.Success(response);
 
                 case HttpStatusCode.NotModified:
+                    _logger.LogWarning(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
+                                     "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
+                                     httpResponse.RequestMessage.RequestUri,
+                                     httpResponse.StatusCode,
+                                     correlationId);
                     return ServiceResponseResult<SalesCatalogueResponse>.NotModified();
 
                 case HttpStatusCode.NoContent:
+                    _logger.LogWarning(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
+                                     "No content available in sales catalogue service with uri:{RequestUri} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
+                                     httpResponse.RequestMessage.RequestUri,
+                                     httpResponse.StatusCode,
+                                     correlationId);
                     return ServiceResponseResult<SalesCatalogueResponse>.NoContent();
 
                 case HttpStatusCode.BadRequest:

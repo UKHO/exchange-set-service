@@ -33,8 +33,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             _fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
             _fakeSalesCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { BaseUrl = "https://test.com", Version = "v2", ResourceId = "testResource" });
             _fakeUriHelper = A.Fake<IUriHelper>();
-            
-            ////_salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+
+          //// _salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
         }
 
         [Test]
