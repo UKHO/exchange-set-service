@@ -89,7 +89,7 @@ namespace UKHO.ExchangeSetService.API.Services
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(productVersionsRequest.ProductVersions, exchangeSetStandard, correlationId);
 
             //to be used while calling SaveSalesCatalogueStorageDetails
-            if (salesCatalogServiceResponse.Value.ResponseCode == HttpStatusCode.NotModified)
+            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified)
             {
                 salesCatalogServiceResponse.Value.ResponseBody = new SalesCatalogueProductResponse
                 {
