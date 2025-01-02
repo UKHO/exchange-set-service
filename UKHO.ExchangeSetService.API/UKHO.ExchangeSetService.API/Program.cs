@@ -140,7 +140,6 @@ namespace UKHO.ExchangeSetService.API
             });
 
             builder.Services.Configure<SalesCatalogueConfiguration>(builder.Configuration.GetSection("SalesCatalogue"));
-            builder.Services.Configure<Common.Configuration.V2.SalesCatalogueConfiguration>(builder.Configuration.GetSection("SalesCatalogueV2"));
 
             var retryCount = Convert.ToInt32(builder.Configuration["RetryConfiguration:RetryCount"]);
             var sleepDuration = Convert.ToDouble(builder.Configuration["RetryConfiguration:SleepDuration"]);

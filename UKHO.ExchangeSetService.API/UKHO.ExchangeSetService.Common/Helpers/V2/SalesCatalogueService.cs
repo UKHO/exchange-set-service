@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using UKHO.ExchangeSetService.Common.Configuration.V2;
+using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
-using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public class SalesCatalogueService : ISalesCatalogueService
     {
+        private const string SaleCatalogueServiceProductVersion = "v2";
         private readonly ILogger<SalesCatalogueService> _logger;
         private readonly IAuthScsTokenProvider _authScsTokenProvider;
         private readonly ISalesCatalogueClient _salesCatalogueClient;
@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 {
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                                                      SCSUpdateSinceURL,
-                                                     _salesCatalogueConfig.Value.Version,
+                                                     SaleCatalogueServiceProductVersion,
                                                      exchangeSetStandard,
                                                      sinceDateTime);
 
@@ -76,24 +76,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             {
                 case HttpStatusCode.OK:
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
-                    response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
                     return ServiceResponseResult<SalesCatalogueResponse>.Success(response);
 
                 case HttpStatusCode.NotModified:
-                    _logger.LogWarning(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
+                    response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
+                    _logger.LogInformation(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
                                      "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
                                      httpResponse.RequestMessage.RequestUri,
                                      httpResponse.StatusCode,
                                      correlationId);
-                    return ServiceResponseResult<SalesCatalogueResponse>.NotModified();
 
-                case HttpStatusCode.NoContent:
-                    _logger.LogWarning(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
-                                     "No content available in sales catalogue service with uri:{RequestUri} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
-                                     httpResponse.RequestMessage.RequestUri,
-                                     httpResponse.StatusCode,
-                                     correlationId);
-                    return ServiceResponseResult<SalesCatalogueResponse>.NoContent();
+                    return ServiceResponseResult<SalesCatalogueResponse>.NotModified(response);
 
                 case HttpStatusCode.BadRequest:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
@@ -103,25 +96,23 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                                      httpResponse.StatusCode,
                                      correlationId);
 
-                    var errorDescription = new ErrorDescription
-                    {
-                        CorrelationId = correlationId,
-                        Errors =
-                        [
-                            new Error
-                            {
-                                Source = "Sales catalogue service",
-                                Description = body
-                            }
-                        ]
-                    };
+                    return ServiceResponseResult<SalesCatalogueResponse>.BadRequest();
 
-                    return ServiceResponseResult<SalesCatalogueResponse>.BadRequest(errorDescription);
+                case HttpStatusCode.NotFound:
+                    _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
+                                     "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
+                                     httpResponse.RequestMessage.RequestUri,
+                                     body,
+                                     httpResponse.StatusCode,
+                                     correlationId);
+
+                    return ServiceResponseResult<SalesCatalogueResponse>.NotFound();
 
                 default:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
-                                     "Error in sales catalogue service with uri:{RequestUri} and responded with statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
+                                     "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
                                      httpResponse.RequestMessage.RequestUri,
+                                     body,
                                      httpResponse.StatusCode,
                                      correlationId);
 
