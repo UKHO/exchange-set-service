@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
-using UKHO.ExchangeSetService.API.Filters;
+using UKHO.ExchangeSetService.API.Filters.V2;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 
-namespace UKHO.ExchangeSetService.API.UnitTests.Filters
+namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
 {
     [TestFixture]
     public class ExchangeSetAuthorizationFilterAttributeTests
@@ -26,8 +26,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         public void Setup()
         {
             httpContext = new DefaultHttpContext();
-            exchangeSetFilterAttribute = new ExchangeSetAuthorizationFilterAttribute();            
-        }       
+            exchangeSetFilterAttribute = new ExchangeSetAuthorizationFilterAttribute();
+        }
 
         [Test]
         public async Task WhenExchangeSetStandardParameterIsNotSent_ThenReturnBadRequest()
@@ -74,6 +74,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         }
-      
+
     }
 }
