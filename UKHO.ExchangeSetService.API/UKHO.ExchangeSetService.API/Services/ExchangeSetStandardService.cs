@@ -160,7 +160,8 @@ namespace UKHO.ExchangeSetService.API.Services
         {
             return serviceResponseResult.StatusCode switch
             {
-                HttpStatusCode.OK or HttpStatusCode.NotModified when request is ProductVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(MapExchangeSetResponse(request, serviceResponseResult.StatusCode, serviceResponseResult.Value)),
+                HttpStatusCode.OK => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(MapExchangeSetResponse(request, serviceResponseResult.StatusCode, serviceResponseResult.Value)),
+                HttpStatusCode.NotModified when request is ProductVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(MapExchangeSetResponse(request, serviceResponseResult.StatusCode, serviceResponseResult.Value)),
                 HttpStatusCode.NotModified when request is UpdatesSinceRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotModified(MapExchangeSetResponse(request, serviceResponseResult.StatusCode, serviceResponseResult.Value)),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };

@@ -53,6 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 {
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                                                      SCSUpdateSinceURL,
+                                                     correlationId,
                                                      SaleCatalogueServiceProductVersion,
                                                      exchangeSetStandard,
                                                      sinceDateTime);
