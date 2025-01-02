@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequest(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequest(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
             A.CallTo(() => _fakeHttpContextAccessor.HttpContext.TraceIdentifier).Returns(correlationId);
 
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new () { ProductName = "102NO32904820801012", EditionNumber = 36, UpdateNumber = 0 },
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
              .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null));
 
             var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 new () { ProductName = "", EditionNumber = 10, UpdateNumber = 2 },
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = [new() { Source = "requestBody", Description = "Either body is null or malformed." }] }));
 
             var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
@@ -142,7 +142,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
             var result = await _controller.PostUpdatesSince(ExchangeSetStandard, updatesSinceRequest, "s101", _callbackUri);
@@ -170,7 +170,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
             var result = await _controller.PostUpdatesSince(ExchangeSetStandard, updatesSinceRequest, "", _callbackUri);
@@ -191,7 +191,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         [Test]
         public async Task WhenNullOrEmptySinceDateTimeRequested_ThenPostUpdatesSinceReturnsBadRequest()
         {
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription
                 {
                     CorrelationId = Guid.NewGuid().ToString(),
@@ -221,7 +221,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString() };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription
                 {
                     CorrelationId = Guid.NewGuid().ToString(),

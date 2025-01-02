@@ -51,7 +51,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 "Get sales catalogue service from specific date time for _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                                                      SCSUpdateSinceURL,
                                                      _salesCatalogueConfig.Value.Version,
@@ -69,6 +68,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
         private async Task<ServiceResponseResult<SalesCatalogueResponse>> CreateSalesCatalogueServiceResponse(HttpResponseMessage httpResponse, string correlationId)
         {
+            var body = await httpResponse.Content.ReadAsStringAsync();
             var response = new SalesCatalogueResponse
             {
                 ResponseCode = httpResponse.StatusCode,
@@ -78,8 +78,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             switch (httpResponse.StatusCode)
             {
                 case HttpStatusCode.OK:
-
-                    var body = await httpResponse.Content.ReadAsStringAsync();
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
                     response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
                     return ServiceResponseResult<SalesCatalogueResponse>.Success(response);
@@ -90,14 +88,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 case HttpStatusCode.NoContent:
                     return ServiceResponseResult<SalesCatalogueResponse>.NoContent();
 
-                default:
+                case HttpStatusCode.BadRequest:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
-                                     "Error in sales catalogue service with uri:{RequestUri} and responded with {StatusCode} and _X-Correlation-ID:{CorrelationId}",
+                                     "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
                                      httpResponse.RequestMessage.RequestUri,
+                                     body,
                                      httpResponse.StatusCode,
                                      correlationId);
-
-                    var errorResponse = await httpResponse.Content.ReadAsStringAsync();
 
                     var errorDescription = new ErrorDescription
                     {
@@ -106,13 +103,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         [
                             new Error
                             {
-                                Source = "SCS API",
-                                Description = errorResponse
+                                Source = "Sales catalogue service",
+                                Description = body
                             }
                         ]
                     };
 
                     return ServiceResponseResult<SalesCatalogueResponse>.BadRequest(errorDescription);
+
+                default:
+                    _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
+                                     "Error in sales catalogue service with uri:{RequestUri} and responded with statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
+                                     httpResponse.RequestMessage.RequestUri,
+                                     httpResponse.StatusCode,
+                                     correlationId);
+
+                    return ServiceResponseResult<SalesCatalogueResponse>.InternalServerError();
             }
         }
 

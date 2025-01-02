@@ -44,7 +44,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductNamesRequest(productNames, callbackUri, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductNamesRequest(productNames, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
                 },
@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, exchangeSetStandard, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
 
@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "UpdatesSince endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, exchangeSetStandard, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
 

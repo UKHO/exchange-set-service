@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
@@ -27,8 +28,11 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly IProductVersionsValidator _productVersionsValidator;
         private readonly IProductNameValidator _productNameValidator;
         private readonly ISalesCatalogueService _salesCatalogueService;
-
-        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger, IUpdatesSinceValidator updatesSinceValidator, IProductVersionsValidator productVersionsValidator, IProductNameValidator productNameValidator, ISalesCatalogueService salesCatalogueService)
+        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger,
+                                          IUpdatesSinceValidator updatesSinceValidator,
+                                          IProductVersionsValidator productVersionsValidator,
+                                          IProductNameValidator productNameValidator,
+                                          ISalesCatalogueService salesCatalogueService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
@@ -37,7 +41,7 @@ namespace UKHO.ExchangeSetService.API.Services
             _salesCatalogueService = salesCatalogueService ?? throw new ArgumentNullException(nameof(salesCatalogueService));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             productNames = SanitizeProductNames(productNames);
 
@@ -62,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.Services
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string callbackUri, string correlationId, string exchangeSetStandard, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (productVersionRequest == null || !productVersionRequest.Any() || productVersionRequest.Any(pv => pv == null))
             {
@@ -88,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.Services
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (updatesSinceRequest == null)
             {
@@ -104,8 +108,9 @@ namespace UKHO.ExchangeSetService.API.Services
                 return validationResult;
             }
 
-            // This is a placeholder, the actual implementation is not provided
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId);
+
+            return SetExchangeSetStandardResponse(salesCatalogServiceResponse);            
         }
 
         private string[] SanitizeProductNames(string[] productNames)
@@ -133,7 +138,7 @@ namespace UKHO.ExchangeSetService.API.Services
             return null;
         }
 
-        protected ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)
+        private ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)
         {
             _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
 
@@ -150,6 +155,30 @@ namespace UKHO.ExchangeSetService.API.Services
                 ]
             };
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
+        }
+
+        private ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse(ServiceResponseResult<SalesCatalogueResponse> serviceResponseResult)
+        {
+            return serviceResponseResult.StatusCode switch
+            {
+                HttpStatusCode.OK or HttpStatusCode.NotModified => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(MapExchangeSetResponse(serviceResponseResult.StatusCode, serviceResponseResult.Value)),
+                _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
+            };
+        }
+
+        private ExchangeSetStandardServiceResponse MapExchangeSetResponse(HttpStatusCode httpStatusCode, SalesCatalogueResponse salesCatalogueResponse)
+        {
+            return new ExchangeSetStandardServiceResponse
+            {
+                ExchangeSetStandardResponse = new ExchangeSetStandardResponse
+                {
+                    RequestedProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount,
+                    ExchangeSetProductCount = httpStatusCode == HttpStatusCode.NotModified ? 0 : (int)salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount,
+                    RequestedProductsAlreadyUpToDateCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount,
+                    RequestedProductsNotInExchangeSet = salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason }).ToList(),
+                },
+                LastModified = salesCatalogueResponse.LastModified?.ToString("R"),
+            };
         }
     }
 }
