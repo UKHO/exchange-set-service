@@ -135,7 +135,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                                                      SCSProductVersionsURL,
-                                                     _salesCatalogueConfig.Value.Version,
+                                                     correlationId,
+                                                     SaleCatalogueServiceProductVersion,
                                                      exchangeSetStandard);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
