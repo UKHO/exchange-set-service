@@ -903,7 +903,12 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805222 - Request for exchange set service product names endpoint is completed.
         /// </summary>
-        PostProductNamesRequestCompleted = 805222
+        PostProductNamesRequestCompleted = 805222,
+        /// <summary>
+        /// 805223 - Uri exception occurred.
+        /// </summary>
+        UriException = 805223,
+
         #endregion
     }
 
