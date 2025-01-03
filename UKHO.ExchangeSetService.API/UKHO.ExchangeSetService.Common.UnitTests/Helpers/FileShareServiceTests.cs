@@ -68,6 +68,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeCacheConfiguration, fakeFileSystemHelper, fakeMonitorHelper, fakeAioConfiguration);
         }
 
+        private static Attribute GetAttribute(string key, string value) => new() { Key = key, Value = value };
+
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
             return new SalesCatalogueServiceResponseQueueMessage
@@ -167,11 +169,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                     new() {
                         BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc",
                         Files= new List<BatchFile>(){ new() { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" }}}},
-                        Attributes = new List<Attribute> { new() { Key= "Agency", Value= "DE" } ,
-                                                           new() { Key= "CellName", Value= "DE416050" },
-                                                           new() { Key= "EditionNumber", Value= "0" } ,
-                                                           new() { Key= "UpdateNumber", Value= "0" },
-                                                           new() { Key= "ProductCode", Value= "AVCS" }},
+                        Attributes = new List<Attribute>
+                        {
+                            GetAttribute("Agency", "DE"),
+                            GetAttribute("CellName", "DE416050"),
+                            GetAttribute("EditionNumber", "0"),
+                            GetAttribute("UpdateNumber", "0"),
+                            GetAttribute("ProductCode", "AVCS")
+                        },
                         BusinessUnit = businessUnit
                     } },
                 Links = new PagingLinks(),
@@ -428,11 +433,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -488,21 +496,27 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "3" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "3"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -564,21 +578,27 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -655,11 +675,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dj",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
@@ -1217,21 +1240,27 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "3" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "3"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -1571,11 +1600,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "GB" } ,
-                                                           new Attribute { Key= "CellName", Value= "GB800001" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "GB"),
+                    GetAttribute("CellName", "GB800001"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
