@@ -71,7 +71,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 return false;
             }
 
-            if (parsedDateTime >= currentDateTime)
+            if (parsedDateTime.Date >= currentDateTime.Date)
             {
                 return false;
             }
