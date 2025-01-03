@@ -1,4 +1,4 @@
-﻿namespace UKHO.ExchangeSetService.Common.Models.Enums.V2
+﻿namespace UKHO.ExchangeSetService.Common.Models.V2.Enums
 {
     public enum ExchangeSetStandard
     {

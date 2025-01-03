@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using UKHO.ExchangeSetService.Common.Models.Enums.V2;
+using UKHO.ExchangeSetService.Common.Models.V2.Enums;
 
-namespace UKHO.ExchangeSetService.API.Filters
+namespace UKHO.ExchangeSetService.API.Filters.V2
 {
     public class ExchangeSetAuthorizationFilterAttribute : ActionFilterAttribute
     {

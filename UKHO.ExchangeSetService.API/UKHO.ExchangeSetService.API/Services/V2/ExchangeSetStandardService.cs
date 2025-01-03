@@ -16,7 +16,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
-namespace UKHO.ExchangeSetService.API.Services
+namespace UKHO.ExchangeSetService.API.Services.V2
 {
     public class ExchangeSetStandardService : IExchangeSetStandardService
     {
