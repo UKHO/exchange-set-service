@@ -1,11 +1,11 @@
-﻿using FakeItEasy;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Helpers;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
@@ -15,7 +15,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
     {
         private ILogger<FileShareService> fakeLogger;
         public int retryCount = 3;
-        private const double sleepDuration = 2; 
+        private const double sleepDuration = 2;
         const string TestClient = "TestClient";
         private bool _isRetryCalled;
 
@@ -25,7 +25,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeLogger = A.Fake<ILogger<FileShareService>>();
         }
 
-        
         [Test]
         public void CheckMethodReturns_CorrectWeekNumer()
         {
@@ -33,17 +32,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var week26 = CommonHelper.GetCurrentWeekNumber(Convert.ToDateTime("2021/07/01"));
             var week53 = CommonHelper.GetCurrentWeekNumber(Convert.ToDateTime("2021/01/01"));
 
-            Assert.That(1, Is.EqualTo(week1));
-            Assert.That(26, Is.EqualTo(week26));
-            Assert.That(53, Is.EqualTo(week53));
+            Assert.That(week1, Is.EqualTo(1));
+            Assert.That(week26, Is.EqualTo(26));
+            Assert.That(week53, Is.EqualTo(53));
         }
+
         [Test]
         public void CheckConversionOfBytesToMegabytes()
         {
             var fileSize = CommonHelper.ConvertBytesToMegabytes((long)4194304);
-            Assert.That(4, Is.EqualTo(fileSize));
+            Assert.That(fileSize, Is.EqualTo(4));
         }
-
 
         [Test]
         public async Task WhenTooManyRequests_GetRetryPolicy()
@@ -68,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             // Assert
             Assert.That(_isRetryCalled, Is.False);
-            Assert.That(HttpStatusCode.TooManyRequests, Is.EqualTo(result.StatusCode));
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.TooManyRequests));
         }
 
         [Test]
@@ -92,16 +91,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.That(_isRetryCalled,Is.False);
-            Assert.That(HttpStatusCode.ServiceUnavailable, Is.EqualTo(result.StatusCode));
-
+            Assert.That(_isRetryCalled, Is.False);
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.ServiceUnavailable));
         }
 
         [Test]
         public void CheckIsNumericReturnsTrueForNumbers()
         {
             bool isNum = CommonHelper.IsNumeric(1234);
-            Assert.That(isNum,Is.True);
+            Assert.That(isNum, Is.True);
         }
 
         [Test]

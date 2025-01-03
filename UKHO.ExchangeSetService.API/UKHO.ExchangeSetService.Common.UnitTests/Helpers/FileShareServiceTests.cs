@@ -1,9 +1,4 @@
-﻿using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -13,6 +8,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -43,7 +43,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         public string fakeBatchId = "c4af46f5-1b41-4294-93f9-dda87bf8ab96";
         public string fakeCorrelationId = Guid.NewGuid().ToString();
         public string fulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
-        public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        public CancellationTokenSource cancellationTokenSource = new();
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            cancellationTokenSource.Dispose();
+        }
 
         [SetUp]
         public void Setup()
@@ -61,6 +67,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeCacheConfiguration, fakeFileSystemHelper, fakeMonitorHelper, fakeAioConfiguration);
         }
+
+        private static Attribute GetAttribute(string key, string value) => new() { Key = key, Value = value };
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
@@ -161,11 +169,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                     new() {
                         BatchId ="63d38bde-5191-4a59-82d5-aa22ca1cc6dc",
                         Files= new List<BatchFile>(){ new() { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" }}}},
-                        Attributes = new List<Attribute> { new() { Key= "Agency", Value= "DE" } ,
-                                                           new() { Key= "CellName", Value= "DE416050" },
-                                                           new() { Key= "EditionNumber", Value= "0" } ,
-                                                           new() { Key= "UpdateNumber", Value= "0" },
-                                                           new() { Key= "ProductCode", Value= "AVCS" }},
+                        Attributes = new List<Attribute>
+                        {
+                            GetAttribute("Agency", "DE"),
+                            GetAttribute("CellName", "DE416050"),
+                            GetAttribute("EditionNumber", "0"),
+                            GetAttribute("UpdateNumber", "0"),
+                            GetAttribute("ProductCode", "AVCS")
+                        },
                         BusinessUnit = businessUnit
                     } },
                 Links = new PagingLinks(),
@@ -273,7 +284,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
             Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.BadRequest), $"Expected {HttpStatusCode.BadRequest} got {response.ResponseCode}");
-            Assert.That(response.ResponseBody,Is.Null);
+            Assert.That(response.ResponseBody, Is.Null);
         }
 
         [Test]
@@ -289,7 +300,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.CreateBatch(string.Empty, string.Empty);
 
-            Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.Created) , $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
+            Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.Created), $"Expected {HttpStatusCode.Created} got {response.ResponseCode}");
             Assert.That(createBatchResponse.BatchId, Is.EqualTo(response.ResponseBody.BatchId));
 
             //assert the mocked API response returned to CreateBatch contains the internal BaseUrl
@@ -298,7 +309,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             Assert.That(createBatchResponse.ExchangeSetFileUri.Contains(fakeFileShareConfig.Value.BaseUrl), Is.True);
 
             //assert FileShareService.CreateBatch() is correctly replacing the internal BaseUrl with PublicUrl
-            Assert.That(response.ResponseBody.BatchStatusUri,Is.EqualTo(createBatchResponse.BatchStatusUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
+            Assert.That(response.ResponseBody.BatchStatusUri, Is.EqualTo(createBatchResponse.BatchStatusUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
             Assert.That(response.ResponseBody.ExchangeSetBatchDetailsUri, Is.EqualTo(createBatchResponse.ExchangeSetBatchDetailsUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
             Assert.That(response.ResponseBody.ExchangeSetFileUri, Is.EqualTo(createBatchResponse.ExchangeSetFileUri.Replace(fakeFileShareConfig.Value.BaseUrl, fakeFileShareConfig.Value.PublicBaseUrl)));
         }
@@ -337,8 +348,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.CreateBatch(userOID, correlationIdParam);
 
             //Test
-            Assert.That(HttpStatusCode.OK, Is.EqualTo(response.ResponseCode));
-            Assert.That(HttpMethod.Post, Is.EqualTo(httpMethodParam));
+            Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Post));
             Assert.That(accessTokenParam, Is.EqualTo(actualAccessToken));
         }
 
@@ -402,7 +413,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
-            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
+            Assert.That(response.Entries[0].BatchId, Is.EqualTo("63d38bde-5191-4a59-82d5-aa22ca1cc6dc"));
         }
 
         [Test]
@@ -422,11 +433,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -482,21 +496,27 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "3" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "3"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -537,8 +557,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
-            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
-            Assert.That("13d38bde-5191-4a59-82d5-aa22ca1cc6de", Is.EqualTo(response.Entries[1].BatchId));
+            Assert.That(response.Entries[0].BatchId, Is.EqualTo("63d38bde-5191-4a59-82d5-aa22ca1cc6dc"));
+            Assert.That(response.Entries[1].BatchId, Is.EqualTo("13d38bde-5191-4a59-82d5-aa22ca1cc6de"));
         }
 
         [Test]
@@ -558,21 +578,27 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -633,7 +659,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
-            Assert.That(response, Is.Not.Null);
             Assert.That(response, Is.InstanceOf<bool>());
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
@@ -650,11 +675,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dj",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }}
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             A.CallTo(() => fakeAuthFssTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(GetFakeToken());
             A.CallTo(() => fakeFileShareServiceClient.CallFileShareServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored))
@@ -670,7 +698,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), null, CancellationToken.None);
 
-            Assert.That(response, Is.Not.Null);
             Assert.That(response, Is.InstanceOf<bool>());
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
@@ -875,7 +902,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.DownloadReadMeFileFromFssAsync(readMeFilePath, batchId, exchangeSetRootPath, null);
 
-            Assert.That(true, Is.EqualTo(response));
+            Assert.That(response, Is.EqualTo(true));
         }
 
         [Test]
@@ -935,8 +962,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
             bool response = await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, fakeZipFilepath, null);
-            Assert.That(response, Is.Not.Null);
-            Assert.That(true, Is.EqualTo(response));
+            Assert.That(response, Is.EqualTo(true));
         }
         #endregion CreateZipFile
 
@@ -1088,7 +1114,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             bool result = await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath, fakeFileShareConfig.Value.ErrorFileName);
 
-            Assert.That(result,Is.True);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -1115,7 +1141,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
              .Returns(httpResponse);
 
             var response = await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName);
-            Assert.That(true, Is.EqualTo(response));
+            Assert.That(response, Is.EqualTo(true));
         }
 
         [Test]
@@ -1194,7 +1220,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
-            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
+            Assert.That(response.Entries[0].BatchId, Is.EqualTo("63d38bde-5191-4a59-82d5-aa22ca1cc6dc"));
         }
 
         [Test]
@@ -1214,21 +1240,27 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416050" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416050"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             searchBatchResponse.Entries.Add(new BatchDetail
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
-                                                           new Attribute { Key= "CellName", Value= "DE416051" },
-                                                           new Attribute { Key= "EditionNumber", Value= "3" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "DE"),
+                    GetAttribute("CellName", "DE416051"),
+                    GetAttribute("EditionNumber", "3"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -1270,8 +1302,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
-            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
-            Assert.That("13d38bde-5191-4a59-82d5-aa22ca1cc6de", Is.EqualTo(response.Entries[1].BatchId));
+            Assert.That(response.Entries[0].BatchId, Is.EqualTo("63d38bde-5191-4a59-82d5-aa22ca1cc6dc"));
+            Assert.That(response.Entries[1].BatchId, Is.EqualTo("13d38bde-5191-4a59-82d5-aa22ca1cc6de"));
         }
 
         [Test]
@@ -1293,7 +1325,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.UploadFileBlockMetaData(A<UploadBlockMetaData>.Ignored)).Returns(byteData);
 
             var response = await fileShareService.UploadLargeMediaFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeLargeMediaZipFilePath);
-            Assert.That(true, Is.EqualTo(response));
+            Assert.That(response, Is.EqualTo(true));
         }
 
         [Test]
@@ -1344,7 +1376,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             var response = await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null);
 
-            Assert.That(true, Is.EqualTo(response));
+            Assert.That(response, Is.EqualTo(true));
         }
 
         [Test]
@@ -1512,7 +1544,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await fileShareService.DownloadFolderDetails(fakeBatchId, correlationidParam, batchFileList, fakeExchangeSetPath);
 
             var expectedFolderFilePath = @"batch/a9e518ee-25b0-42ae-96c7-49dafc553c40/files/TPNMS Diagrams.zip";
-            Assert.That(true, Is.EqualTo(response));
+            Assert.That(response, Is.EqualTo(true));
             Assert.That(expectedFolderFilePath, Is.EqualTo(searchFolderFileName));
         }
 
@@ -1568,11 +1600,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "13d38bde-5191-4a59-82d5-aa22ca1cc6de",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test1.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" } } } },
-                Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "GB" } ,
-                                                           new Attribute { Key= "CellName", Value= "GB800001" },
-                                                           new Attribute { Key= "EditionNumber", Value= "0" } ,
-                                                           new Attribute { Key= "UpdateNumber", Value= "0" },
-                                                           new Attribute { Key= "ProductCode", Value= "AVCS" }},
+                Attributes = new List<Attribute>
+                {
+                    GetAttribute("Agency", "GB"),
+                    GetAttribute("CellName", "GB800001"),
+                    GetAttribute("EditionNumber", "0"),
+                    GetAttribute("UpdateNumber", "0"),
+                    GetAttribute("ProductCode", "AVCS")
+                }
             });
             var jsonString = JsonConvert.SerializeObject(searchBatchResponse);
 
@@ -1609,7 +1644,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.That(response, Is.InstanceOf<SearchBatchResponse>());
 
-            Assert.That("63d38bde-5191-4a59-82d5-aa22ca1cc6dc", Is.EqualTo(response.Entries[0].BatchId));
+            Assert.That(response.Entries[0].BatchId, Is.EqualTo("63d38bde-5191-4a59-82d5-aa22ca1cc6dc"));
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using FakeItEasy;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await eventHubLoggingHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Healthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await eventHubLoggingHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
-using System.Collections.Generic;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         {
             var actualAccessKey = webJobsAccessKeyProvider.GetWebJobsAccessKey("nonexistingkey");
 
-            Assert.That(null, Is.EqualTo(actualAccessKey));
+            Assert.That(actualAccessKey, Is.EqualTo(null));
         }
     }
 }

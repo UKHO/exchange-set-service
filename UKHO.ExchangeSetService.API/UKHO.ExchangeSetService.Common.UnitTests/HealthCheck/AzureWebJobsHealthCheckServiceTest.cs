@@ -1,10 +1,10 @@
-﻿using FakeItEasy;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [SetUp]
         public void Setup()
         {
-            this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() { ExchangeSetTypes = "sxs,mxs,lxs", WebAppVersion = ""});
+            this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() { ExchangeSetTypes = "sxs,mxs,lxs", WebAppVersion = "" });
             this.fakeWebJobsAccessKeyProvider = A.Fake<IWebJobsAccessKeyProvider>();
             this.fakeWebHostEnvironment = A.Fake<IWebHostEnvironment>();
             this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
@@ -42,7 +42,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
 
-            Assert.That(HealthStatus.Healthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
 
-            Assert.That(HealthStatus.Healthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
         }
     }
 }
