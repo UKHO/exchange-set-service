@@ -85,11 +85,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public bool ValidateProductIdentifier(string productIdentifier)
         {
-            if (string.IsNullOrEmpty(productIdentifier) || !Enum.TryParse<S100ProductType>(productIdentifier, out _))
+            if (string.IsNullOrEmpty(productIdentifier) || Enum.TryParse<S100ProductType>(productIdentifier, out _))
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
     }
 }

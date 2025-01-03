@@ -199,29 +199,14 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 0,
-        "returnedProductCount": 9,
+        "returnedProductCount": 8,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": []
       },
       "products": [
         {
-          "editionNumber": 1,
-          "productName": "102DE260001ABCDEFG",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2009-05-15T00:00:00.0000000Z",
-              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 140018
-        },
-        {
           "editionNumber": 2,
-          "productName": "102DE5NOBRKABCDEFG",
+          "productName": "102DE5NOBRKPQRSTUV",
           "updateNumbers": [
             0
           ],
@@ -236,7 +221,7 @@
         },
         {
           "editionNumber": 2,
-          "productName": "102DE4NO18QABCDEFG",
+          "productName": "102DE4NO18QPQRSTUV",
           "updateNumbers": [
             0,
             1
@@ -256,7 +241,7 @@
         },
         {
           "editionNumber": 2,
-          "productName": "102DE516510ABCDEFG",
+          "productName": "102DE516510PQRSTUV",
           "updateNumbers": [
             0,
             1,
@@ -295,7 +280,7 @@
         },
         {
           "editionNumber": 1,
-          "productName": "102DE360010ABCDEFG",
+          "productName": "102DE360010PQRSTUV",
           "updateNumbers": [
             0
           ],
@@ -310,7 +295,7 @@
         },
         {
           "editionNumber": 11,
-          "productName": "102DE416040ABCDEFG",
+          "productName": "102DE416040PQRSTUV",
           "updateNumbers": [
             0,
             1
@@ -330,7 +315,7 @@
         },
         {
           "editionNumber": 7,
-          "productName": "102JP5BHTR7ABCDEFG",
+          "productName": "102JP5BHTR7PQRSTUV",
           "updateNumbers": [
             7
           ],
@@ -344,7 +329,7 @@
         },
         {
           "editionNumber": 7,
-          "productName": "102JP5P9F59ABCDEFG",
+          "productName": "102JP5P9F59PQRSTUV",
           "updateNumbers": [
             3
           ],
@@ -358,7 +343,7 @@
         },
         {
           "editionNumber": 3,
-          "productName": "102GB602571ABCDEFG",
+          "productName": "102GB602571PQRSTUV",
           "updateNumbers": [
             0,
             1,
@@ -394,14 +379,14 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 0,
-        "returnedProductCount": 9,
+        "returnedProductCount": 6,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": []
       },
       "products": [
         {
           "editionNumber": 1,
-          "productName": "104DE260001ABCDEFG",
+          "productName": "104DE260001IJKLMNO",
           "updateNumbers": [
             0
           ],
@@ -416,7 +401,7 @@
         },
         {
           "editionNumber": 2,
-          "productName": "104DE5NOBRKABCDEFG",
+          "productName": "104DE5NOBRKIJKLMNO",
           "updateNumbers": [
             0
           ],
@@ -431,7 +416,7 @@
         },
         {
           "editionNumber": 2,
-          "productName": "104DE4NO18QABCDEFG",
+          "productName": "104DE4NO18QIJKLMNO",
           "updateNumbers": [
             0,
             1
@@ -451,7 +436,107 @@
         },
         {
           "editionNumber": 2,
-          "productName": "104DE516510ABCDEFG",
+          "productName": "104DE516510IJKLMNO",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-04-17T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-04-17T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2015-04-30T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2019-05-31T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 3
+            },
+            {
+              "issueDate": "2021-06-09T00:00:00.0000000Z",
+              "updateNumber": 4
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 38375
+        },
+        {
+          "editionNumber": 7,
+          "productName": "104JP5BHTR7IJKLMNO",
+          "updateNumbers": [
+            7
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-10-23T00:00:00.0000000Z",
+              "updateNumber": 7
+            }
+          ],
+          "fileSize": 654692
+        },
+        {
+          "editionNumber": 7,
+          "productName": "104JP5P9F59IJKLMNO",
+          "updateNumbers": [
+            3
+          ],
+          "dates": [
+            {
+              "issueDate": "2020-11-13T00:00:00.0000000Z",
+              "updateNumber": 3
+            }
+          ],
+          "fileSize": 666602
+        }        
+      ]
+    }
+  },
+  {
+    "id": "updatesSince-s111",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 0,
+        "returnedProductCount": 7,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "111DE4NO18QMNOPQR",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "fileSize": 76909
+        },
+        {
+          "editionNumber": 2,
+          "productName": "111DE516510MNOPQR",
           "updateNumbers": [
             0,
             1,
@@ -490,7 +575,7 @@
         },
         {
           "editionNumber": 1,
-          "productName": "104DE360010ABCDEFG",
+          "productName": "111DE360010MNOPQR",
           "updateNumbers": [
             0
           ],
@@ -505,7 +590,7 @@
         },
         {
           "editionNumber": 11,
-          "productName": "104DE416040ABCDEFG",
+          "productName": "111DE416040MNOPQR",
           "updateNumbers": [
             0,
             1
@@ -525,7 +610,7 @@
         },
         {
           "editionNumber": 7,
-          "productName": "104JP5BHTR7ABCDEFG",
+          "productName": "111JP5BHTR7MNOPQR",
           "updateNumbers": [
             7
           ],
@@ -539,7 +624,7 @@
         },
         {
           "editionNumber": 7,
-          "productName": "104JP5P9F59ABCDEFG",
+          "productName": "111JP5P9F59MNOPQR",
           "updateNumbers": [
             3
           ],
@@ -553,7 +638,7 @@
         },
         {
           "editionNumber": 3,
-          "productName": "104GB602571ABCDEFG",
+          "productName": "111GB602571MNOPQR",
           "updateNumbers": [
             0,
             1,
@@ -585,48 +670,18 @@
     }
   },
   {
-    "id": "updatesSince-s111",
+    "id": "updatesSince-",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 0,
-        "returnedProductCount": 9,
+        "returnedProductCount": 7,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": []
       },
       "products": [
         {
-          "editionNumber": 1,
-          "productName": "111DE260001ABCDEFG",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2009-05-15T00:00:00.0000000Z",
-              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 140018
-        },
-        {
           "editionNumber": 2,
-          "productName": "111DE5NOBRKABCDEFG",
-          "updateNumbers": [
-            0
-          ],
-          "dates": [
-            {
-              "issueDate": "2021-07-09T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
-              "updateNumber": 0
-            }
-          ],
-          "fileSize": 85795
-        },
-        {
-          "editionNumber": 2,
-          "productName": "111DE4NO18QABCDEFG",
+          "productName": "101DE4NO18QMNOPQR",
           "updateNumbers": [
             0,
             1
@@ -646,7 +701,7 @@
         },
         {
           "editionNumber": 2,
-          "productName": "111DE516510ABCDEFG",
+          "productName": "102DE516510MNOPQR",
           "updateNumbers": [
             0,
             1,
@@ -685,7 +740,7 @@
         },
         {
           "editionNumber": 1,
-          "productName": "111DE360010ABCDEFG",
+          "productName": "104DE360010MNOPQR",
           "updateNumbers": [
             0
           ],
@@ -700,7 +755,7 @@
         },
         {
           "editionNumber": 11,
-          "productName": "111DE416040ABCDEFG",
+          "productName": "111DE416040MNOPQR",
           "updateNumbers": [
             0,
             1
@@ -720,7 +775,7 @@
         },
         {
           "editionNumber": 7,
-          "productName": "111JP5BHTR7ABCDEFG",
+          "productName": "111JP5BHTR7MNOPQR",
           "updateNumbers": [
             7
           ],
@@ -734,7 +789,7 @@
         },
         {
           "editionNumber": 7,
-          "productName": "111JP5P9F59ABCDEFG",
+          "productName": "101JP5P9F59MNOPQR",
           "updateNumbers": [
             3
           ],
@@ -748,7 +803,7 @@
         },
         {
           "editionNumber": 3,
-          "productName": "111GB602571ABCDEFG",
+          "productName": "102GB602571MNOPQR",
           "updateNumbers": [
             0,
             1,
