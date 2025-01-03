@@ -198,6 +198,8 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IUpdatesSinceValidator, UpdatesSinceValidator>();
             builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
 
+            builder.Services.AddTransient<ISalesCatalogueClient, SalesCatalogueClient>();
+
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 .AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")

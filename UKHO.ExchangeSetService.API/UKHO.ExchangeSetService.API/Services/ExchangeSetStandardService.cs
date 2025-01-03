@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
@@ -91,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            if (updatesSinceRequest == null)
+            if (updatesSinceRequest == null || updatesSinceRequest.SinceDateTime == null)
             {
                 return BadRequestErrorResponse(correlationId);
             }
@@ -105,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId, cancellationToken);
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(ApiVersion.V2, exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId, cancellationToken);
 
             return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
@@ -174,9 +175,11 @@ namespace UKHO.ExchangeSetService.API.Services
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse
                     {
                         RequestedProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount,
-                        ExchangeSetProductCount = httpStatusCode == HttpStatusCode.NotModified ? 0 : (int)salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount,
+                        ExchangeSetProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount,
                         RequestedProductsAlreadyUpToDateCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount,
-                        RequestedProductsNotInExchangeSet = salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason }).ToList(),
+                        RequestedProductsNotInExchangeSet = salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned
+                            .Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
+                            .ToList(),
                     },
                 },
                 HttpStatusCode.NotModified when request is ProductVersionsRequest => new ExchangeSetStandardServiceResponse

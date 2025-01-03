@@ -3,7 +3,7 @@
 
 using System.Runtime.Serialization;
 
-namespace UKHO.ExchangeSetService.Common.Enums
+namespace UKHO.ExchangeSetService.Common.Models.Enums
 {
     public enum ApiVersion
     {

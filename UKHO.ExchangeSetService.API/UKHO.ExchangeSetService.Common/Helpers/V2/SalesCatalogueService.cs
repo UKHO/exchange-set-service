@@ -10,10 +10,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Enums;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
@@ -41,7 +41,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper));
         }
 
-        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken)
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(ApiVersion apiVersion, string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSGetProductsFromSpecificDateRequestStart,
@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                                                      SCSUpdateSinceURL,
                                                      correlationId,
-                                                     ApiVersion.V2,
+                                                     apiVersion,
                                                      exchangeSetStandard,
                                                      sinceDateTime);
 

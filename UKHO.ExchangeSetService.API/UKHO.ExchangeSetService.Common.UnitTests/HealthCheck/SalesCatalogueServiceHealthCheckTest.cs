@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
@@ -71,7 +72,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public async Task WhenSCSClientReturnsOtherThan200And304_ThenSalesCatalogueServiceIsHealthy()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("BadRequest"))) });
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
@@ -87,7 +88,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             var jsonString = JsonConvert.SerializeObject(scsResponse);
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
             var httpResponse = new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(jsonString))) };
-            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
@@ -99,7 +100,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public async Task WhenSCSClientReturns503_ThenSalesCatalogueServiceIsUnhealthy()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.ServiceUnavailable, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("ServiceUnavailable"))) });
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
@@ -111,7 +112,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         public async Task WhenSCSClientThrowsException_ThenSalesCatalogueServiceIsUnhealthy()
         {
             A.CallTo(() => fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("notRequiredDuringTesting");
-            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, null, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Throws<Exception>();
 
             var response = await salesCatalogueServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());

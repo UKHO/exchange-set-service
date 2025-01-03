@@ -4,12 +4,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public interface ISalesCatalogueService
     {
-        Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(ApiVersion apiVersion, string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken);
     }
 }
