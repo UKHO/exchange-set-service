@@ -262,7 +262,7 @@
     }
   },
   {
-    "id": "productName-101GB40079ABCDEFG-102NO32904820801012",
+    "id": "productName-101GB40079ABCDEFG-101GB40079ABCDEFG",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 2,
@@ -290,44 +290,6 @@
             }
           ],
           "fileSize": 85795
-        }
-      ]
-    }
-  },
-  {
-    "id": "productName-DE4NO18Q-GB123789",
-    "responseBody": {
-      "productCounts": {
-        "requestedProductCount": 2,
-        "returnedProductCount": 1,
-        "requestedProductsAlreadyUpToDateCount": 0,
-        "requestedProductsNotReturned": [
-          {
-            "productName": "GB123789",
-            "reason": "invalidProduct"
-          }
-        ]
-      },
-      "products": [
-        {
-          "editionNumber": 2,
-          "productName": "DE4NO18Q",
-          "updateNumbers": [
-            0,
-            1
-          ],
-          "dates": [
-            {
-              "issueDate": "2021-03-10T00:00:00.0000000Z",
-              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
-              "updateNumber": 0
-            },
-            {
-              "issueDate": "2021-05-12T00:00:00.0000000Z",
-              "updateNumber": 1
-            }
-          ],
-          "fileSize": 76909
         }
       ]
     }
