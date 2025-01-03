@@ -41,6 +41,30 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper));
         }
 
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(ApiVersion apiVersion, string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.SCSGetProductsFromSpecificDateRequestStart,
+                EventIds.SCSGetProductsFromSpecificDateRequestCompleted,
+                "Get sales catalogue service from specific date time for _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
+                                                     SCSUpdateSinceURL,
+                                                     correlationId,
+                                                     apiVersion,
+                                                     exchangeSetStandard,
+                                                     sinceDateTime);
+
+                    var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
+
+                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
+
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId);
+                },
+                correlationId);
+        }
+
         private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId)
         {
             var body = await httpResponse.Content.ReadAsStringAsync();

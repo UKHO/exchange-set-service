@@ -92,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            if (updatesSinceRequest == null)
+            if (updatesSinceRequest == null || updatesSinceRequest.SinceDateTime == null)
             {
                 return BadRequestErrorResponse(correlationId);
             }
@@ -106,8 +106,9 @@ namespace UKHO.ExchangeSetService.API.Services
                 return validationResult;
             }
 
-            // This is a placeholder, the actual implementation is not provided
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(ApiVersion.V2, exchangeSetStandard, updatesSinceRequest.SinceDateTime, correlationId, cancellationToken);
+
+            return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
 
         private string[] SanitizeProductNames(string[] productNames)

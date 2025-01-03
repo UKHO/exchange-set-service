@@ -17,6 +17,9 @@ using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
@@ -72,17 +75,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidSinceDateTimeRequested_ThenCreateUpdatesSinceReturns202Accepted()
+        public async Task WhenValidSinceDateTimeRequested_ThenProcessUpdatesSinceReturns202Accepted()
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
 
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(new ValidationResult());
 
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(ApiVersion.V2, ExchangeSetStandard, updatesSinceRequest.SinceDateTime, _fakeCorrelationId, CancellationToken.None))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueServiceResponse()));
+
             var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard, "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Value.Should().NotBeNull();
+            result.Value.ExchangeSetStandardResponse.ExchangeSetProductCount.Should().Be(1);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -91,7 +98,62 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenNullOrEmptySinceDateTimeRequested_ThenCreateUpdatesSinceReturnsBadRequest()
+        public async Task WhenNoUpdatesFoundInSalesCatalogService_ThenProcessUpdatesSinceReturns304NotModified()
+        {
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
+
+            A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(ApiVersion.V2, ExchangeSetStandard, updatesSinceRequest.SinceDateTime, _fakeCorrelationId, CancellationToken.None))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.NotModified(new SalesCatalogueResponse()));
+
+            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard, "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.NotModified);
+            result.Value.Should().NotBeNull();
+            result.Value.ExchangeSetStandardResponse.ExchangeSetProductCount.Should().Be(0);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        [TestCase(HttpStatusCode.BadRequest)]
+        [TestCase(HttpStatusCode.NotFound)]
+        [TestCase(HttpStatusCode.NoContent)]
+        [TestCase(HttpStatusCode.InternalServerError)]
+        public async Task WhenSalesCatalogServiceReturnsOtherThanOkAndNotModified_ThenProcessUpdatesSinceReturns500InternalServerError(HttpStatusCode httpStatusCode)
+        {
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
+
+            A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(ApiVersion.V2, ExchangeSetStandard, updatesSinceRequest.SinceDateTime, _fakeCorrelationId, CancellationToken.None))
+                .Returns(
+                            httpStatusCode switch
+                            {
+                                HttpStatusCode.BadRequest => ServiceResponseResult<SalesCatalogueResponse>.BadRequest(),
+                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(),
+                                HttpStatusCode.NoContent => ServiceResponseResult<SalesCatalogueResponse>.NoContent(),
+                                _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
+                            });
+
+            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard, "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenNullOrEmptySinceDateTimeRequested_ThenProcessUpdatesSinceReturnsBadRequest()
         {
             var result = await _service.ProcessUpdatesSinceRequest(null, ExchangeSetStandard, "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
@@ -110,7 +172,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [TestCase("101s", "http//callback.uri")]
         [TestCase("S101", "http:callback.uri")]
         [TestCase("s 101", "https:\\callback.uri")]
-        public async Task WhenInValidDataRequested_ThenCreateUpdatesSinceReturnsBadRequest(string inValidProductIdentifier, string inValidCallBackUri)
+        public async Task WhenInValidDataRequested_ThenProcessUpdatesSinceReturnsBadRequest(string inValidProductIdentifier, string inValidCallBackUri)
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString() };
 
@@ -304,6 +366,35 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                         ErrorMessage = "Invalid callbackUri format.",
                     }
                 });
+        }
+
+        private SalesCatalogueResponse GetSalesCatalogueServiceResponse()
+        {
+            return new SalesCatalogueResponse
+            {
+                ResponseCode = HttpStatusCode.OK,
+                ScsRequestDateTime = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                ResponseBody = new SalesCatalogueProductResponse
+                {
+                    ProductCounts = new ProductCounts
+                    {
+                        RequestedProductCount = 2,
+                        ReturnedProductCount = 1,
+                        RequestedProductsAlreadyUpToDateCount = 0,
+                        RequestedProductsNotReturned = [new() { ProductName = "102NO32904820801012", Reason = "productWithdrawn" }]
+                    },
+                    Products =
+                        [
+                            new()
+                            {
+                                ProductName = "101GB40079ABCDEFG",
+                                EditionNumber = 7,
+                                UpdateNumbers =  [0]
+                            }
+                        ]
+                }
+            };
         }
     }
 }

@@ -11,5 +11,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public interface ISalesCatalogueService
     {
+        Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(ApiVersion apiVersion, string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken);
     }
 }
