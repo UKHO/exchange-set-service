@@ -189,6 +189,93 @@
     }
   },
   {
+    "id": "productName-101GB40079ABCDEFG-104US00_CHES_TYPE1_20210630_0600-111US00_ches_dcf8_20190703T00Z",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "101GB40079ABCDEFG",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 8
+          },
+          "fileSize": 76909
+        },
+        {
+          "editionNumber": 9,
+          "productName": "104US00_CHES_TYPE1_20210630_0600",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 770543
+        },
+        {
+          "editionNumber": 8,
+          "productName": "111US00_ches_dcf8_20190703T00Z",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 52921
+        }
+      ]
+    }
+  },
+  {
     "id": "productName-101GB40079ABCDEFG",
     "responseBody": {
       "productCounts": {
