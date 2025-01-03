@@ -31,10 +31,10 @@ namespace UKHO.ExchangeSetService.API.Services
         private readonly ISalesCatalogueService _salesCatalogueService;
 
         public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger,
-                                          IUpdatesSinceValidator updatesSinceValidator,
-                                          IProductVersionsValidator productVersionsValidator,
-                                          IProductNameValidator productNameValidator,
-                                          ISalesCatalogueService salesCatalogueService)
+            IUpdatesSinceValidator updatesSinceValidator,
+            IProductVersionsValidator productVersionsValidator,
+            IProductNameValidator productNameValidator,
+            ISalesCatalogueService salesCatalogueService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.Services
             _salesCatalogueService = salesCatalogueService ?? throw new ArgumentNullException(nameof(salesCatalogueService));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             productNames = SanitizeProductNames(productNames);
 
@@ -65,7 +65,9 @@ namespace UKHO.ExchangeSetService.API.Services
                 return validationResult;
             }
 
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
+
+            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)

@@ -136,7 +136,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             string[] productNames = null;
 
-            var result = await _service.ProcessProductNamesRequest(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -153,7 +153,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             string[] productNames = [];
 
-            var result = await _service.ProcessProductNamesRequest(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -180,7 +180,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(validationResult);
 
-            var result = await _service.ProcessProductNamesRequest(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -199,7 +199,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
 
-            var result = await _service.ProcessProductNamesRequest(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);

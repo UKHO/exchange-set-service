@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +12,7 @@ using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers
@@ -44,7 +48,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductNamesRequest(productNames, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
                 },

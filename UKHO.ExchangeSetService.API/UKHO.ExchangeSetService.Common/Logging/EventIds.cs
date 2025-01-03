@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using Microsoft.Extensions.Logging;
 
 namespace UKHO.ExchangeSetService.Common.Logging
 {
@@ -908,6 +911,14 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805223 - Uri exception occurred.
         /// </summary>
         UriException = 805223,
+        /// <summary>
+        /// 805224 - Request for sales catalogue service product names endpoint is started.
+        /// </summary>
+        SCSPostProductNamesRequestStart = 805224,
+        /// <summary>
+        /// 805225 - Request for sales catalogue service product names endpoint is completed.
+        /// </summary>
+        SCSPostProductNamesRequestCompleted = 805225
 
         #endregion
     }
