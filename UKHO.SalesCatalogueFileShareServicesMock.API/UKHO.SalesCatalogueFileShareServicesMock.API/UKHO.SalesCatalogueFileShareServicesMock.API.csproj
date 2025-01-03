@@ -396,4 +396,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\SalesCatalogueService\V2\" />
+  </ItemGroup>
 </Project>
