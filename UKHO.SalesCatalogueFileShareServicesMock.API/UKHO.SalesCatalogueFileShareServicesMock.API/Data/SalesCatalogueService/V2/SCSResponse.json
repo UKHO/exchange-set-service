@@ -383,5 +383,18 @@
         }
       ]
     }
+  },
+  {
+    "id": "productName-",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 0,
+        "returnedProductCount": 0,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+        ]
+      },
+      "products": []
+    }
   }
 ]
