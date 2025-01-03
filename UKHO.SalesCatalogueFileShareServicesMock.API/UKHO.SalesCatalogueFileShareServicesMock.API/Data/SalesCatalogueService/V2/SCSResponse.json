@@ -3,8 +3,8 @@
     "id": "productName-101GB40079ABCDEFG-102NO32904820801012-104US00_CHES_TYPE1_20210630_0600",
     "responseBody": {
       "productCounts": {
-        "requestedProductCount": 4,
-        "returnedProductCount": 4,
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": [
           {
@@ -85,8 +85,8 @@
     "id": "productName-101GB40079ABCDEFG-102NO32904820801012-104US00_CHES_TYPE1_20210630_0600-111US00_ches_dcf8_20190703T00Z",
     "responseBody": {
       "productCounts": {
-        "requestedProductCount": 3,
-        "returnedProductCount": 3,
+        "requestedProductCount": 4,
+        "returnedProductCount": 4,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": [
           {
@@ -382,6 +382,19 @@
           "fileSize": 38375
         }
       ]
+    }
+  },
+  {
+    "id": "productName-",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 0,
+        "returnedProductCount": 0,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+        ]
+      },
+      "products": []
     }
   }
 ]
