@@ -5,5 +5,6 @@
         public string FileDirectoryPath { get; set; }
         public string ScsResponseFile { get; set; }
         public string ScsCatalogueResponseFile { get; set; }
+        public string V2FileDirectoryPath { get; set; }
     }
 }

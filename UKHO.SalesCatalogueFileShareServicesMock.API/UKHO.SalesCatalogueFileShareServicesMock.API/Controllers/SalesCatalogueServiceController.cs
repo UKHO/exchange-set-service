@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
@@ -35,7 +35,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 { "source", "productSinceDateTime" },
                 { "description", "None of the product Ids exist in the database" }
-            };
+            };            
         }
 
         [HttpGet]
@@ -125,5 +125,24 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
         }
+
+        [HttpGet]
+        [Route("/v2/products/s100/updatesSince")]
+        public IActionResult UpdateSince(string sinceDateTime, string productIdentifier)
+        {
+            if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime) && salesCatalogueService.ValidateProductIdentifier(productIdentifier))
+            {
+                if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-1).Date)
+                {
+                    return StatusCode(StatusCodes.Status304NotModified);
+                }
+                var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime,productIdentifier);
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
+            return BadRequest();
+        }       
     }
 }
