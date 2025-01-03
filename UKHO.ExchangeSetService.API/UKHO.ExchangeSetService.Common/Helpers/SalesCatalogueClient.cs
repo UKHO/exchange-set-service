@@ -13,7 +13,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public SalesCatalogueClient(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClientFactory.CreateClient();
+            _httpClient = httpClientFactory.CreateClient("Sales Catalogue");
         }
 
         public async Task<HttpResponseMessage> CallSalesCatalogueServiceApi(HttpMethod method,
