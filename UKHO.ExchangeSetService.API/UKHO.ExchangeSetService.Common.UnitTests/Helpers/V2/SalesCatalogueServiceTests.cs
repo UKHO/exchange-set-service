@@ -108,9 +108,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             .Returns(httpResponseMessage);
 
             var result = await _salesCatalogueService.PostProductNamesAsync(_apiVersion, _exchangeSetStandard, productNames, _correlationId, _cancellationToken);
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
+            result.Value.ResponseCode.Should().Be(HttpStatusCode.OK);
+            result.Value.ScsRequestDateTime.ToString().Should().NotBeNull();
             result.Value.ResponseBody.Should().BeEquivalentTo(GetSalesCatalogueServiceResponse());
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
