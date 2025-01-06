@@ -48,9 +48,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return responseData; 
         }
 
-        public SalesCatalogueV2Response GetProductNames(string productNames)
+        public V2SalesCatalogueResponse GetProductNames(string productNames)
         {
-            var responseData = FileHelper.ReadJsonFile<List<SalesCatalogueV2Response>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var responseData = FileHelper.ReadJsonFile<List<V2SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
             var selectedProductNames = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productNames.ToLowerInvariant());
             return selectedProductNames;
         }

@@ -2,9 +2,9 @@
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response.V2
 {
-    public class SalesCatalogueProductV2Response
+    public class V2SalesCatalogueProductResponse
     {
         public ProductCounts ProductCounts { get; set; }
-        public List<ProductsV2> Products { get; set; }
+        public List<V2Products> Products { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response.V2
 {
-    public class ProductsV2
+    public class V2Products
     {
         public string ProductName { get; set; }
         public int? EditionNumber { get; set; }
