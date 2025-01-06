@@ -17,7 +17,11 @@ using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
+using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services
 {
@@ -26,7 +30,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
     {
         private readonly string _fakeCorrelationId = Guid.NewGuid().ToString();
         private readonly string _callbackUri = "https://callback.uri";
-        private const string ExchangeSetStandard = "s100";
 
         private IProductNameValidator _fakeProductNameValidator;
         private ILogger<ExchangeSetStandardService> _fakeLogger;
@@ -46,10 +49,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             _fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
 
             _service = new ExchangeSetStandardService(_fakeLogger,
-                                                      _fakeUpdatesSinceValidator,
-                                                      _fakeProductVersionsValidator,
-                                                      _fakeProductNameValidator,
-                                                      _fakeSalesCatalogueService);
+                _fakeUpdatesSinceValidator,
+                _fakeProductVersionsValidator,
+                _fakeProductNameValidator,
+                _fakeSalesCatalogueService);
         }
 
         [Test]
@@ -79,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard, "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Value.Should().NotBeNull();
@@ -93,7 +96,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [Test]
         public async Task WhenNullOrEmptySinceDateTimeRequested_ThenCreateUpdatesSinceReturnsBadRequest()
         {
-            var result = await _service.ProcessUpdatesSinceRequest(null, ExchangeSetStandard, "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequest(null, ExchangeSetStandard.s100.ToString(), "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -117,7 +120,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(GetValidationResult());
 
-            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard, inValidProductIdentifier, inValidCallBackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), inValidProductIdentifier, inValidCallBackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -136,7 +139,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             string[] productNames = null;
 
-            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -153,7 +156,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             string[] productNames = [];
 
-            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -180,7 +183,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(validationResult);
 
-            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -199,7 +202,27 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
 
-            var result = await _service.ProcessProductNamesRequestAsync(productNames, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenValidProductNamesRequest_ThenProcessProductNamesRequestAsyncReturns202Accepted()
+        {
+            string[] productNames = { "Product1", "Product2" };
+
+            A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
+            A.CallTo(() => _fakeSalesCatalogueService.PostProductNamesAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<string>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
+
+            var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
@@ -221,7 +244,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            var result = await _service.ProcessProductVersionsRequest(productVersions, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequest(productVersions, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Should().NotBeNull();
@@ -250,7 +273,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            var result = await _service.ProcessProductVersionsRequest(productVersions, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequest(productVersions, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Should().NotBeNull();
@@ -267,7 +290,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         {
             var error = "Either body is null or malformed.";
 
-            var result = await _service.ProcessProductVersionsRequest(null, ExchangeSetStandard, _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequest(null, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Should().NotBeNull();
@@ -305,5 +328,40 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     }
                 });
         }
+
+        private static SalesCatalogueResponse GetSalesCatalogueResponse()
+        {
+            return new SalesCatalogueResponse
+            {
+                ResponseCode = HttpStatusCode.OK,
+                ResponseBody = new SalesCatalogueProductResponse
+                {
+                    ProductCounts = new ProductCounts
+                    {
+                        RequestedProductCount = 6,
+                        RequestedProductsAlreadyUpToDateCount = 8,
+                        ReturnedProductCount = 2,
+                        RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
+                                new RequestedProductsNotReturned { ProductName = "GB123456", Reason = "productWithdrawn" },
+                                new RequestedProductsNotReturned { ProductName = "GB123789", Reason = "invalidProduct" }
+                            }
+                    },
+                    Products = new List<Products> {
+                            new Products {
+                                ProductName = "productName",
+                                EditionNumber = 2,
+                                UpdateNumbers = new List<int?> { 3, 4 },
+                                Cancellation = new Cancellation {
+                                    EditionNumber = 4,
+                                    UpdateNumber = 6
+                                },
+                                FileSize = 900000000
+                            }
+                        }
+                },
+                ScsRequestDateTime = DateTime.UtcNow
+            };
+        }
+
     }
 }
