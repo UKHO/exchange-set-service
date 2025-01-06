@@ -48,7 +48,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             _fakeProductVersionsValidator = A.Fake<IProductVersionsValidator>();
             _fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
 
-            _service = new ExchangeSetStandardService(_fakeLogger,
+            _service = new ExchangeSetStandardService(
+                _fakeLogger,
                 _fakeUpdatesSinceValidator,
                 _fakeProductVersionsValidator,
                 _fakeProductNameValidator,
@@ -169,7 +170,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidationFails_ThenShouldReturnBadRequest()
+        public async Task WhenProductNamesValidationFails_ThenShouldReturnBadRequest()
         {
             string[] productNames = ["Product1"];
 
@@ -196,11 +197,15 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidationPasses_ThenShouldReturnSuccess()
+        public async Task WhenProductNamesValidationPasses_ThenShouldReturnSuccess()
         {
             string[] productNames = ["Product1"];
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
+            A.CallTo(() => _fakeSalesCatalogueService.PostProductNamesAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<string>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>
+                .Success(GetSalesCatalogueResponse()));
+
 
             var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
@@ -220,7 +225,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
             A.CallTo(() => _fakeSalesCatalogueService.PostProductNamesAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<string>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>
+                .Success(GetSalesCatalogueResponse()));
 
             var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 

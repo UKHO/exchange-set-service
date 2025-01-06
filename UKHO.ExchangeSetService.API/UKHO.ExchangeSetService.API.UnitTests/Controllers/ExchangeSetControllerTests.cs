@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -73,13 +72,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             };
 
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequestAsync(A<string[]>.Ignored, A<ApiVersion>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None))
-                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
+                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>
+                .Accepted(exchangeSetServiceResponse));
+
             A.CallTo(() => _fakeHttpContextAccessor.HttpContext.TraceIdentifier).Returns(correlationId);
 
             var response = await _controller.PostProductNames(ExchangeSetStandard, productNames, _callbackUri);
+            response.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
-            response.Should().BeOfType<StatusCodeResult>();
-            (response as StatusCodeResult).StatusCode.Should().Be((int)HttpStatusCode.Accepted);
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.PostProductNamesRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.PostProductNamesRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         [Test]
@@ -92,11 +101,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             };
 
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-             .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null));
+             .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>
+             .Accepted(null));
 
             var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
 
-            result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+            result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -151,7 +161,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = await _controller.PostUpdatesSince(ExchangeSetStandard, updatesSinceRequest, "s101", _callbackUri);
 
-            result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+            result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -179,7 +189,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = await _controller.PostUpdatesSince(ExchangeSetStandard, updatesSinceRequest, "", _callbackUri);
 
-            result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+            result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
