@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         private readonly IOptions<SalesCatalogueConfiguration> _salesCatalogueConfig;
         private readonly IUriHelper _uriHelper;
 
-        private const string SCSUpdateSinceURL = "/{0}/products/{1}/updatesSince?sinceDateTime={2}";
+        private const string ScsUpdateSinceEndpointFormat = "/{0}/products/{1}/updatesSince?sinceDateTime={2}";
 
         public SalesCatalogueService(ILogger<SalesCatalogueService> logger,
                                      IAuthScsTokenProvider authScsTokenProvider,
@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 async () =>
                 {
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
-                                                     SCSUpdateSinceURL,
+                                                     ScsUpdateSinceEndpointFormat,
                                                      correlationId,
                                                      apiVersion,
                                                      exchangeSetStandard,
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
                     _logger.LogInformation(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
                                      "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
-                                     httpResponse.RequestMessage.RequestUri,
+                                     httpResponse.RequestMessage?.RequestUri,
                                      httpResponse.StatusCode,
                                      correlationId);
 
@@ -93,7 +93,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 case HttpStatusCode.BadRequest:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
                                      "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
-                                     httpResponse.RequestMessage.RequestUri,
+                                     httpResponse.RequestMessage?.RequestUri,
                                      body,
                                      httpResponse.StatusCode,
                                      correlationId);
@@ -103,7 +103,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 case HttpStatusCode.NotFound:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
                                      "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
-                                     httpResponse.RequestMessage.RequestUri,
+                                     httpResponse.RequestMessage?.RequestUri,
                                      body,
                                      httpResponse.StatusCode,
                                      correlationId);
@@ -113,7 +113,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 default:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
                                      "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}",
-                                     httpResponse.RequestMessage.RequestUri,
+                                     httpResponse.RequestMessage?.RequestUri,
                                      body,
                                      httpResponse.StatusCode,
                                      correlationId);

@@ -60,12 +60,7 @@ namespace UKHO.ExchangeSetService.API.Services
             };
 
             var validationResult = await ValidateRequest(productNamesRequest, correlationId);
-            if (validationResult != null)
-            {
-                return validationResult;
-            }
-
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            return validationResult ?? ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -82,17 +77,12 @@ namespace UKHO.ExchangeSetService.API.Services
             };
 
             var validationResult = await ValidateRequest(productVersionsRequest, correlationId);
-            if (validationResult != null)
-            {
-                return validationResult;
-            }
-
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            return validationResult ?? ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            if (updatesSinceRequest == null || updatesSinceRequest.SinceDateTime == null)
+            if (updatesSinceRequest?.SinceDateTime == null)
             {
                 return BadRequestErrorResponse(correlationId);
             }

@@ -67,13 +67,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequest(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None))
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequest(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
             A.CallTo(() => _fakeHttpContextAccessor.HttpContext.TraceIdentifier).Returns(correlationId);
 
             var response = await _controller.PostProductNames(ExchangeSetStandard, productNames, _callbackUri);
 
             response.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+                                                && call.GetArgument<LogLevel>(0) == LogLevel.Information
+                                                && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestStart.ToEventId()
+                                                && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+                                                && call.GetArgument<LogLevel>(0) == LogLevel.Information
+                                                && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestCompleted.ToEventId()
+                                                && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         [Test]
