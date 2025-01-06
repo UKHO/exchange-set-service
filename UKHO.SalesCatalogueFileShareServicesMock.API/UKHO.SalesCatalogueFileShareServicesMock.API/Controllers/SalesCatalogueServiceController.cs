@@ -126,6 +126,29 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
         }
 
+        [HttpPost]
+        [Route("v2/products/s100/productNames")]
+        public IActionResult ProductNames(List<string> productNames)
+        {
+            if (productNames != null && productNames.Any())
+            {
+                var response = salesCatalogueService.GetProductNames("productName-" + String.Join("-", productNames));
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
+            if (!productNames.Any())
+            {
+                var response = salesCatalogueService.GetProductNames("productName-" + String.Join("-", productNames));
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
+        }
+
         [HttpGet]
         [Route("/v2/products/s100/updatesSince")]
         public IActionResult UpdateSince(string sinceDateTime, string productIdentifier)

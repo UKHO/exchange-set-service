@@ -7,6 +7,7 @@ using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Enums;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 {
@@ -50,10 +51,17 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return responseData;
         }
 
-        public Models.V2.Response.SalesCatalogueResponse GetUpdatesSinceDateTime(string sinceDateTime, string productIdentifier)
+        public V2SalesCatalogueResponse GetProductNames(string productNames)
         {
-            string searchId= $"updatesSince-{productIdentifier}";
-            var responseData = FileHelper.ReadJsonFile<List<Models.V2.Response.SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var responseData = FileHelper.ReadJsonFile<List<V2SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var selectedProductNames = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productNames.ToLowerInvariant());
+            return selectedProductNames;
+        }
+
+        public V2SalesCatalogueResponse GetUpdatesSinceDateTime(string sinceDateTime, string productIdentifier)
+        {
+            string searchId = string.IsNullOrEmpty(productIdentifier) ? "updatesSince" : $"updatesSince-{productIdentifier}";
+            var responseData = FileHelper.ReadJsonFile<List<V2SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
             var selectedProductSinceDateTime = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == searchId.ToLowerInvariant());
             return selectedProductSinceDateTime;
         }
@@ -70,9 +78,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             {
                 if (!DateTime.TryParseExact(sinceDateTime, "R", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDateTime))
                 {
-                    return false;                    
+                    return false;
                 }
-            }            
+            }
 
             if (parsedDateTime.Date >= currentDateTime.Date)
             {
