@@ -1,8 +1,7 @@
-﻿using FakeItEasy;
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
+using FakeItEasy;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
@@ -12,37 +11,37 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     [TestFixture]
     public class FulfilmentSalesCatalogueServiceTest
     {
-        public ISalesCatalogueService fakeSalesCatalogueService;
-        public FulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
-        public string fakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        private ISalesCatalogueService _fakeSalesCatalogueService;
+        private FulfilmentSalesCatalogueService _fulfilmentSalesCatalogueService;
+        private const string FakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
 
         [SetUp]
         public void Setup()
         {
-            fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
+            _fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
 
-            fulfilmentSalesCatalogueService = new FulfilmentSalesCatalogueService(fakeSalesCatalogueService);
+            _fulfilmentSalesCatalogueService = new FulfilmentSalesCatalogueService(_fakeSalesCatalogueService);
         }
 
         #region GetSalesCatalogueDataResponse
-        private SalesCatalogueDataResponse GetSalesCatalogueDataResponse()
+        private static SalesCatalogueDataResponse GetSalesCatalogueDataResponse()
         {
             return new SalesCatalogueDataResponse
             {
                 ResponseCode = HttpStatusCode.OK,
-                ResponseBody = new List<SalesCatalogueDataProductResponse>()
-                {
+                ResponseBody =
+                [
                     new SalesCatalogueDataProductResponse
                     {
-                    ProductName="10000002",
-                    LatestUpdateNumber=5,
-                    FileSize=600,
-                    CellLimitSouthernmostLatitude=24,
-                    CellLimitWesternmostLatitude=119,
-                    CellLimitNorthernmostLatitude=25,
-                    CellLimitEasternmostLatitude=120
+                        ProductName="10000002",
+                        LatestUpdateNumber=5,
+                        FileSize=600,
+                        CellLimitSouthernmostLatitude=24,
+                        CellLimitWesternmostLatitude=119,
+                        CellLimitNorthernmostLatitude=25,
+                        CellLimitEasternmostLatitude=120
                     }
-                }
+                ]
             };
         }
         #endregion
@@ -50,13 +49,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenRequestGetSalesCatalogueDataResponse_ThenReturnsDataInResponse()
         {
-            A.CallTo(() => fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
+            A.CallTo(() => _fakeSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueDataResponse());
 
-            var response = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null);
+            var response = await _fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchId, null);
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.OK, response.ResponseCode);
-            Assert.IsInstanceOf(typeof(SalesCatalogueDataResponse), response);
+            Assert.That(response, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That(response, Is.InstanceOf(typeof(SalesCatalogueDataResponse)));
+            });
         }
     }
 }
