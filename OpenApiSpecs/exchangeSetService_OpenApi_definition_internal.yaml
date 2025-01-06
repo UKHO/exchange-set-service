@@ -311,8 +311,6 @@ paths:
         "200":
           description: |
             A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
-
-            If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
             Date:
               description: Returns the current date and time on the server and should be used in subsequent requests this operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
@@ -323,6 +321,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/exchangeSetResponse"
 
+        "304":
+          description: If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
+          headers:
+           Last-Modified:
+             schema:
+               $ref: "#/components/schemas/Date-Header"
+        
         "400":
           description: Bad request.
           content:
@@ -371,9 +376,7 @@ paths:
       responses:
         "202":
           description: |
-            Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set
-
-            If there are no updates since the sinceDateTime attribute, then a 'Not modified' response will be returned.
+            Request to create Exchange Set is accepted. Response body has Exchange Set status URL to track changes to the status of the task. It also contains the URL that the Exchange Set will be available on as well as the number of products in that Exchange Set.
           headers:
             Date:
               description: Returns the current date and time on the server and should be used in subsequent requests this operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
@@ -383,6 +386,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/s100ExchangeSetResponse"
+                
+        "304":
+          description: If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
+          headers:
+           Last-Modified:
+             schema:
+               $ref: "#/components/schemas/Date-Header"
+        
         "400":
           description: Bad request.
           content:
@@ -447,7 +458,7 @@ paths:
                   "token_type": "Bearer",
                   "expires_in": 3599,
                   "ext_expires_in": 3599,
-                  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSU"
+                  "access_token": "token"
                 }
         400:
           description: Bad request - Request missing client_id and/or client_secret.
