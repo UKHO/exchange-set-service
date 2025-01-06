@@ -21,15 +21,17 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
+using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 {
     [TestFixture]
     public class SalesCatalogueServiceTests
     {
+        private readonly Uri _updateSinceUri = new("https://example.com/v2/products/standard/updatesSince?sinceDateTime=2023-01-01T00:00:00Z");
+        private readonly string _accessToken = "test-token";
         private readonly string _correlationId = Guid.NewGuid().ToString();
         private readonly ApiVersion _apiVersion = ApiVersion.V2;
-        private readonly string _exchangeSetStandard = "s100";
         private readonly string _sinceDateTime = DateTime.UtcNow.ToString("R");
         private readonly CancellationToken _cancellationToken = CancellationToken.None;
 
@@ -75,24 +77,22 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         [Test]
         public async Task WhenValidSinceDateTimeRequested_ThenGetProductsFromSpecificDateAsyncReturnsSuccessResponse()
         {
-            var accessToken = "test-token";
-            var uri = new Uri("https://example.com/v2/products/standard/updatesSince?sinceDateTime=2023-01-01T00:00:00Z");
-
-            A.CallTo(() => _fakeUriHelper.CreateUri(_fakeSalesCatalogueConfig.Value.BaseUrl, "/{0}/products/{1}/updatesSince?sinceDateTime={2}", _correlationId, _apiVersion, _exchangeSetStandard, _sinceDateTime))
-                .Returns(uri);
-
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(_fakeSalesCatalogueConfig.Value.ResourceId))
-                .Returns(accessToken);
-
             var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(GetSalesCatalogueServiceResponse())),
-                RequestMessage = new HttpRequestMessage(HttpMethod.Get, uri)
+                RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri)
             };
-            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri, _correlationId, _cancellationToken))
+
+            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
+                .Returns(_updateSinceUri);
+
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored))
+                .Returns(_accessToken);
+
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, _exchangeSetStandard, _sinceDateTime, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _sinceDateTime, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
@@ -112,24 +112,22 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         [Test]
         public async Task WhenSalesCatalogueServiceApiReturnsNotModified_ThenGetProductsFromSpecificDateAsyncReturns304NotModifiedResponse()
         {
-            var accessToken = "test-token";
-            var uri = new Uri("https://example.com/v2/products/standard/updatesSince?sinceDateTime=2023-01-01T00:00:00Z");
-
-            A.CallTo(() => _fakeUriHelper.CreateUri(_fakeSalesCatalogueConfig.Value.BaseUrl, "/{0}/products/{1}/updatesSince?sinceDateTime={2}", _correlationId, _apiVersion, _exchangeSetStandard, _sinceDateTime))
-                .Returns(uri);
-
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(_fakeSalesCatalogueConfig.Value.ResourceId))
-                .Returns(accessToken);
-
             var httpResponse = new HttpResponseMessage(HttpStatusCode.NotModified)
             {
                 Content = new StringContent("NotModified"),
-                RequestMessage = new HttpRequestMessage(HttpMethod.Get, uri)
+                RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri)
             };
-            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri, _correlationId, _cancellationToken))
+            
+            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
+                .Returns(_updateSinceUri);
+
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored))
+                .Returns(_accessToken);
+
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, _exchangeSetStandard, _sinceDateTime, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _sinceDateTime, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.NotModified);
 
@@ -155,24 +153,22 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         [TestCase(HttpStatusCode.InternalServerError)]
         public async Task WhenSalesCatalogueServiceApiReturnsOtherThanOkAndNotModified_ThenGetProductsFromSpecificDateAsyncReturnsNotSuccessResponse(HttpStatusCode httpStatusCode)
         {
-            var accessToken = "test-token";
-            var uri = new Uri("https://example.com/v2/products/standard/updatesSince?sinceDateTime=2023-01-01T00:00:00Z");
-
-            A.CallTo(() => _fakeUriHelper.CreateUri(_fakeSalesCatalogueConfig.Value.BaseUrl, "/{0}/products/{1}/updatesSince?sinceDateTime={2}", _correlationId, _apiVersion, _exchangeSetStandard, _sinceDateTime))
-                .Returns(uri);
-
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(_fakeSalesCatalogueConfig.Value.ResourceId))
-                .Returns(accessToken);
-
             var httpResponse = new HttpResponseMessage(httpStatusCode)
             {
-                Content = new StringContent(Convert.ToString(httpStatusCode)),
-                RequestMessage = new HttpRequestMessage(HttpMethod.Get, uri)
+                Content = new StringContent(Convert.ToString(httpStatusCode)!),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri)
             };
-            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri, _correlationId, _cancellationToken))
+
+            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
+                .Returns(_updateSinceUri);
+
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored))
+                .Returns(_accessToken);
+
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, _exchangeSetStandard, _sinceDateTime, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _sinceDateTime, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(httpStatusCode);
 

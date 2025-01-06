@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Extensions
 
             if (!string.IsNullOrWhiteSpace(exchangeSetServiceResponse.LastModified))
             {
-                httpContextAccessor.HttpContext.Response.Headers.Append(LastModifiedDateHeaderKey, exchangeSetServiceResponse.LastModified);
+                httpContextAccessor.HttpContext?.Response.Headers.Append(LastModifiedDateHeaderKey, exchangeSetServiceResponse.LastModified);
             }
 
             return result.StatusCode switch

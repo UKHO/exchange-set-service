@@ -17,6 +17,7 @@ using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
+using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
@@ -24,7 +25,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
     public class ExchangeSetControllerTests
     {
         private const string Iso8601DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
-        private const string ExchangeSetStandard = "s100";
         private readonly string _callbackUri = "https://callback.uri";
 
         private IHttpContextAccessor _fakeHttpContextAccessor;
@@ -69,20 +69,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequest(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
+
             A.CallTo(() => _fakeHttpContextAccessor.HttpContext.TraceIdentifier).Returns(correlationId);
 
-            var response = await _controller.PostProductNames(ExchangeSetStandard, productNames, _callbackUri);
+            var response = await _controller.PostProductNames(ExchangeSetStandard.s100.ToString(), productNames, _callbackUri);
 
             response.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
                                                 && call.GetArgument<LogLevel>(0) == LogLevel.Information
-                                                && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestStart.ToEventId()
+                                                && call.GetArgument<EventId>(1) == EventIds.PostProductNamesRequestStart.ToEventId()
                                                 && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
                                                 && call.GetArgument<LogLevel>(0) == LogLevel.Information
-                                                && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestCompleted.ToEventId()
+                                                && call.GetArgument<EventId>(1) == EventIds.PostProductNamesRequestCompleted.ToEventId()
                                                 && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard} Elapsed {Elapsed}").MustHaveHappened();
         }
 
@@ -98,7 +99,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
              .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null));
 
-            var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
+            var result = await _controller.PostProductVersions(ExchangeSetStandard.s100.ToString(), productVersionRequest, _callbackUri);
 
             result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
@@ -125,7 +126,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(new ErrorDescription { CorrelationId = Guid.NewGuid().ToString(), Errors = [new() { Source = "requestBody", Description = "Either body is null or malformed." }] }));
 
-            var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
+            var result = await _controller.PostProductVersions(ExchangeSetStandard.s100.ToString(), productVersionRequest, _callbackUri);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 
@@ -153,7 +154,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard, updatesSinceRequest, "s101", _callbackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), updatesSinceRequest, "s101", _callbackUri);
 
             result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
@@ -181,7 +182,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard, updatesSinceRequest, "", _callbackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), updatesSinceRequest, "", _callbackUri);
 
             result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
@@ -206,7 +207,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                     Errors = [new() { Source = "requestBody", Description = "Either body is null or malformed." }]
                 }));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard, null, "s101", _callbackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), null, "s101", _callbackUri);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 
@@ -238,7 +239,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                                   new() { Source = "CallbackUri", Description = "Invalid callbackUri format." }]
                 }));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard, updatesSinceRequest, inValidProductIdentifier, inValidCallBackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), updatesSinceRequest, inValidProductIdentifier, inValidCallBackUri);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 

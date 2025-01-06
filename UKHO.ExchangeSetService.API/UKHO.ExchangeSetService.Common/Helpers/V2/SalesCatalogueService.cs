@@ -78,6 +78,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             {
                 case HttpStatusCode.OK:
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
+                    response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
                     return ServiceResponseResult<SalesCatalogueResponse>.Success(response);
 
                 case HttpStatusCode.NotModified:
