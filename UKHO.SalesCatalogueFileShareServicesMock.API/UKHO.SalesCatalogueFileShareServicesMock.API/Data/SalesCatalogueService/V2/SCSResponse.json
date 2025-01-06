@@ -1,0 +1,449 @@
+[
+  {
+    "id": "productName-101GB40079ABCDEFG-102NO32904820801012-104US00_CHES_TYPE1_20210630_0600",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "102NO32904820801012",
+            "reason": "productWithdrawn"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "101GB40079ABCDEFG",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 8
+          },
+          "fileSize": 76909
+        },
+        {
+          "editionNumber": 2,
+          "productName": "102NO32904820801012",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-07-09T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 85795
+        },
+        {
+          "editionNumber": 9,
+          "productName": "104US00_CHES_TYPE1_20210630_0600",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 770543
+        }
+      ]
+    }
+  },
+  {
+    "id": "productName-101GB40079ABCDEFG-102NO32904820801012-104US00_CHES_TYPE1_20210630_0600-111US00_ches_dcf8_20190703T00Z",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 4,
+        "returnedProductCount": 4,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "102NO32904820801012",
+            "reason": "productWithdrawn"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "101GB40079ABCDEFG",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 8
+          },
+          "fileSize": 76909
+        },
+        {
+          "editionNumber": 2,
+          "productName": "102NO32904820801012",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-07-09T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 85795
+        },
+        {
+          "editionNumber": 9,
+          "productName": "104US00_CHES_TYPE1_20210630_0600",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 770543
+        },
+        {
+          "editionNumber": 8,
+          "productName": "111US00_ches_dcf8_20190703T00Z",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 52921
+        }
+      ]
+    }
+  },
+  {
+    "id": "productName-101GB40079ABCDEFG-104US00_CHES_TYPE1_20210630_0600-111US00_ches_dcf8_20190703T00Z",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 3,
+        "returnedProductCount": 3,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "101GB40079ABCDEFG",
+          "updateNumbers": [
+            0,
+            1
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-03-10T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-03-10T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2021-05-12T00:00:00.0000000Z",
+              "updateNumber": 1
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 8
+          },
+          "fileSize": 76909
+        },
+        {
+          "editionNumber": 9,
+          "productName": "104US00_CHES_TYPE1_20210630_0600",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 770543
+        },
+        {
+          "editionNumber": 8,
+          "productName": "111US00_ches_dcf8_20190703T00Z",
+          "updateNumbers": [
+            0,
+            1,
+            2
+          ],
+          "dates": [
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateApplicationDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2020-04-22T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2020-10-28T00:00:00.0000000Z",
+              "updateNumber": 2
+            }
+          ],
+          "fileSize": 52921
+        }
+      ]
+    }
+  },
+  {
+    "id": "productName-101GB40079ABCDEFG",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "101GB40079ABCDEFG",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018
+        }
+      ]
+    }
+  },
+  {
+    "id": "productName-102NO32904820801012",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 0,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "102NO32904820801012",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": []
+    }
+  },
+  {
+    "id": "productName-104US00_CHES_TYPE1_20210630_0600",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 1,
+          "productName": "104US00_CHES_TYPE1_20210630_0600",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2009-05-15T00:00:00.0000000Z",
+              "updateApplicationDate": "2009-05-15T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 140018
+        }
+      ]
+    }
+  },
+  {
+    "id": "productName-101GB40079ABCDEFG-101GB40079ABCDEFG",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "101GB40079ABCDEFG",
+            "reason": "duplicateProduct"
+          }
+        ]
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "101GB40079ABCDEFG",
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "issueDate": "2021-07-09T00:00:00.0000000Z",
+              "updateApplicationDate": "2021-07-09T00:00:00.0000000Z",
+              "updateNumber": 0
+            }
+          ],
+          "fileSize": 85795
+        }
+      ]
+    }
+  },
+  {
+    "id": "productName-111US00_ches_dcf8_20190703T00Z",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "editionNumber": 2,
+          "productName": "111US00_ches_dcf8_20190703T00Z",
+          "updateNumbers": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "dates": [
+            {
+              "issueDate": "2015-04-17T00:00:00.0000000Z",
+              "updateApplicationDate": "2015-04-17T00:00:00.0000000Z",
+              "updateNumber": 0
+            },
+            {
+              "issueDate": "2015-04-30T00:00:00.0000000Z",
+              "updateNumber": 1
+            },
+            {
+              "issueDate": "2019-05-31T00:00:00.0000000Z",
+              "updateNumber": 2
+            },
+            {
+              "issueDate": "2019-06-14T00:00:00.0000000Z",
+              "updateNumber": 3
+            },
+            {
+              "issueDate": "2021-06-09T00:00:00.0000000Z",
+              "updateNumber": 4
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 4
+          },
+          "fileSize": 38375
+        }
+      ]
+    }
+  },
+  {
+    "id": "productName-",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 0,
+        "returnedProductCount": 0,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+        ]
+      },
+      "products": []
+    }
+  }
+]
