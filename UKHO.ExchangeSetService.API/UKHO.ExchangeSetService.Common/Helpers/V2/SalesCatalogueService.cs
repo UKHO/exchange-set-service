@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
@@ -26,7 +27,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         private readonly IOptions<SalesCatalogueConfiguration> _salesCatalogueConfig;
         private readonly IUriHelper _uriHelper;
 
-        private const string ScsUpdateSinceEndpointFormat = "/{0}/products/{1}/updatesSince?sinceDateTime={2}";
+        private const string ScsUpdateSinceEndpointFormat = "/{0}/products/{1}/updatesSince?sinceDateTime={2}&productIdentifier={3}";
 
         public SalesCatalogueService(ILogger<SalesCatalogueService> logger,
                                      IAuthScsTokenProvider authScsTokenProvider,
@@ -41,7 +42,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper));
         }
 
-        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(ApiVersion apiVersion, string exchangeSetStandard, string sinceDateTime, string correlationId, CancellationToken cancellationToken)
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSGetProductsFromSpecificDateRequestStart,
@@ -54,7 +55,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                                                      correlationId,
                                                      apiVersion,
                                                      exchangeSetStandard,
-                                                     sinceDateTime);
+                                                     updatesSinceRequest.SinceDateTime,
+                                                     updatesSinceRequest.ProductIdentifier);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
 

@@ -19,6 +19,7 @@ using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.Enums.V2;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
@@ -82,10 +83,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueServiceResponse()));
 
-            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), S100ProductType.s101.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Value.Should().NotBeNull();
@@ -105,10 +106,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<SalesCatalogueResponse>.NotModified(new SalesCatalogueResponse()));
 
-            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), S100ProductType.s101.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.NotModified);
             result.Value.Should().NotBeNull();
@@ -132,7 +133,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(
                             httpStatusCode switch
                             {
@@ -142,7 +143,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                                 _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
                             });
 
-            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), S100ProductType.s101.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
@@ -155,7 +156,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [Test]
         public async Task WhenNullOrEmptySinceDateTimeRequested_ThenProcessUpdatesSinceReturnsBadRequest()
         {
-            var result = await _service.ProcessUpdatesSinceRequest(null, ExchangeSetStandard.s100.ToString(), "s101", _callbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequest(null, ExchangeSetStandard.s100.ToString(), S100ProductType.s101.ToString(), _callbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);

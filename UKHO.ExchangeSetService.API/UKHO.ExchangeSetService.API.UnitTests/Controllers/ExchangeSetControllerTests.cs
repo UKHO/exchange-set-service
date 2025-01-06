@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums.V2;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
@@ -154,7 +155,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequest(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), updatesSinceRequest, "s101", _callbackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), updatesSinceRequest, S100ProductType.s101.ToString(), _callbackUri);
 
             result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
@@ -207,7 +208,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                     Errors = [new() { Source = "requestBody", Description = "Either body is null or malformed." }]
                 }));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), null, "s101", _callbackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), null, S100ProductType.s101.ToString(), _callbackUri);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 

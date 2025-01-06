@@ -19,9 +19,11 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.Enums.V2;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
 using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 {
@@ -32,8 +34,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private readonly string _accessToken = "test-token";
         private readonly string _correlationId = Guid.NewGuid().ToString();
         private readonly ApiVersion _apiVersion = ApiVersion.V2;
-        private readonly string _sinceDateTime = DateTime.UtcNow.ToString("R");
         private readonly CancellationToken _cancellationToken = CancellationToken.None;
+
+        private readonly UpdatesSinceRequest _updatesSinceRequest = new()
+        {
+            SinceDateTime = DateTime.UtcNow.ToString("R"),
+            ProductIdentifier = S100ProductType.s101.ToString(),
+            CallbackUri = "https://example.com"
+        };
 
         private ILogger<SalesCatalogueService> _fakeLogger;
         private IAuthScsTokenProvider _fakeAuthScsTokenProvider;
@@ -92,7 +100,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _sinceDateTime, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
@@ -127,7 +135,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _sinceDateTime, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.NotModified);
 
@@ -168,7 +176,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _sinceDateTime, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromSpecificDateAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(httpStatusCode);
 
