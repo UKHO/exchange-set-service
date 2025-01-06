@@ -1,7 +1,6 @@
-﻿using Azure;
-using Azure.Data.Tables;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
