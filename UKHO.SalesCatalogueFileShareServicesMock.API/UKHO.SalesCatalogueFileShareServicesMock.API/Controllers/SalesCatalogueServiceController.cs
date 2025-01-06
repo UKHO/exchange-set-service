@@ -35,7 +35,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 { "source", "productSinceDateTime" },
                 { "description", "None of the product Ids exist in the database" }
-            };            
+            };
         }
 
         [HttpGet]

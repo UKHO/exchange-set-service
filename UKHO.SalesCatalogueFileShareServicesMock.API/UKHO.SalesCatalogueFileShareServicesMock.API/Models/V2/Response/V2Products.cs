@@ -10,6 +10,6 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Response
         public List<int?> UpdateNumbers { get; set; }
         public List<Dates> Dates { get; set; }
         public Cancellation Cancellation { get; set; }
-        public int? FileSize { get; set; }       
+        public int? FileSize { get; set; }
     }    
 }
