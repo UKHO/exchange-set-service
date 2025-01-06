@@ -458,7 +458,7 @@ paths:
                   "token_type": "Bearer",
                   "expires_in": 3599,
                   "ext_expires_in": 3599,
-                  "access_token": "token"
+                  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSU"
                 }
         400:
           description: Bad request - Request missing client_id and/or client_secret.
