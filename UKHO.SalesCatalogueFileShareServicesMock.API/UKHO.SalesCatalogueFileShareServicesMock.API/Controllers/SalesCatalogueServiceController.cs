@@ -132,7 +132,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime) && salesCatalogueService.ValidateProductIdentifier(productIdentifier))
             {
-                if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-1).Date)
+                if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-10).Date)
                 {
                     return StatusCode(StatusCodes.Status304NotModified);
                 }
