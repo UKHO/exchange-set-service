@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
         private ExchangeSetAuthorizationFilterAttribute exchangeSetFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
-        private const string Standard = "exchangeSetStandard";
+        private const string ExchangeSetStandardKey = "exchangeSetStandard";
         private HttpContext httpContext;
 
         [SetUp]
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
         [Test]
         public async Task WhenExchangeSetStandardParameterIsS100_ThenReturnNextRequest()
         {
-            httpContext.Request.RouteValues.Add(Standard, ExchangeSetStandard.s100.ToString());
+            httpContext.Request.RouteValues.Add(ExchangeSetStandardKey, ExchangeSetStandard.s100.ToString());
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
             await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[Standard].Should().Be(ExchangeSetStandard.s100.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandardKey].Should().Be(ExchangeSetStandard.s100.ToString());
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
         [TestCase("s 100")]
         public async Task WhenExchangeSetStandardParameterIsInvalid_ThenReturnBadRequest(string exchangeSetStandard)
         {
-            httpContext.Request.RouteValues.Add(Standard, exchangeSetStandard);
+            httpContext.Request.RouteValues.Add(ExchangeSetStandardKey, exchangeSetStandard);
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
