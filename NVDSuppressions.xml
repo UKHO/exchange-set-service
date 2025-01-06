@@ -514,21 +514,6 @@
   <suppress>
     <notes>
       <![CDATA[
-      file name: Elastic.Apm.MongoDb.dll
-   https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
-   ]]>
-    </notes>
-    <packageUrl regex="true">^pkg:generic/Elastic\.Apm\.MongoDb@.*$</packageUrl>
-    <cve>CVE-2012-6619</cve>
-    <cve>CVE-2013-1892</cve>
-    <cve>CVE-2014-8180</cve>
-    <cve>CVE-2016-6494</cve>
-    <cve>CVE-2015-1609</cve>
-    <cve>CVE-2013-2132</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
    file name: Elastic.Apm.NetCoreAll.dll
    https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=162057
    ]]>
