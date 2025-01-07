@@ -168,7 +168,8 @@ namespace UKHO.ExchangeSetService.API.Services
                         RequestedProductsNotInExchangeSet = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned
                             .Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
                             .ToList(),
-                    }
+                    },
+                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R")
                 }),
                 HttpStatusCode.NotModified when request is ProductVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
                 {
