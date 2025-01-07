@@ -13,7 +13,7 @@ using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.API.Services.V2;
 using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -23,7 +23,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
 
-namespace UKHO.ExchangeSetService.API.UnitTests.Services
+namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
 {
     [TestFixture]
     public class ExchangeSetStandardServiceTests
