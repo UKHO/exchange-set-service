@@ -150,7 +150,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         }
 
         [HttpGet]
-        [Route("/v2/products/s100/updatesSince")]
+        [Route("v2/products/s100/updatesSince")]
         public IActionResult UpdateSince(string sinceDateTime, string productIdentifier)
         {
             if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime) && salesCatalogueService.ValidateProductIdentifier(productIdentifier))

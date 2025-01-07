@@ -13,7 +13,7 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ServiceFilter(typeof(ExchangeSetAuthorizationFilterAttribute))]
     [Route("v2/exchangeSet")]
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
