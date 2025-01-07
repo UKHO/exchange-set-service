@@ -148,5 +148,43 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
         }
+
+        [HttpPost]
+        [Route("v2/products/s100/productVersions")]
+        public IActionResult V2ProductVersions(List<ProductVersionRequest> productVersionRequest)
+        {
+            if (productVersionRequest != null && productVersionRequest.Any())
+            {
+                var productVersionRequestSearchText = new StringBuilder();
+                bool isInitalIndex = true;
+                var NotModifiedProductName = new[] { "101GB40079ABCDEFG" };
+                const int NotModifiedEditionNumber = 4;
+                const int NotModifiedUpdateNumber = 1;
+                foreach (var item in productVersionRequest)
+                {
+                    //code added to handle 304 not modified scenario
+                    if (NotModifiedProductName.Contains(item.ProductName) && item.EditionNumber == NotModifiedEditionNumber && item.UpdateNumber == NotModifiedUpdateNumber)
+                    {
+                        return StatusCode(StatusCodes.Status304NotModified);
+                    }
+                    productVersionRequestSearchText.Append((isInitalIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
+                    isInitalIndex = false;
+                }
+                var response = salesCatalogueService.GetV2ProductVersion("productVersion-" + productVersionRequestSearchText.ToString());
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
+            if (!productVersionRequest.Any())
+            {
+                var response = salesCatalogueService.GetV2ProductVersion("productVersion-");
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
+        }
     }
 }

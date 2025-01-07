@@ -54,5 +54,12 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             var selectedProductNames = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productNames.ToLowerInvariant());
             return selectedProductNames;
         }
+
+        public V2SalesCatalogueResponse GetV2ProductVersion(string productVersion)
+        {
+            var responseData = FileHelper.ReadJsonFile<List<V2SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var selectedProductVersion = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersion.ToLowerInvariant());
+            return selectedProductVersion;
+        }
     }
 }
