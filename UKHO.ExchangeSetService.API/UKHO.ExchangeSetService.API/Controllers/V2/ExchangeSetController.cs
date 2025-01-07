@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
 {
     [Authorize]
     [ServiceFilter(typeof(ExchangeSetAuthorizationFilterAttribute))]
-    [Route("v2/exchangeSet")]
+    [Route("v2/exchangeSet/{exchangeSetStandard}")]
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
         private readonly string _correlationId;
@@ -39,7 +39,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
             _correlationId = GetCorrelationId();
         }
 
-        [HttpPost("{exchangeSetStandard}/productNames")]
+        [HttpPost("productNames")]
         public Task<IActionResult> PostProductNames(string exchangeSetStandard, [FromBody] string[] productNames, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
                 _correlationId, exchangeSetStandard);
         }
 
-        [HttpPost("{exchangeSetStandard}/productVersions")]
+        [HttpPost("productVersions")]
         public Task<IActionResult> PostProductVersions(string exchangeSetStandard, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
                 }, _correlationId, exchangeSetStandard);
         }
 
-        [HttpPost("{exchangeSetStandard}/updatesSince")]
+        [HttpPost("updatesSince")]
         public Task<IActionResult> PostUpdatesSince(string exchangeSetStandard, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
