@@ -887,7 +887,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805218 - Request for s100 for exchange set service product versions endpoint is started.
         /// </summary>
-        PostProductVersionsRequestStart = 805218,
+        PostProductVersionsRequestStarted = 805218,
         /// <summary>
         /// 805219 - Request for s100 for exchange set service product versions endpoint is completed.
         /// </summary>

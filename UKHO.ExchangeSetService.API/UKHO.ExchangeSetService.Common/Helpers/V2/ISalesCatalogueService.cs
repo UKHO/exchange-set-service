@@ -13,6 +13,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public interface ISalesCatalogueService
     {
-        Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, IEnumerable<ProductVersionRequest> productVersions, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken);
     }
 }

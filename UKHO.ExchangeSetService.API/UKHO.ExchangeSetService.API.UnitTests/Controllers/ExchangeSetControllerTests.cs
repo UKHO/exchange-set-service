@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestStarted.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
@@ -121,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<EventId>(1) == EventIds.PostProductVersionsRequestStarted.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"

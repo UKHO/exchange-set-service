@@ -55,7 +55,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public Task<IActionResult> PostProductVersions(string exchangeSetStandard, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
-                EventIds.PostProductVersionsRequestStart,
+                EventIds.PostProductVersionsRequestStarted,
                 EventIds.PostProductVersionsRequestCompleted,
                 "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
