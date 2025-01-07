@@ -88,7 +88,7 @@ paths:
                 $ref: "#/components/schemas/scsResponse"
 
         "304":
-          description:  Not modified.
+          description:  If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
             Last-Modified:
               schema:
