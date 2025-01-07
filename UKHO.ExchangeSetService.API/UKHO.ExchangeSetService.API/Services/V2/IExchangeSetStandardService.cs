@@ -8,7 +8,7 @@ using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
-namespace UKHO.ExchangeSetService.API.Services
+namespace UKHO.ExchangeSetService.API.Services.V2
 {
     public interface IExchangeSetStandardService
     {

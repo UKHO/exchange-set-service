@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using UKHO.ExchangeSetService.API.Controllers;
-using UKHO.ExchangeSetService.API.Services;
+using UKHO.ExchangeSetService.API.Controllers.V2;
+using UKHO.ExchangeSetService.API.Services.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums.V2;
@@ -20,7 +20,7 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
 
-namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
+namespace UKHO.ExchangeSetService.API.UnitTests.Controllers.V2
 {
     [TestFixture]
     public class ExchangeSetControllerTests

@@ -7,7 +7,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace UKHO.ExchangeSetService.API.Controllers
+namespace UKHO.ExchangeSetService.API.Controllers.V2
 {
     [ExcludeFromCodeCoverage]
     public abstract class ExchangeSetBaseController<T> : ControllerBase
