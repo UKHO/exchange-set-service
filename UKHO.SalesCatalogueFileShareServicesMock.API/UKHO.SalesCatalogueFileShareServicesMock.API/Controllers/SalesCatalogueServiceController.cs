@@ -13,7 +13,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
     public class SalesCatalogueServiceController : BaseController
     {
         private readonly SalesCatalogueService salesCatalogueService;
-     
+
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
@@ -160,6 +160,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 var NotModifiedProductName = new[] { "101GB40079ABCDEFG" };
                 const int NotModifiedEditionNumber = 4;
                 const int NotModifiedUpdateNumber = 1;
+
+                if (productVersionRequest != null && productVersionRequest.Any(x => x == null))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, null);
+                }
                 foreach (var item in productVersionRequest)
                 {
                     //code added to handle 304 not modified scenario
@@ -185,6 +190,6 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 }
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
-        }
+        }      
     }
 }
