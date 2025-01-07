@@ -1,15 +1,15 @@
-﻿using FakeItEasy;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FakeItEasy;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await fileShareServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await fileShareServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Healthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await fileShareServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await fileShareServiceHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
     }
 }

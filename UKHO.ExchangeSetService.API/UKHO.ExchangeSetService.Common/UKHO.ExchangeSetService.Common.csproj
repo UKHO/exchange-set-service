@@ -23,7 +23,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
-    <PackageReference Include="System.IO.Abstractions" Version="21.1.7" />
+    <PackageReference Include="System.IO.Abstractions" Version="21.2.1" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.0" />
     <PackageReference Include="UKHO.Logging.EventHubLogProvider" Version="1.24163.8" />
