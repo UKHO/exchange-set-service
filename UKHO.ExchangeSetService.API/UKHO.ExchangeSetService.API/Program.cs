@@ -146,7 +146,7 @@ namespace UKHO.ExchangeSetService.API
 
             const string ExchangeSetService = "ExchangeSetService";
 
-            builder.Services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
+            builder.Services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>("Sales Catalogue", client =>
             {
                 client.BaseAddress = new Uri(builder.Configuration["SalesCatalogue:BaseUrl"]);
                 var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetService,
@@ -197,6 +197,8 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IProductNameValidator, ProductNameValidator>();
             builder.Services.AddScoped<IUpdatesSinceValidator, UpdatesSinceValidator>();
             builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
+
+            builder.Services.AddScoped<ISalesCatalogueClient, SalesCatalogueClient>();
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
