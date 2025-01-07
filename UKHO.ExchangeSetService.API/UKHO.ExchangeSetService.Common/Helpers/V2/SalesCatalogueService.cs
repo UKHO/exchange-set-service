@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
                     var payloadJson = JsonConvert.SerializeObject(productNames);
 
-                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
+                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId);
 
                     return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId);
                 },

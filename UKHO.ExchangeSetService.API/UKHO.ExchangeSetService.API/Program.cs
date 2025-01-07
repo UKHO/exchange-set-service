@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -33,8 +36,10 @@ using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
-using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogueService;
 using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.ISalesCatalogueService;
+using ISalesCatalogueServiceV2 = UKHO.ExchangeSetService.Common.Helpers.V2.ISalesCatalogueService;
+using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogueService;
+using SalesCatalogueServiceV2 = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
 
 namespace UKHO.ExchangeSetService.API
 {
@@ -121,7 +126,6 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
             builder.Services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
             builder.Services.AddScoped<ISalesCatalogueService, SalesCatalogueService>();
-            builder.Services.AddScoped<Common.Helpers.V2.ISalesCatalogueService, Common.Helpers.V2.SalesCatalogueService>(); // Version V2
             builder.Services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
             builder.Services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
             builder.Services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
@@ -129,7 +133,6 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
             builder.Services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
-            builder.Services.AddScoped<IUriHelper, UriHelper>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddAllElasticApm();
@@ -146,7 +149,7 @@ namespace UKHO.ExchangeSetService.API
 
             const string ExchangeSetService = "ExchangeSetService";
 
-            builder.Services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>("Sales Catalogue", client =>
+            builder.Services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
             {
                 client.BaseAddress = new Uri(builder.Configuration["SalesCatalogue:BaseUrl"]);
                 var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetService,
@@ -197,8 +200,8 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IProductNameValidator, ProductNameValidator>();
             builder.Services.AddScoped<IUpdatesSinceValidator, UpdatesSinceValidator>();
             builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
-
-            builder.Services.AddScoped<ISalesCatalogueClient, SalesCatalogueClient>();
+            builder.Services.AddScoped<ISalesCatalogueServiceV2, SalesCatalogueServiceV2>();
+            builder.Services.AddTransient<IUriHelper, UriHelper>();
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
