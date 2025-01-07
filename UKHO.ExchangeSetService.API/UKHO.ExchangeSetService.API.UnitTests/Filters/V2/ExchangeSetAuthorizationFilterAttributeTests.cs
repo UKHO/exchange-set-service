@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
-using UKHO.ExchangeSetService.API.Filters;
-using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.API.Filters.V2;
+using UKHO.ExchangeSetService.Common.Models.V2.Enums;
 
-namespace UKHO.ExchangeSetService.API.UnitTests.Filters
+namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
 {
     [TestFixture]
     public class ExchangeSetAuthorizationFilterAttributeTests
@@ -19,15 +19,15 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         private ExchangeSetAuthorizationFilterAttribute exchangeSetFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
-        private const string ExchangeSetStandard = "exchangeSetStandard";
+        private const string ExchangeSetStandardKey = "exchangeSetStandard";
         private HttpContext httpContext;
 
         [SetUp]
         public void Setup()
         {
             httpContext = new DefaultHttpContext();
-            exchangeSetFilterAttribute = new ExchangeSetAuthorizationFilterAttribute();            
-        }       
+            exchangeSetFilterAttribute = new ExchangeSetAuthorizationFilterAttribute();
+        }
 
         [Test]
         public async Task WhenExchangeSetStandardParameterIsNotSent_ThenReturnBadRequest()
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         [Test]
         public async Task WhenExchangeSetStandardParameterIsS100_ThenReturnNextRequest()
         {
-            httpContext.Request.RouteValues.Add(ExchangeSetStandard, ExchangeSetStandardForUnitTests.s100.ToString());
+            httpContext.Request.RouteValues.Add(ExchangeSetStandardKey, ExchangeSetStandard.s100.ToString());
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(ExchangeSetStandardForUnitTests.s100.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandardKey].Should().Be(ExchangeSetStandard.s100.ToString());
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         [TestCase("s 100")]
         public async Task WhenExchangeSetStandardParameterIsInvalid_ThenReturnBadRequest(string exchangeSetStandard)
         {
-            httpContext.Request.RouteValues.Add(ExchangeSetStandard, exchangeSetStandard);
+            httpContext.Request.RouteValues.Add(ExchangeSetStandardKey, exchangeSetStandard);
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
@@ -74,6 +74,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         }
-      
+
     }
 }
