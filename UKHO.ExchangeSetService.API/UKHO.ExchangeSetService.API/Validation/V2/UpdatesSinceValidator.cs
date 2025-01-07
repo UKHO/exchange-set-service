@@ -9,7 +9,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
-using UKHO.ExchangeSetService.Common.Models.Enums.V2;
+using UKHO.ExchangeSetService.Common.Models.V2.Enums;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation.V2
