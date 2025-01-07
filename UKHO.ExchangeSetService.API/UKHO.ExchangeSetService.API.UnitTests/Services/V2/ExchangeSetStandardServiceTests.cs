@@ -19,10 +19,10 @@ using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
-using UKHO.ExchangeSetService.Common.Models.Enums.V2;
+using UKHO.ExchangeSetService.Common.Models.V2.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
-using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.Enums.V2.ExchangeSetStandard;
+using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
 {
