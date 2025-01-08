@@ -197,7 +197,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
-        public static async Task CheckEssS100ApiResponseBodyDeatils(this HttpResponseMessage apiResponse, int requestedProductCount, int exchangeSetProductCount, int requestedProductsAlreadyUpToDateCount, List<string> requestedProductsNotInExchangeSet = null)
+        /// <summary>
+        /// This method is used to verify the ESS S100 API response body structure.
+        /// </summary>
+        /// <param name="apiResponse"></param>
+        /// <param name="requestedProductCount"></param>
+        /// <param name="exchangeSetProductCount"></param>
+        /// <param name="requestedProductsAlreadyUpToDateCount"></param>
+        /// <param name="requestedProductsNotInExchangeSet"></param>
+        /// <returns></returns>
+        public static async Task VerifyEssS100ApiResponseBodyDetails(this HttpResponseMessage apiResponse, int requestedProductCount, int exchangeSetProductCount, int requestedProductsAlreadyUpToDateCount, List<string> requestedProductsNotInExchangeSet = null)
         {
             var responseBody = JsonConvert.DeserializeObject<ExchangeSetBatch>(await apiResponse.Content.ReadAsStringAsync());
             Assert.That(responseBody.RequestedProductCount == requestedProductCount, $"RequestedProductCount was expected {requestedProductCount} but found " + responseBody.RequestedProductCount);
@@ -205,8 +214,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(responseBody.RequestedProductsAlreadyUpToDateCount == requestedProductsAlreadyUpToDateCount, $"RequestedProductsAlreadyUpToDateCount was expected {requestedProductsAlreadyUpToDateCount} but found " + responseBody.RequestedProductsAlreadyUpToDateCount);
             foreach (var product in responseBody.RequestedProductsNotInExchangeSet)
             {
-                    Assert.That(requestedProductsNotInExchangeSet.Contains(product.ProductName),
-                        $"Product Name {product.ProductName} not found in requested products not in exchange set.");
+                Assert.That(requestedProductsNotInExchangeSet!.Contains(product.ProductName),
+                $"Product Name {product.ProductName} not found in requested products not in exchange set.");
             }
         }
     }

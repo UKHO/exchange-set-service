@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 {
-    public class S100EssEndPointsAuthorizationScenarios : ObjectStorage
+    public class S100EssEndPointsScenarios : ObjectStorage
     {
         private UpdatesSinceModel sinceDateTimePayload;
         private List<string> productNames;
@@ -33,31 +33,36 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         }
 
         //PBI 194403: Azure AD Authorization
+        //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenAndValidDate_ThenResponseCodeReturnedIs202Accepted()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload);
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(202), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
-            await apiResponse.CheckEssS100ApiResponseBodyDeatils(0, 7, 0);
+            await apiResponse.VerifyEssS100ApiResponseBodyDetails(0, 7, 0);
         }
 
+        //PBI 194403: Azure AD Authorization
+        //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenValidDateAndProductIdentifier_ThenResponseCodeReturnedIs202Accepted()
+        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenAndValidDateWithProductIdentifierParam_ThenResponseCodeReturnedIs202Accepted()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload, "s102");
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(202), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
-            await apiResponse.CheckEssS100ApiResponseBodyDeatils(0, 8, 0);
+            await apiResponse.VerifyEssS100ApiResponseBodyDetails(0, 8, 0);
         }
 
+        //PBI 194403: Azure AD Authorization
+        //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenForADateWhichHasNoUpdate_ThenResponseCodeReturnedIs202Accepted()
+        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenForADateWhichHasNoUpdateWithProductIdentifierParam_ThenResponseCodeReturnedIs304Accepted()
         {
             sinceDateTimePayload = DataHelper.GetSinceDateTime(DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)); // Set a date that has no updates
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload);
-            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(304), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload, "s111");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(304), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 304.");
             Assert.That(await apiResponse.Content.ReadAsStringAsync(), Is.Empty, "Response body is not empty.");
         }
 
