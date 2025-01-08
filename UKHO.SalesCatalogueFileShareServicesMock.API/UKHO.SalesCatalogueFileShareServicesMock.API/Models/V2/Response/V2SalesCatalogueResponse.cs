@@ -1,7 +1,7 @@
-﻿using System.Net;
-using System;
+﻿using System;
+using System.Net;
 
-namespace UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response.V2
+namespace UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Response
 {
     public class V2SalesCatalogueResponse
     {
