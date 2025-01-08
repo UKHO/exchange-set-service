@@ -33,7 +33,6 @@ namespace UKHO.ExchangeSetService.Common.Extensions
                 HttpStatusCode.NoContent => new NoContentResult(),
                 HttpStatusCode.NotModified => new StatusCodeResult(StatusCodes.Status304NotModified),
                 HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription),
-                HttpStatusCode.NotFound => new NotFoundObjectResult(result.ErrorDescription),
                 HttpStatusCode.InternalServerError => new ObjectResult(new InternalServerError
                 {
                     CorrelationId = correlationId,
