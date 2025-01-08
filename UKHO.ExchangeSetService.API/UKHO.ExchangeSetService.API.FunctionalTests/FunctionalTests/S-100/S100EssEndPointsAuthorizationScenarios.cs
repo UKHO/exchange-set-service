@@ -48,12 +48,39 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         }
 
         //PBI 194403: Azure AD Authorization
+        //PBI 194579: Integrate S-100 ESS producNames EP with stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100ProductNamesEndPointWithValidToken_ThenResponseCodeReturnedIs202Accepted()
+        public async Task WhenICallS100ProductNamesEndPointWithValidTokenAndOneOfTheProductWithdrawn_ThenResponseCodeReturnedIs202Accepted()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(productNames, null, EssJwtToken, "s100");
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(202), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
+            var ExpectedRequestedProductsNotInExchangeSet = new Dictionary<string, string> { { "102NO32904820801012", "productWithdrawn" } };
+            await apiResponse.VerifyEssS100ApiResponseBodyDetails(4, 4, 0, ExpectedRequestedProductsNotInExchangeSet);
+        }
+
+        //PBI 194403: Azure AD Authorization
+        //PBI 194579: Integrate S-100 ESS producNames EP with stub
+        [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
+        public async Task WhenICallS100ProductNamesEndPointWithValidTokenAndDuplicateProducts_ThenResponseCodeReturnedIs202Accepted()
+        {
+            var duplicateProductNames = new List<string>() { "101GB40079ABCDEFG", "101GB40079ABCDEFG" };
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(duplicateProductNames, null, EssJwtToken, "s100");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(202), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
+            var ExpectedRequestedProductsNotInExchangeSet = new Dictionary<string, string> { { "101GB40079ABCDEFG", "duplicateProduct" } };
+            await apiResponse.VerifyEssS100ApiResponseBodyDetails(2, 1, 0, ExpectedRequestedProductsNotInExchangeSet);
+        }
+
+        //PBI 194403: Azure AD Authorization
+        //PBI 194579: Integrate S-100 ESS producNames EP with stub
+        [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
+        public async Task WhenICallS100ProductNamesEndPointWithValidTokenAndNonExisitingProduct_ThenResponseCodeReturnedIs500InternalServerError()
+        {
+            var nonExisitingProductNames = new List<string>() { "103GB40079ABCDEFG" };
+            var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(nonExisitingProductNames, null, EssJwtToken, "s100");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(500), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 500.");
         }
 
         //PBI 194403: Azure AD Authorization

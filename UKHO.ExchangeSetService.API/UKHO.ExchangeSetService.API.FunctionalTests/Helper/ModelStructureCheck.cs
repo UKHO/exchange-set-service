@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Newtonsoft.Json;
+using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -192,7 +194,23 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(apiResponseData.RequestedAioProductsAlreadyUpToDateCount.GetType().Equals(typeof(int)), Is.True, "Responsebody returns other datatype, instead of expected Int");
             Assert.That(apiResponseData.RequestedAioProductsAlreadyUpToDateCount >= 0, Is.True, "Response body returns RequestedProductsAlreadyUpToDateCount less than zero, instead of expected count should not be less than zero.");
 
-            
+        }
+
+        public static async Task VerifyEssS100ApiResponseBodyDetails(this HttpResponseMessage apiResponse, int requestedProductCount, int exchangeSetProductCount, int requestedProductsAlreadyUpToDateCount, Dictionary<string, string> requestedProductsNotInExchangeSet = null)
+        {
+            var responseBody = JsonConvert.DeserializeObject<ExchangeSetBatch>(await apiResponse.Content.ReadAsStringAsync());
+            Assert.That(responseBody.RequestedProductCount == requestedProductCount, $"RequestedProductCount was expected {requestedProductCount} but found " + responseBody.RequestedProductCount);
+            Assert.That(responseBody.ExchangeSetProductCount == exchangeSetProductCount, $"ExchangeSetProductCount was expected {exchangeSetProductCount} but found " + responseBody.ExchangeSetProductCount);
+            Assert.That(responseBody.RequestedProductsAlreadyUpToDateCount == requestedProductsAlreadyUpToDateCount, $"RequestedProductsAlreadyUpToDateCount was expected {requestedProductsAlreadyUpToDateCount} but found " + responseBody.RequestedProductsAlreadyUpToDateCount);
+
+            foreach (var product in responseBody.RequestedProductsNotInExchangeSet)
+            {
+                Assert.That(requestedProductsNotInExchangeSet.ContainsKey(product.ProductName),
+                    $"Product Name {product.ProductName} not found in requested products not in exchange set.");
+
+                var expectedValue = requestedProductsNotInExchangeSet[product.ProductName];
+                Assert.That(product.Reason, Is.EqualTo(expectedValue), $"For Product Name {product.ProductName}, expected value was {expectedValue} but found {product.Reason}.");
+            }
         }
     }
 }
