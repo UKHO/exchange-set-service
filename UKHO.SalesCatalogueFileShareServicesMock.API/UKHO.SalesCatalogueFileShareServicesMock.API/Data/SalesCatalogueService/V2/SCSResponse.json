@@ -9,7 +9,7 @@
         "requestedProductsNotReturned": [
           {
             "productName": "102NO32904820801012",
-            "reason": "productWithdrawn"
+            "reason": "invalidProduct"
           }
         ]
       },
@@ -91,7 +91,7 @@
         "requestedProductsNotReturned": [
           {
             "productName": "102NO32904820801012",
-            "reason": "productWithdrawn"
+            "reason": "invalidProduct"
           }
         ]
       },
