@@ -153,14 +153,13 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("v2/products/s100/productVersions")]
         public IActionResult V2ProductVersions(List<ProductVersionRequest> productVersionRequest)
         {
-            if (productVersionRequest != null && productVersionRequest.Any() || !productVersionRequest.Any())
+            if (productVersionRequest != null && productVersionRequest.Any() || productVersionRequest.Count == 0)
             {
                 var productVersionRequestSearchText = new StringBuilder();
                 bool isInitialIndex = true;
                 var notModifiedProductName = new[] { "101GB40079ABCDEFG" };
-                const int NotModifiedEditionNumber = 4;
-                const int NotModifiedUpdateNumber = 1;
-
+                const int NotModifiedEditionNumber = 4, NotModifiedUpdateNumber = 1;
+              
                 if (productVersionRequest.Any(x => x == null))
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, null);

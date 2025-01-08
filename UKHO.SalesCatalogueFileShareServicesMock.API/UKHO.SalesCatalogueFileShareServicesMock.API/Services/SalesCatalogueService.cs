@@ -67,7 +67,10 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return selectedProductVersion;
         }
 
-        public void SearchProductVersion(StringBuilder productVersionRequestSearchText, bool isInitialIndex, ProductVersionRequest item) => productVersionRequestSearchText.Append((isInitialIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
+        public void SearchProductVersion(StringBuilder productVersionRequestSearchText, bool isInitialIndex, ProductVersionRequest item)
+        {
+            productVersionRequestSearchText.Append((isInitialIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
+        }
 
         public V2SalesCatalogueResponse GetUpdatesSinceDateTime(string sinceDateTime, string productIdentifier)
         {
