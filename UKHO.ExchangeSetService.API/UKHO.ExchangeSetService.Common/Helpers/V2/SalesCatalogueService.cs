@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         private readonly IOptions<SalesCatalogueConfiguration> _salesCatalogueConfig;
         private readonly IUriHelper _uriHelper;
 
-        private const string ScsUpdateSinceEndpointFormat = "/{0}/products/{1}/updatesSince?sinceDateTime={2}&productIdentifier={3}";
+        private const string ScsUpdateSinceEndpointPathFormat = "/{0}/products/{1}/updatesSince?sinceDateTime={2}&productIdentifier={3}";
 
         public SalesCatalogueService(ILogger<SalesCatalogueService> logger,
                                      IAuthScsTokenProvider authScsTokenProvider,
@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 async () =>
                 {
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
-                                                     ScsUpdateSinceEndpointFormat,
+                                                     ScsUpdateSinceEndpointPathFormat,
                                                      correlationId,
                                                      apiVersion,
                                                      exchangeSetStandard,
