@@ -166,8 +166,6 @@ paths:
         "200":
           description: |
             A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.
-
-            If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
             Date:
               description: Returns the current date and time on the server and should be used in subsequent requests this operation to ensure that there are no gaps due to minor time difference between your own and UKHO systems. The date format is in RFC 1123 format.
@@ -179,9 +177,9 @@ paths:
                 $ref: "#/components/schemas/exchangeSetResponse"
 
         "304":
-          description: Not modified.
+          description: If there are no updates since the sinceDateTime parameter, then a 'Not modified' response will be returned.
           headers:
-            Date:
+            Last-Modified:
               schema:
                 $ref: "#/components/schemas/Date-Header"
 
