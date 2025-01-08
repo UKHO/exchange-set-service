@@ -73,9 +73,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         }
 
         [Test]
-        public async Task PostProductVersionsAsync_ReturnsSuccess_WhenResponseIsOk()
+        public async Task WhenPostProductVersionsAsyncResponseIsOk_ThenReturnsSuccess()
         {
-            // Arrange
             var productVersions = new List<ProductVersionRequest> {
                 new() { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = 1 },
                 new() { ProductName = "102NO32904820801012", EditionNumber = 2, UpdateNumber = 2 },
@@ -113,7 +112,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         }
 
         [Test]
-        public async Task PostProductVersionsAsync_ReturnsNotModified_WhenResponseIsNotModified()
+        public async Task WhenPostProductVersionsAsyncResponseIsNotModified_ThenReturnsNotModified()
         {
             var productVersions = new List<ProductVersionRequest> {
                 new() { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = 1 }
@@ -134,7 +133,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             var result = await _salesCatalogueService.PostProductVersionsAsync(ApiVersion, _exchangeSetStandard, productVersions, _correlationId, _cancellationToken);
 
-            // Assert
             result.StatusCode.Should().Be(HttpStatusCode.NotModified);
             result.Value.Should().NotBeNull();
             result.Value.ResponseCode.Should().Be(HttpStatusCode.NotModified);
@@ -158,7 +156,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         [TestCase(HttpStatusCode.BadRequest)]
         [TestCase(HttpStatusCode.NotFound)]
         [TestCase(HttpStatusCode.InternalServerError)]
-        public async Task PostProductVersionsAsync_ReturnsInternalServerError_WhenResponseIsInternalServerError(HttpStatusCode httpStatusCode)
+
+        public async Task WhenPostProductVersionsAsyncResponseIsNotOkOrNotModified_ReturnsExpectedResult(HttpStatusCode httpStatusCode)
         {
             var productVersions = new List<ProductVersionRequest> {
                 new() { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = 1 },

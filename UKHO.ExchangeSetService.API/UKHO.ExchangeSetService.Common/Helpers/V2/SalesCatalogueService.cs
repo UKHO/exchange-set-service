@@ -51,7 +51,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 "SalesCatalogueService PostProductVersions endpoint request for _X-Correlation-ID:{correlationId}",
                 async () =>
                 {
-
                     var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                                                      ScsProductVersionsEndpointPathFormat,
                                                      correlationId,
@@ -65,7 +64,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
 
                     return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId);
-
                 },
                 correlationId);
         }
@@ -126,6 +124,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
                     return ServiceResponseResult<SalesCatalogueResponse>.InternalServerError();
             }
-        }        
+        }
     }
 }
