@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Microsoft.Extensions.Options;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Enums;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Response;
@@ -64,6 +66,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             var selectedProductVersion = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersion.ToLowerInvariant());
             return selectedProductVersion;
         }
+        public void SearchProductVersion(StringBuilder productVersionRequestSearchText, bool isInitialIndex, ProductVersionRequest item) => productVersionRequestSearchText.Append((isInitialIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
 
         public V2SalesCatalogueResponse GetUpdatesSinceDateTime(string sinceDateTime, string productIdentifier)
         {
