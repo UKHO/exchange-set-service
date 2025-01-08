@@ -32,8 +32,8 @@ namespace UKHO.ExchangeSetService.Common.Extensions
                 HttpStatusCode.Accepted => new AcceptedResult(string.Empty, exchangeSetServiceResponse.ExchangeSetStandardResponse) { StatusCode = StatusCodes.Status202Accepted },
                 HttpStatusCode.NoContent => new NoContentResult(),
                 HttpStatusCode.NotModified => new StatusCodeResult(StatusCodes.Status304NotModified),
-                HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription.Errors),
-                HttpStatusCode.NotFound => new NotFoundObjectResult(result.ErrorDescription.Errors),
+                HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription),
+                HttpStatusCode.NotFound => new NotFoundObjectResult(result.ErrorDescription),
                 HttpStatusCode.InternalServerError => new ObjectResult(new InternalServerError
                 {
                     CorrelationId = correlationId,
