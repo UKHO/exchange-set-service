@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
         }
 
-        private string[] SanitizeProductNames(string[] productNames)
+        private static string[] SanitizeProductNames(IEnumerable<string> productNames)
         {
             return productNames?.Where(name => !string.IsNullOrEmpty(name))
                                 .Select(name => name.Trim())
@@ -144,19 +144,19 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             var errorDescription = new ErrorDescription
             {
                 CorrelationId = correlationId,
-                Errors =
-                [
-                    new Error
+                Errors = new List<Error>
+                {
+                    new()
                     {
                         Source = "requestBody",
                         Description = "Either body is null or malformed."
                     }
-                ]
+                }
             };
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
         }
 
-        private ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<T>(T request, ServiceResponseResult<SalesCatalogueResponse> salesCatalogueResponse)
+        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<T>(T request, ServiceResponseResult<SalesCatalogueResponse> salesCatalogueResponse)
         {
             return salesCatalogueResponse.StatusCode switch
             {
