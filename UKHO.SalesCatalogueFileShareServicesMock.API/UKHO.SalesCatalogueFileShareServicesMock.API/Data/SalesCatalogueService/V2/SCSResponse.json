@@ -9,7 +9,7 @@
         "requestedProductsNotReturned": [
           {
             "productName": "102NO32904820801012",
-            "reason": "productWithdrawn"
+            "reason": "invalidProduct"
           }
         ]
       },
@@ -91,7 +91,7 @@
         "requestedProductsNotReturned": [
           {
             "productName": "102NO32904820801012",
-            "reason": "productWithdrawn"
+            "reason": "invalidProduct"
           }
         ]
       },
@@ -445,7 +445,158 @@
       },
       "products": []
     }
-  },
+  },  
+  {
+      "id": "productVersion-101GB40079ABCDEFG-1-1",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 1,
+        "returnedProductCount": 1,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": []
+      },
+      "products": [
+        {
+          "productName": "101GB40079ABCDEFG",
+          "editionNumber": 0,
+          "updateNumbers": [
+            0
+          ],
+          "dates": [
+            {
+              "updateNumber": 0,
+              "updateApplicationDate": "2019-10-27T00:00:00Z",
+              "issueDate": "2019-10-27T00:00:00Z"
+            }
+          ],
+          "cancellation": {
+            "editionNumber": 0,
+            "updateNumber": 8
+          },
+          "fileSize": 0
+        }
+      ]
+    }
+      },
+      {
+        "id": "productVersion-102NO32904820801012-4-3",
+        "responseBody": {
+          "productCounts": {
+            "requestedProductCount": 1,
+            "returnedProductCount": 1,
+            "requestedProductsAlreadyUpToDateCount": 0,
+            "requestedProductsNotReturned": []
+          },
+          "products": [
+            {
+              "editionNumber": 4,
+              "productName": "102NO32904820801012",
+              "updateNumbers": [
+                1,
+                2
+              ],
+              "dates": [
+                {
+                  "issueDate": "2020-10-28T00:00:00.0000000Z",
+                  "updateNumber": 2
+                }
+              ],
+              "fileSize": 2722
+            }
+          ]
+        }
+      },
+      {
+        "id": "productVersion-102NO32904820801012-2-0-101GB40079ABCDEFG-10-0",
+        "responseBody": {
+          "productCounts": {
+            "requestedProductCount": 2,
+            "returnedProductCount": 2,
+            "requestedProductsAlreadyUpToDateCount": 0,
+            "requestedProductsNotReturned": []
+          },
+          "products": [
+            {
+              "editionNumber": 2,
+              "productName": "102NO32904820801012",
+              "updateNumbers": [
+                1
+              ],
+              "dates": [
+                {
+                  "issueDate": "2020-09-09T00:00:00.0000000Z",
+                  "updateNumber": 1
+                }
+              ],
+              "fileSize": 11285
+            },
+            {
+              "editionNumber": 10,
+              "productName": "101GB40079ABCDEFG",
+              "updateNumbers": [
+                1,
+                2
+              ],
+              "dates": [
+                {
+                  "issueDate": "2020-05-22T00:00:00.0000000Z",
+                  "updateNumber": 1
+                },
+                {
+                  "issueDate": "2020-07-06T00:00:00.0000000Z",
+                  "updateNumber": 2
+                }
+              ],
+              "fileSize": 9228
+            }
+          ]
+        }
+      },
+      {
+        "id": "productVersion-102NO32904820801012-7-1-104US00_CHES_TYPE1_20210630_0600-1-0",
+        "responseBody": {
+          "productCounts": {
+            "requestedProductCount": 2,
+            "returnedProductCount": 1,
+            "requestedProductsAlreadyUpToDateCount": 0,
+            "requestedProductsNotReturned": [
+              {
+                "productName": "104US00_CHES_TYPE1_20210630_0600",
+                "reason": "invalidProduct"
+              }
+            ]
+          },
+          "products": [
+            {
+              "editionNumber": 9,
+              "productName": "102NO32904820801012",
+              "updateNumbers": [
+                2
+              ],
+              "dates": [
+                {
+                  "issueDate": "2020-10-28T00:00:00.0000000Z",
+                  "updateNumber": 2
+                }
+              ],
+              "fileSize": 2722
+            }
+          ]
+        }
+      },
+      {
+        "id": "productVersion-",
+        "responseBody": {
+          "productCounts": {
+            "requestedProductCount": 0,
+            "returnedProductCount": 0,
+            "requestedProductsAlreadyUpToDateCount": 0,
+            "requestedProductsNotReturned": [
+            ]
+          },
+          "products": []
+        }
+      },
   {
     "id": "updatesSince-s101",
     "responseBody": {
