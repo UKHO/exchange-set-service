@@ -348,8 +348,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                         RequestedProductsAlreadyUpToDateCount = 8,
                         ReturnedProductCount = 2,
                         RequestedProductsNotReturned = new List<RequestedProductsNotReturned> {
-                                new() { ProductName = "GB123456", Reason = "productWithdrawn" },
-                                new() { ProductName = "GB123789", Reason = "invalidProduct" }
+                                new() { ProductName = "102NO32904820801012", Reason = "invalidProduct" }
                             }
                     },
                     Products = new List<Products> {

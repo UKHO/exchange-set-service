@@ -221,7 +221,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                         new()
                         {
                             ProductName = "102NO32904820801012",
-                            Reason = "productWithdrawn"
+                            Reason = "invalidProduct"
                         }
                     }
                 },
