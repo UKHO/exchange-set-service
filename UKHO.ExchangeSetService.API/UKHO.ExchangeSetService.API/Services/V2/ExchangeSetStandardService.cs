@@ -153,9 +153,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 {
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse
                     {
-                        RequestedProductCount = (int)salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductCount,
-                        ExchangeSetProductCount = (int)salesCatalogueResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount,
-                        RequestedProductsAlreadyUpToDateCount = (int)salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount,
+                        RequestedProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductCount ?? 0,
+                        ExchangeSetProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount ?? 0,
+                        RequestedProductsAlreadyUpToDateCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount ?? 0,
                         RequestedProductsNotInExchangeSet = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned
                             .Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
                             .ToList(),
