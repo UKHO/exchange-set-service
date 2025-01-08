@@ -162,7 +162,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  })
                  .AddPolicyHandler((services, request) => CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
 
-                 services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>(client =>
+                 services.AddHttpClient<ISalesCatalogueClient, SalesCatalogueClient>("Sales Catalogue", client =>
                  {
                      client.BaseAddress = new Uri(ConfigurationBuilder["SalesCatalogue:BaseUrl"]);
                      var productHeaderValue = new ProductInfoHeaderValue(ExchangeSetServiceUserAgent, AssemblyVersion);
@@ -185,6 +185,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
                  services.AddScoped<IFulfilmentCallBackService, FulfilmentCallBackService>();
                  services.AddScoped<IFileSystem, FileSystem>();
+                 services.AddScoped<ISalesCatalogueClient, SalesCatalogueClient>();
 
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
