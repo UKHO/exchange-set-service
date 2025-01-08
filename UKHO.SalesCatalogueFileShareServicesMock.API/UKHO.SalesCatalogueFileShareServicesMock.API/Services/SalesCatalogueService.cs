@@ -81,12 +81,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 return false;
             }
 
-            if (!DateTime.TryParseExact(sinceDateTime, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDateTime))
+            if (!DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime))
             {
-                if (!DateTime.TryParseExact(sinceDateTime, "R", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDateTime))
-                {
-                    return false;
-                }
+                return false;
             }
 
             if (parsedDateTime.Date >= currentDateTime.Date)
