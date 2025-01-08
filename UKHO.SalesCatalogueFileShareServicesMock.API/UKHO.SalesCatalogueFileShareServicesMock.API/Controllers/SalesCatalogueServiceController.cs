@@ -161,7 +161,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 const int NotModifiedEditionNumber = 4;
                 const int NotModifiedUpdateNumber = 1;
 
-                if (productVersionRequest != null && productVersionRequest.Any(x => x == null))
+                if (productVersionRequest.Any(x => x == null))
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, null);
                 }
