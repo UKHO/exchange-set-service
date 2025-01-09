@@ -13,7 +13,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
     public class SalesCatalogueServiceController : BaseController
     {
         private readonly SalesCatalogueService salesCatalogueService;
-     
+
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
@@ -147,6 +147,40 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 }
             }
             return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
+        }
+
+        [HttpPost]
+        [Route("v2/products/s100/productVersions")]
+        public IActionResult V2ProductVersions(List<ProductVersionRequest> productVersionRequest)
+        {
+            if (productVersionRequest != null && productVersionRequest.Any() || productVersionRequest.Count == 0)
+            {
+                var productVersionRequestSearchText = new StringBuilder();
+                bool isInitialIndex = true;
+                var notModifiedProductName = new[] { "101GB40079ABCDEFG" };
+                const int NotModifiedEditionNumber = 4, NotModifiedUpdateNumber = 1;
+              
+                if (productVersionRequest.Any(x => x == null))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, null);
+                }
+                foreach (var item in productVersionRequest)
+                {
+                    //code added to handle 304 not modified scenario
+                    if (notModifiedProductName.Contains(item.ProductName) && item.EditionNumber == NotModifiedEditionNumber && item.UpdateNumber == NotModifiedUpdateNumber)
+                    {
+                        return StatusCode(StatusCodes.Status304NotModified);
+                    }
+                    salesCatalogueService.SearchProductVersion(productVersionRequestSearchText, isInitialIndex, item);
+                    isInitialIndex = false;
+                }
+                var response = salesCatalogueService.GetV2ProductVersion("productVersion-" + productVersionRequestSearchText.ToString());
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+            }            
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
         }
 
         [HttpGet]
