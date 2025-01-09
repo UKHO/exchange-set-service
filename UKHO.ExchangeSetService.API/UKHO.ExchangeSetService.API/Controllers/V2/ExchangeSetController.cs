@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -9,15 +12,17 @@ using UKHO.ExchangeSetService.API.Filters.V2;
 using UKHO.ExchangeSetService.API.Services.V2;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Controllers.V2
 {
     [Authorize]
     [ServiceFilter(typeof(ExchangeSetAuthorizationFilterAttribute))]
-    [Route("v2/exchangeSet")]
+    [Route("v2/exchangeSet/{exchangeSetStandard}")]
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
+        private readonly string _correlationId;
         private readonly ILogger<ExchangeSetController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IExchangeSetStandardService _exchangeSetStandardService;
@@ -31,9 +36,10 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _exchangeSetStandardService = exchangeSetStandardService ?? throw new ArgumentNullException(nameof(exchangeSetStandardService));
+            _correlationId = GetCorrelationId();
         }
 
-        [HttpPost("{exchangeSetStandard}/productNames")]
+        [HttpPost("productNames")]
         public Task<IActionResult> PostProductNames(string exchangeSetStandard, [FromBody] string[] productNames, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
@@ -42,28 +48,30 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
                 "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductNamesRequest(productNames, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
 
-                    return result.ToActionResult(_httpContextAccessor);
+                    return result.ToActionResult(_httpContextAccessor, _correlationId);
                 },
-                GetCorrelationId(), exchangeSetStandard);
+                _correlationId, exchangeSetStandard);
         }
 
-        [HttpPost("{exchangeSetStandard}/productVersions")]
+        [HttpPost("productVersions")]
         public Task<IActionResult> PostProductVersions(string exchangeSetStandard, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
         {
-            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.PostProductVersionsRequestStart, EventIds.PostProductVersionsRequestCompleted,
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.PostProductVersionsRequestStart,
+                EventIds.PostProductVersionsRequestCompleted,
                 "ProductVersions endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequest(productVersionRequest, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
 
-                    return result.ToActionResult(_httpContextAccessor);
+                    return result.ToActionResult(_httpContextAccessor, _correlationId);
 
-                }, GetCorrelationId(), exchangeSetStandard);
+                }, _correlationId, exchangeSetStandard);
         }
 
-        [HttpPost("{exchangeSetStandard}/updatesSince")]
+        [HttpPost("updatesSince")]
         public Task<IActionResult> PostUpdatesSince(string exchangeSetStandard, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
@@ -72,11 +80,11 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
                 "UpdatesSince endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, productIdentifier, callbackUri, GetCorrelationId(), GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequest(updatesSinceRequest, exchangeSetStandard, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
 
-                    return result.ToActionResult(_httpContextAccessor);
+                    return result.ToActionResult(_httpContextAccessor, _correlationId);
 
-                }, GetCorrelationId(), exchangeSetStandard);
+                }, _correlationId, exchangeSetStandard);
         }
     }
 }

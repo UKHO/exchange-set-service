@@ -1,0 +1,45 @@
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
+using Microsoft.Extensions.Logging;
+using UKHO.ExchangeSetService.Common.Logging;
+
+namespace UKHO.ExchangeSetService.Common.Helpers.V2
+{
+    public class UriFactory : IUriFactory
+    {
+        private readonly ILogger<UriFactory> _logger;
+
+        public UriFactory(ILogger<UriFactory> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public Uri CreateUri(string baseUrl, string endpointFormat, string correlationId, params object[] args)
+        {
+            try
+            {
+                var formattedEndpoint = string.Format(endpointFormat, args);
+                var finalUri = new Uri(new Uri(baseUrl), formattedEndpoint);
+
+                if (!Uri.TryCreate(finalUri.AbsoluteUri, UriKind.Absolute, out var validatedUri))
+                {
+                    throw new UriFormatException("The constructed URI is not well-formed.");
+                }
+
+                return finalUri;
+            }
+            catch (UriFormatException ex)
+            {
+                _logger.LogError(EventIds.UriException.ToEventId(), "Invalid URI format. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}", ex.Message, ex.StackTrace, correlationId);
+                throw;
+            }
+            catch (FormatException ex)
+            {
+                _logger.LogError(EventIds.UriException.ToEventId(), "Exception occurred while creating Uri. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}", ex.Message, ex.StackTrace, correlationId);
+                throw;
+            }
+        }
+    }
+}

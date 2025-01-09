@@ -4,15 +4,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Validation.V2;
+using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
@@ -24,16 +28,22 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         private readonly IUpdatesSinceValidator _updatesSinceValidator;
         private readonly IProductVersionsValidator _productVersionsValidator;
         private readonly IProductNameValidator _productNameValidator;
+        private readonly ISalesCatalogueService _salesCatalogueService;
 
-        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger, IUpdatesSinceValidator updatesSinceValidator, IProductVersionsValidator productVersionsValidator, IProductNameValidator productNameValidator)
+        public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger,
+            IUpdatesSinceValidator updatesSinceValidator,
+            IProductVersionsValidator productVersionsValidator,
+            IProductNameValidator productNameValidator,
+            ISalesCatalogueService salesCatalogueService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
             _productVersionsValidator = productVersionsValidator ?? throw new ArgumentNullException(nameof(productVersionsValidator));
             _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));
+            _salesCatalogueService = salesCatalogueService ?? throw new ArgumentNullException(nameof(salesCatalogueService));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             productNames = SanitizeProductNames(productNames);
 
@@ -55,10 +65,12 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
+
+            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse);
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (productVersionRequest == null || !productVersionRequest.Any() || productVersionRequest.Any(pv => pv == null))
             {
@@ -80,7 +92,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (updatesSinceRequest == null)
             {
@@ -100,7 +112,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
         }
 
-        private string[] SanitizeProductNames(string[] productNames)
+        private static string[] SanitizeProductNames(IEnumerable<string> productNames)
         {
             return productNames?.Where(name => !string.IsNullOrEmpty(name))
                                 .Select(name => name.Trim())
@@ -125,23 +137,54 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return null;
         }
 
-        protected ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)
+        private ServiceResponseResult<ExchangeSetStandardServiceResponse> BadRequestErrorResponse(string correlationId)
         {
             _logger.LogError(EventIds.EmptyBodyError.ToEventId(), "Either body is null or malformed | _X-Correlation-ID : {correlationId}", correlationId);
 
             var errorDescription = new ErrorDescription
             {
                 CorrelationId = correlationId,
-                Errors =
-                [
-                    new Error
+                Errors = new List<Error>
+                {
+                    new()
                     {
                         Source = "requestBody",
                         Description = "Either body is null or malformed."
                     }
-                ]
+                }
             };
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
+        }
+
+        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<T>(T request, ServiceResponseResult<SalesCatalogueResponse> salesCatalogueResponse)
+        {
+            return salesCatalogueResponse.StatusCode switch
+            {
+                HttpStatusCode.OK => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
+                {
+                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse
+                    {
+                        RequestedProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductCount ?? 0,
+                        ExchangeSetProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount ?? 0,
+                        RequestedProductsAlreadyUpToDateCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount ?? 0,
+                        RequestedProductsNotInExchangeSet = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned
+                            .Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
+                            .ToList(),
+                    },
+                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R")
+                }),
+                HttpStatusCode.NotModified when request is ProductVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
+                {
+                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
+                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R"),
+                }),
+                HttpStatusCode.NotModified when request is UpdatesSinceRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotModified(new ExchangeSetStandardServiceResponse
+                {
+                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
+                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R"),
+                }),
+                _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
+            };
         }
     }
 }

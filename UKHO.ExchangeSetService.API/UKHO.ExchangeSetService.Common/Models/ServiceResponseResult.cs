@@ -21,12 +21,20 @@ namespace UKHO.ExchangeSetService.Common.Models
 
         public static ServiceResponseResult<T> NoContent() => new(default, HttpStatusCode.NoContent);
 
+        public static ServiceResponseResult<T> NotModified(T value) => new(value, HttpStatusCode.NotModified);
+
         public static ServiceResponseResult<T> NotModified() => new(default, HttpStatusCode.NotModified);
 
         public static ServiceResponseResult<T> NotFound(ErrorDescription errorDescription) => new(default, HttpStatusCode.NotFound, errorDescription);
 
+        public static ServiceResponseResult<T> NotFound() => new(default, HttpStatusCode.NotFound);
+
         public static ServiceResponseResult<T> BadRequest(ErrorDescription errorDescription) => new(default, HttpStatusCode.BadRequest, errorDescription);
 
+        public static ServiceResponseResult<T> BadRequest() => new(default, HttpStatusCode.BadRequest);
+
         public static ServiceResponseResult<T> NotAcceptable(ErrorDescription errorDescription) => new(default, HttpStatusCode.NotAcceptable, errorDescription);
+
+        public static ServiceResponseResult<T> InternalServerError() => new(default, HttpStatusCode.InternalServerError);
     }
 }
