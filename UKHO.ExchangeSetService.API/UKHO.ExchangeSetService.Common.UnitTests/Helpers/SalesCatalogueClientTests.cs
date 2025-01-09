@@ -51,17 +51,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenInvalidUriIsPassed_ThenCallSalesCatalogueServiceApiThrowsArgumentException()
-        {
-            var method = HttpMethod.Get;
-            var requestBody = "{\"key\":\"value\"}";
-            var uri = "invalid-uri";
-            await FluentActions.Invoking(async () => await _salesCatalogueClient.CallSalesCatalogueServiceApi(method, requestBody, _fakeAuthToken, uri, _correlationId, _cancellationToken))
-                .Should()
-                .ThrowExactlyAsync<ArgumentException>().WithMessage("The provided URI is not valid. (Parameter 'uri')");
-        }
-
-        [Test]
         public async Task WhenNoCorrelationIdIsPassed_ThenCallSalesCatalogueServiceApiDoesNotAddCorrelationIdHeader()
         {
             var method = HttpMethod.Get;

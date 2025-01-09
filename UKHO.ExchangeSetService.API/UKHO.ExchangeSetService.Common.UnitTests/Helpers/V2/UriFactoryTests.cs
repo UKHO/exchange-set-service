@@ -14,7 +14,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 {
     [TestFixture]
-    public class UriHelperTests
+    public class UriFactoryTests
     {
         private ILogger<UriFactory> _fakeLogger;
         private readonly string _fakeCorrelationId = Guid.NewGuid().ToString();
@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.UriException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exception occurred while creating Uri. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Invalid URI format. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}").MustHaveHappened();
         }
 
         [Test]

@@ -21,7 +21,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             try
             {
                 var formattedEndpoint = string.Format(endpointFormat, args);
-                return new Uri(new Uri(baseUrl), formattedEndpoint);
+                var finalUri = new Uri(new Uri(baseUrl), formattedEndpoint);
+
+                if (!Uri.IsWellFormedUriString(finalUri.ToString(), UriKind.Absolute))
+                {
+                    throw new UriFormatException("The constructed URI is not well-formed.");
+                }
+
+                return finalUri;
+            }
+            catch (UriFormatException ex)
+            {
+                _logger.LogError(EventIds.UriException.ToEventId(), "Invalid URI format. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}", ex.Message, ex.StackTrace, correlationId);
+                throw;
             }
             catch (FormatException ex)
             {
