@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     throw new UriFormatException("The constructed URI is not well-formed.");
                 }
 
-                return finalUri;
+                return validatedUri;
             }
             catch (UriFormatException ex)
             {

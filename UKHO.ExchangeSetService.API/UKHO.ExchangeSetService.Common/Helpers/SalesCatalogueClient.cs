@@ -26,7 +26,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string correlationId = "",
             CancellationToken cancellationToken = default)
         {
-
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             {
                 Content = string.IsNullOrEmpty(requestBody) ? null : new StringContent(requestBody, Encoding.UTF8, "application/json")

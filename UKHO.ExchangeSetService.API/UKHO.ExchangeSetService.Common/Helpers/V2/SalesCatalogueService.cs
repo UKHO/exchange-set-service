@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
@@ -25,7 +26,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         private readonly IAuthScsTokenProvider _authScsTokenProvider;
         private readonly ISalesCatalogueClient _salesCatalogueClient;
         private readonly IOptions<SalesCatalogueConfiguration> _salesCatalogueConfig;
-        private readonly IUriFactory _uriHelper;
+        private readonly IUriFactory _uriFactory;
 
         private const string ProductNamesEndpointPathFormat = "/{0}/products/{1}/productNames";
 
@@ -33,13 +34,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             IAuthScsTokenProvider authScsTokenProvider,
             ISalesCatalogueClient salesCatalogueClient,
             IOptions<SalesCatalogueConfiguration> salesCatalogueConfig,
-            IUriFactory uriHelper)
+            IUriFactory uriFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger)); ;
             _authScsTokenProvider = authScsTokenProvider ?? throw new ArgumentNullException(nameof(authScsTokenProvider));
             _salesCatalogueClient = salesCatalogueClient ?? throw new ArgumentNullException(nameof(salesCatalogueClient));
             _salesCatalogueConfig = salesCatalogueConfig ?? throw new ArgumentNullException(nameof(salesCatalogueConfig));
-            _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper));
+            _uriFactory = uriFactory ?? throw new ArgumentNullException(nameof(uriFactory));
         }
 
         public Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken)
@@ -50,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
+                    var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                         ProductNamesEndpointPathFormat,
                         correlationId,
                         apiVersion.ToString(),
@@ -100,7 +101,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         httpResponse.StatusCode,
                         correlationId);
 
-                    return ServiceResponseResult<SalesCatalogueResponse>.BadRequest();
+                    var responseBody = JsonConvert.DeserializeObject<ErrorDescription>(body);
+                    return ServiceResponseResult<SalesCatalogueResponse>.BadRequest(responseBody);
 
                 case HttpStatusCode.NotFound:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),

@@ -156,33 +156,42 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
         }
 
-        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<T>(T request, ServiceResponseResult<SalesCatalogueResponse> salesCatalogueResponse)
+        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<T>(T request, ServiceResponseResult<T> salesCatalogueResult)
         {
-            return salesCatalogueResponse.StatusCode switch
+            if (salesCatalogueResult.Value is not SalesCatalogueResponse salesCatalogueResponse)
+            {
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
+            }
+
+            var productCounts = salesCatalogueResponse.ResponseBody.ProductCounts;
+            var lastModified = salesCatalogueResponse.LastModified?.ToString("R");
+
+            return salesCatalogueResult.StatusCode switch
             {
                 HttpStatusCode.OK => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
                 {
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse
                     {
-                        RequestedProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductCount ?? 0,
-                        ExchangeSetProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount ?? 0,
-                        RequestedProductsAlreadyUpToDateCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount ?? 0,
-                        RequestedProductsNotInExchangeSet = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned
+                        RequestedProductCount = productCounts.RequestedProductCount ?? 0,
+                        ExchangeSetProductCount = productCounts.ReturnedProductCount ?? 0,
+                        RequestedProductsAlreadyUpToDateCount = productCounts.RequestedProductsAlreadyUpToDateCount ?? 0,
+                        RequestedProductsNotInExchangeSet = productCounts.RequestedProductsNotReturned
                             .Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
                             .ToList(),
                     },
-                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R")
+                    LastModified = lastModified
                 }),
                 HttpStatusCode.NotModified when request is ProductVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
                 {
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
-                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R"),
+                    LastModified = lastModified,
                 }),
                 HttpStatusCode.NotModified when request is UpdatesSinceRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotModified(new ExchangeSetStandardServiceResponse
                 {
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
-                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R"),
+                    LastModified = lastModified,
                 }),
+                HttpStatusCode.BadRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(salesCatalogueResult.ErrorDescription),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
         }
