@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
     [TestFixture]
     public class SalesCatalogueClientTests
     {
+        private readonly string _correlationId = Guid.NewGuid().ToString();
+        private readonly CancellationToken _cancellationToken = CancellationToken.None;
+        private readonly string _fakeAuthToken = "fake-token";
+        private readonly string _baseUrl = "https://example.com";
+
         private IHttpClientFactory _httpClientFactory;
         private HttpClient _httpClient;
         private SalesCatalogueClient _salesCatalogueClient;
@@ -31,16 +37,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         {
             var method = HttpMethod.Get;
             var requestBody = "{\"key\":\"value\"}";
-            var authToken = "test-token";
-            var uri = "https://example.com/api";
-            var correlationId = "test-correlation-id";
-            var cancellationToken = CancellationToken.None;
 
             var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK);
             A.CallTo(() => _httpClient.SendAsync(A<HttpRequestMessage>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(expectedResponse);
 
-            var response = await _salesCatalogueClient.CallSalesCatalogueServiceApi(method, requestBody, authToken, uri, correlationId, cancellationToken);
+            var response = await _salesCatalogueClient.CallSalesCatalogueServiceApi(method, requestBody, _fakeAuthToken, _baseUrl, _correlationId, _cancellationToken);
 
             response.Should().Be(expectedResponse);
         }

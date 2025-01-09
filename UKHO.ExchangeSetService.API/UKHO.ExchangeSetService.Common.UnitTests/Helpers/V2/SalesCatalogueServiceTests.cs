@@ -38,6 +38,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private readonly string _correlationId = Guid.NewGuid().ToString();
         private readonly string _exchangeSetStandard = Models.V2.Enums.ExchangeSetStandard.s100.ToString();
         private readonly CancellationToken _cancellationToken = CancellationToken.None;
+        private readonly string _accessToken = "test-token";
 
         private SalesCatalogueService _salesCatalogueService;
 
@@ -83,9 +84,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             var uri = new Uri("https://test.com/v2/products/S100/productVersions");
             A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
-
-            var accessToken = "test-token";
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(accessToken);
+            
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_accessToken);
 
             var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
             {
@@ -121,8 +121,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var uri = new Uri("https://test.com/v2/products/S100/productVersions");
             A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
 
-            var accessToken = "test-token";
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(accessToken);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_accessToken);
 
             var httpResponse = new HttpResponseMessage(HttpStatusCode.NotModified)
             {
@@ -168,8 +167,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var uri = new Uri("https://test.com/v2/products/S100/productVersions");
             A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
 
-            var accessToken = "test-token";
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(accessToken);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_accessToken);
 
             var httpResponse = new HttpResponseMessage(httpStatusCode)
             {
