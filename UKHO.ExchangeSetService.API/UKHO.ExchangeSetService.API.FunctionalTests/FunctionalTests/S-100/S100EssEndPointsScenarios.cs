@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 {
-    public class S100EssEndPointsAuthorizationScenarios : ObjectStorage
+    public class S100EssEndPointsScenarios : ObjectStorage
     {
         private string sinceDateTime;
         private UpdatesSinceModel sinceDateTimePayload;
@@ -21,10 +21,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
             sinceDateTimePayload = DataHelper.GetSinceDateTime(sinceDateTime);
             ProductVersionData =
             [
-                DataHelper.GetProductVersionModelData("101GB40079ABCDEFG", 7, 10),
-                DataHelper.GetProductVersionModelData("102NO32904820801012", 36, 0),
-                DataHelper.GetProductVersionModelData("104US00_CHES_TYPE1_20210630_0600", 7, 10),
-                DataHelper.GetProductVersionModelData("111US00_ches_dcf8_20190703T00Z", 36, 0)
+                DataHelper.GetProductVersionModelData("101GB40079ABCDEFG",10, 0),
+                DataHelper.GetProductVersionModelData("102NO32904820801012", 2, 0),
+                DataHelper.GetProductVersionModelData("104US00_CHES_TYPE1_20210630_0600", 1, 0),
+                DataHelper.GetProductVersionModelData("111US00_ches_dcf8_20190703T00Z", 5, 2)
             ];
             productNames = DataHelper.GetProductNamesForS100();
         }
@@ -66,12 +66,38 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         }
 
         //PBI 194403: Azure AD Authorization
+        //PBI 194580: Integrate S-100 ESS API Endpoint /productVersions with corresponding SCS Stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100ProductVersionsEndPointWithValidToken_ThenResponseCodeReturnedIs202Accepted()
+        public async Task WhenICallS100ProductVersionsEndPointWithValidTokenAndOneOfTheInvalidProductVersions_ThenResponseCodeReturnedIs202Accepted()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, EssJwtToken, "s100");
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(202), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
+            var expectedRequestedProductsNotInExchangeSet = new Dictionary<string, string> { { "104US00_CHES_TYPE1_20210630_0600", "invalidProduct" } };
+            await apiResponse.VerifyEssS100ApiResponseBodyDetails(4, 3, 0, expectedRequestedProductsNotInExchangeSet);
+        }
+
+        //PBI 194403: Azure AD Authorization
+        //PBI 194580: Integrate S-100 ESS API Endpoint /productVersions with corresponding SCS Stub
+        [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
+        public async Task WhenICallS100ProductVersionsEndPointWithValidTokenAndNonExistingProductVersions_ThenResponseCodeReturnedIs500InternalServererror()
+        {
+            List<ProductVersionModel> nonExistingProductVersionData = [ DataHelper.GetProductVersionModelData("103GB40079ABCDEFG", 10, 0) ];
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(nonExistingProductVersionData, null, EssJwtToken, "s100");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(500), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 500.");
+        }
+
+        //PBI 194403: Azure AD Authorization
+        //PBI 194580: Integrate S-100 ESS API Endpoint /productVersions with corresponding SCS Stub
+        [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
+        public async Task WhenICallS100ProductVersionsEndPointWithValidTokenAndProductVersionsWhichIsNotModified_ThenResponseCodeReturnedIs202Accepted()
+        {
+            List<ProductVersionModel> nonModifiedProductVersionData = [DataHelper.GetProductVersionModelData("101GB40079ABCDEFG", 4, 1)];
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(nonModifiedProductVersionData, null, EssJwtToken, "s100");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(202), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
+            await apiResponse.VerifyEssS100ApiResponseBodyDetails(1, 0, 1, null);
         }
 
         //PBI 194403: Azure AD Authorization
