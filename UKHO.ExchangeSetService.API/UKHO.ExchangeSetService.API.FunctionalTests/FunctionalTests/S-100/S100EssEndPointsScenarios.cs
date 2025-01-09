@@ -81,7 +81,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenButWithInValidDateExchangeSetStandard_ThenResponseCodeReturnedIs400BadRequest()
+        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenButWithInValidExchangeSetStandard_ThenResponseCodeReturnedIs400BadRequest()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload, "s876");
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
