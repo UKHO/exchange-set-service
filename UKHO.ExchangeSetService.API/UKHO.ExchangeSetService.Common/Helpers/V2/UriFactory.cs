@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 var formattedEndpoint = string.Format(endpointFormat, args);
                 var finalUri = new Uri(new Uri(baseUrl), formattedEndpoint);
 
-                if (!Uri.IsWellFormedUriString(finalUri.ToString(), UriKind.Absolute))
+                if (!Uri.TryCreate(finalUri.AbsoluteUri, UriKind.Absolute, out var validatedUri))
                 {
                     throw new UriFormatException("The constructed URI is not well-formed.");
                 }
