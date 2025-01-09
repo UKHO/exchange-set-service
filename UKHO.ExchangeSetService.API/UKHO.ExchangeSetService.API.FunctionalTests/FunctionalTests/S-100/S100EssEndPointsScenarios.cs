@@ -101,6 +101,17 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         }
 
         //PBI 194403: Azure AD Authorization
+        //PBI 194580: Integrate S-100 ESS API Endpoint /productVersions with corresponding SCS Stub
+        [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
+        public async Task WhenICallS100ProductVersionsEndPointWithValidTokenAndProductVersionsHavingInvalidEdition_ThenResponseCodeReturnedIs400BadRequest()
+        {
+            List<ProductVersionModel> invalidEditionProductVersionData = [DataHelper.GetProductVersionModelData("102NO32904820801012", -2, 0)];
+            var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(invalidEditionProductVersionData, null, EssJwtToken, "s100");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
+        }
+
+        //PBI 194403: Azure AD Authorization
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100ProductVersionsEndPointWithInvalidToken_ThenResponseCodeReturnedIs401unauthorized()
