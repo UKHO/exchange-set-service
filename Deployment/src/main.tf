@@ -217,9 +217,26 @@ module "azure-dashboard" {
   resource_group = azurerm_resource_group.rg
   tags           = local.tags
 }
+
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   name                                  = local.env_name == "prod" && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.storage_suffix}"
+  resource_group_name                   = azurerm_resource_group.rg.name
+  allowed_ips                           = var.allowed_ips  
+  location                              = var.location
+  tags                                  = local.tags
+  small_exchange_set_subnets            = data.azurerm_subnet.small_exchange_set_subnet[*].id
+  medium_exchange_set_subnets           = data.azurerm_subnet.medium_exchange_set_subnet[*].id
+  large_exchange_set_subnets            = data.azurerm_subnet.large_exchange_set_subnet[*].id
+  m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
+  service_name                          = local.service_name
+  agent_2204_subnet                     = var.agent_2204_subnet
+  agent_prd_subnet                      = var.agent_prd_subnet
+}
+
+module "storage" {
+  source                                = "./Modules/Storage"
+  name                                  = local.storage_name
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location

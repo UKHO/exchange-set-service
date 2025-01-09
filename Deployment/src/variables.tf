@@ -13,6 +13,7 @@ locals {
   service_name			= "ess"
   web_app_name		    = "${local.service_name}-${local.env_name}-webapp${var.suffix}"
   key_vault_name		= "${local.service_name}-ukho-${local.env_name}-kv${var.suffix}"
+  storage_name	        = "${local.service_name}${local.env_name}storageukho${var.storage_suffix}"
   tags = {
     SERVICE          = "Exchange Set Service"
     ENVIRONMENT      = local.env_name
