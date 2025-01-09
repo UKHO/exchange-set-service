@@ -51,11 +51,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         //PBI 194579: Integrate S-100 ESS API Endpoint /productNames with corresponding SCS Stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100ProductNamesEndPointWithValidTokenAndOneOfTheProductWithdrawn_ThenResponseCodeReturnedIs202Accepted()
+        public async Task WhenICallS100ProductNamesEndPointWithValidTokenAndOneOfTheInvalidProduct_ThenResponseCodeReturnedIs202Accepted()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(productNames, null, EssJwtToken, "s100");
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(202), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 202.");
-            var expectedRequestedProductsNotInExchangeSet = new Dictionary<string, string> { { "102NO32904820801012", "productWithdrawn" } };
+            var expectedRequestedProductsNotInExchangeSet = new Dictionary<string, string> { { "102NO32904820801012", "invalidProduct" } };
             await apiResponse.VerifyEssS100ApiResponseBodyDetails(4, 4, 0, expectedRequestedProductsNotInExchangeSet);
         }
 
