@@ -38,6 +38,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private readonly string _correlationId = Guid.NewGuid().ToString();
         private readonly string _exchangeSetStandard = Models.V2.Enums.ExchangeSetStandard.s100.ToString();
         private readonly CancellationToken _cancellationToken = CancellationToken.None;
+        private readonly string _fakeAuthToken = "fake-token";
 
         private SalesCatalogueService _salesCatalogueService;
 
@@ -81,7 +82,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var uri = new Uri("https://test.com");
 
             A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("fake-token");
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(new SalesCatalogueProductResponse())) });
 
@@ -99,7 +100,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var uri = new Uri("https://test.com");
 
             A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns("fake-token");
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
 
             var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
             {
@@ -130,11 +131,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         public async Task WhenPostProductNamesAsyncReturnsNotModified_ThenServiceResponseResultIsNotModified()
         {
             var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
-            var accessToken = "fake-token";
             var uri = new Uri("https://test.com");
 
             A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(accessToken);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
 
             var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.NotModified)
             {
@@ -172,11 +172,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         public async Task WhenPostProductNamesAsyncReturnsOtherStatusCodes_ThenServiceResponseResultIsAsExpected(HttpStatusCode httpStatusCode)
         {
             var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
-            var accessToken = "fake-token";
             var uri = new Uri("https://test.com");
 
             A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
-            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(accessToken);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
 
             var httpResponseMessage = new HttpResponseMessage(httpStatusCode)
             {
