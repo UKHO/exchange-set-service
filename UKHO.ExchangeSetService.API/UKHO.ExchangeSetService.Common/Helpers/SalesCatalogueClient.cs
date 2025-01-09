@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -26,7 +27,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             string correlationId = "",
             CancellationToken cancellationToken = default)
         {
-            using var httpRequestMessage = new HttpRequestMessage(method, uri)
+            if (!Uri.TryCreate(uri, UriKind.Absolute, out var validatedUri))
+            {
+                throw new ArgumentException("The provided URI is not valid.", nameof(uri));
+            }
+
+            using var httpRequestMessage = new HttpRequestMessage(method, validatedUri)
             {
                 Content = string.IsNullOrEmpty(requestBody) ? null : new StringContent(requestBody, Encoding.UTF8, "application/json")
             };
