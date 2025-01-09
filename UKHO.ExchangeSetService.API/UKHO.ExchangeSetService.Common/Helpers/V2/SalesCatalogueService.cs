@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         private readonly IAuthScsTokenProvider _authScsTokenProvider;
         private readonly ISalesCatalogueClient _salesCatalogueClient;
         private readonly IOptions<SalesCatalogueConfiguration> _salesCatalogueConfig;
-        private readonly IUriHelper _uriHelper;
+        private readonly IUriFactory _uriHelper;
 
         private const string ProductNamesEndpointPathFormat = "/{0}/products/{1}/productNames";
 
@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             IAuthScsTokenProvider authScsTokenProvider,
             ISalesCatalogueClient salesCatalogueClient,
             IOptions<SalesCatalogueConfiguration> salesCatalogueConfig,
-            IUriHelper uriHelper)
+            IUriFactory uriHelper)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger)); ;
             _authScsTokenProvider = authScsTokenProvider ?? throw new ArgumentNullException(nameof(authScsTokenProvider));

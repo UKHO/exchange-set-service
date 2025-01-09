@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private IAuthScsTokenProvider _fakeAuthScsTokenProvider;
         private ISalesCatalogueClient _fakeSalesCatalogueClient;
         private IOptions<SalesCatalogueConfiguration> _fakeSalesCatalogueConfig;
-        private IUriHelper _fakeUriHelper;
+        private IUriFactory _fakeUriFactory;
 
         private const ApiVersion ApiVersion = Models.Enums.ApiVersion.V2;
         private readonly string _correlationId = Guid.NewGuid().ToString();
@@ -49,24 +49,24 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             _fakeAuthScsTokenProvider = A.Fake<IAuthScsTokenProvider>();
             _fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
             _fakeSalesCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { BaseUrl = "https://test.com", Version = "v2", ResourceId = "testResource" });
-            _fakeUriHelper = A.Fake<IUriHelper>();
+            _fakeUriFactory = A.Fake<IUriFactory>();
 
-            _salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            _salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriFactory);
         }
 
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullLogger = () => new SalesCatalogueService(null, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            Action nullLogger = () => new SalesCatalogueService(null, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriFactory);
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
-            Action nullAuthScsTokenProvider = () => new SalesCatalogueService(_fakeLogger, null, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            Action nullAuthScsTokenProvider = () => new SalesCatalogueService(_fakeLogger, null, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriFactory);
             nullAuthScsTokenProvider.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("authScsTokenProvider");
 
-            Action nullSalesCatalogueClient = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, null, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            Action nullSalesCatalogueClient = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, null, _fakeSalesCatalogueConfig, _fakeUriFactory);
             nullSalesCatalogueClient.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("salesCatalogueClient");
 
-            Action nullSalesCatalogueConfig = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, null, _fakeUriHelper);
+            Action nullSalesCatalogueConfig = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, null, _fakeUriFactory);
             nullSalesCatalogueConfig.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("salesCatalogueConfig");
 
             Action nullUriHelper = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, null);
@@ -81,14 +81,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
             var uri = new Uri("https://test.com");
 
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(new SalesCatalogueProductResponse())) });
 
             await _salesCatalogueService.PostProductNamesAsync(ApiVersion, _exchangeSetStandard, productNames, _correlationId, _cancellationToken);
 
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappenedOnceExactly();
         }
@@ -99,7 +99,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
             var uri = new Uri("https://test.com");
 
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
 
             var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
@@ -133,7 +133,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
             var uri = new Uri("https://test.com");
 
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
 
             var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.NotModified)
@@ -174,7 +174,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
             var uri = new Uri("https://test.com");
 
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
 
             var httpResponseMessage = new HttpResponseMessage(httpStatusCode)

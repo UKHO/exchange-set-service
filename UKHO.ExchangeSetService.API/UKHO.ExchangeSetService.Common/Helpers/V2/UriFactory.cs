@@ -7,11 +7,11 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
-    public class UriHelper : IUriHelper
+    public class UriFactory : IUriFactory
     {
-        private readonly ILogger<UriHelper> _logger;
+        private readonly ILogger<UriFactory> _logger;
 
-        public UriHelper(ILogger<UriHelper> logger)
+        public UriFactory(ILogger<UriFactory> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
