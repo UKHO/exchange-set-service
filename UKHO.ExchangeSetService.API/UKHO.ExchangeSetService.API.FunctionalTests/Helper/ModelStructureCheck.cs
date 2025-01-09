@@ -196,6 +196,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         }
 
+        /// <summary>
+        /// This method is used to verify the ESS S100 API response body structure.
+        /// </summary>
+        /// <param name="apiResponse"></param>
+        /// <param name="requestedProductCount"></param>
+        /// <param name="exchangeSetProductCount"></param>
+        /// <param name="requestedProductsAlreadyUpToDateCount"></param>
+        /// <param name="requestedProductsNotInExchangeSet"></param>
         public static async Task VerifyEssS100ApiResponseBodyDetails(this HttpResponseMessage apiResponse, int requestedProductCount, int exchangeSetProductCount, int requestedProductsAlreadyUpToDateCount, Dictionary<string, string> requestedProductsNotInExchangeSet = null)
         {
             var responseBody = JsonConvert.DeserializeObject<ExchangeSetBatch>(await apiResponse.Content.ReadAsStringAsync());
