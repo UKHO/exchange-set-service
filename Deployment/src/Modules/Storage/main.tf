@@ -17,5 +17,5 @@ resource "azurerm_storage_account" "ess_storage" {
 
 resource "azurerm_storage_queue" "ess_storage_queue" {
   name                               = "fulfilment-queue"
-  storage_account_name               = azurerm_storage_account.storage.name
+  storage_account_name               = azurerm_storage_account.ess_storage.name
 }
