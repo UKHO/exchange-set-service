@@ -4,7 +4,7 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 3,
-        "returnedProductCount": 3,
+        "returnedProductCount": 2,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": [
           {
@@ -86,7 +86,7 @@
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 4,
-        "returnedProductCount": 4,
+        "returnedProductCount": 3,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": [
           {
@@ -585,15 +585,19 @@
     }
   },
   {
-    "id": "productVersion-101GB40079ABCDEFG-10-0-102NO32904820801012-2-0-104US00_CHES_TYPE1_20210630_0600-1-0-111US00_ches_dcf8_20190703T00Z-5-2",
+    "id": "productVersion-101GB40079ABCDEFG-10-0-102NO32904820801012-2-0-105US00_CHES_TYPE1_20210630_0600-1-0-122US00_ches_dcf8_20190703T00Z-5-2",
     "responseBody": {
       "productCounts": {
         "requestedProductCount": 4,
-        "returnedProductCount": 3,
+        "returnedProductCount": 2,
         "requestedProductsAlreadyUpToDateCount": 0,
         "requestedProductsNotReturned": [
           {
-            "productName": "104US00_CHES_TYPE1_20210630_0600",
+            "productName": "105US00_CHES_TYPE1_20210630_0600",
+            "reason": "invalidProduct"
+          },
+          {
+            "productName": "122US00_ches_dcf8_20190703T00Z",
             "reason": "invalidProduct"
           }
         ]
@@ -616,7 +620,7 @@
           "editionNumber": 10,
           "productName": "101GB40079ABCDEFG",
           "updateNumbers": [
-  
+
           ],
           "dates": [
             {
@@ -625,27 +629,29 @@
             }
           ],
           "fileSize": 9228
-        },
-        {
-          "editionNumber": 5,
-          "productName": "111US00_ches_dcf8_20190703T00Z",
-          "updateNumbers": [
-            1,
-            2
-          ],
-          "dates": [
-            {
-              "issueDate": "2020-05-22T00:00:00.0000000Z",
-              "updateNumber": 1
-            },
-            {
-              "issueDate": "2020-07-06T00:00:00.0000000Z",
-              "updateNumber": 2
-            }
-          ],
-          "fileSize": 10145
         }
       ]
+    }
+  },
+  {
+    "id": "productVersion-101GB410PPP-9-1-111234PB23-2-0",
+    "responseBody": {
+      "productCounts": {
+        "requestedProductCount": 2,
+        "returnedProductCount": 0,
+        "requestedProductsAlreadyUpToDateCount": 0,
+        "requestedProductsNotReturned": [
+          {
+            "productName": "101GB410PPP",
+            "reason": "invalidProduct"
+          },
+          {
+            "productName": "111234PB23",
+            "reason": "invalidProduct"
+          }
+        ]
+      },
+      "products": []
     }
   },
   {
