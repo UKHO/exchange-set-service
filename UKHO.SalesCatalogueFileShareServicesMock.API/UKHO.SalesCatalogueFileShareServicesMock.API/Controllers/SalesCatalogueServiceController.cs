@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
@@ -17,6 +18,8 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
+
+        private readonly string _errDescription = "None of the product Ids exist in the database";
 
         public SalesCatalogueServiceController(IHttpContextAccessor httpContextAccessor, SalesCatalogueService salesCatalogueService) : base(httpContextAccessor)
         {
@@ -84,7 +87,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             {
                 var productVersionRequestSearchText = new StringBuilder();
                 bool isInitalIndex = true;
-                var NotModifiedProductName = new [] { "DE416040" , "DE448899" };
+                var NotModifiedProductName = new[] { "DE416040", "DE448899" };
                 const int NotModifiedEditionNumber = 11;
                 const int NotModifiedUpdateNumber = 1;
                 foreach (var item in productVersionRequest)
@@ -146,7 +149,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                     return Ok(response.ResponseBody);
                 }
             }
-            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsIdentifiers });
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = GetCurrentCorrelationId(),
+                Errors =
+                [
+                    new() { Source = "productNames", Description = _errDescription }
+                ]
+
+            };
+            return BadRequest(errorDescription);
         }
 
         [HttpPost]
@@ -159,7 +171,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 bool isInitialIndex = true;
                 var notModifiedProductName = new[] { "101GB40079ABCDEFG" };
                 const int NotModifiedEditionNumber = 4, NotModifiedUpdateNumber = 1;
-              
+
                 if (productVersionRequest.Any(x => x == null))
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, null);
@@ -179,8 +191,16 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 {
                     return Ok(response.ResponseBody);
                 }
-            }            
-            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = ErrorsVersions });
+            }
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = GetCurrentCorrelationId(),
+                Errors =
+                [
+                    new() { Source = "productVersions", Description = _errDescription }
+                ]
+            };
+            return BadRequest(errorDescription);
         }
 
         [HttpGet]
@@ -194,13 +214,21 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 {
                     return StatusCode(StatusCodes.Status304NotModified);
                 }
-                var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime,productIdentifier);
+                var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime, productIdentifier);
                 if (response != null)
                 {
                     return Ok(response.ResponseBody);
                 }
             }
-            return BadRequest();
-        }       
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = GetCurrentCorrelationId(),
+                Errors =
+                [
+                    new() { Source = "updatesSince", Description = _errDescription }
+                ]
+            };
+            return BadRequest(errorDescription);
+        }
     }
 }
