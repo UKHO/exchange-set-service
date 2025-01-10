@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Newtonsoft.Json;
+using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -37,7 +39,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(apiResponseData.ExchangeSetUrlExpiryDateTime, Is.Not.Null, $"Response body returns null, Instead of valid datetime {apiResponseData.ExchangeSetUrlExpiryDateTime}.");
 
             //Check data type of RequestedProductCount and value should not be less than zero
-            Assert.That(apiResponseData.RequestedProductCount.GetType().Equals(typeof(int)),Is.True, "Responsebody returns other datatype, instead of expected Int");
+            Assert.That(apiResponseData.RequestedProductCount.GetType().Equals(typeof(int)), Is.True, "Responsebody returns other datatype, instead of expected Int");
             Assert.That(apiResponseData.RequestedProductCount >= 0, Is.True, "Response body returns RequestedProductCount less than zero, instead of expected count should not be less than zero.");
 
             //Check data type of ExchangeSetCellCount and value should not be less than zero
@@ -64,7 +66,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), Is.True, $"Exchange set returned file URI {apiResponseData.Links.ExchangeSetFileUri.Href}, Its not valid uri");
 
             //Verify ExchangeSetCellCount
-            Assert.That(apiResponseData.ExchangeSetCellCount,Is.EqualTo(1), $"Exchange set returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount 1.");
+            Assert.That(apiResponseData.ExchangeSetCellCount, Is.EqualTo(1), $"Exchange set returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount 1.");
 
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.That(apiResponseData.RequestedProductsNotInExchangeSet, Is.Not.Null, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
@@ -82,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] exchangeSetBatchStatusUri = apiResponseData.Links.ExchangeSetBatchStatusUri.Href.Split('/');
 
             //Verify the exchangeSetBatchStatusUri format for batch
-            Assert.That( exchangeSetBatchStatusUri[4],Is.EqualTo("batch"), $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
+            Assert.That(exchangeSetBatchStatusUri[4], Is.EqualTo("batch"), $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
 
 
             var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 2];
@@ -111,7 +113,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(hasGUID, Is.True, $"Exchange set returned file URI contains BatchId {fileBatchId} is not a valid GUID");
 
             //Verify the File format for ExchangeSetFileUri
-            Assert.That(ExchangeSetFileUri[7],Is.EqualTo(Config.ExchangeSetFileName), $"Exchange set returned File URI contains file name  {ExchangeSetFileUri[7]}, instead of expected file name {Config.ExchangeSetFileName}.");
+            Assert.That(ExchangeSetFileUri[7], Is.EqualTo(Config.ExchangeSetFileName), $"Exchange set returned File URI contains file name  {ExchangeSetFileUri[7]}, instead of expected file name {Config.ExchangeSetFileName}.");
 
             // verify both batch ID of ExchangeSetBatchStatusUri and ExchangeSetFileUri are the same
             Assert.That(fileBatchId, Is.EqualTo(batchID), $"The Batch ID of ExchangeSetBatchStatusUri {batchID} and ExchangeSetFileUri {fileBatchId} are not equal.");
@@ -122,7 +124,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Verify expiry datetime
             var expiryDateTime = DateTime.UtcNow.AddDays(1).AddMinutes(1);
 
-            Assert.That(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second),Is.True,  $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
+            Assert.That(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second), Is.True, $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
         }
 
         public static async Task<string> GetBatchId(this HttpResponseMessage apiResponse)
@@ -192,7 +194,32 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(apiResponseData.RequestedAioProductsAlreadyUpToDateCount.GetType().Equals(typeof(int)), Is.True, "Responsebody returns other datatype, instead of expected Int");
             Assert.That(apiResponseData.RequestedAioProductsAlreadyUpToDateCount >= 0, Is.True, "Response body returns RequestedProductsAlreadyUpToDateCount less than zero, instead of expected count should not be less than zero.");
 
-            
+        }
+
+        /// <summary>
+        /// This method is used to verify the ESS S100 API response body structure.
+        /// </summary>
+        /// <param name="apiResponse"></param>
+        /// <param name="requestedProductCount"></param>
+        /// <param name="exchangeSetProductCount"></param>
+        /// <param name="requestedProductsAlreadyUpToDateCount"></param>
+        /// <param name="requestedProductsNotInExchangeSet"></param>
+        /// <returns></returns>
+        public static async Task VerifyEssS100ApiResponseBodyDetails(this HttpResponseMessage apiResponse, int requestedProductCount, int exchangeSetProductCount, int requestedProductsAlreadyUpToDateCount, Dictionary<string, string> requestedProductsNotInExchangeSet = null)
+        {
+            var responseBody = JsonConvert.DeserializeObject<ExchangeSetBatch>(await apiResponse.Content.ReadAsStringAsync());
+            Assert.That(responseBody.RequestedProductCount == requestedProductCount, $"RequestedProductCount was expected {requestedProductCount} but found " + responseBody.RequestedProductCount);
+            Assert.That(responseBody.ExchangeSetProductCount == exchangeSetProductCount, $"ExchangeSetProductCount was expected {exchangeSetProductCount} but found " + responseBody.ExchangeSetProductCount);
+            Assert.That(responseBody.RequestedProductsAlreadyUpToDateCount == requestedProductsAlreadyUpToDateCount, $"RequestedProductsAlreadyUpToDateCount was expected {requestedProductsAlreadyUpToDateCount} but found " + responseBody.RequestedProductsAlreadyUpToDateCount);
+
+            foreach (var product in responseBody.RequestedProductsNotInExchangeSet)
+            {
+                Assert.That(requestedProductsNotInExchangeSet.ContainsKey(product.ProductName),
+                    $"Product Name {product.ProductName} not found in requested products not in exchange set.");
+
+                var expectedValue = requestedProductsNotInExchangeSet[product.ProductName];
+                Assert.That(product.Reason, Is.EqualTo(expectedValue), $"For Product Name {product.ProductName}, expected value was {expectedValue} but found {product.Reason}.");
+            }
         }
     }
 }

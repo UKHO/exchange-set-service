@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Microsoft.Extensions.Options;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Enums;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Response;
@@ -58,6 +60,18 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             return selectedProductNames;
         }
 
+        public V2SalesCatalogueResponse GetV2ProductVersion(string productVersion)
+        {
+            var responseData = FileHelper.ReadJsonFile<List<V2SalesCatalogueResponse>>(salesCatalogueConfiguration.Value.V2FileDirectoryPath + salesCatalogueConfiguration.Value.ScsResponseFile);
+            var selectedProductVersion = responseData?.FirstOrDefault(a => a.Id.ToLowerInvariant() == productVersion.ToLowerInvariant());
+            return selectedProductVersion;
+        }
+
+        public void SearchProductVersion(StringBuilder productVersionRequestSearchText, bool isInitialIndex, ProductVersionRequest item)
+        {
+            productVersionRequestSearchText.Append((isInitialIndex ? "" : "-") + item.ProductName + "-" + item.EditionNumber + "-" + item.UpdateNumber);
+        }
+
         public V2SalesCatalogueResponse GetUpdatesSinceDateTime(string sinceDateTime, string productIdentifier)
         {
             string searchId = string.IsNullOrEmpty(productIdentifier) ? "updatesSince" : $"updatesSince-{productIdentifier}";
@@ -74,12 +88,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                 return false;
             }
 
-            if (!DateTime.TryParseExact(sinceDateTime, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDateTime))
+            if (!DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime))
             {
-                if (!DateTime.TryParseExact(sinceDateTime, "R", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDateTime))
-                {
-                    return false;
-                }
+                return false;
             }
 
             if (parsedDateTime.Date >= currentDateTime.Date)
