@@ -187,20 +187,27 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("v2/products/s100/updatesSince")]
         public IActionResult UpdatesSince(string sinceDateTime, string productIdentifier)
         {
-            if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime) && salesCatalogueService.ValidateProductIdentifier(productIdentifier))
+            if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime))
             {
-                //code added for 304 not modified scenario
-                if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-10).Date)
+                if (salesCatalogueService.ValidateProductIdentifier(productIdentifier))
                 {
-                    return StatusCode(StatusCodes.Status304NotModified);
-                }
-                var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime,productIdentifier);
-                if (response != null)
-                {
-                    return Ok(response.ResponseBody);
-                }
+                    //code added for 304 not modified scenario
+                    if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-10).Date)
+                    {
+                        return StatusCode(StatusCodes.Status304NotModified);
+                    }
+                    var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime, productIdentifier);
+                    if (response != null)
+                    {
+                        return Ok(response.ResponseBody);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }                
             }
             return BadRequest();
-        }       
+        }
     }
 }

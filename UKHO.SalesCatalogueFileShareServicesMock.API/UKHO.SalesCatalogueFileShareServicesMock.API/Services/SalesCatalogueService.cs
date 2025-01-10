@@ -111,6 +111,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
             {
                 return true;
             }
+
+            if (productIdentifier.StartsWith("s") && productIdentifier.Length == 4)
+            {
+                if (int.TryParse(productIdentifier.Substring(1), out int value) && value >= 101 && value <= 999)
+                {
+                    return true;
+                }
+            }
             return false;
         }
     }
