@@ -5,7 +5,7 @@ using System;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
-    public interface IUriHelper
+    public interface IUriFactory
     {
         Uri CreateUri(string baseUrl, string endpointFormat, string correlationId, params object[] args);
     }

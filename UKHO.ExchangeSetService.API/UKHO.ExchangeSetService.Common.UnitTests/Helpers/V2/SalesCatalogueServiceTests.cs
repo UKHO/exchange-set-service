@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -19,11 +20,11 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Enums;
-using UKHO.ExchangeSetService.Common.Models.V2.Enums;
+using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
-using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
+using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
+using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 {
@@ -31,7 +32,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
     public class SalesCatalogueServiceTests
     {
         private readonly Uri _updateSinceUri = new("https://example.com/v2/products/standard/updatesSince?sinceDateTime=2023-01-01T00:00:00Z");
-        private readonly string _accessToken = "test-token";
+        private readonly string _fakeAuthToken = "fake-token";
         private readonly string _correlationId = Guid.NewGuid().ToString();
         private readonly ApiVersion _apiVersion = ApiVersion.V2;
         private readonly CancellationToken _cancellationToken = CancellationToken.None;
@@ -39,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private readonly UpdatesSinceRequest _updatesSinceRequest = new()
         {
             SinceDateTime = DateTime.UtcNow.ToString("R"),
-            ProductIdentifier = S100ProductType.s101.ToString(),
+            ProductIdentifier = "s101",
             CallbackUri = "https://example.com"
         };
 
@@ -47,7 +48,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private IAuthScsTokenProvider _fakeAuthScsTokenProvider;
         private ISalesCatalogueClient _fakeSalesCatalogueClient;
         private IOptions<SalesCatalogueConfiguration> _fakeSalesCatalogueConfig;
-        private IUriHelper _fakeUriHelper;
+        private IUriFactory _fakeUriFactory;
+
 
         private SalesCatalogueService _salesCatalogueService;
 
@@ -57,30 +59,172 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             _fakeLogger = A.Fake<ILogger<SalesCatalogueService>>();
             _fakeAuthScsTokenProvider = A.Fake<IAuthScsTokenProvider>();
             _fakeSalesCatalogueClient = A.Fake<ISalesCatalogueClient>();
-            _fakeSalesCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { BaseUrl = "https://example.com", Version = ApiVersion.V2.ToString(), ResourceId = "testResource" });
-            _fakeUriHelper = A.Fake<IUriHelper>();
+            _fakeSalesCatalogueConfig = Options.Create(new SalesCatalogueConfiguration() { BaseUrl = "https://test.com", Version = "v2", ResourceId = "testResource" });
+            _fakeUriFactory = A.Fake<IUriFactory>();
 
-            _salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            _salesCatalogueService = new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriFactory);
         }
 
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullLogger = () => new SalesCatalogueService(null, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            Action nullLogger = () => new SalesCatalogueService(null, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriFactory);
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
-            Action nullAuthScsTokenProvider = () => new SalesCatalogueService(_fakeLogger, null, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            Action nullAuthScsTokenProvider = () => new SalesCatalogueService(_fakeLogger, null, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, _fakeUriFactory);
             nullAuthScsTokenProvider.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("authScsTokenProvider");
 
-            Action nullSalesCatalogueClient = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, null, _fakeSalesCatalogueConfig, _fakeUriHelper);
+            Action nullSalesCatalogueClient = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, null, _fakeSalesCatalogueConfig, _fakeUriFactory);
             nullSalesCatalogueClient.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("salesCatalogueClient");
 
-            Action nullSalesCatalogueConfig = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, null, _fakeUriHelper);
+            Action nullSalesCatalogueConfig = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, null, _fakeUriFactory);
             nullSalesCatalogueConfig.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("salesCatalogueConfig");
 
-            Action nullUriHelper = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, null);
-            nullUriHelper.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("uriHelper");
+            Action nullUriFactory = () => new SalesCatalogueService(_fakeLogger, _fakeAuthScsTokenProvider, _fakeSalesCatalogueClient, _fakeSalesCatalogueConfig, null);
+            nullUriFactory.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("uriFactory");
         }
+
+        #region PostProductNamesAsync
+
+        [Test]
+        public async Task WhenPostProductNamesAsyncIsCalled_ThenDependenciesAreCalled()
+        {
+            var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
+            var uri = new Uri("https://test.com");
+
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(new SalesCatalogueProductResponse())) });
+
+            await _salesCatalogueService.PostProductNamesAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public async Task WhenPostProductNamesAsyncAsyncReturnsOk_ThenServiceResponseResultIsSuccess()
+        {
+            var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
+            var uri = new Uri("https://test.com");
+
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
+
+            var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(GetSalesCatalogueServiceResponse())),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            };
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+            .Returns(httpResponseMessage);
+
+            var result = await _salesCatalogueService.PostProductNamesAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+            result.Value.Should().NotBeNull();
+            result.Value.ResponseCode.Should().Be(HttpStatusCode.OK);
+            result.Value.ScsRequestDateTime.ToString(CultureInfo.InvariantCulture).Should().NotBeNull();
+            result.Value.ResponseBody.Should().BeEquivalentTo(GetSalesCatalogueServiceResponse());
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductNamesRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductNamesRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId} Elapsed {Elapsed}").MustHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenPostProductNamesAsyncReturnsNotModified_ThenServiceResponseResultIsNotModified()
+        {
+            var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
+            var uri = new Uri("https://test.com");
+
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
+
+            var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.NotModified)
+            {
+                Content = new StringContent("NotModified"),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            };
+
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponseMessage);
+
+            var result = await _salesCatalogueService.PostProductNamesAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be(HttpStatusCode.NotModified);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductNamesRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductNamesRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId} Elapsed {Elapsed}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        [TestCase(HttpStatusCode.BadRequest)]
+        [TestCase(HttpStatusCode.NotFound)]
+        [TestCase(HttpStatusCode.InternalServerError)]
+        public async Task WhenPostProductNamesAsyncReturnsOtherStatusCodes_ThenServiceResponseResultIsAsExpected(HttpStatusCode httpStatusCode)
+        {
+            var productNames = new List<string> { "101GB40079ABCDEFG", "102NO32904820801012" };
+            var uri = new Uri("https://test.com");
+
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
+
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = _correlationId,
+                Errors = [new Error
+                {
+                    Description = "Error in sales catalogue service",
+                    Source = "Sales catalogue service"
+                }]
+            };
+            var httpResponseMessage = new HttpResponseMessage(httpStatusCode)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(errorDescription)),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            };
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponseMessage);
+
+            var result = await _salesCatalogueService.PostProductNamesAsync(_apiVersion, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+
+            result.StatusCode.Should().Be(httpStatusCode);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductNamesRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductNamesRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId} Elapsed {Elapsed}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        }
+
+        #endregion PostProductNamesAsync
 
         [Test]
         public async Task WhenValidSinceDateTimeRequested_ThenGetProductsFromSpecificDateAsyncReturnsSuccessResponse()
@@ -91,11 +235,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                 RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri)
             };
 
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
                 .Returns(_updateSinceUri);
 
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored))
-                .Returns(_accessToken);
+                .Returns(_fakeAuthToken);
 
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
@@ -125,12 +269,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                 Content = new StringContent("NotModified"),
                 RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri)
             };
-            
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
+
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
                 .Returns(_updateSinceUri);
 
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored))
-                .Returns(_accessToken);
+                .Returns(_fakeAuthToken);
 
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
@@ -147,7 +291,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -161,17 +305,31 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         [TestCase(HttpStatusCode.InternalServerError)]
         public async Task WhenSalesCatalogueServiceApiReturnsOtherThanOkAndNotModified_ThenGetProductsFromSpecificDateAsyncReturnsNotSuccessResponse(HttpStatusCode httpStatusCode)
         {
+
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = _correlationId,
+                Errors = new List<Error>
+                {
+                    new()
+                    {
+                        Description = "Error in sales catalogue service",
+                        Source = "Sales catalogue service"
+                    }
+                }
+            };
+
             var httpResponse = new HttpResponseMessage(httpStatusCode)
             {
-                Content = new StringContent(Convert.ToString(httpStatusCode)!),
+                Content = new StringContent(JsonConvert.SerializeObject(errorDescription)),
                 RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri)
             };
 
-            A.CallTo(() => _fakeUriHelper.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
                 .Returns(_updateSinceUri);
 
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored))
-                .Returns(_accessToken);
+                .Returns(_fakeAuthToken);
 
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
@@ -193,10 +351,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
         }
 
-        private SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
+        private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
         {
             return new SalesCatalogueProductResponse
             {
@@ -205,17 +363,24 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                     RequestedProductCount = 2,
                     ReturnedProductCount = 1,
                     RequestedProductsAlreadyUpToDateCount = 0,
-                    RequestedProductsNotReturned = [new() { ProductName = "102NO32904820801012", Reason = "productWithdrawn" }]
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>
+                    {
+                        new()
+                        {
+                            ProductName = "102NO32904820801012",
+                            Reason = "invalidProduct"
+                        }
+                    }
                 },
-                Products =
-                        [
-                            new()
-                            {
-                                ProductName = "101GB40079ABCDEFG",
-                                EditionNumber = 7,
-                                UpdateNumbers =  [0]
-                            }
-                        ]
+                Products = new List<Products>
+                {
+                    new()
+                    {
+                        ProductName = "101GB40079ABCDEFG",
+                        EditionNumber = 7,
+                        UpdateNumbers = new List<int?> { 0 }
+                    }
+                }
             };
         }
     }

@@ -26,5 +26,4 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
         public List<RequestedProductNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
         public string FssBatchId { get; set; }
     }
-
 }

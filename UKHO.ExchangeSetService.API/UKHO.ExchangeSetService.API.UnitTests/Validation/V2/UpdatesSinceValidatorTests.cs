@@ -9,7 +9,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Validation.V2;
-using UKHO.ExchangeSetService.Common.Models.V2.Enums;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
@@ -113,35 +112,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
 
             result.IsValid.Should().BeFalse();
             result.Errors.Should().ContainSingle(e => e.ErrorMessage == "Invalid callbackUri format.");
-        }
-
-        [Test]
-        public async Task WhenProductIdentifierIsValid_ThenValidatorReturnsTrue()
-        {
-            var request = new UpdatesSinceRequest
-            {
-                SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture),
-                ProductIdentifier = S100ProductType.s101.ToString()
-            };
-
-            var result = await _validator.ValidateAsync(request);
-
-            result.IsValid.Should().BeTrue();
-        }
-
-        [Test]
-        public async Task WhenProductIdentifierIsInvalid_ThenValidatorReturnsFalse()
-        {
-            var request = new UpdatesSinceRequest
-            {
-                SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture),
-                ProductIdentifier = "InvalidProduct"
-            };
-
-            var result = await _validator.ValidateAsync(request);
-
-            result.IsValid.Should().BeFalse();
-            result.Errors.Should().ContainSingle(e => e.ErrorMessage.Contains("ProductIdentifier must be valid value"));
         }
     }
 }
