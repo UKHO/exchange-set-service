@@ -19,7 +19,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
 
-        private readonly string _errDescription = "None of the product Ids exist in the database";
+        private readonly string _errorText = "None of the product Ids exist in the database";
 
         public SalesCatalogueServiceController(IHttpContextAccessor httpContextAccessor, SalesCatalogueService salesCatalogueService) : base(httpContextAccessor)
         {
@@ -154,7 +154,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 CorrelationId = GetCurrentCorrelationId(),
                 Errors =
                 [
-                    new() { Source = "productNames", Description = _errDescription }
+                    new() { Source = "productNames", Description = _errorText }
                 ]
 
             };
@@ -197,7 +197,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 CorrelationId = GetCurrentCorrelationId(),
                 Errors =
                 [
-                    new() { Source = "productVersions", Description = _errDescription }
+                    new() { Source = "productVersions", Description = _errorText }
                 ]
             };
             return BadRequest(errorDescription);
@@ -225,7 +225,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 CorrelationId = GetCurrentCorrelationId(),
                 Errors =
                 [
-                    new() { Source = "updatesSince", Description = _errDescription }
+                    new() { Source = "updatesSince", Description = _errorText }
                 ]
             };
             return BadRequest(errorDescription);

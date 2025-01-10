@@ -276,13 +276,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsV2RequestStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsV2RequestCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         [Test]
@@ -312,8 +312,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsV2RequestStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -322,15 +322,15 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsV2RequestCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         [TestCase(HttpStatusCode.BadRequest)]
         [TestCase(HttpStatusCode.NotFound)]
         [TestCase(HttpStatusCode.InternalServerError)]
 
-        public async Task WhenPostProductVersionsAsyncResponseIsNotOkOrNotModified_ReturnsExpectedResult(HttpStatusCode httpStatusCode)
+        public async Task WhenPostProductVersionsAsyncResponseIsNotOkOrNotModified_ThenReturnsExpectedResult(HttpStatusCode httpStatusCode)
         {
             var productVersions = new List<ProductVersionRequest> {
                 new() { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = 1 },
@@ -366,8 +366,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsV2RequestStarted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -376,8 +376,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsV2RequestCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         private static SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions()
