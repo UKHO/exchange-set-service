@@ -31,10 +31,10 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         private readonly ISalesCatalogueService _salesCatalogueService;
 
         public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger,
-                                          IUpdatesSinceValidator updatesSinceValidator,
-                                          IProductVersionsValidator productVersionsValidator,
-                                          IProductNameValidator productNameValidator,
-                                          ISalesCatalogueService salesCatalogueService)
+            IUpdatesSinceValidator updatesSinceValidator,
+            IProductVersionsValidator productVersionsValidator,
+            IProductNameValidator productNameValidator,
+            ISalesCatalogueService salesCatalogueService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             _salesCatalogueService = salesCatalogueService ?? throw new ArgumentNullException(nameof(salesCatalogueService));
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequest(string[] productNames, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             productNames = SanitizeProductNames(productNames);
 
@@ -65,7 +65,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
+
+            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -125,7 +127,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
         }
 
-        private string[] SanitizeProductNames(string[] productNames)
+        private static string[] SanitizeProductNames(IEnumerable<string> productNames)
         {
             return productNames?.Where(name => !string.IsNullOrEmpty(name))
                                 .Select(name => name.Trim())
@@ -157,34 +159,42 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             var errorDescription = new ErrorDescription
             {
                 CorrelationId = correlationId,
-                Errors =
-                [
-                    new Error
+                Errors = new List<Error>
+                {
+                    new()
                     {
                         Source = "requestBody",
                         Description = "Either body is null or malformed."
                     }
-                ]
+                }
             };
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
         }
 
-        private ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<T>(T request, ServiceResponseResult<SalesCatalogueResponse> salesCatalogueResponse)
+        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<R, T>(R request, ServiceResponseResult<T> salesCatalogueResult)
         {
-            return salesCatalogueResponse.StatusCode switch
+            if (salesCatalogueResult.Value is not SalesCatalogueResponse salesCatalogueResponse)
+            {
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
+            }
+
+            var productCounts = salesCatalogueResponse.ResponseBody.ProductCounts;
+            var lastModified = salesCatalogueResponse.LastModified?.ToString("R");
+
+            return salesCatalogueResult.StatusCode switch
             {
                 HttpStatusCode.OK => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
                 {
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse
                     {
-                        RequestedProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductCount ?? 0,
-                        ExchangeSetProductCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount ?? 0,
-                        RequestedProductsAlreadyUpToDateCount = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount ?? 0,
-                        RequestedProductsNotInExchangeSet = salesCatalogueResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned
+                        RequestedProductCount = productCounts.RequestedProductCount ?? 0,
+                        ExchangeSetProductCount = productCounts.ReturnedProductCount ?? 0,
+                        RequestedProductsAlreadyUpToDateCount = productCounts.RequestedProductsAlreadyUpToDateCount ?? 0,
+                        RequestedProductsNotInExchangeSet = productCounts.RequestedProductsNotReturned
                             .Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
                             .ToList(),
                     },
-                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R")
+                    LastModified = lastModified
                 }),
                 HttpStatusCode.NotModified when request is ProductVersionsRequest productVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
                 {
@@ -195,13 +205,14 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                         RequestedProductsNotInExchangeSet = [],
                         ExchangeSetProductCount = 0
                     },
-                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R"),
+                    LastModified = lastModified,
                 }),
                 HttpStatusCode.NotModified when request is UpdatesSinceRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotModified(new ExchangeSetStandardServiceResponse
                 {
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
-                    LastModified = salesCatalogueResponse.Value.LastModified?.ToString("R"),
+                    LastModified = lastModified,
                 }),
+                HttpStatusCode.BadRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(salesCatalogueResult.ErrorDescription),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
         }

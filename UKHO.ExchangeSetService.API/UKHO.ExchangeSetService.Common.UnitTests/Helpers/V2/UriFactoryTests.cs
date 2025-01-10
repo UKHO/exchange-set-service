@@ -14,19 +14,19 @@ using UKHO.ExchangeSetService.Common.Logging;
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 {
     [TestFixture]
-    public class UriHelperTests
+    public class UriFactoryTests
     {
-        private ILogger<UriHelper> _fakeLogger;
+        private ILogger<UriFactory> _fakeLogger;
         private readonly string _fakeCorrelationId = Guid.NewGuid().ToString();
 
-        private UriHelper _uriHelper;
+        private UriFactory _uriFactory;
 
         [SetUp]
         public void Setup()
         {
-            _fakeLogger = A.Fake<ILogger<UriHelper>>();
+            _fakeLogger = A.Fake<ILogger<UriFactory>>();
 
-            _uriHelper = new UriHelper(_fakeLogger);
+            _uriFactory = new UriFactory(_fakeLogger);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var endpointFormat = "/api/resource/{0}";
             object[] args = ["123"];
 
-            var result = _uriHelper.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId, args);
+            var result = _uriFactory.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId, args);
 
             result.Should().Be(new Uri("https://example.com/api/resource/123"));
 
@@ -53,14 +53,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var endpointFormat = "/api/resource/{0}";
             object[] args = ["123"];
 
-            Action act = () => _uriHelper.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId, args);
+            Action act = () => _uriFactory.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId, args);
 
             act.Should().Throw<UriFormatException>();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.UriException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Exception occurred while creating Uri. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Invalid URI format. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}").MustHaveHappened();
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var endpointFormat = "/api/resource/{0}/{1}";
             object[] args = ["123"];
 
-            Action act = () => _uriHelper.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId, args);
+            Action act = () => _uriFactory.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId, args);
 
             act.Should().Throw<FormatException>();
 
@@ -86,7 +86,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             var baseUrl = "https://example.com";
             var endpointFormat = "/api/resource";
 
-            var result = _uriHelper.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId);
+            var result = _uriFactory.CreateUri(baseUrl, endpointFormat, _fakeCorrelationId);
 
             result.Should().Be(new Uri("https://example.com/api/resource"));
 

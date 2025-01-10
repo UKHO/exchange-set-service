@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(apiResponseData.ExchangeSetUrlExpiryDateTime, Is.Not.Null, $"Response body returns null, Instead of valid datetime {apiResponseData.ExchangeSetUrlExpiryDateTime}.");
 
             //Check data type of RequestedProductCount and value should not be less than zero
-            Assert.That(apiResponseData.RequestedProductCount.GetType().Equals(typeof(int)),Is.True, "Responsebody returns other datatype, instead of expected Int");
+            Assert.That(apiResponseData.RequestedProductCount.GetType().Equals(typeof(int)), Is.True, "Responsebody returns other datatype, instead of expected Int");
             Assert.That(apiResponseData.RequestedProductCount >= 0, Is.True, "Response body returns RequestedProductCount less than zero, instead of expected count should not be less than zero.");
 
             //Check data type of ExchangeSetCellCount and value should not be less than zero
@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(Uri.IsWellFormedUriString(apiResponseData.Links.ExchangeSetFileUri.Href, UriKind.RelativeOrAbsolute), Is.True, $"Exchange set returned file URI {apiResponseData.Links.ExchangeSetFileUri.Href}, Its not valid uri");
 
             //Verify ExchangeSetCellCount
-            Assert.That(apiResponseData.ExchangeSetCellCount,Is.EqualTo(1), $"Exchange set returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount 1.");
+            Assert.That(apiResponseData.ExchangeSetCellCount, Is.EqualTo(1), $"Exchange set returned ExchangeSetCellCount {apiResponseData.ExchangeSetCellCount}, instead of expected ExchangeSetCellCount 1.");
 
             //Check RequestedProductsNotInExchangeSet is not empty
             Assert.That(apiResponseData.RequestedProductsNotInExchangeSet, Is.Not.Null, "Response body returns Empty for RequestedProductsNotInExchangeSet, instead of Not Empty");
@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string[] exchangeSetBatchStatusUri = apiResponseData.Links.ExchangeSetBatchStatusUri.Href.Split('/');
 
             //Verify the exchangeSetBatchStatusUri format for batch
-            Assert.That( exchangeSetBatchStatusUri[4],Is.EqualTo("batch"), $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
+            Assert.That(exchangeSetBatchStatusUri[4], Is.EqualTo("batch"), $"Exchange set returned batch status URI {apiResponseData.Links.ExchangeSetBatchStatusUri.Href}, which is wrong format.");
 
 
             var batchID = exchangeSetBatchStatusUri[exchangeSetBatchStatusUri.Length - 2];
@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(hasGUID, Is.True, $"Exchange set returned file URI contains BatchId {fileBatchId} is not a valid GUID");
 
             //Verify the File format for ExchangeSetFileUri
-            Assert.That(ExchangeSetFileUri[7],Is.EqualTo(Config.ExchangeSetFileName), $"Exchange set returned File URI contains file name  {ExchangeSetFileUri[7]}, instead of expected file name {Config.ExchangeSetFileName}.");
+            Assert.That(ExchangeSetFileUri[7], Is.EqualTo(Config.ExchangeSetFileName), $"Exchange set returned File URI contains file name  {ExchangeSetFileUri[7]}, instead of expected file name {Config.ExchangeSetFileName}.");
 
             // verify both batch ID of ExchangeSetBatchStatusUri and ExchangeSetFileUri are the same
             Assert.That(fileBatchId, Is.EqualTo(batchID), $"The Batch ID of ExchangeSetBatchStatusUri {batchID} and ExchangeSetFileUri {fileBatchId} are not equal.");
@@ -125,7 +125,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             //Verify expiry datetime
             var expiryDateTime = DateTime.UtcNow.AddDays(1).AddMinutes(1);
 
-            Assert.That(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second),Is.True,  $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
+            Assert.That(apiResponseData.ExchangeSetUrlExpiryDateTime <= new DateTime(expiryDateTime.Year, expiryDateTime.Month, expiryDateTime.Day, expiryDateTime.Hour, expiryDateTime.Minute, expiryDateTime.Second), Is.True, $"Response body returned ExpiryDateTime {apiResponseData.ExchangeSetUrlExpiryDateTime} , greater than the expected value.");
         }
 
         public static async Task<string> GetBatchId(this HttpResponseMessage apiResponse)

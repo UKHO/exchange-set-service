@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -45,6 +48,23 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await _salesCatalogueClient.CallSalesCatalogueServiceApi(method, requestBody, _fakeAuthToken, _baseUrl, _correlationId, _cancellationToken);
 
             response.Should().Be(expectedResponse);
+        }
+
+        [Test]
+        public async Task WhenNoCorrelationIdIsPassed_ThenCallSalesCatalogueServiceApiDoesNotAddCorrelationIdHeader()
+        {
+            var method = HttpMethod.Get;
+            var requestBody = "{\"key\":\"value\"}";
+
+            var expectedResponse = new HttpResponseMessage(HttpStatusCode.OK);
+            A.CallTo(() => _httpClient.SendAsync(A<HttpRequestMessage>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(expectedResponse);
+
+            var response = await _salesCatalogueClient.CallSalesCatalogueServiceApi(method, requestBody, _fakeAuthToken, _baseUrl, cancellationToken: _cancellationToken);
+
+            response.Should().Be(expectedResponse);
+            A.CallTo(() => _httpClient.SendAsync(A<HttpRequestMessage>.That.Matches(req => !req.Headers.Contains(SalesCatalogueClient.XCorrelationIdHeaderKey)), A<CancellationToken>.Ignored))
+                .MustHaveHappenedOnceExactly();
         }
     }
 }

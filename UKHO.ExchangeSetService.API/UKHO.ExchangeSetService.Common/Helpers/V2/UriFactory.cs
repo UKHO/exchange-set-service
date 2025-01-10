@@ -7,11 +7,11 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
-    public class UriHelper : IUriHelper
+    public class UriFactory : IUriFactory
     {
-        private readonly ILogger<UriHelper> _logger;
+        private readonly ILogger<UriFactory> _logger;
 
-        public UriHelper(ILogger<UriHelper> logger)
+        public UriFactory(ILogger<UriFactory> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -21,7 +21,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             try
             {
                 var formattedEndpoint = string.Format(endpointFormat, args);
-                return new Uri(new Uri(baseUrl), formattedEndpoint);
+                var finalUri = new Uri(new Uri(baseUrl), formattedEndpoint);
+
+                if (!Uri.TryCreate(finalUri.AbsoluteUri, UriKind.Absolute, out var validatedUri))
+                {
+                    throw new UriFormatException("The constructed URI is not well-formed.");
+                }
+
+                return validatedUri;
+            }
+            catch (UriFormatException ex)
+            {
+                _logger.LogError(EventIds.UriException.ToEventId(), "Invalid URI format. Error: {Error} | StackTrace: {StackTrace} | _X-Correlation-ID: {CorrelationId}", ex.Message, ex.StackTrace, correlationId);
+                throw;
             }
             catch (FormatException ex)
             {

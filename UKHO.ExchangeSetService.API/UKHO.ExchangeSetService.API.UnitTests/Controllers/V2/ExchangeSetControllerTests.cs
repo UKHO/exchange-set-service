@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -14,6 +17,7 @@ using UKHO.ExchangeSetService.API.Controllers.V2;
 using UKHO.ExchangeSetService.API.Services.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
@@ -67,13 +71,24 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers.V2
                 ExchangeSetStandardResponse = GetExchangeSetResponse()
             };
 
-            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequest(A<string[]>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None))
-                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
+            A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductNamesRequestAsync(A<string[]>.Ignored, A<ApiVersion>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None))
+                .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>
+                .Accepted(exchangeSetServiceResponse));
+
             A.CallTo(() => _fakeHttpContextAccessor.HttpContext.TraceIdentifier).Returns(correlationId);
 
             var response = await _controller.PostProductNames(ExchangeSetStandard, productNames, _callbackUri);
-
             response.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.PostProductNamesRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.PostProductNamesRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard} Elapsed {Elapsed}").MustHaveHappened();
         }
 
         [Test]
@@ -86,7 +101,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers.V2
             };
 
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessProductVersionsRequest(A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-             .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null));
+             .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>
+             .Accepted(null));
 
             var result = await _controller.PostProductVersions(ExchangeSetStandard, productVersionRequest, _callbackUri);
 
