@@ -17,6 +17,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
+        public List<Dictionary<string, string>> V2ErrorsSinceDateTime { get;set; }
 
         public SalesCatalogueServiceController(IHttpContextAccessor httpContextAccessor, SalesCatalogueService salesCatalogueService) : base(httpContextAccessor)
         {
@@ -36,6 +37,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 { "source", "productSinceDateTime" },
                 { "description", "None of the product Ids exist in the database" }
             };
+            V2ErrorsSinceDateTime = new List<Dictionary<string, string>>
+            {
+                new Dictionary<string, string>
+                {
+                    { "source", "productSinceDateTime" },
+                    { "description", "Invalid sinceDateTime or productIdentifier found in the request" }
+                }
+            };            
         }
 
         [HttpGet]
@@ -187,27 +196,26 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         [Route("v2/products/s100/updatesSince")]
         public IActionResult UpdatesSince(string sinceDateTime, string productIdentifier)
         {
-            if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime))
+            if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime) && salesCatalogueService.ValidateProductIdentifier(productIdentifier))
             {
-                if (salesCatalogueService.ValidateProductIdentifier(productIdentifier))
+                // Code added for 304 not modified scenario
+                if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-10).Date)
                 {
-                    //code added for 304 not modified scenario
-                    if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-10).Date)
-                    {
-                        return StatusCode(StatusCodes.Status304NotModified);
-                    }
-                    var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime, productIdentifier);
-                    if (response != null)
-                    {
-                        return Ok(response.ResponseBody);
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
-                }                
+                    return StatusCode(StatusCodes.Status304NotModified);
+                }
+
+                var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime, productIdentifier);
+                if (response != null)
+                {
+                    return Ok(response.ResponseBody);
+                }
+                else
+                {
+                    return NotFound(new { CorrelationId = GetCurrentCorrelationId(), detail = $"Products not found for productIdentifier: {productIdentifier}" });
+                }
             }
-            return BadRequest();
+
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = V2ErrorsSinceDateTime });
         }
     }
 }
