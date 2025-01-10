@@ -78,7 +78,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}",
                 async () =>
                 {
-                    var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl, ScsProductVersionsEndpointPathFormat, correlationId, apiVersion, exchangeSetStandard);
+                    var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
+                        ScsProductVersionsEndpointPathFormat,
+                        correlationId,
+                        apiVersion,
+                        exchangeSetStandard);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
 
