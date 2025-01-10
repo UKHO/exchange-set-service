@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
                     var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
 
-                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId);
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId, cancellationToken);
                 },
                 correlationId);
         }
@@ -90,14 +90,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
                     var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
 
-                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId);
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId, cancellationToken);
                 },
                 correlationId);
         }
 
-        private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId)
+        private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId, CancellationToken cancellationToken)
         {
-            var body = await httpResponse.Content.ReadAsStringAsync();
+            var body = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             var response = new SalesCatalogueResponse
             {
                 ResponseCode = httpResponse.StatusCode,

@@ -160,7 +160,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers.V2
             A.CallTo(() => _fakeExchangeSetStandardService.ProcessUpdatesSinceRequestAsync(A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetServiceResponse));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), updatesSinceRequest, "s100", CallbackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), updatesSinceRequest, "s101", CallbackUri);
 
             result.Should().BeOfType<AcceptedResult>().Which.StatusCode.Should().Be(StatusCodes.Status202Accepted);
 
@@ -213,7 +213,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers.V2
                     Errors = [new() { Source = "requestBody", Description = "Either body is null or malformed." }]
                 }));
 
-            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), null, "s100", CallbackUri);
+            var result = await _controller.PostUpdatesSince(ExchangeSetStandard.s100.ToString(), null, "s101", CallbackUri);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 
@@ -230,7 +230,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers.V2
 
         [Test]
         [TestCase("101", "http://callback.uri")]
-        [TestCase("101s", "http//callback.uri")]
+        [TestCase("101s", "http//callback.uri")]    
         [TestCase("S101", "http:callback.uri")]
         public async Task WhenInValidDataRequested_ThenPostUpdatesSinceReturnsBadRequest(string inValidProductIdentifier, string inValidCallBackUri)
         {
@@ -241,7 +241,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers.V2
                 {
                     CorrelationId = Guid.NewGuid().ToString(),
                     Errors = [new() { Source = "SinceDateTime", Description = "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z')." },
-                                  new() { Source = "ProductIdentifier", Description = "ProductIdentifier must be valid value" },
                                   new() { Source = "CallbackUri", Description = "Invalid callbackUri format." }]
                 }));
 
