@@ -19,8 +19,10 @@ using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
+using UKHO.ExchangeSetService.Common.Models.V2.Response;
 using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
@@ -294,6 +296,35 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         }
 
         [Test]
+        public async Task WhenSalesCatalogServiceReturnsBadRequest_ThenProcessProductVersionsRequestsReturnsBadRequest()
+        {
+            var productVersions = new List<ProductVersionRequest>
+            {
+                new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 7, UpdateNumber = 10 }
+            };
+
+            A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = _fakeCorrelationId,
+                Errors = [new Error
+                {
+                    Description = "Error in sales catalogue service",
+                    Source = "Sales catalogue service"
+                }]
+            };
+
+            A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.BadRequest(errorDescription));
+
+            var result = await _service.ProcessProductVersionsRequest(productVersions, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Test]
         [TestCase(HttpStatusCode.NotFound)]
         [TestCase(HttpStatusCode.NoContent)]
         [TestCase(HttpStatusCode.InternalServerError)]
@@ -434,7 +465,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             };
         }
 
-        private SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode httpStatusCode)
+        private static SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode httpStatusCode)
         {
             return httpStatusCode switch
             {

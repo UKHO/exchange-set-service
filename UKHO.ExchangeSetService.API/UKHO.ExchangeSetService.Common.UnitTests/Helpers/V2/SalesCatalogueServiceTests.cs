@@ -318,7 +318,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -327,8 +327,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         }
 
         [TestCase(HttpStatusCode.BadRequest)]
-        //[TestCase(HttpStatusCode.NotFound)]
-        //[TestCase(HttpStatusCode.InternalServerError)]
+        [TestCase(HttpStatusCode.NotFound)]
+        [TestCase(HttpStatusCode.InternalServerError)]
 
         public async Task WhenPostProductVersionsAsyncResponseIsNotOkOrNotModified_ReturnsExpectedResult(HttpStatusCode httpStatusCode)
         {
@@ -343,9 +343,18 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
 
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = _correlationId,
+                Errors = [new Error
+                {
+                    Description = "Error in sales catalogue service",
+                    Source = "Sales catalogue service"
+                }]
+            };
             var httpResponse = new HttpResponseMessage(httpStatusCode)
             {
-                Content = new StringContent(Convert.ToString(httpStatusCode)),
+                Content = new StringContent(JsonConvert.SerializeObject(errorDescription)),
                 RequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
             };
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponse);
@@ -363,7 +372,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statuscode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information

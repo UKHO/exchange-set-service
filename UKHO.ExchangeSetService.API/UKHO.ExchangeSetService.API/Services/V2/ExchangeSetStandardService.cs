@@ -173,13 +173,8 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
         private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<R, T>(R request, ServiceResponseResult<T> salesCatalogueResult)
         {
-            if (salesCatalogueResult.Value is not SalesCatalogueResponse salesCatalogueResponse)
-            {
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
-            }
-
-            var productCounts = salesCatalogueResponse.ResponseBody.ProductCounts;
-            var lastModified = salesCatalogueResponse.LastModified?.ToString("R");
+            var productCounts = (salesCatalogueResult.Value as SalesCatalogueResponse)?.ResponseBody?.ProductCounts;
+            var lastModified = (salesCatalogueResult.Value as SalesCatalogueResponse)?.LastModified?.ToString("R");
 
             return salesCatalogueResult.StatusCode switch
             {
