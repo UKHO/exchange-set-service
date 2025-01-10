@@ -15,7 +15,12 @@ resource "azurerm_storage_account" "ess_storage" {
    }  
 }
 
+resource "azurerm_storage_container" "ess_storage_container" {
+  name                               = "ess-fulfilment"
+  storage_account_name               = azurerm_storage_account.ess_storage.name
+}
+
 resource "azurerm_storage_queue" "ess_storage_queue" {
-  name                               = "fulfilment-queue"
+  name                               = "ess-fulfilment-queue"
   storage_account_name               = azurerm_storage_account.ess_storage.name
 }
