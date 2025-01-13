@@ -56,7 +56,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                         ProductNamesEndpointPathFormat,
                         correlationId,
-                        apiVersion.ToString(),
+                        apiVersion,
                         exchangeSetStandard);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);

@@ -59,6 +59,12 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 CorrelationId = correlationId
             };
 
+            var validationResult = await ValidateRequest(productNamesRequest, correlationId);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
             return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse);
