@@ -406,6 +406,9 @@ paths:
 
         "403":
           $ref: "#/components/responses/forbidden"
+          
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
         "429":
           $ref: "#/components/responses/tooManyRequests"
@@ -554,7 +557,14 @@ components:
           schema:
             type: integer
           description: Specifies the time you should wait in seconds before retrying.
-
+    
+    NotFoundResponse:
+      description: Not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DefaultErrorResponse'
+            
     internalServerError:
       description: Internal Server Error.
       content:
