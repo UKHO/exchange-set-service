@@ -163,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         //PBI 194403: Azure AD Authorization
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100ProductVersionsEndPointWithInvalidToken_ThenResponseCodeReturnedIs401unauthorized()
+        public async Task WhenICallS100ProductVersionsEndPointWithInvalidToken_ThenResponseCodeReturnedIs401Unauthorized()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, null, "InvalidEssJwtToken", "s100");
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(401), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 401.");
