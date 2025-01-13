@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
@@ -107,19 +107,17 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public bool ValidateProductIdentifier(string productIdentifier)
         {
-            if (string.IsNullOrEmpty(productIdentifier) || Enum.TryParse<S100ProductType>(productIdentifier, out _))
+            if (string.IsNullOrEmpty(productIdentifier) || Enum.TryParse<S100ProductType>(productIdentifier.ToLower(), out _))
             {
                 return true;
             }
 
-            if (productIdentifier.StartsWith("s") && productIdentifier.Length == 4)
+            if (!Regex.IsMatch(productIdentifier, @"^s\d{3}$", RegexOptions.IgnoreCase))
             {
-                if (int.TryParse(productIdentifier.Substring(1), out int value) && value >= 101 && value <= 999)
-                {
-                    return true;
-                }
+                return false;
             }
-            return false;
+
+            return true;
         }
     }
 }
