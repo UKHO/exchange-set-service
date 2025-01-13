@@ -8,7 +8,6 @@ using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Enums;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -107,7 +106,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public bool ValidateProductIdentifier(string productIdentifier)
         {
-            if (string.IsNullOrEmpty(productIdentifier) || Enum.TryParse<S100ProductType>(productIdentifier.ToLower(), out _))
+            if (string.IsNullOrEmpty(productIdentifier))
             {
                 return true;
             }
