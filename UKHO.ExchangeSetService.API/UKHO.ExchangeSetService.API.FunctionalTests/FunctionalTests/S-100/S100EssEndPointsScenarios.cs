@@ -81,10 +81,20 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
         //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenButWithInValidExchangeSetStandard_ThenResponseCodeReturnedIs400BadRequest()
+        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenButWithInValidProductIdentifierParam_ThenResponseCodeReturnedIs400BadRequest()
         {
-            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload, "s876");
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload, "a101");
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(400), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 400.");
+        }
+
+        //PBI 194403: Azure AD Authorization
+        //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
+        [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
+        public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenAndValidButNonExistingProductIdentifierParam_ThenResponseCodeReturnedIs404NotFound()
+        {
+            var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(null, null, EssJwtToken, "s100", sinceDateTimePayload, "s999");
+            Assert.That((int)apiResponse.StatusCode, Is.EqualTo(404), $"Incorrect status code is returned {apiResponse.StatusCode}, instead of the expected 404.");
         }
 
         //PBI 194403: Azure AD Authorization
