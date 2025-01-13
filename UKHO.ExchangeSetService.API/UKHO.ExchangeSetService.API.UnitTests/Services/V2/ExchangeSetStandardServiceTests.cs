@@ -141,7 +141,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                             httpStatusCode switch
                             {
                                 HttpStatusCode.BadRequest => ServiceResponseResult<SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
-                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(),
+                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(new NotFoundError { CorrelationId = _fakeCorrelationId, Detail = "Not found"}),
                                 _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
                             });
 

@@ -140,7 +140,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         httpResponse.StatusCode,
                         correlationId);
 
-                    return ServiceResponseResult<SalesCatalogueResponse>.NotFound();
+                    var errorBody = JsonConvert.DeserializeObject<NotFoundError>(body);
+                    return ServiceResponseResult<SalesCatalogueResponse>.NotFound(errorBody);
 
                 default:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),

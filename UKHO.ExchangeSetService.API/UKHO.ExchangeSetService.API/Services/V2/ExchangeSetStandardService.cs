@@ -177,7 +177,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     LastModified = lastModified,
                 }),
                 HttpStatusCode.BadRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(salesCatalogueResult.ErrorDescription),
-                HttpStatusCode.NotFound => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotFound(),
+                HttpStatusCode.NotFound => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotFound(salesCatalogueResult.NotFoundError),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
         }

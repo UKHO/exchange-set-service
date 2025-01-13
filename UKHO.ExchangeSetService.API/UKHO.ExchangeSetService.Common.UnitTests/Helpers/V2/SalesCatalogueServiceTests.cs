@@ -50,7 +50,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         private IOptions<SalesCatalogueConfiguration> _fakeSalesCatalogueConfig;
         private IUriFactory _fakeUriFactory;
 
-
         private SalesCatalogueService _salesCatalogueService;
 
         [SetUp]
@@ -305,7 +304,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         [TestCase(HttpStatusCode.InternalServerError)]
         public async Task WhenSalesCatalogueServiceApiReturnsOtherThanOkAndNotModified_ThenGetProductsFromSpecificDateAsyncReturnsNotSuccessResponse(HttpStatusCode httpStatusCode)
         {
-
             var errorDescription = new ErrorDescription
             {
                 CorrelationId = _correlationId,
@@ -319,10 +317,17 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                 }
             };
 
+            var notFoundError = new NotFoundError
+            {
+                CorrelationId = _correlationId,
+                Detail = "Error in sales catalogue service",
+
+            };
+
             var httpResponse = new HttpResponseMessage(httpStatusCode)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(errorDescription)),
-                RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri)
+                Content = new StringContent(JsonConvert.SerializeObject(httpStatusCode == HttpStatusCode.NotFound ? notFoundError : errorDescription)),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri),
             };
 
             A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored))
