@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse);
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (productVersionRequest == null || !productVersionRequest.Any() || productVersionRequest.Any(pv => pv == null))
             {
@@ -84,7 +84,27 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             };
 
             var validationResult = await ValidateRequest(productVersionsRequest, correlationId);
-            return validationResult ?? ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(null); // This is a placeholder, the actual implementation is not provided
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
+            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(apiVersion, exchangeSetStandard, productVersionsRequest.ProductVersions, correlationId, cancellationToken);
+
+            //to be used while calling SaveSalesCatalogueStorageDetails
+            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified)
+            {
+                salesCatalogServiceResponse.Value.ResponseBody = new SalesCatalogueProductResponse
+                {
+                    Products = [],
+                    ProductCounts = new ProductCounts()
+                };
+                salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount = 0;
+                salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned = [];
+                salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductCount = salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count();
+            }
+
+            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -172,9 +192,15 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     },
                     LastModified = lastModified
                 }),
-                HttpStatusCode.NotModified when request is ProductVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
+                HttpStatusCode.NotModified when request is ProductVersionsRequest productVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
                 {
-                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
+                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse()
+                    {
+                        RequestedProductCount = productVersionsRequest.ProductVersions.Count(),
+                        RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count(),
+                        RequestedProductsNotInExchangeSet = [],
+                        ExchangeSetProductCount = 0
+                    },
                     LastModified = lastModified,
                 }),
                 HttpStatusCode.NotModified when request is UpdatesSinceRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotModified(new ExchangeSetStandardServiceResponse

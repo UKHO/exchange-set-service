@@ -359,6 +359,139 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
         }
 
+        [Test]
+        public async Task WhenPostProductVersionsAsyncResponseIsOk_ThenReturnsSuccess()
+        {
+            var productVersions = new List<ProductVersionRequest> {
+                new() { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = 1 },
+                new() { ProductName = "102NO32904820801012", EditionNumber = 2, UpdateNumber = 2 },
+                new() { ProductName = "111US00_ches_dcf8_20190703T00Z", EditionNumber = 4, UpdateNumber = 4 }
+            };
+
+            var uri = new Uri("https://test.com/v2/products/S100/productVersions");
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+            
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
+
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(GetSalesCatalogueServiceResponseForProductVersions())),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            };
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponse);
+
+            var result = await _salesCatalogueService.PostProductVersionsAsync(APIVERSION, ExchangeSetStandard.s100.ToString(), productVersions, _correlationId, _cancellationToken);
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+            result.Value.ResponseCode.Should().Be(HttpStatusCode.OK);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenPostProductVersionsAsyncResponseIsNotModified_ThenReturnsNotModified()
+        {
+            var productVersions = new List<ProductVersionRequest> {
+                new() { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = 1 }
+            };
+
+            var uri = new Uri("https://test.com/v2/products/S100/productVersions");
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
+
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.NotModified)
+            {
+                Content = new StringContent("NotModified"),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            };
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponse);
+
+            var result = await _salesCatalogueService.PostProductVersionsAsync(APIVERSION, ExchangeSetStandard.s100.ToString(), productVersions, _correlationId, _cancellationToken);
+
+            result.StatusCode.Should().Be(HttpStatusCode.NotModified);
+            result.Value.Should().NotBeNull();
+            result.Value.ResponseCode.Should().Be(HttpStatusCode.NotModified);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Content is already up to date, no new content available in sales catalogue service with uri:{RequestUri} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
+        }
+
+        [TestCase(HttpStatusCode.BadRequest)]
+        [TestCase(HttpStatusCode.NotFound)]
+        [TestCase(HttpStatusCode.InternalServerError)]
+
+        public async Task WhenPostProductVersionsAsyncResponseIsNotOkOrNotModified_ThenReturnsExpectedResult(HttpStatusCode httpStatusCode)
+        {
+            var productVersions = new List<ProductVersionRequest> {
+                new() { ProductName = "101GB40079ABCDEFG", EditionNumber = 1, UpdateNumber = 1 },
+                new() { ProductName = "102NO32904820801012", EditionNumber = 2, UpdateNumber = 2 },
+                new() { ProductName = "111US00_ches_dcf8_20190703T00Z", EditionNumber = 4, UpdateNumber = 4 }
+            };
+
+            var uri = new Uri("https://test.com/v2/products/S100/productVersions");
+            A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).Returns(uri);
+
+            A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).Returns(_fakeAuthToken);
+
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = _correlationId,
+                Errors = [new Error
+                {
+                    Description = "Error in sales catalogue service",
+                    Source = "Sales catalogue service"
+                }]
+            };
+            var httpResponse = new HttpResponseMessage(httpStatusCode)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(errorDescription)),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
+            };
+            A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponse);
+
+            var result = await _salesCatalogueService.PostProductVersionsAsync(APIVERSION, ExchangeSetStandard.s100.ToString(), productVersions, _correlationId, _cancellationToken);
+
+            result.StatusCode.Should().Be(httpStatusCode);
+            result.Value.Should().BeNull();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestStart.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.SalesCatalogueServiceNonOkResponse.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in sales catalogue service with uri:{RequestUri} and responded with error:{Error} | statusCode:{StatusCode} | _X-Correlation-ID:{CorrelationId}").MustHaveHappened();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Information
+            && call.GetArgument<EventId>(1) == EventIds.SCSPostProductVersionsRequestCompleted.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
+        }
+
         private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
         {
             return new SalesCatalogueProductResponse
@@ -385,6 +518,50 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                         EditionNumber = 7,
                         UpdateNumbers = new List<int?> { 0 }
                     }
+                }
+            };
+        }
+
+        private static SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions()
+        {
+            return new SalesCatalogueResponse
+            {
+                ResponseCode = HttpStatusCode.OK,
+                ScsRequestDateTime = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                ResponseBody = new SalesCatalogueProductResponse
+                {
+                    ProductCounts = new ProductCounts
+                    {
+                        RequestedProductCount = 1,
+                        RequestedProductsAlreadyUpToDateCount = 0,
+                        ReturnedProductCount = 1,
+                        RequestedProductsNotReturned = []
+                    },
+                    Products = [
+                               new Products {
+                                ProductName = "101GB40079ABCDEFG",
+                                EditionNumber = 1,
+                                UpdateNumbers = [2],
+                                Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=2}],
+                                FileSize = 900000000
+                            },
+                            new Products {
+                        ProductName = "102NO32904820801012",
+                        EditionNumber = 2,
+                        UpdateNumbers = [3, 4],
+                        Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=3},
+                                new Dates{IssueDate=DateTime.Today, UpdateNumber = 4}],
+                        FileSize = 900000000
+                    },
+                    new Products {
+                                ProductName = "111US00_ches_dcf8_20190703T00Z",
+                                EditionNumber = 4,
+                                UpdateNumbers = [4],
+                                Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=4}],
+                                FileSize = 1000000
+                            }
+                           ]
                 }
             };
         }

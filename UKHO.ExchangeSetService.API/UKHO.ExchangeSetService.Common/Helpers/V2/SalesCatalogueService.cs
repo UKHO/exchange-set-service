@@ -30,6 +30,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         private readonly IUriFactory _uriFactory;
 
         private const string ProductNamesEndpointPathFormat = "/{0}/products/{1}/productNames";
+        private const string ScsProductVersionsEndpointPathFormat = "/{0}/products/{1}/productVersions";
         private const string ScsUpdateSinceEndpointPathFormat = "/{0}/products/{1}/updatesSince?sinceDateTime={2}&productIdentifier={3}";
 
         public SalesCatalogueService(ILogger<SalesCatalogueService> logger,
@@ -62,6 +63,31 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
 
                     var payloadJson = JsonConvert.SerializeObject(productNames);
+
+                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
+
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId, cancellationToken);
+                },
+                correlationId);
+        }
+
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.SCSPostProductVersionsRequestStart,
+                EventIds.SCSPostProductVersionsRequestCompleted,
+                "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}",
+                async () =>
+                {
+                    var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
+                        ScsProductVersionsEndpointPathFormat,
+                        correlationId,
+                        apiVersion,
+                        exchangeSetStandard);
+
+                    var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
+
+                    var payloadJson = JsonConvert.SerializeObject(productVersions);
 
                     var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
 

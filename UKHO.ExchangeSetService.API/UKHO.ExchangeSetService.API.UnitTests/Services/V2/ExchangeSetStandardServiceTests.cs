@@ -22,6 +22,7 @@ using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
+using UKHO.ExchangeSetService.Common.Models.V2.Response;
 using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
@@ -146,7 +147,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                             });
 
             var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
-
 
             var statusCode = httpStatusCode switch
             {
@@ -282,7 +282,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequest_ThenProcessProductVersionsRequestReturns202Accepted()
+        public async Task WhenValidProductVersionRequestAndScsServiceReturns200Ok_ThenProcessProductVersionsRequestReturns202Accepted()
         {
             var productVersions = new List<ProductVersionRequest>
             {
@@ -292,10 +292,111 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
+            A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+               .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.OK)));
+
+            var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Should().NotBeNull();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenValidProductVersionRequestAndScsServiceReturns304NotModified_ThenProcessProductVersionsRequestReturns202Accepted()
+        {
+            var productVersions = new List<ProductVersionRequest>
+            {
+                new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 7, UpdateNumber = 10 }
+            };
+
+            A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+               .Returns(ServiceResponseResult<SalesCatalogueResponse>.NotModified(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.NotModified)));
+
+            var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            result.Should().NotBeNull();
+            result.Value.ExchangeSetStandardResponse.ExchangeSetProductCount.Should().Be(0);
+            result.Value.ExchangeSetStandardResponse.RequestedProductCount.Should().Be(productVersions.Count);
+            result.Value.ExchangeSetStandardResponse.RequestedProductsAlreadyUpToDateCount.Should().Be(productVersions.Count);
+            result.Value.ExchangeSetStandardResponse.RequestedProductsNotInExchangeSet.Should().BeEmpty();
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenSalesCatalogServiceReturnsBadRequest_ThenProcessProductVersionsRequestsReturnsBadRequest()
+        {
+            var productVersions = new List<ProductVersionRequest>
+            {
+                new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 7, UpdateNumber = 10 }
+            };
+
+            A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            var errorDescription = new ErrorDescription
+            {
+                CorrelationId = _fakeCorrelationId,
+                Errors = [new Error
+                {
+                    Description = "Error in sales catalogue service",
+                    Source = "Sales catalogue service"
+                }]
+            };
+
+            A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.BadRequest(errorDescription));
+
+            var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Test]
+        [TestCase(HttpStatusCode.NotFound)]
+        [TestCase(HttpStatusCode.NoContent)]
+        [TestCase(HttpStatusCode.InternalServerError)]
+        public async Task WhenSalesCatalogServiceReturnsOtherResponse_ThenProcessProductVersionsRequestsReturns500InternalServerError(HttpStatusCode httpStatusCode)
+        {
+            var productVersions = new List<ProductVersionRequest>
+            {
+                new () { ProductName = "101GB40079ABCDEFG", EditionNumber = 7, UpdateNumber = 10 }
+            };
+
+            A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(
+                            httpStatusCode switch
+                            {
+                                HttpStatusCode.BadRequest => ServiceResponseResult<SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
+                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(new NotFoundError { CorrelationId = _fakeCorrelationId, Detail = "Not found" }),
+                                _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
+                            });
+
+            var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            var statusCode = httpStatusCode switch
+            {
+                HttpStatusCode.BadRequest => HttpStatusCode.BadRequest,
+                HttpStatusCode.NotFound => HttpStatusCode.NotFound,
+                _ => HttpStatusCode.InternalServerError
+            };
+
+            result.StatusCode.Should().Be(statusCode);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -321,7 +422,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             A.CallTo(() => _fakeProductVersionsValidator.Validate(A<ProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure> { validationMessage }));
 
-            var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Should().NotBeNull();
@@ -338,7 +439,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         {
             var error = "Either body is null or malformed.";
 
-            var result = await _service.ProcessProductVersionsRequestAsync(null, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessProductVersionsRequestAsync(null, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Should().NotBeNull();
@@ -402,6 +503,59 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                         }
                 },
                 ScsRequestDateTime = DateTime.UtcNow
+            };
+        }
+
+        private static SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode httpStatusCode)
+        {
+            return httpStatusCode switch
+            {
+                HttpStatusCode.OK =>
+                    new SalesCatalogueResponse
+                    {
+                        ResponseCode = HttpStatusCode.OK,
+                        ScsRequestDateTime = DateTime.UtcNow,
+                        LastModified = DateTime.UtcNow,
+                        ResponseBody = new SalesCatalogueProductResponse
+                        {
+                            ProductCounts = new ProductCounts
+                            {
+                                RequestedProductCount = 1,
+                                RequestedProductsAlreadyUpToDateCount = 0,
+                                ReturnedProductCount = 1,
+                                RequestedProductsNotReturned = []
+                            },
+                            Products = [
+                               new Products {
+                                ProductName = "101GB40079ABCDEFG",
+                                EditionNumber = 7,
+                                UpdateNumbers = [11, 12],
+                                Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=1},
+                                new Dates{IssueDate=DateTime.Today, UpdateNumber = 2}],
+                                FileSize = 900000000
+                            }
+                           ]
+                        }
+                    },
+                HttpStatusCode.NotModified =>
+                new SalesCatalogueResponse
+                {
+                    ResponseCode = HttpStatusCode.NotModified,
+                    ScsRequestDateTime = DateTime.UtcNow,
+                    LastModified = DateTime.UtcNow,
+                    ResponseBody = new SalesCatalogueProductResponse
+                    {
+                        Products = [],
+                        ProductCounts = new ProductCounts()
+                        {
+                            RequestedProductCount = 1,
+                            RequestedProductsAlreadyUpToDateCount = 1,
+                            ReturnedProductCount = 0,
+                            RequestedProductsNotReturned = []
+                        },
+                    }
+                },
+                _ => throw new NotImplementedException()
             };
         }
     }
