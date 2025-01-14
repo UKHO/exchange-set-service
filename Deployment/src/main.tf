@@ -236,7 +236,7 @@ module "cache_storage" {
 
 module "storage" {
   source                                = "./Modules/Storage"
-  name                                  = local.storage_name
+  name                                  = "ukho${local.service_name}${local.env_name}storage${var.storage_suffix}"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location
