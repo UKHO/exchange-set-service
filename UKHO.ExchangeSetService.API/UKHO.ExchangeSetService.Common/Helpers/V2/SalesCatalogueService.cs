@@ -105,12 +105,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 async () =>
                 {
                     var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
-                                                     ScsUpdateSinceEndpointPathFormat,
-                                                     correlationId,
-                                                     apiVersion,
-                                                     exchangeSetStandard,
-                                                     updatesSinceRequest.SinceDateTime,
-                                                     updatesSinceRequest.ProductIdentifier);
+                        ScsUpdateSinceEndpointPathFormat,
+                        correlationId,
+                        apiVersion,
+                        exchangeSetStandard,
+                        updatesSinceRequest.SinceDateTime,
+                        updatesSinceRequest.ProductIdentifier);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
 
@@ -166,7 +166,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         httpResponse.StatusCode,
                         correlationId);
 
-                    var errorBody = JsonConvert.DeserializeObject<NotFoundError>(body);
+                    var errorBody = JsonConvert.DeserializeObject<ErrorResponse>(body);
                     return ServiceResponseResult<SalesCatalogueResponse>.NotFound(errorBody);
 
                 default:

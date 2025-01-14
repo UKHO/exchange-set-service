@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace UKHO.ExchangeSetService.Common.Models.Response
 {
     [ExcludeFromCodeCoverage]
-    public class NotFoundError
+    public class ErrorResponse
     {
         public string CorrelationId { get; set; }
         public string Detail { get; set; }

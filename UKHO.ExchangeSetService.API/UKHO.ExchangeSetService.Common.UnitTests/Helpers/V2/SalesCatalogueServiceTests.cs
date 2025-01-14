@@ -317,7 +317,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                 }
             };
 
-            var notFoundError = new NotFoundError
+            var notFoundError = new ErrorResponse
             {
                 CorrelationId = _correlationId,
                 Detail = "Error in sales catalogue service",

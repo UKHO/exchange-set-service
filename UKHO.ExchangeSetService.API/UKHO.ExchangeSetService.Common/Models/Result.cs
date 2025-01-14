@@ -10,9 +10,9 @@ namespace UKHO.ExchangeSetService.Common.Models
         public T Value { get; }
         public HttpStatusCode StatusCode { get; }
         public ErrorDescription ErrorDescription { get; }
-        public NotFoundError NotFoundError { get; }
+        public ErrorResponse NotFoundError { get; }
 
-        protected Result(T value, HttpStatusCode statusCode, ErrorDescription errorDescription = null, NotFoundError notFoundError = null)
+        protected Result(T value, HttpStatusCode statusCode, ErrorDescription errorDescription = null, ErrorResponse notFoundError = null)
         {
             Value = value;
             StatusCode = statusCode;

@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
                 "UpdatesSince endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, exchangeSetStandard, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, exchangeSetStandard, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
 

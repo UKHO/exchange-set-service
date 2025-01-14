@@ -107,7 +107,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse);
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, ApiVersion apiVersion, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (updatesSinceRequest?.SinceDateTime == null)
             {
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(ApiVersion.V2, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
 
             return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
