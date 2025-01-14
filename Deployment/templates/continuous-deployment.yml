@@ -36,74 +36,74 @@ steps:
       TF_VAR_agent_prd_subnet: $(agentprdSubnetId)
       TF_VAR_agent_subscription_id: $(agentSubscriptionId)
 
-  - task: FileTransform@2
-    displayName: "File Transform: WebJob"
-    inputs:
-      folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
-      enableXmlTransform: false
-      xmlTransformationRules: ''
-      jsonTargetFiles: '**/appsettings.json'
+  # - task: FileTransform@2
+  #   displayName: "File Transform: WebJob"
+  #   inputs:
+  #     folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
+  #     enableXmlTransform: false
+  #     xmlTransformationRules: ''
+  #     jsonTargetFiles: '**/appsettings.json'
 
-  - task: AzureCLI@2
-    displayName: "Azure Fulfilment Webjob Deployment"
-    inputs:
-      azureSubscription: "${{ parameters.AzureSubscription }}"
-      scriptType: 'pscore'
-      scriptLocation: 'scriptPath'
-      scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
-      arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'
+  # - task: AzureCLI@2
+  #   displayName: "Azure Fulfilment Webjob Deployment"
+  #   inputs:
+  #     azureSubscription: "${{ parameters.AzureSubscription }}"
+  #     scriptType: 'pscore'
+  #     scriptLocation: 'scriptPath'
+  #     scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
+  #     arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'
 
 
-  - task: FileTransform@2
-    displayName: "File Transform: WebAppSettings"
-    inputs:
-      folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
-      enableXmlTransform: false
-      xmlTransformationRules: ''
-      jsonTargetFiles: '**/appsettings.json'
+  # - task: FileTransform@2
+  #   displayName: "File Transform: WebAppSettings"
+  #   inputs:
+  #     folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
+  #     enableXmlTransform: false
+  #     xmlTransformationRules: ''
+  #     jsonTargetFiles: '**/appsettings.json'
 
-  - task: AzureWebApp@1
-    displayName: "Azure App Deploy: ess-$(Environment)-webapp to Staging slot"
-    inputs:
-      azureSubscription: "${{ parameters.AzureSubscription }}"
-      appType: webApp
-      appName: "$(WEB_APP_NAME)"
-      package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
-      deployToSlotOrASE: true
-      slotName: $(WEB_APP_SLOT_NAME)
+  # - task: AzureWebApp@1
+  #   displayName: "Azure App Deploy: ess-$(Environment)-webapp to Staging slot"
+  #   inputs:
+  #     azureSubscription: "${{ parameters.AzureSubscription }}"
+  #     appType: webApp
+  #     appName: "$(WEB_APP_NAME)"
+  #     package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
+  #     deployToSlotOrASE: true
+  #     slotName: $(WEB_APP_SLOT_NAME)
 
-  - task: AzureAppServiceManage@0
-    displayName: "Swap with production slot"
-    inputs:
-      azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $(RESOURCE_GROUP_NAME)
-      webAppName: $(WEB_APP_NAME)
-      action: "Swap Slots"
-      swapWithProduction: true
-      sourceSlot: $(WEB_APP_SLOT_NAME)  
+  # - task: AzureAppServiceManage@0
+  #   displayName: "Swap with production slot"
+  #   inputs:
+  #     azureSubscription: "${{ parameters.AzureSubscription }}"
+  #     resourceGroupName: $(RESOURCE_GROUP_NAME)
+  #     webAppName: $(WEB_APP_NAME)
+  #     action: "Swap Slots"
+  #     swapWithProduction: true
+  #     sourceSlot: $(WEB_APP_SLOT_NAME)  
 
-  - task: PowerShell@2
-    displayName: "Check the status of production slot"
-    inputs:
-      targetType: filePath
-      filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 1"
+  # - task: PowerShell@2
+  #   displayName: "Check the status of production slot"
+  #   inputs:
+  #     targetType: filePath
+  #     filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
+  #     arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 1"
 
-  - task: AzureAppServiceManage@0
-    displayName: "Swap with production slot - Rollback"
-    condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
-    inputs:
-      azureSubscription: "${{ parameters.AzureSubscription }}"
-      resourceGroupName: $(RESOURCE_GROUP_NAME)
-      webAppName: $(WEB_APP_NAME)
-      action: "Swap Slots"
-      swapWithProduction: true
-      sourceSlot: $(WEB_APP_SLOT_NAME)  
+  # - task: AzureAppServiceManage@0
+  #   displayName: "Swap with production slot - Rollback"
+  #   condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
+  #   inputs:
+  #     azureSubscription: "${{ parameters.AzureSubscription }}"
+  #     resourceGroupName: $(RESOURCE_GROUP_NAME)
+  #     webAppName: $(WEB_APP_NAME)
+  #     action: "Swap Slots"
+  #     swapWithProduction: true
+  #     sourceSlot: $(WEB_APP_SLOT_NAME)  
 
-  - task: PowerShell@2
-    displayName: "Check the status of production slot after rollback"
-    condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
-    inputs:
-      targetType: filePath
-      filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
-      arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 0"
+  # - task: PowerShell@2
+  #   displayName: "Check the status of production slot after rollback"
+  #   condition: and(succeeded(), eq(variables['IS_HEALTHY'], 'false'))
+  #   inputs:
+  #     targetType: filePath
+  #     filePath: "$(Pipeline.Workspace)/terraformartifact/check_service_status.ps1"
+  #     arguments: "-healthEndPointUrl $(EssApiUrl)/health -waitTimeInMinute $(waitTimeInMinute) -onErrorContinue 0"
