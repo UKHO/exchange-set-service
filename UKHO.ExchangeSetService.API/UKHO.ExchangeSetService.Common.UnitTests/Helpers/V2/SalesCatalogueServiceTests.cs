@@ -317,7 +317,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                 }
             };
 
-            var notFoundError = new ErrorResponse
+            var errorResponse = new ErrorResponse
             {
                 CorrelationId = _correlationId,
                 Detail = "Error in sales catalogue service",
@@ -326,7 +326,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             var httpResponse = new HttpResponseMessage(httpStatusCode)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(httpStatusCode == HttpStatusCode.NotFound ? notFoundError : errorDescription)),
+                Content = new StringContent(JsonConvert.SerializeObject(httpStatusCode == HttpStatusCode.NotFound ? errorResponse : errorDescription)),
                 RequestMessage = new HttpRequestMessage(HttpMethod.Get, _updateSinceUri),
             };
 

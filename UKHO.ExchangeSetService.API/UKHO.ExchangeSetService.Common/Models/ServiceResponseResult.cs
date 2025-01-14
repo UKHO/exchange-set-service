@@ -10,8 +10,8 @@ namespace UKHO.ExchangeSetService.Common.Models
         private ServiceResponseResult(T value,
             HttpStatusCode statusCode,
             ErrorDescription errorDescription = null,
-            ErrorResponse notFoundError = null)
-            : base(value, statusCode, errorDescription, notFoundError)
+            ErrorResponse errorResponse = null)
+            : base(value, statusCode, errorDescription, errorResponse)
         {
         }
 
@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Models
 
         public static ServiceResponseResult<T> NotModified() => new(default, HttpStatusCode.NotModified);
 
-        public static ServiceResponseResult<T> NotFound(ErrorResponse notFoundError) => new(default, HttpStatusCode.NotFound, null, notFoundError);
+        public static ServiceResponseResult<T> NotFound(ErrorResponse errorResponse) => new(default, HttpStatusCode.NotFound, null, errorResponse);
 
         public static ServiceResponseResult<T> NotFound() => new(default, HttpStatusCode.NotFound);
 
