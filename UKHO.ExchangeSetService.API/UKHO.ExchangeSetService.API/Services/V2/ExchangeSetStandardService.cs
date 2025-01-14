@@ -81,7 +81,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             var createBatchResponse = await _fileShareService.CreateBatch(_userIdentifier.UserIdentity, correlationId);
             if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
             {
-                ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
+                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
             }
 
             return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse, createBatchResponse);
