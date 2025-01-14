@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Validation.V2;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
@@ -19,6 +21,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
+using UKHO.ExchangeSetService.Common.Storage.V2;
 
 namespace UKHO.ExchangeSetService.API.Services.V2
 {
@@ -29,18 +32,22 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         private readonly IProductVersionsValidator _productVersionsValidator;
         private readonly IProductNameValidator _productNameValidator;
         private readonly ISalesCatalogueService _salesCatalogueService;
+        private readonly IExchangeSetServiceStorageProvider _exchangeSetServiceStorageProvider;
+        private bool isEmptyExchangeSet = false;
 
         public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger,
             IUpdatesSinceValidator updatesSinceValidator,
             IProductVersionsValidator productVersionsValidator,
             IProductNameValidator productNameValidator,
-            ISalesCatalogueService salesCatalogueService)
+            ISalesCatalogueService salesCatalogueService,
+            IExchangeSetServiceStorageProvider exchangeSetServiceStorageProvider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _updatesSinceValidator = updatesSinceValidator ?? throw new ArgumentNullException(nameof(updatesSinceValidator));
             _productVersionsValidator = productVersionsValidator ?? throw new ArgumentNullException(nameof(productVersionsValidator));
             _productNameValidator = productNameValidator ?? throw new ArgumentNullException(nameof(productNameValidator));
             _salesCatalogueService = salesCatalogueService ?? throw new ArgumentNullException(nameof(salesCatalogueService));
+            _exchangeSetServiceStorageProvider = exchangeSetServiceStorageProvider ?? throw new ArgumentNullException(nameof(exchangeSetServiceStorageProvider));
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -67,7 +74,19 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
-            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse);
+            var essResponse = SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse);
+
+            string expiryDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture); // Temp code to be removed once expiry date is available from FSS
+            var tempbatchid = "Temp"+ Guid.NewGuid().ToString();
+
+            CheckEmptyExchangeSet(essResponse.Value);
+
+            var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, tempbatchid, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse);
+            if (!success)
+            {
+                _logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "ProcessProductNamesRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", tempbatchid, correlationId);
+            }
+            return essResponse;
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequest(IEnumerable<ProductVersionRequest> productVersionRequest, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -185,6 +204,24 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 }),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
+        }
+
+        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSResponseStoreRequestStart,
+                EventIds.SCSResponseStoreRequestCompleted,
+                "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    bool result = await _exchangeSetServiceStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, exchangeSetStandardResponse);
+
+                    return result;
+                }, batchId, correlationId);
+        }
+
+        private void CheckEmptyExchangeSet(ExchangeSetStandardServiceResponse exchangeSetServiceResponse)
+        {
+            isEmptyExchangeSet = exchangeSetServiceResponse.ExchangeSetStandardResponse.RequestedProductsNotInExchangeSet.Any();// when invalid enc or aio cell requested
         }
     }
 }

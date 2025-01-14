@@ -37,6 +37,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
+using UKHO.ExchangeSetService.Common.Storage.V2;
 using UKHO.Logging.EventHubLogProvider;
 using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.ISalesCatalogueService;
 using ISalesCatalogueServiceV2 = UKHO.ExchangeSetService.Common.Helpers.V2.ISalesCatalogueService;
@@ -217,6 +218,8 @@ namespace UKHO.ExchangeSetService.API
 
             builder.Services.AddScoped<IEnterpriseEventCacheDataRequestValidator, EnterpriseEventCacheDataRequestValidator>();
             builder.Services.AddScoped<IEssWebhookService, EssWebhookService>();
+            builder.Services.AddScoped<IExchangeSetServiceStorageProvider, ExchangeSetServiceStorageProvider>();
+            builder.Services.AddScoped<IAzureStorageBlobService, AzureStorageBlobService>();
 
             builder.Services.AddEndpointsApiExplorer();
             ConfigureSwagger();
