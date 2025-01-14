@@ -32,7 +32,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         void CreateFile(string filePath);
         IDirectoryInfo[] GetSubDirectories(string folderPath);
         IFileInfo[] GetZipFiles(string folderPath);
-        bool DownloadFile(string filePath, Stream stream, string lineToWrite);
-        bool DownloadIhoCrtFile(string filePath, Stream stream, string lineToWrite);
+        bool DownloadFile(string filePath, Stream stream);
     }
 }

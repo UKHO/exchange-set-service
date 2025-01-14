@@ -230,7 +230,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -aioenabled "true" -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run Functional tests AIOEnabled"
@@ -252,7 +252,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
     dependsOn:
@@ -348,7 +348,7 @@ stages:
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells) -aioenabled $(AioConfiguration.AioEnabled) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
+                    arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
       - deployment: QADeployApp2
         dependsOn:

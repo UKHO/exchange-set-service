@@ -1,8 +1,8 @@
-﻿using Azure.Storage.Blobs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
@@ -10,10 +10,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 {
     public class FakeFileHelper : IFileSystemHelper
     {
-        public bool CheckAndCreateFolderIsCalled = false;
-        public bool CreateFileContentWithBytesIsCalled = false;
-        public bool DownloadReadmeFileIsCalled = false;
-        public bool CreateFileCopyIsCalled = false;
+        public bool CheckAndCreateFolderIsCalled { get; set; } = false;
+        public bool CreateFileContentWithBytesIsCalled { get; set; } = false;
+        public bool DownloadReadmeFileIsCalled { get; set; } = false;
+        public bool CreateFileCopyIsCalled { get; set; } = false;
 
         public void CheckAndCreateFolder(string folderPath)
         {
@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         public byte[] ReadAllBytes(string filePath)
         {
-            byte[] byteContent = new byte[100];
+            var byteContent = new byte[100];
             return byteContent;
         }
 
@@ -79,7 +79,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         public byte[] ConvertStreamToByteArray(Stream input)
         {
-            byte[] byteContent = new byte[100];
+            var byteContent = new byte[100];
             return byteContent;
         }
 
@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
         public string[] GetDirectories(string path)
         {
-             throw new System.NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
         public IDirectoryInfo GetParent(string path)
@@ -137,7 +137,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             throw new System.NotImplementedException();
         }
 
-        public bool DownloadFile(string filePath, Stream stream, string lineToWrite)
+        public bool DownloadFile(string filePath, Stream stream)
         {
             throw new System.NotImplementedException();
         }

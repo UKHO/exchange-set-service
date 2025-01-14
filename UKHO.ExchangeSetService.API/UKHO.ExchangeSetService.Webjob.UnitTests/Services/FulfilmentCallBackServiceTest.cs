@@ -1,39 +1,39 @@
-﻿using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
-using Newtonsoft.Json;
 
 namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 {
     [TestFixture]
     public class FulfilmentCallBackServiceTest
     {
-        public IOptions<EssCallBackConfiguration> fakeEssCallBackConfiguration;
-        public ICallBackClient fakeCallBackClient;
-        public IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
-        public FulfilmentCallBackService fulfilmentCallBackService;
-        public ILogger<FulfilmentCallBackService> fakeLogger;
-        public string postBodyParam;
-        public string uriParam;
-        public HttpMethod httpMethodParam;
-        public SalesCatalogueProductResponse salesCatalogueProductResponse;
-        public SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage;
-        public IOptions<AioConfiguration> fakeAioConfiguration;
-        public IList<string> aioCells = new List<string> { "GB800001" };
+        private IOptions<EssCallBackConfiguration> fakeEssCallBackConfiguration;
+        private ICallBackClient fakeCallBackClient;
+        private IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        private FulfilmentCallBackService fulfilmentCallBackService;
+        private ILogger<FulfilmentCallBackService> fakeLogger;
+        private string postBodyParam;
+        private string uriParam;
+        private HttpMethod httpMethodParam;
+        private SalesCatalogueProductResponse salesCatalogueProductResponse;
+        private SalesCatalogueServiceResponseQueueMessage scsResponseQueueMessage;
+        private IOptions<AioConfiguration> fakeAioConfiguration;
+        private readonly List<string> aioCells = ["GB800001"];
 
         [SetUp]
         public void Setup()
@@ -53,55 +53,44 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fulfilmentCallBackService = new FulfilmentCallBackService(fakeEssCallBackConfiguration, fakeCallBackClient, fakeFileShareServiceConfig, fakeLogger, fakeAioConfiguration);
         }
 
-        #region GetCallBackResponse
-        public CallBackResponse GetCallBackResponse()
-        {
-            return new CallBackResponse()
-            {
-                SpecVersion = "1.0",
-                Type = "test",
-                Source = "test",
-                Subject = "test",
-                Time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
-                DataContentType = "application/json",
-                Data = new ExchangeSetResponse()
-            };
-        }
-        #endregion
-
         #region GetSalesCatalogueServiceResponse
+
         private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
         {
-            return new SalesCatalogueProductResponse()
+            return new SalesCatalogueProductResponse
             {
-                ProductCounts = new ProductCounts()
+                ProductCounts = new ProductCounts
                 {
                     RequestedProductCount = 12,
                     RequestedProductsAlreadyUpToDateCount = 5,
-                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>
-                    {
-                        new RequestedProductsNotReturned()
+                    RequestedProductsNotReturned =
+                    [
+                        new RequestedProductsNotReturned
                         {
                             ProductName = "test",
                             Reason = "notfound"
                         }
-                    },
+                    ],
                     ReturnedProductCount = 4
                 },
-                Products = new List<Products> {
-                            new Products {
-                                ProductName = "DE5NOBRK",
-                                EditionNumber = 0,
-                                UpdateNumbers = new List<int?> {0,1},
-                                FileSize = 400
-                            }
-                        }
+                Products =
+                [
+                    new Products
+                    {
+                        ProductName = "DE5NOBRK",
+                        EditionNumber = 0,
+                        UpdateNumbers = [0, 1],
+                        FileSize = 400
+                    }
+                ]
             };
         }
+
         #endregion
 
         #region GetScsResponseQueueMessage
-        private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
+
+        private static SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
             return new SalesCatalogueServiceResponseQueueMessage
             {
@@ -112,25 +101,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CorrelationId = "727c5230-2c25-4244-9580-13d90004584a"
             };
         }
+
         #endregion
-
-        [Test]
-        public async Task WhenIncorrectCallBackPayloadInRequest_ThenCallBackApiIsNotCalled()
-        {
-            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
-
-            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri) =>
-               {
-                   uriParam = uri;
-                   httpMethodParam = method;
-                   postBodyParam = postBody;
-               });
-
-            var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
-
-            Assert.IsFalse(response);
-        }
 
         [Test]
         public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackResponseReturnsFalse()
@@ -139,56 +111,45 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.IsFalse(response);
+            Assert.That(response, Is.False);
         }
 
         [Test]
         public async Task WhenCallBackApiSocketExceptionFound_ThenSendCallBackResponseReturnsFalse()
         {
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-              .Throws(new SocketException());
+                .Throws(new SocketException());
 
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.IsFalse(response);
+            Assert.That(response, Is.False);
         }
 
         [Test]
         public async Task WhenCallBackUriInRequest_ThenSendCallBackResponseReturnsTrue()
         {
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri) =>
-               {
-                   uriParam = uri;
-                   httpMethodParam = method;
-                   postBodyParam = postBody;
-                   var callBackResponse = JsonConvert.DeserializeObject<CallBackResponse>(postBody);
-                   Assert.IsNotNull(callBackResponse, "PostBody can not be null");
-                   Assert.AreEqual(scsResponseQueueMessage.BatchId, callBackResponse.Data.BatchId);
-               });
+                .Invokes((HttpMethod method, string postBody, string uri) =>
+                {
+                    uriParam = uri;
+                    httpMethodParam = method;
+                    postBodyParam = postBody;
+                    var callBackResponse = JsonConvert.DeserializeObject<CallBackResponse>(postBody);
+                    Assert.That(callBackResponse, Is.Not.Null, "PostBody can not be null");
+                    Assert.That(callBackResponse.Data.BatchId, Is.EqualTo(scsResponseQueueMessage.BatchId));
+                });
 
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.IsTrue(response);
+            Assert.Multiple(() =>
+            {
+                Assert.That(response, Is.True);
+                Assert.That(uriParam, Is.EqualTo(scsResponseQueueMessage.CallbackUri));
+                Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Post));
+                Assert.That(postBodyParam, Is.Not.Null);
+            });
         }
 
-        [Test]
-        public async Task WhenIncorrectCallBackPayloadErrorInRequest_ThenCallBackApiIsNotCalled()
-        {
-            salesCatalogueProductResponse.ProductCounts.RequestedProductCount = -1;
-
-            A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri) =>
-               {
-                   uriParam = uri;
-                   httpMethodParam = method;
-                   postBodyParam = postBody;
-               });
-
-            var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
-
-            Assert.IsFalse(response);
-        }
 
         [Test]
         public async Task WhenEmptyCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsFalse()
@@ -197,7 +158,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.IsFalse(response);
+            Assert.That(response, Is.False);
         }
 
         [Test]
@@ -208,23 +169,29 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.IsFalse(response);
+            Assert.That(response, Is.False);
         }
 
         [Test]
         public async Task WhenCallBackUriInRequest_ThenSendCallBackErrorResponseReturnsTrue()
         {
             A.CallTo(() => fakeCallBackClient.CallBackApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored))
-               .Invokes((HttpMethod method, string postBody, string uri) =>
-               {
-                   uriParam = uri;
-                   httpMethodParam = method;
-                   postBodyParam = postBody;
-               });
+                .Invokes((HttpMethod method, string postBody, string uri) =>
+                {
+                    uriParam = uri;
+                    httpMethodParam = method;
+                    postBodyParam = postBody;
+                });
 
             var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.IsTrue(response);
+            Assert.Multiple(() =>
+            {
+                Assert.That(response, Is.True);
+                Assert.That(uriParam, Is.EqualTo(scsResponseQueueMessage.CallbackUri));
+                Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Post));
+                Assert.That(postBodyParam, Is.Not.Null);
+            });
         }
 
         #region ValidateCallbackRequestPayload
@@ -245,7 +212,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackRequestPayload(callBackResponse);
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -257,7 +224,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -269,7 +236,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test, TestCaseSource(nameof(GetValidateCallbackRequestPayloadWithFileUriTestData))]
@@ -298,9 +265,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
-
 
         [Test]
         [TestCase("response Id", true, TestName = "When CallBackResponse Id is not null")]
@@ -315,7 +281,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackRequestPayload(callBackResponse);
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         #endregion
@@ -339,7 +305,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(callBackResponse);
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -351,19 +317,19 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
-        
+
         [Test]
         [TestCase("batch detail uri", true, TestName = "When ExchangeSetBatchDetailsUri is not null")]
         [TestCase(null, false, TestName = "When ExchangeSetBatchDetailsUri is null")]
         public void WhenValidateCallbackErrorRequestPayloadWithExchangeSetBatchDetailsUri_ThenReturnResult(string exchangeSetBatchDetailsUri, bool expectedResult)
         {
-            var exchangeSetResponse = GetExchangeSetResponseForErrorCallback((e) => e.Links.ExchangeSetBatchDetailsUri.Href = exchangeSetBatchDetailsUri );
+            var exchangeSetResponse = GetExchangeSetResponseForErrorCallback((e) => e.Links.ExchangeSetBatchDetailsUri.Href = exchangeSetBatchDetailsUri);
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -378,7 +344,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -393,7 +359,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -409,7 +375,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(callBackResponse);
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -421,7 +387,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
@@ -434,53 +400,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var result = fulfilmentCallBackService.ValidateCallbackErrorRequestPayload(GetCallBackResponse(exchangeSetResponse));
 
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         #endregion
 
         #region SetExchangeSetResponse
 
-        [Test, TestCaseSource(nameof(GetExchangeSetResponseTestData), new object[] { false })]
-        public void WhenSetExchangeSetResponseWithAioDisabled_ThenReturnValidExchangeSetResponse(bool isAioReturned,
-             bool isEncReturned, bool isEmptyEncExchangeSet)
-        {
-            var scProductResponse = GetSalesCatalogueProductResponse(a =>
-            {
-                if (!isEncReturned)
-                {
-                    a.Products.Clear();
-                    a.ProductCounts.RequestedProductCount = 0;
-                    a.ProductCounts.ReturnedProductCount = 0;
-                    a.ProductCounts.RequestedProductsAlreadyUpToDateCount = 0;
-                }
-
-                if (isAioReturned)
-                {
-                    a.Products.Add(new Products { ProductName = aioCells.First() });
-                    a.ProductCounts.RequestedProductCount += 1;
-                    a.ProductCounts.ReturnedProductCount += 1;
-                    a.ProductCounts.RequestedProductsAlreadyUpToDateCount += 1;
-                }
-            });
-
-            var queueMessage = GetSalesCatalogueServiceResponseQueueMessage(a =>
-                a.IsEmptyEncExchangeSet = isEmptyEncExchangeSet);
-
-            fakeAioConfiguration.Value.AioEnabled = false;
-
-            var result = fulfilmentCallBackService.SetExchangeSetResponse(scProductResponse, queueMessage);
-
-            Assert.IsNotNull(result);
-            Assert.IsNull(result.Links.AioExchangeSetFileUri);
-            Assert.IsNull(result.AioExchangeSetCellCount);
-            Assert.IsNull(result.RequestedAioProductsAlreadyUpToDateCount);
-            Assert.IsNotNull(result.Links.ExchangeSetFileUri);
-        }
-
         [Test, TestCaseSource(nameof(GetExchangeSetResponseTestData), new object[] { true })]
-        public void WhenSetExchangeSetResponseWithAioEnabled_ThenReturnValidExchangeSetResponse(bool isAioReturned,
-            bool isEncReturned, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
+        public void WhenSetExchangeSetResponseWithAioEnabled_ThenReturnValidExchangeSetResponse(bool isAioReturned, bool isEncReturned, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
         {
             var scProductResponse = GetSalesCatalogueProductResponse(a =>
             {
@@ -507,35 +435,39 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 a.IsEmptyAioExchangeSet = isEmptyAioExchangeSet;
             });
 
-            fakeAioConfiguration.Value.AioEnabled = true;
-
             var result = fulfilmentCallBackService.SetExchangeSetResponse(scProductResponse, queueMessage);
 
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.Not.Null);
 
             if (isAioReturned || isEmptyAioExchangeSet)
             {
-                Assert.IsNotNull(result.Links.AioExchangeSetFileUri, "AioExchangeSetFileUri can not be null");
+                Assert.That(result.Links.AioExchangeSetFileUri, Is.Not.Null, "AioExchangeSetFileUri can not be null");
             }
             else
             {
-                Assert.Null(result.Links.AioExchangeSetFileUri, "AioExchangeSetFileUri should be null");
+                Assert.That(result.Links.AioExchangeSetFileUri, Is.Null, "AioExchangeSetFileUri should be null");
             }
 
-            Assert.IsNotNull(result.AioExchangeSetCellCount);
-            Assert.IsNotNull(result.RequestedAioProductsAlreadyUpToDateCount);
-
-            if (isEncReturned || isEmptyEncExchangeSet || result.RequestedProductsNotInExchangeSet.Any())
+            Assert.Multiple(() =>
             {
-                Assert.IsNotNull(result.Links.ExchangeSetFileUri);
+                Assert.That(result.AioExchangeSetCellCount, Is.Not.Null);
+                Assert.That(result.RequestedAioProductsAlreadyUpToDateCount, Is.Not.Null);
+            });
+
+            if (isEncReturned || isEmptyEncExchangeSet || result.RequestedProductsNotInExchangeSet.Count != 0)
+            {
+                Assert.That(result.Links.ExchangeSetFileUri, Is.Not.Null);
             }
             else
             {
-                Assert.Null(result.Links.ExchangeSetFileUri);
+                Assert.That(result.Links.ExchangeSetFileUri, Is.Null);
             }
 
-            Assert.IsNotNull(result.ExchangeSetCellCount);
-            Assert.IsNotNull(result.RequestedProductsAlreadyUpToDateCount);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ExchangeSetCellCount, Is.GreaterThanOrEqualTo(0));
+                Assert.That(result.RequestedProductsAlreadyUpToDateCount, Is.GreaterThanOrEqualTo(0));
+            });
         }
 
         #endregion
@@ -551,27 +483,27 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         private static ExchangeSetResponse GetExchangeSetResponse(Action<ExchangeSetResponse> action = null)
         {
-            var linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            var linkSetBatchStatusUri = new LinkSetBatchStatusUri
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
             };
 
-            var linkSetBatchDetailsUri = new LinkSetBatchDetailsUri()
+            var linkSetBatchDetailsUri = new LinkSetBatchDetailsUri
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             };
 
-            var linkSetEncFileUri = new LinkSetFileUri()
+            var linkSetEncFileUri = new LinkSetFileUri
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
             };
 
-            var linkSetAioFileUri = new LinkSetFileUri()
+            var linkSetAioFileUri = new LinkSetFileUri
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip",
             };
 
-            Common.Models.Response.Links links = new Common.Models.Response.Links()
+            var links = new Links
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
@@ -593,17 +525,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         private static ExchangeSetResponse GetExchangeSetResponseForErrorCallback(Action<ExchangeSetResponse> action = null)
         {
-            var linkSetBatchStatusUri = new LinkSetBatchStatusUri()
+            var linkSetBatchStatusUri = new LinkSetBatchStatusUri
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
             };
 
-            var linkSetBatchDetailsUri = new LinkSetBatchDetailsUri()
+            var linkSetBatchDetailsUri = new LinkSetBatchDetailsUri
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
             };
 
-            Common.Models.Response.Links links = new Common.Models.Response.Links()
+            var links = new Links
             {
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri
@@ -623,8 +555,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             return exchangeSetResponse;
         }
 
-        private static SalesCatalogueProductResponse GetSalesCatalogueProductResponse(
-            Action<SalesCatalogueProductResponse> action = null)
+        private static SalesCatalogueProductResponse GetSalesCatalogueProductResponse(Action<SalesCatalogueProductResponse> action = null)
         {
             var response = new SalesCatalogueProductResponse
             {
@@ -633,16 +564,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                     RequestedProductCount = 3,
                     RequestedProductsAlreadyUpToDateCount = 2,
                     ReturnedProductCount = 2,
-                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>
-                    {
+                    RequestedProductsNotReturned =
+                    [
                         new RequestedProductsNotReturned { ProductName = "AU000004", Reason = "productWithdrawn" }
-                    }
+                    ]
                 },
-                Products = new List<Products>
-                {
+                Products =
+                [
                     new Products { ProductName = "AU000001" },
                     new Products { ProductName = "AU000002"}
-                }
+                ]
             };
 
             action?.Invoke(response);
