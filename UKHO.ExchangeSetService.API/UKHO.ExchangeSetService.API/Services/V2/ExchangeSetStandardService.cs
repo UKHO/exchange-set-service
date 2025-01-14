@@ -121,13 +121,17 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductCount = salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count();
             }
 
-            var createBatchResponse = await _fileShareService.CreateBatch(_userIdentifier.UserIdentity, correlationId);
-            if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
+            if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
             {
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
+                var createBatchResponse = await _fileShareService.CreateBatch(_userIdentifier.UserIdentity, correlationId);
+                if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
+                {
+                    return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
+                }
+                return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, createBatchResponse);
             }
 
-            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, createBatchResponse);
+            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, null);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
