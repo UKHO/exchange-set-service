@@ -31,8 +31,6 @@ namespace UKHO.ExchangeSetService.Common.Models
 
         public static ServiceResponseResult<T> BadRequest(ErrorDescription errorDescription) => new(default, HttpStatusCode.BadRequest, errorDescription);
 
-        public static ServiceResponseResult<T> BadRequest() => new(default, HttpStatusCode.BadRequest);
-
         public static ServiceResponseResult<T> NotAcceptable(ErrorDescription errorDescription) => new(default, HttpStatusCode.NotAcceptable, errorDescription);
 
         public static ServiceResponseResult<T> InternalServerError() => new(default, HttpStatusCode.InternalServerError);
