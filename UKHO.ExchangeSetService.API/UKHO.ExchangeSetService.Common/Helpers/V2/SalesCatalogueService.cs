@@ -15,7 +15,9 @@ using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
+using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
@@ -25,21 +27,22 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
         private readonly IAuthScsTokenProvider _authScsTokenProvider;
         private readonly ISalesCatalogueClient _salesCatalogueClient;
         private readonly IOptions<SalesCatalogueConfiguration> _salesCatalogueConfig;
-        private readonly IUriFactory _uriHelper;
+        private readonly IUriFactory _uriFactory;
 
         private const string ProductNamesEndpointPathFormat = "/{0}/products/{1}/productNames";
+        private const string ScsProductVersionsEndpointPathFormat = "/{0}/products/{1}/productVersions";
 
         public SalesCatalogueService(ILogger<SalesCatalogueService> logger,
             IAuthScsTokenProvider authScsTokenProvider,
             ISalesCatalogueClient salesCatalogueClient,
             IOptions<SalesCatalogueConfiguration> salesCatalogueConfig,
-            IUriFactory uriHelper)
+            IUriFactory uriFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger)); ;
             _authScsTokenProvider = authScsTokenProvider ?? throw new ArgumentNullException(nameof(authScsTokenProvider));
             _salesCatalogueClient = salesCatalogueClient ?? throw new ArgumentNullException(nameof(salesCatalogueClient));
             _salesCatalogueConfig = salesCatalogueConfig ?? throw new ArgumentNullException(nameof(salesCatalogueConfig));
-            _uriHelper = uriHelper ?? throw new ArgumentNullException(nameof(uriHelper));
+            _uriFactory = uriFactory ?? throw new ArgumentNullException(nameof(uriFactory));
         }
 
         public Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken)
@@ -50,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 "Post sales catalogue service for ProductNames for _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    var uri = _uriHelper.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
+                    var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                         ProductNamesEndpointPathFormat,
                         correlationId,
                         apiVersion.ToString(),
@@ -62,14 +65,39 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
                     var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
 
-                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId);
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId, cancellationToken);
                 },
                 correlationId);
         }
 
-        private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId)
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken)
         {
-            var body = await httpResponse.Content.ReadAsStringAsync();
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.SCSPostProductVersionsRequestStart,
+                EventIds.SCSPostProductVersionsRequestCompleted,
+                "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId}",
+                async () =>
+                {
+                    var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
+                        ScsProductVersionsEndpointPathFormat,
+                        correlationId,
+                        apiVersion,
+                        exchangeSetStandard);
+
+                    var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
+
+                    var payloadJson = JsonConvert.SerializeObject(productVersions);
+
+                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
+
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId, cancellationToken);
+                },
+                correlationId);
+        }
+
+        private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId, CancellationToken cancellationToken)
+        {
+            var body = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             var response = new SalesCatalogueResponse
             {
                 ResponseCode = httpResponse.StatusCode,
@@ -100,7 +128,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         httpResponse.StatusCode,
                         correlationId);
 
-                    return ServiceResponseResult<SalesCatalogueResponse>.BadRequest();
+                    var responseBody = JsonConvert.DeserializeObject<ErrorDescription>(body);
+                    return ServiceResponseResult<SalesCatalogueResponse>.BadRequest(responseBody);
 
                 case HttpStatusCode.NotFound:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),

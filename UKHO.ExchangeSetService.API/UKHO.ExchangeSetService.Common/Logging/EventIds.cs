@@ -888,38 +888,29 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         EmptyBodyError = 805217,
         /// <summary>
-        /// 805218 - Request for s100 for exchange set service product versions endpoint is started.
+        /// 805218 - Validation failed.
         /// </summary>
-        PostProductVersionsRequestStart = 805218,
+        ValidationFailed = 805218,
         /// <summary>
-        /// 805219 - Request for s100 for exchange set service product versions endpoint is completed.
+        /// 805219 - Request for exchange set service product names endpoint is started.
         /// </summary>
-        PostProductVersionsRequestCompleted = 805219,
+        PostProductNamesRequestStart = 805219,
         /// <summary>
-        /// 805220 - Validation failed.
+        /// 805220 - Request for exchange set service product names endpoint is completed.
         /// </summary>
-        ValidationFailed = 805220,
+        PostProductNamesRequestCompleted = 805220,
         /// <summary>
-        /// 805221 - Request for exchange set service product names endpoint is started.
+        /// 805221 - Uri exception occurred.
         /// </summary>
-        PostProductNamesRequestStart = 805221,
+        UriException = 805221,
         /// <summary>
-        /// 805222 - Request for exchange set service product names endpoint is completed.
+        /// 805222 - Request for sales catalogue service product names endpoint is started.
         /// </summary>
-        PostProductNamesRequestCompleted = 805222,
+        SCSPostProductNamesRequestStart = 805222,
         /// <summary>
-        /// 805223 - Uri exception occurred.
+        /// 805223 - Request for sales catalogue service product names endpoint is completed.
         /// </summary>
-        UriException = 805223,
-        /// <summary>
-        /// 805224 - Request for sales catalogue service product names endpoint is started.
-        /// </summary>
-        SCSPostProductNamesRequestStart = 805224,
-        /// <summary>
-        /// 805225 - Request for sales catalogue service product names endpoint is completed.
-        /// </summary>
-        SCSPostProductNamesRequestCompleted = 805225
-
+        SCSPostProductNamesRequestCompleted = 805223
         #endregion
     }
 
