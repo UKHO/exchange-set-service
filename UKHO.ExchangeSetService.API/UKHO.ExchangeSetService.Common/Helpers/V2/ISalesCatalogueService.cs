@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public interface ISalesCatalogueService
     {
         public Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken);
+
+        Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken);
     }
 }

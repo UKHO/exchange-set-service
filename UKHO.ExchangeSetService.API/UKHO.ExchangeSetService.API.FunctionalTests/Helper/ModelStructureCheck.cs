@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
+using static UKHO.ExchangeSetService.API.FunctionalTests.Models.EssS100ResponseModel;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -204,7 +205,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// <param name="exchangeSetProductCount"></param>
         /// <param name="requestedProductsAlreadyUpToDateCount"></param>
         /// <param name="requestedProductsNotInExchangeSet"></param>
-        /// <returns></returns>
         public static async Task VerifyEssS100ApiResponseBodyDetails(this HttpResponseMessage apiResponse, int requestedProductCount, int exchangeSetProductCount, int requestedProductsAlreadyUpToDateCount, Dictionary<string, string> requestedProductsNotInExchangeSet = null)
         {
             var responseBody = JsonConvert.DeserializeObject<ExchangeSetBatch>(await apiResponse.Content.ReadAsStringAsync());
