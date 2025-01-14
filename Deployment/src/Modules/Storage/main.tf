@@ -16,11 +16,11 @@ resource "azurerm_storage_account" "ess_storage" {
 }
 
 resource "azurerm_storage_container" "ess_storage_container" {
-  name                               = "${local.service_name}-fulfilment"
+  name                               = "${var.service_name}-fulfilment"
   storage_account_name               = azurerm_storage_account.ess_storage.name
 }
 
 resource "azurerm_storage_queue" "ess_storage_queue" {
-  name                               = "${local.service_name}-fulfilment-queue"
+  name                               = "${var.service_name}-fulfilment-queue"
   storage_account_name               = azurerm_storage_account.ess_storage.name
 }
