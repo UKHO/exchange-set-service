@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromSpecificDateAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
 
             return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
@@ -209,7 +209,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     LastModified = lastModified,
                 }),
                 HttpStatusCode.BadRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(salesCatalogueResult.ErrorDescription),
-                HttpStatusCode.NotFound => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotFound(salesCatalogueResult.NotFoundError),
+                HttpStatusCode.NotFound => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotFound(salesCatalogueResult.ErrorResponse),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
         }

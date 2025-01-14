@@ -96,7 +96,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
-        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromSpecificDateAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSGetProductsFromSpecificDateRequestStart,
