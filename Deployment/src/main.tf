@@ -219,7 +219,7 @@ module "azure-dashboard" {
 }
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
-  name                                  = local.env_name == "prod" && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.storage_suffix}"
+  name                                  = local.env_name == "prod" || local.env_name == "pre" && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.storage_suffix}"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location
