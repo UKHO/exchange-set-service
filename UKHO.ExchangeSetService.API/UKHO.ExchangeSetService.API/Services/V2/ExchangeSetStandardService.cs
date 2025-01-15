@@ -25,6 +25,7 @@ using UKHO.ExchangeSetService.Common.Models.V2.Response;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using Links = UKHO.ExchangeSetService.Common.Models.Response.Links;
 using UKHO.ExchangeSetService.Common.Extensions;
+using ProductVersionRequest = UKHO.ExchangeSetService.Common.Models.V2.Request.ProductVersionRequest;
 
 namespace UKHO.ExchangeSetService.API.Services.V2
 {
@@ -79,13 +80,17 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
-            var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
-            if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
+            if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
             {
-                return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
+                var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
+                if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
+                {
+                    return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
+                }
+                return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
 
-            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse, fssBatchResponse);
+            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse, null);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
