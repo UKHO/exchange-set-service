@@ -24,6 +24,7 @@ using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using Links = UKHO.ExchangeSetService.Common.Models.Response.Links;
+using UKHO.ExchangeSetService.Common.Extensions;
 
 namespace UKHO.ExchangeSetService.API.Services.V2
 {
@@ -78,13 +79,13 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
-            var createBatchResponse = await _fileShareService.CreateBatch(_userIdentifier.UserIdentity, correlationId);
-            if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
+            var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
+            if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
             {
                 return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
             }
 
-            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse, createBatchResponse);
+            return SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse, fssBatchResponse);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -123,12 +124,12 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
             {
-                var createBatchResponse = await _fileShareService.CreateBatch(_userIdentifier.UserIdentity, correlationId);
-                if (createBatchResponse.ResponseCode != HttpStatusCode.Created)
+                var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
+                if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
                 {
                     return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
                 }
-                return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, createBatchResponse);
+                return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
 
             return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, null);
@@ -245,6 +246,18 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 HttpStatusCode.BadRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(salesCatalogueResult.ErrorDescription),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
+        }
+
+        private Task<CreateBatchResponse> CreateFssBatch(string userOid, string correlationId)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.FSSCreateBatchRequestStart,
+                EventIds.FSSCreateBatchRequestCompleted,
+                "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    var createBatchResponse = await _fileShareService.CreateBatch(userOid, correlationId);
+                    return createBatchResponse;
+                }, correlationId);
         }
     }
 }
