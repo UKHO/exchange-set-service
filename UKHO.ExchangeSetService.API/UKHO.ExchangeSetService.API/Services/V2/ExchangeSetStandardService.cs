@@ -80,7 +80,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
-            if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
+            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.OK)
             {
                 var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
                 if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
