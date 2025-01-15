@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Extensions
 
             if (!string.IsNullOrWhiteSpace(exchangeSetServiceResponse.LastModified))
             {
-                httpContextAccessor.HttpContext.Response.Headers.Append(LastModifiedDateHeaderKey, exchangeSetServiceResponse.LastModified);
+                httpContextAccessor.HttpContext?.Response.Headers.Append(LastModifiedDateHeaderKey, exchangeSetServiceResponse.LastModified);
             }
 
             return result.StatusCode switch
@@ -33,6 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Extensions
                 HttpStatusCode.NoContent => new NoContentResult(),
                 HttpStatusCode.NotModified => new StatusCodeResult(StatusCodes.Status304NotModified),
                 HttpStatusCode.BadRequest => new BadRequestObjectResult(result.ErrorDescription),
+                HttpStatusCode.NotFound => new NotFoundObjectResult(result.ErrorResponse),
                 HttpStatusCode.InternalServerError => new ObjectResult(new InternalServerError
                 {
                     CorrelationId = correlationId,

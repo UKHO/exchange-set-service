@@ -24,12 +24,13 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         /// Provide all the releasable data after a datetime. - POST /productData
         /// </summary>
         /// <param name="updatesSinceModel">updatesSince Model,pass Null to skip the model</param>
+        /// <param name="productIdentifier">takes values s101, s102, s104 and s111</param>
         /// <param name="sincedateTime">The date and time from which changes are requested which follows RFC1123 format</param>
         /// <param name="callbackUri">callbackUri, pass NULL to skip call back notification</param>
         /// <param name="accessToken">Access Token, pass NULL to skip auth header</param>
         /// <param name="exchangeSetStandard">exchangeSetStandard, pass s63 or s57 for valid exchange set</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63", UpdatesSinceModel updatesSinceModel = null)
+        public async Task<HttpResponseMessage> GetExchangeSetBasedOnDateTimeAsync(string sincedateTime = null, string callbackUri = null, string accessToken = null, string exchangeSetStandard = "s63", UpdatesSinceModel updatesSinceModel = null, string productIdentifier = "")  
         {
             var uri = $"{apiHost}/productData";
             var payloadJson = string.Empty;
@@ -37,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             switch (exchangeSetStandard)
             {
                 case "s100":
-                    uri = $"{apiHost}/v2/exchangeSet/s100/updatesSince";
+                    uri = $"{apiHost}/v2/exchangeSet/s100/updatesSince?productIdentifier={productIdentifier}";
                     payloadJson = JsonConvert.SerializeObject(updatesSinceModel);
                     break;
 

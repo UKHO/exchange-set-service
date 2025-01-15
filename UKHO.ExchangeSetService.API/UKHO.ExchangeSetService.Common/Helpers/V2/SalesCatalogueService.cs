@@ -31,6 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
         private const string ProductNamesEndpointPathFormat = "/{0}/products/{1}/productNames";
         private const string ScsProductVersionsEndpointPathFormat = "/{0}/products/{1}/productVersions";
+        private const string ScsUpdateSinceEndpointPathFormat = "/{0}/products/{1}/updatesSince?sinceDateTime={2}&productIdentifier={3}";
 
         public SalesCatalogueService(ILogger<SalesCatalogueService> logger,
             IAuthScsTokenProvider authScsTokenProvider,
@@ -56,7 +57,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
                         ProductNamesEndpointPathFormat,
                         correlationId,
-                        apiVersion.ToString(),
+                        apiVersion,
                         exchangeSetStandard);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
@@ -95,6 +96,31 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
+        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
+        {
+            return _logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.SCSGetProductsFromSpecificDateRequestStart,
+                EventIds.SCSGetProductsFromSpecificDateRequestCompleted,
+                "Get sales catalogue service from specific date time for _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    var uri = _uriFactory.CreateUri(_salesCatalogueConfig.Value.BaseUrl,
+                        ScsUpdateSinceEndpointPathFormat,
+                        correlationId,
+                        apiVersion,
+                        exchangeSetStandard,
+                        updatesSinceRequest.SinceDateTime,
+                        updatesSinceRequest.ProductIdentifier);
+
+                    var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
+
+                    var httpResponse = await _salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri.AbsoluteUri, correlationId, cancellationToken);
+
+                    return await HandleSalesCatalogueServiceResponseAsync(httpResponse, correlationId, cancellationToken);
+                },
+                correlationId);
+        }
+
         private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId, CancellationToken cancellationToken)
         {
             var body = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
@@ -108,6 +134,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             {
                 case HttpStatusCode.OK:
                     response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
+                    response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
                     return ServiceResponseResult<SalesCatalogueResponse>.Success(response);
 
                 case HttpStatusCode.NotModified:
@@ -139,7 +166,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         httpResponse.StatusCode,
                         correlationId);
 
-                    return ServiceResponseResult<SalesCatalogueResponse>.NotFound();
+                    var errorBody = JsonConvert.DeserializeObject<ErrorResponse>(body);
+                    return ServiceResponseResult<SalesCatalogueResponse>.NotFound(errorBody);
 
                 default:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),

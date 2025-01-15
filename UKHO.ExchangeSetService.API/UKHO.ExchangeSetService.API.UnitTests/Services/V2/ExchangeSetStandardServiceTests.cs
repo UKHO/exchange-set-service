@@ -93,17 +93,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         }
 
         [Test]
-        public async Task WhenValidSinceDateTimeRequested_ThenCreateUpdatesSinceReturns202Accepted()
+        public async Task WhenValidSinceDateTimeRequested_ThenProcessUpdatesSinceReturns202Accepted()
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
 
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(new ValidationResult());
 
-            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
+
+            var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);
             result.Value.Should().NotBeNull();
+            result.Value.ExchangeSetStandardResponse.ExchangeSetProductCount.Should().Be(2);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -112,9 +116,72 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         }
 
         [Test]
-        public async Task WhenNullOrEmptySinceDateTimeRequested_ThenCreateUpdatesSinceReturnsBadRequest()
+        public async Task WhenNoUpdatesFoundInSalesCatalogService_ThenProcessUpdatesSinceReturns304NotModified()
         {
-            var result = await _service.ProcessUpdatesSinceRequest(null, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
+
+            A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.NotModified(new SalesCatalogueResponse()));
+
+            var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.StatusCode.Should().Be(HttpStatusCode.NotModified);
+            result.Value.Should().NotBeNull();
+            result.Value.ExchangeSetStandardResponse.ExchangeSetProductCount.Should().Be(0);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        [TestCase(HttpStatusCode.NoContent)]
+        [TestCase(HttpStatusCode.Unauthorized)]
+        [TestCase(HttpStatusCode.BadRequest)]
+        [TestCase(HttpStatusCode.Forbidden)]
+        [TestCase(HttpStatusCode.NotFound)]
+        [TestCase(HttpStatusCode.InternalServerError)]
+        public async Task WhenSalesCatalogServiceReturnsOtherThanOkAndNotModified_ThenProcessUpdatesSinceReturns500InternalServerError(HttpStatusCode httpStatusCode)
+        {
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
+
+            A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(
+                            httpStatusCode switch
+                            {
+                                HttpStatusCode.BadRequest => ServiceResponseResult<SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
+                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(new ErrorResponse { CorrelationId = _fakeCorrelationId, Detail = "Not found"}),
+                                _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
+                            });
+
+            var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            var statusCode = httpStatusCode switch
+            {
+                HttpStatusCode.BadRequest => HttpStatusCode.BadRequest,
+                HttpStatusCode.NotFound => HttpStatusCode.NotFound,
+                _ => HttpStatusCode.InternalServerError
+            };
+
+            result.StatusCode.Should().Be(statusCode);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+            && call.GetArgument<LogLevel>(0) == LogLevel.Error
+            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task WhenNullOrEmptySinceDateTimeRequested_ThenProcessUpdatesSinceReturnsBadRequest()
+        {
+            var result = await _service.ProcessUpdatesSinceRequestAsync(null, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -131,19 +198,18 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         [TestCase("101s", "http//callback.uri")]
         [TestCase("S101", "http:callback.uri")]
         [TestCase("s 101", "https:\\callback.uri")]
-        public async Task WhenInValidDataRequested_ThenCreateUpdatesSinceReturnsBadRequest(string inValidProductIdentifier, string inValidCallBackUri)
+        public async Task WhenInValidDataRequested_ThenProcessUpdatesSinceReturnsBadRequest(string inValidProductIdentifier, string inValidCallBackUri)
         {
             var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString() };
 
             A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
                 .Returns(GetValidationResult());
 
-            var result = await _service.ProcessUpdatesSinceRequest(updatesSinceRequest, ExchangeSetStandard.s100.ToString(), inValidProductIdentifier, inValidCallBackUri, _fakeCorrelationId, CancellationToken.None);
+            var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), inValidProductIdentifier, inValidCallBackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').");
-            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "ProductIdentifier must be valid value");
             result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Invalid callbackUri format.");
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
@@ -184,33 +250,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
             && call.GetArgument<EventId>(1) == EventIds.EmptyBodyError.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Either body is null or malformed | _X-Correlation-ID : {correlationId}").MustHaveHappened();
-        }
-
-        [Test]
-        public async Task WhenProductNamesValidationFails_ThenShouldReturnBadRequest()
-        {
-            string[] productNames = ["Product1"];
-
-            var validationResult = new ValidationResult(new List<ValidationFailure>
-                {
-                    new("ProductIdentifier", "Invalid product identifier")
-                    {
-                        ErrorCode = HttpStatusCode.BadRequest.ToString()
-                    },
-                });
-
-            A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(validationResult);
-
-            var result = await _service.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
-
-            result.Should().NotBeNull();
-            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            result.ErrorDescription.Errors.Should().ContainSingle(e => e.Description == "Invalid product identifier");
-
-            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustHaveHappened();
         }
 
         [Test]
@@ -403,14 +442,21 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(
                             httpStatusCode switch
                             {
-                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(),
-                                HttpStatusCode.NoContent => ServiceResponseResult<SalesCatalogueResponse>.NoContent(),
+                                HttpStatusCode.BadRequest => ServiceResponseResult<SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
+                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(new ErrorResponse { CorrelationId = _fakeCorrelationId, Detail = "Not found" }),
                                 _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
                             });
 
             var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
-            result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            var statusCode = httpStatusCode switch
+            {
+                HttpStatusCode.BadRequest => HttpStatusCode.BadRequest,
+                HttpStatusCode.NotFound => HttpStatusCode.NotFound,
+                _ => HttpStatusCode.InternalServerError
+            };
+
+            result.StatusCode.Should().Be(statusCode);
 
             A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -504,12 +550,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                         ErrorCode = HttpStatusCode.BadRequest.ToString(),
                         PropertyName = "SinceDateTime",
                         ErrorMessage = "Provided sinceDateTime is either invalid or invalid format, the valid format is 'ISO 8601 format' (e.g. '2024-12-20T11:51:00.000Z').",
-                    },
-                    new()
-                    {
-                        ErrorCode = HttpStatusCode.BadRequest.ToString(),
-                        PropertyName = "ProductIdentifier",
-                        ErrorMessage = "ProductIdentifier must be valid value",
                     },
                     new()
                     {
