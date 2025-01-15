@@ -2,14 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
-using UKHO.ExchangeSetService.Common.Models.V2.Enums;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.API.Validation.V2
@@ -42,11 +40,6 @@ namespace UKHO.ExchangeSetService.API.Validation.V2
             RuleFor(x => x.CallbackUri)
                 .Must(x => x.IsValidCallbackUri()).When(x => !string.IsNullOrEmpty(x.CallbackUri))
                 .WithMessage("Invalid callbackUri format.")
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString());
-
-            RuleFor(x => x.ProductIdentifier)
-                .Must(x => Enum.IsDefined(typeof(S100ProductType), x)).When(x => !string.IsNullOrEmpty(x.ProductIdentifier))
-                .WithMessage($"ProductIdentifier must be valid value from {string.Join(",", Enum.GetValues(typeof(S100ProductType)).Cast<S100ProductType>().Select(e => e.ToString()))}")
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString());
         }
 

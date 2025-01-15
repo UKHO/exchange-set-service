@@ -214,7 +214,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
             foreach (var product in responseBody.RequestedProductsNotInExchangeSet)
             {
-                Assert.That(requestedProductsNotInExchangeSet.ContainsKey(product.ProductName),
+                Assert.That(requestedProductsNotInExchangeSet!.ContainsKey(product.ProductName),
                     $"Product Name {product.ProductName} not found in requested products not in exchange set.");
 
                 var expectedValue = requestedProductsNotInExchangeSet[product.ProductName];
