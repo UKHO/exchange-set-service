@@ -526,8 +526,7 @@ stages:
 
   - stage: IatDeploy
     dependsOn: 
-    #- Devdeploy
-    - BuildTestPublish
+    - Devdeploy
     displayName: IAT Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
@@ -540,8 +539,7 @@ stages:
 
   - stage: PreProdDeploy
     dependsOn: 
-    #- Devdeploy
-    - BuildTestPublish
+    - IatDeploy
     displayName: PreProd Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
