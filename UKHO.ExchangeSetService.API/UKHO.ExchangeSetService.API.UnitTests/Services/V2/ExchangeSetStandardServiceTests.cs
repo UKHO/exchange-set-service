@@ -103,6 +103,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
 
+            A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
+                .Returns(GetCreateBatchResponse());
+
             var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
             result.StatusCode.Should().Be(HttpStatusCode.Accepted);

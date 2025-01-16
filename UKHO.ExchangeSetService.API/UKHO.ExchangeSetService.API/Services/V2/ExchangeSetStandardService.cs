@@ -83,14 +83,11 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.OK)
             {
                 var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
-                if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
-                {
-                    return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
-                }
-                return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse, fssBatchResponse);
+                return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
+                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponseOk(productNamesRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
 
-            return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse, null);
+            return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -130,14 +127,11 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
             {
                 var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
-                if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
-                {
-                    return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
-                }
-                return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, fssBatchResponse);
+                return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
+                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponseOk(productVersionsRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
 
-            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, null);
+            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse);
         }
 
         public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, ApiVersion apiVersion, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
@@ -158,7 +152,14 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
 
-            return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse, null);
+            if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
+            {
+                var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
+                return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
+                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponseOk(updatesSinceRequest, salesCatalogServiceResponse, fssBatchResponse);
+            }
+
+            return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
 
         private static string[] SanitizeProductNames(IEnumerable<string> productNames)
@@ -205,49 +206,16 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(errorDescription);
         }
 
-        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<R, T>(R request, ServiceResponseResult<T> salesCatalogueResult, CreateBatchResponse createBatchResponse)
+        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<R, T>(R request, ServiceResponseResult<T> salesCatalogueResult)
         {
-            var productCounts = (salesCatalogueResult.Value as SalesCatalogueResponse)?.ResponseBody?.ProductCounts;
             var lastModified = (salesCatalogueResult.Value as SalesCatalogueResponse)?.LastModified?.ToString("R");
 
             return salesCatalogueResult.StatusCode switch
             {
-                HttpStatusCode.OK => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
-                {
-                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse
-                    {
-                        RequestedProductCount = productCounts.RequestedProductCount ?? 0,
-                        ExchangeSetProductCount = productCounts.ReturnedProductCount ?? 0,
-                        RequestedProductsAlreadyUpToDateCount = productCounts.RequestedProductsAlreadyUpToDateCount ?? 0,
-                        RequestedProductsNotInExchangeSet = productCounts.RequestedProductsNotReturned
-                            .Select(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
-                            .ToList(),
-                        Links = new Links
-                        {
-                            ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = createBatchResponse.ResponseBody.BatchStatusUri },
-                            ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
-                            ExchangeSetFileUri = new LinkSetFileUri { Href = $"{createBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/S100.zip" }
-                        },
-                        ExchangeSetUrlExpiryDateTime = DateTime.ParseExact(createBatchResponse.ResponseBody.BatchExpiryDateTime, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture).ToUniversalTime(),
-                        BatchId = createBatchResponse.ResponseBody.BatchId
-                    },
-                    LastModified = lastModified
-                }),
-                HttpStatusCode.NotModified when request is ProductVersionsRequest productVersionsRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse
-                {
-                    ExchangeSetStandardResponse = new ExchangeSetStandardResponse()
-                    {
-                        RequestedProductCount = productVersionsRequest.ProductVersions.Count(),
-                        RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count(),
-                        RequestedProductsNotInExchangeSet = [],
-                        ExchangeSetProductCount = 0
-                    },
-                    LastModified = lastModified,
-                }),
                 HttpStatusCode.NotModified when request is UpdatesSinceRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotModified(new ExchangeSetStandardServiceResponse
                 {
                     ExchangeSetStandardResponse = new ExchangeSetStandardResponse(),
-                    LastModified = lastModified,
+                    LastModified = lastModified
                 }),
                 HttpStatusCode.BadRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(salesCatalogueResult.ErrorDescription),
                 HttpStatusCode.NotFound => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotFound(salesCatalogueResult.ErrorResponse),
@@ -255,11 +223,56 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             };
         }
 
+        private ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponseOk<R, T>(
+            R request, Result<T> salesCatalogResponse, CreateBatchResponse fssBatchResponse)
+        {
+            var productCounts = (salesCatalogResponse.Value as SalesCatalogueResponse)?.ResponseBody?.ProductCounts;
+            var lastModified = (salesCatalogResponse.Value as SalesCatalogueResponse)?.LastModified?.ToString("R");
+
+            var exchangeSetStandardServiceResponse = new ExchangeSetStandardServiceResponse
+            {
+                LastModified = lastModified,
+                ExchangeSetStandardResponse = new ExchangeSetStandardResponse
+                {
+                    Links = new Links
+                    {
+                        ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = fssBatchResponse.ResponseBody.BatchStatusUri },
+                        ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = fssBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
+                        ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fssBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/S100.zip" }
+                    },
+                    ExchangeSetUrlExpiryDateTime = DateTime.ParseExact(fssBatchResponse.ResponseBody.BatchExpiryDateTime, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture).ToUniversalTime(),
+                    BatchId = fssBatchResponse.ResponseBody.BatchId
+                }
+            };
+
+            if (salesCatalogResponse.StatusCode == HttpStatusCode.NotModified && request is ProductVersionsRequest productVersionsRequest)
+            {
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.RequestedProductCount = productVersionsRequest.ProductVersions.Count();
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count();
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.RequestedProductsNotInExchangeSet = [];
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.ExchangeSetProductCount = 0;
+
+            }
+            else if (salesCatalogResponse.StatusCode == HttpStatusCode.OK)
+            {
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.RequestedProductCount = productCounts.RequestedProductCount ?? 0;
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.ExchangeSetProductCount = productCounts.ReturnedProductCount ?? 0;
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.RequestedProductsAlreadyUpToDateCount = productCounts.RequestedProductsAlreadyUpToDateCount ?? 0;
+                exchangeSetStandardServiceResponse.ExchangeSetStandardResponse.RequestedProductsNotInExchangeSet =
+                    productCounts.RequestedProductsNotReturned
+                        .Select(x =>
+                            new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason })
+                        .ToList();
+            }
+
+            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetStandardServiceResponse);
+        }
+
         private Task<CreateBatchResponse> CreateFssBatch(string userOid, string correlationId)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.FSSCreateBatchRequestStart,
                 EventIds.FSSCreateBatchRequestCompleted,
-                "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}",
+                "FSS create batch endpoint request for _X-Correlation-ID:{correlationId}",
                 async () =>
                 {
                     var createBatchResponse = await _fileShareService.CreateBatch(userOid, correlationId);
