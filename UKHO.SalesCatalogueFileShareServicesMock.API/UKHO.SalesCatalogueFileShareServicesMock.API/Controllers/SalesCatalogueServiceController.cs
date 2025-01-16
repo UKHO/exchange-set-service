@@ -18,6 +18,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         public Dictionary<string, string> ErrorsIdentifiers { get; set; }
         public Dictionary<string, string> ErrorsVersions { get; set; }
         public Dictionary<string, string> ErrorsSinceDateTime { get; set; }
+        public List<Dictionary<string, string>> V2ErrorsSinceDateTime { get;set; }
 
         private readonly string _errorText = "None of the product Ids exist in the database";
 
@@ -39,6 +40,14 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
                 { "source", "productSinceDateTime" },
                 { "description", "None of the product Ids exist in the database" }
             };
+            V2ErrorsSinceDateTime = new List<Dictionary<string, string>>
+            {
+                new Dictionary<string, string>
+                {
+                    { "source", "productSinceDateTime" },
+                    { "description", "Invalid sinceDateTime or productIdentifier found in the request" }
+                }
+            };            
         }
 
         [HttpGet]
@@ -209,26 +218,24 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
         {
             if (salesCatalogueService.ValidateSinceDateTime(sinceDateTime) && salesCatalogueService.ValidateProductIdentifier(productIdentifier))
             {
-                //code added for 304 not modified scenario
+                // Code added for 304 not modified scenario
                 if (DateTime.TryParse(sinceDateTime, out DateTime parsedDateTime) && parsedDateTime.Date == DateTime.UtcNow.AddDays(-10).Date)
                 {
                     return StatusCode(StatusCodes.Status304NotModified);
                 }
+
                 var response = salesCatalogueService.GetUpdatesSinceDateTime(sinceDateTime, productIdentifier);
                 if (response != null)
                 {
                     return Ok(response.ResponseBody);
                 }
+                else
+                {
+                    return NotFound(new { CorrelationId = GetCurrentCorrelationId(), detail = $"Products not found for productIdentifier: {productIdentifier}" });
+                }
             }
-            var errorDescription = new ErrorDescription
-            {
-                CorrelationId = GetCurrentCorrelationId(),
-                Errors =
-                [
-                    new() { Source = "updatesSince", Description = _errorText }
-                ]
-            };
-            return BadRequest(errorDescription);
+
+            return BadRequest(new { CorrelationId = GetCurrentCorrelationId(), Errors = V2ErrorsSinceDateTime });
         }
     }
 }

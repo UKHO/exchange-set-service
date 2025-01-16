@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
-            var essResponse = SetExchangeSetStandardResponse(salesCatalogServiceResponse.Value, salesCatalogServiceResponse);
+            var essResponse = SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse);
 
             string expiryDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture); // Temp code to be removed once expiry date is available from FSS
             var tempbatchid = "Temp"+ Guid.NewGuid().ToString();
@@ -126,9 +126,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse);
         }
 
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequest(UpdatesSinceRequest updatesSinceRequest, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, ApiVersion apiVersion, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
-            if (updatesSinceRequest == null)
+            if (updatesSinceRequest?.SinceDateTime == null)
             {
                 return BadRequestErrorResponse(correlationId);
             }
@@ -142,8 +142,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            // This is a placeholder, the actual implementation is not provided
-            return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(new ExchangeSetStandardServiceResponse { LastModified = DateTime.UtcNow.ToString("R") });
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
+
+            return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
 
         private static string[] SanitizeProductNames(IEnumerable<string> productNames)
@@ -227,6 +228,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     LastModified = lastModified,
                 }),
                 HttpStatusCode.BadRequest => ServiceResponseResult<ExchangeSetStandardServiceResponse>.BadRequest(salesCatalogueResult.ErrorDescription),
+                HttpStatusCode.NotFound => ServiceResponseResult<ExchangeSetStandardServiceResponse>.NotFound(salesCatalogueResult.ErrorResponse),
                 _ => ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError()
             };
         }

@@ -1,18 +1,18 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
 namespace UKHO.ExchangeSetService.Common.Models
 {
+    [ExcludeFromCodeCoverage]
     public class ServiceResponseResult<T> : Result<T>
     {
-        public new ErrorDescription ErrorDescription { get; }
-
         private ServiceResponseResult(T value,
             HttpStatusCode statusCode,
-            ErrorDescription errorDescription = null)
-            : base(value, statusCode, errorDescription)
+            ErrorDescription errorDescription = null,
+            ErrorResponse errorResponse = null)
+            : base(value, statusCode, errorDescription, errorResponse)
         {
-            ErrorDescription = errorDescription;
         }
 
         public static ServiceResponseResult<T> Success(T value) => new(value, HttpStatusCode.OK);
@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Models
 
         public static ServiceResponseResult<T> NotModified() => new(default, HttpStatusCode.NotModified);
 
-        public static ServiceResponseResult<T> NotFound(ErrorDescription errorDescription) => new(default, HttpStatusCode.NotFound, errorDescription);
+        public static ServiceResponseResult<T> NotFound(ErrorResponse errorResponse) => new(default, HttpStatusCode.NotFound, null, errorResponse);
 
         public static ServiceResponseResult<T> NotFound() => new(default, HttpStatusCode.NotFound);
 

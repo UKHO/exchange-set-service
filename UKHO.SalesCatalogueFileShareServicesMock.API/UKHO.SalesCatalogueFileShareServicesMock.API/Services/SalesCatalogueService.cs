@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
-using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Enums;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.V2.Response;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
@@ -107,11 +106,17 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
         public bool ValidateProductIdentifier(string productIdentifier)
         {
-            if (string.IsNullOrEmpty(productIdentifier) || Enum.TryParse<S100ProductType>(productIdentifier, out _))
+            if (string.IsNullOrEmpty(productIdentifier))
             {
                 return true;
             }
-            return false;
+
+            if (!Regex.IsMatch(productIdentifier, @"^s\d{3}$", RegexOptions.IgnoreCase))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
