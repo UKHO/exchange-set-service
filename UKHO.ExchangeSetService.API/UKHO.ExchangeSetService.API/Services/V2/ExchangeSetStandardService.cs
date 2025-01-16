@@ -39,6 +39,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         private readonly IFileShareService _fileShareService;
         private readonly UserIdentifier _userIdentifier;
 
+        private const string RFC3339Format = "yyyy-MM-ddTHH:mm:ss.fffZ";
+        private const string S100ExchangeSetFileName = "S100.zip";
+
         public ExchangeSetStandardService(ILogger<ExchangeSetStandardService> logger,
             IUpdatesSinceValidator updatesSinceValidator,
             IProductVersionsValidator productVersionsValidator,
@@ -84,7 +87,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             {
                 var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
                 return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
-                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponseOk(productNamesRequest, salesCatalogServiceResponse, fssBatchResponse);
+                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
 
             return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse);
@@ -128,7 +131,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             {
                 var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
                 return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
-                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponseOk(productVersionsRequest, salesCatalogServiceResponse, fssBatchResponse);
+                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
 
             return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse);
@@ -152,11 +155,11 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
 
-            if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
+            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.OK)
             {
                 var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
                 return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
-                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponseOk(updatesSinceRequest, salesCatalogServiceResponse, fssBatchResponse);
+                    ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
 
             return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
@@ -223,7 +226,8 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             };
         }
 
-        private ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponseOk<R, T>(
+        //This method provide batch details and file uri for the exchange set standard response
+        private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<R, T>(
             R request, Result<T> salesCatalogResponse, CreateBatchResponse fssBatchResponse)
         {
             var productCounts = (salesCatalogResponse.Value as SalesCatalogueResponse)?.ResponseBody?.ProductCounts;
@@ -238,9 +242,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     {
                         ExchangeSetBatchStatusUri = new LinkSetBatchStatusUri { Href = fssBatchResponse.ResponseBody.BatchStatusUri },
                         ExchangeSetBatchDetailsUri = new LinkSetBatchDetailsUri { Href = fssBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri },
-                        ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fssBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/S100.zip" }
+                        ExchangeSetFileUri = new LinkSetFileUri { Href = $"{fssBatchResponse.ResponseBody.ExchangeSetBatchDetailsUri}/files/{S100ExchangeSetFileName}" }
                     },
-                    ExchangeSetUrlExpiryDateTime = DateTime.ParseExact(fssBatchResponse.ResponseBody.BatchExpiryDateTime, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture).ToUniversalTime(),
+                    ExchangeSetUrlExpiryDateTime = DateTime.ParseExact(fssBatchResponse.ResponseBody.BatchExpiryDateTime, RFC3339Format, CultureInfo.InvariantCulture).ToUniversalTime(),
                     BatchId = fssBatchResponse.ResponseBody.BatchId
                 }
             };
