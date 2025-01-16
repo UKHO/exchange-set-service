@@ -1,15 +1,15 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
 using FakeItEasy;
 using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
@@ -378,8 +378,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataByProductIdentifiers(new ProductIdentifierRequest());
 
-            Assert.That(result.IsValid,Is.False);
-            Assert.That("Product Identifiers cannot be blank or null.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Product Identifiers cannot be blank or null."));
+            });
         }
 
         [Test]
@@ -390,8 +393,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     {new ValidationFailure("RequestBody", "Either body is null or malformed.")}));
 
             var result = await service.ValidateProductDataByProductIdentifiers(null);
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Either body is null or malformed.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Either body is null or malformed."));
+            });
         }
 
         [Test]
@@ -413,7 +419,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
                 });
 
-            Assert.That(result.IsValid,Is.True);
+            Assert.That(result.IsValid, Is.True);
         }
 
         [Test]
@@ -438,8 +444,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureB2CToken); //B2C Token with file Size less than 300 mb
 
-            Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            });
         }
 
         [Test]
@@ -464,8 +473,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureAdB2CToken); //AdB2C token with file size large than 300 mb
 
-            Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            });
         }
 
         [Test]
@@ -479,7 +491,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             string callbackUri = string.Empty;
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             var azureAdToken = GetAzureADToken();
-            
+
 
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -505,7 +517,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ExchangeSetStandard = exchangeSetStandard.ToString()
                 }, azureAdToken);
 
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -549,10 +561,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureB2CToken); // AzureB2C Token but file size is less than 300 Mb
 
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+                Assert.That(result.LastModified, Is.Not.Null);
+            });
 
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(result.LastModified, Is.Not.Null);
-            
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
@@ -589,8 +603,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureAdB2CToken);//azure Ad B2C token when file size is less than 300 Mb
 
-            Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.InternalServerError, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+            });
         }
 
         [Test]
@@ -631,8 +648,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ExchangeSetStandard = exchangeSetStandard.ToString()
                 }, azureAdToken);
 
-            Assert.That(result.ExchangeSetResponse, Is.Null);
-            Assert.That(HttpStatusCode.InternalServerError, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ExchangeSetResponse, Is.Null);
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+            });
         }
 
         [Test]
@@ -684,7 +704,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeExchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, CreateBatchResponseModel.ResponseBody.BatchId, callBackUri, A<string>.Ignored, correlationId, A<string>.Ignored, salesCatalogueResponse.ScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).MustNotHaveHappened();
         }
 
-        
         [Test]
         public async Task WhenValidProductIdentifierRequest_And_AIOToggleIsOn_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
         {
@@ -737,21 +756,24 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var exchangeSetResponseAioToggleOn = GetExchangeSetResponseAioToggleON();
 
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOn.BatchId, Is.EqualTo(result.BatchId));
-            //Aio cell details
-            Assert.That(exchangeSetResponseAioToggleOn.AioExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.AioExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+                Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
+                Assert.That(exchangeSetResponseAioToggleOn.BatchId, Is.EqualTo(result.BatchId));
+                //Aio cell details
+                Assert.That(exchangeSetResponseAioToggleOn.AioExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.AioExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
+            });
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -853,8 +875,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } } });
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("productName cannot be blank or null.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("productName cannot be blank or null."));
+            });
         }
 
         [Test]
@@ -866,8 +891,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataByProductVersions(null);
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Either body is null or malformed.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Either body is null or malformed."));
+            });
         }
 
         [Test]
@@ -879,7 +907,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = "Demo", EditionNumber = 5, UpdateNumber = 0 } } });
 
-            Assert.That(result.IsValid,Is.True);
+            Assert.That(result.IsValid, Is.True);
         }
 
         [Test]
@@ -900,8 +928,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureB2CToken);//valid AzureAdB2c Token , but filesize is large than 300 mb
 
-            Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            });
         }
 
         [Test]
@@ -922,8 +953,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureAdB2CToken);//valid AzureAdB2c Token , but filesize is large than 300 mb
 
-            Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            });
         }
 
         [Test]
@@ -934,7 +968,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
-            var azureAdToken = GetAzureADToken();           
+            var azureAdToken = GetAzureADToken();
 
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -968,7 +1002,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, azureAdToken);
 
 
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1020,13 +1054,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(result.LastModified,Is.Null);
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+                Assert.That(result.LastModified, Is.Null);
+                Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
+                Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
+                Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
+            });
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1080,13 +1117,16 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(result.LastModified,Is.Not.Null);
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+                Assert.That(result.LastModified, Is.Not.Null);
+                Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOff.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
+                Assert.That(exchangeSetResponseAioToggleOff.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOff.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
+                Assert.That(exchangeSetResponseAioToggleOff.BatchId, Is.EqualTo(result.BatchId));
+            });
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1124,8 +1164,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, azureADToken);
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.InternalServerError, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(result.LastModified,Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+                Assert.That(result.LastModified, Is.Null);
+            });
         }
 
         [Test]
@@ -1163,8 +1206,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ExchangeSetStandard = exchangeSetStandard.ToString()
             }, azureAdToken);
 
-            Assert.That(result.ExchangeSetResponse,Is.Null);
-            Assert.That(HttpStatusCode.InternalServerError, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ExchangeSetResponse, Is.Null);
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+            });
         }
 
         [Test]
@@ -1218,10 +1264,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
         }
 
-        
         [Test]
         public async Task WhenValidProductVersionRequestWithExchangeSetStandardS57_AndFileSizeIsMoreThan700Mb_ThenCreateProductDataByProductVersionsReturnsBadRequest()
         {
@@ -1357,21 +1401,24 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var exchangeSetResponseAioToggleOn = GetExchangeSetResponseAioToggleON();
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOn.BatchId, Is.EqualTo(result.BatchId));
-            //Aio cell details
-            Assert.That(exchangeSetResponseAioToggleOn.AioExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.AioExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+                Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetFileUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
+                Assert.That(exchangeSetResponseAioToggleOn.BatchId, Is.EqualTo(result.BatchId));
+                //Aio cell details
+                Assert.That(exchangeSetResponseAioToggleOn.AioExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.AioExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
+            });
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1402,8 +1449,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateScsProductDataByProductIdentifiers(new ScsProductIdentifierRequest());
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Product Identifiers cannot be blank or null.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Product Identifiers cannot be blank or null."));
+            });
         }
 
         [Test]
@@ -1414,8 +1464,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     {new ValidationFailure("RequestBody", "Either body is null or malformed.")}));
 
             var result = await service.ValidateScsProductDataByProductIdentifiers(null);
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Either body is null or malformed.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Either body is null or malformed."));
+            });
         }
 
         [Test]
@@ -1452,7 +1505,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers
                 });
 
-            Assert.That(HttpStatusCode.OK, Is.EqualTo(result.ResponseCode));
+            Assert.That(result.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
@@ -1473,7 +1526,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ProductIdentifier = productIdentifiers
                 });
 
-            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.ResponseCode));
+            Assert.That(result.ResponseCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         #endregion ScsValidateProductIndentifier
@@ -1489,8 +1542,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'."));
+            });
         }
 
         [Test]
@@ -1502,8 +1558,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Provided sinceDateTime cannot be a future date.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime cannot be a future date."));
+            });
         }
 
         [Test]
@@ -1515,8 +1574,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Invalid callbackUri format.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Invalid callbackUri format."));
+            });
         }
 
         [Test]
@@ -1529,7 +1591,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
             var exchangeSetResponse = GetExchangeSetResponse();
-            var CreateBatchResponseModel = CreateBatchResponse();           
+            var CreateBatchResponseModel = CreateBatchResponse();
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -1545,10 +1607,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
-
             result.Should().BeOfType<ExchangeSetServiceResponse>();
             result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
-            
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1600,7 +1660,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());// B2C token passed and file size large than 300 mb
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.HttpStatusCode));
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -1619,7 +1679,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());//AdB2C token passed and file size large than 300 mb
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.BadRequest, Is.EqualTo(result.HttpStatusCode));
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -1644,10 +1704,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
-
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1658,7 +1716,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
         }
 
         [Test]
@@ -1679,8 +1736,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());// ADB2C Token with File size less than 300 mb
 
-            Assert.That(result.ExchangeSetResponse, Is.Null);
-            Assert.That(HttpStatusCode.InternalServerError, Is.EqualTo(result.HttpStatusCode));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ExchangeSetResponse, Is.Null);
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+            });
         }
 
         [Test]
@@ -1718,10 +1778,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
         }
 
-        
         [Test]
         public async Task WhenValidateProductDataSinceDateTimeInRequest_And_AIOToggleIsON_ThenCreateProductDataSinceDateTimeReturnOk()
         {
@@ -1767,20 +1825,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             exchangeSetResponseAioToggleOn.RequestedAioProductCount = 0;
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.That(HttpStatusCode.Created, Is.EqualTo(result.HttpStatusCode));
-            Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
-            Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
-            Assert.That(exchangeSetResponseAioToggleOn.BatchId, Is.EqualTo(result.BatchId));
-            //Aio cell details
-            Assert.That(exchangeSetResponseAioToggleOn.AioExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.AioExchangeSetCellCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
-            Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet.Count, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
-            Assert.That(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+                Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchStatusUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchStatusUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.ExchangeSetBatchDetailsUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.ExchangeSetBatchDetailsUri.Href));
+                Assert.That(exchangeSetResponseAioToggleOn.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
+                Assert.That(exchangeSetResponseAioToggleOn.BatchId, Is.EqualTo(result.BatchId));
+                //Aio cell details
+                Assert.That(exchangeSetResponseAioToggleOn.AioExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.AioExchangeSetCellCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
+                Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
+                Assert.That(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
+            });
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1843,10 +1904,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
-
             result.Should().BeOfType<ExchangeSetServiceResponse>();
             result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
-            
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1893,7 +1952,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.GetProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.That(HttpStatusCode.OK, Is.EqualTo(result.ResponseCode));
+            Assert.That(result.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
@@ -1905,8 +1964,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateScsDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'."));
+            });
         }
 
         [Test]
@@ -1918,11 +1980,13 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateScsDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.That(result.IsValid, Is.False);
-            Assert.That("Provided sinceDateTime cannot be a future date.", Is.EqualTo(result.Errors.Single().ErrorMessage));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.IsValid, Is.False);
+                Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime cannot be a future date."));
+            });
         }
 
         #endregion ScsProductDataSinceDateTime
-
     }
 }
