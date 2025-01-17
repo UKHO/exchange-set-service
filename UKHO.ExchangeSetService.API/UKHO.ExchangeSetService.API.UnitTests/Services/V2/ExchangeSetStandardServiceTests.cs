@@ -222,6 +222,30 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         }
 
         [Test]
+        public async Task WhenFssBatchResponseIsNotCreated_ThenProcessUpdatesSinceRequestReturnsInternalServerError()
+        {
+            var updatesSinceRequest = new UpdatesSinceRequest { SinceDateTime = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) };
+
+            A.CallTo(() => _fakeUpdatesSinceValidator.Validate(A<UpdatesSinceRequest>.Ignored))
+                .Returns(new ValidationResult());
+
+            A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
+
+            A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
+                .Returns(new CreateBatchResponse { ResponseCode = HttpStatusCode.BadRequest });
+
+            var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ExchangeSetStandard.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
+
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+            A.CallTo(_fakeLogger).Where(call => call.Method.Name == "Log"
+                                                && call.GetArgument<LogLevel>(0) == LogLevel.Error
+                                                && call.GetArgument<EventId>(1) == EventIds.ValidationFailed.ToEventId()
+                                                && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Validation failed for {RequestType} | errors : {errors} | _X-Correlation-ID : {correlationId}").MustNotHaveHappened();
+        }
+        [Test]
         public async Task WhenProductNamesAreNull_ThenShouldReturnBadRequest()
         {
             string[] productNames = null;
