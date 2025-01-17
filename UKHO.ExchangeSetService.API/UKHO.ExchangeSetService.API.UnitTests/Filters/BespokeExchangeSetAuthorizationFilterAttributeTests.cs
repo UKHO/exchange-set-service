@@ -1,5 +1,9 @@
-﻿using FakeItEasy;
-using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -10,11 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -70,9 +69,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullBespokeFilterAttribute = () => new BespokeExchangeSetAuthorizationFilterAttribute(null, null, null, null);
-
-            nullBespokeFilterAttribute.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("azureAdConfiguration");
+            var ex = Assert.Throws<ArgumentNullException>(() => new BespokeExchangeSetAuthorizationFilterAttribute(null, null, null, null));
+            Assert.That(ex.ParamName, Is.EqualTo("azureAdConfiguration"));
         }
 
         [Test]
@@ -88,8 +86,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString()));
+            });
         }
 
         [Test]
@@ -107,8 +108,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -126,8 +130,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s63.ToString()));
+            });
         }
 
         [Test]
@@ -146,8 +153,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -165,7 +175,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status400BadRequest));
         }
 
         [Test]
@@ -183,7 +193,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status400BadRequest));
         }
 
         [Test]
@@ -201,7 +211,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status400BadRequest));
         }
 
         [Test]
@@ -229,8 +239,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -250,7 +263,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
 
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status400BadRequest));
         }
 
         [Test]
@@ -277,8 +290,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -305,8 +321,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -333,8 +352,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -364,8 +386,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -391,8 +416,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
         }
 
         [Test]
@@ -422,8 +450,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
             await bespokeFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-            actionExecutingContext.ActionArguments[ExchangeSetStandard].Should().Be(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status403Forbidden));
+                Assert.That(actionExecutingContext.ActionArguments[ExchangeSetStandard], Is.EqualTo(Common.Models.Enums.ExchangeSetStandardForUnitTests.s57.ToString()));
+            });
 
             A.CallTo(fakelogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
