@@ -16,7 +16,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.V2
@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _uriFactory = uriFactory ?? throw new ArgumentNullException(nameof(uriFactory));
         }
 
-        public Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken)
+        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSPostProductNamesRequestStart,
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
-        public Task<ServiceResponseResult<SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken)
+        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSPostProductVersionsRequestStart,
@@ -96,7 +96,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
-        public Task<ServiceResponseResult<SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
+        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSGetProductsFromSpecificDateRequestStart,
@@ -121,10 +121,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
-        private async Task<ServiceResponseResult<SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId, CancellationToken cancellationToken)
+        private async Task<ServiceResponseResult<V2SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId, CancellationToken cancellationToken)
         {
             var body = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-            var response = new SalesCatalogueResponse
+            var response = new V2SalesCatalogueResponse
             {
                 ResponseCode = httpResponse.StatusCode,
                 ScsRequestDateTime = httpResponse.Headers.Date?.UtcDateTime ?? DateTime.UtcNow
@@ -133,9 +133,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             switch (httpResponse.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
+                    response.ResponseBody = JsonConvert.DeserializeObject<V2SalesCatalogueProductResponse>(body);
                     response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
-                    return ServiceResponseResult<SalesCatalogueResponse>.Success(response);
+                    return ServiceResponseResult<V2SalesCatalogueResponse>.Success(response);
 
                 case HttpStatusCode.NotModified:
                     response.LastModified = httpResponse.Content.Headers.LastModified?.UtcDateTime;
@@ -145,7 +145,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         httpResponse.StatusCode,
                         correlationId);
 
-                    return ServiceResponseResult<SalesCatalogueResponse>.NotModified(response);
+                    return ServiceResponseResult<V2SalesCatalogueResponse>.NotModified(response);
 
                 case HttpStatusCode.BadRequest:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
@@ -156,7 +156,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         correlationId);
 
                     var responseBody = JsonConvert.DeserializeObject<ErrorDescription>(body);
-                    return ServiceResponseResult<SalesCatalogueResponse>.BadRequest(responseBody);
+                    return ServiceResponseResult<V2SalesCatalogueResponse>.BadRequest(responseBody);
 
                 case HttpStatusCode.NotFound:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
@@ -167,7 +167,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         correlationId);
 
                     var errorBody = JsonConvert.DeserializeObject<ErrorResponse>(body);
-                    return ServiceResponseResult<SalesCatalogueResponse>.NotFound(errorBody);
+                    return ServiceResponseResult<V2SalesCatalogueResponse>.NotFound(errorBody);
 
                 default:
                     _logger.LogError(EventIds.SalesCatalogueServiceNonOkResponse.ToEventId(),
@@ -177,7 +177,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         httpResponse.StatusCode,
                         correlationId);
 
-                    return ServiceResponseResult<SalesCatalogueResponse>.InternalServerError();
+                    return ServiceResponseResult<V2SalesCatalogueResponse>.InternalServerError();
             }
         }
     }

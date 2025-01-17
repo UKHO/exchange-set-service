@@ -3,13 +3,13 @@
 
 using System;
 using System.Threading.Tasks;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
 namespace UKHO.ExchangeSetService.Common.Storage.V2
 {
     public interface IExchangeSetServiceStorageProvider
     {
-        Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse);
+        Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse);
     }
 }

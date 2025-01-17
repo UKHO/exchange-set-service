@@ -22,6 +22,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
 using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
@@ -491,9 +492,9 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "SalesCatalogueService PostProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} Elapsed {Elapsed}").MustHaveHappened();
         }
 
-        private static SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
+        private static V2SalesCatalogueProductResponse GetSalesCatalogueServiceResponse()
         {
-            return new SalesCatalogueProductResponse
+            return new V2SalesCatalogueProductResponse
             {
                 ProductCounts = new ProductCounts
                 {
@@ -509,7 +510,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                         }
                     }
                 },
-                Products = new List<Products>
+                Products = new List<V2Products>
                 {
                     new()
                     {
@@ -521,14 +522,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             };
         }
 
-        private static SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions()
+        private static V2SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions()
         {
-            return new SalesCatalogueResponse
+            return new V2SalesCatalogueResponse
             {
                 ResponseCode = HttpStatusCode.OK,
                 ScsRequestDateTime = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
-                ResponseBody = new SalesCatalogueProductResponse
+                ResponseBody = new V2SalesCatalogueProductResponse
                 {
                     ProductCounts = new ProductCounts
                     {
@@ -538,29 +539,29 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
                         RequestedProductsNotReturned = []
                     },
                     Products = [
-                               new Products {
-                                ProductName = "101GB40079ABCDEFG",
-                                EditionNumber = 1,
-                                UpdateNumbers = [2],
-                                Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=2}],
-                                FileSize = 900000000
-                            },
-                            new Products {
-                        ProductName = "102NO32904820801012",
-                        EditionNumber = 2,
-                        UpdateNumbers = [3, 4],
-                        Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=3},
+                        new V2Products {
+                            ProductName = "101GB40079ABCDEFG",
+                            EditionNumber = 1,
+                            UpdateNumbers = [2],
+                            Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=2}],
+                            FileSize = 900000000
+                        },
+                        new V2Products {
+                            ProductName = "102NO32904820801012",
+                            EditionNumber = 2,
+                            UpdateNumbers = [3, 4],
+                            Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=3},
                                 new Dates{IssueDate=DateTime.Today, UpdateNumber = 4}],
-                        FileSize = 900000000
-                    },
-                    new Products {
-                                ProductName = "111US00_ches_dcf8_20190703T00Z",
-                                EditionNumber = 4,
-                                UpdateNumbers = [4],
-                                Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=4}],
-                                FileSize = 1000000
-                            }
-                           ]
+                            FileSize = 900000000
+                        },
+                        new V2Products {
+                            ProductName = "111US00_ches_dcf8_20190703T00Z",
+                            EditionNumber = 4,
+                            UpdateNumbers = [4],
+                            Dates = [new Dates { IssueDate =DateTime.Today.AddDays(-50), UpdateNumber=4}],
+                            FileSize = 1000000
+                        }
+                        ]
                 }
             };
         }

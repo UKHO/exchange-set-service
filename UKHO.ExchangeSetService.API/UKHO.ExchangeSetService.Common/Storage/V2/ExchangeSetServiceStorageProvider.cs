@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
-using UKHO.ExchangeSetService.Common.Models.Response;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
 namespace UKHO.ExchangeSetService.Common.Storage.V2
@@ -25,7 +24,7 @@ namespace UKHO.ExchangeSetService.Common.Storage.V2
             _azureStorageBlobService = azureStorageBlobService;
         }
 
-        public virtual async Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse)
+        public virtual async Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse)
         {
             return await _azureStorageBlobService.StoreSaleCatalogueServiceResponseAsync(_storageConfig.Value.ExchangeSetStorageContainerName, batchId, salesCatalogueResponse, callBackUri, exchangeSetStandard, correlationId, CancellationToken.None, expiryDate, scsRequestDateTime, isEmptyExchangeSet, exchangeSetResponse);
         }

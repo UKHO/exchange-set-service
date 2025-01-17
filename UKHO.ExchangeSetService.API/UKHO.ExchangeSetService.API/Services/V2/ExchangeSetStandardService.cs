@@ -19,6 +19,7 @@ using UKHO.ExchangeSetService.Common.Models;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 using UKHO.ExchangeSetService.Common.Storage.V2;
@@ -113,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             //to be used while calling SaveSalesCatalogueStorageDetails
             if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified)
             {
-                salesCatalogServiceResponse.Value.ResponseBody = new SalesCatalogueProductResponse
+                salesCatalogServiceResponse.Value.ResponseBody = new V2SalesCatalogueProductResponse
                 {
                     Products = [],
                     ProductCounts = new ProductCounts()
@@ -193,8 +194,8 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
         private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<R, T>(R request, ServiceResponseResult<T> salesCatalogueResult)
         {
-            var productCounts = (salesCatalogueResult.Value as SalesCatalogueResponse)?.ResponseBody?.ProductCounts;
-            var lastModified = (salesCatalogueResult.Value as SalesCatalogueResponse)?.LastModified?.ToString("R");
+            var productCounts = (salesCatalogueResult.Value as V2SalesCatalogueResponse)?.ResponseBody?.ProductCounts;
+            var lastModified = (salesCatalogueResult.Value as V2SalesCatalogueResponse)?.LastModified?.ToString("R");
 
             return salesCatalogueResult.StatusCode switch
             {
@@ -233,7 +234,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             };
         }
 
-        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse)
+        private Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSResponseStoreRequestStart,
                 EventIds.SCSResponseStoreRequestCompleted,

@@ -12,8 +12,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Models.Response;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
 
@@ -34,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _essFulfilmentStorageconfig = essFulfilmentStorageconfig ?? throw new ArgumentNullException(nameof(essFulfilmentStorageconfig));
         }
 
-        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse)
+        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, V2SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse)
         {
             var uploadFileName = string.Concat(batchId, ".json");
             var fileSize = salesCatalogueResponse.Products?.Sum(p => (long)p.FileSize) ?? 0;
@@ -79,7 +78,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             await _azureMessageQueueHelper.AddMessage(message.BatchId, storageAccountConnectionString, scsResponseQueueMessageJSON, message.CorrelationId);
         }
 
-        public async Task<bool> UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
+        public async Task<bool> UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, V2SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var uploadSuccess = false;
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
