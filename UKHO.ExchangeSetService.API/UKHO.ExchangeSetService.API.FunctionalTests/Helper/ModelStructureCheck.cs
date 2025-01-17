@@ -220,8 +220,8 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 Assert.That(product.Reason, Is.EqualTo(expectedValue), $"For Product Name {product.ProductName}, expected value was {expectedValue} but found {product.Reason}.");
             }
 
-            bool hasGUID = Guid.TryParse(responseBody.FssBatchId, out Guid guidIdBatch);
-            Assert.That(hasGUID, Is.True, $"Exchange set returned batch status URI contains BatchId {responseBody.FssBatchId} is not a valid GUID");
+            var hasGuid = Guid.TryParse(responseBody.FssBatchId, out Guid guidIdBatch);
+            Assert.That(hasGuid, Is.True, $"Exchange set returned batch status URI contains BatchId {responseBody.FssBatchId} is not a valid GUID");
             void ValidateUri(string uri, string uriName)
             {
                 Assert.That(uri, Is.Not.Null, $"Response body returns null, instead of expected link {uriName}.");
