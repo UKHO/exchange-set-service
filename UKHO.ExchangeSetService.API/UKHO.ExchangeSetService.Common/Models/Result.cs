@@ -11,6 +11,7 @@ namespace UKHO.ExchangeSetService.Common.Models
         public HttpStatusCode StatusCode { get; }
         public ErrorDescription ErrorDescription { get; }
         public ErrorResponse ErrorResponse { get; }
+        public bool IsSuccess => StatusCode == HttpStatusCode.OK;
 
         protected Result(T value, HttpStatusCode statusCode, ErrorDescription errorDescription = null, ErrorResponse errorResponse = null)
         {

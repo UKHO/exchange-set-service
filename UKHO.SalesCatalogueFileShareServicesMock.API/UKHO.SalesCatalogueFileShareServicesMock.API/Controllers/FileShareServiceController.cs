@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Data.FileShareService;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Request;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Services;
@@ -208,7 +209,7 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Controllers
             if (validated)
             {
                 BatchStatusResponse batchStatusResponse = fileShareService.GetBatchStatus(validatedBatchId, homeDirectoryPath);
-                if (batchStatusResponse.Status == "Committed")
+                if (batchStatusResponse.Status is nameof(BatchStatus.Committed) or nameof(BatchStatus.Incomplete))
                 {
                     return new OkObjectResult(batchStatusResponse);
                 }

@@ -32,6 +32,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 
         //PBI 194403: Azure AD Authorization
         //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
+        //PBI 194794: Create an empty, incomplete  batch in FSS and add URIs in S-100 ESS response
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenAndValidDate_ThenResponseCodeReturnedIs202Accepted()
@@ -43,6 +44,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 
         //PBI 194403: Azure AD Authorization
         //PBI 194581: Integrate S-100 ESS API Endpoint /updatesSince with corresponding SCS Stub
+        //PBI 194794: Create an empty, incomplete  batch in FSS and add URIs in S-100 ESS response
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100UpdatesSinceEndPointWithValidTokenAndValidDateWithProductIdentifierParam_ThenResponseCodeReturnedIs202Accepted()
@@ -106,6 +108,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 
         //PBI 194403: Azure AD Authorization
         //PBI 194579: Integrate S-100 ESS API Endpoint /productNames with corresponding SCS Stub
+        //PBI 194794: Create an empty, incomplete  batch in FSS and add URIs in S-100 ESS response
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100ProductNamesEndPointWithValidTokenAndOneOfTheInvalidProduct_ThenResponseCodeReturnedIs202Accepted()
@@ -118,6 +121,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 
         //PBI 194403: Azure AD Authorization
         //PBI 194579: Integrate S-100 ESS API Endpoint /productNames with corresponding SCS Stub
+        //PBI 194794: Create an empty, incomplete  batch in FSS and add URIs in S-100 ESS response
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100ProductNamesEndPointWithValidTokenAndDuplicateProducts_ThenResponseCodeReturnedIs202Accepted()
@@ -151,6 +155,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 
         //PBI 194403: Azure AD Authorization
         //PBI 194580: Integrate S-100 ESS API Endpoint /productVersions with corresponding SCS Stub
+        //PBI 194794: Create an empty, incomplete  batch in FSS and add URIs in S-100 ESS response
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100ProductVersionsEndPointWithValidTokenAndOneOfTheInvalidProduct_ThenResponseCodeReturnedIs202Accepted()
@@ -174,6 +179,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests.S_100
 
         //PBI 194403: Azure AD Authorization
         //PBI 194580: Integrate S-100 ESS API Endpoint /productVersions with corresponding SCS Stub
+        //PBI 194794: Create an empty, incomplete  batch in FSS and add URIs in S-100 ESS response
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallS100ProductVersionsEndPointWithValidTokenAndProductWithNoUpdates_ThenResponseCodeReturnedIs202Accepted()
