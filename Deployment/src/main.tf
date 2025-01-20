@@ -151,6 +151,8 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"   = module.fulfilment_storage.medium_exchange_set_primary_access_key
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"   = module.fulfilment_storage.large_exchange_set_name
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.fulfilment_storage.ess_storage_name
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.fulfilment_storage.ess_storage_primary_access_key
         "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
         "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
       },
@@ -236,7 +238,7 @@ module "cache_storage" {
 
 module "storage" {
   source                                = "./Modules/Storage"
-  name                                  = "${local.service_name}${local.env_name}corestorage${var.storage_suffix}"
+  name                                  = "${local.service_name}${local.env_name}corestorage"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location
