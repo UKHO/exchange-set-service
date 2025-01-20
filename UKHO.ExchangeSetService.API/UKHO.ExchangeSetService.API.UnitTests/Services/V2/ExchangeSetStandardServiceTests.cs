@@ -373,7 +373,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequestAndScsServiceReturns200Ok_ThenProcessProductVersionsRequestReturns202Accepted()
+        public async Task WhenValidProductVersionsRequestAndScsServiceReturns200Ok_ThenProcessProductVersionsRequestReturns202Accepted()
         {
             var productVersions = new List<ProductVersionRequest>
             {
@@ -401,7 +401,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequestAndScsServiceReturns304NotModified_ThenProcessProductVersionsRequestReturns202Accepted()
+        public async Task WhenValidProductVersionsRequestAndScsServiceReturns304NotModified_ThenProcessProductVersionsRequestReturns202Accepted()
         {
             var productVersions = new List<ProductVersionRequest>
             {
@@ -674,7 +674,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             };
         }
 
-        private static CreateBatchResponse GetCreateBatchResponse()
+        private CreateBatchResponse GetCreateBatchResponse()
         {
             return new CreateBatchResponse
             {

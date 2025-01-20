@@ -83,9 +83,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
-            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.OK)
+            if (salesCatalogServiceResponse.IsSuccess)
             {
-                var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
+                var fssBatchResponse = await CreateFssBatchAsync(_userIdentifier.UserIdentity, correlationId);
                 return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
                     ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
@@ -127,9 +127,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductCount = salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count();
             }
 
-            if (salesCatalogServiceResponse.Value?.ResponseCode is HttpStatusCode.NotModified or HttpStatusCode.OK)
+            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified || salesCatalogServiceResponse.IsSuccess)
             {
-                var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
+                var fssBatchResponse = await CreateFssBatchAsync(_userIdentifier.UserIdentity, correlationId);
                 return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
                     ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
@@ -155,9 +155,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
 
-            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.OK)
+            if (salesCatalogServiceResponse.IsSuccess)
             {
-                var fssBatchResponse = await CreateFssBatch(_userIdentifier.UserIdentity, correlationId);
+                var fssBatchResponse = await CreateFssBatchAsync(_userIdentifier.UserIdentity, correlationId);
                 return fssBatchResponse.ResponseCode != HttpStatusCode.Created ?
                     ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError() : SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse, fssBatchResponse);
             }
@@ -272,7 +272,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetStandardServiceResponse);
         }
 
-        private Task<CreateBatchResponse> CreateFssBatch(string userOid, string correlationId)
+        private Task<CreateBatchResponse> CreateFssBatchAsync(string userOid, string correlationId)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.FSSCreateBatchRequestStart,
                 EventIds.FSSCreateBatchRequestCompleted,
