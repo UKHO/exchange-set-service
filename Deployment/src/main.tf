@@ -151,8 +151,8 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"   = module.fulfilment_storage.medium_exchange_set_primary_access_key
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"   = module.fulfilment_storage.large_exchange_set_name
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.fulfilment_storage.ess_storage_name
-        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.fulfilment_storage.ess_storage_primary_access_key
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.storage.ess_storage_name
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.storage.ess_storage_primary_access_key
         "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
         "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
       },
