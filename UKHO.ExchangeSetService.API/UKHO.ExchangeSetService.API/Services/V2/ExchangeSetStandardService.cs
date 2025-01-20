@@ -272,14 +272,14 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetStandardServiceResponse);
         }
 
-        private Task<CreateBatchResponse> CreateFssBatchAsync(string userOid, string correlationId)
+        private Task<CreateBatchResponse> CreateFssBatchAsync(string userIdentity, string correlationId)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.FSSCreateBatchRequestStart,
                 EventIds.FSSCreateBatchRequestCompleted,
                 "FSS create batch endpoint request for _X-Correlation-ID:{correlationId}",
                 async () =>
                 {
-                    var createBatchResponse = await _fileShareService.CreateBatch(userOid, correlationId);
+                    var createBatchResponse = await _fileShareService.CreateBatch(userIdentity, correlationId);
                     return createBatchResponse;
                 }, correlationId);
         }
