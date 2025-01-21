@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
@@ -36,9 +37,9 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
 
         public static bool CheckBatchWithZipFileExist(string filePathWithFileName)
         {
-            if(ValidateFilePath(filePathWithFileName))
+            if (ValidateFilePath(filePathWithFileName))
             {
-                    return File.Exists(filePathWithFileName);
+                return File.Exists(filePathWithFileName);
             }
             return false;
         }
@@ -66,6 +67,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Helpers
                 return true;
             }
             return false;
+        }
+
+        public static bool CheckEmptyDirectory(string folderPath)
+        {
+            return Directory.EnumerateFileSystemEntries(folderPath).Any();
         }
     }
 }
