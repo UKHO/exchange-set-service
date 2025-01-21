@@ -210,14 +210,6 @@ resource "azurerm_api_management_product" "ess_ui_product" {
   published             = true
 }
 
-# ESS product-Group mapping
-resource "azurerm_api_management_product_group" "ess_ui_product_group_mappping" {
-  resource_group_name = data.azurerm_resource_group.rg.name
-  api_management_name = data.azurerm_api_management.apim_instance.name
-  product_id          = azurerm_api_management_product.ess_ui_product.product_id
-  group_name          = azurerm_api_management_group.ess_management_group.name
-}
-
 # Add ESS API to ESS UI Product
 resource "azurerm_api_management_product_api" "ess_ui_product_api_mapping" {
   resource_group_name = data.azurerm_resource_group.rg.name
