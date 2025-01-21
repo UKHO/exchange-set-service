@@ -114,7 +114,6 @@ stages:
     - template: Deployment/templates/build-test-publish.yml  
       parameters:
         DisableDependencyCheck: ${{ parameters.DisableDependencyCheck }}
-        DotNetVersion: '8.0.x'
  
   - stage: Devdeploy
     dependsOn:
