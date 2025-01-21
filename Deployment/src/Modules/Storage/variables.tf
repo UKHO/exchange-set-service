@@ -42,6 +42,6 @@ variable "name" {
   type = string
 }
 
-variable "storage_suffix" {
-  default     = ""
-}
+#variable "storage_suffix" {
+# default     = ""
+#}
