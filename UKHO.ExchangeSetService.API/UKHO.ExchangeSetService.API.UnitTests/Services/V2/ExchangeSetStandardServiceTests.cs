@@ -95,6 +95,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
 
             var nullUserIdentifier = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, null, _fakeExchangeSetServiceStorageProvider);
             nullUserIdentifier.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("userIdentifier");
+
+            var nullExchangeSetServiceStorageProvider = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier, null);
+            nullExchangeSetServiceStorageProvider.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("exchangeSetServiceStorageProvider");
         }
 
         [Test]

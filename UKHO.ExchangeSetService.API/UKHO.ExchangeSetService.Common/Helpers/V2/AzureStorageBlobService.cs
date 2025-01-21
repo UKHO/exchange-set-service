@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Critical Error, stream upload failed: {message} stream source {sjo} ", ex.Message, serializeJsonObject);
+                _logger.LogInformation(EventIds.StreamUploadFailed.ToEventId(), "Critical Error, stream upload failed: {message} stream source {sjo} ", ex.Message, serializeJsonObject);
             }
             return uploadSuccess;
         }

@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
@@ -21,8 +22,8 @@ namespace UKHO.ExchangeSetService.Common.Storage.V2
         public ExchangeSetServiceStorageProvider(IOptions<EssFulfilmentStorageConfiguration> storageConfig,
             IAzureStorageBlobService azureStorageBlobService)
         {
-            _storageConfig = storageConfig;
-            _azureStorageBlobService = azureStorageBlobService;
+            _storageConfig = storageConfig?? throw new ArgumentNullException(nameof(storageConfig));
+            _azureStorageBlobService = azureStorageBlobService ?? throw new ArgumentNullException(nameof(azureStorageBlobService)); ;
         }
 
         public virtual async Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse, ApiVersion apiVersion, string productIdentifier = "")
