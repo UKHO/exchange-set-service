@@ -938,7 +938,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805230 - Create Update since request failed.
         /// </summary>
-        CreateUpdateSinceError = 805230
+        CreateUpdateSinceError = 805230,
+        /// <summary>
+        /// 805231 - Failed to upload stream to blob
+        /// </summary>
+        StreamUploadFailed = 805231
         #endregion
     }
 

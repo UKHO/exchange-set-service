@@ -2,9 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace UKHO.ExchangeSetService.Common.Models.V2
 {
+    [ExcludeFromCodeCoverage]
     public class ExchangeSetStandardQueueMessage
     {
         public string BatchId { get; set; }
