@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
             CheckEmptyExchangeSet(essResponse.Value);
 
-            var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, tempbatchid, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse);
+            var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, tempbatchid, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse,apiVersion);
             if (!success)
             {
                 _logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "ProcessProductNamesRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", tempbatchid, correlationId);
@@ -234,17 +234,17 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             };
         }
 
-        private Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse)
+        private Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse, ApiVersion apiVersion, string productIdentifier = "")
         {
-            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSResponseStoreRequestStart,
-                EventIds.SCSResponseStoreRequestCompleted,
-                "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                async () =>
-                {
-                    bool result = await _exchangeSetServiceStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, exchangeSetStandardResponse);
+            return _logger.LogStartEndAndElapsedTimeAsync(EventIds.StoreResponseRequestStart,
+                    EventIds.StoreResponseRequestCompleted,
+                    "Response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                    async () =>
+                    {
+                        bool result = await _exchangeSetServiceStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, exchangeSetStandardResponse,apiVersion,productIdentifier);
 
-                    return result;
-                }, batchId, correlationId);
+                        return result;
+                    }, batchId, correlationId);
         }
 
         private void CheckEmptyExchangeSet(ExchangeSetStandardServiceResponse exchangeSetServiceResponse)

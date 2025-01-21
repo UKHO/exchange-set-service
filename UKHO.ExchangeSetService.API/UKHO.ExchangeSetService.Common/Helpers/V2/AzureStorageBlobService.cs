@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Response;
@@ -33,7 +34,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _essFulfilmentStorageconfig = essFulfilmentStorageconfig ?? throw new ArgumentNullException(nameof(essFulfilmentStorageconfig));
         }
 
-        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, V2SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse)
+        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, V2SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse, ApiVersion apiVersion, string productIdentifier = "")
         {
             var uploadFileName = string.Concat(batchId, ".json");
             var fileSize = salesCatalogueResponse.Products?.Sum(p => (long)p.FileSize) ?? 0;
@@ -44,7 +45,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
             if (scsStorageSuccessful)
             {
-                _logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
+                _logger.LogInformation(EventIds.ResponseStoredToBlobStorage.ToEventId(), "Response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
                 var scsResponseQueueMessage = new ExchangeSetStandardQueueMessage()
                 {
@@ -59,15 +60,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     IsEmptyExchangeSet = isEmptyExchangeSet,
                     RequestedProductCount = exchangeSetResponse?.RequestedProductCount ?? 0,
                     RequestedProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedProductsAlreadyUpToDateCount ?? 0,
-                    ProductIdentifier = "",
-                    Version = "",
+                    ProductIdentifier = productIdentifier,
+                    Version = apiVersion.ToString(),
                 };
 
                 await AddQueueMessage(scsResponseQueueMessage, connectionString);
             }
             else
             {
-                _logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Critical error, Sales catalogue service response not stored to blob storage for  fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
+                _logger.LogInformation(EventIds.ResponseFailedStoredToBlobStorage.ToEventId(), "Response not stored to blob storage for  fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
             }
             return scsStorageSuccessful;
         }
