@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
@@ -61,7 +62,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                     RequestedProductCount = exchangeSetResponse?.RequestedProductCount ?? 0,
                     RequestedProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedProductsAlreadyUpToDateCount ?? 0,
                     ProductIdentifier = productIdentifier,
-                    Version = apiVersion.ToString(),
+                    Version = GetEnumMemberAttrValue(apiVersion),
                 };
 
                 await AddQueueMessage(scsResponseQueueMessage, connectionString);
@@ -106,5 +107,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             ms.Position = 0;
         }
 
+        public string GetEnumMemberAttrValue<T>(T enumVal)
+        {
+            var enumType = typeof(T);
+            var memInfo = enumType.GetMember(enumVal.ToString());
+            var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
+            if (attr != null)
+            {
+                return attr.Value;
+            }
+
+            return null;
+        }
     }
 }

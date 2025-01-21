@@ -926,7 +926,19 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805227 - Response failed to store in blob storage.
         /// </summary>
-        ResponseFailedStoredToBlobStorage = 805227
+        ResponseFailedStoredToBlobStorage = 805227,
+        /// <summary>
+        /// 805228 - Create Product Name request failed.
+        /// </summary>
+        CreateProductNamesError = 805228,
+        /// <summary>
+        /// 805229 - Create Product version request failed.
+        /// </summary>
+        CreateProductVersionError = 805229,
+        /// <summary>
+        /// 805230 - Create Update since request failed.
+        /// </summary>
+        CreateUpdateSinceError = 805230
         #endregion
     }
 
