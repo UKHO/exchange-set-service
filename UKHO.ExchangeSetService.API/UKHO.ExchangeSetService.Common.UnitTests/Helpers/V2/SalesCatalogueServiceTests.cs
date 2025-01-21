@@ -23,7 +23,7 @@ using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
-using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
+using ProductType = UKHO.ExchangeSetService.Common.Models.V2.Enums.ProductType;
 using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
@@ -95,7 +95,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(new SalesCatalogueProductResponse())) });
 
-            await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+            await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ProductType.s100.ToString(), productNames, _correlationId, _cancellationToken);
 
             A.CallTo(() => _fakeUriFactory.CreateUri(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<object[]>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAuthScsTokenProvider.GetManagedIdentityAuthAsync(A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -119,7 +119,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
             .Returns(httpResponseMessage);
 
-            var result = await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ProductType.s100.ToString(), productNames, _correlationId, _cancellationToken);
             result.Value.Should().NotBeNull();
             result.Value.ResponseCode.Should().Be(HttpStatusCode.OK);
             result.Value.ScsRequestDateTime.ToString(CultureInfo.InvariantCulture).Should().NotBeNull();
@@ -153,7 +153,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
 
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponseMessage);
 
-            var result = await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ProductType.s100.ToString(), productNames, _correlationId, _cancellationToken);
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(HttpStatusCode.NotModified);
@@ -202,7 +202,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             };
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponseMessage);
 
-            var result = await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), productNames, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.PostProductNamesAsync(ApiVersion.V2, ProductType.s100.ToString(), productNames, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(httpStatusCode);
 
@@ -242,7 +242,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(ApiVersion.V2, ProductType.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
@@ -277,7 +277,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(ApiVersion.V2, ProductType.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.NotModified);
 
@@ -338,7 +338,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(httpResponse);
 
-            var result = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(ApiVersion.V2, ProductType.s100.ToString(), _updatesSinceRequest, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(httpStatusCode);
 
@@ -379,7 +379,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             };
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponse);
 
-            var result = await _salesCatalogueService.PostProductVersionsAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), productVersions, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.PostProductVersionsAsync(ApiVersion.V2, ProductType.s100.ToString(), productVersions, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
@@ -415,7 +415,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             };
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponse);
 
-            var result = await _salesCatalogueService.PostProductVersionsAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), productVersions, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.PostProductVersionsAsync(ApiVersion.V2, ProductType.s100.ToString(), productVersions, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(HttpStatusCode.NotModified);
             result.Value.Should().NotBeNull();
@@ -470,7 +470,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
             };
             A.CallTo(() => _fakeSalesCatalogueClient.CallSalesCatalogueServiceApi(A<HttpMethod>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(httpResponse);
 
-            var result = await _salesCatalogueService.PostProductVersionsAsync(ApiVersion.V2, ExchangeSetStandard.s100.ToString(), productVersions, _correlationId, _cancellationToken);
+            var result = await _salesCatalogueService.PostProductVersionsAsync(ApiVersion.V2, ProductType.s100.ToString(), productVersions, _correlationId, _cancellationToken);
 
             result.StatusCode.Should().Be(httpStatusCode);
             result.Value.Should().BeNull();
