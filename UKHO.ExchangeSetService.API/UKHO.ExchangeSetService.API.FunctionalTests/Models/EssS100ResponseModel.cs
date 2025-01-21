@@ -1,32 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Models
 {
-    public class EssS100ResponseModel
+    public class Link
     {
-        public class ExchangeSetLinks
-        {
-            public Uri ExchangeSetBatchStatusUri { get; set; }
-            public Uri ExchangeSetBatchDetailsUri { get; set; }
-            public Uri ExchangeSetFileUri { get; set; }
-        }
+        public string Href { get; set; }
+    }
 
-        public class RequestedProductNotInExchangeSet
-        {
-            public string ProductName { get; set; }
-            public string Reason { get; set; }
-        }
+    public class S100Links
+    {
+        public Link ExchangeSetBatchStatusUri { get; set; }
+        public Link ExchangeSetBatchDetailsUri { get; set; }
+        public Link ExchangeSetFileUri { get; set; }
+    }
 
-        public class ExchangeSetBatch
-        {
-            public ExchangeSetLinks Links { get; set; }
-            public DateTime? ExchangeSetUrlExpiryDateTime { get; set; }
-            public int RequestedProductCount { get; set; }
-            public int ExchangeSetProductCount { get; set; }
-            public int RequestedProductsAlreadyUpToDateCount { get; set; }
-            public List<RequestedProductNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
-            public string FssBatchId { get; set; }
-        }
+
+    public class RequestedProductNotInExchangeSet
+    {
+        public string ProductName { get; set; }
+        public string Reason { get; set; }
+    }
+
+    public class ExchangeSetBatch
+    {
+        [JsonProperty("_links")]
+        public S100Links Link { get; set; }
+
+        [JsonProperty("exchangeSetUrlExpiryDateTime")]
+        public DateTime? ExchangeSetUrlExpiryDateTime { get; set; }
+
+        [JsonProperty("requestedProductCount")]
+        public int RequestedProductCount { get; set; }
+
+        [JsonProperty("exchangeSetProductCount")]
+        public int ExchangeSetProductCount { get; set; }
+
+        [JsonProperty("requestedProductsAlreadyUpToDateCount")]
+        public int RequestedProductsAlreadyUpToDateCount { get; set; }
+
+        [JsonProperty("requestedProductsNotInExchangeSet")]
+        public List<RequestedProductNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
+
+        [JsonProperty("fssBatchId")]
+        public string FssBatchId { get; set; }
     }
 }

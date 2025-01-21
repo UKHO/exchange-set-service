@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
-using static UKHO.ExchangeSetService.API.FunctionalTests.Models.EssS100ResponseModel;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 {
@@ -220,6 +219,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
                 var expectedValue = requestedProductsNotInExchangeSet[product.ProductName];
                 Assert.That(product.Reason, Is.EqualTo(expectedValue), $"For Product Name {product.ProductName}, expected value was {expectedValue} but found {product.Reason}.");
             }
+
+            var hasGuid = Guid.TryParse(responseBody.FssBatchId, out Guid guidIdBatch);
+            Assert.That(hasGuid, Is.True, $"Exchange set returned batch status URI contains BatchId {responseBody.FssBatchId} is not a valid GUID");
+            void ValidateUri(string uri, string uriName)
+            {
+                Assert.That(uri, Is.Not.Null, $"Response body returns null, instead of expected link {uriName}.");
+                Assert.That(Uri.IsWellFormedUriString(uri, UriKind.RelativeOrAbsolute), Is.True, $"Exchange set returned {uriName} {uri}, Its not valid uri");
+                Assert.That(uri.Contains(responseBody.FssBatchId));
+            }
+
+            ValidateUri(responseBody.Link.ExchangeSetBatchStatusUri.Href, "batch status URI");
+            ValidateUri(responseBody.Link.ExchangeSetBatchDetailsUri.Href, "batch details URI");
+            ValidateUri(responseBody.Link.ExchangeSetFileUri.Href, "file URI");
+
+            Assert.That(responseBody.ExchangeSetUrlExpiryDateTime, Is.Not.Null, $"Response body returns null, Instead of valid datetime {responseBody.ExchangeSetUrlExpiryDateTime}.");
         }
     }
 }

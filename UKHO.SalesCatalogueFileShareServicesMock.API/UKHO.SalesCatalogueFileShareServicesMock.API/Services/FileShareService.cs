@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Common;
+using UKHO.SalesCatalogueFileShareServicesMock.API.Data.FileShareService;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Helpers;
 using UKHO.SalesCatalogueFileShareServicesMock.API.Models.Response;
 
@@ -69,25 +70,25 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
                     filePaths = Directory.GetFiles(setZipPath, filesName);
                     break;
                 default:
+                {
+                    string[] fileDirectorys = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPath, $"*{Path.GetExtension(filesName)}*", SearchOption.AllDirectories).Where(i => i.Split("\\").Last().Equals(filesName)).ToArray();
+
+                    bool isEnc = (fileDirectorys == null || fileDirectorys.Length == 0) || (fileDirectorys.Length > 0 && fileDirectorys[0].Contains(fileShareServiceConfiguration.Value.FileDirectoryPathForENC));
+
+                    if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && isEnc)
                     {
-                        string[] fileDirectorys = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPath, $"*{Path.GetExtension(filesName)}*", SearchOption.AllDirectories).Where(i => i.Split("\\").Last().Equals(filesName)).ToArray();
-
-                        bool isEnc = (fileDirectorys == null || fileDirectorys.Length == 0) || (fileDirectorys.Length > 0 && fileDirectorys[0].Contains(fileShareServiceConfiguration.Value.FileDirectoryPathForENC));
-
-                        if (FileHelper.ValidateFilePath(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && Directory.Exists(fileShareServiceConfiguration.Value.FileDirectoryPathForENC) && isEnc)
-                        {
-                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
-                        }
-                        else if (fileDirectorys != null && fileDirectorys.Length > 0)
-                        {
-                            filePaths = fileDirectorys;
-                        }
-                        else
-                        {
-                            filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, "*.TXT");
-                        }
-                        break;
+                        filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, string.Equals(fileType, ".TXT", StringComparison.OrdinalIgnoreCase) ? "*.TXT" : "*.000");
                     }
+                    else if (fileDirectorys != null && fileDirectorys.Length > 0)
+                    {
+                        filePaths = fileDirectorys;
+                    }
+                    else
+                    {
+                        filePaths = Directory.GetFiles(fileShareServiceConfiguration.Value.FileDirectoryPathForENC, "*.TXT");
+                    }
+                    break;
+                }
             }
             if (filePaths != null && filePaths.Any())
             {
@@ -135,8 +136,11 @@ namespace UKHO.SalesCatalogueFileShareServicesMock.API.Services
 
             if (FileHelper.ValidateFilePath(batchFolderPath) && FileHelper.CheckFolderExists(batchFolderPath))
             {
+                // Check if the folder is empty
+                var isEmpty = !FileHelper.CheckEmptyDirectory(batchFolderPath);
+
                 batchStatusResponse.BatchId = batchId;
-                batchStatusResponse.Status = "Committed";
+                batchStatusResponse.Status = isEmpty ? BatchStatus.Incomplete.ToString() : BatchStatus.Committed.ToString();
             }
             return batchStatusResponse;
         }
