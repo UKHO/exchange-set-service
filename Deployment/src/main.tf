@@ -157,8 +157,8 @@ module "key_vault" {
         "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
       },
       var.storage_suffix == "v2" ? {} : {
-        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.storage.ess_storage_name,
-        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.storage.ess_storage_primary_access_key
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.storage[0].ess_storage_name,
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.storage[0].ess_storage_primary_access_key
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
