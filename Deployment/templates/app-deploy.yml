@@ -138,7 +138,7 @@ jobs:
             displayName: 'Use .NET SDK'
             inputs:
               packageType: sdk
-              version: 6.0.x
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: "Run Functional"
