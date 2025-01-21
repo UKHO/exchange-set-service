@@ -42,6 +42,6 @@ variable "name" {
   type = string
 }
 
-variable "count" {
-
+variable "storage_suffix" {
+  default     = ""
 }

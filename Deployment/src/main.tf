@@ -239,7 +239,6 @@ module "cache_storage" {
 module "storage" {
   source                                = "./Modules/Storage"
   name                                  = "${local.service_name}${local.env_name}corestorage"
-  count                                 = var.storage_suffix == "v2" ? 0 : 1
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location
@@ -251,4 +250,5 @@ module "storage" {
   service_name                          = local.service_name
   agent_2204_subnet                     = var.agent_2204_subnet
   agent_prd_subnet                      = var.agent_prd_subnet
+  storage_suffix                        = var.storage_suffix
 }
