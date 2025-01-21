@@ -47,13 +47,13 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         /// Processes the product names request and returns the exchange set standard service response.
         /// </summary>
         /// <param name="productNames">Array of product names to be processed.</param>
-        /// <param name="apiVersion">API version V2 to be used.</param>
-        /// <param name="exchangeSetStandard">The standard of the Exchange Set (s100).</param>
+        /// <param name="apiVersion">The API version to be used.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
         /// <param name="callbackUri">Optional callback URI for notification once the Exchange Set is ready.</param>
         /// <param name="correlationId">Guid based id for tracking the request.</param>
         /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
         /// <returns>Service response result containing the exchange set standard service response.</returns>
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string productType, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             productNames = SanitizeProductNames(productNames);
 
@@ -75,7 +75,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
+            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, productType, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
             return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse);
         }
@@ -84,13 +84,13 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         /// Processes the product versions request and returns the exchange set standard service response.
         /// </summary>
         /// <param name="productVersionRequest">Enumerable of product version requests to be processed.</param>
-        /// <param name="apiVersion">API version V2 to be used.</param>
-        /// <param name="exchangeSetStandard">The standard of the Exchange Set (s100).</param>
+        /// <param name="apiVersion">The API version to be used.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
         /// <param name="callbackUri">Optional callback URI for notification once the Exchange Set is ready.</param>
         /// <param name="correlationId">Guid based id for tracking the request.</param>
         /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
         /// <returns>Service response result containing the exchange set standard service response.</returns>
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string productType, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (productVersionRequest == null || !productVersionRequest.Any() || productVersionRequest.Any(pv => pv == null))
             {
@@ -109,9 +109,8 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(apiVersion, exchangeSetStandard, productVersionsRequest.ProductVersions, correlationId, cancellationToken);
+            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(apiVersion, productType, productVersionsRequest.ProductVersions, correlationId, cancellationToken);
 
-            //to be used while calling SaveSalesCatalogueStorageDetails
             if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified)
             {
                 salesCatalogServiceResponse.Value.ResponseBody = new SalesCatalogueProductResponse
@@ -131,14 +130,14 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         /// Processes the updates since request and returns the exchange set standard service response.
         /// </summary>
         /// <param name="updatesSinceRequest">Request containing the sinceDateTime parameter.</param>
-        /// <param name="apiVersion">API version V2 to be used.</param>
-        /// <param name="exchangeSetStandard">The standard of the Exchange Set (s100).</param>
+        /// <param name="apiVersion">The API version to be used.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
         /// <param name="productIdentifier">Optional product identifier for filtering the updates.</param>
         /// <param name="callbackUri">Optional callback URI for notification once the Exchange Set is ready.</param>
         /// <param name="correlationId">Guid based id for tracking the request.</param>
         /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
         /// <returns>Service response result containing the exchange set standard service response.</returns>
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, ApiVersion apiVersion, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, ApiVersion apiVersion, string productType, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (updatesSinceRequest?.SinceDateTime == null)
             {
@@ -154,7 +153,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
+            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, productType, updatesSinceRequest, correlationId, cancellationToken);
 
             return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
         }
