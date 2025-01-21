@@ -1,16 +1,15 @@
-﻿using FakeItEasy;
-using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using FakeItEasy;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Controllers;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -21,7 +20,6 @@ using Attribute = UKHO.ExchangeSetService.Common.Models.Request.Attribute;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 {
-
     [TestFixture]
     public class EssWebhookControllerTests
     {
@@ -53,7 +51,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)fakeWebHookController.NewFilesPublishedOptions();
 
-            Assert.That(200, Is.EqualTo(result.StatusCode));
+            Assert.That(result.StatusCode, Is.EqualTo(200));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -65,8 +63,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
               && call.GetArgument<EventId>(1) == EventIds.NewFilesPublishedWebhookOptionsCallCompleted.ToEventId()
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Completed processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}").MustHaveHappenedOnceExactly();
 
-            Assert.That(responseHeaders["WebHook-Allowed-Rate"], Is.EqualTo("*"));
-            Assert.That(responseHeaders["WebHook-Allowed-Origin"], Is.EqualTo("test.com"));
+            Assert.That(responseHeaders, Has.Count.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(responseHeaders["WebHook-Allowed-Rate"].ToString(), Is.EqualTo("*"));
+                Assert.That(responseHeaders["WebHook-Allowed-Origin"].ToString(), Is.EqualTo("test.com"));
+            });
         }
 
         [Test]
@@ -84,7 +86,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeEssWebhookService.ValidateEventGridCacheDataRequest(A<EnterpriseEventCacheDataRequest>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheDataAsync(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
-            Assert.That(200, Is.EqualTo(result.StatusCode));
+            Assert.That(result.StatusCode, Is.EqualTo(200));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -123,7 +125,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             A.CallTo(() => fakeEssWebhookService.InvalidateAndInsertCacheDataAsync(A<EnterpriseEventCacheDataRequest>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
-            Assert.That(200, Is.EqualTo(result.StatusCode));
+            Assert.That(result.StatusCode, Is.EqualTo(200));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -161,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
-            result.StatusCode.Should().Be(200);
+            Assert.That(result.StatusCode, Is.EqualTo(200));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -194,7 +196,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
-            result.StatusCode.Should().Be(200);
+            Assert.That(result.StatusCode, Is.EqualTo(200));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
