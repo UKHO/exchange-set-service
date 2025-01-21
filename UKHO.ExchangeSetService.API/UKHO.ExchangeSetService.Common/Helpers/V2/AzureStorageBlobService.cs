@@ -35,12 +35,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _essFulfilmentStorageconfig = essFulfilmentStorageconfig ?? throw new ArgumentNullException(nameof(essFulfilmentStorageconfig));
         }
 
-        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, V2SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse, ApiVersion apiVersion, string productIdentifier = "")
+        public async Task<bool> StoreSalesCatalogueServiceResponseAsync(string containerName, string batchId, V2SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse, ApiVersion apiVersion, string productIdentifier = "")
         {
             var uploadFileName = string.Concat(batchId, ".json");
             var fileSize = salesCatalogueResponse.Products?.Sum(p => (long)p.FileSize) ?? 0;
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
-            var connectionString = $"DefaultEndpointsProtocol=https;AccountName={_essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountName};AccountKey={_essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountKey};EndpointSuffix=core.windows.net";
+            var connectionString = GetStorageConnectionString(_essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountName,_essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountKey);
             var blobClient = await _azureBlobStorageClient.GetBlobClient(uploadFileName, connectionString, containerName);
             var scsStorageSuccessful = await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
 
@@ -107,7 +107,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             ms.Position = 0;
         }
 
-        public string GetEnumMemberAttrValue<T>(T enumVal)
+        private string GetEnumMemberAttrValue<T>(T enumVal)
         {
             var enumType = typeof(T);
             var memInfo = enumType.GetMember(enumVal.ToString());
@@ -119,5 +119,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 
             return null;
         }
+
+        private string GetStorageConnectionString(string accountName,string accountKey )
+        {
+            return $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accountKey};EndpointSuffix=core.windows.net";
+        }
+
     }
 }

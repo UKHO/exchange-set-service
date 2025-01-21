@@ -27,7 +27,7 @@ namespace UKHO.ExchangeSetService.Common.Storage.V2
 
         public virtual async Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse, ApiVersion apiVersion, string productIdentifier = "")
         {
-            return await _azureStorageBlobService.StoreSaleCatalogueServiceResponseAsync(_storageConfig.Value.ExchangeSetStorageContainerName, batchId, salesCatalogueResponse, callBackUri, exchangeSetStandard, correlationId, CancellationToken.None, expiryDate, scsRequestDateTime, isEmptyExchangeSet, exchangeSetResponse, apiVersion,productIdentifier);
+            return await _azureStorageBlobService.StoreSalesCatalogueServiceResponseAsync(_storageConfig.Value.ExchangeSetStorageContainerName, batchId, salesCatalogueResponse, callBackUri, exchangeSetStandard, correlationId, CancellationToken.None, expiryDate, scsRequestDateTime, isEmptyExchangeSet, exchangeSetResponse, apiVersion,productIdentifier);
         }
     }
 }
