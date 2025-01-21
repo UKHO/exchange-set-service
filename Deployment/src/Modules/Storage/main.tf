@@ -19,11 +19,11 @@ resource "azurerm_storage_account" "ess_storage" {
 resource "azurerm_storage_container" "ess_storage_container" {
   count                              = var.storage_suffix == "v2" ? 0 : 1
   name                               = "${var.service_name}-fulfilment"
-  storage_account_name               = azurerm_storage_account.ess_storage.name
+  storage_account_name               = azurerm_storage_account.ess_storage[0].name
 }
 
 resource "azurerm_storage_queue" "ess_storage_queue" {
   count                              = var.storage_suffix == "v2" ? 0 : 1
   name                               = "${var.service_name}-fulfilment-queue"
-  storage_account_name               = azurerm_storage_account.ess_storage.name
+  storage_account_name               = azurerm_storage_account.ess_storage[0].name
 }
