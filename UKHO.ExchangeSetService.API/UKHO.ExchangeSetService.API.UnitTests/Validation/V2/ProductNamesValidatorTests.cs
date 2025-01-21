@@ -111,7 +111,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation.V2
                 CallbackUri = callbackUri
             };
             var result = _validator.TestValidate(model);
-            Assert.That(0, Is.EqualTo(result.Errors.Count));
+            Assert.That(result.Errors, Has.Count.EqualTo(0));
         }
     }
 }
