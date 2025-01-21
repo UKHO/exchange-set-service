@@ -151,10 +151,12 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"   = module.fulfilment_storage.medium_exchange_set_primary_access_key
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"   = module.fulfilment_storage.large_exchange_set_name
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.storage.ess_storage_name
-        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.storage.ess_storage_primary_access_key
         "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
         "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+      },
+      var.storage_suffix == "v2" ? {} : {
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.storage[0].ess_storage_name,
+        "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.storage[0].ess_storage_primary_access_key
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
@@ -238,6 +240,7 @@ module "cache_storage" {
 
 module "storage" {
   source                                = "./Modules/Storage"
+  count                                 = var.storage_suffix == "v2" ? 0 : 1
   name                                  = "${local.service_name}${local.env_name}corestorage"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
@@ -249,6 +252,5 @@ module "storage" {
   m_spoke_subnet                        = data.azurerm_subnet.main_subnet.id
   service_name                          = local.service_name
   agent_2204_subnet                     = var.agent_2204_subnet
-  agent_prd_subnet                      = var.agent_prd_subnet
-  storage_suffix                        = var.storage_suffix
+  agent_prd_subnet                      = var.agent_prd_subnet  
 }

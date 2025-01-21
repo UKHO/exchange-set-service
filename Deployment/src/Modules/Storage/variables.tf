@@ -41,7 +41,3 @@ variable "large_exchange_set_subnets" {
 variable "name" {
   type = string
 }
-
-variable "storage_suffix" {
-  default     = ""
-}
