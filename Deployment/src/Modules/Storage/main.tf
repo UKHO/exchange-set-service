@@ -1,4 +1,5 @@
 resource "azurerm_storage_account" "ess_storage" {
+  count                              = var.count == "1" ? 1 : 0
   name                               = var.name
   resource_group_name                = var.resource_group_name
   location                           = var.location
