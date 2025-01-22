@@ -13,8 +13,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
 {
     public interface ISalesCatalogueService
     {
-        Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken);
-        Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken);
-        Task<ServiceResponseResult<V2SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string productType, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string productType, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken);
+        Task<ServiceResponseResult<V2SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string productType, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken);
     }
 }

@@ -46,7 +46,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _uriFactory = uriFactory ?? throw new ArgumentNullException(nameof(uriFactory));
         }
 
-        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken)
+        /// <summary>
+        /// Posts the product names to the sales catalogue service and returns the response.
+        /// </summary>
+        /// <param name="apiVersion">The API version to be used.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
+        /// <param name="productNames">The list of product names to be posted.</param>
+        /// <param name="correlationId">Guid based id for tracking the request.</param>
+        /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
+        /// <returns>Sales Catalogue Service response.</returns>
+        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductNamesAsync(ApiVersion apiVersion, string productType, IEnumerable<string> productNames, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSPostProductNamesRequestStart,
@@ -58,7 +67,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         ProductNamesEndpointPathFormat,
                         correlationId,
                         apiVersion,
-                        exchangeSetStandard);
+                        productType);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
 
@@ -71,7 +80,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
-        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string exchangeSetStandard, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken)
+        /// <summary>
+        /// Posts the product versions to the sales catalogue service and returns the response.
+        /// </summary>
+        /// <param name="apiVersion">The API version to be used.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
+        /// <param name="productVersions">The list of product versions to be posted.</param>
+        /// <param name="correlationId">Guid based id for tracking the request.</param>
+        /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
+        /// <returns>Sales Catalogue Service response.</returns>
+        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> PostProductVersionsAsync(ApiVersion apiVersion, string productType, IEnumerable<ProductVersionRequest> productVersions, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSPostProductVersionsRequestStart,
@@ -83,7 +101,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         ScsProductVersionsEndpointPathFormat,
                         correlationId,
                         apiVersion,
-                        exchangeSetStandard);
+                        productType);
 
                     var accessToken = await _authScsTokenProvider.GetManagedIdentityAuthAsync(_salesCatalogueConfig.Value.ResourceId);
 
@@ -96,7 +114,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
-        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string exchangeSetStandard, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
+        /// <summary>
+        /// Gets the products from the sales catalogue service since the specified date and returns the response.
+        /// </summary>
+        /// <param name="apiVersion">The API version to be used.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
+        /// <param name="updatesSinceRequest">The request containing the sinceDateTime parameter.</param>
+        /// <param name="correlationId">Guid based id for tracking the request.</param>
+        /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
+        /// <returns>Sales Catalogue Service response.</returns>
+        public Task<ServiceResponseResult<V2SalesCatalogueResponse>> GetProductsFromUpdatesSinceAsync(ApiVersion apiVersion, string productType, UpdatesSinceRequest updatesSinceRequest, string correlationId, CancellationToken cancellationToken)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.SCSGetProductsFromSpecificDateRequestStart,
@@ -108,7 +135,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                         ScsUpdateSinceEndpointPathFormat,
                         correlationId,
                         apiVersion,
-                        exchangeSetStandard,
+                        productType,
                         updatesSinceRequest.SinceDateTime,
                         updatesSinceRequest.ProductIdentifier);
 
@@ -121,6 +148,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
                 correlationId);
         }
 
+        /// <summary>
+        /// Handles the response from the sales catalogue service and returns the service response result.
+        /// </summary>
+        /// <param name="httpResponse">The HTTP response from the sales catalogue service.</param>
+        /// <param name="correlationId">Guid based id for tracking the request.</param>
+        /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
+        /// <returns>Sales Catalogue Service response result with status code.</returns>
         private async Task<ServiceResponseResult<V2SalesCatalogueResponse>> HandleSalesCatalogueServiceResponseAsync(HttpResponseMessage httpResponse, string correlationId, CancellationToken cancellationToken)
         {
             var body = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
