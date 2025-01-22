@@ -19,11 +19,11 @@ resource "azurerm_storage_queue" "exchange_set_storage_queue" {
 }
 
 resource "azurerm_storage_container" "ess_storage_container" {
-  name                               = "${var.service_name}-fulfilment-container"
-  storage_account_name               = azurerm_storage_account.storage.name
+  name                 = "ess-fulfilment-container"
+  storage_account_name = azurerm_storage_account.storage.name
 }
 
 resource "azurerm_storage_queue" "ess_storage_queue" {
-  name                               = "${var.service_name}-fulfilment-queue"
-  storage_account_name               = azurerm_storage_account.storage.name
+  name                 = "ess-fulfilment-queue"
+  storage_account_name = azurerm_storage_account.storage.name
 }
