@@ -114,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateProductNamesError.ToEventId(), "ProcessProductNamesRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -183,7 +183,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateProductVersionError.ToEventId(), "ProcessProductVersionsRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -238,7 +238,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion, productIdentifier);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion, productIdentifier);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateUpdateSinceError.ToEventId(), "ProcessUpdatesSinceRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -337,7 +337,15 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             };
         }
 
-        //This method provide batch details and file uri for the exchange set standard response
+        /// <summary>
+        /// Sets the Exchange Set Standard Response based on the sales catalog response and file share service batch response.
+        /// </summary>
+        /// <typeparam name="R">Type of the request.</typeparam>
+        /// <typeparam name="T">Type of the sales catalog response value.</typeparam>
+        /// <param name="request">The request object.</param>
+        /// <param name="salesCatalogResponse">The sales catalog response.</param>
+        /// <param name="fssBatchResponse">The file share service batch response.</param>
+        /// <returns>Service response result containing the Exchange Set Standard Service Response.</returns>
         private static ServiceResponseResult<ExchangeSetStandardServiceResponse> SetExchangeSetStandardResponse<R, T>(
             R request, Result<T> salesCatalogResponse, CreateBatchResponse fssBatchResponse)
         {
@@ -383,6 +391,12 @@ namespace UKHO.ExchangeSetService.API.Services.V2
             return ServiceResponseResult<ExchangeSetStandardServiceResponse>.Accepted(exchangeSetStandardServiceResponse);
         }
 
+        /// <summary>
+        /// Creates a batch in the File Share Service (FSS) asynchronously.
+        /// </summary>
+        /// <param name="userIdentity">The user identity.</param>
+        /// <param name="correlationId">The correlation ID for tracking the request.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the CreateBatchResponse.</returns>
         private Task<CreateBatchResponse> CreateFssBatchAsync(string userIdentity, string correlationId)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.FSSCreateBatchRequestStart,
@@ -395,6 +409,21 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 }, correlationId);
         }
 
+        /// <summary>
+        /// Saves the sales catalogue storage details asynchronously.
+        /// </summary>
+        /// <param name="salesCatalogueResponse">The sales catalogue response.</param>
+        /// <param name="batchId">The batch identifier.</param>
+        /// <param name="callBackUri">The callback URI.</param>
+        /// <param name="exchangeSetStandard">The exchange set standard.</param>
+        /// <param name="correlationId">The correlation identifier.</param>
+        /// <param name="expiryDate">The expiry date.</param>
+        /// <param name="scsRequestDateTime">The SCS request date and time.</param>
+        /// <param name="isEmptyEncExchangeSet">if set to <c>true</c> [is empty ENC exchange set].</param>
+        /// <param name="exchangeSetStandardResponse">The exchange set standard response.</param>
+        /// <param name="apiVersion">The API version.</param>
+        /// <param name="productIdentifier">The product identifier.</param>
+        /// <returns>A task that represents the asynchronous save operation. The task result contains a boolean indicating success or failure.</returns>
         private Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse, ApiVersion apiVersion, string productIdentifier = "")
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.StoreResponseRequestStart,
@@ -402,12 +431,16 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     "Response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
-                        bool result = await _exchangeSetServiceStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, exchangeSetStandardResponse,apiVersion,productIdentifier);
+                        bool result = await _exchangeSetServiceStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, exchangeSetStandardResponse, apiVersion, productIdentifier);
 
                         return result;
                     }, batchId, correlationId);
         }
 
+        /// <summary>
+        /// Checks if the exchange set is empty based on the product counts in the response.
+        /// </summary>
+        /// <param name="exchangeSetServiceResponse">The response containing the exchange set details.</param>
         private void CheckEmptyExchangeSet(ExchangeSetStandardServiceResponse exchangeSetServiceResponse)
         {
             isEmptyExchangeSet = exchangeSetServiceResponse.ExchangeSetStandardResponse.ExchangeSetProductCount == 0 && exchangeSetServiceResponse.ExchangeSetStandardResponse.RequestedProductsAlreadyUpToDateCount > 0
